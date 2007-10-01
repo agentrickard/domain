@@ -1,0 +1,5 @@
+;  $Id $
+name = Domain Manager : Site Configuration
+description = Advanced site configuration options for Domain Manager.
+package = Domain Manager
+dependencies = domain

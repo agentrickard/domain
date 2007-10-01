@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Implements hook_install()
+ */
+function domain_conf_install() {
+  db_query(
+    "CREATE TABLE {domain_conf} (
+       domain_id int(11) NOT NULL default '0',
+       settings blob,
+       PRIMARY KEY (domain_id)
+     ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function domain_conf_uninstall() {
+  db_query("DROP TABLE {domain_conf}");
+}

@@ -1,0 +1,393 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ * Administration functions for the domain module.  
+ *
+ * These functions only need to be accessed from admin/build/domain, so we put them in a separate include file.
+ */
+ 
+/**
+ * The main administration page, a list of active domains.
+ *
+ * @return
+ *  A sortable table of active domain records, or an error message.
+ *
+ * @ingroup domain
+ */
+function domain_list() {
+  global $_domain, $base_url;
+  $_path = parse_url($base_url);
+  $default = variable_get('domain_default', 'www');
+  $path_check = explode('.', $_path['host']);
+  if ($_domain['subdomain'] == $default) {
+    if ($path_check[0] != $default) {
+      $redirect = $_path['scheme'] .'://'. $default .'.'. $_path['host'] . request_uri();
+      drupal_goto($redirect);
+    }
+  }
+  $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
+  $header = array(t('Id'), t('Subdomain'), t('Site name'), t('Actions'));
+  $rows = array();
+  $sitename = variable_get('sitename', 'Drupal');  
+  $host = preg_replace('/'. $_domain['subdomain'] .'/i', $default, $_path['host'], 1);  
+  $link = l($default, $_path['scheme'] .'://'. $host . request_uri());
+  $rows[] = array(0, ($default == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, variable_get('domain_sitename', $sitename), l(t('Default settings'), 'admin/build/domain/settings'));
+  while ($data = db_fetch_array($result)) {
+    $host = preg_replace('/'. $_domain['subdomain'] .'/i', $data['subdomain'], $_path['host'], 1);
+    $new_path = $_path['scheme'] .'://'. $host . request_uri();
+    $link = l($data['subdomain'], $new_path, array(), NULL, NULL, TRUE);
+    $actions = l(t('edit'), 'admin/build/domain/edit/'. $data['domain_id']);
+    // add advanced settings
+    if (module_exists('domain_conf')) {
+      $actions .= ' | '. l(t('settings'), 'admin/build/domain/conf/'. $data['domain_id']);     
+    }
+    $actions .= ' | '. l(t('delete'), 'admin/build/domain/del ete/'. $data['domain_id']); 
+    $rows[] = array($data['domain_id'], ($data['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $data['sitename'], $actions);
+  }
+  if (!empty($rows)) {
+    return theme('table', $header, $rows);  
+  }
+  else {
+    return t('No domains have been configured.');
+  }
+}
+
+/**
+ * Module settings and behaviors.
+ *
+ * @ingroup domain 
+ */
+function domain_configure() {
+  return drupal_get_form('domain_configure_form');
+}
+
+/**
+ * FormsAPI for configuring the domain module.
+ *
+ * @ingroup domain
+ */
+function domain_configure_form() {
+  $form = array();
+  $form['domain'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Default domain settings'),
+    '#collapsible' => TRUE
+  );  
+  $form['#redirect'] = 'admin/build/domain';
+  $sitename = variable_get('sitename', 'Drupal');
+  $form['domain']['domain_root'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Primary domain name'),
+    '#size' => 40,
+    '#maxlength' => 80,
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_root', ''),
+    '#description' => t('The root domain for example.com.  No http or slashes.')
+  );    
+  $form['domain']['domain_default'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Default subdomain'),
+    '#size' => 40,
+    '#maxlength' => 40,
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_default', 'www'),
+    '#description' => t('The default domain for *.example.com.  Can only contain alphanumeric characters.')
+  );  
+  $form['domain']['domain_sitename'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site name'),
+    '#size' => 40,
+    '#maxlength' => 80,
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_sitename', $sitename),    
+    '#description' => t('The human-readable name of this domain.')    
+  );    
+  $form['domain_behavior'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Domain module behaviors'),
+    '#collapsible' => TRUE
+  );
+  $form['domain_behavior']['domain_debug'] = array(
+    '#type' => 'radios',
+    '#title' => t('Debugging status'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_debug', 0),
+    '#options' => array(1 => t('Show debugging output on node view'), 0 => t('Do not show debugging output')),
+    '#description' => t('If set, users with the <em>administer domain</em> permission will be able toview the node access rules for each node. See the README for more details.')    
+  );   
+  $form['domain_behavior']['domain_editors'] = array(
+    '#type' => 'radios',
+    '#title' => t('Domain-based editing controls'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_editors', 0),
+    '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editor')),
+    '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
+  );  
+  $form['domain_behavior']['domain_behavior'] = array(
+    '#type' => 'radios',
+    '#title' => t('New content settings'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_behavior', 1),
+    '#options' => array(1 => t('Show on all sites'), 2 => t('Only show on selected sites')),
+    '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
+  );
+  return system_settings_form($form);
+}
+
+/**
+ * Create a new domain record
+ *
+ * @ingroup domain
+ */
+function domain_create() {
+  return drupal_get_form('domain_create_form');
+}
+
+/**
+ * FormsAPI for creating domain records.
+ *
+ * @ingroup domain
+ */
+function domain_create_form() { 
+  $form = array();
+  $form['domain'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('New domain record'),
+    '#collapsible' => TRUE
+  );
+  $form['domain']['subdomain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Subdomain'),
+    '#size' => 40,
+    '#maxlength' => 40,
+    '#required' => TRUE,
+    '#description' => t('The allowed subdomain for *.example.com.  Can only contain alphanumeric characters.')
+  );
+  $form['domain']['sitename'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site name'),
+    '#size' => 40,
+    '#maxlength' => 80,
+    '#required' => TRUE,
+    '#description' => t('The human-readable name of this domain.')    
+  );  
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Create domain record'));
+  return $form;
+}
+
+/**
+ * FormsAPI for domain_create_form()
+ *
+ * @ingroup domain
+ */
+function domain_create_form_validate($form_id, $form_values) {
+  // TODO: Make this a proper regex?
+  $subdomain = strtolower(urlencode($form_values['subdomain']));
+  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
+  if ($check) {
+    form_set_error('subdomain', t('The subdomain value must be unique.'));
+  }
+  $check = NULL;
+  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s'", $form_values['sitename']));
+  if ($check) {
+    form_set_error('sitename', t('The site name value must be unique.'));
+  }  
+}
+
+/**
+ * FormsAPI for domain_create_form()
+ *
+ * @ingroup domain 
+ */
+function domain_create_form_submit($form_id, $form_values) {
+  db_query("INSERT INTO {domain} (subdomain, sitename) VALUES ('%s', '%s')", $form_values['subdomain'], $form_values['sitename']);
+  drupal_set_message(t('Domain record created.'));
+  drupal_goto('admin/build/domain');
+}
+
+/**
+ * Edit an existing domain record
+ * 
+ * @param $domain_id
+ *  The unique id for this domain, taken from {domain}.
+ *
+ * @ingroup domain
+ */
+function domain_edit($domain_id) {
+  $domain = domain_lookup($domain_id);
+  return drupal_get_form('domain_edit_form', $domain);
+}
+
+/**
+ * FormsAPI for editing a domain record
+ *
+ * @param $domain
+ * An array containing the record from the {domain} table
+ *
+ * @ingroup domain 
+ */
+function domain_edit_form($domain) { 
+  $form = array();
+  $form['domain'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Edit domain record'),
+    '#collapsible' => TRUE
+  );
+  $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+  $form['domain']['subdomain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Subdomain'),
+    '#size' => 40,
+    '#maxlength' => 40,
+    '#required' => TRUE,
+    '#default_value' => $domain['subdomain'],
+    '#description' => t('The allowed domain for *.example.com.  Can only contain alphanumeric characters.')
+  );
+  $form['domain']['sitename'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site name'),
+    '#size' => 40,
+    '#maxlength' => 80,
+    '#required' => TRUE,
+    '#default_value' => $domain['sitename'],
+    '#description' => t('The human-readable name of this domain.')    
+  );  
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Edit domain record'));
+  return $form;
+}
+
+/**
+ * FormsAPI for domain_edit_form()
+ *
+ * @ingroup domain 
+ */
+function domain_edit_form_validate($form_id, $form_values) {
+  // TODO: Make this a proper regex
+  $subdomain = strtolower(urlencode($form_values['subdomain']));
+  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id != %d", $subdomain, $form_values['domain_id']));
+  if ($check) {
+    form_set_error('subdomain', t('The subdomain value must be unique.'));
+  }
+  $check2 = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id != %d", $form_values['sitename'], $form_values['domain_id']));
+  if ($check2) {
+    form_set_error('sitename', t('The site name value must be unique.'));
+  }  
+}
+
+/**
+ * FormsAPI for domain_edit_form()
+ *
+ * @ingroup domain 
+ */
+function domain_edit_form_submit($form_id, $form_values) {
+  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s' WHERE domain_id = %d", $form_values['subdomain'], $form_values['sitename'], $form_values['domain_id']);
+  drupal_set_message(t('Domain record updated.'));
+  drupal_goto('admin/build/domain');  
+}
+
+/**
+ * Delete a domain record.
+ * 
+ * @param $domain_id
+ *  The unique id for this domain, taken from {domain}. 
+ *
+ * @ingroup domain 
+ */
+function domain_delete($domain_id) {
+  $domain = domain_lookup($domain_id);
+  return drupal_get_form('domain_delete_form', $domain);
+}
+
+/**
+ * FormsAPI
+ *
+ * @param $domain
+ * An array containing the record from the {domain} table
+ *
+ * @ingroup domain 
+ */
+function domain_delete_form($domain) { 
+  $form = array(); 
+  $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);  
+  $form['domain'] = array('#value' => t('<p>Are you sure you wish to delete the domain record for <b>%domain</b>?</p>', array('%domain' => $domain['subdomain'])));
+  $form['cancel'] = array('#value' => '<p>'. l(t('Cancel action'), 'admin/build/domain') .'<br />');
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Delete domain record'), '#suffix' => '<p>');
+  return $form;
+}
+
+/**
+ * FormsAPI for domain_delete_form()
+ *
+ * @ingroup domain 
+ */
+function domain_delete_form_submit($form_id, $form_values) {
+  db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_values['domain_id']);
+  drupal_set_message(t('Domain record deleted.'));
+  drupal_goto('admin/build/domain');  
+}
+
+/**
+ * Advanced node-type settings
+ *
+ * @ingroup domain 
+ */
+function domain_advanced() {
+  $node_types = node_get_types('names');
+  return drupal_get_form('domain_advanced_form', $node_types);  
+}
+
+/**
+ * FormsAPI
+ *
+ * @param $node_types
+ *  A list of active node types taken from node_get_types().
+ *
+ * @ingroup domain 
+ */
+function domain_advanced_form($node_types) {
+  $form = array();
+  // Some editors will not have full node editing permissions.  This allows us
+  // to give selected permissions for nodes within the editor's domain.
+  if (variable_get('domain_editors', 0) == 1) {
+    $form['domain_form'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Domain node editing'),
+      '#collapsible' => TRUE
+    );    
+    $form['domain_form']['intro'] = array('#value' => t('<p>When editors view domain-access restricted nodes, which form elements should be exposed?</p>'));
+    $options = array(
+      'log' => t('Log messages'), 
+      'author' => t('Authoring information'), 
+      'options' => t('Publishing options'),
+      'delete' => t('Delete node'),
+      'comment_settings' => t('Comment settings'),
+      'path' => t('Path aliasing'),
+      'menu' => t('Menu settings'),
+      'attachments' => t('File attachments')
+    );
+    ksort($options);
+    $form['domain_form']['domain_form_elements'] = array(
+      '#type' => 'checkboxes',
+      '#default_value' => variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path')),
+      '#options' => $options,
+    );
+  }
+  $default = variable_get('domain_behavior', 1);
+  $form['domain_node'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Domain node types'),
+    '#collapsible' => TRUE
+  );  
+  $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.</p>'));
+  foreach ($node_types as $key => $value) {
+    $form['domain_node']['domain_node_'. $key] = array(
+      '#type' => 'checkbox',
+      '#title' => check_plain($value),
+      '#default_value' => variable_get('domain_node_'. $key, $default),
+    );
+  }
+  return system_settings_form($form);
+}

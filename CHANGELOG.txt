@@ -1,0 +1,9 @@
+// $Id$
+
+01-OCT-2007
+-- Initial commit of the Domain Manager module. This module provides a lightwieght set of tools for
+    creating and managing a network of affiliates sites.  The sites run on subdomains of a master domain.
+    A single Drupal installation and database are required.  The module uses hook_node_access() to determine
+    how content should be presented.  Originally developed for www.skirt.com, the module was introduces
+    at DrupalCON Barcelona.
+    

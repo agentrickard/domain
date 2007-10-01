@@ -1,0 +1,4 @@
+;  $Id $
+name = Domain Manager
+description = A domain-based access control system
+package = Domain Manager

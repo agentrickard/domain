@@ -1,0 +1,568 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Core module functions for the Domain Manager suite.
+ */
+
+/**
+ * Implements hook_init()
+ *
+ * Inititalizes a global $_domain variable and set it based on the 
+ * third-level domain used to access the page.
+ *
+ * @ingroup drupal
+ */
+function domain_init() {
+  global $_domain;
+  // It is possibile that this routine ran in settings.php, so only run if needed.
+  // See the README.txt for domain_conf.module for more information.
+  if (empty($_domain)) {
+    print 'empty';
+    $_domain = array();
+    // Cribbed from bootstrap.inc -- removes port protocols from the host value.
+    $subdomain = explode('.', implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
+
+    // Lookup the subdomain against our allowed hosts record.
+    $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $subdomain[0]));
+
+    // If empty, then the wildcard DNS didn't match anything, so use defaults.
+    if (empty($_domain['domain_id'])) {
+      $_domain['domain_id'] = 0;
+      $sitename = variable_get('sitename', 'Drupal');    
+      $_domain['sitename'] = variable_get('domain_sitename', $sitename);
+      $_domain['subdomain'] = variable_get('domain_default', 'www');
+    }
+  }  
+}
+
+/**
+ * Implements hook_menu()
+ *
+ * @ingroup drupal
+ */
+function domain_menu($may_cache) {
+  $items = array();
+  $admin = user_access('administer domains');
+  if ($may_cache) {
+    $items[] = array(
+      'title' => t('Domain administration'),
+      'path' => 'admin/build/domain',
+      'access' => $admin,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('list'),
+      'description' => t('Settings for the Domain Manager module.')
+    );    
+    $items[] = array(
+      'title' => t('List'),
+      'path' => 'admin/build/domain/view',
+      'access' => $admin,
+      'type' => MENU_DEFAULT_LOCAL_TASK,      
+      'callback' => 'domain_admin',
+      'callback arguments' => array('list'),
+      'weight' => -10
+    );    
+    $items[] = array(
+      'title' => t('Create domain record'),
+      'path' => 'admin/build/domain/create',
+      'access' => $admin,
+      'type' => MENU_LOCAL_TASK,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('create'),
+      'weight' => -8      
+    );    
+    $items[] = array(
+      'title' => t('Settings'),
+      'path' => 'admin/build/domain/settings',
+      'access' => $admin,
+      'type' => MENU_LOCAL_TASK,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('configure'),
+      'weight' => -5
+    );     
+    $items[] = array(
+      'title' => t('Node settings'),
+      'path' => 'admin/build/domain/advanced',
+      'access' => $admin,
+      'type' => MENU_LOCAL_TASK,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('advanced'),
+      'weight' => -2
+    );         
+  }  
+  else {    
+    $items[] = array(
+      'title' => t('Edit domain record'),
+      'path' => 'admin/build/domain/edit',
+      'access' => $admin,
+      'type' => MENU_CALLBACK,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('edit', arg(4))      
+    );  
+    $items[] = array(
+      'title' => t('Delete domain record'),
+      'path' => 'admin/build/domain/delete',
+      'access' => $admin,
+      'type' => MENU_CALLBACK,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('delete', arg(4))      
+    );    
+  }
+  return $items;
+}
+
+/**
+ * Implements hook_perm()
+ *
+ * @ingroup drupal 
+ */
+function domain_perm() {
+  return array('administer domains', 'set domain access', 'edit domain nodes');
+}
+
+/**
+ * Implements hook_block()
+ *
+ * A nifty little domain-switcher block, useful during debugging.
+ *
+ * @ingroup drupal
+ */
+function domain_block($op = 'list', $delta = 0, $edit = array()) {
+  global $_domain, $base_url;
+  $blocks = array();
+  switch ($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Domain switcher'),
+      );
+      return $blocks;
+      break;
+    case 'view':
+      $block['subject'] = t('Domain switcher');
+      // TODO: This code shares a lot of operations with domain_list() so 
+      // perhaps if might need to be abstracted.
+      $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
+      $items = array();
+      $root = variable_get('domain_root', '');
+      $_path = parse_url($base_url);
+      $scheme = $_path['scheme'] .'://';
+      $default = variable_get('domain_default', 'www'); 
+      $sitename = variable_get('sitename', 'Drupal');      
+      $name = variable_get('domain_sitename', $sitename);
+      $items[] =  l($name, $scheme . $default .'.'. $root . request_uri());
+      while ($data = db_fetch_array($result)) {      
+        $path = $scheme . $data['subdomain'] .'.'. $root . request_uri(); 
+        $items[] = l($data['sitename'], $path);
+      }
+      $block['content'] = theme('item_list', $items);
+      return $block;
+      break;
+  }
+}
+
+/**
+ * Implements hook_user()
+ *
+ * Attached domain_id records to all registering users.  These 
+ * are used to determine which 'domain_editor' group that users
+ * with the 'edit domain nodes' permission are in.
+ *
+ * @ingroup drupal
+ */
+function domain_user($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'form':
+    case 'register':
+      global $_domain;
+      $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
+      $options = array();
+      // By default, the requesting domain is assigned.
+      if (empty($account->domain_user)) {
+        ($_domain['domain_id'] == 0) ? $default  = array(-1) : $default = array($_domain['domain_id']);
+      }
+      else {
+        $default = $account->domain_user;
+      }
+      $options[-1] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+      while ($data = db_fetch_array($result)) {
+        $options[$data['domain_id']] = $data['sitename'];
+      }    
+      if (user_access('set domain access')) {
+        $form['domain_user'] = array(
+          '#type' => 'checkboxes',
+          '#options' => $options,
+          '#title' => t('Domain access setttings'),
+          '#default_value' => $default
+        );      
+      }
+      else {
+        $form['domain_user'] = array(
+          '#type' => 'value',
+          '#value' => $default
+        );      
+      }
+      return $form;
+      break;
+    case 'validate':
+      return array('domain_user' => $edit['domain_user']);
+      break;
+    case 'view':
+      if (user_access('set domain access') && !empty($account->domain_user)) {
+        $output = '<ul>';
+        foreach ($account->domain_user as $id) {
+          if (abs($id) > 0) {
+            if ($id > 0) {      
+              $domain = domain_lookup($id);
+              $output .= '<li>'. $domain['sitename'] .'</li>';
+            }
+            else {
+              $output .= '<li>'. variable_get('domain_sitename', variable_get('sitename', 'Drupal')) . '</li>';
+            }      
+          }  
+        }
+        $output .= '</ul>';    
+        $items['domain'] = array('title' => t('Domain settings'),
+          'value' => $output,
+        );       
+        return array(t('Domain status') => $items);
+      }  
+      break;
+  }
+}
+
+/**
+ * Router function to call various administration tasks
+ *
+ * @param $action
+ *  The function to be performed.
+ * @param $id
+ *  The domain_id of the record to be acted upon.
+ *
+ * @ingroup domain
+ */
+function domain_admin($action, $id = NULL) {
+  include_once('domain_admin.inc');
+  $func = 'domain_'. $action;
+  return $func($id);
+}
+
+/**
+ * Runs a lookup against the {domain} table.  One of the two values must be present
+ * 
+ * @param $domain_id
+ *  The domain_id taken from {domain}. Optional.
+ * @param $subdomain
+ *  The string representation of a {domain} entry. Optional.
+ * @return
+ *  An array containing the requested row from the {domain} table.  Returns -1 on failure.
+ *
+ * @ingroup domain
+ */
+function domain_lookup($domain_id = NULL, $subdomain = NULL) {
+  if ($domain_id) {
+    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE domain_id = %d", $domain_id));
+  }
+  else if ($subdomain) {
+    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $subdomain));
+  }
+  if ($domain['domain_id']) {
+    return $domain;
+  }
+  else {
+    return -1;
+  }
+}
+
+/**
+ * Implements hook_nodeapi().
+ *
+ * This function is used to provide debugging information and to prep values from
+ * the {node_access} table when editing nodes.  Since not all users can see the 
+ * domain access editing checkboxes, we pass some node_access values as hidden elements.
+ *
+ * @ingroup node
+ */
+function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+  switch ($op) {
+    case 'prepare':
+    case 'load':
+      // Append the domain grants to the node for editing.
+      $node->domains = array();
+      $node->editors = array();
+      $node->domain_site = FALSE;
+      $result = db_query("SELECT gid, realm, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = %d AND (realm = '%s' OR realm = '%s' OR realm = '%s')", $node->nid, 'domain_id', 'domain_site', 'domain_editor');
+      while ($data = db_fetch_object($result)) {
+        if ($data->realm == 'domain_id') {
+          // Transform the 0 to -1, since {node_access} is unsigned.
+          ($data->gid == 0) ? $gid = -1 : $gid = $data->gid;
+          $node->domains[] = $gid;
+          if ($gid > 0) {
+            $domain = domain_lookup($gid);
+            $node->subdomains[] = $domain['sitename'];
+          }
+          else {
+            $node->subdomains[] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+          }
+        }  
+        else if ($data->realm == 'domain_site') {
+          $node->domain_site = TRUE;
+          $node->subdomains[] = t('All affiliates');
+        }
+        else if ($data->realm == 'domain_editor') {
+          $node->domain_editor = TRUE;
+          if ($gid > 0) {
+            $domain = domain_lookup($gid);
+            $node->editors[] = $domain['sitename'];
+          }
+          else {
+            $node->editors[] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+          }          
+        }        
+      }
+      break;
+    case 'view':
+      $output = '';
+      $debug = variable_get('domain_debug', 0);
+      if ($debug && user_access('set domain access')) {
+        if (!empty($node->subdomains)) {
+          $output .= '<p><b>Subdomains</b></p><ul>';
+          foreach($node->subdomains as $name) {
+            $output .= '<li>'. $name .'</li>';
+          }
+          $output .= '</ul>';
+          $node->content['subdomains'] = array('#value' => $output, '#weight' => 20);
+        }
+        if (!empty($node->editors)) {
+          $output = '<p><b>Editors</b></p><ul>';
+          foreach($node->editors as $name) {
+            $output .= '<li>'. $name .'</li>';
+          }
+          $output .= '</ul>';
+          $node->content['editors'] = array('#value' => $output, '#weight' => 21);     
+        }
+        if (empty($output)) {
+          $node->content['domain'] = array('#value' => t('This node is not assigned to a domain.'), '#weight' => 22);
+        }
+      }
+      break;
+  }
+} 
+
+/**
+ * Implements hook_node_grants()
+ *
+ * Informs the node access system what permissions the user has.  By design
+ * all users are in the realm defined by the currently active domain_id.
+ *
+ * @ingroup node
+ */
+function domain_node_grants($account, $op) {
+  global $_domain, $user;
+  // By design, all users can see content sent to all affiliates.
+  $grants['domain_site'][] = 0;
+  
+  // Grant based on active subdomain.
+  $grants['domain_id'][] = $_domain['domain_id'];
+
+  // special permissions for editors
+  $editors = variable_get('domain_editors', 0);
+  if ($editors && user_access('edit domain nodes', $account)) {
+    if (!empty($account->domain_user)) {
+      foreach ($account->domain_user as $id) {
+        if (abs($id) > 0) {
+          if ($id > 0) {      
+            $grants['domain_editor'][] = $id;
+          }
+          else {
+            $grants['domain_editor'][] = 0;
+          }      
+        }  
+      }  
+    }  
+  }
+  return $grants;
+}
+
+/**
+ * Implements hook_node_access_records()
+ *
+ * Set permissions for a node to be written to the database.  By design
+ * if no options are selected, the node is assigned to the main site.
+ *
+ * @ingroup node
+ */
+function domain_node_access_records($node) {
+  if (domain_disabling()) {
+    return;
+  } 
+  $grants = array();
+  // If the form is hidden, we are passed the 'domains_raw' variable.
+  if (is_array($node->domains_raw)) {
+    $node->domains = array();
+    foreach ($node->domains_raw as $value) {
+      $node->domains[$value] = $value;
+    }
+  }
+  // If set, grant access to the core site, otherwise 
+  // The grant must be explicitly given to a domain.
+  if ($node->domain_site) {
+    $grants[] = array(
+    'realm' => 'domain_site',
+    'gid' => 0,
+    'grant_view' => TRUE,
+    'grant_update' => FALSE,
+    'grant_delete' => FALSE,
+    'priority' => 0,         // If this value is > 0, then other grants will not be recorded
+    );
+  }
+  // Special permissions for editors, if activated.
+  $editors = variable_get('domain_editors', 0);  
+  if (!empty($node->domains)) {
+    foreach($node->domains as $key => $value) {
+      // We can't use a 0 value in an $options list, so convert -1 to 0.
+      if (abs($value) > 0) {
+        ($key == -1) ? $key = 0 : $key = $key;
+        $grants[] = array(
+          'realm' => 'domain_id',
+          'gid' => $key,
+          'grant_view' => TRUE,
+          'grant_update' => FALSE,
+          'grant_delete' => FALSE,
+          'priority' => 0,         
+        );
+        if ($editors) {
+          $grants[] = array(
+            'realm' => 'domain_editor',
+            'gid' => $key,
+            'grant_view' => FALSE,
+            'grant_update' => TRUE,
+            'grant_delete' => TRUE,
+            'priority' => 0,         
+          );
+        } 
+      }
+    }
+  }
+  // At least one option must be present, and it is the default site 
+  // this prevents null values in the form.
+  // There is probably a more elegant way to do this, earlier in the routine.
+  if (empty($grants)) {
+    $grants[] = array(
+    'realm' => 'domain_id',
+    'gid' => 0,
+    'grant_view' => TRUE,
+    'grant_update' => FALSE,
+    'grant_delete' => FALSE,
+    'priority' => 0,         
+    );
+    if ($editors) {
+      $grants[] = array(
+        'realm' => 'domain_editor',
+        'gid' => 0,
+        'grant_view' => FALSE,
+        'grant_update' => TRUE,
+        'grant_delete' => TRUE,
+        'priority' => -5,         
+      );    
+    }
+  }
+  return $grants;
+}
+
+/**
+ * Implements hook_enable()
+ *
+ * @ingroup node
+ */
+function domain_enable() {
+  node_access_rebuild();
+}  
+
+/**
+ * Implements hook_disable()
+ *
+ * @ingroup node
+ */
+function domain_disable() {
+  domain_disabling(TRUE);
+  node_access_rebuild();
+}  
+
+/**
+ * Simple function to make sure we don't respond with grants when disabling ourselves.
+ *
+ * @ingroup node
+ */
+function domain_disabling($set = NULL) {
+  static $disabling = false;
+  if ($set !== NULL) {
+    $disabling = $set;
+  }
+  return $disabling;
+} 
+
+/**
+ * Implements hook_form_alter()
+ *
+ * This function is crucial, as it appends our node access elements to the node edit form.
+ * For users without the "set domain access" permission, this happens silently.
+ *
+ * @ingroup node
+ */
+function domain_form_alter($form_id, &$form) {
+  if ($form['#id'] == 'node-form') {
+    global $_domain;
+    $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
+    $options = array();
+    // By default, the requesting domain is assigned.
+    $default = array($_domain['domain_id']);
+    // How is core content handled for this site?
+    $behavior = variable_get('domain_behavior', 1);
+    if ($behavior == 1 || $_domain['domain_id'] == 0) {
+      $default[] = -1;
+    }
+    $options[-1] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+    while ($data = db_fetch_array($result)) {
+      $options[$data['domain_id']] = $data['sitename'];
+    }
+    // If the user is a site admin, show the form, otherwise pass it silently.
+    if (user_access('set domain access')) {
+      $form['domain_site'] = array(
+        '#type' => 'checkbox',
+        '#prefix' => t('<p><b>Publishing options:</b>'),
+        '#suffix' => '</p>',
+        '#title' => t('Send to all affiliates'),
+        '#required' => FALSE,
+        '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below..'),
+        '#default_value' => ($form['#node']->nid) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
+      );    
+      $form['domains'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Publish to'),
+        '#options' => $options,
+        '#required' => TRUE,
+        '#description' => t('Select which affiliates can access this content.'),
+        '#default_value' => ($form['#node']->nid) ? $form['#node']->domains : $default,
+      );
+    }
+    else {
+      $form['domain_site'] = array(
+        '#type' => 'value',
+        '#value' => ($form['#node']->nid) ? $form['#node']->domain_site : $behavior,
+      );
+      // Name this element for special handling.
+      $form['domains_raw'] = array(
+        '#type' => 'value',
+        '#value' => ($form['#node']->nid) ? $form['#node']->domains : $default
+      );
+    }
+    // Some editors cannot administer nodes, so we have to add these form elements.
+    if (variable_get('domain_editors', 0) == 1 && user_access('edit domain nodes')) {
+      $access = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
+      foreach ($access as $item) {
+        $form[$item]['#access'] = TRUE;
+      }
+    }    
+  }
+}  

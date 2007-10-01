@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Implements hook_install()
+ */
+function domain_install() {
+  db_query("CREATE TABLE {domain} (
+    domain_id int(11) NOT NULL AUTO_INCREMENT,
+    subdomain varchar(40) NOT NULL default '',
+    sitename varchar(80) NOT NULL default '',
+    PRIMARY KEY  (domain_id),
+    KEY subdomain (subdomain)
+    ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+}
+
+
+/**
+ * Implements hook_uninstall()
+ */
+function domain_uninstall() {
+  db_query("DROP TABLE {domain}");
+  db_query("DELETE from {variable} WHERE name LIKE '%s%%'", 'domain_');
+}

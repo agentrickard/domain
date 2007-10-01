@@ -1,0 +1,50 @@
+<?php
+
+// $Id$
+
+/**
+ * @file
+ * Domain manager configuration options.
+ *
+ * By design, this only contains a menu hook and a router.  No need to load
+ * the entire code except when requested.
+ */
+
+/**
+ * Implements hook_menu()
+ *
+ * @ingroup drupal
+ */
+function domain_conf_menu($may_cache) {
+  $items = array();
+  if (!$may_cache) {
+    $items[] = array(
+      'title' => t('Domain site settings'),
+      'path' => 'admin/build/domain/conf',
+      'access' => user_access('administer domains'),
+      'type' => MENU_CALLBACK,
+      'callback' => 'domain_conf_page',
+      'callback arguments' => array(arg(4))      
+    );    
+  }
+  return $items;
+}
+
+/**
+ * The domain conf page callback router.
+ *
+ * @param $domain_id
+ *  The unique identifier for this domain, taken from {domain}.
+ *
+ * @ingroup conf
+ */
+function domain_conf_page($domain_id) {
+  $domain = domain_lookup($domain_id);
+  if ($domain['domain_id']) {
+    include_once('domain_form.inc');
+    return drupal_get_form('system_site_information_settings');
+  }
+  else {
+    return t('Invalid domain request.');
+  } 
+}
