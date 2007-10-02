@@ -1,6 +1,12 @@
 // $Id$
 
+02-OCT-2007
+
+-- Moves the domain_conf routine out of settings.php and into hook_init().  This idea, taken from
+    the Multidomain module, makes it easier to use the Domain Manager module.
+
 01-OCT-2007
+
 -- Initial commit of the Domain Manager module. This module provides a lightwieght set of tools for
     creating and managing a network of affiliates sites.  The sites run on subdomains of a master domain.
     A single Drupal installation and database are required.  The module uses hook_node_access() to determine

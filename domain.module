@@ -16,25 +16,32 @@
  */
 function domain_init() {
   global $_domain;
-  // It is possibile that this routine ran in settings.php, so only run if needed.
-  // See the README.txt for domain_conf.module for more information.
-  if (empty($_domain)) {
-    print 'empty';
-    $_domain = array();
-    // Cribbed from bootstrap.inc -- removes port protocols from the host value.
-    $subdomain = explode('.', implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
+  $_domain = array();
+  // Cribbed from bootstrap.inc -- removes port protocols from the host value.
+  $subdomain = explode('.', implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
 
-    // Lookup the subdomain against our allowed hosts record.
-    $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $subdomain[0]));
+  // Lookup the subdomain against our allowed hosts record.
+  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $subdomain[0]));
 
-    // If empty, then the wildcard DNS didn't match anything, so use defaults.
-    if (empty($_domain['domain_id'])) {
-      $_domain['domain_id'] = 0;
-      $sitename = variable_get('sitename', 'Drupal');    
-      $_domain['sitename'] = variable_get('domain_sitename', $sitename);
-      $_domain['subdomain'] = variable_get('domain_default', 'www');
+  // If empty, then the wildcard DNS didn't match anything, so use defaults.
+  if (empty($_domain['domain_id'])) {
+    $_domain['domain_id'] = 0;
+    $sitename = variable_get('sitename', 'Drupal');    
+    $_domain['sitename'] = variable_get('domain_sitename', $sitename);
+    $_domain['subdomain'] = variable_get('domain_default', 'www');
+  }
+  // Load the domain-specific variables, if they exist.
+  else if (module_exists('domain_conf')) {
+    $data = array();
+    $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $_domain['domain_id']));
+    if (!empty($data)) {
+      global $conf;
+      $settings = unserialize($data['settings']);
+      foreach ($settings as $key => $value) {
+        $conf[$key] = $value;
+      }
     }
-  }  
+  }
 }
 
 /**
