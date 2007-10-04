@@ -1,5 +1,13 @@
 // $Id$
 
+03-OCT-2007
+
+-- #180514.  Changes the module to recognize fully-qualified domain names instead of subdomains.
+    Doing so increases the flexibility of the module.  However, single-sign on across mutliple domains
+    is not yet supported.
+-- Changes the default menu item for the settings page.
+-- Changes the module name to Domain Access
+
 02-OCT-2007
 
 -- Moves the domain_conf routine out of settings.php and into hook_init().  This idea, taken from

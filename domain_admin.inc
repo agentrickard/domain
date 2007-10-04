@@ -20,24 +20,16 @@
 function domain_list() {
   global $_domain, $base_url;
   $_path = parse_url($base_url);
-  $default = variable_get('domain_default', 'www');
-  $path_check = explode('.', $_path['host']);
-  if ($_domain['subdomain'] == $default) {
-    if ($path_check[0] != $default) {
-      $redirect = $_path['scheme'] .'://'. $default .'.'. $_path['host'] . request_uri();
-      drupal_goto($redirect);
-    }
-  }
+  $default = variable_get('domain_root', '');
   $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
-  $header = array(t('Id'), t('Subdomain'), t('Site name'), t('Actions'));
+  $header = array(t('Id'), t('Domain'), t('Site name'), t('Actions'));
   $rows = array();
   $sitename = variable_get('sitename', 'Drupal');  
   $host = preg_replace('/'. $_domain['subdomain'] .'/i', $default, $_path['host'], 1);  
-  $link = l($default, $_path['scheme'] .'://'. $host . request_uri());
+  $link = l($default, $_path['scheme'] .'://'. $default . request_uri());
   $rows[] = array(0, ($default == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, variable_get('domain_sitename', $sitename), l(t('Default settings'), 'admin/build/domain/settings'));
   while ($data = db_fetch_array($result)) {
-    $host = preg_replace('/'. $_domain['subdomain'] .'/i', $data['subdomain'], $_path['host'], 1);
-    $new_path = $_path['scheme'] .'://'. $host . request_uri();
+    $new_path = $_path['scheme'] .'://'. $data['subdomain']. request_uri();
     $link = l($data['subdomain'], $new_path, array(), NULL, NULL, TRUE);
     $actions = l(t('edit'), 'admin/build/domain/edit/'. $data['domain_id']);
     // add advanced settings
@@ -87,15 +79,16 @@ function domain_configure_form() {
     '#default_value' => variable_get('domain_root', ''),
     '#description' => t('The root domain for example.com.  No http or slashes.')
   );    
+  /*
   $form['domain']['domain_default'] = array(
     '#type' => 'textfield',
     '#title' => t('Default subdomain'),
     '#size' => 40,
     '#maxlength' => 40,
     '#required' => TRUE,
-    '#default_value' => variable_get('domain_default', 'www'),
+    '#default_value' => variable_get('domain_default', ''),
     '#description' => t('The default domain for *.example.com.  Can only contain alphanumeric characters.')
-  );  
+  ); */ 
   $form['domain']['domain_sitename'] = array(
     '#type' => 'textfield',
     '#title' => t('Site name'),
@@ -160,11 +153,11 @@ function domain_create_form() {
   );
   $form['domain']['subdomain'] = array(
     '#type' => 'textfield',
-    '#title' => t('Subdomain'),
+    '#title' => t('Domain'),
     '#size' => 40,
-    '#maxlength' => 40,
+    '#maxlength' => 80,
     '#required' => TRUE,
-    '#description' => t('The allowed subdomain for *.example.com.  Can only contain alphanumeric characters.')
+    '#description' => t('The allowed subdomain for *.example.com.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
@@ -205,7 +198,7 @@ function domain_create_form_validate($form_id, $form_values) {
 function domain_create_form_submit($form_id, $form_values) {
   db_query("INSERT INTO {domain} (subdomain, sitename) VALUES ('%s', '%s')", $form_values['subdomain'], $form_values['sitename']);
   drupal_set_message(t('Domain record created.'));
-  drupal_goto('admin/build/domain');
+  drupal_goto('admin/build/domain/view');
 }
 
 /**
@@ -239,12 +232,12 @@ function domain_edit_form($domain) {
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   $form['domain']['subdomain'] = array(
     '#type' => 'textfield',
-    '#title' => t('Subdomain'),
+    '#title' => t('Domain'),
     '#size' => 40,
-    '#maxlength' => 40,
+    '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => $domain['subdomain'],
-    '#description' => t('The allowed domain for *.example.com.  Can only contain alphanumeric characters.')
+    '#description' => t('The allowed subdomain for *.example.com.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
@@ -285,7 +278,7 @@ function domain_edit_form_validate($form_id, $form_values) {
 function domain_edit_form_submit($form_id, $form_values) {
   db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s' WHERE domain_id = %d", $form_values['subdomain'], $form_values['sitename'], $form_values['domain_id']);
   drupal_set_message(t('Domain record updated.'));
-  drupal_goto('admin/build/domain');  
+  drupal_goto('admin/build/domain/view');  
 }
 
 /**
@@ -326,7 +319,7 @@ function domain_delete_form($domain) {
 function domain_delete_form_submit($form_id, $form_values) {
   db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_values['domain_id']);
   drupal_set_message(t('Domain record deleted.'));
-  drupal_goto('admin/build/domain');  
+  drupal_goto('admin/build/domain/view');  
 }
 
 /**

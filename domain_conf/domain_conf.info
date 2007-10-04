@@ -1,5 +1,5 @@
-;  $Id $
-name = Domain Manager : Site Configuration
-description = Advanced site configuration options for Domain Manager.
-package = Domain Manager
+;  $Id$
+name = Domain Acccess : Site Configuration
+description = Advanced site configuration options for Domain Access.
+package = Domain Access
 dependencies = domain

@@ -51,8 +51,7 @@ function domain_conf_form_alter($form_id, &$form) {
     // Change the path for the frontpage.
     $prefix = $form['main']['site_frontpage']['#field_prefix'];
     $_path = parse_url($prefix);    
-    $path_check = explode('.', $_path['host']);
-    $str = $path_check[0];
+    $str = $_path['host'];
     $fix = preg_replace("/$str/", $domain['subdomain'], $prefix, 1);
     $form['main']['site_frontpage']['#field_prefix'] = $fix;
     

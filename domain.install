@@ -4,13 +4,27 @@
  * Implements hook_install()
  */
 function domain_install() {
-  db_query("CREATE TABLE {domain} (
-    domain_id int(11) NOT NULL AUTO_INCREMENT,
-    subdomain varchar(40) NOT NULL default '',
-    sitename varchar(80) NOT NULL default '',
-    PRIMARY KEY  (domain_id),
-    KEY subdomain (subdomain)
-    ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+  switch ($GLOBALS['db_type']) {
+    case 'mysqli':
+    case 'mysql':
+      db_query("CREATE TABLE IF NOT EXISTS {domain} (
+        domain_id int(11) NOT NULL AUTO_INCREMENT,
+        subdomain varchar(40) NOT NULL default '',
+        sitename varchar(80) NOT NULL default '',
+        PRIMARY KEY  (domain_id),
+        KEY subdomain (subdomain)
+        ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {domain} (
+        domain_id serial,
+        subdomain varchar(40) NOT NULL default '',
+        sitename varchar(80) NOT NULL default '',
+        PRIMARY KEY (domain_id)
+        )");     
+      db_query("CREATE INDEX {domain}_subdomain_idx ON {domain} (subdomain)");
+      break;
+  } 
 }
 
 

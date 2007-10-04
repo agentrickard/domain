@@ -1,4 +1,4 @@
-;  $Id $
-name = Domain Manager
-description = A domain-based access control system
-package = Domain Manager
+;  $Id$
+name = Domain Access
+description = A subdomain-based access control system
+package = Domain Access

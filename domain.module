@@ -17,30 +17,19 @@
 function domain_init() {
   global $_domain;
   $_domain = array();
+
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
-  $subdomain = explode('.', implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
+  $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
 
-  // Lookup the subdomain against our allowed hosts record.
-  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $subdomain[0]));
+  // Lookup the active domain against our allowed hosts record.
+  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $_subdomain));
 
-  // If empty, then the wildcard DNS didn't match anything, so use defaults.
+  // If empty, then the DNS didn't match anything, so use defaults.
   if (empty($_domain['domain_id'])) {
     $_domain['domain_id'] = 0;
-    $sitename = variable_get('sitename', 'Drupal');    
-    $_domain['sitename'] = variable_get('domain_sitename', $sitename);
-    $_domain['subdomain'] = variable_get('domain_default', 'www');
-  }
-  // Load the domain-specific variables, if they exist.
-  else if (module_exists('domain_conf')) {
-    $data = array();
-    $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $_domain['domain_id']));
-    if (!empty($data)) {
-      global $conf;
-      $settings = unserialize($data['settings']);
-      foreach ($settings as $key => $value) {
-        $conf[$key] = $value;
-      }
-    }
+    $_sitename = variable_get('sitename', 'Drupal');    
+    $_domain['sitename'] = variable_get('domain_sitename', $_sitename);
+    $_domain['subdomain'] = variable_get('domain_root', '');
   }
 }
 
@@ -54,21 +43,30 @@ function domain_menu($may_cache) {
   $admin = user_access('administer domains');
   if ($may_cache) {
     $items[] = array(
-      'title' => t('Domain administration'),
+      'title' => t('Domain access'),
       'path' => 'admin/build/domain',
       'access' => $admin,
       'callback' => 'domain_admin',
-      'callback arguments' => array('list'),
-      'description' => t('Settings for the Domain Manager module.')
+      'callback arguments' => array('configure'),
+      'description' => t('Settings for the Domain Access module.')
     );    
     $items[] = array(
-      'title' => t('List'),
+      'title' => t('Settings'),
+      'path' => 'admin/build/domain/settings',
+      'access' => $admin,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('configure'),
+      'weight' => -10
+    );     
+    $items[] = array(
+      'title' => t('Domain list'),
       'path' => 'admin/build/domain/view',
       'access' => $admin,
-      'type' => MENU_DEFAULT_LOCAL_TASK,      
+      'type' => MENU_LOCAL_TASK,      
       'callback' => 'domain_admin',
       'callback arguments' => array('list'),
-      'weight' => -10
+      'weight' => -8
     );    
     $items[] = array(
       'title' => t('Create domain record'),
@@ -77,17 +75,8 @@ function domain_menu($may_cache) {
       'type' => MENU_LOCAL_TASK,
       'callback' => 'domain_admin',
       'callback arguments' => array('create'),
-      'weight' => -8      
+      'weight' => -4      
     );    
-    $items[] = array(
-      'title' => t('Settings'),
-      'path' => 'admin/build/domain/settings',
-      'access' => $admin,
-      'type' => MENU_LOCAL_TASK,
-      'callback' => 'domain_admin',
-      'callback arguments' => array('configure'),
-      'weight' => -5
-    );     
     $items[] = array(
       'title' => t('Node settings'),
       'path' => 'admin/build/domain/advanced',
@@ -151,15 +140,14 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
       // perhaps if might need to be abstracted.
       $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
       $items = array();
-      $root = variable_get('domain_root', '');
       $_path = parse_url($base_url);
       $scheme = $_path['scheme'] .'://';
-      $default = variable_get('domain_default', 'www'); 
+      $default = variable_get('domain_root', ''); 
       $sitename = variable_get('sitename', 'Drupal');      
       $name = variable_get('domain_sitename', $sitename);
-      $items[] =  l($name, $scheme . $default .'.'. $root . request_uri());
+      $items[] =  l($name, $scheme . $default . request_uri());
       while ($data = db_fetch_array($result)) {      
-        $path = $scheme . $data['subdomain'] .'.'. $root . request_uri(); 
+        $path = $scheme . $data['subdomain'] . request_uri(); 
         $items[] = l($data['sitename'], $path);
       }
       $block['content'] = theme('item_list', $items);
