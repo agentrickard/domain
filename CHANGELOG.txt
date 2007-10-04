@@ -1,12 +1,20 @@
 // $Id$
 
+04-OCT-2007
+
+-- Adds pgsql install to domain_conf module.
+-- Puts node edit form elements into a collapsible group.
+-- Finishes initial README.
+-- Adds DOMAIN_INSTALL_RULE and DOMAIN_EDITOR_RULE to enable custom behavior when the
+    module is initially enabled.  See the README.
+
 03-OCT-2007
 
 -- #180514.  Changes the module to recognize fully-qualified domain names instead of subdomains.
     Doing so increases the flexibility of the module.  However, single-sign on across mutliple domains
     is not yet supported.
 -- Changes the default menu item for the settings page.
--- Changes the module name to Domain Access
+-- Changes the module name to Domain Access.
 
 02-OCT-2007
 

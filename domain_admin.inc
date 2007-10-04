@@ -115,7 +115,7 @@ function domain_configure_form() {
     '#type' => 'radios',
     '#title' => t('Domain-based editing controls'),
     '#required' => TRUE,
-    '#default_value' => variable_get('domain_editors', 0),
+    '#default_value' => variable_get('domain_editors', DOMAIN_EDITOR_RULE),
     '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editor')),
     '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
   );  
@@ -123,7 +123,7 @@ function domain_configure_form() {
     '#type' => 'radios',
     '#title' => t('New content settings'),
     '#required' => TRUE,
-    '#default_value' => variable_get('domain_behavior', 1),
+    '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
     '#options' => array(1 => t('Show on all sites'), 2 => t('Only show on selected sites')),
     '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
   );
@@ -344,7 +344,7 @@ function domain_advanced_form($node_types) {
   $form = array();
   // Some editors will not have full node editing permissions.  This allows us
   // to give selected permissions for nodes within the editor's domain.
-  if (variable_get('domain_editors', 0) == 1) {
+  if (variable_get('domain_editors', DOMAIN_EDITOR_RULE) == 1) {
     $form['domain_form'] = array(
       '#type' => 'fieldset',
       '#title' => t('Domain node editing'),
@@ -368,7 +368,7 @@ function domain_advanced_form($node_types) {
       '#options' => $options,
     );
   }
-  $default = variable_get('domain_behavior', 1);
+  $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
   $form['domain_node'] = array(
     '#type' => 'fieldset',
     '#title' => t('Domain node types'),

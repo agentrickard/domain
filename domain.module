@@ -6,6 +6,10 @@
  * Core module functions for the Domain Manager suite.
  */
 
+// You may alter these variables before installing the module. See README.txt.
+define('DOMAIN_INSTALL_RULE', TRUE);
+define('DOMAIN_EDITOR_RULE', FALSE);
+
 /**
  * Implements hook_init()
  *
@@ -361,7 +365,7 @@ function domain_node_grants($account, $op) {
   $grants['domain_id'][] = $_domain['domain_id'];
 
   // special permissions for editors
-  $editors = variable_get('domain_editors', 0);
+  $editors = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
   if ($editors && user_access('edit domain nodes', $account)) {
     if (!empty($account->domain_user)) {
       foreach ($account->domain_user as $id) {
@@ -390,7 +394,15 @@ function domain_node_grants($account, $op) {
 function domain_node_access_records($node) {
   if (domain_disabling()) {
     return;
-  } 
+  }
+  // Test function to promote content to all affliates on module activation
+  if (domain_enabling()) {
+    // How is core content handled for this site?
+    $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+    if ($behavior == 1) {
+      $node->domain_site = TRUE;
+    }
+  }
   $grants = array();
   // If the form is hidden, we are passed the 'domains_raw' variable.
   if (is_array($node->domains_raw)) {
@@ -412,7 +424,7 @@ function domain_node_access_records($node) {
     );
   }
   // Special permissions for editors, if activated.
-  $editors = variable_get('domain_editors', 0);  
+  $editors = variable_get('domain_editors', DOMAIN_EDITOR_RULE);  
   if (!empty($node->domains)) {
     foreach($node->domains as $key => $value) {
       // We can't use a 0 value in an $options list, so convert -1 to 0.
@@ -458,7 +470,7 @@ function domain_node_access_records($node) {
         'grant_view' => FALSE,
         'grant_update' => TRUE,
         'grant_delete' => TRUE,
-        'priority' => -5,         
+        'priority' => 0,         
       );    
     }
   }
@@ -471,6 +483,7 @@ function domain_node_access_records($node) {
  * @ingroup node
  */
 function domain_enable() {
+  domain_enabling(TRUE);
   node_access_rebuild();
 }  
 
@@ -481,6 +494,10 @@ function domain_enable() {
  */
 function domain_disable() {
   domain_disabling(TRUE);
+  // This lets us control how the module updates the {node_access} table.
+  cache_clear_all('variables', 'cache');
+  variable_set('domain_behavior', DOMAIN_INSTALL_RULE);
+  variable_set('domain_editors', DOMAIN_EDITOR_RULE);  
   node_access_rebuild();
 }  
 
@@ -495,6 +512,19 @@ function domain_disabling($set = NULL) {
     $disabling = $set;
   }
   return $disabling;
+} 
+
+/**
+ * Simple function to make sure we respond with the correct grants when enabling ourselves.
+ *
+ * @ingroup node
+ */
+function domain_enabling($set = NULL) {
+  static $enabling = false;
+  if ($set !== NULL) {
+    $enabling = $set;
+  }
+  return $enabling;
 } 
 
 /**
@@ -513,7 +543,7 @@ function domain_form_alter($form_id, &$form) {
     // By default, the requesting domain is assigned.
     $default = array($_domain['domain_id']);
     // How is core content handled for this site?
-    $behavior = variable_get('domain_behavior', 1);
+    $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
     if ($behavior == 1 || $_domain['domain_id'] == 0) {
       $default[] = -1;
     }
@@ -523,7 +553,13 @@ function domain_form_alter($form_id, &$form) {
     }
     // If the user is a site admin, show the form, otherwise pass it silently.
     if (user_access('set domain access')) {
-      $form['domain_site'] = array(
+      $form['domain'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Domain access options'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE
+      );
+      $form['domain']['domain_site'] = array(
         '#type' => 'checkbox',
         '#prefix' => t('<p><b>Publishing options:</b>'),
         '#suffix' => '</p>',
@@ -532,7 +568,7 @@ function domain_form_alter($form_id, &$form) {
         '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below..'),
         '#default_value' => ($form['#node']->nid) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );    
-      $form['domains'] = array(
+      $form['domain']['domains'] = array(
         '#type' => 'checkboxes',
         '#title' => t('Publish to'),
         '#options' => $options,
@@ -553,7 +589,7 @@ function domain_form_alter($form_id, &$form) {
       );
     }
     // Some editors cannot administer nodes, so we have to add these form elements.
-    if (variable_get('domain_editors', 0) == 1 && user_access('edit domain nodes')) {
+    if (variable_get('domain_editors', DOMAIN_EDITOR_RULE) == 1 && user_access('edit domain nodes')) {
       $access = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
       foreach ($access as $item) {
         $form[$item]['#access'] = TRUE;

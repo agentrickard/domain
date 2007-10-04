@@ -4,12 +4,24 @@
  * Implements hook_install()
  */
 function domain_conf_install() {
-  db_query(
-    "CREATE TABLE {domain_conf} (
-       domain_id int(11) NOT NULL default '0',
-       settings blob,
-       PRIMARY KEY (domain_id)
-     ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+  switch ($GLOBALS['db_type']) {
+    case 'mysqli':
+    case 'mysql':
+      db_query(
+        "CREATE TABLE IF NOT EXISTS {domain_conf} (
+           domain_id int(11) NOT NULL default '0',
+           settings blob,
+           PRIMARY KEY (domain_id)
+           ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {domain_conf} (
+        domain_id integer NOT NULL default '0',
+        settings bytea,
+        PRIMARY KEY (domain_id)        
+        )");     
+      break;
+  }  
 }
 
 /**
