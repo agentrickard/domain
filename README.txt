@@ -27,6 +27,7 @@ CONTENTS
 4.4   Node Settings
 4.4.1   Domain node editing
 4.4.2   Domain node types
+4.5   Block -- Domain Switcher
 5.  Node Access
 5.1   Assigning Domain Access
 5.2.  Editor Access
@@ -37,6 +38,7 @@ CONTENTS
 6.1   Extension Modules
 6.2   The $_domain Global
 6.3   Database Schema
+6.4   API
 7.  To Do
 
 
@@ -61,9 +63,6 @@ Drupal, the Domain Access module determines user access based on the active
 subdomain that the user is viewing, rather than which group or site the user
 belongs to.
 
-For more information about node_access(), see
-http://api.drupal.org/api/group/node_access/5
-
 Additionally, when a user creates content, that content will automatically be
 assigned to the currently active subdomain unless the user has specific 
 privileges to be able to assign domain access.  Under advanced setups, the 
@@ -71,6 +70,9 @@ ability to edit content for a specific subdomain can be segregated from the
 typical Drupal privilege to 'administer nodes.'
 
 For more information about Domain Access privileges, see section 3.
+
+For more information about node_access(), see 
+http://api.drupal.org/api/group/node_access/5
 
 ----
 1.1 Use-Case
@@ -105,7 +107,7 @@ Domain Access is sponsored by Morris DigitalWorks.
 2.  Installation
 
 To install the module, simply untar the download and put it in your site's
-modules directory.  Afte reading this document, enable the module normally.
+modules directory.  After reading this document, enable the module normally.
 
 When you enable the module, it will create a {domain} table in your Drupal
 database.
@@ -140,6 +142,10 @@ server.  For more information, see:
 After you have enabled multiple DNS entries to resolve to your Drupal
 installation, you may activate the module and configure its settings.  
 
+No matter how many domains resolve to the same IP, you only need one instance
+of Drupal's settings.php file.  The sites folder should be named 'default' or
+named for your root domain.
+
 ----
 2.2 Creating Subdomain Records
 
@@ -163,10 +169,10 @@ This setting controls the default behavior of the module when installing over
 an existing installation.  If set to TRUE, the Domain Access module will assign
 all existing nodes to be viewable by all affiliate sites.
 
-For more details, see section 5.
-
 If you set this value to FALSE, existing nodes will only be visible to users on
 your root domain.
+
+For more details, see section 5.
 
 ----
 2.4 Setting DOMAIN_EDITOR_RULE
@@ -181,8 +187,9 @@ This setting controls the default behavior for affiliate editors.  If
 DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
 intend to use editing controls.
 
-If this is set to TRUE, all existing nodes on your site will be editable by 
-users who are assigned as editors of your root domain.
+If this is set to TRUE and DOMAIN_INSTALL_RULE is set to FALSE, all existing 
+nodes on your site will be editable by users who are assigned as editors of your
+root domain.
 
 See section 3 and section 5 for more information.
 
@@ -192,6 +199,7 @@ See section 3 and section 5 for more information.
 After enabling the module, go to Access Control to configure the module's 
 permissions.
 
+----
 3.1 Module Permissions
 
 The Domain Access module has three standard permissions.
@@ -223,7 +231,7 @@ The Domain Access module has three standard permissions.
 
 Under a normal Drupal site, a single administrator (or a handful of equally
 trusted administrators) typically have the 'administer nodes' permission and
-individual 'edit {type} nodes' permissions.
+individual 'edit TYPE nodes' permissions.
 
 If your site follows this method, you will not need to enable the advanced
 editing controls provided by Domain Access.  Under the module settings, leave 
@@ -262,7 +270,8 @@ Due to the way node_access() works, the following limitations should be noted.
 
   - Users who look at the sites and have the 'administer nodes' permission 
     can always see all content on all sites, which can be confusing.  This is 
-    unavoidable.
+    unavoidable.  It is best to preview your site as an anonymous or 
+    authenticated user who does not have special permissions.
     
   - Users who have the 'edit TYPE nodes' permission will be able to edit nodes
     that do not belong to their subdomain.
@@ -282,7 +291,7 @@ The settings for Domain Access are listed under Site Building.  The path is
 This screen is split into two sections.
 
   1. Default domain settings
-  These elements define the "root" domain for your site.  In the event that a 
+  These elements define the 'root' domain for your site.  In the event that a 
   user tries to access an invalid domain, this domain will be used.
   
   -- Primary domain name
@@ -316,7 +325,7 @@ This screen is split into two sections.
   This setting is especially useful when you restrict editorial permissions.
   
   Note that this setting can be extended through the Node settings described 
-  below.
+  in section 4.4.
 
 ----
 4.2 Domain List
@@ -377,6 +386,22 @@ checking the box, nodes for that given type will automatically be assigned to
 'all affiliate sites' during node creation and editing.  
 
 ----
+4.5 Block -- Domain Switcher
+
+The Domain Access module provides on block, which can be used to help you
+debug your use of the module.
+
+The Domain Switcher block presents a list of all active domains.  Clicking
+on one of the links will take you from your current URL to the same URL on
+the selected domain.
+
+For example, if you are looking at example.com/?q=node and click on another
+domain, the link will take you to one.example.com/?q=node.
+
+In the Domain Switcher block, domains are listed using their human-readable
+sitename variables.
+
+----
 5.  Node Access
 
 The Domain Access module is a node_access() module.  For additional developer
@@ -396,7 +421,7 @@ displayed as checkboxes under the heading "Domain access options":
   Publishing options:
     []  Send to all affiliates
     Select if this content can be shown to all affiliates. This setting will 
-    override the options below..
+    override the options below.
 
   Publish to: * (required)
     [] Drupal
@@ -478,7 +503,7 @@ In each of the realms, there are specific rules for node access grants, as follo
 ----
 5.5   Warnings
 
-Node access is Drupal is a permissive system.  Once a grant has been issued, it 
+Node access in Drupal is a permissive system.  Once a grant has been issued, it 
 cannot be revoked.  As a result, it is possible for multiple editors to be able
 to edit or delete a single node.  Here's the use case:
 
@@ -495,16 +520,15 @@ To be more clear about Drupal permissions:
   - User E has 'edit book nodes' permission for the site.
 
 In this case, User D and User E can also edit or delete node 10. This is why 
-only super-admins are given 'administer nodes' and 'edit {type} nodes' 
+only super-admins are given 'administer nodes' and 'edit TYPE nodes' 
 permissions with the Domain Access module.  If you want your affiliate editors
 to have limited permissions, only grant them 'edit domain nodes'.
 
-However, you still need to give users the 'create {type} nodes' permission 
+However, you still need to give users the 'create TYPE nodes' permission 
 normally.  Domain Access does not affect node creation.
 
 Since Domain Access implements node_access() fully, if you uninstall the module 
--- using Drupal's uninstall sequence -- all node_access rules should be removed
-from your database.
+-- using Drupal's uninstall sequence -- all node_access entries should be reset to grant 'grant_view' to realm 'all' with gid '0'.
 
 ----
 6.  Developer Notes
@@ -519,7 +543,7 @@ Currently, the Domain Conf module is also included in the distribution.  It
 provides separate site configuration options for registered domains.
 
 ----
-6.1 The $_domain Global
+6.2 The $_domain Global
 
 During hook_init(), the Domain Access module creates a nwe global variable,
 $_domain, which can be used by other Drupal elements (themes, blocks, modules).
@@ -528,11 +552,18 @@ The $_domain global is an array of data taken from the {domain} table for the
 currently active domain. If no active domain is found, default values are used:
 
   $_domain['domain_id'] = 0;
-  $_domain['sitename'] = variable_get('domain_sitename', $_sitename);
+  $_domain['sitename'] = variable_get('domain_sitename',
+    variable_get('sitename', 'Drupal'));
   $_domain['subdomain'] = variable_get('domain_root', '');
 
+Some uses for this global variable might include:
+
+  - Block placement based on active subdomain (using PHP for block visibility).
+  - Ad tags inserted based on active subdomain.
+  - Theme switching based on subdomain.
+
 ----
-6.2 Database Schema
+6.3 Database Schema
 
 The Domain Access module creates one table in a Drupal installation.  It 
 contains the following structure:
@@ -550,6 +581,13 @@ contains the following structure:
   Varchar, 80, unique (enforced by code)
   The name for this affiliate, used for readability.
   
+----
+6.4 API
+
+The Domain Access module has an API for internal module hooks.  Documentation is
+included in the download as API.php and can be viewed online at:
+
+  http://therickards.com/api
 
 ----
 7. To Do

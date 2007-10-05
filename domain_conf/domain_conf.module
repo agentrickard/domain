@@ -65,3 +65,15 @@ function domain_conf_page($domain_id) {
     return t('Invalid domain request.');
   } 
 }
+
+/**
+ * Implements hook_domainlinks()
+ * @ingroup hooks
+ */
+function domain_conf_domainlinks($domain) {
+  $links[] = array(
+    'title' => t('settings'),
+    'path' => 'admin/build/domain/conf/'. $domain['domain_id']
+  );
+  return $links;
+}

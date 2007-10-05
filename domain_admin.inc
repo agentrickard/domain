@@ -32,11 +32,15 @@ function domain_list() {
     $new_path = $_path['scheme'] .'://'. $data['subdomain']. request_uri();
     $link = l($data['subdomain'], $new_path, array(), NULL, NULL, TRUE);
     $actions = l(t('edit'), 'admin/build/domain/edit/'. $data['domain_id']);
-    // add advanced settings
-    if (module_exists('domain_conf')) {
-      $actions .= ' | '. l(t('settings'), 'admin/build/domain/conf/'. $data['domain_id']);     
+    // Add advanced settings from other modules.
+    $items = array();
+    $items = module_invoke_all('domainlinks', $data);
+    if (!empty($items)) {
+      foreach ($items as $item) {
+        $actions .= ' | '. l($item['title'], $item['path']);     
+      }
     }
-    $actions .= ' | '. l(t('delete'), 'admin/build/domain/del ete/'. $data['domain_id']); 
+    $actions .= ' | '. l(t('delete'), 'admin/build/domain/delete/'. $data['domain_id']); 
     $rows[] = array($data['domain_id'], ($data['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $data['sitename'], $actions);
   }
   if (!empty($rows)) {
@@ -79,16 +83,6 @@ function domain_configure_form() {
     '#default_value' => variable_get('domain_root', ''),
     '#description' => t('The root domain for example.com.  No http or slashes.')
   );    
-  /*
-  $form['domain']['domain_default'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Default subdomain'),
-    '#size' => 40,
-    '#maxlength' => 40,
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_default', ''),
-    '#description' => t('The default domain for *.example.com.  Can only contain alphanumeric characters.')
-  ); */ 
   $form['domain']['domain_sitename'] = array(
     '#type' => 'textfield',
     '#title' => t('Site name'),

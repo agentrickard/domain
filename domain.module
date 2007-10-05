@@ -189,9 +189,17 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
       }    
       if (user_access('set domain access')) {
         $form['domain_user'] = array(
+          '#type' => 'fieldset',
+          '#title' => t('Domain access'),
+          '#collapsible' => TRUE,
+          '#collapsed' => FALSE,
+          '#weight' => 1
+        );        
+        $form['domain_user']['domain_user'] = array(
           '#type' => 'checkboxes',
           '#options' => $options,
           '#title' => t('Domain access setttings'),
+          '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain nodes" permission.'),
           '#default_value' => $default
         );      
       }
@@ -565,7 +573,7 @@ function domain_form_alter($form_id, &$form) {
         '#suffix' => '</p>',
         '#title' => t('Send to all affiliates'),
         '#required' => FALSE,
-        '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below..'),
+        '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
         '#default_value' => ($form['#node']->nid) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );    
       $form['domain']['domains'] = array(

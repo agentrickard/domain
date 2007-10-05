@@ -1,5 +1,12 @@
 // $Id$
 
+05-OCT-2007
+
+-- Cleans up README errors.
+-- Introduces internal hooks for settings links -- hook_domainlinks(), to be used by submodules to
+    add links to admin/build/domain/list.
+-- Moves the domain access element of the user form into a fieldset.    
+
 04-OCT-2007
 
 -- Adds pgsql install to domain_conf module.
