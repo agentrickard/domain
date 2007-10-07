@@ -2,23 +2,33 @@
 // $Id$
 
 /**
+ * @file
+ * API documentation file.
+ */
+
+/**
  * @defgroup drupal Drupal core
+ * Core Drupal hooks.
  */
 
 /**
  * @defgroup node Node hooks
+ * Drupal node and node_access hooks.
  */
 
 /**
  * @defgroup domain Domain Access module
+ * Core functions for the Domain Access module.
  */
 
 /**
- * @defgroup conf Domain Access configuration extension
+ * @defgroup conf Domain Conf: configuration extension
+ * Core functions for the Domain Conf module.
  */
  
  /**
   * @defgroup hooks Domain API hooks
+  * Internal module hooks for Domain Access.
   */
 
  /**

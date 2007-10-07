@@ -1,4 +1,10 @@
 <?php
+// $Id$
+
+/**
+ * @file
+ * Install file.
+ */
 
 /**
  * Implements hook_install()

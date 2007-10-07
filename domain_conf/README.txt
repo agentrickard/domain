@@ -120,3 +120,9 @@ Installing the module creates a {domain_conf} table that contains:
   - settings
   Blob (bytea)
   A serialized array of settings for this domain.
+  
+/**
+ * @file
+ * README file for Domain Conf
+ */
+  

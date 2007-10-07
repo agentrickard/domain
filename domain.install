@@ -1,4 +1,10 @@
 <?php
+// $Id$
+
+/**
+ * @file
+ * Install file.
+ */
 
 /**
  * Implements hook_install()
@@ -26,7 +32,6 @@ function domain_install() {
       break;
   } 
 }
-
 
 /**
  * Implements hook_uninstall()

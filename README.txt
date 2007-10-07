@@ -615,3 +615,9 @@ domain to have a separate theme and settings.
 
 This module has not been tested with other node_access() modules, and strange 
 behavior may result when used with OG and similar modules.
+
+
+/**
+ * @file
+ * README file for Domain Access.
+ */
