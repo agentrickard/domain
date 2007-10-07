@@ -20,6 +20,15 @@
  /**
   * @defgroup hooks Domain API hooks
   */
+
+ /**
+  * @mainpage
+   Welcome to the API documentation for the Domain Access module, I hope you find it useful.
+  
+   If you find errors in the documentation, please file an issue at http://drupal.org/project/issues/domain.
+  
+   -- agentrickard
+  */
   
 /**
  * Returns links to additional functions for the Domain Access module's admin screen
