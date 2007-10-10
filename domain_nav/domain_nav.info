@@ -1,0 +1,5 @@
+;  $Id $
+name = Domain Access: Navigation
+description = Navigation block and menu options for Domain Access
+package = Domain Access
+dependencies = domain

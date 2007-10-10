@@ -1,0 +1,236 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Navigation block and menu options for Domain Access
+ */
+
+/**
+ * Kill-switch for hook_menu().  
+ * Set this value to FALSE to disable the entire menu.
+ */
+define('DOMAIN_NAV_MENU', TRUE); 
+
+/**
+ * Implements hook_menu()
+ */
+function domain_nav_menu($may_cache) {
+  global $base_url;
+  $items = array();
+  if ($may_cache && DOMAIN_NAV_MENU) {
+    $root = domain_default();
+    $items[] = array(
+      'path' => 'domain',
+      'title' => t('Domain'),
+      'description' => t('Go to main site'),
+      'callback' => 'drupal_goto',
+      'callback arguments' => array($root['path']),
+      'type' => MENU_SUGGESTED_ITEM,
+      'access' => TRUE
+    );  
+    // Generate the list of active domains as menu items
+    $domains = domain_domains();
+    foreach ($domains as $domain) {
+      $items[] = array(
+        'path' => 'domain/'. $domain['subdomain'],
+        'title' => $domain['sitename'],
+        'description' => t('Go to !domain', array('!domain' => $domain['subdomain'])),
+        'callback' => 'drupal_goto',
+        'callback arguments' => array($domain['path']),
+        'access' => TRUE
+      );  
+    }  
+  }
+  return $items;
+}
+
+/**
+ * Implements hook_block()
+ *
+ * @ingroup drupal
+ */
+function domain_nav_block($op='list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $block[0]["info"] = t('Domain list navigator');
+      break;
+    case 'view':
+      $block['subject'] = '<none>';
+      $block['content'] = domain_nav_render();
+      break;
+    case 'configure':
+      $form['domain_nav_block'] = array(
+        '#type' => 'radios',
+        '#title' => t('Link paths'),
+        '#default_value' => variable_get('domain_nav_block', 0),
+        '#options' => array(0 => t('Link to site home page'), 1 => t('Link to active url')),
+      );
+      $form['domain_nav_theme'] = array(
+        '#type' => 'radios',
+        '#title' => t('Link theme'),
+        '#default_value' => variable_get('domain_nav_theme', 'default'),
+        '#options' => array(
+          'default' => t('JavaScript select list'),
+          'menus' => t('Menu-style tab links'),
+          'ul' => t('Unordered list of links'),
+        ),
+      );      
+      return $form;    
+      break;
+    case 'save':
+      variable_set('domain_nav_block', $edit['domain_nav_block']);
+      variable_set('domain_nav_theme', $edit['domain_nav_theme']);      
+      break;
+  }
+  return $block;
+} 
+
+/**
+ * Renders output for the block.
+ *
+ * This function is extracted for use in your themes.  Just call:
+ *   domain_nav_render($paths = 0, $style = 'default');
+ *
+ * @param $paths
+ *  A boolean flag indicating how to write links to other domains:
+ *    0 == link to home page of selected domain
+ *    1 == link to current url on selected domain
+ *
+ * @param $style
+ *  Indicates which theme function to invoke.  Default options are:
+ *    'default' == theme_domain_nav_default()
+ *    'menus' == theme_domain_nav_menus()
+ *    'ul' == theme_domain_nav_ul()
+ *
+ * @return
+ *  A themed HTML object for navigation.
+ *
+ * @ingroup list
+ */
+function domain_nav_render($paths = 0, $style = 'default') { 
+  global $_domain;
+  // Get the options and set the variables.
+  $paths = variable_get('domain_nav_block', $paths);
+  $style = variable_get('domain_nav_theme', $style);
+  $options = array();
+  $domains = domain_domains();
+  // Select which path calculation to use.
+  ($paths == 0) ? $func = 'domain_nav_full' : $func = 'domain_nav_uri';
+  foreach ($domains as $key => $value) {
+    if ($_domain['subdomain'] == $value['subdomain']) {
+      $value['active'] = TRUE;
+    }
+    $path = $func($value);
+    $value['path'] = $path;
+    // Allow other modules to add elements to the array.
+    $extra = array();
+    $extra = module_invoke_all('domainlist', $value);
+    $value = array_merge($value, $extra);
+    $options[$value['domain_id']] = $value;
+  }
+  $theme = 'domain_nav_'. $style;
+  $content = theme($theme, $options);
+  return $content; 
+}
+
+/**
+ * Formats a path in relation to the $base_url
+ *
+ * @param $domain
+ *  The domain record for this domain_id, taken from {domain}.
+ *
+ * @ingroup list
+ */
+function domain_nav_full($domain) {
+  return domain_get_path($domain);
+}
+
+/**
+ * Formats a path in relation to the request_uri()
+ *
+ * @param $domain
+ *  The domain record for this domain_id, taken from {domain}.
+ *
+ * @ingroup list
+ */
+function domain_nav_uri($domain) {
+  return domain_get_uri($domain);
+}
+
+/**
+ * Themes the domain list as a JavaScript selection form.
+ *
+ * @param $options
+ *  An array of information about each domain.  Options contain the following:
+ *
+ *    - domain_id -- the unique identifier of this domain
+ *    - subdomain -- the host path of the url for this domain
+ *    - sitename -- the human-readable name of this domain
+ *    - path -- the link path (a Drupal-formatted path)
+ *    - active -- a boolean flag indicating the currently active domain 
+ *    
+ *  If hook_domainlist() is invoked, additonal elements may be present.
+ *
+ * @ingroup themes
+ */
+function theme_domain_nav_default($options) {
+  $output = '<form id="domain-list">';
+  $output .= '<select onchange="if (this.value) location.href=this.value;">';
+  $output .= '<option>'. t('Jump to...') .'</option>';
+  foreach ($options as $key => $value) {
+    ($value['active']) ? $selected = ' selected' : $selected = '';
+    $output .= '<option value="'. $value['path'] .'"'. $selected .'>'. $value['sitename'] .'</option>';
+  }
+  $output .= '</select>';
+  $output .= '</form>';  
+  return $output;
+}
+
+/**
+ * Themes the domain list as an unordered list of links.
+ *
+ * @param $options
+ *  An array of information about each domain.
+ *
+ * @ingroup themes
+ */
+function theme_domain_nav_ul($options) { 
+  foreach ($options as $key => $value) {
+    $items[] = l($value['sitename'], $value['path']); 
+  }
+  return theme('item_list', $items);
+}
+
+/**
+ * Themes the domain list as a menu-style group of tabs.
+ *
+ * @param $options
+ *  An array of information about each domain.
+ *
+ * @ingroup themes
+ */
+function theme_domain_nav_menus($options) { 
+  foreach ($options as $key => $value) {
+    ($value['active']) ? $active = 'active' : $active =  '';
+    $items[] = array(
+      'data' => l($value['sitename'], $value['path']),
+      'class' => $active
+    ); 
+  }
+  return theme('item_list', $items, NULL, 'ul', array('class' => 'tabs primary'));
+} 
+
+/**
+ * Implements hook_domainrecord()
+ */
+function domain_nav_domainrecord($op, $domain = array(), $edit = array()) {
+  // Only execute if the menu is turned on.
+  if (DOMAIN_NAV_MENU) {
+    // We rebuild the menu, since the domain records have changed.
+    // Clear the page cache, so that changed menus are reflected for anonymous users.
+    cache_clear_all('*', 'cache_page', TRUE);
+    // Also clear the menu cache.
+    cache_clear_all('*', 'cache_menu', TRUE);
+  }  
+}

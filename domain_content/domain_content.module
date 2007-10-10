@@ -1,0 +1,227 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Editorial overview module.
+ *
+ * Provides batch node editing for users with 'edit domain nodes' permission
+ * but without the 'administer nodes' permission.
+ */
+
+/**
+ * Implements hook_menu()
+ */
+function domain_content_menu($may_cache) {
+  $items = array();
+  $access = FALSE;
+  $all = FALSE;
+  if (user_access('edit domain nodes') || user_access('set domain access') || user_access('administer nodes')) {
+    $access = TRUE;
+  }
+  if (user_access('administer nodes') || user_access('set domain access')) {
+    $all = TRUE;
+  }
+  if ($may_cache) {
+    $items[] = array(
+      'title' => t('Domain content'),
+      'path' => 'admin/domain/content',
+      'callback' => 'domain_content_page',
+      'type' => MENU_NORMAL_ITEM,      
+      'access' => $access
+    );  
+    $items[] = array(
+      'title' => t('All affiliate sites'),
+      'path' => 'admin/domain/content/all',
+      'callback' => 'domain_content_view',
+      'description' => t('View Content assigned to all affiliate sites.'),
+      'callback arguments' => array(NULL, TRUE),      
+      'access' => $access
+    );    
+  }
+  // Generate the list of active domains as menu items
+  $domains = domain_domains();
+  foreach ($domains as $domain) {
+    $check = domain_content_check($domain, $all);
+    $items[] = array(
+      'path' => 'admin/domain/content/'. $domain['subdomain'],
+      'title' => $domain['sitename'],
+      'description' => t('View Content for !domain', array('!domain' => $domain['subdomain'])),
+      'callback' => 'domain_content_view',
+      'callback arguments' => array($domain['domain_id']),
+      'access' => $check
+    );
+  }
+  return $items;
+}
+
+/**
+ * Access checking routine for the menu
+ */
+function domain_content_check($domain, $all) {
+  global $user;
+  $check = FALSE;
+  $editor = FALSE;
+  // Can this user see the default site?
+  if ($domain['domain_id'] == 0 && $user->domain_user['-1'] == -1) {
+    $editor = TRUE;
+  }
+  // Can this user see the active site?
+  else if ($domain['domain_id'] > 0 && $domain['domain_id'] == $user->domain_user[$domain['domain_id']]) {
+    $editor = TRUE;
+  }
+  if ($all || $editor) {
+    $check = TRUE;
+  }
+  return $check;
+}
+
+/**
+ * The domain content page of menu callbacks
+ */
+function domain_content_page() {
+  $menu = menu_get_item(NULL, 'admin/domain/content');
+  foreach ($menu['children'] as $mid) {
+    $item = menu_get_item($mid);
+    if ($item['access']) {
+      $items[] = l($item['title'], $item['path']) . '<br />'. $item['description'];
+    }  
+  }
+  if (count($items) > 1) {
+    $output = theme('item_list', $items);
+  }
+  else if (count($items) == 1) {
+    drupal_goto($items[0]['path']);
+  }
+  else {
+    $output = t('There are no valid domains configured.');
+  }
+  return $output;
+}
+
+/**
+ * Content for a specific domain
+ */
+function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
+  global $_domain;
+  // For users with limited privileges, we have to be on the same server
+  // as the content we are looking up.
+  $domain = domain_lookup($domain_id);
+  if ($_domain['domain_id'] != $domain_id) {
+    $path = domain_get_uri($domain);
+    drupal_goto($path);
+  } 
+  // Override the $_domain global so we can see the appropriate content
+  if (!is_null($domain_id)) {
+    $_domain['site_grant'] = FALSE;
+    drupal_set_title(t('Content for !domain', array('!domain' => $_domain['sitename'])));
+  }
+  else if ($all_affiliates) {
+    // set $_domain to the default?
+    $_domain['site_grants'] = TRUE;
+    drupal_set_title(t('Content for all affiliate sites'));
+  }
+  // KILLSWITCH CASE: returns an error
+  else {
+    drupal_set_message(t('Invalid request'), 'error');
+    $output = t('<p>The specified domain does not exist.</p>');
+    return $output;
+  }
+  $output .= domain_content_admin();
+  return $output;
+}
+
+/**
+ * Implements hook_form_alter()
+ */
+function domain_content_form_alter($form_id, &$form) {
+  switch ($form_id) {
+  }
+}
+
+/**
+ * Content admin
+ */
+function domain_content_admin() {
+  $output = drupal_get_form('node_filter_form');
+
+  if ($_POST['operation'] == 'delete' && $_POST['nodes']) {
+    return drupal_get_form('node_multiple_delete_confirm');
+  }
+  // Call the form first, to allow for the form_values array to be populated.
+  $output .= drupal_get_form('domain_content_form');  
+  
+  return $output;
+}
+
+/**
+ * Rewrites node_admin_nodes() to use db_rewrite_sql()
+ */
+function domain_content_form() {
+  global $user;
+  $filter = node_build_filter_query();
+
+  $result = pager_query(db_rewrite_sql('SELECT n.*, u.name, u.uid FROM {node} n '. $filter['join'] .' INNER JOIN {users} u ON n.uid = u.uid '. $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
+
+  $destination = drupal_get_destination();
+  $check = array();  
+  
+  while ($node = db_fetch_object($result)) {
+    $form['title'][$node->nid] = array('#value' => l($node->title, 'node/'. $node->nid) .' '. theme('mark', node_mark($node->nid, $node->changed)));
+    $form['name'][$node->nid] =  array('#value' => check_plain(node_get_types('name', $node)));
+    $form['username'][$node->nid] = array('#value' => theme('username', $node));
+    $form['status'][$node->nid] =  array('#value' =>  ($node->status ? t('published') : t('not published')));
+    // This routine controls if the editor can see the 'edit' link.
+    // Load the domain_access rules directly from domain_nodeapi().
+    domain_nodeapi($node, 'load');
+    $all = FALSE;
+    if (user_access('administer nodes') || user_access('set domain access')) {
+      $all = TRUE;
+      $check[$node->nid] = TRUE;
+      if ($message == 0) {
+        drupal_set_message(t('Your privlieges allow you to see content that may not be unique to this domain.'));
+        $message++;
+      }  
+    }    
+    if (!empty($node->domains)) {
+      foreach ($node->domains as $domain) {
+        $check[$node->nid] = domain_content_check($domain, $all);
+      }
+    }  
+    if (!empty($check[$node->nid])) {
+      $form['operations'][$node->nid] = array('#value' => l(t('edit'), 'node/'. $node->nid .'/edit', array(), $destination));
+      $nodes[$node->nid] = '';
+    }  
+  }
+  if (!empty($check)) {  
+    $form['options'] = array('#type' => 'fieldset',
+      '#title' => t('Update options'),
+      '#prefix' => '<div class="container-inline">',
+      '#suffix' => '</div>',
+      '#weight' => -1
+    );
+    $options = array();
+    foreach (module_invoke_all('node_operations') as $operation => $array) {
+      $options[$operation] = $array['label'];
+    }
+    $form['options']['operation'] = array('#type' => 'select', '#options' => $options,  '#default_value' => 'approve');
+    $form['options']['submit'] = array('#type' => 'submit', '#value' => t('Update'));  
+
+    $form['nodes'] = array('#type' => 'checkboxes', '#options' => $nodes);
+  }  
+  $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
+  $form['#theme'] = 'node_admin_nodes';
+    $form['#submit']['node_admin_nodes_submit'] = array();  
+  return $form;
+}
+
+/**
+ * Implements hook_domainrecord()
+ */
+function domain_content_domainrecord($op, $domain = array(), $edit = array()) {
+  // We rebuild the menu, since the domain records have changed.
+  // Clear the page cache, so that changed menus are reflected for anonymous users.
+  cache_clear_all('*', 'cache_page', TRUE);
+  // Also clear the menu cache.
+  cache_clear_all('*', 'cache_menu', TRUE);
+}

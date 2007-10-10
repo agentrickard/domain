@@ -1,0 +1,5 @@
+;  $Id $
+name = Domain Access: Content Administration
+description = Provides a Content list screen for each active domain.
+package = Domain Access
+dependencies = domain
