@@ -1,5 +1,10 @@
 // $Id$
-
+  
+/**
+ * @file
+ * README file for Domain Conf
+ */
+ 
 Domain Access: Site Configuration
 Advanced site configuration options for Domain Access.
 
@@ -21,7 +26,8 @@ CONTENTS
 1.  Introduction
 
 The Domain Access: Site Configuration module (called Domain Conf), is an
-optional extension of the Domain Access module.  Domain Conf provides options for configuring basic settings of your affiliate sites to be different.
+optional extension of the Domain Access module.  Domain Conf provides options 
+for configuring basic settings of your affiliate sites to be different.
 
 ----
 1.1 Use-Case
@@ -120,9 +126,5 @@ Installing the module creates a {domain_conf} table that contains:
   - settings
   Blob (bytea)
   A serialized array of settings for this domain.
-  
-/**
- * @file
- * README file for Domain Conf
- */
+
   

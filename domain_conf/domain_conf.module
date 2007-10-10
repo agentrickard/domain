@@ -12,6 +12,8 @@
 
 /**
  * Implements hook_init()
+ *
+ * @ingroup drupal
  */
 function domain_conf_init() {
   global $_domain;
@@ -68,7 +70,8 @@ function domain_conf_page($domain_id) {
 
 /**
  * Implements hook_domainlinks()
- * @ingroup hooks
+ *
+ * @ingroup conf
  */
 function domain_conf_domainlinks($domain) {
   $links[] = array(

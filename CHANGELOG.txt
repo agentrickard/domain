@@ -1,5 +1,14 @@
 // $Id$
 
+09-OCT-2007
+
+-- Adds the Domain Nav module, which generates a block of navigation links.
+-- Adds the Domain Content module, for batch editing domain-specific content.
+-- Adds several new helper functions.
+-- Corrects use of variable_del() to reset variables during the domain_disable() function.
+-- Changes domain_list() to domain_view().
+-- Cleans up documentation style and defgroups.
+
 07-OCT-2007
 
 -- Cleans up API documentation file.

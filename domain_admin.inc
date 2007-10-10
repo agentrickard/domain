@@ -17,7 +17,7 @@
  *
  * @ingroup domain
  */
-function domain_list() {
+function domain_view() {
   global $_domain, $base_url;
   $_path = parse_url($base_url);
   $default = variable_get('domain_root', '');
@@ -191,6 +191,10 @@ function domain_create_form_validate($form_id, $form_values) {
  */
 function domain_create_form_submit($form_id, $form_values) {
   db_query("INSERT INTO {domain} (subdomain, sitename) VALUES ('%s', '%s')", $form_values['subdomain'], $form_values['sitename']);
+  // Let other modules act.
+  // Let other modules act.
+  $domain = domain_lookup(NULL, $form_values['subdomain']);
+  module_invoke_all('domainrecord', 'create', $domain, $form_values);
   drupal_set_message(t('Domain record created.'));
   drupal_goto('admin/build/domain/view');
 }
@@ -271,6 +275,9 @@ function domain_edit_form_validate($form_id, $form_values) {
  */
 function domain_edit_form_submit($form_id, $form_values) {
   db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s' WHERE domain_id = %d", $form_values['subdomain'], $form_values['sitename'], $form_values['domain_id']);
+  // Let other modules act.
+  $domain = domain_lookup($form_values['domain_id']);
+  module_invoke_all('domainrecord', 'update', $domain, $form_values);
   drupal_set_message(t('Domain record updated.'));
   drupal_goto('admin/build/domain/view');  
 }
@@ -312,6 +319,9 @@ function domain_delete_form($domain) {
  */
 function domain_delete_form_submit($form_id, $form_values) {
   db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_values['domain_id']);
+  // Let other modules act.
+  $domain = domain_lookup($form_values['domain_id']);
+  module_invoke_all('domainrecord', 'delete', $domain, $form_values);
   drupal_set_message(t('Domain record deleted.'));
   drupal_goto('admin/build/domain/view');  
 }
