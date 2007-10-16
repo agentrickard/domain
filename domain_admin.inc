@@ -18,30 +18,27 @@
  * @ingroup domain
  */
 function domain_view() {
-  global $_domain, $base_url;
-  $_path = parse_url($base_url);
-  $default = variable_get('domain_root', '');
-  $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
-  $header = array(t('Id'), t('Domain'), t('Site name'), t('Actions'));
-  $rows = array();
-  $sitename = variable_get('sitename', 'Drupal');  
-  $host = preg_replace('/'. $_domain['subdomain'] .'/i', $default, $_path['host'], 1);  
-  $link = l($default, $_path['scheme'] .'://'. $default . request_uri());
-  $rows[] = array(0, ($default == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, variable_get('domain_sitename', $sitename), l(t('Default settings'), 'admin/build/domain/settings'));
-  while ($data = db_fetch_array($result)) {
-    $new_path = $_path['scheme'] .'://'. $data['subdomain']. request_uri();
-    $link = l($data['subdomain'], $new_path, array(), NULL, NULL, TRUE);
-    $actions = l(t('edit'), 'admin/build/domain/edit/'. $data['domain_id']);
-    // Add advanced settings from other modules.
-    $items = array();
-    $items = module_invoke_all('domainlinks', $data);
-    if (!empty($items)) {
-      foreach ($items as $item) {
-        $actions .= ' | '. l($item['title'], $item['path']);     
-      }
+  global $_domain;
+  $header = array(t('Id'), t('Domain'), t('Site name'), t('Actions'));  
+  $domains = domain_domains();
+  foreach ($domains as $domain) {
+    $link = l($domain['subdomain'], domain_get_uri($domain), array(), NULL, NULL, TRUE);
+    if ($domain['domain_id'] == 0) {
+      $actions = l(t('Default settings'), 'admin/build/domain/settings');
     }
-    $actions .= ' | '. l(t('delete'), 'admin/build/domain/delete/'. $data['domain_id']); 
-    $rows[] = array($data['domain_id'], ($data['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $data['sitename'], $actions);
+    else {
+      $actions = l(t('edit'), 'admin/build/domain/edit/'. $domain['domain_id']);
+      // Add advanced settings from other modules.
+      $items = array();
+      $items = module_invoke_all('domainlinks', $domain);
+      if (!empty($items)) {
+        foreach ($items as $item) {
+          $actions .= ' | '. l($item['title'], $item['path']);     
+        }
+      }
+      $actions .= ' | '. l(t('delete'), 'admin/build/domain/delete/'. $domain['domain_id']); 
+    }  
+    $rows[] = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $domain['sitename'], $actions);
   }
   if (!empty($rows)) {
     return theme('table', $header, $rows);  

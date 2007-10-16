@@ -7,13 +7,15 @@
  */
 
 /**
- * Kill-switch for hook_menu().  
- * Set this value to FALSE to disable the entire menu.
+ * Killswitch for hook_menu().  
+ * Set this value to FALSE to disable the Domain Nav menu items.
  */
 define('DOMAIN_NAV_MENU', TRUE); 
 
 /**
  * Implements hook_menu()
+ *
+ * @ingroup drupal
  */
 function domain_nav_menu($may_cache) {
   global $base_url;
@@ -33,7 +35,7 @@ function domain_nav_menu($may_cache) {
     $domains = domain_domains();
     foreach ($domains as $domain) {
       $items[] = array(
-        'path' => 'domain/'. $domain['subdomain'],
+        'path' => 'domain/'. $domain['subdomain'], // Can't use absolute paths, so we goto.
         'title' => $domain['sitename'],
         'description' => t('Go to !domain', array('!domain' => $domain['subdomain'])),
         'callback' => 'drupal_goto',
@@ -106,7 +108,7 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
  * @return
  *  A themed HTML object for navigation.
  *
- * @ingroup list
+ * @ingroup nav
  */
 function domain_nav_render($paths = 0, $style = 'default') { 
   global $_domain;
@@ -116,7 +118,7 @@ function domain_nav_render($paths = 0, $style = 'default') {
   $options = array();
   $domains = domain_domains();
   // Select which path calculation to use.
-  ($paths == 0) ? $func = 'domain_nav_full' : $func = 'domain_nav_uri';
+  ($paths == 0) ? $func = 'domain_get_path' : $func = 'domain_get_uri';
   foreach ($domains as $key => $value) {
     if ($_domain['subdomain'] == $value['subdomain']) {
       $value['active'] = TRUE;
@@ -135,30 +137,6 @@ function domain_nav_render($paths = 0, $style = 'default') {
 }
 
 /**
- * Formats a path in relation to the $base_url
- *
- * @param $domain
- *  The domain record for this domain_id, taken from {domain}.
- *
- * @ingroup list
- */
-function domain_nav_full($domain) {
-  return domain_get_path($domain);
-}
-
-/**
- * Formats a path in relation to the request_uri()
- *
- * @param $domain
- *  The domain record for this domain_id, taken from {domain}.
- *
- * @ingroup list
- */
-function domain_nav_uri($domain) {
-  return domain_get_uri($domain);
-}
-
-/**
  * Themes the domain list as a JavaScript selection form.
  *
  * @param $options
@@ -170,7 +148,7 @@ function domain_nav_uri($domain) {
  *    - path -- the link path (a Drupal-formatted path)
  *    - active -- a boolean flag indicating the currently active domain 
  *    
- *  If hook_domainlist() is invoked, additonal elements may be present.
+ *  If hook_domainnav() is invoked, additonal elements may be present.
  *
  * @ingroup themes
  */
@@ -223,6 +201,8 @@ function theme_domain_nav_menus($options) {
 
 /**
  * Implements hook_domainrecord()
+ *
+ * @ingroup nav
  */
 function domain_nav_domainrecord($op, $domain = array(), $edit = array()) {
   // Only execute if the menu is turned on.

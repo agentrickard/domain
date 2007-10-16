@@ -32,7 +32,12 @@
   */
 
 /**
- * @defgroup list Domain List: navigation block
+ * @defgroup nav Domain Navigation: navigation block and menu options
+ * Configurable navigation and block based on active domains.
+ */
+
+/**
+ * @defgroup content Domain Content : administer nodes
  * Configurable navigation block based on active domains.
  */
 

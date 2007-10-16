@@ -1,5 +1,16 @@
 // $Id$
 
+15-OCT-2007
+
+-- Finishes the Domain Content module for batch editing.
+-- API updates for Domain Content.
+-- Cleans up some additional redundancy.
+
+10-OCT-2007
+ 
+-- Shortens module names in info files.
+-- Cleans up some redundant functions.
+
 09-OCT-2007
 
 -- Adds the Domain Nav module, which generates a block of navigation links.

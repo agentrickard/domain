@@ -20,6 +20,7 @@ CONTENTS
 2.2   Creating Subdomain Records
 2.3   Setting DOMAIN_INSTALL_RULE
 2.4   Setting DOMAIN_EDITOR_RULE
+2.5   Setting DOMAIN_SITE_GRANT
 3.  Permissons
 3.1   Module Permissions
 3.2   Normal Usage
@@ -197,6 +198,20 @@ nodes on your site will be editable by users who are assigned as editors of your
 root domain.
 
 See section 3 and section 5 for more information.
+
+----
+2.5 Setting DOMAIN_SITE_GRANT
+
+At the top of the domain.module file, you will find this line:
+
+  define('DOMAIN_SITE_GRANT', TRUE);
+
+This setting controls the default behavior for viewing affiliate content.
+By design, the Domain Access module allows site administrators to assign
+content to 'all affiliates.'  If this value is set to TRUE, then content
+assigned to all affiliates can be seen by all users on all current domains.
+
+Normally, you will not need to edit this value.
 
 ----
 3.  Permissions

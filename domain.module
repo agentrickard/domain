@@ -19,6 +19,12 @@ define('DOMAIN_INSTALL_RULE', TRUE);
 define('DOMAIN_EDITOR_RULE', FALSE);
 
 /**
+ * Defines whether to show affiliated content on all domains..
+ * You may alter this variable before installing the module. See README.txt.
+ */
+define('DOMAIN_SITE_GRANT', TRUE);
+
+/**
  * Implements hook_init()
  *
  * Inititalizes a global $_domain variable and set it based on the 
@@ -30,7 +36,7 @@ function domain_init() {
   global $_domain;
   $_domain = array();
   // Grant access to all affiliates.
-  $_domain['site_grant'] = TRUE;
+  $_domain['site_grant'] = DOMAIN_SITE_GRANT;
 
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
   $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
@@ -147,19 +153,10 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
       break;
     case 'view':
       $block['subject'] = t('Domain switcher');
-      // TODO: This code shares a lot of operations with domain_view() so 
-      // perhaps if might need to be abstracted.
-      $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
       $items = array();
-      $_path = parse_url($base_url);
-      $scheme = $_path['scheme'] .'://';
-      $default = variable_get('domain_root', ''); 
-      $sitename = variable_get('sitename', 'Drupal');      
-      $name = variable_get('domain_sitename', $sitename);
-      $items[] =  l($name, $scheme . $default . request_uri());
-      while ($data = db_fetch_array($result)) {      
-        $path = $scheme . $data['subdomain'] . request_uri(); 
-        $items[] = l($data['sitename'], $path);
+      $domains = domain_domains();
+      foreach ($domains as $domain) {
+        $items[] = l($domain['sitename'], domain_get_uri($domain));
       }
       $block['content'] = theme('item_list', $items);
       return $block;
@@ -300,13 +297,14 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL) {
  */
 function domain_default() {
   static $default;
-  if (empty($domain_default)) {
+  if (empty($default)) {
     $default['domain_id'] = 0;
     $default['sitename'] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
     $default['subdomain'] = variable_get('domain_root', '');
-    $default['path'] = domain_get_path($domain);
-    $default['site_grants'] = TRUE;
+    $default['path'] = domain_get_path($default);
+    $default['site_grant'] = DOMAIN_SITE_GRANT;
   }  
+
   return $default;
 }    
 
@@ -435,8 +433,11 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  */
 function domain_node_grants($account, $op) {
   global $_domain, $user;
-  // By design, all users can see content sent to all affiliates.
-  if ($_domain['site_grants']) {
+  // By design, all users can see content sent to all affiliates,
+  // but the $_domain['site_grant'] can be set to FALSE.  
+  // In the case of node batch editing and node_access_rebuild(), we
+  // deliberately set this value to FALSE.
+  if ($_domain['site_grant']) {
     $grants['domain_site'][] = 0;
   }  
   
@@ -474,7 +475,7 @@ function domain_node_access_records($node) {
   if (domain_disabling()) {
     return;
   }
-  // Test function to promote content to all affliates on module activation
+  // Promote content to all affliates on module activation
   if (domain_enabling()) {
     // How is core content handled for this site?
     $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
