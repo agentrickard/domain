@@ -54,11 +54,67 @@
   
    -- agentrickard
   */
+
+/**
+ * Notify other modules that we are granting access to a node.
+ *
+ * This hook allows Domain Access modules to overwrite default behaviors.
+ * See http://api.drupal.org/api/function/hook_node_grants/5 for more detail.
+ * 
+ * @param &$grants
+ *  The existing default $grants, passed by reference.
+ * @param $account
+ *  The user object of the user requesting the node.
+ * @param $op
+ *  The node operation being performed (view, update, or delete).
+ *
+ * @return
+ *  No return value. Modify the $grants array, passed by reference.
+ *
+ * @ingroup hooks
+ */
+function hook_domaingrants(&$grants, $account, $op) {
+  // Add a sample grant privilege to let a user see their content at all times.
+  $grants['domain_example'][] = $account->uid;
+  return $grants;
+}
+
+
+/**
+ * Notify other modules that we are saving node access records.
+ *
+ * This hook allows Domain Access modules to overwrite the default bahaviors.
+ * See http://api.drupal.org/api/function/hook_node_access_records/5 for more detail.
+ * 
+ * @param &$grants
+ *  The existing default $grants, passed by reference.
+ * @param $node
+ *  The node object being saved.
+ *
+ * @return
+ *  No return value. Modify the $grants array, passed by reference.
+ * 
+ *
+ * @ingroup domain
+ */
+function hook_domainrecords(&$grants, $node) {
+  // Add a sample access record to let a user see their content at all times.
+  $grants[] = array(
+    'realm' => 'domain_example',
+    'gid' => $node->uid,
+    'grant_view' => TRUE,
+    'grant_update' => TRUE,
+    'grant_delete' => TRUE,
+    'priority' => 0,         // If this value is > 0, then other grants will not be recorded
+  );
+  return $grants;
+}
   
 /**
  * Notify other modules that we have created a new domain or 
- * updated a domain record.  Where possible, use the $domain values
- * in preference to the $edit values.
+ * updated a domain record.  
+ 
+ * NOTE: Where possible, use the $domain values in preference to the $edit values.
  *
  * @param $op
  *  The operation being performed: 'create', 'update', 'delete'
@@ -67,7 +123,7 @@
  *
  * @ingroup hooks
  */
-function hook_domainrecord($op, $domain = array(), $edit = array()) {
+function hook_domainupdate($op, $domain = array(), $edit = array()) {
   switch ($op) {
     case 'create':
       db_query("INSERT INTO {mytable} (subdomain, sitename) VALUES ('%s', '%s')", $domain['subdomain'], $domain['sitename']);
@@ -80,9 +136,7 @@ function hook_domainrecord($op, $domain = array(), $edit = array()) {
       break;
   }
 }
-  
-}
-  
+
 /**
  * Returns links to additional functions for the Domain Access module's admin screen
  *

@@ -38,7 +38,8 @@ function domain_content_menu($may_cache) {
       'callback' => 'domain_content_view',
       'description' => t('View content assigned to all affiliate sites.'),
       'callback arguments' => array(NULL, TRUE),      
-      'access' => $access
+      'access' => $access,
+      'weight' => -10
     );    
   }
   // Generate the list of active domains as menu items
@@ -51,7 +52,8 @@ function domain_content_menu($may_cache) {
       'description' => t('View content for !domain', array('!domain' => $domain['subdomain'])),
       'callback' => 'domain_content_view',
       'callback arguments' => array($domain['domain_id'], FALSE),
-      'access' => $check
+      'access' => $check,
+      'weight' => $domain['domain_id']
     );
   }
   return $items;
@@ -281,11 +283,11 @@ function domain_content_form() {
 }
 
 /**
- * Implements hook_domainrecord()
+ * Implements hook_domainupdate()
  *
  * @ingroup content 
  */
-function domain_content_domainrecord($op, $domain = array(), $edit = array()) {
+function domain_content_domainupdate($op, $domain = array(), $edit = array()) {
   // We rebuild the menu, since the domain records have changed.
   // Clear the page cache, so that changed menus are reflected for anonymous users.
   cache_clear_all('*', 'cache_page', TRUE);

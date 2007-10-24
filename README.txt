@@ -323,6 +323,10 @@ This screen is split into two sections.
   This value is taken from your system settings and need not be changed.  It is 
   provided to allow readbility in the domain list.
   
+  -- Domain URL scheme
+  Allows the site to use 'http' or 'https' as the URL scheme.  Default is 
+  'http'.  All links and redirects to root site will use the selected scheme.
+  
   2. Domain module behaviors
   These options affect how the module behaves.
   
@@ -372,6 +376,10 @@ When you create a new domain record, simply fill in the two fields:
   - Site name
   This is the name of the site that will be shown when users access this site.
   
+  -- Domain URL scheme
+  Allows the domain to use 'http' or 'https' as the URL scheme.  Default is 
+  'http'.  All links and redirects to the domain will use the selected scheme.
+  
 Both the Domain and the Site name are required to be unique values.  
 
 After you create a record, you may edit or delete it as you see fit.
@@ -420,6 +428,9 @@ domain, the link will take you to one.example.com/?q=node.
 
 In the Domain Switcher block, domains are listed using their human-readable
 sitename variables.
+
+NOTE: This block is for debugging purposes.  The included Domain Navigation
+module provides block and menu items intended for end users.
 
 ----
 5.  Node Access
@@ -548,7 +559,8 @@ However, you still need to give users the 'create TYPE nodes' permission
 normally.  Domain Access does not affect node creation.
 
 Since Domain Access implements node_access() fully, if you uninstall the module 
--- using Drupal's uninstall sequence -- all node_access entries should be reset to grant 'grant_view' to realm 'all' with gid '0'.
+-- using Drupal's uninstall sequence -- all node_access entries should be reset 
+to grant 'grant_view' to realm 'all' with gid '0'.
 
 ----
 6.  Developer Notes
@@ -559,8 +571,20 @@ modules which add functionality.
 ----
 6.1  Extension Modules
 
-Currently, the Domain Conf module is also included in the distribution.  It 
-provides separate site configuration options for registered domains.
+Currently, the following modules are included in the download.  They are not 
+required, but each adds functionality to the core module.
+
+  - Domain Configuration -- Allows you to change select system variables for 
+  each subdomain, such as files directory, offline status, footer message and 
+  default home page.
+
+  - Domain Content -- Provides a content administration page for each subdomain, 
+  so that affiliate editors can administer content for their section of the 
+  site.
+
+  - Domain Navigation -- Supplies a navigation block with three themes. Creates 
+  menu items for each subdomain, suitable for using as primary or secondary 
+  links. 
 
 ----
 6.2 The $_domain Global
@@ -600,6 +624,11 @@ contains the following structure:
   - sitename
   Varchar, 80, unique (enforced by code)
   The name for this affiliate, used for readability.
+  
+  - scheme
+  Varchar, 8 default 'http'
+  Indicates the URL scheme to use when accessing this domain.  Allowed values, 
+  are currently 'http' and 'https'.
   
 ----
 6.4 API

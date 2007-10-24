@@ -42,7 +42,7 @@ function domain_init() {
   $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
 
   // Lookup the active domain against our allowed hosts record.
-  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $_subdomain));
+  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE subdomain = '%s'", $_subdomain));
 
   // If empty, then the DNS didn't match anything, so use defaults.
   if (empty($_domain['domain_id'])) {
@@ -178,7 +178,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
     case 'form':
     case 'register':
       global $_domain;
-      $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
+      $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain}");
       $options = array();
       // By default, the requesting domain is assigned.
       if (empty($account->domain_user)) {
@@ -276,10 +276,10 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL) {
     $domain = domain_default();
   }
   else if ($domain_id) {
-    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE domain_id = %d", $domain_id));
+    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE domain_id = %d", $domain_id));
   }
   else if ($subdomain) {
-    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $subdomain));
+    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE subdomain = '%s'", $subdomain));
   }
   if (!is_null($domain['domain_id'])) {
     $domain['path'] = domain_get_path($domain);  
@@ -301,6 +301,7 @@ function domain_default() {
     $default['domain_id'] = 0;
     $default['sitename'] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
     $default['subdomain'] = variable_get('domain_root', '');
+    $default['scheme'] = variable_get('domain_scheme', 'http');
     $default['path'] = domain_get_path($default);
     $default['site_grant'] = DOMAIN_SITE_GRANT;
   }  
@@ -317,7 +318,7 @@ function domain_domains() {
     $domains = array();
     $domains[] = domain_default();
     // Query the db for active domain records.
-    $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain} ORDER BY sitename ASC");
+    $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} ORDER BY sitename ASC");
     while ($domain = db_fetch_array($result)) {
       $domain['path'] = domain_get_path($domain);
       $domains[] = $domain;
@@ -334,7 +335,7 @@ function domain_get_path($domain) {
   $_url = parse_url($base_url);
   // If in a subfolder, the web server needs the trailing slash.
   (!empty($_url['path'])) ? $_path = $_url['path'] .'/' : $_path = $_url['path'];
-  $path = $_url['scheme'] .'://'. $domain['subdomain'] . $_path;
+  $path = $domain['scheme'] .'://'. $domain['subdomain'] . $_path;
   return $path;
 }
 
@@ -344,7 +345,7 @@ function domain_get_path($domain) {
 function domain_get_uri($domain) {
   global $base_url;
   $_url = parse_url($base_url);
-  $path = $_url['scheme'] .'://'. $domain['subdomain'] . request_uri();
+  $path = $domain['scheme'] .'://'. $domain['subdomain'] . request_uri();
   return $path;
 }  
 
@@ -432,7 +433,7 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  * @ingroup node
  */
 function domain_node_grants($account, $op) {
-  global $_domain, $user;
+  global $_domain;
   // By design, all users can see content sent to all affiliates,
   // but the $_domain['site_grant'] can be set to FALSE.  
   // In the case of node batch editing and node_access_rebuild(), we
@@ -444,7 +445,7 @@ function domain_node_grants($account, $op) {
   // Grant based on active subdomain.
   $grants['domain_id'][] = $_domain['domain_id'];
 
-  // special permissions for editors
+  // Special permissions for editors
   $editors = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
   if ($editors && user_access('edit domain nodes', $account)) {
     if (!empty($account->domain_user)) {
@@ -460,6 +461,9 @@ function domain_node_grants($account, $op) {
       }  
     }  
   }
+  
+  // Let Domain Access module extensions act to override the defaults.
+  $grants = module_invoke_all('domaingrants', $grants, $account, $op);
   return $grants;
 }
 
@@ -495,12 +499,12 @@ function domain_node_access_records($node) {
   // The grant must be explicitly given to a domain.
   if ($node->domain_site) {
     $grants[] = array(
-    'realm' => 'domain_site',
-    'gid' => 0,
-    'grant_view' => TRUE,
-    'grant_update' => FALSE,
-    'grant_delete' => FALSE,
-    'priority' => 0,         // If this value is > 0, then other grants will not be recorded
+      'realm' => 'domain_site',
+      'gid' => 0,
+      'grant_view' => TRUE,
+      'grant_update' => FALSE,
+      'grant_delete' => FALSE,
+      'priority' => 0,         // If this value is > 0, then other grants will not be recorded
     );
   }
   // Special permissions for editors, if activated.
@@ -554,6 +558,9 @@ function domain_node_access_records($node) {
       );    
     }
   }
+  
+  // Let Domain Access module extensions act to override the defaults.
+  $grants = module_invoke_all('domainrecords', $grants, $node);
   return $grants;
 }
 
@@ -617,7 +624,7 @@ function domain_enabling($set = NULL) {
 function domain_form_alter($form_id, &$form) {
   if ($form['#id'] == 'node-form') {
     global $_domain;
-    $result = db_query("SELECT domain_id, subdomain, sitename FROM {domain}");
+    $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain}");
     $options = array();
     // By default, the requesting domain is assigned.
     $default = array($_domain['domain_id']);

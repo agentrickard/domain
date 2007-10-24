@@ -200,11 +200,11 @@ function theme_domain_nav_menus($options) {
 } 
 
 /**
- * Implements hook_domainrecord()
+ * Implements hook_domainupdate()
  *
  * @ingroup nav
  */
-function domain_nav_domainrecord($op, $domain = array(), $edit = array()) {
+function domain_nav_domainupdate($op, $domain = array(), $edit = array()) {
   // Only execute if the menu is turned on.
   if (DOMAIN_NAV_MENU) {
     // We rebuild the menu, since the domain records have changed.

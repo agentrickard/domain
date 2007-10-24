@@ -19,7 +19,7 @@
  */
 function domain_view() {
   global $_domain;
-  $header = array(t('Id'), t('Domain'), t('Site name'), t('Actions'));  
+  $header = array(t('Id'), t('Domain'), t('Scheme'), t('Site name'), t('Actions'));  
   $domains = domain_domains();
   foreach ($domains as $domain) {
     $link = l($domain['subdomain'], domain_get_uri($domain), array(), NULL, NULL, TRUE);
@@ -38,7 +38,7 @@ function domain_view() {
       }
       $actions .= ' | '. l(t('delete'), 'admin/build/domain/delete/'. $domain['domain_id']); 
     }  
-    $rows[] = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $domain['sitename'], $actions);
+    $rows[] = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $domain['scheme'], $domain['sitename'], $actions);
   }
   if (!empty($rows)) {
     return theme('table', $header, $rows);  
@@ -89,6 +89,14 @@ function domain_configure_form() {
     '#default_value' => variable_get('domain_sitename', $sitename),    
     '#description' => t('The human-readable name of this domain.')    
   );    
+  $form['domain']['domain_scheme'] = array(
+    '#type' => 'radios',
+    '#title' => t('Domain URL scheme'),
+    '#required' => TRUE,
+    '#options' => array('http' => 'http://', 'https' => 'https://'),
+    '#default_value' => variable_get('domain_scheme', 'http'),
+    '#description' => t('The URL scheme for accessing the primary domain.')
+  );   
   $form['domain_behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Domain module behaviors'),
@@ -148,7 +156,7 @@ function domain_create_form() {
     '#size' => 40,
     '#maxlength' => 80,
     '#required' => TRUE,
-    '#description' => t('The allowed subdomain for *.example.com.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
+    '#description' => t('The allowed subdomain, using the full path.example.com format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
@@ -158,6 +166,14 @@ function domain_create_form() {
     '#required' => TRUE,
     '#description' => t('The human-readable name of this domain.')    
   );  
+  $form['domain']['scheme'] = array(
+    '#type' => 'radios',
+    '#title' => t('Domain URL scheme'),
+    '#required' => TRUE,
+    '#options' => array('http' => 'http://', 'https' => 'https://'),
+    '#default_value' => 'http',
+    '#description' => t('The URL scheme for accessing this domain.')
+  );    
   $form['submit'] = array('#type' => 'submit', '#value' => t('Create domain record'));
   return $form;
 }
@@ -187,11 +203,10 @@ function domain_create_form_validate($form_id, $form_values) {
  * @ingroup domain 
  */
 function domain_create_form_submit($form_id, $form_values) {
-  db_query("INSERT INTO {domain} (subdomain, sitename) VALUES ('%s', '%s')", $form_values['subdomain'], $form_values['sitename']);
-  // Let other modules act.
+  db_query("INSERT INTO {domain} (subdomain, sitename, scheme) VALUES ('%s', '%s', '%s')", $form_values['subdomain'], $form_values['sitename'], $form_values['scheme']);
   // Let other modules act.
   $domain = domain_lookup(NULL, $form_values['subdomain']);
-  module_invoke_all('domainrecord', 'create', $domain, $form_values);
+  module_invoke_all('domainupdate', 'create', $domain, $form_values);
   drupal_set_message(t('Domain record created.'));
   drupal_goto('admin/build/domain/view');
 }
@@ -232,7 +247,7 @@ function domain_edit_form($domain) {
     '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => $domain['subdomain'],
-    '#description' => t('The allowed subdomain for *.example.com.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
+    '#description' => t('The allowed subdomain, using the full path.example.com format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
@@ -243,7 +258,15 @@ function domain_edit_form($domain) {
     '#default_value' => $domain['sitename'],
     '#description' => t('The human-readable name of this domain.')    
   );  
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Edit domain record'));
+  $form['domain']['scheme'] = array(
+    '#type' => 'radios',
+    '#title' => t('Domain URL scheme'),
+    '#required' => TRUE,
+    '#options' => array('http' => 'http://', 'https' => 'https://'),
+    '#default_value' => $domain['scheme'],
+    '#description' => t('The URL scheme for accessing this domain.')
+  );   
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
   return $form;
 }
 
@@ -271,10 +294,10 @@ function domain_edit_form_validate($form_id, $form_values) {
  * @ingroup domain 
  */
 function domain_edit_form_submit($form_id, $form_values) {
-  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s' WHERE domain_id = %d", $form_values['subdomain'], $form_values['sitename'], $form_values['domain_id']);
+  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s' WHERE domain_id = %d", $form_values['subdomain'], $form_values['sitename'], $form_values['scheme'], $form_values['domain_id']);
   // Let other modules act.
   $domain = domain_lookup($form_values['domain_id']);
-  module_invoke_all('domainrecord', 'update', $domain, $form_values);
+  module_invoke_all('domainupdate', 'update', $domain, $form_values);
   drupal_set_message(t('Domain record updated.'));
   drupal_goto('admin/build/domain/view');  
 }
@@ -318,7 +341,7 @@ function domain_delete_form_submit($form_id, $form_values) {
   db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_values['domain_id']);
   // Let other modules act.
   $domain = domain_lookup($form_values['domain_id']);
-  module_invoke_all('domainrecord', 'delete', $domain, $form_values);
+  module_invoke_all('domainupdate', 'delete', $domain, $form_values);
   drupal_set_message(t('Domain record deleted.'));
   drupal_goto('admin/build/domain/view');  
 }

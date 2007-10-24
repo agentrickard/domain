@@ -1,5 +1,15 @@
 // $Id$
 
+19-OCT-2007
+
+-- #184993.  Fixes menu order for domain_content.module.
+-- Changes help text to indicate full path.example.com should be used.
+-- Adds hook_domaingrants() to allow submodules to alter default node grants.
+-- Adds hook_domainrecords() to allow submodules to alter default node access records.
+-- Renames hook_domainrecord() to hook_domainupdate().
+-- Adds column *scheme* to the {domain} table.  Warning: no database update provided.
+-- Now allows the configuration of different URL schemes (http, https) for each domain.
+
 15-OCT-2007
 
 -- Finishes the Domain Content module for batch editing.
