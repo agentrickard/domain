@@ -115,7 +115,7 @@ function domain_configure_form() {
     '#title' => t('Domain-based editing controls'),
     '#required' => TRUE,
     '#default_value' => variable_get('domain_editors', DOMAIN_EDITOR_RULE),
-    '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editor')),
+    '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editors')),
     '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
   );  
   $form['domain_behavior']['domain_behavior'] = array(
@@ -338,12 +338,20 @@ function domain_delete_form($domain) {
  * @ingroup domain 
  */
 function domain_delete_form_submit($form_id, $form_values) {
+  // Run the lookup before we delete the row!
+  $domain = domain_lookup($form_values['domain_id']);
   db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_values['domain_id']);
   // Let other modules act.
-  $domain = domain_lookup($form_values['domain_id']);
   module_invoke_all('domainupdate', 'delete', $domain, $form_values);
   drupal_set_message(t('Domain record deleted.'));
-  drupal_goto('admin/build/domain/view');  
+  // Some tortured logic to return to the root domain and the domain list.
+  $default = domain_default();
+  $uri = request_uri();
+  $_path = explode('/', $uri);
+  $_slice = array_slice($_path, 0, -2);
+  $path = implode('/', $_slice) . '/view';
+  $goto = $default['scheme'] .'://'. $default['subdomain'] . $path;
+  drupal_goto($goto);  
 }
 
 /**

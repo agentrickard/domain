@@ -1,5 +1,14 @@
 // $Id$
 
+24-OCT-2007
+
+-- #186153 by skizzo.  THe Domain Conf module needs to be on the selected domain in order
+    to load the correct setings for the form.
+-- Related to the above.  After deleting a domain record, return to the root domain.    
+-- #186321.  Logic error in domain_init() causes the site_grant variable to be unset, causing the
+    module not to function properly.
+-- #186255.  Lookup the domain data before deleting the record and firing hook_domainrecord().
+
 19-OCT-2007
 
 -- #184993.  Fixes menu order for domain_content.module.

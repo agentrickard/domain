@@ -58,8 +58,14 @@ function domain_conf_menu($may_cache) {
  * @ingroup conf
  */
 function domain_conf_page($domain_id) {
+  global $_domain;
   $domain = domain_lookup($domain_id);
   if ($domain['domain_id']) {
+    // We must be on the proper domain, see http://drupal.org/node/186153.
+    if ($domain != -1 && $_domain['domain_id'] != $domain_id) {
+      $path = domain_get_uri($domain);
+      drupal_goto($path);
+    }   
     include_once('domain_form.inc');
     return drupal_get_form('system_site_information_settings');
   }

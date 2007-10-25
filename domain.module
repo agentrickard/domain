@@ -35,15 +35,12 @@ define('DOMAIN_SITE_GRANT', TRUE);
 function domain_init() {
   global $_domain;
   $_domain = array();
-  // Grant access to all affiliates.
-  $_domain['site_grant'] = DOMAIN_SITE_GRANT;
-
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
   $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
-
   // Lookup the active domain against our allowed hosts record.
-  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE subdomain = '%s'", $_subdomain));
-
+  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $_subdomain));
+  // Grant access to all affiliates.
+  $_domain['site_grant'] = DOMAIN_SITE_GRANT;
   // If empty, then the DNS didn't match anything, so use defaults.
   if (empty($_domain['domain_id'])) {
     $_domain = domain_default();
