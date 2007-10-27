@@ -95,7 +95,7 @@ function hook_domaingrants(&$grants, $account, $op) {
  *  No return value. Modify the $grants array, passed by reference.
  * 
  *
- * @ingroup domain
+ * @ingroup hooks
  */
 function hook_domainrecords(&$grants, $node) {
   // Add a sample access record to let a user see their content at all times.
@@ -113,7 +113,7 @@ function hook_domainrecords(&$grants, $node) {
 /**
  * Notify other modules that we have created a new domain or 
  * updated a domain record.  
- 
+ *
  * NOTE: Where possible, use the $domain values in preference to the $edit values.
  *
  * @param $op
@@ -184,3 +184,27 @@ function hook_domainnav($domain) {
   $extra['test'] = 'test';
   return $extra;
 }
+
+/**
+ * Enables Domain Access modules to fire cron hooks across all
+ * active domains.  
+ *
+ * Each module implementing this hook will have the function run
+ * once per active domain record.  The global $_domain variable 
+ * will be set to the current $domain passed as an argument.
+ *
+ * This function is especially useful if you need to run node queries
+ * that obey node access rules.
+ *
+ * @param $domain
+ *  The information for the current domain record, taken from {domain}.
+ *
+ * @ingroup hooks
+ */
+function hook_domaincron($domain) {
+  // Run a node query.
+  $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n ORDER BY n.changed"), 0, 1);
+  $node = db_fetch_object($result);
+  // Set a variable for each domain containing the last node updated.
+  variable_set('domain_'. $domain['domain_id'] .'_lastnode', $node->nid);
+} 

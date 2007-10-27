@@ -240,6 +240,36 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
 }
 
 /**
+ * Implements hook_cron()
+ *
+ * This function invokes hook_domaincron() and allows
+ * Domain Access modules to run functions for all active affiliates.
+ *
+ * @ingroup drupal
+ */
+function domain_cron() {
+  global $_domain;
+  // Check to see if this function is needed at all.
+  $modules = module_implements('domaincron');
+  if (!empty($modules)) {
+    // Store the current $_domain global.
+    $_temp = $_domain;
+    // Get the domain list.
+    $domains = domain_domains();
+    // Run the hook for each active domain.
+    foreach ($domains as $domain) {
+      // Set the global to the current $domain.
+      $_domain = $domain;
+      foreach ($modules as $module) {
+        module_invoke($module, 'domaincron', $domain);
+      }
+    }
+    // Set the $_domain global back.
+    $_domain = $_temp;
+  }  
+}
+
+/**
  * Router function to call various administration tasks
  *
  * @param $action
@@ -300,6 +330,7 @@ function domain_default() {
     $default['subdomain'] = variable_get('domain_root', '');
     $default['scheme'] = variable_get('domain_scheme', 'http');
     $default['path'] = domain_get_path($default);
+    // Grant access to all affiliates.    
     $default['site_grant'] = DOMAIN_SITE_GRANT;
   }  
 
@@ -318,6 +349,8 @@ function domain_domains() {
     $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} ORDER BY sitename ASC");
     while ($domain = db_fetch_array($result)) {
       $domain['path'] = domain_get_path($domain);
+      // Grant access to all affiliates.
+      $_domain['site_grant'] = DOMAIN_SITE_GRANT;      
       $domains[] = $domain;
     }
   }  
@@ -619,7 +652,8 @@ function domain_enabling($set = NULL) {
  * @ingroup node
  */
 function domain_form_alter($form_id, &$form) {
-  if ($form['#id'] == 'node-form') {
+  // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
+  if ($form['#id'] == 'node-form' && !$form['#node']->cck_dummy_node_form) {
     global $_domain;
     $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain}");
     $options = array();
@@ -671,6 +705,7 @@ function domain_form_alter($form_id, &$form) {
         '#value' => ($form['#node']->nid) ? $form['#node']->domains : $default
       );
     }
+    // THIS SECTION BREAKS CCK!  See http://drupal.org/node/186624
     // Some editors cannot administer nodes, so we have to add these form elements.
     if (variable_get('domain_editors', DOMAIN_EDITOR_RULE) == 1 && user_access('edit domain nodes')) {
       $access = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));

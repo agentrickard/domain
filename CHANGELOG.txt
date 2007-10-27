@@ -1,5 +1,11 @@
 // $Id$
 
+26-OCT-2007
+
+-- #186935.  The site_grant element of the domain array was not being set by domain_domains().
+-- #186624. domain_form_alter() breaks CCK field management.
+-- Adds hook_domaincron().
+
 24-OCT-2007
 
 -- #186153 by skizzo.  THe Domain Conf module needs to be on the selected domain in order
