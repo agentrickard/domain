@@ -297,7 +297,7 @@ function domain_admin($action, $id = NULL) {
  *  The string representation of a {domain} entry. Optional.
  * @return
  *  An array containing the requested row from the {domain} table, plus the
- *  absolute path to the domain $base_url.  Returns -1 on failure.
+ *  elements added by hook_domainload().  Returns -1 on failure.
  *
  * @ingroup domain
  */
@@ -326,6 +326,8 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL) {
  * Assigns the default settings to domain 0, the root domain.
  *
  * This value is used throughout the modules, so needed abstraction.
+ *
+ * @ingroup domain 
  */
 function domain_default() {
   static $default;
@@ -343,6 +345,8 @@ function domain_default() {
 
 /**
  * Return all active domains (including the default) as an array.
+ *
+ * @ingroup domain 
  */
 function domain_domains() {
   static $domains;
@@ -361,6 +365,10 @@ function domain_domains() {
 
 /**
  * Implements hook_domainload()
+ *
+ * Adds the home page 'path' and 'site_grant' boolean.
+ *
+ * @ingroup domain
  */
 function domain_domainload($domain) {
   // Get the path to the home page for this domain.
@@ -373,6 +381,11 @@ function domain_domainload($domain) {
 
 /**
  * Determine an absolute path for a domain
+ *
+ * @param $domain
+ *  The currently active $domain array, privided by domain_lookup().
+ *
+ * @ingroup domain 
  */
 function domain_get_path($domain) {
   global $base_url;
@@ -400,7 +413,7 @@ function domain_get_uri($domain) {
  * domain.
  *
  * @param $domain
- *  The currently active $domain array, privided by domain_lookup().
+ *  The currently active $domain array, provided by domain_lookup().
  *
  * @ingroup domain
  */

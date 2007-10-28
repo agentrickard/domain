@@ -1,0 +1,41 @@
+<?php
+// $Id$
+
+/** 
+* @file
+* Install file for the Domain Theme module
+*/
+
+/**
+ * Implements hook_install()
+ *
+ * @ingroup drupal
+ */
+function domain_theme_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysqli':
+    case 'mysql':
+      db_query("CREATE TABLE IF NOT EXISTS {domain_theme} (
+       domain_id int(11) NOT NULL default '0',
+       theme varchar(32) NOT NULL default '',
+       settings blob,
+       PRIMARY KEY (domain_id)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {domain_theme} (
+       domain_id integer NOT NULL default 0,
+       theme varchar(32) NOT NULL default '',
+       settings bytea,
+       PRIMARY KEY (domain_id)
+      )");     
+      break;
+  }
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function domain_theme_uninstall() {
+  db_query("DROP TABLE {domain_theme}");
+}

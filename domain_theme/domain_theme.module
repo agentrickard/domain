@@ -1,0 +1,102 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Domain Theme module for the Domain Access module group.
+ *
+ * Originally written by canen; http://drupal.org/user/16188.
+ */
+
+/**
+ * Implements hook_init()
+ *
+ * @ingroup drupal
+ */
+function domain_theme_init() {
+  global $_domain, $custom_theme;
+  $theme = domain_theme_lookup($_domain['domain_id']);
+  $custom_theme = $theme['theme'];
+}
+
+/**
+ * Implements hook_menu()
+ *
+ * @ingroup drupal
+ */
+function domain_theme_menu($may_cache) {
+  $items = array();
+  if (!$may_cache) {
+    $items[] = array(
+      'title' => t('Domain theme settings'),
+      'path' => 'admin/build/domain/theme',
+      'access' => user_access('administer domains'),
+      'type' => MENU_CALLBACK,
+      'callback' => 'domain_theme_page',
+      'callback arguments' => array(arg(4))      
+    );    
+  }
+  return $items;
+}
+
+/**
+ * The domain theme page callback router.
+ *
+ * @param $domain_id
+ *  The unique identifier for this domain, taken from {domain}.
+ *
+ * @ingroup theme
+ */
+function domain_theme_page($domain_id) {
+  global $_domain;
+  $domain = domain_lookup($domain_id);
+  if ($domain['domain_id']) {
+    // Ensure we are on the proper domain.
+    domain_goto($domain);
+    drupal_set_title(t('!site : Domain theme settings', array('!site' => $domain['sitename'])));    
+    include_once('domain_theme_form.inc');
+    return drupal_get_form('system_themes');
+  }
+  else {
+    return t('Invalid domain request.');
+  } 
+}
+
+/** 
+ * Get domain theme information
+ *
+ * @param $domain_id
+ *  The domain_id taken from {domain}. Optional.
+ * @param $theme
+ *  The string representation of a {domain_theme} entry. Optional.
+ * @return
+ *  An array containing the requested row from the {domain_theme} table. 
+ *  Returns -1 on failure.
+ *
+ * @ingroup theme
+ */
+function domain_theme_lookup($domain_id = NULL, $theme = NULL) {
+  if (!is_null($domain_id)) {
+    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE domain_id = %d", $domain_id));
+  }
+  else if (!is_null($theme)) {
+    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE theme= '%s'", $theme));    
+  }
+  else {
+    $return = -1;
+  }
+  return $return;
+}
+
+/**
+ * Implements hook_domainlinks()
+ *
+ * @ingroup theme
+ */
+function domain_theme_domainlinks($domain) {
+  $links[] = array(
+    'title' => t('theme'),
+    'path' => 'admin/build/domain/theme/'. $domain['domain_id']
+  );
+  return $links;
+}

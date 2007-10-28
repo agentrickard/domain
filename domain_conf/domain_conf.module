@@ -63,7 +63,8 @@ function domain_conf_page($domain_id) {
   if ($domain['domain_id']) {
     // Ensure we are on the proper domain.
     domain_goto($domain);
-    include_once('domain_form.inc');
+    include_once('domain_conf_form.inc');
+    drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
     return drupal_get_form('system_site_information_settings');
   }
   else {

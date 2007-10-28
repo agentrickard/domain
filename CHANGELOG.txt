@@ -1,5 +1,12 @@
 // $Id$
 
+28-OCT-2007 (3)
+
+-- Changes file domain_form.inc to domain_conf_form.inc.
+-- Adds the Domain Theme module.
+-- Some function documentation cleanup.
+-- Beta4 release.
+
 28-OCT-2007 (2)
 
 -- Checked a few of the API hooks for proper functionality.

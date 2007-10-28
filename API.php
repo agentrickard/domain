@@ -40,6 +40,11 @@
  * @defgroup content Domain Content : administer nodes
  * Configurable navigation block based on active domains.
  */
+ 
+/**
+ * @defgroup theme Domain Theme: manage themes
+ * Switch themes based on active domain.
+ */
 
 /**
  * @defgroup themes Theme functions
