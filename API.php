@@ -107,6 +107,12 @@ function hook_domainrecords(&$grants, $node) {
     'grant_delete' => TRUE,
     'priority' => 0,         // If this value is > 0, then other grants will not be recorded
   );
+  // Remove the domain_site grant.
+  foreach ($grants as $key => $grant) {
+    if ($grant['realm'] == 'domain_site') {
+      unset($grants[$key]);
+    }
+  }  
   return $grants;
 }
 

@@ -312,8 +312,6 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL) {
     $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE subdomain = '%s'", $subdomain));
   }
   if (!is_null($domain['domain_id'])) {
-    $domain['path'] = domain_get_path($domain);  
-    $domain['site_grant'] = DOMAIN_SITE_GRANT;    
     // Let submodules overwrite the defaults, if they wish.
     $extra = module_invoke_all('domainload', $domain);
     $domain = array_merge($domain, $extra);
@@ -336,12 +334,9 @@ function domain_default() {
     $default['sitename'] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
     $default['subdomain'] = variable_get('domain_root', '');
     $default['scheme'] = variable_get('domain_scheme', 'http');
-    $default['path'] = domain_get_path($default);
-    // Grant access to all affiliates.    
-    $default['site_grant'] = DOMAIN_SITE_GRANT;
     // Let submodules overwrite the defaults, if they wish.
     $extra = module_invoke_all('domainload', $default); 
-    $default = array_merge($default, $extra);
+    $default = array_merge($default, $extra);    
   }  
   return $default;
 }    
@@ -363,6 +358,18 @@ function domain_domains() {
   }  
   return $domains;
 }
+
+/**
+ * Implements hook_domainload()
+ */
+function domain_domainload($domain) {
+  // Get the path to the home page for this domain.
+  $domain['path'] = domain_get_path($domain);
+  // Grant access to all affiliates.    
+  $domain['site_grant'] = DOMAIN_SITE_GRANT;
+  return $domain;
+}
+ 
 
 /**
  * Determine an absolute path for a domain
@@ -395,6 +402,7 @@ function domain_get_uri($domain) {
  * @param $domain
  *  The currently active $domain array, privided by domain_lookup().
  *
+ * @ingroup domain
  */
 function domain_goto($domain) {
   global $_domain;
@@ -524,6 +532,18 @@ function domain_node_grants($account, $op) {
 }
 
 /**
+ * Implements hook_domaingrants()
+ *
+ * Allows us to set the $grants by invoking module_invoke_all().
+ *
+ * @ingroup domain 
+ */
+function domain_domaingrants(&$grants, $account, $op) {
+  // Return default grants
+  return $grants;
+}
+
+/**
  * Implements hook_node_access_records()
  *
  * Set permissions for a node to be written to the database.  By design
@@ -617,6 +637,18 @@ function domain_node_access_records($node) {
   
   // Let Domain Access module extensions act to override the defaults.
   $grants = module_invoke_all('domainrecords', $grants, $node);
+  return $grants;
+}
+
+/**
+ * Implements hook_domainrecords()
+ *
+ * Allows us to set the $grants by invoking module_invoke_all().
+ *
+ * @ingroup domain
+ */
+function domain_domainrecords(&$grants, $node) {
+  // Return default grants
   return $grants;
 }
 

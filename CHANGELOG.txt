@@ -1,5 +1,9 @@
 // $Id$
 
+28-OCT-2007 (2)
+
+-- Checked a few of the API hooks for proper functionality.
+
 28-OCT-2007
 
 -- Adds hook_domainload() to allow submodules to modify the $domain array.
