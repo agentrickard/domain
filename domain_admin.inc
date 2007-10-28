@@ -221,6 +221,7 @@ function domain_create_form_submit($form_id, $form_values) {
  */
 function domain_edit($domain_id) {
   $domain = domain_lookup($domain_id);
+  domain_goto($domain);  
   return drupal_get_form('domain_edit_form', $domain);
 }
 

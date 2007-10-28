@@ -140,10 +140,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   // For users with limited privileges, we have to be on the same server
   // as the content we are looking up.  Will return -1 if it fails.
   $domain = domain_lookup($domain_id);
-  if ($domain != -1 && $_domain['domain_id'] != $domain_id) {
-    $path = domain_get_uri($domain);
-    drupal_goto($path);
-  } 
+  domain_goto($domain);
   // Override the $_domain global so we can see the appropriate content
   if (!is_null($domain_id)) {
     $_domain['site_grant'] = FALSE;

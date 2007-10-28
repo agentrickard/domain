@@ -38,11 +38,11 @@ function domain_init() {
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
   $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
   // Lookup the active domain against our allowed hosts record.
-  $_domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $_subdomain));
-  // Grant access to all affiliates.
-  $_domain['site_grant'] = DOMAIN_SITE_GRANT;
-  // If empty, then the DNS didn't match anything, so use defaults.
-  if (empty($_domain['domain_id'])) {
+  $data = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
+  // Get the domain data.
+  $_domain = domain_lookup($data['domain_id']);
+  // If return is -1, then the DNS didn't match anything, so use defaults.
+  if ($_domain == -1) {
     $_domain = domain_default();
   }
 }
@@ -288,6 +288,9 @@ function domain_admin($action, $id = NULL) {
 /**
  * Runs a lookup against the {domain} table.  One of the two values must be present
  * 
+ * This function also calls hook_domainload(), which lets module developers overwrite
+ * or add to the $domain array.
+ *
  * @param $domain_id
  *  The domain_id taken from {domain}. Optional.
  * @param $subdomain
@@ -310,6 +313,10 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL) {
   }
   if (!is_null($domain['domain_id'])) {
     $domain['path'] = domain_get_path($domain);  
+    $domain['site_grant'] = DOMAIN_SITE_GRANT;    
+    // Let submodules overwrite the defaults, if they wish.
+    $extra = module_invoke_all('domainload', $domain);
+    $domain = array_merge($domain, $extra);
     return $domain;
   }
   else {
@@ -332,8 +339,10 @@ function domain_default() {
     $default['path'] = domain_get_path($default);
     // Grant access to all affiliates.    
     $default['site_grant'] = DOMAIN_SITE_GRANT;
+    // Let submodules overwrite the defaults, if they wish.
+    $extra = module_invoke_all('domainload', $default); 
+    $default = array_merge($default, $extra);
   }  
-
   return $default;
 }    
 
@@ -346,11 +355,9 @@ function domain_domains() {
     $domains = array();
     $domains[] = domain_default();
     // Query the db for active domain records.
-    $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} ORDER BY sitename ASC");
-    while ($domain = db_fetch_array($result)) {
-      $domain['path'] = domain_get_path($domain);
-      // Grant access to all affiliates.
-      $_domain['site_grant'] = DOMAIN_SITE_GRANT;      
+    $result = db_query("SELECT domain_id FROM {domain}");
+    while ($data = db_fetch_array($result)) {
+      $domain = domain_lookup($data['domain_id']);   
       $domains[] = $domain;
     }
   }  
@@ -378,6 +385,25 @@ function domain_get_uri($domain) {
   $path = $domain['scheme'] .'://'. $domain['subdomain'] . request_uri();
   return $path;
 }  
+
+/**
+ * Determine if we must switch the active domain.
+ *
+ * This function will execute a drupal_goto() to pop users to the correct
+ * domain.
+ *
+ * @param $domain
+ *  The currently active $domain array, privided by domain_lookup().
+ *
+ */
+function domain_goto($domain) {
+  global $_domain;
+  // We must be on the proper domain, see http://drupal.org/node/186153.
+  if ($domain != -1 && $_domain['domain_id'] != $domain['domain_id']) {
+    $path = domain_get_uri($domain);
+    drupal_goto($path);
+  }     
+}
 
 /**
  * Implements hook_nodeapi().

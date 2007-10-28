@@ -1,5 +1,11 @@
 // $Id$
 
+28-OCT-2007
+
+-- Adds hook_domainload() to allow submodules to modify the $domain array.
+-- Adds domain_goto($domain).  This function allows developers to pop users to the 
+    correct domain.  Useful when editors must be on their specific domain to edit content.
+
 26-OCT-2007
 
 -- #186935.  The site_grant element of the domain array was not being set by domain_domains().

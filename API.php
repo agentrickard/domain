@@ -109,6 +109,36 @@ function hook_domainrecords(&$grants, $node) {
   );
   return $grants;
 }
+
+/**
+ * Notifies other modules that we are loading a domain record from the database.
+ *
+ * Modules may overwrite or add to the $domain array for each subdomain.
+ *
+ * WARNING: If you need to make revisions to the $_domain global before it is processed
+ * by other modules, you must implement hook_init().  Only modules that implement hook_init()
+ * are loaded during the creation routine for the $_domain global.  If your module has not
+ * been loaded, then hook_domainload() will skip your implementation.
+ *
+ * When loading lists of domains or generating domain information, either use the proper
+ * functions -- domain_default(), domain_lookup(), and domain_domains() -- or invoke this hook.
+ *
+ * Invoked by domain_lookup() and domain_default().
+ *
+ * @param &$domain
+ *  The current $domain array.
+ *
+ * @return
+ *  The modified $domain array.
+ *
+ * @ingroup hooks
+ */
+function hook_domainload($domain) {
+  // Add a variable to the $domain array.
+  $domain['myvar'] = 'mydomainvar';
+  // Remove the site_grant flag, making it so users can't see content for 'all affiliates.'
+  $domain['site_grant'] = FALSE;
+}
   
 /**
  * Notify other modules that we have created a new domain or 
