@@ -585,6 +585,8 @@ required, but each adds functionality to the core module.
   - Domain Navigation -- Supplies a navigation block with three themes. Creates 
   menu items for each subdomain, suitable for using as primary or secondary 
   links. 
+  
+  - Domain Theme -- Allows separate themes for each subdomain.
 
 ----
 6.2 The $_domain Global

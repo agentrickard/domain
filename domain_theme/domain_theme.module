@@ -82,7 +82,7 @@ function domain_theme_lookup($domain_id = NULL, $theme = NULL) {
   else if (!is_null($theme)) {
     $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE theme= '%s'", $theme));    
   }
-  else {
+  if (empty($return)) {
     $return = -1;
   }
   return $return;
