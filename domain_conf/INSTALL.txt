@@ -1,0 +1,91 @@
+// $Id$
+  
+/**
+ * @file
+ * INSTALL file for Domain Conf
+ */
+ 
+Domain Access: Site Configuration
+Advanced site configuration options for Domain Access.
+
+CONTENTS
+--------
+
+1.  Introduction
+2.  Installation
+2.1   Option 1 -- Preferred
+2.2   Option 2
+3.  Reminder
+
+----
+1.  Introduction
+
+This routine was in hook_init(), but there are cases where
+the $conf array needs to be loaded in early phases of bootstrap.
+In particular, these variables need to be available during variable_init().
+
+
+----
+2.  Installation
+
+In the Domain Access download, find the following file:
+
+  domain > domain_conf > settings_domain_conf.inc
+  
+You will need to load this file from inside your settings.php file. There
+are two methods for this.
+
+
+----
+2.1 Option 1 -- Preferred
+
+This method is preferred, since any updates to the module release 
+will be reflected in this file.
+
+NOTE: the elements inside the ==== marks are php code that
+should be copied into your settings.php file.  DO NOT COPY THE ==== MARKS.
+
+Add the following lines to the end of your settings.php file:
+
+====
+/**
+ * Add the domain_conf settings override
+ */
+require_once './path/to/modules/domain/domain_conf/settings_domain_conf.inc'; 
+====
+
+In this case, change 'path/to/modules' with the directory where your modules are
+stored.  Typically this will be 'sites/all/modules', which makes the lines:
+
+====
+/**
+ * Add the domain_conf settings override
+ */
+require_once './sites/all/modules/domain/domain_conf/settings_domain_conf.inc'; 
+====
+
+
+----
+2.2 Option 2
+
+If you are having difficulty determining the correct path, copy the file
+into your settings folder.
+
+  domain > domain_conf > settings_domain_conf.inc
+  
+The file should be in the same directory as your active settings.php file.  Then
+add the following lines:
+
+====
+/**
+ * Add the domain_conf settings override
+ */
+require_once 'settings_domain_conf.inc';
+====
+
+----
+3.  Reminder
+
+With the Domain Access module, you are running multiple sites from one
+installation and one settings.php file.  The change you make to this file will
+affect all active domains configured with this module
