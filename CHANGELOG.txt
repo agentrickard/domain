@@ -1,5 +1,12 @@
 // $Id$
 
+29-OCT-2007 (2)
+
+-- #187494 by skizzo.  To change variables in the $conf array, we cannot wait for hook_init().
+    These variables must be loaded dynamically from settings.php.
+--  Adds file: settings_domain_conf.inc
+--  Beta5 release.
+
 29-OCT-2007
 
 -- #187509 by skizzo.  Fixes error in domain_theme_lookup() that prevents themes from being saved.

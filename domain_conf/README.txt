@@ -65,10 +65,15 @@ untar the domain package and place the entire folder in your modules directory.
 When you enable the module, it will create a {domain_conf} table in your Drupal
 database.
 
+For the module to function correctly, you must follow the instructions in INSTALL.txt.
+
 ----
 2.1   Dependencies
 
 Domain Conf requires the Domain Access module be installed and active.
+
+Domain Conf requires a change to your settings.php file, as indicated by the
+directions in INSTALL.txt
 
 ----
 2.2   Configuration Options

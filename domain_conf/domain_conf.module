@@ -6,29 +6,12 @@
  * @file
  * Domain manager configuration options.
  *
- * By design, this only contains an init hook, a menu hook and a router.  No need to load
+ * By design, this only contains a menu hook and a router.  No need to load
  * the entire code except when requested.
- */
-
-/**
- * Implements hook_init()
  *
- * @ingroup drupal
+ * For this module to work correctly, you will need to follow the INSTALL.txt 
+ * instructions for editing your settings.php file.
  */
-function domain_conf_init() {
-  global $_domain;
-  // Load the domain-specific variables, if they exist.
-  $data = array();
-  $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $_domain['domain_id']));
-  if (!empty($data)) {
-    global $conf;
-    $settings = unserialize($data['settings']);
-    // Overwrite the $conf variables.
-    foreach ($settings as $key => $value) {
-      $conf[$key] = $value;
-    }
-  }
-}
 
 /**
  * Implements hook_menu()
