@@ -1,5 +1,11 @@
 // $Id$
 
+29-OCT-2007 (3)
+
+-- #187593.  Sets warning message when editing an admin form when you might be
+    on the wrong domain.
+-- file domain_conf/domain_conf_form.inc deprecated and removed.    
+
 29-OCT-2007 (2)
 
 -- #187494 by skizzo.  To change variables in the $conf array, we cannot wait for hook_init().
