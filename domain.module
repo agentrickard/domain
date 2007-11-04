@@ -768,7 +768,7 @@ function domain_form_alter($form_id, &$form) {
     else {
       $form['domain_site'] = array(
         '#type' => 'value',
-        '#value' => ($form['#node']->nid) ? $form['#node']->domain_site : $behavior,
+        '#value' => ($form['#node']->nid) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );
       // Name this element for special handling.
       $form['domains_raw'] = array(

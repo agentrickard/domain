@@ -16,6 +16,7 @@ CONTENTS
 2.1   Option 1 -- Preferred
 2.2   Option 2
 3.  Reminder
+4.  Unistalling
 
 ----
 1.  Introduction
@@ -88,4 +89,10 @@ require_once 'settings_domain_conf.inc';
 
 With the Domain Access module, you are running multiple sites from one
 installation and one settings.php file.  The change you make to this file will
-affect all active domains configured with this module
+affect all active domains configured with this module.
+
+----
+4. Uninstalling
+
+When you disable this module, you must remove the lines from your settings.php 
+file.

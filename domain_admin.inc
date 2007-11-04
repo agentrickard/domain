@@ -114,7 +114,7 @@ function domain_configure_form() {
     '#type' => 'radios',
     '#title' => t('Domain-based editing controls'),
     '#required' => TRUE,
-    '#default_value' => variable_get('domain_editors', DOMAIN_EDITOR_RULE),
+    '#default_value' => variable_get('domain_editors', intval(DOMAIN_EDITOR_RULE)),
     '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editors')),
     '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
   );  

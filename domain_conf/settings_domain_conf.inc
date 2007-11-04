@@ -27,19 +27,22 @@ _domain_conf_load();
  * @ingroup conf
  */
 function _domain_conf_load() {
-  // Cribbed from bootstrap.inc -- removes port protocols from the host value.
-  $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
-  // Lookup the active domain against our allowed hosts record.
-  $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
-  if ($domain['domain_id']) {
-    $data = array();
-    $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
-    if (!empty($data)) {
-      global $conf;
-      $settings = unserialize($data['settings']);
-      // Overwrite the $conf variables.
-      foreach ($settings as $key => $value) {
-        $conf[$key] = $value;
+  $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain_conf'"));
+  if ($check) {
+    // Cribbed from bootstrap.inc -- removes port protocols from the host value.
+    $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
+    // Lookup the active domain against our allowed hosts record.
+    $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
+    if ($domain['domain_id']) {
+      $data = array();
+      $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+      if (!empty($data)) {
+        global $conf;
+        $settings = unserialize($data['settings']);
+        // Overwrite the $conf variables.
+        foreach ($settings as $key => $value) {
+          $conf[$key] = $value;
+        }
       }
     }
   }
