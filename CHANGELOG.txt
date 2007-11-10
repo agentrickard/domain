@@ -1,5 +1,17 @@
 // $Id$
 
+09-NOV-2007
+
+-- Adds the Domain Prefix module, for advanced table prefixing options.
+    The Domain Prefix module is unstable and needs testing.
+-- #190605 by Martijnhaan.  UI issues related to the edit permissions and domain_editor grants.  Hides the 
+    edit domain nodes permission if that feature is disabled.  Fixes issue with Domain Content showing edit links
+    when the user does not have the edit grant.
+-- #188826 by trailerparkopera.  The site name is not changed dynamically unless Domain Conf settings have been saved.
+    This change disables the ability to edit a site name through Domain Conf, and loads the domain-specific sitename through
+    domain_init().
+--  Creates beta6.
+
 05-NOV-2007
 
 -- #188160 by skizzo.  Disabling the domain_conf module does not stop it from loading.  You must

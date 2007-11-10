@@ -33,7 +33,7 @@ define('DOMAIN_SITE_GRANT', TRUE);
  * @ingroup drupal
  */
 function domain_init() {
-  global $_domain;
+  global $_domain, $conf;
   $_domain = array();
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
   $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
@@ -45,6 +45,8 @@ function domain_init() {
   if ($_domain == -1) {
     $_domain = domain_default();
   }
+  // Set the site name to the domain-specific name.
+  $conf['site_name'] = filter_xss_admin($_domain['sitename']);
 }
 
 /**
@@ -128,7 +130,13 @@ function domain_menu($may_cache) {
  * @ingroup drupal 
  */
 function domain_perm() {
-  return array('administer domains', 'set domain access', 'edit domain nodes');
+  $rule = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
+  if ($rule) {
+    return array('administer domains', 'set domain access', 'edit domain nodes');
+  }
+  else {
+    return array('administer domains', 'set domain access');
+  }  
 }
 
 /**

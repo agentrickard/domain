@@ -105,10 +105,6 @@ affiliates.
 ----
 3.  Developer Notes
 
-Some working notes on the module, which uses hook_init() to load variable
-overrides.  Hat tip to Adrian Rossouw's Multidomain module, which uses the
-same trick.
-
 The Domain Conf module is the model for extending Domain Acccess.
 
 ----

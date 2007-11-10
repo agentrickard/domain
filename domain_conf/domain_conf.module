@@ -6,9 +6,6 @@
  * @file
  * Domain manager configuration options.
  *
- * By design, this only contains a menu hook and a router.  No need to load
- * the entire code except when requested.
- *
  * For this module to work correctly, you will need to follow the INSTALL.txt 
  * instructions for editing your settings.php file.
  */
@@ -111,7 +108,7 @@ function domain_conf_form_alter($form_id, &$form) {
         $form['main'][$field] = $form[$field];
         unset($form[$field]);
       }
-      
+
       // Change the path for the frontpage.
       $prefix = $form['main']['site_frontpage']['#field_prefix'];
       $_path = parse_url($prefix);    
@@ -176,12 +173,16 @@ function domain_conf_form_alter($form_id, &$form) {
       $form['offline']['site_offline_message'] = array(
         '#type' => 'textarea',
         '#title' => t('Site off-line message'),
-        '#default_value' => isset($settings['site_offline_message']) ? $settings['site_offline_message'] :variable_get('site_offline_message', t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => isset($settings['site_name']) ? $settings['site_name'] : $domain['sitename']))),
+        '#default_value' => isset($settings['site_offline_message']) ? $settings['site_offline_message'] : variable_get('site_offline_message', t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => $domain['sitename']))),
         '#description' => t('Message to show visitors when the site is in off-line mode.')
       );    
       
+      // Site name must be edited at the domain creation screen.
+      $form['main']['site_name']['#disabled'] = TRUE;
+      $form['main']['site_name']['#description'] = t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/'. $domain['domain_id'])));
+
       // Reset the provided form defaults, if needed
-      $form['main']['site_name']['#default_value'] = isset($settings['site_name']) ? $settings['site_name'] : $domain['sitename'];
+      $form['main']['site_name']['#default_value'] = $domain['sitename'];
       $form['main']['site_mail']['#default_value'] = isset($settings['site_mail']) ? $settings['site_mail'] : variable_get('site_mail', ini_get('sendmail_from'));
       $form['main']['site_slogan']['#default_value'] = isset($settings['site_slogan']) ? $settings['site_slogan'] : variable_get('site_slogan', '');    
       $form['main']['site_mission']['#default_value'] = isset($settings['site_mission']) ? $settings['site_mission'] : variable_get('site_mission', '');    

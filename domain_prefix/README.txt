@@ -1,0 +1,183 @@
+// $Id$
+  
+/**
+ * @file
+ * README file for Domain Prefix
+ */
+ 
+Domain Access: Table Prefixing
+Dynamic table prefixing for Domain Access.
+
+CONTENTS
+--------
+
+1.  Introduction
+1.1   WARNING!
+1.2   Use-Case
+1.3   Sponsors
+2.  Installation
+2.1   Dependencies
+2.2   Configuration Options
+3.  Drupal Upgrades
+4.  Developer Notes
+4.1   Database Schema
+
+----
+1.  Introduction
+
+The Domain Access: Table Prefixing module (called Domain Prefix), is an
+optional extension of the Domain Access module.  Domain Prefix provides options 
+for dynamically creating and selecting different database tables for affiliate sites.
+
+The Domain Prefix module allows you to create, copy, and drop tables that are
+used by a specific domain.  These tables are dynamically selected inside your
+site's settings.php file.
+
+----
+1.1 WARNING!
+
+Table prefixing is an advanced Drupal option; it should only be performed by
+experienced admins or by those willing to learn how table prefixing functions.
+
+For more information, see http://drupal.org/node/2622.
+
+This module may cause unexpected behavior.  Test any changes to your database
+carefully.
+
+To test basic functionality, I recommend prefixing the 'watchdog' table.  Then test 
+Drupal's error logging on variuous subdomains.
+
+THIS MODULE WILL NOT WORK ON pgSQL.
+
+----
+1.2 Use-Case
+
+For affiliated sites, there are times when you want to use a different configuration
+or data set for each site (or for a select site).
+
+In the original use-case, we needed to have different block settings for each affiliate.
+
+----
+1.3 Example
+
+To have different block settings for each affiliate, you would set the following tables 
+to 'copy':
+
+  - blocks
+  - blocks_roles
+  - boxes
+
+When you create a new domain, these root tables will be copied, using the pattern:
+
+  - domain_ID_tablename
+  
+In the Domain Prefix UI, tables are grouped by module (or by default function).
+This grouping should help you decide which tables must be kept together to ensure
+proper functionality.
+
+
+----
+1.3 Sponsors
+
+Domain Prefix is sponsored by Morris DigitalWorks.
+  http://morrisdigitalworks.com
+
+----
+2.  Installation
+
+The Domain Prefix module is included in the Domain Access download.  To install,
+untar the domain package and place the entire folder in your modules directory.
+
+When you enable the module, it will create a {domain_prefix} table in your Drupal
+database.
+
+For the module to function correctly, you must follow the instructions in INSTALL.txt.
+
+----
+2.1   Dependencies
+
+Domain Prefix requires the Domain Access module be installed and active.
+
+Domain Prefix requires a change to your settings.php file, as indicated by the
+directions in INSTALL.txt
+
+----
+2.2   Configuration Options
+
+Clicking on the 'Table prefixing' tab takes you to a screen with configuration options:
+
+ Domain creation options: *
+   [] Generate tables as defined below
+   [] Do not generate any tables
+   Determines what actions to take when creating new domain records.
+
+This setting controls the behavior of newly created domain records.  If set to
+'Generate', then the module will attempt to create prefixed tables as defined.
+
+----
+3. Drupal Upgrades
+
+Running Drupal's upgrade script [update.php] respects the table prefixing provided
+by Domain Prefix.  That is, if you run the script from one.example.com, it will update
+tables prefixed for that domain.
+
+However, without hacking the update script, we cannot force ths script to update tables
+for all domains.  In order to update you site correctly you must follow these steps.
+
+  - Go to update.php on your root domain [example.com].
+  - Click 'run the database upgrade script'
+  - Expand the 'Select versions' fieldset.
+  - Make a record of each update to be performed. That is:
+      - If a module indicates "no updates available", ingore it.
+      - If a module indicates a number, write down the module name and the number.
+  - Run the update script.
+  - Check for errors.
+
+Then you must follow these instructions for _each_ domain that uses table prefixing.
+
+  - Go to update.php on that domain [one.example.com]
+  - Click 'run the database upgrade script'
+  - Expand the 'Select versions' fieldset.
+  - Select the appropriate updates that you wrote down.
+  - Run the update script.
+  - Check for errors.  
+  
+There does not appear to be an automated way of doing this process.
+
+----
+4.  Developer Notes
+
+Some issues:
+
+  - I have not found a way to run a function any time hook_uninstall() is run.
+  Attempts to add a #submit handler using hook_form_alter() failed.  As a resut
+  I may have to create an admin page for uninstalling domain_prefix tables.
+  
+  - I also failed to find a way to automate the update.php process -- hook_form_alter()
+  also fails to add a #submit handler in that case.
+
+----
+4.1   Database Schema
+
+Installing the module creates a {domain_conf} table that contains:
+
+  - domain_id
+  Integer, unique
+  The lookup key for this record, foreign key to the {domain} table.
+  
+  - status
+  Small integer
+  The status of this row.  Values are:
+      1 == No table created.
+      2 == Table created, structure only.
+      4 == Table created and data copied from source table.
+
+  - tablename
+  Varchar (80)
+  The name of the root table -- e.g. 'cache' or 'watchdog'.
+  
+  - module
+  Varchar (80)
+  The name of the module that "owns" the root table.
+
+  

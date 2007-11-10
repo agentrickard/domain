@@ -1,0 +1,5 @@
+;  $Id$
+name = Domain Prefix
+description = Interface for selective table prefixing for use with Domain Access.
+package = Domain Access
+dependencies = domain

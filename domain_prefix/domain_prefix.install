@@ -1,0 +1,52 @@
+<?php
+// $Id$
+
+/** 
+* @file
+* Install file for the Domain Prefix module
+*/
+
+/**
+ * Implements hook_install()
+ *
+ * @ingroup drupal
+ */
+function domain_prefix_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysqli':
+    case 'mysql':
+      db_query("CREATE TABLE IF NOT EXISTS {domain_prefix} (
+       domain_id int(11) NOT NULL default '0',
+       status smallint NOT NULL default 0,
+       tablename varchar(80) NOT NULL default '',
+       module varchar(80) NOT NULL default '', 
+       INDEX (domain_id)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {domain_theme} (
+       domain_id integer NOT NULL default 0,
+       status smallint NOT NULL default 0,
+       tablename varchar(80) NOT NULL default '',
+       module varchar(80) NOT NULL default '' 
+      )");     
+      db_query("CREATE INDEX {domain_prefix}_domain_id_idx ON {domain_prefix} (domain_id)");
+      break;
+  }
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function domain_prefix_uninstall() {
+  // We must drop all the created tables.
+  $result = db_query("SELECT domain_id, tablename FROM {domain_prefix} WHERE status > 1");
+  while ($table = db_fetch_array($result)) {
+    $name = db_escape_table('domain_'. $table['domain_id'] .'_'. $table['tablename']);
+    db_query("DROP TABLE $name");
+  }
+  // Now drop the storage table.
+  db_query("DROP TABLE {domain_prefix}");
+  variable_del('domain_prefix');
+  variable_del('domain_prefix_options');  
+}
