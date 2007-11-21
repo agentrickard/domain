@@ -16,7 +16,7 @@ function domain_prefix_install() {
     case 'mysqli':
     case 'mysql':
       db_query("CREATE TABLE IF NOT EXISTS {domain_prefix} (
-       domain_id int(11) NOT NULL default '0',
+       domain_id int(11) NOT NULL default 0,
        status smallint NOT NULL default 0,
        tablename varchar(80) NOT NULL default '',
        module varchar(80) NOT NULL default '', 
@@ -24,7 +24,7 @@ function domain_prefix_install() {
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
       break;
     case 'pgsql':
-      db_query("CREATE TABLE {domain_theme} (
+      db_query("CREATE TABLE {domain_prefix} (
        domain_id integer NOT NULL default 0,
        status smallint NOT NULL default 0,
        tablename varchar(80) NOT NULL default '',
@@ -43,7 +43,7 @@ function domain_prefix_uninstall() {
   $result = db_query("SELECT domain_id, tablename FROM {domain_prefix} WHERE status > 1");
   while ($table = db_fetch_array($result)) {
     $name = db_escape_table('domain_'. $table['domain_id'] .'_'. $table['tablename']);
-    db_query("DROP TABLE $name");
+    db_query("DROP TABLE {%s}", $name);
   }
   // Now drop the storage table.
   db_query("DROP TABLE {domain_prefix}");

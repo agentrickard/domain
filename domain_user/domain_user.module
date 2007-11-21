@@ -1,0 +1,68 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Creates unique subdomains for registered users.
+ */
+
+/**
+ * Implements hook_menu()
+ *
+ * @ingroup user
+ */
+function domain_user_menu($may_cache) {
+  $items = array();
+  
+  if ($may_cache) {
+    $items[] = array(
+      'title' => t('User domains'),
+      'path' => 'admin/build/domain/user',
+      'type' => MENU_LOCAL_TASK,
+      'access' => user_access('administer domains'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('domain_user_configure_form')
+    );
+  }
+  return $items;
+}
+
+/**
+ * FormsAPI
+ *
+ * @ingroup user
+ */
+function domain_user_configure_form() { 
+  drupal_set_title(t('User domain settings'));
+  $form = array();
+  $form['domain_user'] = array(
+    '#type' => 'radios',
+    '#title' => t('Default settings'),
+    '#options' => array(1 => t('Create domains for all users'), 0 => t('Do not create domains')),
+    '#description' => t('Should subdomains be created when users register?'),
+    '#default_value' => variable_get('domain_user', 1),
+  );
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_domainload()
+ *
+ * @ingroup user
+ */
+function domain_user_domainload(&$domain) {
+  // Zero is the default domain, and we don't want to invalidate it.
+  if ($domain['domain_id'] > 0) {
+    $data = db_fetch_array(db_query("SELECT du.uid, u.status FROM {domain_user} du INNER JOIN {users} u ON du.uid = u.uid WHERE du.domain_id = %d", $domain['domain_id']));
+    if ($data['uid']) {
+      if ($data['status']) {
+        $domain['uid'] = $data['uid'];
+        $domain['valid'] = TRUE;
+      }
+      else {
+        $domain['valid'] = FALSE;
+      }
+    }  
+  }  
+}
+

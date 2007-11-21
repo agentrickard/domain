@@ -1,0 +1,43 @@
+<?php
+// $Id$
+
+/** 
+* @file
+* Install file for the Domain User module
+*/
+
+/**
+ * Implements hook_install()
+ *
+ * @ingroup drupal
+ */
+function domain_user_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysqli':
+    case 'mysql':
+      db_query("CREATE TABLE IF NOT EXISTS {domain_user} (
+       domain_id int(11) NOT NULL default '0',
+       uid int(11) NOT NULL default '0',
+       INDEX (domain_id),
+       INDEX (uid)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {domain_user} (
+       domain_id integer NOT NULL default 0,
+       uid integer NOT NULL default 0,       
+      )");     
+      db_query("CREATE INDEX {domain_user}_domain_id_idx ON {domain_user} (domain_id)");
+      db_query("CREATE INDEX {domain_user}_uid_idx ON {domain_user} (uid)");      
+      break;
+  }
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function domain_user_uninstall() {
+  // Drop the storage table.
+  db_query("DROP TABLE {domain_user}");
+  variable_del('domain_user');
+}

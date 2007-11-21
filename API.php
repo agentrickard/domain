@@ -144,7 +144,7 @@ function hook_domainrecords(&$grants, $node) {
  *
  * @ingroup hooks
  */
-function hook_domainload($domain) {
+function hook_domainload(&$domain) {
   // Add a variable to the $domain array.
   $domain['myvar'] = 'mydomainvar';
   // Remove the site_grant flag, making it so users can't see content for 'all affiliates.'

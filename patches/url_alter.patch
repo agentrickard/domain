@@ -1,0 +1,24 @@
+--- /Users/ken/Drupal Development/drupal-5.3/includes/common.inc	2007-10-17 17:28:59.000000000 -0400
++++ includes/common.inc	2007-11-21 14:02:57.000000000 -0500
+@@ -1142,6 +1142,21 @@ function format_date($timestamp, $type =
+  * alternative than url().
+  */
+ function url($path = NULL, $query = NULL, $fragment = NULL, $absolute = FALSE) {
++  // Implementation of hook_url_alter().
++  // This hook allows modules to change the elements of the path dynamically.
++  // For example usage see domain_url_alter().
++  static $_modules;
++  if (!isset($_modules)) {
++    $_modules = module_implements('url_alter');
++  }
++  if (!empty($_modules)) {
++    foreach ($_modules as $module) {
++      // Cannot use module_invoke_all() since we pass by reference.
++      $function = $module .'_url_alter';
++      $function($path, $query, $fragment, $absolute);
++    }
++  }
++
+   if (isset($fragment)) {
+     $fragment = '#'. $fragment;
+   }

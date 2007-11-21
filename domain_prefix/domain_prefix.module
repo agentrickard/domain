@@ -91,7 +91,7 @@ function domain_prefix_get_tables($prefix = NULL) {
     $result = db_query("SHOW TABLES");
   }
   else {
-    $result = db_query("SHOW TABLES LIKE '$prefix%%'");  
+    $result = db_query("SHOW TABLES LIKE '{$prefix}%%'");  
   }
   $tables = array();
   $disallow = domain_prefix_disallow();
@@ -296,7 +296,7 @@ function domain_prefix_form($domain_id) {
   // Sort them by module
   uasort($table_options, '_domain_prefix_sort');  
   // All tables are prefixed as 'domain_#_'
-  $prefix = 'domain_'. $domain_id .'_';
+  $prefix = domain_prefix_string($domain_id);
   // Generate the form.
   $form = array();
   $delete_flag = 0; // Flag for the theme function delete column
@@ -351,10 +351,10 @@ function domain_prefix_table_exists($prefix, $table) {
   $string = db_escape_table($prefix . $table);
   switch($db_type) {
     case 'pgsql':
-      $query = "SELECT relname FROM pg_class WHERE relname = '%s'";
+      $query = "SELECT relname FROM pg_class WHERE relname = '{%s}'";
       break;
     default:
-      $query = "SHOW TABLES LIKE '%s'";
+      $query = "SHOW TABLES LIKE '{%s}'";
       break;
   }
   return db_num_rows(db_query($query, $string));
@@ -365,7 +365,7 @@ function domain_prefix_table_exists($prefix, $table) {
  */
 function domain_prefix_form_submit($form_id, $form_values) {
   // Throw away what we don't need.
-  $prefix = 'domain_'. $form_values['domain_id'] .'_';
+  $prefix = domain_prefix_string($form_values['domain_id']);
   $unset = array('prefix_theme', 'domain_id', 'op', 'submit', 'restore', 'form_token', 'form_id', 'execute');
   $data = $form_values;
   foreach ($unset as $key) {
@@ -387,7 +387,7 @@ function domain_prefix_form_submit($form_id, $form_values) {
     $oldtable = db_escape_table($key);
     if ($value == DOMAIN_PREFIX_CREATE) {
       if (!$exists) {
-        db_query("CREATE TABLE %s LIKE %s", $newtable, $oldtable);
+        db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $oldtable);
         drupal_set_message(t('!string table created.', array('!string' => $newtable)));
         $update = TRUE;
       }
@@ -397,8 +397,8 @@ function domain_prefix_form_submit($form_id, $form_values) {
     }
     else if ($value == DOMAIN_PREFIX_COPY) {
       if (!$exists) {
-        db_query("CREATE TABLE %s LIKE %s", $newtable, $oldtable);
-        db_query("INSERT INTO %s SELECT * FROM %s", $newtable, $oldtable);
+        db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $oldtable);
+        db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $oldtable);
         drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
         $update = TRUE;      
       }
@@ -408,7 +408,7 @@ function domain_prefix_form_submit($form_id, $form_values) {
     }
     else if ($value == DOMAIN_PREFIX_DROP) {
       if ($exists > 0) {
-        db_query("DROP TABLE %s", $newtable);
+        db_query("DROP TABLE {%s}", $newtable);
         $value = DOMAIN_PREFIX_IGNORE;
         drupal_set_message(t('!string table dropped.', array('!string' => $newtable)));      
         $update = TRUE;      
@@ -469,11 +469,11 @@ function domain_prefix_module_lookup($table) {
     case 'accesslog':
       $module = 'statistics';
       break;
-     case 'term_data':
-     case 'term_hierarchy':
-     case 'term_node':
-     case 'term_relation':
-     case 'term_synonym':
+    case 'term_data':
+    case 'term_hierarchy':
+    case 'term_node':
+    case 'term_relation':
+    case 'term_synonym':
       $module = 'taxonomy';
       break;
   }
@@ -504,6 +504,7 @@ function domain_prefix_disallow() {
     'domain_conf',
     'domain_prefix',
     'domain_theme',
+    'domain_user'
   );
 }
 
@@ -536,14 +537,32 @@ function domain_prefix_domainupdate($op, $domain = array(), $edit = array()) {
  */
 function domain_prefix_drop_records($domain_id) {
   $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > 1", $domain_id);
-  $prefix = 'domain_'. $domain_id .'_';
+  $prefix = domain_prefix_string($domain_id);
   while ($tables = db_fetch_array($result)) {
     $table = db_escape_table($prefix . $tables['tablename']);
     $exists = domain_prefix_table_exists($prefix, $tables['tablename']);  
     if ($exists > 0) {
-      db_query("DROP TABLE %s", $table);
+      db_query("DROP TABLE {%s}", $table);
       drupal_set_message(t('!string table dropped.', array('!string' => $table)));      
     }  
   }
   db_query("DELETE FROM {domain_prefix} WHERE domain_id = %d", $domain_id);
 }
+
+/**
+ * Check updates
+
+function domain_prefix_update() {
+  print '<pre>';
+  print_r($_SESSION);
+  print '</pre>';
+  return 'hi';
+  
+} */
+
+/**
+ * Uniform prefix string
+ */
+function domain_prefix_string($domain_id) { 
+  return 'domain_'. $domain_id .'_'; 
+}  

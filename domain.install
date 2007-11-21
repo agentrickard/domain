@@ -13,7 +13,7 @@ function domain_install() {
   switch ($GLOBALS['db_type']) {
     case 'mysqli':
     case 'mysql':
-      db_query("CREATE TABLE IF NOT EXISTS {domain} (
+      db_query("CREATE TABLE {domain} (
         domain_id int(11) NOT NULL AUTO_INCREMENT,
         subdomain varchar(40) NOT NULL default '',
         sitename varchar(80) NOT NULL default '',
@@ -29,10 +29,12 @@ function domain_install() {
         sitename varchar(80) NOT NULL default '',
         scheme varchar(8) NOT NULL default 'http',        
         PRIMARY KEY (domain_id)
-        )");     
+        )");   
       db_query("CREATE INDEX {domain}_subdomain_idx ON {domain} (subdomain)");
       break;
   } 
+  // Create the 'all' realm for Domain Access.
+  db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");    
 }
 
 /**

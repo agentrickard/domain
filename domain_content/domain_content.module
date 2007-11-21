@@ -193,6 +193,30 @@ function domain_content_form() {
   global $user, $_domain;
   $filter = node_build_filter_query();
 
+  // Bypass the superuser permissions by forcing an AND on {node_access}.
+  $filter['join'] .= " INNER JOIN {node_access} nac ON nac.nid = n.nid ";
+  $arg = arg(3);
+  
+  if ($arg != 'all') {
+    // In this case, we must check the domain_id grant.
+    // We use intval() here for security, since we are not filtering the query parameter otherwise.
+    if (empty($filter['where'])) {
+      $filter['where'] = " WHERE nac.realm = 'domain_id' AND nac.gid = ". intval($_domain['domain_id'])." ";
+    }
+    else {
+      $filter['where'] .= " AND nac.realm = 'domain_id' AND nac.gid = ". intval($_domain['domain_id']) ." ";
+    }
+  }
+  else {
+    // Or check the domain_site grant.
+    if (empty($filter['where'])) {
+      $filter['where'] = " WHERE nac.realm = 'domain_site' AND nac.gid = 0 ";
+    }
+    else {
+      $filter['where'] .= " AND nac.realm = 'domain_id' AND nac.gid = 0 ";
+    }
+  }
+
   $result = pager_query(db_rewrite_sql('SELECT n.*, u.name, u.uid FROM {node} n '. $filter['join'] .' INNER JOIN {users} u ON n.uid = u.uid '. $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
 
   $destination = drupal_get_destination();
@@ -215,10 +239,10 @@ function domain_content_form() {
     // Flag a message if user has extra permissions
     if ($message) {
       $check[$node->nid] = TRUE;
-      if ($set == 0) {
+     /* if ($set == 0) {
         drupal_set_message(t('Your privileges allow you to see content that may not be unique to this domain.'));
         $set++;
-      }  
+      } */  
     }    
     $form['title'][$node->nid] = array('#value' => l($node->title, 'node/'. $node->nid) .' '. theme('mark', node_mark($node->nid, $node->changed)));
     $form['name'][$node->nid] =  array('#value' => check_plain(node_get_types('name', $node)));
@@ -232,9 +256,8 @@ function domain_content_form() {
 
     if (!empty($node->domains)) {
       foreach ($node->domains as $domain) {
-        // Can the user edit this node?
-        $check[$node->nid] = domain_content_check($domain, $all);
-
+        // Can the user edit this node.  We use += here since this is an array loop.
+        $check[$node->nid] += domain_content_check($domain, $all);
         // The root domain is stored as -1, but cast as zero in the global variable.
         $key = ($domain == -1) ? 0 : $domain;
         // Convert the domain ids to data so we can print them.

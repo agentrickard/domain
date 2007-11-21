@@ -1,5 +1,27 @@
 // $Id$
 
+21-NOV-2007
+
+-- Fixes logical error in domain_content.
+-- Changes implementation of hook_node_access_grants() to work with OG.
+-- Adds patches folder.
+-- Includes hook_node_access_logic() patch.
+-- Fixes error where module hooks did not pass by reference correctly.
+-- #192849 by canen.  pgsql in domain_prefix_install() calls wrong table.
+
+-- #191456 by derjochenmeyer. Removes filter_xss_admin() from hook_init.  Breaks caching and is not needed.
+-- #191494 by lpirotte.  Domain Prefix does not work when a global $db_prefix is used.
+-- $gid not set properly in domain_nodeapi().
+-- #191570.  Removes the domain_enabling() function, which caused issues when installing other node access modules.
+
+-- Adds a VALID boolean element to the $_domain array to allow for checking user status with
+    the Domain User module.
+-- #191134 inspired by derjochenmeyer .  Filters content for Domain Content so that superusers
+    do not see all content on all domains.
+-- #189797.  hook_url_alter() patch to the url() function to enable absolute path links when needed by the
+    Domain Access module -- required for Search, MySite, and other aggregating functions.
+-- #191368.  Prevent debugging output from being indexed by the search mechanism.
+
 09-NOV-2007
 
 -- Adds the Domain Prefix module, for advanced table prefixing options.

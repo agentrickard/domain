@@ -1,0 +1,162 @@
+--- /Users/ken/Drupal Development/drupal-5.3/modules/node/node.module	2007-09-29 19:41:28.000000000 -0400
++++ modules/node/node.module	2007-11-21 13:35:35.000000000 -0500
+@@ -2729,22 +2729,19 @@ function node_access($op, $node = NULL) 
+ 
+   // If the module did not override the access rights, use those set in the
+   // node_access table.
+-  if ($op != 'create' && $node->nid && $node->status) {
+-    $grants = array();
+-    foreach (node_access_grants($op) as $realm => $gids) {
+-      foreach ($gids as $gid) {
+-        $grants[] = "(gid = $gid AND realm = '$realm')";
+-      }
+-    }
+-
+-    $grants_sql = '';
+-    if (count($grants)) {
+-      $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
++  if ($op != 'create' && $node->nid) {
++    $grants_sql = node_access_grants_sql($op, NULL, $node->status);
++    // If the return value is FALSE, then the node status is unpublished and
++    // none of the grants requested an access check be run.  In which case,
++    // we should fall through to the final 'if' statement.
++    if ($grants_sql !== FALSE) {
++      if (!empty($grants_sql)) {
++        $grants_sql .= ' AND';
++      }  
++      $sql = "SELECT COUNT(*) FROM {node_access} WHERE (nid = 0 OR nid = %d) $grants_sql grant_$op >= 1";
++      $result = db_query($sql, $node->nid);
++      return (db_result($result));
+     }
+-
+-    $sql = "SELECT COUNT(*) FROM {node_access} WHERE (nid = 0 OR nid = %d) $grants_sql AND grant_$op >= 1";
+-    $result = db_query($sql, $node->nid);
+-    return (db_result($result));
+   }
+ 
+   // Let authors view their own nodes.
+@@ -2791,17 +2788,7 @@ function _node_access_where_sql($op = 'v
+     return;
+   }
+ 
+-  $grants = array();
+-  foreach (node_access_grants($op, $uid) as $realm => $gids) {
+-    foreach ($gids as $gid) {
+-      $grants[] = "($node_access_alias.gid = $gid AND $node_access_alias.realm = '$realm')";
+-    }
+-  }
+-
+-  $grants_sql = '';
+-  if (count($grants)) {
+-    $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
+-  }
++  $grants_sql = node_access_grants_sql('view', $node_access_alias, $uid);
+ 
+   $sql = "$node_access_alias.grant_$op >= 1 $grants_sql";
+   return $sql;
+@@ -2842,18 +2829,7 @@ function node_access_view_all_nodes() {
+   static $access;
+ 
+   if (!isset($access)) {
+-    $grants = array();
+-    foreach (node_access_grants('view') as $realm => $gids) {
+-      foreach ($gids as $gid) {
+-        $grants[] = "(gid = $gid AND realm = '$realm')";
+-      }
+-    }
+-
+-    $grants_sql = '';
+-    if (count($grants)) {
+-      $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
+-    }
+-
++    $grants_sql = node_access_grants_sql('view');
+     $sql = "SELECT COUNT(*) FROM {node_access} WHERE nid = 0 $grants_sql AND grant_view >= 1";
+     $result = db_query($sql);
+     $access = db_result($result);
+@@ -2863,6 +2839,85 @@ function node_access_view_all_nodes() {
+ }
+ 
+ /**
++ * Check the logic of node grants and prepare the sql statement.
++ *
++ * @param $op
++ *   The operation that the user is trying to perform.
++ * @param $uid
++ *   The user ID performing the operation. If omitted, the current user is used.
++ * @param $status
++ *   The publication status of the node being checked.  Typically, node_access
++ *   checks are not run for unpublished nodes.  However, some advanced uses
++ *   require that users can act on unpublished nodes.
++ * @return
++ *   There are three possible return values.
++ *   - A sql string containing the appropriate WHERE clauses, grouped together
++ *   according to the logic of hook_node_grants.
++ *   - An empty string, indicating that no extra rules are needed.
++ *   - Boolean FALSE, indicating that all nodes are unpublished and no module
++ *   has explicitly requested an access check.
++ */
++function node_access_grants_sql($op = 'view', $node_access_alias = NULL, $uid = NULL, $status = TRUE) {
++  // Define the grants array.
++  $grants = array();
++  // First, acquire all the grants as and array of rules.
++  $rules = node_access_grants($op, $uid);
++
++  // Prepare the table alias, if needed.
++  if (!empty($node_access_alias)) {
++    $alias = $node_access_alias .'.';
++  }
++  // It may be that only the default rule is active.  In that case, we can skip the
++  // process below.
++  if (count($rules) == 1 && key($rules) == 'all') {
++    $grants_sql .= "AND (". $alias ."realm = 'all' AND ". $alias ."gid = 0)";    
++  }
++  else {
++    // Process the grants into logical groupings.
++    foreach ($rules as $realm => $rule) {
++      // Set the status flag.
++      $status += $rule['check'];  
++      // Set the default clause group.  Then check for options.
++      $group = 'all';
++      if (!empty($rule['group'])) {
++        $group = $rule['group'];
++      }
++      foreach ($rule as $gid) {
++        // Grants ids must be numeric.
++        if (is_numeric($gid)) {
++          $grants[$group][$realm] = $gid;
++        }  
++      }  
++    }
++    // In most cases, node status must be set to TRUE.  However, there are use-cases where 
++    // we allow access to unpublished nodes.  So we check the status to see if we need to 
++    // continue with the logic or end this IF statement.  
++    if (!$status) {
++      return FALSE;
++    }
++    $grants_sql = '';
++    // Run throught the $grants, if needed and generate the query SQL.
++    if (count($grants)) {
++      foreach ($grants as $group => $grant) {
++        $clauses = array();
++        foreach ($grant as $key => $value) {
++          $clauses[] = "(". $alias ."realm = '$key' AND ". $alias ."gid = $value)";
++        }
++        if ($group == 'all') {
++          $grants_sql .= 'AND ('. implode(' OR ', $clauses) .') ';            
++        }
++        else {
++          // Required elements must go into a subquery.  Will not work prior to MySQL 4.1.x.
++          $subquery = "AND ". $alias ."nid IN (SELECT ". $alias ."nid FROM {node_access} ". $node_access_alias ." WHERE ";
++          $grants_sql .= $subquery .'('. implode(' OR ', $clauses) .')) ';            
++        }
++      }  
++    }
++  }  
++  return $grants_sql;
++}
++
++/**
+  * Implementation of hook_db_rewrite_sql
+  */
+ function node_db_rewrite_sql($query, $primary_table, $primary_field) {

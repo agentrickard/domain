@@ -32,13 +32,16 @@ function _domain_prefix_load() {
       }
       if (!empty($tables)) {
         global $db_prefix;
+        $new_prefix = array();
         // There might be global prefixing; if so, prepend the global.
         if (is_string($db_prefix)) {
+          $new_prefix['default'] = $db_prefix;
           $prefix = $db_prefix . $prefix;
         }
         foreach($tables as $table) {
-          $db_prefix[$table] = $prefix;
+          $new_prefix[$table] = $prefix;
         }
+        $db_prefix = $new_prefix;
       }
     }
   }
