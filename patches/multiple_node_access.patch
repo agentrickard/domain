@@ -99,7 +99,7 @@
 +function node_access_grants_sql($op = 'view', $node_access_alias = NULL, $uid = NULL, $status = TRUE) {
 +  // Define the grants array.
 +  $grants = array();
-+  // First, acquire all the grants as and array of rules.
++  // First, acquire all the grants as an array of rules.
 +  $rules = node_access_grants($op, $uid);
 +
 +  // Prepare the table alias, if needed.

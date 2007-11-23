@@ -20,6 +20,7 @@ function domain_prefix_install() {
        status smallint NOT NULL default 0,
        tablename varchar(80) NOT NULL default '',
        module varchar(80) NOT NULL default '', 
+       source smallint NOT NULL default 0,       
        INDEX (domain_id)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
       break;
@@ -28,7 +29,8 @@ function domain_prefix_install() {
        domain_id integer NOT NULL default 0,
        status smallint NOT NULL default 0,
        tablename varchar(80) NOT NULL default '',
-       module varchar(80) NOT NULL default '' 
+       module varchar(80) NOT NULL default '',
+       status smallint NOT NULL default 0       
       )");     
       db_query("CREATE INDEX {domain_prefix}_domain_id_idx ON {domain_prefix} (domain_id)");
       break;
@@ -49,4 +51,25 @@ function domain_prefix_uninstall() {
   db_query("DROP TABLE {domain_prefix}");
   variable_del('domain_prefix');
   variable_del('domain_prefix_options');  
+}
+
+
+/**
+ * Update from beta6 to beta7.
+ * Adds the source column to the database.
+ */
+function domain_prefix_update_1() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {domain_prefix} ADD COLUMN source smallint NOT NULL DEFAULT 0");
+      break;
+    case 'pgsql':
+      db_add_column($ret, 'domain_prefix', 'source', 'smallint', array('not null' => TRUE, 'default' => 0));
+      break;
+  }
+
+  return $ret;  
 }

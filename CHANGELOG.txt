@@ -1,5 +1,11 @@
 // $Id$
 
+23-NOV-2007
+
+-- #192353 by okday.  Domain Prefix fix. Allows the source table for data copying to be specified through the UI.
+    Requires that update.php be run.
+-- #194671 by skizzo.  Allows sorting of the domain list admin page.  Adds pagination, if needed.    
+
 21-NOV-2007
 
 -- Fixes logical error in domain_content.

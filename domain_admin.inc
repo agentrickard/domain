@@ -19,8 +19,21 @@
  */
 function domain_view() {
   global $_domain;
-  $header = array(t('Id'), t('Domain'), t('Scheme'), t('Site name'), t('Actions'));  
-  $domains = domain_domains();
+  $header = array(
+    array('data' => t('Id'), 'field' => 'domain_id'),
+    array('data' => t('Domain'), 'field' => 'subdomain'),
+    array('data' => t('Scheme'), 'field' => 'scheme'), 
+    array('data' => t('Site name'), 'field' => 'sitename'),
+    array('data' => t('Actions'))
+  );  
+  // Cannot use domain_domains() here because we need to sort the output.
+  $domains = array();
+  $domains[] = domain_default();
+  $sql = "SELECT * FROM {domain}". tablesort_sql($header);
+  $result = pager_query($sql, 2);  
+  while ($data = db_fetch_array($result)) {
+    $domains[] = $data;
+  }
   foreach ($domains as $domain) {
     $link = l($domain['subdomain'], domain_get_uri($domain), array(), NULL, NULL, TRUE);
     if ($domain['domain_id'] == 0) {
@@ -41,7 +54,9 @@ function domain_view() {
     $rows[] = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $domain['scheme'], $domain['sitename'], $actions);
   }
   if (!empty($rows)) {
-    return theme('table', $header, $rows);  
+    $output .= theme_table($header, $rows);
+    $output .= theme('pager', NULL, 2, 0); 
+    return $output;
   }
   else {
     return t('No domains have been configured.');
