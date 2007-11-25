@@ -50,7 +50,7 @@ function domain_user_configure_form() {
  *
  * @ingroup user
  */
-function domain_user_domainload(&$domain) {
+function domain_user_domainload($domain) {
   // Zero is the default domain, and we don't want to invalidate it.
   if ($domain['domain_id'] > 0) {
     $data = db_fetch_array(db_query("SELECT du.uid, u.status FROM {domain_user} du INNER JOIN {users} u ON du.uid = u.uid WHERE du.domain_id = %d", $domain['domain_id']));
@@ -63,6 +63,7 @@ function domain_user_domainload(&$domain) {
         $domain['valid'] = FALSE;
       }
     }  
+    return $domain;
   }  
 }
 

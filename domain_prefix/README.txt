@@ -114,6 +114,9 @@ Clicking on the 'Table prefixing' tab takes you to a screen with configuration o
 This setting controls the behavior of newly created domain records.  If set to
 'Generate', then the module will attempt to create prefixed tables as defined.
 
+When selecting options for table prefixing, you can now select which data source
+to use when copying tables.  Use the select list to determine the source for data.
+
 ----
 3. Drupal Upgrades
 
@@ -180,4 +183,8 @@ Installing the module creates a {domain_conf} table that contains:
   Varchar (80)
   The name of the module that "owns" the root table.
 
+  - source
+  Small integer
+  Indicates the source of data copied for this domain.  This value is
+  the domain_id of the source domain.
   

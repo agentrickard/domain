@@ -302,20 +302,6 @@ function domain_cron() {
 }
 
 /**
- * Upon enabling this module, store the default view grant
- * in the {node_access} table. 
- * @see domain_grant_all()
- *
- * @ingroup domain
- */
-function domain_enable() {
-  $check = db_result(db_query("SELECT COUNT(nid) FROM {node_access} WHERE realm = 'domain_all' AND gid = 0"));
-  if (!$check) {
-    db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");
-  }
-}
-
-/**
  * Router function to call various administration tasks
  *
  * @param $action
@@ -486,12 +472,11 @@ function _domain_rurl_sort($a, $b) {
  *
  * @ingroup domain
  */
-function domain_domainload($domain) {
+function domain_domainload(&$domain) {
   // Get the path to the home page for this domain.
   $domain['path'] = domain_get_path($domain);
   // Grant access to all affiliates.    
   $domain['site_grant'] = DOMAIN_SITE_GRANT;
-  return $domain;
 }
  
 
@@ -722,9 +707,10 @@ function domain_node_access_records($node) {
   if (function_exists('node_access_grants_sql') && count(module_implements('node_grants')) > 1) {
     variable_set('domain_access_rules', TRUE);
   }
-  // How is core content handled for this site?
+  // How is core content handled for this site?  We need to run this
+  // check when the module is first enabled.
   $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
-  if ($behavior == 1) {
+  if (domain_enabling() && $behavior == 1) {
     $node->domain_site = TRUE;
   }
   
@@ -818,6 +804,34 @@ function domain_node_access_records($node) {
 }
 
 /**
+ * Upon enabling this module, store the default view grant
+ * in the {node_access} table. 
+ * @see domain_grant_all()
+ *
+ * @ingroup domain
+ */
+function domain_enable() {
+  domain_enabling(TRUE);
+  $check = db_result(db_query("SELECT COUNT(nid) FROM {node_access} WHERE realm = 'domain_all' AND gid = 0"));
+  if (!$check) {
+    db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");
+  }
+}
+
+/**
+ * Writes the default grants when the module is frist enabled.
+ *
+ * @ingroup node
+ */
+function domain_enabling($set = NULL) {
+  static $enabling = FALSE;
+  if ($set !== NULL) {
+    $enabling = $set;
+  }
+  return $enabling;
+} 
+
+/**
  * Implements hook_disable()
  *
  * @ingroup node
@@ -857,8 +871,6 @@ function domain_form_alter($form_id, &$form) {
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
   if ($form['#id'] == 'node-form' && !$form['#node']->cck_dummy_node_form) {
     global $_domain;
-    $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain}");
-    $options = array();
     // By default, the requesting domain is assigned.
     $default = array($_domain['domain_id']);
     // How is core content handled for this site?
@@ -866,9 +878,14 @@ function domain_form_alter($form_id, &$form) {
     if ($behavior == 1 || $_domain['domain_id'] == 0) {
       $default[] = -1;
     }
-    $options[-1] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
-    while ($data = db_fetch_array($result)) {
-      $options[$data['domain_id']] = $data['sitename'];
+    $options = array();
+    foreach (domain_domains() as $data) {
+      // Cannot pass zero in checkboxes.
+      ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
+      // The domain must be valid.
+      if ($data['valid'] || user_access('administer domains')) {
+        $options[$key] = $data['sitename'];
+      }  
     }
     // If the user is a site admin, show the form, otherwise pass it silently.
     if (user_access('set domain access')) {
@@ -927,16 +944,16 @@ function domain_form_alter($form_id, &$form) {
 function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   global $_domain;
   // Set static variables for the node lookups, to remove redundant queries.
-  static $_check, $domain_site, $domain;
+  static $domain_site, $domain;
   // This routine only needs to be run from certain urls.
-  if (!isset($_check)) {
-    $_check = domain_grant_all();
-  }
-  if ($_check) {
+  $check = domain_grant_all();
+  if ($check) {
     // Check to see if this is a node or comment link and set $nid accordingly.
     // We static the $nid results to make this more efficient.
     $pattern = explode('/', $path);
-    if (($pattern[0] == 'node' && is_numeric($pattern[1])) || ($pattern[0] == 'comment' && $pattern[1] == 'reply' && is_numeric($pattern[2]))) {
+    // Known paths that use the format 'node/NID'.
+    $match = array('node', 'print', 'forward');
+    if ((in_array($pattern[0], $match) && is_numeric($pattern[1])) || ($pattern[0] == 'comment' && $pattern[1] == 'reply' && is_numeric($pattern[2]))) {
       // Get the node id as $nid.
       $nid = $pattern[1];
       if ($pattern[0] == 'comment') {
@@ -972,8 +989,9 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
 function domain_grant_all() {
   static $grant;
   if (!isset($grant)) {
+    $search = variable_get('domain_search', 0);
     // Proof of concept.
-    if (arg(0) == 'search' || arg(0) == 'mysite' || (arg(0) == 'user' && arg(2) == 'track')) {
+    if ((arg(0) == 'search' && $search) || arg(0) == 'mysite' || (arg(0) == 'user' && arg(2) == 'track')) {
       $grant = TRUE;
     }
     else {

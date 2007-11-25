@@ -150,9 +150,18 @@ function domain_configure_form() {
     '#options' => array(1 => t('Show on all sites'), 2 => t('Only show on selected sites')),
     '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
   );
+  
+  $form['domain_behavior']['domain_search'] = array(
+    '#type' => 'radios',
+    '#title' => t('Search settings'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_search', 0),
+    '#options' => array(0 => t('Search content for the current domain only'), 1 => t('Search all domains from any URL')),
+    '#description' => t('Options for content searching.  This feature requires the hook_url_alter() patch.')
+  );  
   $options = array(
-    'id' => t('Creation order, oldest > newest.  Default'),
-    'rid' => t('Creation order, newest > oldest.'),
+    'id' => t('Creation order, oldest > newest'),
+    'rid' => t('Creation order, newest > oldest'),
     'name' => t('Sitename, A > Z'),
     'rname' => t('Sitename, Z > A'),
     'url' => t('URL, A > Z'),

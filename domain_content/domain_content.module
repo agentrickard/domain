@@ -239,10 +239,6 @@ function domain_content_form() {
     // Flag a message if user has extra permissions
     if ($message) {
       $check[$node->nid] = TRUE;
-     /* if ($set == 0) {
-        drupal_set_message(t('Your privileges allow you to see content that may not be unique to this domain.'));
-        $set++;
-      } */  
     }    
     $form['title'][$node->nid] = array('#value' => l($node->title, 'node/'. $node->nid) .' '. theme('mark', node_mark($node->nid, $node->changed)));
     $form['name'][$node->nid] =  array('#value' => check_plain(node_get_types('name', $node)));
@@ -280,6 +276,44 @@ function domain_content_form() {
       $nodes[$node->nid] = '';
     }  
   }
+  // Privileged users can make global changes to Domain Access permissions.
+  if (user_access('set domain access')) {
+    $options = array();
+    foreach (domain_domains() as $data) {
+      // Cannot pass zero in checkboxes.
+      ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
+      // The domain must be valid.
+      if ($data['valid'] || user_access('administer domains')) {
+        $options[$key] = $data['sitename'];
+      }  
+    }
+    // If the user is a site admin, show the form, otherwise pass it silently.
+    if (user_access('set domain access')) {
+      $form['domain'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Domain access options'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE
+      );
+      $form['domain']['domain_site'] = array(
+        '#type' => 'checkbox',
+        '#prefix' => t('<p><b>Publishing options:</b>'),
+        '#suffix' => '</p>',
+        '#title' => t('Send to all affiliates'),
+        '#required' => FALSE,
+        '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
+        '#default_value' => 0,
+      );    
+      $form['domain']['domains'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Publish to'),
+        '#options' => $options,
+        '#required' => FALSE,
+        '#description' => t('Select which affiliates can access this content.'),
+        '#default_value' => array(),
+      );
+    }  
+  }
   // Users must have passed at least one access check to have batch options.
   if (!empty($check)) {  
     $form['options'] = array('#type' => 'fieldset',
@@ -300,7 +334,79 @@ function domain_content_form() {
   $form['#theme'] = 'domain_content_admin_nodes';
   $form['#validate']['node_admin_nodes_validate'] = array();    
   $form['#submit']['node_admin_nodes_submit'] = array();  
+  $form['#submit']['domain_content_update_nodes'] = array();    
   return $form;
+}
+
+/**
+ * FormAPI function that lets us update access rules.
+ *
+ * @ingroup content
+ */
+function domain_content_update_nodes($form_id, $form_values) {
+  // If our operation is flagged, then we have to manually change the 
+  // node_access table.
+  if ($form_values['operation'] == 'domain') {
+    if ($form_values['domain_site']) {
+      $domain_site = TRUE;
+    }
+    $domains = array();
+    foreach ($form_values['domains'] as $key => $value) {
+      // Cannot pass zero in checkboxes, so these are converted from -1.
+      if (abs($key) > 0 && $key == $value) {
+        ($key == -1) ? $id = 0 : $id = $value;
+        $domains[] = $id;
+      }  
+    }
+    $editor = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
+    if ($editor) {
+      $editors = $domains;
+    }
+    foreach ($form_values['nodes'] as $nid) {
+      // Delete anything not selected.
+      db_query("DELETE FROM {node_access} WHERE nid = %d AND realm IN ('domain_id', 'domain_site', 'domain_editor')", $nid);
+      if ($domain_site) {
+        db_query("INSERT INTO {node_access} VALUES (%d, 0, 'domain_site', 1, 0, 0)", $nid);
+      }
+      if (!empty($domains)) {
+        foreach ($domains as $id) {
+          db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_id', 1, 0, 0)", $nid, $id);
+        }
+        if ($editor) {
+          db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $nid, $id);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_operations()
+ *
+ * @ingroup content 
+ */
+function domain_content_node_operations() {
+  // Only privileged users can perform this operation.
+  if (user_access('set domain access')) {
+    $operations = array(
+      'domain' => array(
+      'label' => t('Change Domain Access rules'),
+      'callback' => 'domain_content_node_operations_access',
+      )
+    );  
+    return $operations;
+  }  
+}  
+
+/**
+ * Callback for domain_content_node_operations().
+ *
+ * This callback is required, but we actually do our action inside
+ * of domain_content_update_nodes().
+ *
+ * @ingroup content
+ */
+function domain_content_node_operations_access($nodes) {
 }
 
 /**

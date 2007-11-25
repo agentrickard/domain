@@ -1,5 +1,15 @@
 // $Id$
 
+25-NOV-2007 (2)
+
+-- #189797 by moshub.  Allows the admin to decide if content searches should be run
+    across all affiliates or just the currently active domain.
+-- Allows administrators to change domain access settings as a batch process, using
+    the Domain Content module.
+-- Fixed error in domain_user_domainload() -- this hook is not passed by reference.    
+-- Creates the beta7 release.  
+-- Requires that update.php be run.
+
 25-NOV-2007
 
 -- #192452 by skizzo.  Allows domains to be set to inactive.  Inactive domains can only be

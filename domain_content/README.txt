@@ -21,8 +21,8 @@ CONTENTS
 3.2   Affiliated Content
 3.3   Active Domains
 4.  Content Editing
-4.1   Privileged Users
-4.2   Affiliates
+4.1   Affiliates
+4.2   Domain Access Options
 5.  Developer Notes
 
 
@@ -112,22 +112,28 @@ The batch editing forms for Domain Content work identically to those for the
 default Drupal 'administer content' screen.
 
 ----
-4.1 Privileged Users
-
-It is possible that some users with 'administer nodes' and 'edit TYPE nodes'
-permissions may be able to see nodes that do not belong to the selected domain.
-This behavior is currently unavoidable, due to the nature of node access in 
-Drupal.  Users with these permissions will be shown a message indicating that
-some content might not be specific to the current domain.
-
-----
-4.2 Affiliates
+4.1 Affiliates
 
 On the batch editing form is an additional column labelled 'Affiliates.'
 
 This column shows the Domain Access rules for each node.  Remember that content
 that is assigned to more than one domain can be edited by multiple users, so
 be careful when editing content that is published to multiple affiliates.
+
+----
+4.2 Domain Access Options
+
+You may use this form to batch update the Domain Access rules for your nodes.
+
+If you have the 'set domain access' permission, you will see the Domain Access
+Options form elements beneath the node list.
+
+If you select the operation "Change Domain Access rules", any nodes that you
+select can be batch updated to the new settings you select.
+
+WARNING: It is possible that you may move some nodes to domains other
+than the currently active domain.  If so, some nodes will be reomved from
+the form after you submit the update.  This behavior is normal and desired.
 
 ----
 5.  Developer Notes

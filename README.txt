@@ -16,11 +16,14 @@ CONTENTS
 1.2   Examples
 1.3   Sponsors
 2.  Installation
-2.1   Server Configuration
-2.2   Creating Subdomain Records
-2.3   Setting DOMAIN_INSTALL_RULE
-2.4   Setting DOMAIN_EDITOR_RULE
-2.5   Setting DOMAIN_SITE_GRANT
+2.1   Patches to Drupal Core
+2.1.1   multiple_node_access.patch
+2.1.2   url_alter.patch
+2.2   Server Configuration
+2.3   Creating Subdomain Records
+2.4   Setting DOMAIN_INSTALL_RULE
+2.5   Setting DOMAIN_EDITOR_RULE
+2.6   Setting DOMAIN_SITE_GRANT
 3.  Permissons
 3.1   Module Permissions
 3.2   Normal Usage
@@ -31,10 +34,9 @@ CONTENTS
 4.2   The Domain List
 4.3   Creating Domain Records
 4.4   Node Settings
-4.4.1   Domain node editing
-4.4.2   Domain node types
-4.5   Sorting domain lists
-4.6   Block -- Domain Switcher
+4.4.1   Domain Node Editing
+4.4.2   Domain Node Types
+4.5   Block -- Domain Switcher
 5.  Node Access
 5.1   Assigning Domain Access
 5.2.  Editor Access
@@ -120,7 +122,55 @@ When you enable the module, it will create a {domain} table in your Drupal
 database.
 
 ----
-2.1 Server Configuration
+2.1 Patches to Drupal Core
+
+The following patches are optional.  They affect advanced behavior of the 
+Domain Access module.
+
+Patches are distributed in the 'patches' folder of the download.
+
+To apply these patches, place them in your root Drupal folder.
+Then follow the instructions at: http://drupal.org/patch/apply
+
+----
+2.1.1 multiple_node_access.patch
+
+You should apply this patch only if you use Domain Access along with
+another Node Access module, such as Organic Groups (OG).
+
+The multiple_node_access.patch allows Drupal to run more than one
+node access control scheme in parallel.  Instead of using OR logic to
+determine node access, this patch uses subselects to enable AND logic
+for multiple node access rules.
+
+WARNING: This patch uses subselect statements and requires pgSQL or
+MySQL 4.1 or higher.
+
+Developers: see http://drupal.org/node/191375 for more information.
+
+This patch is being submitted to Drupal core for version 7.
+
+----
+2.1.2 url_alter.patch
+
+This patch is only needed if:
+
+  -- You wish to allow searching of all domains from any domain.
+  -- You use a content aggregation module such as MySite.
+  -- You get "access denied" errors when linking to items on a 
+  user's Track page.
+  
+This patch allows modules to edit the path to a Drupal object.  In the
+above cases, some content can only be viewed from certain domains, so
+we must write absolute links to that content.  
+
+Developers: see http://drupal.org/node/189797 for more information.
+
+This patch introduces hook_url_alter(), which is being submitted to
+Drupal core for version 7.
+
+----
+2.2 Server Configuration
 
 For the module to work correctly, the DNS record of your server must accept
 multiple DNS entries pointing at a single IP address that hosts your Drupal
@@ -154,7 +204,7 @@ of Drupal's settings.php file.  The sites folder should be named 'default' or
 named for your root domain.
 
 ----
-2.2 Creating Subdomain Records
+2.3 Creating Subdomain Records
 
 After you enable the module, you will have a user interface for registering new
 subdomains with your site.  For these to work correctly, they must also be 
@@ -164,7 +214,7 @@ To be clear: creating a new subdomain record through this module will not alter
 the DNS server of your web server.
 
 ----
-2.3 Setting DOMAIN_INSTALL_RULE
+2.4 Setting DOMAIN_INSTALL_RULE
 
 This is an advanced instruction, and may be ignored.
 
@@ -182,7 +232,7 @@ your root domain.
 For more details, see section 5.
 
 ----
-2.4 Setting DOMAIN_EDITOR_RULE
+2.5 Setting DOMAIN_EDITOR_RULE
 
 This is an advanced instruction, and may be ignored.
 
@@ -201,7 +251,7 @@ root domain.
 See section 3 and section 5 for more information.
 
 ----
-2.5 Setting DOMAIN_SITE_GRANT
+2.6 Setting DOMAIN_SITE_GRANT
 
 At the top of the domain.module file, you will find this line:
 
@@ -351,6 +401,15 @@ This screen is split into two sections.
   
   Note that this setting can be extended through the Node settings described 
   in section 4.4.
+  
+  -- Search Settings
+  Allows the admin to decide if content searches should be run across all 
+  affiliates or just the currently active domain.
+  
+  -- Sorting Domain Lists
+  Both the Domain Switcher block and the Domain Nav module provide an
+  end-user visible list of domains.  The domain sorting settings control how
+  these lists are generated and presented to the user.  
 
 ----
 4.2 Domain List
@@ -386,12 +445,12 @@ Both the Domain and the Site name are required to be unique values.
 After you create a record, you may edit or delete it as you see fit.
 
 ----
-4.4 Node settings
+4.4 Node Settings
 
 The Node settings page is divided into two parts, each with a different purpose.
 
 ----
-4.4.1 Domain node editing
+4.4.1 Domain Node Editing
 
 The top section 'Domain node editing' is required for those sites that use the
 advanced editing techniques outlined in section 3.
@@ -405,7 +464,7 @@ By default, 'Comment settings', 'Delete node', 'Publshing options', and 'Path
 aliasing' are enabled.  
 
 ----
-4.4.2 Domain node types
+4.4.2 Domain Node Types
 
 The lower section 'Domain node types' is used to extend the 'New content 
 settings' described in 4.1.
@@ -415,14 +474,7 @@ checking the box, nodes for that given type will automatically be assigned to
 'all affiliate sites' during node creation and editing.  
 
 ----
-4.5 Sorting domain lists
-
-Both the Domain Switcher block and the Domain Nav module provide an
-end-user visible list of domains.  The domain sorting settings control how
-these lists are generated and presented to the user.
-
-----
-4.6 Block -- Domain Switcher
+4.5 Block -- Domain Switcher
 
 The Domain Access module provides on block, which can be used to help you
 debug your use of the module.
@@ -503,6 +555,12 @@ This section contains technical details about Drupal's node access system.
 
 In Domain Access, the following realms are defined:
 
+  - domain_all
+  Indicates whether the view grant should be passed for all nodes on
+  a given page request.  Used in cases such as Search and MySite to
+  enable aggregation of content across affiliates.  The only valid nid
+  and gid for this grant are zero (0).
+
   - domain_site
   Indicates whether a node is assigned to all affliaites.  The only valid
   grant id for this realm is zero (0).
@@ -519,6 +577,11 @@ In Domain Access, the following realms are defined:
 5.4   Grants
 
 In each of the realms, there are specific rules for node access grants, as follows.
+
+  - domain_all
+  In some specific cases, like Search, or MySite, or the user's Tracker page
+  we want people to be able to see content across all affiliates.  Only the domain_all
+  grant is assigned in these cases.  This grants only 'grant_view'.
 
   - domain_site
   By design, all site users, including anonymous users, are granted access to
@@ -594,7 +657,13 @@ required, but each adds functionality to the core module.
   menu items for each subdomain, suitable for using as primary or secondary 
   links. 
   
+  - Domain Prefix -- A powerful module that allows for selective table prefixing
+  for each subdomain in your installation.
+  
   - Domain Theme -- Allows separate themes for each subdomain.
+
+  - Domain User -- Allows the creation of specific subdomains for each active
+  site user.
 
 ----
 6.2 The $_domain Global
@@ -607,8 +676,11 @@ currently active domain. If no active domain is found, default values are used:
 
   $_domain['domain_id'] = 0;
   $_domain['sitename'] = variable_get('domain_sitename',
-    variable_get('sitename', 'Drupal'));
-  $_domain['subdomain'] = variable_get('domain_root', '');
+    variable_get('sitename', 'Drupal'))
+  $_domain['subdomain'] = variable_get('domain_root', '')
+  $_domain['scheme'] = 'http'
+  $_domain['valid'] = TRUE
+  $_domain['path'] = http://example.com
 
 Some uses for this global variable might include:
 
@@ -640,6 +712,10 @@ contains the following structure:
   Indicates the URL scheme to use when accessing this domain.  Allowed values, 
   are currently 'http' and 'https'.
   
+  - valid
+  Char, 1 default 1
+  Indicates that this domain is active and can be accessed by site users.
+  
 ----
 6.4 API
 
@@ -668,10 +744,3 @@ not work, since Drupal's login cookie is domain-specific.
 Possible soultions for this issue are welcome -- the Single SignOn module may
 work, with some modification.  Solutions should be rolled as separate 
 sub-modules.
-
-Drupal user 'canen' is already working on Theme support, which would allow each
-domain to have a separate theme and settings.
-
-This module has not been tested with other node_access() modules, and strange 
-behavior may result when used with OG and similar modules.
-
