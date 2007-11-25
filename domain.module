@@ -42,9 +42,14 @@ function domain_init() {
   // Get the domain data.
   $_domain = domain_lookup($data['domain_id']);
   // If return is -1, then the DNS didn't match anything, so use defaults.
-  // For Domain User, we check the validity of accounts, so the 'vaid' flag must be TRUE.
-  if ($_domain == -1 || !$_domain['valid']) {
+  if ($_domain == -1) {
     $_domain = domain_default();
+  }
+  // For Domain User, we check the validity of accounts, so the 'valid' flag must be TRUE.
+  // If this check fails, we send users to the default site homepage.
+  if (!$_domain['valid'] && !user_access('administer domains')) {
+    $_domain = domain_default();
+    drupal_goto($_domain['path']);
   }
   // Set the site name to the domain-specific name.
   $conf['site_name'] = $_domain['sitename'];
@@ -122,7 +127,6 @@ function domain_menu($may_cache) {
       'callback arguments' => array('delete', arg(4))      
     );    
   }
-
   return $items;
 }
 
@@ -162,10 +166,28 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
       $block['subject'] = t('Domain switcher');
       $items = array();
       $domains = domain_domains();
+      $msg = FALSE;
       foreach ($domains as $domain) {
-        $items[] = l($domain['sitename'], domain_get_uri($domain));
+        if ($domain['valid']) {
+          $title = $domain['sitename']; 
+          $allow = TRUE;
+        }  
+        else {
+          $title = $domain['sitename'] .' *';
+          $allow = FALSE;          
+          if (user_access('administer domains')) {
+            $msg = TRUE;
+            $allow = TRUE;
+          }  
+        }  
+        if ($allow) {
+          $items[] = l($title, domain_get_uri($domain));
+        }  
       }
       $block['content'] = theme('item_list', $items);
+      if ($msg) {
+        $block['content'] .= t('<em>* Inactive domain.</em>');
+      }  
       return $block;
       break;
   }
@@ -280,6 +302,20 @@ function domain_cron() {
 }
 
 /**
+ * Upon enabling this module, store the default view grant
+ * in the {node_access} table. 
+ * @see domain_grant_all()
+ *
+ * @ingroup domain
+ */
+function domain_enable() {
+  $check = db_result(db_query("SELECT COUNT(nid) FROM {node_access} WHERE realm = 'domain_all' AND gid = 0"));
+  if (!$check) {
+    db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");
+  }
+}
+
+/**
  * Router function to call various administration tasks
  *
  * @param $action
@@ -312,26 +348,36 @@ function domain_admin($action, $id = NULL) {
  * @ingroup domain
  */
 function domain_lookup($domain_id = NULL, $subdomain = NULL) {
-  if ($domain_id === 0) {
-    $domain = domain_default();
-  }
-  else if ($domain_id) {
-    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE domain_id = %d", $domain_id));
-  }
-  else if ($subdomain) {
-    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE subdomain = '%s'", $subdomain));
-  }
-  if (!is_null($domain['domain_id'])) {
-    // Set the valid flag.
-    $domain['valid'] = TRUE;
-    // Let submodules overwrite the defaults, if they wish.
-    $extra = module_invoke_all('domainload', $domain);
-    $domain = array_merge($domain, $extra);
-    return $domain;
-  }
-  else {
+  static $domains;
+  // If both are NULL, no lookup can be run.
+  if (is_null($domain_id) && is_null($subdomain)) {
     return -1;
   }
+  // Create a unique key so we can static cache all requests.
+  else {
+    $key = $domain_id . $subdomain;
+  }  
+  if (!isset($domains[$key])) {
+    if ($domain_id === 0) {
+      $domain = domain_default();
+    }
+    else if ($domain_id) {
+      $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE domain_id = %d", $domain_id));
+    }
+    else if ($subdomain) {
+      $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE subdomain = '%s'", $subdomain));
+    }
+    if (!is_null($domain['domain_id'])) {
+      // Let submodules overwrite the defaults, if they wish.
+      $extra = module_invoke_all('domainload', $domain);
+      $domain = array_merge($domain, $extra);
+      $domains[$key] = $domain;
+    }
+    else {
+      $domains[$key] = -1;
+    }
+  }
+  return $domains[$key];
 }
 
 /**
@@ -373,8 +419,64 @@ function domain_domains() {
       $domain = domain_lookup($data['domain_id']);   
       $domains[] = $domain;
     }
-  }  
+  }
+  $sort = variable_get('domain_sort', 'id');
+  uasort($domains, '_domain_'. $sort  .'_sort');  
   return $domains;
+}
+
+/**
+ * Helper sort function
+ *
+ * @ingroup domain
+ */
+function _domain_id_sort($a, $b) {
+  return ($a['domain_id'] < $b['domain_id']) ? -1 : 1;
+}
+
+/**
+ * Helper sort function
+ *
+ * @ingroup domain
+ */
+function _domain_name_sort($a, $b) {
+  return strcmp($a['sitename'], $b['sitename']);
+}
+
+/**
+ * Helper sort function
+ *
+ * @ingroup domain
+ */
+function _domain_url_sort($a, $b) {
+  return strcmp($a['subdomain'], $b['subdomain']);
+}
+
+/**
+ * Helper sort function
+ *
+ * @ingroup domain
+ */
+function _domain_rid_sort($a, $b) {
+  return ($a['domain_id'] > $b['domain_id']) ? -1 : 1;
+}
+
+/**
+ * Helper sort function
+ *
+ * @ingroup domain
+ */
+function _domain_rname_sort($a, $b) {
+  return strcmp($b['sitename'], $a['sitename']);
+}
+
+/**
+ * Helper sort function
+ *
+ * @ingroup domain
+ */
+function _domain_rurl_sort($a, $b) {
+  return strcmp($a['subdomain'], $b['subdomain']);
 }
 
 /**
@@ -397,7 +499,7 @@ function domain_domainload($domain) {
  * Determine an absolute path for a domain
  *
  * @param $domain
- *  The currently active $domain array, privided by domain_lookup().
+ *  The currently active $domain array, provided by domain_lookup().
  *
  * @ingroup domain 
  */
@@ -552,8 +654,16 @@ function domain_node_grants($account, $op) {
     }
     // In special cases, we grant the ability to view all nodes.  That is,
     // we simply get out of the way of other node_access rules.
+    // We do this with the universal 'domain_all' grant.
     if ($op == 'view' && domain_grant_all()) {
-      return array();
+      // If no other node access modules are present, return our grant.
+      // Otherwise, we just step out of the way.
+      if ($rules) {
+        return array();
+      }
+      else {
+        return array('domain_all' => array(0));
+      }  
     }
   }
   else {
@@ -714,6 +824,8 @@ function domain_node_access_records($node) {
  */
 function domain_disable() {
   domain_disabling(TRUE);
+  // Delete our all access row from {node_access}.
+  db_query("DELETE FROM {node_access} WHERE realm = 'domain_all' AND gid = 0");
   // This lets us control how the module updates the {node_access} table.
   variable_del('domain_behavior');
   variable_del('domain_editors');
@@ -854,6 +966,8 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
 
 /**
  * Activate the hidden grant for searches.
+ *
+ * @ingroup domain
  */
 function domain_grant_all() {
   static $grant;

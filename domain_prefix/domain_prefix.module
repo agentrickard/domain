@@ -54,7 +54,9 @@ function domain_prefix_menu($may_cache) {
 }
 
 /**
- * Implements hook_perm
+ * Implements hook_perm 
+ *
+ * @ingroup drupal
  */
 function domain_prefix_perm() {
   return array('prefix tables');
@@ -62,6 +64,8 @@ function domain_prefix_perm() {
 
 /**
  * Check for existing table prefixing.
+ *
+ * @ingroup prefix
  */
 function domain_prefix_get_prefix() {
   global $db_prefix;
@@ -80,6 +84,11 @@ function domain_prefix_get_prefix() {
 
 /**
  * Get the tables with the active prefix
+ *
+ * @param $prefix
+ *   The table prefix used with this domain. Optional.
+ *
+ * @ingroup prefix
  */
 function domain_prefix_get_tables($prefix = NULL) {
   // Check for default prefix settings.
@@ -113,6 +122,8 @@ function domain_prefix_get_tables($prefix = NULL) {
 
 /**
  * Helper sort function
+ *
+ * @ingroup prefix
  */
 function _domain_prefix_sort($a, $b) {
   $_a = str_replace('_', '', $a['tablename']);
@@ -125,6 +136,8 @@ function _domain_prefix_sort($a, $b) {
 
 /**
  * FormsAPI for generating the configuration form
+ *
+ * @ingroup prefix
  */
 function domain_prefix_configure_form() {
   drupal_set_title(t('Default table prefix settings'));
@@ -214,6 +227,9 @@ function domain_prefix_configure_form() {
 /**
  * Implements hook_domainlinks()
  *
+ * @param $domain
+ *  The currently active $domain array, provided by domain_lookup().
+ *
  * @ingroup prefix
  */
 function domain_prefix_domainlinks($domain) {
@@ -225,7 +241,9 @@ function domain_prefix_domainlinks($domain) {
 }
 
 /**
- * FormsAPI
+ * FormsAPI for the domain_prefix_configure_form.
+ *
+ * @ingroup prefix
  */
 function domain_prefix_configure_form_submit($form_id, $form_values) {
   // Throw away what we don't need.
@@ -258,7 +276,9 @@ function domain_prefix_configure_form_submit($form_id, $form_values) {
 
 
 /**
- * FormsAPI
+ * FormsAPI theming for domain_prefix_configure_form.
+ *
+ * @ingroup prefix 
  */
 function theme_domain_prefix_configure_form($form) {
   $output = t('<p>These settings control advanced functions.  Please read the documentation carefully.</p>');
@@ -267,8 +287,6 @@ function theme_domain_prefix_configure_form($form) {
     $header[] = t('Drop');
     unset($form['prefix_theme']);
   }
-  // Pull out the source elements.
-
   $output = drupal_render($form['domain']);
   foreach (element_children($form['domain_prefix']) as $key) {
     if ($form['domain_prefix'][$key]['#description']) {
@@ -281,7 +299,7 @@ function theme_domain_prefix_configure_form($form) {
     foreach (element_children($form['domain_prefix'][$key]) as $option) {
       $row[] = drupal_render($form['domain_prefix'][$key][$option]);    
     }  
-    // throw this away
+    // Throw the rest away, since we already rendered what we want from it.
     $render = drupal_render($form['domain_prefix'][$key]);
     $rows[] = $row;
   }
@@ -292,6 +310,11 @@ function theme_domain_prefix_configure_form($form) {
 
 /**
  * The table prefixing page for a domain.
+ *
+ * @param $domain_id
+ *  The domain_id taken from {domain}.
+ *
+ * @ingroup prefix 
  */
 function domain_prefix_form($domain_id) {
   // We must be on the root domain!
@@ -409,6 +432,13 @@ function domain_prefix_form($domain_id) {
 
 /**
  * Does a table exist -- we use this to bypass Drupal's default table prefixing check.
+ *
+ * @param $prefix
+ *   The table prefix used with this domain. Optional.
+ * @param $table
+ *   The name of the table being acted upon.
+ *
+ * @ingroup prefix
  */
 function domain_prefix_table_exists($prefix, $table) {
   global $db_type;
@@ -425,7 +455,9 @@ function domain_prefix_table_exists($prefix, $table) {
 }
 
 /**
- * FormsAPI
+ * FormsAPI for domain_prefix_form.
+ *
+ * @ingroup prefix
  */
 function domain_prefix_form_submit($form_id, $form_values) {
   // Throw away what we don't need.
@@ -508,6 +540,11 @@ function domain_prefix_form_submit($form_id, $form_values) {
  *
  * In future, SchemaAPI will do this for us.
  * For now, we will have to map core tables.
+ *
+ * @param $table
+ *   The name of the table being acted upon. 
+ *
+ * @ingroup prefix 
  */
 function domain_prefix_module_lookup($table) {
   $match = explode('_', $table);
@@ -559,13 +596,18 @@ function domain_prefix_module_lookup($table) {
 }
 
 /**
- * Lookup stored table information for a domain
+ * Lookup stored table information for a domain.
+ *
+ * @param $domain_id
+ *  The domain_id taken from {domain}.
+ *
+ * @ingroup prefix 
  */
 function domain_prefix_lookup($domain_id) {
   static $domain_prefix;
   if (!isset($domain_prefix[$domain_id])) {
     $domain_prefix[$domain_id] = array();
-    $result = db_query("SELECT domain_id, status, tablename, module FROM {domain_prefix} WHERE domain_id = %d", $domain_id);
+    $result = db_query("SELECT domain_id, status, tablename, module, source FROM {domain_prefix} WHERE domain_id = %d", $domain_id);
     while ($data = db_fetch_array($result)) {
       $domain_prefix[$domain_id][$data['tablename']] = $data;
     }  
@@ -575,6 +617,8 @@ function domain_prefix_lookup($domain_id) {
 
 /**
  * Names of tables explicitly not allowed to be copied
+ *
+ * @ingroup prefix
  */
 function domain_prefix_disallow() {
   return array(
@@ -582,24 +626,24 @@ function domain_prefix_disallow() {
     'domain_conf',
     'domain_prefix',
     'domain_theme',
-    'domain_user'
+    'domain_user' 
   );
 }
 
 /**
- * Creating a record, make the tables
+ * Implements hook_domainupdate().
+ *
+ * @ingroup prefix
  */
 function domain_prefix_domainupdate($op, $domain = array(), $edit = array()) {
   switch ($op) {
     case 'create':
       $rule = variable_get('domain_prefix_options', 1);
       if ($rule) {
-        $settings = unserialize(variable_get('domain_prefix', NULL));    
+        // Get the current settings.
+        $settings = unserialize(variable_get('domain_prefix', NULL));
         if (!empty($settings)) {
-          $form_values = array();
           $settings['domain_id'] = $domain['domain_id'];
-          $settings['execute'] = TRUE;
-          $form_values['domain_prefix'] = $settings;
           drupal_execute('domain_prefix_form', $settings, $domain['domain_id']);
         }
       }
@@ -611,7 +655,12 @@ function domain_prefix_domainupdate($op, $domain = array(), $edit = array()) {
 }
 
 /**
- * Drop tables
+ * Drop tables created by this module.
+ *
+ * @param $domain_id
+ *  The domain_id taken from {domain}.
+ *
+ * @ingroup prefix
  */
 function domain_prefix_drop_records($domain_id) {
   $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > 1", $domain_id);
@@ -628,7 +677,12 @@ function domain_prefix_drop_records($domain_id) {
 }
 
 /**
- * Uniform prefix string
+ * Uniform prefix string 
+ *
+ * @param $domain_id
+ *  The domain_id taken from {domain}.
+ *
+ * @ingroup prefix
  */
 function domain_prefix_string($domain_id) { 
   return 'domain_'. $domain_id .'_'; 

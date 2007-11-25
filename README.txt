@@ -33,7 +33,8 @@ CONTENTS
 4.4   Node Settings
 4.4.1   Domain node editing
 4.4.2   Domain node types
-4.5   Block -- Domain Switcher
+4.5   Sorting domain lists
+4.6   Block -- Domain Switcher
 5.  Node Access
 5.1   Assigning Domain Access
 5.2.  Editor Access
@@ -414,7 +415,14 @@ checking the box, nodes for that given type will automatically be assigned to
 'all affiliate sites' during node creation and editing.  
 
 ----
-4.5 Block -- Domain Switcher
+4.5 Sorting domain lists
+
+Both the Domain Switcher block and the Domain Nav module provide an
+end-user visible list of domains.  The domain sorting settings control how
+these lists are generated and presented to the user.
+
+----
+4.6 Block -- Domain Switcher
 
 The Domain Access module provides on block, which can be used to help you
 debug your use of the module.

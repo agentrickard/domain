@@ -34,12 +34,18 @@ function domain_nav_menu($may_cache) {
     // Generate the list of active domains as menu items
     $domains = domain_domains();
     foreach ($domains as $domain) {
+      // If the domain is not valid, we disable it by default.
+      $type = MENU_NORMAL_ITEM;
+      if (!$domain['valid']) {
+       $type = MENU_SUGGESTED_ITEM;
+      }
       $items[] = array(
         'path' => 'domain/'. $domain['subdomain'], // Can't use absolute paths, so we goto.
         'title' => $domain['sitename'],
         'description' => t('Go to !domain', array('!domain' => $domain['subdomain'])),
         'callback' => 'drupal_goto',
         'callback arguments' => array($domain['path']),
+        'type' => $type,
         'access' => TRUE
       );  
     }  
@@ -120,17 +126,29 @@ function domain_nav_render($paths = 0, $style = 'default') {
   // Select which path calculation to use.
   ($paths == 0) ? $func = 'domain_get_path' : $func = 'domain_get_uri';
   foreach ($domains as $key => $value) {
-    if ($_domain['subdomain'] == $value['subdomain']) {
-      $value['active'] = TRUE;
+    $allow = TRUE;
+    // If the domain is not valid, we disable it by default.
+    if (!$value['valid']) {
+      if (user_access('administer domains')) {
+        $value['sitename'] .= ' *';
+      }
+      else {
+        $allow = FALSE;        
+      }
     }
-    $path = $func($value);
-    $value['path'] = $path;
-    // Allow other modules to add elements to the array.
-    $extra = array();
-    $extra = module_invoke_all('domainlist', $value);
-    $value = array_merge($value, $extra);
-    $options[$value['domain_id']] = $value;
-  }
+    if ($allow) {
+      if ($_domain['subdomain'] == $value['subdomain']) {
+        $value['active'] = TRUE;
+      }
+      $path = $func($value);
+      $value['path'] = $path;
+      // Allow other modules to add elements to the array.
+      $extra = array();
+      $extra = module_invoke_all('domainlist', $value);
+      $value = array_merge($value, $extra);
+      $options[$value['domain_id']] = $value;
+    }
+  }  
   $theme = 'domain_nav_'. $style;
   $content = theme($theme, $options);
   return $content; 

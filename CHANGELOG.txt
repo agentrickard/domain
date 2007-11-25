@@ -1,5 +1,14 @@
 // $Id$
 
+25-NOV-2007
+
+-- #192452 by skizzo.  Allows domains to be set to inactive.  Inactive domains can only be
+    accessed by the site administrator. 
+-- #192452 by skizzo.  Allows the listst of domains used in domain_block() and Domain Nav to
+    be sorted according to an administrator setting.
+-- #189797 by moshub.  Introduces the domain_all() grant, which allows for search and similar
+    pages to grant access across all sites.
+
 23-NOV-2007
 
 -- #192353 by okday.  Domain Prefix fix. Allows the source table for data copying to be specified through the UI.

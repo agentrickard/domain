@@ -19,9 +19,13 @@
  */
 function domain_view() {
   global $_domain;
+  $output = t('<p>The following domains have been created for your site.  The currently active domain <b>is shown in boldface</b>.  You
+                    may click on a domain to change the currently active domain.  Your default domain has an ID of zero (0) and is always 
+                    at the top of the list below.</p>');
   $header = array(
     array('data' => t('Id'), 'field' => 'domain_id'),
     array('data' => t('Domain'), 'field' => 'subdomain'),
+    array('data' => t('Status'), 'field' => 'valid'),     
     array('data' => t('Scheme'), 'field' => 'scheme'), 
     array('data' => t('Site name'), 'field' => 'sitename'),
     array('data' => t('Actions'))
@@ -30,7 +34,7 @@ function domain_view() {
   $domains = array();
   $domains[] = domain_default();
   $sql = "SELECT * FROM {domain}". tablesort_sql($header);
-  $result = pager_query($sql, 2);  
+  $result = pager_query($sql, 24);  
   while ($data = db_fetch_array($result)) {
     $domains[] = $data;
   }
@@ -50,12 +54,14 @@ function domain_view() {
         }
       }
       $actions .= ' | '. l(t('delete'), 'admin/build/domain/delete/'. $domain['domain_id']); 
-    }  
-    $rows[] = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $domain['scheme'], $domain['sitename'], $actions);
+    }
+    // Set the valid flag.
+    ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
+    $rows[] = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $valid, $domain['scheme'], $domain['sitename'], $actions);
   }
   if (!empty($rows)) {
     $output .= theme_table($header, $rows);
-    $output .= theme('pager', NULL, 2, 0); 
+    $output .= theme('pager', NULL, 24, 0); 
     return $output;
   }
   else {
@@ -69,6 +75,9 @@ function domain_view() {
  * @ingroup domain 
  */
 function domain_configure() {
+  // Ensure that the default grant is present.
+  domain_enable();
+  // Return the configuration form.
   return drupal_get_form('domain_configure_form');
 }
 
@@ -141,6 +150,22 @@ function domain_configure_form() {
     '#options' => array(1 => t('Show on all sites'), 2 => t('Only show on selected sites')),
     '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
   );
+  $options = array(
+    'id' => t('Creation order, oldest > newest.  Default'),
+    'rid' => t('Creation order, newest > oldest.'),
+    'name' => t('Sitename, A > Z'),
+    'rname' => t('Sitename, Z > A'),
+    'url' => t('URL, A > Z'),
+    'rurl' => t('URL, Z > A')
+  );
+  $form['domain_behavior']['domain_sort'] = array(
+    '#type' => 'radios',
+    '#title' => t('Sort domain lists'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_sort', 'id'),
+    '#options' => $options,
+    '#description' => t('Controls the display of domain lists to end users.')
+  );  
   return system_settings_form($form);
 }
 
@@ -189,6 +214,14 @@ function domain_create_form() {
     '#default_value' => 'http',
     '#description' => t('The URL scheme for accessing this domain.')
   );    
+  $form['domain']['valid'] = array(
+    '#type' => 'radios',
+    '#title' => t('Domain status'),
+    '#required' => TRUE,
+    '#options' => array(1 => t('Active'), 0 => t('Inactive')),
+    '#default_value' => 1,
+    '#description' => t('Must be set to "Active" for users to navigate to this domain.')
+  );      
   $form['submit'] = array('#type' => 'submit', '#value' => t('Create domain record'));
   return $form;
 }
@@ -218,7 +251,7 @@ function domain_create_form_validate($form_id, $form_values) {
  * @ingroup domain 
  */
 function domain_create_form_submit($form_id, $form_values) {
-  db_query("INSERT INTO {domain} (subdomain, sitename, scheme) VALUES ('%s', '%s', '%s')", $form_values['subdomain'], $form_values['sitename'], $form_values['scheme']);
+  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_values['subdomain'], $form_values['sitename'], $form_values['scheme'], $form_values['valid']);
   // Let other modules act.
   $domain = domain_lookup(NULL, $form_values['subdomain']);
   module_invoke_all('domainupdate', 'create', $domain, $form_values);
@@ -236,7 +269,9 @@ function domain_create_form_submit($form_id, $form_values) {
  */
 function domain_edit($domain_id) {
   $domain = domain_lookup($domain_id);
-  domain_goto($domain);  
+  // We must do this from the default domain, in case the URL does not resolve.
+  $default = domain_default();
+  domain_goto($default);  
   return drupal_get_form('domain_edit_form', $domain);
 }
 
@@ -282,6 +317,14 @@ function domain_edit_form($domain) {
     '#default_value' => $domain['scheme'],
     '#description' => t('The URL scheme for accessing this domain.')
   );   
+  $form['domain']['valid'] = array(
+    '#type' => 'radios',
+    '#title' => t('Domain status'),
+    '#required' => TRUE,
+    '#options' => array(1 => t('Active'), 0 => t('Inactive')),
+    '#default_value' => $domain['valid'],
+    '#description' => t('Must be set to "Active" for users to navigate to this domain.')
+  );     
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
   return $form;
 }
@@ -310,7 +353,7 @@ function domain_edit_form_validate($form_id, $form_values) {
  * @ingroup domain 
  */
 function domain_edit_form_submit($form_id, $form_values) {
-  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s' WHERE domain_id = %d", $form_values['subdomain'], $form_values['sitename'], $form_values['scheme'], $form_values['domain_id']);
+  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = %d WHERE domain_id = %d", $form_values['subdomain'], $form_values['sitename'], $form_values['scheme'], $form_values['valid'], $form_values['domain_id']);
   // Let other modules act.
   $domain = domain_lookup($form_values['domain_id']);
   module_invoke_all('domainupdate', 'update', $domain, $form_values);
