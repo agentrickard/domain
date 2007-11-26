@@ -477,6 +477,7 @@ function domain_domainload(&$domain) {
   $domain['path'] = domain_get_path($domain);
   // Grant access to all affiliates.    
   $domain['site_grant'] = DOMAIN_SITE_GRANT;
+  return $domain;
 }
  
 

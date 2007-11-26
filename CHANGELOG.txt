@@ -1,5 +1,9 @@
 // $Id$
 
+25-NOV-2007 (3)
+
+-- #195256 by Martijnhaan.  Fixes error in domain_domainload().
+
 25-NOV-2007 (2)
 
 -- #189797 by moshub.  Allows the admin to decide if content searches should be run
@@ -9,12 +13,13 @@
 -- Fixed error in domain_user_domainload() -- this hook is not passed by reference.    
 -- Creates the beta7 release.  
 -- Requires that update.php be run.
+-- Returns the domain_enabling() function, which is needed.
 
 25-NOV-2007
 
 -- #192452 by skizzo.  Allows domains to be set to inactive.  Inactive domains can only be
     accessed by the site administrator. 
--- #192452 by skizzo.  Allows the listst of domains used in domain_block() and Domain Nav to
+-- #192452 by skizzo.  Allows the lists of domains used in domain_block() and Domain Nav to
     be sorted according to an administrator setting.
 -- #189797 by moshub.  Introduces the domain_all() grant, which allows for search and similar
     pages to grant access across all sites.
