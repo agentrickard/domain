@@ -77,6 +77,7 @@ function domain_view() {
 function domain_configure() {
   // Ensure that the default grant is present.
   domain_enable();
+  module_invoke_all('domaininstall');
   // Return the configuration form.
   return drupal_get_form('domain_configure_form');
 }
@@ -159,6 +160,18 @@ function domain_configure_form() {
     '#options' => array(0 => t('Search content for the current domain only'), 1 => t('Search all domains from any URL')),
     '#description' => t('Options for content searching.  This feature requires the hook_url_alter() patch.')
   );  
+  
+  $form['domain_behavior']['domain_seo'] = array(
+    '#type' => 'radios',
+    '#title' => t('Search engine optimization'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_seo', 0),
+    '#options' => array(0 => t('Do not rewrite URLs'), 1 => t('Rewrite all URLs to point to a single source')),
+    '#description' => t('If rewrite is turned on, all node links will point to a single instance of the node.  This
+      option reduces the chance that search engines will recognize duplicate content.  
+      This feature requires the hook_url_alter() patch.')
+  );    
+  
   $options = array(
     'id' => t('Creation order, oldest > newest'),
     'rid' => t('Creation order, newest > oldest'),
@@ -230,7 +243,7 @@ function domain_create_form() {
     '#options' => array(1 => t('Active'), 0 => t('Inactive')),
     '#default_value' => 1,
     '#description' => t('Must be set to "Active" for users to navigate to this domain.')
-  );      
+  );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Create domain record'));
   return $form;
 }
@@ -264,8 +277,13 @@ function domain_create_form_submit($form_id, $form_values) {
   // Let other modules act.
   $domain = domain_lookup(NULL, $form_values['subdomain']);
   module_invoke_all('domainupdate', 'create', $domain, $form_values);
-  drupal_set_message(t('Domain record created.'));
-  drupal_goto('admin/build/domain/view');
+  // The user_submitted flag is needed for Domain User.
+  print_r($form_values);
+  exit;
+  if (!$form_values['user_submitted']) { 
+    drupal_set_message(t('Domain record created.'));
+    drupal_goto('admin/build/domain/view');
+  }  
 }
 
 /**

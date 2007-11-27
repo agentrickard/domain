@@ -406,6 +406,17 @@ This screen is split into two sections.
   Allows the admin to decide if content searches should be run across all 
   affiliates or just the currently active domain.
   
+  -- Search Engine Optimization
+  There is a risk with these modules that your site could be penalized by search engines
+  such as Google for having duplicate content.  This setting controls the behavior of
+  URLs written for nodes on your affiliated sites.
+  
+    - If SEO settings are turned on, all node links are rewritten as absolute URLs.
+    - If assigned to 'all affiliates' the node link goes to the root domain.
+    - If assigned to a single affiliate, the node link goes to that affiliate.
+    - If assigned to multiple affiliates, the node link goes to the first matching domain.  
+  
+  
   -- Sorting Domain Lists
   Both the Domain Switcher block and the Domain Nav module provide an
   end-user visible list of domains.  The domain sorting settings control how

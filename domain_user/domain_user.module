@@ -34,15 +34,23 @@ function domain_user_menu($may_cache) {
  */
 function domain_user_configure_form() { 
   drupal_set_title(t('User domain settings'));
+  domain_user_rules();
   $form = array();
   $form['domain_user'] = array(
     '#type' => 'radios',
     '#title' => t('Default settings'),
-    '#options' => array(1 => t('Create domains for all users'), 0 => t('Do not create domains')),
+    '#options' => array(0 => t('Do not create domains'), 1 => t('Create domains for new users')),
     '#description' => t('Should subdomains be created when users register?'),
-    '#default_value' => variable_get('domain_user', 1),
+    '#default_value' => variable_get('domain_user', 0),
   );
   return system_settings_form($form);
+}
+
+/**
+ * Checks for existing domains to create rules
+ */
+function domain_user_rules() { 
+  drupal_set_message(t('Some rules'));
 }
 
 /**
@@ -67,3 +75,87 @@ function domain_user_domainload($domain) {
   }  
 }
 
+/**
+ * Implements hook_user()
+ */
+function domain_user_user ($op, &$edit, &$account, $category = NULL) {
+  switch ($op) {
+    case 'register':
+    case 'form':
+      $form['domain_user']['domain_create_user'] = array(
+        '#type' => 'value',
+        '#value' => variable_get('domain_user', 0)
+      );
+      return $form;
+      break;
+    case 'submit':
+      if ($edit['domain_create_user']) {
+        // create the user domain
+        $account = user_load(array('mail' => $edit['mail']));
+        $root = domain_default();
+        $name = $account->name;
+        $pattern = '/\s/';
+        $name = preg_replace($pattern, '-', $name);
+        $name = strtolower($name);
+        $form_values['sitename'] = $account->name;
+        $form_values['subdomain'] = $name .'.'. $root['subdomain'];
+        $form_values['valid'] = $account->status;
+        $form_values['user_submitted'] = TRUE;
+        // This function will return -1 if no domain exists.
+        $domain = domain_user_lookup(NULL, $account->name);
+        if ($domain == -1) {
+          include_once(drupal_get_path('module', 'domain') .'/domain_admin.inc');          
+          drupal_execute('domain_create_form', $form_values);
+          $domain = domain_user_lookup(NULL, $account->name);     
+          if ($domain['domain_id']) { 
+            db_query("INSERT INTO {domain_user} VALUES (%d, %d)", $domain['domain_id'], $account->uid);    
+            $edit['domains'][] = $domain['domain_id'];            
+          }
+          else {
+            drupal_set_message(t('Could not create your personal URL.'));
+          }
+        }
+        // Set the user's default domain to their subdomain.
+        else if ($domain['domain_id']) {
+          $edit['domains'][] = $domain['domain_id'];
+        }
+      }
+      break;
+    case 'delete':
+      // delete the record
+      break;
+  }
+}
+
+/**
+ * Implements hook_domainupdate()
+ */
+function domain_user_domainupdate($op, $domain = array(), $edit = array()) {
+  switch ($op) {
+    case 'delete':
+      db_query("DELETE FROM {domain_user} WHERE domain_id = %d", $domain['domain_id']);
+      break;
+  }  
+}      
+
+/**
+ * Check to see if a user has created a domain record
+ */
+function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL) {
+  if ($uid) {
+    $id = db_result(db_query("SELECT domain_id FROM {domain_user} WHERE uid = %d", $uid));
+  }
+  else if ($name) {
+    $id = db_result(db_query("SELECT du.domain_id FROM {domain_user} du INNER JOIN {users} u ON du.uid = u.uid WHERE u.name = '%s'", $name));
+  }
+  else if ($domain_id) {
+    $id = db_result(db_query("SELECT domain_id FROM {domain_user} WHERE domain_id = %d", $domain_id));
+  }
+  if ($id) {
+    $return = domain_lookup($id);
+  }
+  else {
+    $return = -1;
+  }
+  return $return;
+}

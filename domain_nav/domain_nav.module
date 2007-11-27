@@ -50,6 +50,10 @@ function domain_nav_menu($may_cache) {
       );  
     }  
   }
+  
+  // In the Garland header, we have to force the block to appear correctly.
+  drupal_add_css(drupal_get_path('module', 'domain_nav') .'/domain_nav.css');
+  
   return $items;
 }
 
@@ -61,7 +65,7 @@ function domain_nav_menu($may_cache) {
 function domain_nav_block($op='list', $delta = 0, $edit = array()) {
   switch ($op) {
     case 'list':
-      $block[0]["info"] = t('Domain list navigator');
+      $block[0]['info'] = t('Domain list navigator');
       break;
     case 'view':
       $block['subject'] = '<none>';
@@ -171,7 +175,7 @@ function domain_nav_render($paths = 0, $style = 'default') {
  * @ingroup themes
  */
 function theme_domain_nav_default($options) {
-  $output = '<form id="domain-list">';
+  $output = '<form class="domain-list" action="">';
   $output .= '<select onchange="if (this.value) location.href=this.value;">';
   $output .= '<option>'. t('Jump to...') .'</option>';
   foreach ($options as $key => $value) {

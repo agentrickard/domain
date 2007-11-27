@@ -255,3 +255,13 @@ function domain_conf_warning() {
     $_warning = TRUE;
   }  
 }
+
+/**
+ * Implements hook_domaininstall()
+ */
+function domain_conf_domaininstall() {
+  // If Domain Conf is being used, check to see that it is installed correctly.
+  if (module_exists('domain_conf') && !function_exists('_domain_conf_load')) {
+    drupal_set_message(t('The Domain Configuration module is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => drupal_get_path('module', 'domain_conf') .'/INSTALL.txt')));
+  }
+}

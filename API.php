@@ -250,3 +250,19 @@ function hook_domaincron($domain) {
   // Set a variable for each domain containing the last node updated.
   variable_set('domain_'. $domain['domain_id'] .'_lastnode', $node->nid);
 } 
+
+/**
+ * Some Domain modules require that settings.php be edited to add 
+ * additional files during the bootstrap process.
+ *
+ * This hook allows those modules to check to see if they have been installed
+ * correctly.  Usually the module is enabled, but the required function is not.
+ *
+ * @see domain_conf_domaininstall() for an example.
+ */
+function hook_domaininstall() {
+  // If MyModule is being used, check to see that it is installed correctly.
+  if (module_exists('mymodule') && !function_exists('_mymodule_load')) {
+    drupal_set_message(t('MyModule is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => drupal_get_path('module', 'mymodule') .'/INSTALL.txt')));
+  }
+}

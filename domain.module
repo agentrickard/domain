@@ -946,15 +946,19 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   global $_domain;
   // Set static variables for the node lookups, to remove redundant queries.
   static $domain_site, $domain;
-  // This routine only needs to be run from certain urls.
+  // This routine only needs to be run from certain urls or if we want to
+  // force all links to go to a single domain for SEO.
+  // See http://drupal.org/node/195366 for the background.
   $check = domain_grant_all();
-  if ($check) {
+  $seo = variable_get('domain_seo', 0);
+  if ($check || $seo) {
     // Check to see if this is a node or comment link and set $nid accordingly.
     // We static the $nid results to make this more efficient.
     $pattern = explode('/', $path);
     // Known paths that use the format 'node/NID'.
     $match = array('node', 'print', 'forward');
     if ((in_array($pattern[0], $match) && is_numeric($pattern[1])) || ($pattern[0] == 'comment' && $pattern[1] == 'reply' && is_numeric($pattern[2]))) {
+      $root = domain_default();  
       // Get the node id as $nid.
       $nid = $pattern[1];
       if ($pattern[0] == 'comment') {
@@ -962,7 +966,7 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
       }
       // Remove redundancy from the domain_site check.
       if (!isset($domain_site[$nid])) {
-        // If this check works, we don't need to rewrite the path.
+        // If this check works, we don't need to rewrite the path unless SEO rules demand it.
         $domain_site[$nid] = db_result(db_query("SELECT grant_view FROM {node_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
       }  
       if (!$domain_site[$nid]) {
@@ -978,6 +982,12 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
           $path = $domain[$nid]['path'] . $path;
         }  
       }  
+      // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
+      // Only needed if we are not on the root domain.
+      else if ($seo && $_domain['domain_id'] != $root['domain_id']) {
+        $absolute = TRUE;
+        $path = $root['path'] . $path;
+      }
     }  
   }  
 }

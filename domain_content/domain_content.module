@@ -387,7 +387,8 @@ function domain_content_update_nodes($form_id, $form_values) {
  */
 function domain_content_node_operations() {
   // Only privileged users can perform this operation.
-  if (user_access('set domain access')) {
+  // Do not show this on the default node editing form.
+  if (arg(0) == 'admin' &&  arg(1) == 'domain' && user_access('set domain access')) {
     $operations = array(
       'domain' => array(
       'label' => t('Change Domain Access rules'),

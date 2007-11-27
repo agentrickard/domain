@@ -1,5 +1,17 @@
 // $Id$
 
+26-NOV-2007
+
+-- Prevents the Domain Access option from showing on the default batch content editing page.
+    domain_content_node_operations() is now path resitricted.
+-- #195366 by nicholasThompson.  Adds an option to force all node links to go to a single
+    source.  This may help prevent search engines from thinking that content published to
+    multiple domains is spam.
+-- #195439 by skizzo.  A rendering bug in Garland breaks the Domain Nav block.  Fix adds
+    a very small domain_nav.css file to fix the issue.
+-- #195489 by mrichar1.  Notify site admins when they fail to install Domain Prefix or Domain
+    Conf correctly.  Introduces hook_domaininstall().
+
 25-NOV-2007 (3)
 
 -- #195256 by Martijnhaan.  Fixes error in domain_domainload().
