@@ -1,5 +1,12 @@
 // $Id$
 
+27-NOV-2007
+
+-- Sets a check for the hook_url_alter() patch and notifies the user if it is not installed.
+    Also disables features that rely on the patch.
+-- Makes the AND behavior of Domain Access and other node access modules a setting.
+-- Cleans up the settings page and places Advanced Settings in a separate group.
+
 26-NOV-2007
 
 -- Prevents the Domain Access option from showing on the default batch content editing page.

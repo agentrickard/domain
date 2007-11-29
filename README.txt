@@ -30,13 +30,25 @@ CONTENTS
 3.3   Advanced Usage
 3.4   Limitations
 4.  Module Configuration
-4.1   Domain Access Options
-4.2   The Domain List
-4.3   Creating Domain Records
-4.4   Node Settings
-4.4.1   Domain Node Editing
-4.4.2   Domain Node Types
-4.5   Block -- Domain Switcher
+4.1   Default Domain Settings
+4.1.1   Primary Domain Name
+4.1.2   Site Name
+4.1.3   Domain URL Scheme
+4.2   Domain Module Behaviors
+4.2.1   Debugging Status
+4.2.2   New Content Settings
+4.2.3   Sort Domain Lists
+4.3   Advanced Settings
+4.3.1   Domain-based Editing Controls
+4.3.2   Search Settings
+4.3.3   Search Engine Optimization
+4.3.4   Node Access Settings
+4.4   The Domain List
+4.5   Creating Domain Records
+4.6   Node Settings
+4.6.1   Domain Node Editing
+4.6.2   Domain Node Types
+4.7   Block -- Domain Switcher
 5.  Node Access
 5.1   Assigning Domain Access
 5.2.  Editor Access
@@ -357,56 +369,88 @@ The settings for Domain Access are listed under Site Building.  The path is
 'admin/build/domain'.
 
 ----
-4.1 Domain Access Options
+4.1   Default Domain Settings
 
-This screen is split into two sections.
+These elements define the 'root' domain for your site.  In the event that a 
+user tries to access an invalid domain, this domain will be used.
 
-  1. Default domain settings
-  These elements define the 'root' domain for your site.  In the event that a 
-  user tries to access an invalid domain, this domain will be used.
-  
-  -- Primary domain name
-  Enter the primary domain for your site.  Typically, you will also enter this
-  value into settings.php for cookie handling.  Do not use http:// or a trailing
-  slash when entering this value.
-  
-  -- Site name
-  This value is taken from your system settings and need not be changed.  It is 
-  provided to allow readbility in the domain list.
-  
-  -- Domain URL scheme
-  Allows the site to use 'http' or 'https' as the URL scheme.  Default is 
-  'http'.  All links and redirects to root site will use the selected scheme.
-  
-  2. Domain module behaviors
-  These options affect how the module behaves.
-  
-  -- Debugging status
-  If enabled, this will append node access information to the bottom of each   
-  node.  This data is only viewable by uses with the 'set domain access'
-  privilege.  It is provided for debugging, since 'adminiseter nodes' will make
-  all nodes viewable to some users.
-  
-  -- Domain-based editing controls
-  Uses the Domain Access module to control which editors can edit content.
-  See section 3.3 for a full discussion of this feature.
-  
-  -- New content settings
-  Defines the default behavior for content added to your site.  By design, the 
-  module automatically assigned all content to the currently active subdomain.  
-  If this value is set to 'Show on all sites,' then all new content will be 
-  assigned to all sites _in addition to_ the active subdomain.
-  
-  This setting is especially useful when you restrict editorial permissions.
-  
-  Note that this setting can be extended through the Node settings described 
-  in section 4.4.
-  
-  -- Search Settings
-  Allows the admin to decide if content searches should be run across all 
-  affiliates or just the currently active domain.
-  
-  -- Search Engine Optimization
+----
+4.1.1   Primary Domain Name
+
+Enter the primary domain for your site.  Typically, you will also enter this
+value into settings.php for cookie handling.  Do not use http:// or a trailing
+slash when entering this value.
+
+----
+4.1.2   Site Name
+
+This value is taken from your system settings and need not be changed.  It is 
+provided to allow readbility in the domain list.
+
+----
+4.1.3   Domain URL Scheme
+
+Allows the site to use 'http' or 'https' as the URL scheme.  Default is 
+'http'.  All links and redirects to root site will use the selected scheme.
+
+----
+4.2   Domain Module Behaviors
+
+These options affect the basic options for how the module behaves.
+
+----
+4.2.1   Debugging Status
+
+If enabled, this will append node access information to the bottom of each   
+node.  This data is only viewable by uses with the 'set domain access'
+privilege.  It is provided for debugging, since 'adminiseter nodes' will make
+all nodes viewable to some users.
+
+----
+4.2.2   New Content Settings
+
+Defines the default behavior for content added to your site.  By design, the 
+module automatically assigned all content to the currently active subdomain.  
+If this value is set to 'Show on all sites,' then all new content will be 
+assigned to all sites _in addition to_ the active subdomain.
+
+----
+4.2.3   Sort Domain Lists
+
+Both the Domain Switcher block and the Domain Nav module provide an
+end-user visible list of domains.  The domain sorting settings control how
+these lists are generated and presented to the user.  
+
+----
+4.3   Advanced Settings
+
+These settings control advanced features for the module.  Some of these
+features require patches to Drupal core.  Please read the documentation
+carefully before implementing these features.
+
+NOTE: Some of these options may be disabled in the event that patches
+have not been applied.
+
+By default, these features are all disabled.
+
+----
+4.3.1   Domain-based Editing Controls
+
+Uses the Domain Access module to control which editors can edit content.
+See section 3.3 for a full discussion of this feature.
+
+----
+4.3.2   Search Settings
+
+Allows the admin to decide if content searches should be run across all 
+affiliates or just the currently active domain.  By design, Drupal will only
+find matches for the current domain.  
+
+Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2
+
+----
+4.3.3   Search Engine Optimization
+
   There is a risk with these modules that your site could be penalized by search engines
   such as Google for having duplicate content.  This setting controls the behavior of
   URLs written for nodes on your affiliated sites.
@@ -415,15 +459,52 @@ This screen is split into two sections.
     - If assigned to 'all affiliates' the node link goes to the root domain.
     - If assigned to a single affiliate, the node link goes to that affiliate.
     - If assigned to multiple affiliates, the node link goes to the first matching domain.  
-  
-  
-  -- Sorting Domain Lists
-  Both the Domain Switcher block and the Domain Nav module provide an
-  end-user visible list of domains.  The domain sorting settings control how
-  these lists are generated and presented to the user.  
+
+Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2.
 
 ----
-4.2 Domain List
+4.3.4   Node Access Settings
+
+This setting controls how you want Domain Access to interact with other
+node access modules.  
+
+If you _are not_ using a module such as Organic Groups or Taxonomy
+Access Control, this setting may be disabled.  This setting is only 
+required IF:
+
+  -- You are using more than one node access control module.
+  -- You want to strictly enforce access permissions by requiring
+  both Domain Access and your other module to grant permission.
+
+
+By design, the node access system in Drupal 5 is a permissive system.
+That is, if you are using multiple node access modules, the permissions
+are checked using an OR syntax.  
+
+As a result, if any node access module grants access to a node, the user
+is granted access.
+
+The included multiple_node_access.patch (discussed in 2.1.1) alters this
+behavior.  The patch allows Drupal to use AND logic when running more
+than one node access module.
+
+For example, when using OG and DA, Drupal's default behavior is:
+
+  -- Return TRUE if OG is TRUE -or- DA is TRUE.
+  
+This patch allows you to enforce the rule as:
+
+  -- Return TRUE if OG is TRUE -and- DA is TRUE.
+
+By design, the default behavior is to use Drupal's OR logic.
+
+For more information, see http://drupal.org/node/191375.
+
+Enabling this feature requires the multiple_node_access patch discussed 
+in 2.1.1.
+
+----
+4.4 Domain List
 
 This screen shows all active subdomains registered for use with the site.
 
@@ -431,7 +512,7 @@ Record zero (0) is hardcoded to refer to the "root" site defined as your
 Primary domain name.
 
 ----
-4.3 Create domain record
+4.5 Create domain record
 
 As noted above, this screen does not register DNS records with Apache.
 
@@ -456,12 +537,12 @@ Both the Domain and the Site name are required to be unique values.
 After you create a record, you may edit or delete it as you see fit.
 
 ----
-4.4 Node Settings
+4.6 Node Settings
 
 The Node settings page is divided into two parts, each with a different purpose.
 
 ----
-4.4.1 Domain Node Editing
+4.6.1 Domain Node Editing
 
 The top section 'Domain node editing' is required for those sites that use the
 advanced editing techniques outlined in section 3.
@@ -475,7 +556,7 @@ By default, 'Comment settings', 'Delete node', 'Publshing options', and 'Path
 aliasing' are enabled.  
 
 ----
-4.4.2 Domain Node Types
+4.6.2 Domain Node Types
 
 The lower section 'Domain node types' is used to extend the 'New content 
 settings' described in 4.1.
@@ -485,7 +566,7 @@ checking the box, nodes for that given type will automatically be assigned to
 'all affiliate sites' during node creation and editing.  
 
 ----
-4.5 Block -- Domain Switcher
+4.7 Block -- Domain Switcher
 
 The Domain Access module provides on block, which can be used to help you
 debug your use of the module.

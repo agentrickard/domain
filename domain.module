@@ -703,11 +703,7 @@ function domain_node_access_records($node) {
   if (domain_disabling()) {
     return;
   }
-  // Check to see if the node_access patch is enabled.  If it is, then
-  // we need to know if more than one node_access module is running.
-  if (function_exists('node_access_grants_sql') && count(module_implements('node_grants')) > 1) {
-    variable_set('domain_access_rules', TRUE);
-  }
+
   // How is core content handled for this site?  We need to run this
   // check when the module is first enabled.
   $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
@@ -946,12 +942,21 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   global $_domain;
   // Set static variables for the node lookups, to remove redundant queries.
   static $domain_site, $domain;
+  
+  // Check to see that this function is installed.
+  $skip = FALSE;
+  $arg = arg(0);
+  if ($arg == 'admin' && ($path == 'domain_access_test_path' || $path == 'domain_access_path_test')) {
+    $path = 'yes';
+    $skip = TRUE;
+  }
+
   // This routine only needs to be run from certain urls or if we want to
   // force all links to go to a single domain for SEO.
   // See http://drupal.org/node/195366 for the background.
   $check = domain_grant_all();
   $seo = variable_get('domain_seo', 0);
-  if ($check || $seo) {
+  if (!$skip && ($check || $seo)) {
     // Check to see if this is a node or comment link and set $nid accordingly.
     // We static the $nid results to make this more efficient.
     $pattern = explode('/', $path);
@@ -1010,4 +1015,14 @@ function domain_grant_all() {
     }
   }
   return $grant;
+}
+
+/**
+ * Implements hook_domaininstall()
+ */
+function domain_domaininstall() {
+  // Check to see if the hook_url_alter() patch is installed.
+  if (url('domain_access_test_path') != url('domain_access_path_test')) {
+    drupal_set_message(t('The hook_url_rewrite() patch is not installed.  Some features are not available. See the Patches to Drupal Core section of <a href="!url">README.txt</a>', array('!url' => drupal_get_path('module', 'domain') .'/README.txt')));
+  }
 }

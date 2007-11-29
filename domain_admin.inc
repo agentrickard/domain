@@ -87,7 +87,7 @@ function domain_configure() {
  *
  * @ingroup domain
  */
-function domain_configure_form() {
+function domain_configure_form($user_submitted = FALSE) {
   $form = array();
   $form['domain'] = array(
     '#type' => 'fieldset',
@@ -125,7 +125,8 @@ function domain_configure_form() {
   $form['domain_behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Domain module behaviors'),
-    '#collapsible' => TRUE
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE
   );
   $form['domain_behavior']['domain_debug'] = array(
     '#type' => 'radios',
@@ -135,14 +136,7 @@ function domain_configure_form() {
     '#options' => array(1 => t('Show debugging output on node view'), 0 => t('Do not show debugging output')),
     '#description' => t('If set, users with the <em>administer domain</em> permission will be able toview the node access rules for each node. See the README for more details.')    
   );   
-  $form['domain_behavior']['domain_editors'] = array(
-    '#type' => 'radios',
-    '#title' => t('Domain-based editing controls'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_editors', intval(DOMAIN_EDITOR_RULE)),
-    '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editors')),
-    '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
-  );  
+
   $form['domain_behavior']['domain_behavior'] = array(
     '#type' => 'radios',
     '#title' => t('New content settings'),
@@ -151,26 +145,6 @@ function domain_configure_form() {
     '#options' => array(1 => t('Show on all sites'), 2 => t('Only show on selected sites')),
     '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
   );
-  
-  $form['domain_behavior']['domain_search'] = array(
-    '#type' => 'radios',
-    '#title' => t('Search settings'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_search', 0),
-    '#options' => array(0 => t('Search content for the current domain only'), 1 => t('Search all domains from any URL')),
-    '#description' => t('Options for content searching.  This feature requires the hook_url_alter() patch.')
-  );  
-  
-  $form['domain_behavior']['domain_seo'] = array(
-    '#type' => 'radios',
-    '#title' => t('Search engine optimization'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_seo', 0),
-    '#options' => array(0 => t('Do not rewrite URLs'), 1 => t('Rewrite all URLs to point to a single source')),
-    '#description' => t('If rewrite is turned on, all node links will point to a single instance of the node.  This
-      option reduces the chance that search engines will recognize duplicate content.  
-      This feature requires the hook_url_alter() patch.')
-  );    
   
   $options = array(
     'id' => t('Creation order, oldest > newest'),
@@ -188,6 +162,72 @@ function domain_configure_form() {
     '#options' => $options,
     '#description' => t('Controls the display of domain lists to end users.')
   );  
+
+  $form['domain_advanced'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Advanced settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE
+  );
+  
+  $form['domain_advanced']['domain_editors'] = array(
+    '#type' => 'radios',
+    '#title' => t('Domain-based editing controls'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_editors', intval(DOMAIN_EDITOR_RULE)),
+    '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editors')),
+    '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
+  );    
+  
+  // Check to see if the node_access patch is enabled.  If it is, then
+  // we need to know if more than one node_access module is running.
+  $disabled = FALSE;
+  $modules = count(module_implements('node_grants'));
+
+  if (!function_exists('node_access_grants_sql') ||  $modules < 2) {
+    $disabled = TRUE;
+    variable_set('domain_access_rules', 0);    
+  }
+  // Do not show this form element unless it is necessary
+  if ($modules > 1) {
+    $form['domain_advanced']['domain_access_rules'] = array(
+      '#type' => 'radios',
+      '#title' => t('Node access settings'),
+      '#required' => TRUE,
+      '#disabled' => $disabled,
+      '#default_value' => variable_get('domain_access_rules', 0),
+      '#options' => array(0 => t('Use the default Drupal behavior (OR)'), 1 => t('Check Domain Access in addition to other modules (AND)')),
+      '#description' => t('Controls how Domain Access interacts with access control modules such as Organic Groups. Requires the multiple_node_access patch.')
+    );  
+  }
+  // Check to see if the hook_url_alter() patch is installed.
+  $disabled = FALSE;
+  if (url('domain_access_test_path') != url('domain_access_path_test')) {
+    $disabled = TRUE;
+    variable_set('domain_search', 0);
+    variable_set('domain_seo', 0);
+  }
+  $form['domain_advanced']['domain_search'] = array(
+    '#type' => 'radios',
+    '#title' => t('Search settings'),
+    '#required' => TRUE,
+    '#disabled' => $disabled,
+    '#default_value' => variable_get('domain_search', 0),
+    '#options' => array(0 => t('Search content for the current domain only'), 1 => t('Search all domains from any URL')),
+    '#description' => t('Options for content searching.  This feature requires the hook_url_alter() patch.')
+  );  
+  
+  $form['domain_advanced']['domain_seo'] = array(
+    '#type' => 'radios',
+    '#title' => t('Search engine optimization'),
+    '#required' => TRUE,
+    '#disabled' => $disabled,
+    '#default_value' => variable_get('domain_seo', 0),
+    '#options' => array(0 => t('Do not rewrite URLs'), 1 => t('Rewrite all URLs to point to a single source')),
+    '#description' => t('If rewrite is turned on, all node links will point to a single instance of the node.  This
+      option reduces the chance that search engines will recognize duplicate content.  
+      This feature requires the hook_url_alter() patch.')
+  );    
   return system_settings_form($form);
 }
 
