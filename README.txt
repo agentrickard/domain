@@ -127,6 +127,8 @@ Domain Access is sponsored by Morris DigitalWorks.
 ----
 2.  Installation
 
+For detailed instructions, see INSTALL.txt.
+
 To install the module, simply untar the download and put it in your site's
 modules directory.  After reading this document, enable the module normally.
 

@@ -1,5 +1,13 @@
 // $Id$
 
+01-DEC-2007
+
+-- Fixes error in multiple_node_access.patch, which was passing the uid incorrectly.
+-- Adds INSTALL.txt instructions.
+-- #195366 by Rogdor.  Fixes path issue for domain_get_path().
+-- #196217 by Rogdor.  Uses hook_form_alter() to force complete paths on form
+    actions when using SEO optimization mode.
+
 27-NOV-2007
 
 -- Sets a check for the hook_url_alter() patch and notifies the user if it is not installed.

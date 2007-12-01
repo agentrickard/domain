@@ -16,7 +16,7 @@ CONTENTS
 2.1   Option 1 -- Preferred
 2.2   Option 2
 3.  Reminder
-4.  Unistalling
+4.  Uninstalling
 
 ----
 1.  Introduction

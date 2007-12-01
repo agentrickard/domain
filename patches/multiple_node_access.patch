@@ -16,7 +16,7 @@
 -    if (count($grants)) {
 -      $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
 +  if ($op != 'create' && $node->nid) {
-+    $grants_sql = node_access_grants_sql($op, NULL, $node->status);
++    $grants_sql = node_access_grants_sql($op, NULL, $user->uid, $node->status);
 +    // If the return value is FALSE, then the node status is unpublished and
 +    // none of the grants requested an access check be run.  In which case,
 +    // we should fall through to the final 'if' statement.

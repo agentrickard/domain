@@ -1,0 +1,258 @@
+// $Id$
+
+/**
+ * @file
+ * INSTALL file for Domain Access.
+ */
+ 
+Domain Access
+A subdomain-based access control system.
+
+CONTENTS
+--------
+
+1.  Introduction
+2.  Installation
+2.1   Before Installing
+2.2   Server Configuration
+2.3   Setting DOMAIN_INSTALL_RULE
+2.4   Setting DOMAIN_EDITOR_RULE
+2.5   Setting DOMAIN_SITE_GRANT
+3.   Patches to Drupal Core
+3.1   multiple_node_access.patch
+3.2   url_alter.patch
+4.  Configuring settings.php
+4.1   $base_url
+4.2   $db_prefix
+4.3   $cookie_domain
+5.  Additional Module Installation
+5.1   Domain Configuration
+5.2   Domain Prefix
+6.  Uninstalling
+
+----
+1.  Introduction
+
+The Domain Access module is a Node Access module.  It is designed to 
+restrict access to content.
+
+Failure to install or uninstall this module according to instructions may 
+cause errors in your site.
+
+----
+2.  Installation
+
+This module requires some advanced understanding of Drupal and of
+how DNS servers behave.  If you simply untar the download and 
+activate the module, it may not work correctly.
+
+----
+2.1  Before Installing
+
+You will need to do the following before you install the module.
+
+  - Read this document
+  - Configure your web server DNS records appropriately
+  - Read the supplied README.txt
+  
+----
+2.2   Server Configuration
+
+For the module to work correctly, the DNS record of your server must accept
+multiple DNS entries pointing at a single IP address that hosts your Drupal
+installation.
+
+The two basic methods for doing this are either to:
+
+  - Setup WildCard DNS, so that *.example.com resolves to your Drupal site.
+  - Setup VirtualHosts so that one.example.com, two.example.com, etc. all 
+    resolve to your Drupal site.
+
+For example, on my local testing machine, I have VirtualHosts to the following
+sites setup in httpd.conf (and my hosts file, to allow the .test TLD):
+
+  - ken.test => 127.0.0.1
+  - one.ken.test => 127.0.0.1
+  - two.ken.test => 127.0.0.1
+  - three.ken.test => 127.0.0.1
+  
+It is beyond the scope of this document to explain how to configure your DNS 
+server.  For more information, see:
+
+  - http://en.wikipedia.org/wiki/Wildcard_DNS_record
+  - http://en.wikipedia.org/wiki/Virtual_hosting  
+  
+After you have enabled multiple DNS entries to resolve to your Drupal
+installation, you may activate the module and configure its settings.  
+
+NOTE: No matter how many domains resolve to the same IP, you only need one instance
+of Drupal's settings.php file.  The sites folder should be named 'default' or
+named for your root domain.
+
+----
+2.3 Setting DOMAIN_INSTALL_RULE
+
+This is an advanced instruction, and may be ignored.
+
+At the top of the domain.module file, you will find this line:
+
+  define('DOMAIN_INSTALL_RULE', TRUE);
+
+This setting controls the default behavior of the module when installing over
+an existing installation.  If set to TRUE, the Domain Access module will assign
+all existing nodes to be viewable by all affiliate sites.
+
+If you set this value to FALSE, existing nodes will only be visible to users on
+your root domain.
+
+For more details, see section 5 of README.txt.
+
+----
+2.4 Setting DOMAIN_EDITOR_RULE
+
+This is an advanced instruction, and may be ignored.
+
+At the top of the domain.module file, you will find this line:
+
+  define('DOMAIN_EDITOR_RULE', FALSE);
+
+This setting controls the default behavior for affiliate editors.  If 
+DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
+intend to use editing controls.
+
+If this is set to TRUE and DOMAIN_INSTALL_RULE is set to FALSE, all existing 
+nodes on your site will be editable by users who are assigned as editors of your
+root domain.
+
+See section 3 and section 5 of README.txt for more information.
+
+----
+2.5 Setting DOMAIN_SITE_GRANT
+
+At the top of the domain.module file, you will find this line:
+
+  define('DOMAIN_SITE_GRANT', TRUE);
+
+This setting controls the default behavior for viewing affiliate content.
+By design, the Domain Access module allows site administrators to assign
+content to 'all affiliates.'  If this value is set to TRUE, then content
+assigned to all affiliates can be seen by all users on all current domains.
+
+Normally, you will not need to edit this value.
+
+----
+3. Patches to Drupal Core
+
+The following patches are optional.  They affect advanced behavior of the 
+Domain Access module.
+
+Patches are distributed in the 'patches' folder of the download.
+
+To apply these patches, place them in your root Drupal folder.
+Then follow the instructions at: http://drupal.org/patch/apply
+
+----
+3.1 multiple_node_access.patch
+
+You should apply this patch only if you use Domain Access along with
+another Node Access module, such as Organic Groups (OG).
+
+The multiple_node_access.patch allows Drupal to run more than one
+node access control scheme in parallel.  Instead of using OR logic to
+determine node access, this patch uses subselects to enable AND logic
+for multiple node access rules.
+
+WARNING: This patch uses subselect statements and requires pgSQL or
+MySQL 4.1 or higher.
+
+Developers: see http://drupal.org/node/191375 for more information.
+
+This patch is being submitted to Drupal core for version 7.
+
+----
+3.2 url_alter.patch
+
+This patch is only needed if:
+
+  -- You wish to allow searching of all domains from any domain.
+  -- You use a content aggregation module such as MySite.
+  -- You get "access denied" errors when linking to items on a 
+  user's Track page.
+  
+This patch allows modules to edit the path to a Drupal object.  In the
+above cases, some content can only be viewed from certain domains, so
+we must write absolute links to that content.  
+
+Developers: see http://drupal.org/node/189797 for more information.
+
+This patch introduces hook_url_alter(), which is being submitted to
+Drupal core for version 7.
+
+----
+4.  Configuring settings.php
+
+Remember, the Domain Access module lets you run multiple sites
+from a single installation.  You only need one settings.php file.
+
+As a result, some options in your settings.php file need to be
+considered carefully.
+
+----
+4.1   $base_url
+
+The $base_url setting is normally not set.  With Domain Access, you
+cannot set this value manually.
+
+Since mutliple domains are involved, Drupal needs to be allowed to
+set this value.  (For the technical, this happens in the conf_init() 
+function).
+
+----
+4.2   $db_prefix
+
+The $db_prefix value allows for table prefixing of your Drupal database
+in the event that you run more than one site from a single database.
+
+$db_prefix can be used normally with Domain Access.
+
+However, the Domain Prefix module provides for dynamic table prefixing
+based on the currently active domain.  If you use the Domain Prefix module
+you can only set $db_prefix as a string value, not an array.
+
+For more detail, see INSTALL.txt in the domain_prefix folder.
+
+----
+4.3   $cookie_domain
+
+By design, Drupal cookies are set for the current website on login.  That is, if
+you login from www.example.com, the cookie will be set from the domain
+'www.example.com.'
+
+However, a cookie from www.example.com is not valid on one.example.com.
+
+In order to provide for login across your active domains, you must set the
+$cookie_domain value to the string indicating your root domain.
+
+Typically, this value is 'example.com' or '.example.com'.
+
+----
+5.  Additional Module Installation
+
+The Domain Access module includes several sub-modules.  Two of these
+have their own INSTALL.txt instructions.
+
+----
+5.1   Domain Configuration
+
+Refer to domain > domain_conf > INSTALL.txt
+
+----
+5.2   Domain Prefix
+
+Refer to domain > domain_prefix > INSTALL.txt
+
+----
+6.  Uninstalling
+
+When you disable this module, you must run Drupal's uninstall
+sequence to properly reset your {node_access} tables.

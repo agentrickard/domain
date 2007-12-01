@@ -492,9 +492,11 @@ function domain_domainload(&$domain) {
 function domain_get_path($domain) {
   global $base_url;
   $_url = parse_url($base_url);
-  // If in a subfolder, the web server needs the trailing slash.
-  (!empty($_url['path'])) ? $_path = $_url['path'] .'/' : $_path = $_url['path'];
-  $path = $domain['scheme'] .'://'. $domain['subdomain'] . $_path;
+  // We need a trailing slash at the end of the path
+  if (substr($_url['path'], -1) != '/') {
+    $_url['path'] .= '/';
+  }
+  $path = $domain['scheme'] .'://'. $domain['subdomain'] . $_url['path'];
   return $path;
 }
 
@@ -865,6 +867,18 @@ function domain_disabling($set = NULL) {
  * @ingroup node
  */
 function domain_form_alter($form_id, &$form) {
+  // If SEO is turned on, then form actions need to be absolute paths
+  // to the currently active domain.  See http://drupal.org/node/196217.
+  $seo = variable_get('domain_seo', 0);
+  if ($seo) {
+    global $_domain;
+    $action = parse_url($form['#action']);
+    if ($action['query']) {
+      $action['path'] .= '?';  
+    }
+    $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
+  }
+
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
   if ($form['#id'] == 'node-form' && !$form['#node']->cck_dummy_node_form) {
     global $_domain;
@@ -950,12 +964,13 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
     $path = 'yes';
     $skip = TRUE;
   }
-
+  
   // This routine only needs to be run from certain urls or if we want to
   // force all links to go to a single domain for SEO.
   // See http://drupal.org/node/195366 for the background.
   $check = domain_grant_all();
   $seo = variable_get('domain_seo', 0);
+
   if (!$skip && ($check || $seo)) {
     // Check to see if this is a node or comment link and set $nid accordingly.
     // We static the $nid results to make this more efficient.
