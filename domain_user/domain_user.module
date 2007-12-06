@@ -28,6 +28,13 @@ function domain_user_menu($may_cache) {
 }
 
 /**
+ * Implements hook_perm()
+ */
+function domain_user_perm() {
+  return array('create personal domain');
+}
+
+/**
  * FormsAPI
  *
  * @ingroup user
@@ -38,11 +45,29 @@ function domain_user_configure_form() {
   $form = array();
   $form['domain_user'] = array(
     '#type' => 'radios',
-    '#title' => t('Default settings'),
-    '#options' => array(0 => t('Do not create domains'), 1 => t('Create domains for new users')),
+    '#title' => t('Module behavior'),
+    '#options' => array(0 => t('Do not create domains for users'), 1 => t('Automatically create domains for new users'), 2=> t('Ask users if they would like to create a domain')),
     '#description' => t('Should subdomains be created when users register?'),
     '#default_value' => variable_get('domain_user', 0),
   );
+  $form['domain_user_root'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Root domain name'),
+    '#size' => 40,
+    '#maxlength' => 80,
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_user_root', variable_get('domain_root', '')),
+    '#description' => t('The root domain to user for usernames, typically example.com.  No http or slashes.')
+  );    
+  if (module_exists('domain_prefix')) {
+    $form['domain_user_prefixing'] = array(
+      '#type' => 'radios',
+      '#title' => t('Domain table prefixing'),
+      '#options' => array(0 => t('Never create prefixed tabled for user domains'), 1 => t('Obey the settings in Domain Prefix')),
+      '#description' => t('Should user domains have detabase talbes created?'),
+      '#default_value' => variable_get('domain_user_prefixing', 0),
+    );    
+  }
   return system_settings_form($form);
 }
 
@@ -63,13 +88,7 @@ function domain_user_domainload($domain) {
   if ($domain['domain_id'] > 0) {
     $data = db_fetch_array(db_query("SELECT du.uid, u.status FROM {domain_user} du INNER JOIN {users} u ON du.uid = u.uid WHERE du.domain_id = %d", $domain['domain_id']));
     if ($data['uid']) {
-      if ($data['status']) {
-        $domain['uid'] = $data['uid'];
-        $domain['valid'] = TRUE;
-      }
-      else {
-        $domain['valid'] = FALSE;
-      }
+      $domain['uid'] = $data['uid'];
     }  
     return $domain;
   }  
@@ -82,44 +101,71 @@ function domain_user_user ($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'register':
     case 'form':
-      $form['domain_user']['domain_create_user'] = array(
-        '#type' => 'value',
-        '#value' => variable_get('domain_user', 0)
-      );
-      return $form;
+      // This function will return -1 if no domain exists.
+      $domain = domain_user_lookup(NULL, $account->uid);    
+      if ($domain == -1) {
+        // The module must be configured properly. 
+        $default = domain_default();
+        $root = variable_get('domain_user_root', $default['subdomain']);
+        $create_domain = variable_get('domain_user', 0);
+        if ($create_domain == 1 && !empty($root)) {
+          $form['domain_user']['domain_create_user'] = array(
+            '#type' => 'value',
+            '#value' => 1,
+          );
+        }  
+        else if ($create_domain == 2 && !empty($root)) {
+          $form['domain_user']['domain_create_user'] = array(
+            '#type' => 'checkbox',
+            '#return_value' => 1,
+            '#title' => t('Would you like to create your own site at <b>YOURNAME.!site</b>', array('!site' => $root)),
+          );      
+        }
+        return $form;
+      }  
       break;
     case 'submit':
-      if ($edit['domain_create_user']) {
-        // create the user domain
-        $account = user_load(array('mail' => $edit['mail']));
+    case 'insert':
+      if ($edit['domain_create_user'] && user_access('create personal domain', $account)) {
+        $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
         $root = domain_default();
         $name = $account->name;
         $pattern = '/\s/';
         $name = preg_replace($pattern, '-', $name);
         $name = strtolower($name);
         $form_values['sitename'] = $account->name;
-        $form_values['subdomain'] = $name .'.'. $root['subdomain'];
+        $form_values['subdomain'] = $name .'.'. $user_root;
         $form_values['valid'] = $account->status;
         $form_values['user_submitted'] = TRUE;
         // This function will return -1 if no domain exists.
-        $domain = domain_lookup(NULL, $form_values['subdomain']);
+        $domain = domain_user_lookup(NULL, $account->uid);
         if ($domain == -1) {
+          // Set arguments to be passed to the form
+          $arguments = array('user_submitted' => TRUE);
+          // Include the form file.
           include_once(drupal_get_path('module', 'domain') .'/domain_admin.inc');          
-          drupal_execute('domain_create_form', $form_values, array('user_submitted' => TRUE));
-          $domain = domain_lookup(NULL, $form_values['subdomain'], TRUE);    
+          drupal_execute('domain_create_form', $form_values, $arguments);
+          $domain = domain_lookup(NULL, $form_values['subdomain']);    
           if ($domain['domain_id']) { 
             db_query("INSERT INTO {domain_user} VALUES (%d, %d)", $domain['domain_id'], $account->uid);    
             $edit['domains'][] = $domain['domain_id'];            
             drupal_set_message(t('Your personal URL is <a href="!url">!url</a>.', array('!url' => url($domain['path']))));
           }
           else {
-            drupal_set_message(t('Could not create your personal URL.'));
+            drupal_set_message(t('Your personal URL could not be created.'));
           }
         }
         // Set the user's default domain to their subdomain.
         if ($domain['domain_id']) {
           $edit['domains'][] = $domain['domain_id'];
+          // If the user account is blocked, set the domain to invalid.
+          if ($account->status == 0) {
+            db_query("UPDATE {domain} SET valid = 0 WHERE domain_id = %d", $domain['domain_id']);
+          }
         }
+      }
+      if ($edit['domain_create_user'] && !user_access('create personal domain', $account)) {
+        drupal_set_message(t('Your personal URL could not be created.'));
       }
       break;
     case 'delete':
@@ -141,8 +187,17 @@ function domain_user_domainupdate($op, $domain = array(), $edit = array()) {
 
 /**
  * Check to see if a user has created a domain record
+ *
+ * @param $uid
+ *  The user id of the domain to be checked. Optional. 
+ * @param $name
+ *  The username of the domain to be checked. Optional. 
+ * @param $domain_id
+ *  The domain_id taken from {domain}. Optional.
+ * @param $clear
+ *  A boolean flag to clear the static variable if necessary. Not used.  Here for consistency. 
  */
-function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL) {
+function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL, $clear = FALSE) {
   if ($uid) {
     $id = db_result(db_query("SELECT domain_id FROM {domain_user} WHERE uid = %d", $uid));
   }
@@ -159,4 +214,21 @@ function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL) {
     $return = -1;
   }
   return $return;
+}
+
+/**
+ * Implements hook_domaininfo()
+ */
+function domain_user_domaininfo($op, $domain = array()) {
+  switch ($op) {
+    case 'header':
+      return array('data' => t('User'));
+      break;
+    case 'data':
+      if ($domain['uid']) {
+        $account = user_load(array('uid' => $domain['uid']));
+        return l($account->name, 'user/'. $account->uid);
+      }
+      break;
+  }
 }

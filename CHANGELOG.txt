@@ -1,5 +1,12 @@
 // $Id$
 
+06-DEC-2007
+
+-- Allows all *_lookup functions to clear their static variables.
+-- Changes domain_perfix_perm from -prefix tables- to -administer table prefixing-.
+-- Adds domain_user perm -create personal domain-.
+-- Adds hook_domaininfo().
+
 05-DEC-2007 (2)
 
 -- Adds the personal domain construction logic for Domain User.  This module is still

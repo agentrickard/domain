@@ -45,7 +45,7 @@ function domain_prefix_menu($may_cache) {
     $items[] = array(
       'title' => t('Domain prefix update'),
       'path' => 'domain_prefix_update',
-      'access' => user_access('prefix tables'),
+      'access' => user_access('administer table prefixing'),
       'type' => MENU_CALLBACK,
       'callback' => 'domain_prefix_update',
     );    
@@ -59,7 +59,7 @@ function domain_prefix_menu($may_cache) {
  * @ingroup drupal
  */
 function domain_prefix_perm() {
-  return array('prefix tables');
+  return array('administer table prefixing');
 }
 
 /**
@@ -472,89 +472,93 @@ function domain_prefix_table_exists($prefix, $table) {
 function domain_prefix_form_submit($form_id, $form_values) {
   // Flag messages for the administrative user only.
   $msg = TRUE;
+  $create = TRUE;
   if ($form_values['domain_arguments']['user_submitted']) { 
     $msg = FALSE;
+    // Should we create tables for user domains?
+    $create = variable_get('domain_user_prefixing', 0);  
   }
-
-  // Throw away what we don't need.
-  $prefix = domain_prefix_string($form_values['domain_id']);
-  $unset = array('prefix_theme', 'domain_id', 'op', 'submit', 'restore', 'form_token', 'form_id', 'execute');
-  $data = $form_values;
-  foreach ($unset as $key) {
-    unset($data[$key]);
-  }
-  // Delete existing records, but get the existing values first.
-  $current = domain_prefix_lookup($form_values['domain_id']);
-  db_query("DELETE FROM {domain_prefix} WHERE domain_id = %d", $form_values['domain_id']);
-
-  foreach ($data as $key => $value) {
-    // Do not process tables for the source elements.
-    // But be sure to set the proper source table prefix for copying data.
-    if (substr($key, 0, 8) != '_source_') {
-      $source = $data['_source_'. $key];
-      if ($source > 0) {
-        $source_prefix = domain_prefix_string($source);
-      }
-      else {
-        $source_prefix = '';
-      }
-
-      $update = FALSE;
-      if (empty($value)) {
-        $value = DOMAIN_PREFIX_IGNORE;
-        $update = TRUE;
-      }
-      
-      $newtable = db_escape_table($prefix . $key);
-      $module = domain_prefix_module_lookup($key);
-      $exists = domain_prefix_table_exists($prefix, $key);
-      $oldtable = db_escape_table($key);
-      $sourcetable = db_escape_table($source_prefix . $key);
-      if ($value == DOMAIN_PREFIX_CREATE) {
-        if (!$exists) {
-          db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
-          if ($msg) {
-            drupal_set_message(t('!string table created.', array('!string' => $newtable)));
-          }
+  if ($create) {
+    // Throw away what we don't need.
+    $prefix = domain_prefix_string($form_values['domain_id']);
+    $unset = array('prefix_theme', 'domain_id', 'op', 'submit', 'restore', 'form_token', 'form_id', 'execute');
+    $data = $form_values;
+    foreach ($unset as $key) {
+      unset($data[$key]);
+    }
+    // Delete existing records, but get the existing values first.
+    $current = domain_prefix_lookup($form_values['domain_id']);
+    db_query("DELETE FROM {domain_prefix} WHERE domain_id = %d", $form_values['domain_id']);
+  
+    foreach ($data as $key => $value) {
+      // Do not process tables for the source elements.
+      // But be sure to set the proper source table prefix for copying data.
+      if (substr($key, 0, 8) != '_source_') {
+        $source = $data['_source_'. $key];
+        if ($source > 0) {
+          $source_prefix = domain_prefix_string($source);
+        }
+        else {
+          $source_prefix = '';
+        }
+  
+        $update = FALSE;
+        if (empty($value)) {
+          $value = DOMAIN_PREFIX_IGNORE;
           $update = TRUE;
         }
-        else if ($current[$oldtable]['status'] == DOMAIN_PREFIX_COPY) {
-          drupal_set_message(t('!string table cannot be created, since it already exists.', array('!string' => $newtable)));
-        }
-      }
-      else if ($value == DOMAIN_PREFIX_COPY) {
-        if (!$exists) {
-          db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
-          db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
-          if ($msg) {          
-            drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
+        
+        $newtable = db_escape_table($prefix . $key);
+        $module = domain_prefix_module_lookup($key);
+        $exists = domain_prefix_table_exists($prefix, $key);
+        $oldtable = db_escape_table($key);
+        $sourcetable = db_escape_table($source_prefix . $key);
+        if ($value == DOMAIN_PREFIX_CREATE) {
+          if (!$exists) {
+            db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
+            if ($msg) {
+              drupal_set_message(t('!string table created.', array('!string' => $newtable)));
+            }
+            $update = TRUE;
           }
-          $update = TRUE;      
-        }
-        else if ($current[$oldtable]['status'] == DOMAIN_PREFIX_CREATE) {
-          drupal_set_message(t('!string table cannot be copied, since it already exists.', array('!string' => $newtable)));
-        }
-      }
-      else if ($value == DOMAIN_PREFIX_DROP) {
-        if ($exists > 0) {
-          db_query("DROP TABLE {%s}", $newtable);
-          $value = DOMAIN_PREFIX_IGNORE;
-          if ($msg) {          
-            drupal_set_message(t('!string table dropped.', array('!string' => $newtable)));      
+          else if ($current[$oldtable]['status'] == DOMAIN_PREFIX_COPY) {
+            drupal_set_message(t('!string table cannot be created, since it already exists.', array('!string' => $newtable)));
           }
-          $update = TRUE;      
-        }  
-        else {
-          drupal_set_message(t('!string table does not exist.', array('!string' => $newtable)));
         }
+        else if ($value == DOMAIN_PREFIX_COPY) {
+          if (!$exists) {
+            db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
+            db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
+            if ($msg) {          
+              drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
+            }
+            $update = TRUE;      
+          }
+          else if ($current[$oldtable]['status'] == DOMAIN_PREFIX_CREATE) {
+            drupal_set_message(t('!string table cannot be copied, since it already exists.', array('!string' => $newtable)));
+          }
+        }
+        else if ($value == DOMAIN_PREFIX_DROP) {
+          if ($exists > 0) {
+            db_query("DROP TABLE {%s}", $newtable);
+            $value = DOMAIN_PREFIX_IGNORE;
+            if ($msg) {          
+              drupal_set_message(t('!string table dropped.', array('!string' => $newtable)));      
+            }
+            $update = TRUE;      
+          }  
+          else {
+            drupal_set_message(t('!string table does not exist.', array('!string' => $newtable)));
+          }
+        }
+        // Update our records.
+        if (!$update && $value != 1) {
+          $value = $current[$oldtable]['status'];
+        }
+        db_query("INSERT INTO {domain_prefix} (domain_id, status, tablename, module, source) VALUES (%d, %d, '%s', '%s', %d)", $form_values['domain_id'], $value, $key, $module, $form_values['_source_'. $key]);
       }
-      // Update our records.
-      if (!$update && $value != 1) {
-        $value = $current[$oldtable]['status'];
-      }
-      db_query("INSERT INTO {domain_prefix} (domain_id, status, tablename, module, source) VALUES (%d, %d, '%s', '%s', %d)", $form_values['domain_id'], $value, $key, $module, $form_values['_source_'. $key]);
-    }
-  }  
+    }  
+  }
 }
 
 /**
@@ -625,9 +629,9 @@ function domain_prefix_module_lookup($table) {
  *
  * @ingroup prefix 
  */
-function domain_prefix_lookup($domain_id) {
+function domain_prefix_lookup($domain_id, $clear = FALSE) {
   static $domain_prefix;
-  if (!isset($domain_prefix[$domain_id])) {
+  if ($clear || !isset($domain_prefix[$domain_id])) {
     $domain_prefix[$domain_id] = array();
     $result = db_query("SELECT domain_id, status, tablename, module, source FROM {domain_prefix} WHERE domain_id = %d", $domain_id);
     while ($data = db_fetch_array($result)) {

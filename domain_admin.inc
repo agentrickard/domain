@@ -28,8 +28,11 @@ function domain_view() {
     array('data' => t('Status'), 'field' => 'valid'),     
     array('data' => t('Scheme'), 'field' => 'scheme'), 
     array('data' => t('Site name'), 'field' => 'sitename'),
-    array('data' => t('Actions'))
   );  
+  // Get header elements from other modules
+  $extra = module_invoke_all('domaininfo', 'header');
+  $header = array_merge($header, $extra);
+  $header[] = array('data' => t('Actions'));
   // Cannot use domain_domains() here because we need to sort the output.
   $domains = array();
   $domains[] = domain_default();
@@ -39,6 +42,9 @@ function domain_view() {
     $domains[] = $data;
   }
   foreach ($domains as $domain) {
+    // Let submodules overwrite the defaults, if they wish.
+    $extra = module_invoke_all('domainload', $domain);
+    $domain = array_merge($domain, $extra);  
     $link = l($domain['subdomain'], domain_get_uri($domain), array(), NULL, NULL, TRUE);
     if ($domain['domain_id'] == 0) {
       $actions = l(t('Default settings'), 'admin/build/domain/settings');
@@ -57,7 +63,14 @@ function domain_view() {
     }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
-    $rows[] = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $valid, $domain['scheme'], $domain['sitename'], $actions);
+    $row = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $valid, $domain['scheme'], $domain['sitename']);
+    // Let other modules add data.
+    foreach (module_implements('domaininfo') as $module) {
+      $row[] = module_invoke($module, 'domaininfo', 'data', $domain);
+    }
+    // Add the actions.
+    $row[] = $actions;
+    $rows[] = $row;
   }
   if (!empty($rows)) {
     $output .= theme_table($header, $rows);

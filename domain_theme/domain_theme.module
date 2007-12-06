@@ -69,13 +69,15 @@ function domain_theme_page($domain_id) {
  *  The domain_id taken from {domain}. Optional.
  * @param $theme
  *  The string representation of a {domain_theme} entry. Optional.
+ * @param $clear
+ *  A boolean flag to clear the static variable if necessary. Not used.  Here for consistency.
  * @return
  *  An array containing the requested row from the {domain_theme} table. 
  *  Returns -1 on failure.
  *
  * @ingroup theme
  */
-function domain_theme_lookup($domain_id = NULL, $theme = NULL) {
+function domain_theme_lookup($domain_id = NULL, $theme = NULL, $clear = FALSE) {
   if (!is_null($domain_id)) {
     $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE domain_id = %d", $domain_id));
   }

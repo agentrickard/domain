@@ -259,10 +259,47 @@ function hook_domaincron($domain) {
  * correctly.  Usually the module is enabled, but the required function is not.
  *
  * @see domain_conf_domaininstall() for an example.
+ *
+ * @ingroup hooks 
  */
 function hook_domaininstall() {
   // If MyModule is being used, check to see that it is installed correctly.
   if (module_exists('mymodule') && !function_exists('_mymodule_load')) {
     drupal_set_message(t('MyModule is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => drupal_get_path('module', 'mymodule') .'/INSTALL.txt')));
+  }
+}
+
+/**
+ * Allows Domain modules to add columns to the domain list view at 
+ * path 'admin/build/domain/view'.
+ *
+ * @param $op
+ *  The operation being performed.  Valid requests are:
+ *    -- 'header' defines a column header.  Note that you may only 
+ *        pass 'data' in this array, field sorting is not supported.
+ *    -- 'data' defines the data to be written in the column for the
+ *        specified domain.
+ * @param $domain
+ *  The $domain object prepared by hook_domainload().
+ * @return
+ *  Return values vary based on the $op value.
+ *    -- 'header' return a $header array formatted as per theme_table().
+ *    -- 'data' return a $data element to print in the row.
+ *
+ * @see domain_user_domaininfo() for an example.
+ *
+ * @ingroup hooks
+ */
+function hook_domaininfo($op, $domain = array()) {
+  switch ($op) {
+    case 'header':
+      return array('data' => t('MyData'));
+      break;
+    case 'data':
+      if ($domain['uid']) {
+        $account = user_load(array('uid' => $domain['uid']));
+        return l($account->name, 'user/'. $account->uid);
+      }
+      break;
   }
 }
