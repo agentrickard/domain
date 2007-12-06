@@ -134,7 +134,7 @@ function domain_configure_form($user_submitted = FALSE) {
     '#required' => TRUE,
     '#default_value' => variable_get('domain_debug', 0),
     '#options' => array(1 => t('Show debugging output on node view'), 0 => t('Do not show debugging output')),
-    '#description' => t('If set, users with the <em>administer domain</em> permission will be able toview the node access rules for each node. See the README for more details.')    
+    '#description' => t('If set, users with the <em>set domain access</em> permission will be able to view the node access rules for each node. See the README for more details.')    
   );   
 
   $form['domain_behavior']['domain_behavior'] = array(
@@ -239,10 +239,23 @@ function domain_create() {
 /**
  * FormsAPI for creating domain records.
  *
+ * @param $arguments
+ *  An array of additional hidden key/value pairs to pass to the form.
+ *  Used by child modules to control behaviors.
+ *  Currently supported arguments are:
+ *    'user_submitted' => TRUE
+ *    Indicates that a form should not process administrative messages and paths
+ *    upon form submit.  Used by the Domain User module.
+ *
  * @ingroup domain
  */
-function domain_create_form() { 
+function domain_create_form($arguments = array()) { 
   $form = array();
+  // The $arguments arrray allows other modules to pass values to change the bahavior
+  // of submit and validate functions.
+  if (!empty($arguments)) {
+    $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
+  }  
   $form['domain'] = array(
     '#type' => 'fieldset',
     '#title' => t('New domain record'),
@@ -314,7 +327,7 @@ function domain_create_form_submit($form_id, $form_values) {
   $domain = domain_lookup(NULL, $form_values['subdomain']);
   module_invoke_all('domainupdate', 'create', $domain, $form_values);
   // The user_submitted flag is needed for Domain User.
-  if (!$form_values['user_submitted']) { 
+  if (!$form_values['domain_arguments']['user_submitted']) { 
     drupal_set_message(t('Domain record created.'));
     drupal_goto('admin/build/domain/view');
   }  

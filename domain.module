@@ -327,13 +327,15 @@ function domain_admin($action, $id = NULL) {
  *  The domain_id taken from {domain}. Optional.
  * @param $subdomain
  *  The string representation of a {domain} entry. Optional.
+ * @param $clear
+ *  A boolean flag to clear the static variable if necessary.
  * @return
  *  An array containing the requested row from the {domain} table, plus the
  *  elements added by hook_domainload().  Returns -1 on failure.
  *
  * @ingroup domain
  */
-function domain_lookup($domain_id = NULL, $subdomain = NULL) {
+function domain_lookup($domain_id = NULL, $subdomain = NULL, $clear = FALSE) {
   static $domains;
   // If both are NULL, no lookup can be run.
   if (is_null($domain_id) && is_null($subdomain)) {
@@ -343,7 +345,7 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL) {
   else {
     $key = $domain_id . $subdomain;
   }  
-  if (!isset($domains[$key])) {
+  if ($clear || !isset($domains[$key])) {
     if ($domain_id === 0) {
       $domain = domain_default();
     }

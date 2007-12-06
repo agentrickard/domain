@@ -1,5 +1,10 @@
 // $Id$
 
+05-DEC-2007 (2)
+
+-- Adds the personal domain construction logic for Domain User.  This module is still
+    unstable, however, and should not be used.
+
 05-DEC-2007
 
 -- #197692 by skizzo.  Removes the ability to define separate files directories

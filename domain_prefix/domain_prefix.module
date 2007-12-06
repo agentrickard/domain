@@ -313,10 +313,13 @@ function theme_domain_prefix_configure_form($form) {
  *
  * @param $domain_id
  *  The domain_id taken from {domain}.
+ * @param $arguments
+ *  An array of additional hidden key/value pairs to pass to the form.
+ *  Used by child modules to control behaviors. 
  *
  * @ingroup prefix 
  */
-function domain_prefix_form($domain_id) {
+function domain_prefix_form($domain_id, $arguments = array()) {
   // We must be on the root domain!
   $default = domain_default();
   domain_goto($default);
@@ -346,7 +349,7 @@ function domain_prefix_form($domain_id) {
   $tables = domain_prefix_lookup($domain_id);
   $submit = t('Update domain tables');
   if (empty($tables)) {
-    if (!$form_values['execute']) {
+    if (!$form_values['execute'] && !$arguments['user_submitted']) {
       drupal_set_message(t('The table creation sequence has not run for this domain.'));
     }  
     $submit = t('Generate domain tables');
@@ -367,6 +370,13 @@ function domain_prefix_form($domain_id) {
   $prefix = domain_prefix_string($domain_id);
   // Generate the form.
   $form = array();
+  
+  // The $arguments arrray allows other modules to pass values to change the bahavior
+  // of submit and validate functions.
+  if (!empty($arguments)) {
+    $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
+  }    
+  
   $delete_flag = 0; // Flag for the theme function delete column
   $last = ''; // Flag for module groupings.
   foreach ($table_options as $table => $info) {
@@ -460,6 +470,12 @@ function domain_prefix_table_exists($prefix, $table) {
  * @ingroup prefix
  */
 function domain_prefix_form_submit($form_id, $form_values) {
+  // Flag messages for the administrative user only.
+  $msg = TRUE;
+  if ($form_values['domain_arguments']['user_submitted']) { 
+    $msg = FALSE;
+  }
+
   // Throw away what we don't need.
   $prefix = domain_prefix_string($form_values['domain_id']);
   $unset = array('prefix_theme', 'domain_id', 'op', 'submit', 'restore', 'form_token', 'form_id', 'execute');
@@ -497,7 +513,9 @@ function domain_prefix_form_submit($form_id, $form_values) {
       if ($value == DOMAIN_PREFIX_CREATE) {
         if (!$exists) {
           db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
-          drupal_set_message(t('!string table created.', array('!string' => $newtable)));
+          if ($msg) {
+            drupal_set_message(t('!string table created.', array('!string' => $newtable)));
+          }
           $update = TRUE;
         }
         else if ($current[$oldtable]['status'] == DOMAIN_PREFIX_COPY) {
@@ -508,7 +526,9 @@ function domain_prefix_form_submit($form_id, $form_values) {
         if (!$exists) {
           db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
           db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
-          drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
+          if ($msg) {          
+            drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
+          }
           $update = TRUE;      
         }
         else if ($current[$oldtable]['status'] == DOMAIN_PREFIX_CREATE) {
@@ -519,7 +539,9 @@ function domain_prefix_form_submit($form_id, $form_values) {
         if ($exists > 0) {
           db_query("DROP TABLE {%s}", $newtable);
           $value = DOMAIN_PREFIX_IGNORE;
-          drupal_set_message(t('!string table dropped.', array('!string' => $newtable)));      
+          if ($msg) {          
+            drupal_set_message(t('!string table dropped.', array('!string' => $newtable)));      
+          }
           $update = TRUE;      
         }  
         else {
@@ -644,7 +666,7 @@ function domain_prefix_domainupdate($op, $domain = array(), $edit = array()) {
         $settings = unserialize(variable_get('domain_prefix', NULL));
         if (!empty($settings)) {
           $settings['domain_id'] = $domain['domain_id'];
-          drupal_execute('domain_prefix_form', $settings, $domain['domain_id']);
+          drupal_execute('domain_prefix_form', $settings, $domain['domain_id'], $edit['domain_arguments']);
         }
       }
       break;

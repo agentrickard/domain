@@ -102,21 +102,22 @@ function domain_user_user ($op, &$edit, &$account, $category = NULL) {
         $form_values['valid'] = $account->status;
         $form_values['user_submitted'] = TRUE;
         // This function will return -1 if no domain exists.
-        $domain = domain_user_lookup(NULL, $account->name);
+        $domain = domain_lookup(NULL, $form_values['subdomain']);
         if ($domain == -1) {
           include_once(drupal_get_path('module', 'domain') .'/domain_admin.inc');          
-          drupal_execute('domain_create_form', $form_values);
-          $domain = domain_user_lookup(NULL, $account->name);     
+          drupal_execute('domain_create_form', $form_values, array('user_submitted' => TRUE));
+          $domain = domain_lookup(NULL, $form_values['subdomain'], TRUE);    
           if ($domain['domain_id']) { 
             db_query("INSERT INTO {domain_user} VALUES (%d, %d)", $domain['domain_id'], $account->uid);    
             $edit['domains'][] = $domain['domain_id'];            
+            drupal_set_message(t('Your personal URL is <a href="!url">!url</a>.', array('!url' => url($domain['path']))));
           }
           else {
             drupal_set_message(t('Could not create your personal URL.'));
           }
         }
         // Set the user's default domain to their subdomain.
-        else if ($domain['domain_id']) {
+        if ($domain['domain_id']) {
           $edit['domains'][] = $domain['domain_id'];
         }
       }
