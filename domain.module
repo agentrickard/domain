@@ -964,7 +964,7 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
     $path = 'yes';
     $skip = TRUE;
   }
-  
+
   // This routine only needs to be run from certain urls or if we want to
   // force all links to go to a single domain for SEO.
   // See http://drupal.org/node/195366 for the background.
@@ -974,7 +974,7 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   if (!$skip && ($check || $seo)) {
     // Check to see if this is a node or comment link and set $nid accordingly.
     // We static the $nid results to make this more efficient.
-    $pattern = explode('/', $path);
+    $pattern = explode('/', $path);    
     // Known paths that use the format 'node/NID'.
     $match = array('node', 'print', 'forward');
     if ((in_array($pattern[0], $match) && is_numeric($pattern[1])) || ($pattern[0] == 'comment' && $pattern[1] == 'reply' && is_numeric($pattern[2]))) {

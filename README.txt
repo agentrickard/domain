@@ -412,7 +412,7 @@ all nodes viewable to some users.
 4.2.2   New Content Settings
 
 Defines the default behavior for content added to your site.  By design, the 
-module automatically assigned all content to the currently active subdomain.  
+module automatically assigns all content to the currently active subdomain.  
 If this value is set to 'Show on all sites,' then all new content will be 
 assigned to all sites _in addition to_ the active subdomain.
 

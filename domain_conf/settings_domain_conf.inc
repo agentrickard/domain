@@ -41,7 +41,7 @@ function _domain_conf_load() {
         $settings = unserialize($data['settings']);
         // Overwrite the $conf variables.
         foreach ($settings as $key => $value) {
-          $conf[$key] = $value;
+            $conf[$key] = $value;
         }
       }
     }

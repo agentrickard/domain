@@ -173,7 +173,6 @@ function domain_configure_form($user_submitted = FALSE) {
   $form['domain_advanced']['domain_editors'] = array(
     '#type' => 'radios',
     '#title' => t('Domain-based editing controls'),
-    '#required' => TRUE,
     '#default_value' => variable_get('domain_editors', intval(DOMAIN_EDITOR_RULE)),
     '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editors')),
     '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
@@ -193,7 +192,6 @@ function domain_configure_form($user_submitted = FALSE) {
     $form['domain_advanced']['domain_access_rules'] = array(
       '#type' => 'radios',
       '#title' => t('Node access settings'),
-      '#required' => TRUE,
       '#disabled' => $disabled,
       '#default_value' => variable_get('domain_access_rules', 0),
       '#options' => array(0 => t('Use the default Drupal behavior (OR)'), 1 => t('Check Domain Access in addition to other modules (AND)')),
@@ -210,7 +208,6 @@ function domain_configure_form($user_submitted = FALSE) {
   $form['domain_advanced']['domain_search'] = array(
     '#type' => 'radios',
     '#title' => t('Search settings'),
-    '#required' => TRUE,
     '#disabled' => $disabled,
     '#default_value' => variable_get('domain_search', 0),
     '#options' => array(0 => t('Search content for the current domain only'), 1 => t('Search all domains from any URL')),
@@ -220,7 +217,6 @@ function domain_configure_form($user_submitted = FALSE) {
   $form['domain_advanced']['domain_seo'] = array(
     '#type' => 'radios',
     '#title' => t('Search engine optimization'),
-    '#required' => TRUE,
     '#disabled' => $disabled,
     '#default_value' => variable_get('domain_seo', 0),
     '#options' => array(0 => t('Do not rewrite URLs'), 1 => t('Rewrite all URLs to point to a single source')),
@@ -318,8 +314,6 @@ function domain_create_form_submit($form_id, $form_values) {
   $domain = domain_lookup(NULL, $form_values['subdomain']);
   module_invoke_all('domainupdate', 'create', $domain, $form_values);
   // The user_submitted flag is needed for Domain User.
-  print_r($form_values);
-  exit;
   if (!$form_values['user_submitted']) { 
     drupal_set_message(t('Domain record created.'));
     drupal_goto('admin/build/domain/view');
@@ -470,6 +464,10 @@ function domain_delete_form_submit($form_id, $form_values) {
   // Let other modules act.
   module_invoke_all('domainupdate', 'delete', $domain, $form_values);
   drupal_set_message(t('Domain record deleted.'));
+  // Remove domain-specific entries from the {node_access} table and clear the cache.
+  db_query("DELETE FROM {node_access} WHERE realm = 'domain_id' AND gid = %d", $domain['domain_id']);
+  db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);  
+  cache_clear_all();
   // Some tortured logic to return to the root domain and the domain list.
   $default = domain_default();
   $uri = request_uri();

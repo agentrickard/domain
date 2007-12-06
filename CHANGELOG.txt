@@ -1,5 +1,14 @@
 // $Id$
 
+05-DEC-2007
+
+-- #197692 by skizzo.  Removes the ability to define separate files directories
+    for subdomains using Domain Conf.  This feature did not work as expected.
+    Trying to fix this issue will delay release unnecessarily.
+-- #197600 by Rogdor.  Advanced form elements may be disabled and cannot be required.
+-- #197757 by derjochenmeyer [comment 3].  Delete related {node_access} records when 
+    a domain record is deleted.
+
 01-DEC-2007
 
 -- Fixes error in multiple_node_access.patch, which was passing the uid incorrectly.

@@ -93,8 +93,6 @@ settings are:
   - Default front page [untested]
   - Anonymous user
   - Default time zone
-  - File system path
-  - Temporary directory
   - Site status
   - Site off-line message
 
@@ -106,6 +104,13 @@ affiliates.
 3.  Developer Notes
 
 The Domain Conf module is the model for extending Domain Acccess.
+
+The following form elements were removed during beta testing:
+
+  - File system path
+  - Temporary directory
+
+See http://drupal.org/node/197692 for the reasons.
 
 ----
 3.1   Additional Form Elements
