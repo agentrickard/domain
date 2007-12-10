@@ -1,5 +1,10 @@
 // $Id$
 
+10-DEC-2007 (3)
+
+-- #191785 by skizzo. Allows the setting of an administrative theme in Domain Conf.
+-- Removes a colspan left behind from testing.
+
 10-DEC-2007 (2)
 
 -- Disabling the Domain module will now reset the {node_access} table to default state

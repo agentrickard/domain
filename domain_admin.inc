@@ -26,7 +26,7 @@ function domain_view() {
     array('data' => t('Id'), 'field' => 'd.domain_id'),
     array('data' => t('Domain'), 'field' => 'd.subdomain'),
     array('data' => t('Site name'), 'field' => 'd.sitename'),
-    array('data' => t('Status'), 'field' => 'd.valid', 'colspan' => 3),     
+    array('data' => t('Status'), 'field' => 'd.valid'),
     array('data' => t('Scheme'), 'field' => 'd.scheme'), 
   );  
   // Get header elements from other modules
