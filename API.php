@@ -51,6 +51,10 @@
  * Theme functions used by the Domain Access modules.
  */
 
+/**
+ * @defgroup user Domain User: personal subdomains
+ * Creates unique subdomains for registered users.
+
  /**
   * @mainpage
    Welcome to the API documentation for the Domain Access module, I hope you find it useful.
@@ -275,8 +279,12 @@ function hook_domaininstall() {
  *
  * @param $op
  *  The operation being performed.  Valid requests are:
- *    -- 'header' defines a column header.  Note that you may only 
- *        pass 'data' in this array, field sorting is not supported.
+ *    -- 'header' defines a column header according to theme_table.
+ *    -- 'select' defines a string of data to be returned.  Must be prefixed.
+ *        The {domain} table is prefixed with 'd' -- do not select any columns
+ *        from the domain table.  You must not select domain_id from your table.
+ *    -- 'join' defines a sql join to use to pull extra data.  To properly enable
+ *        sorting of all records, this MUST be a LEFT JOIN.
  *    -- 'data' defines the data to be written in the column for the
  *        specified domain.
  * @param $domain
@@ -284,17 +292,24 @@ function hook_domaininstall() {
  * @return
  *  Return values vary based on the $op value.
  *    -- 'header' return a $header array formatted as per theme_table().
+ *    -- 'select' return a comman-separated list of fields to select from your table.
+ *    -- 'join' return a LEFT JOIN statement for connecting your table to the {domain} table.
  *    -- 'data' return a $data element to print in the row.
  *
  * @see domain_user_domaininfo() for an example.
  *
  * @ingroup hooks
  */
-function hook_domaininfo($op, $domain = array()) {
+function hook_domainview($op, $domain = array()) {
   switch ($op) {
     case 'header':
-      return array('data' => t('MyData'));
+      return array(array('data' => t('MyData'), 'field' => 'my.uid'), array('data' => t('MyName'), 'field' => 'my.name'));
       break;
+    case 'select':
+      return 'my.uid, my.name';
+    case 'join':
+      return "LEFT JOIN {mytable} my ON my.domain_id = d.domain_id";
+      break;    
     case 'data':
       if ($domain['uid']) {
         $account = user_load(array('uid' => $domain['uid']));

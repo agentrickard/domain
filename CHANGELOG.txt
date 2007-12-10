@@ -1,5 +1,11 @@
 // $Id$
 
+10-DEC-2007
+
+-- Moves secondary domain CRUD functions from domain_admin to hook implementations.  This
+    allows other modules to call these functions directly without using drupal_execute().
+-- First stable domain_user module.    
+
 06-DEC-2007
 
 -- Allows all *_lookup functions to clear their static variables.

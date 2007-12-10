@@ -1043,3 +1043,19 @@ function domain_domaininstall() {
     drupal_set_message(t('The hook_url_rewrite() patch is not installed.  Some features are not available. See the Patches to Drupal Core section of <a href="!url">README.txt</a>', array('!url' => drupal_get_path('module', 'domain') .'/README.txt')));
   }
 }
+
+/**
+ * Implements hook_domainupdate()
+ */
+function domain_domainupdate($op, $domain = array(), $edit = array()) {
+  switch ($op) {
+    case 'delete':
+      if ($domain != -1) {
+        // Remove domain-specific entries from the {node_access} table and clear the cache.
+        db_query("DELETE FROM {node_access} WHERE realm = 'domain_id' AND gid = %d", $domain['domain_id']);
+        db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);  
+        cache_clear_all();
+      }  
+      break;
+  }  
+}  

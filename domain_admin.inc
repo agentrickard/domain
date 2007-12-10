@@ -23,20 +23,37 @@ function domain_view() {
                     may click on a domain to change the currently active domain.  Your default domain has an ID of zero (0) and is always 
                     at the top of the list below.</p>');
   $header = array(
-    array('data' => t('Id'), 'field' => 'domain_id'),
-    array('data' => t('Domain'), 'field' => 'subdomain'),
-    array('data' => t('Status'), 'field' => 'valid'),     
-    array('data' => t('Scheme'), 'field' => 'scheme'), 
-    array('data' => t('Site name'), 'field' => 'sitename'),
+    array('data' => t('Id'), 'field' => 'd.domain_id'),
+    array('data' => t('Domain'), 'field' => 'd.subdomain'),
+    array('data' => t('Site name'), 'field' => 'd.sitename'),
+    array('data' => t('Status'), 'field' => 'd.valid', 'colspan' => 3),     
+    array('data' => t('Scheme'), 'field' => 'd.scheme'), 
   );  
   // Get header elements from other modules
-  $extra = module_invoke_all('domaininfo', 'header');
+  $extra = module_invoke_all('domainview', 'header');
   $header = array_merge($header, $extra);
   $header[] = array('data' => t('Actions'));
+  
   // Cannot use domain_domains() here because we need to sort the output.
   $domains = array();
   $domains[] = domain_default();
-  $sql = "SELECT * FROM {domain}". tablesort_sql($header);
+
+  // Get any select sql from other modules.
+  $select = module_invoke_all('domainview', 'select');
+  $select_sql = '';
+  if (!empty($select)) {
+    $select_sql = ', '. implode(', ', $select);
+    $select_sql = rtrim($select_sql, ',');
+  }  
+  
+  // Get any tablesort sql from other modules.
+  $join = module_invoke_all('domainview', 'join');
+  $join_sql = '';
+  if (!empty($join)) {
+    $join_sql = ' '. implode(' ', $join);
+  }
+  
+  $sql = 'SELECT d.*'. $select_sql .' FROM {domain} d'. $join_sql . tablesort_sql($header);
   $result = pager_query($sql, 24);  
   while ($data = db_fetch_array($result)) {
     $domains[] = $data;
@@ -63,10 +80,10 @@ function domain_view() {
     }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
-    $row = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $valid, $domain['scheme'], $domain['sitename']);
+    $row = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $domain['sitename'], $valid, $domain['scheme']);
     // Let other modules add data.
-    foreach (module_implements('domaininfo') as $module) {
-      $row[] = module_invoke($module, 'domaininfo', 'data', $domain);
+    foreach (module_implements('domainview') as $module) {
+      $row[] = module_invoke($module, 'domainview', 'data', $domain);
     }
     // Add the actions.
     $row[] = $actions;
@@ -490,10 +507,6 @@ function domain_delete_form_submit($form_id, $form_values) {
   // Let other modules act.
   module_invoke_all('domainupdate', 'delete', $domain, $form_values);
   drupal_set_message(t('Domain record deleted.'));
-  // Remove domain-specific entries from the {node_access} table and clear the cache.
-  db_query("DELETE FROM {node_access} WHERE realm = 'domain_id' AND gid = %d", $domain['domain_id']);
-  db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);  
-  cache_clear_all();
   // Some tortured logic to return to the root domain and the domain list.
   $default = domain_default();
   $uri = request_uri();

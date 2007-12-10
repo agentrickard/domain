@@ -40,4 +40,7 @@ function domain_user_uninstall() {
   // Drop the storage table.
   db_query("DROP TABLE {domain_user}");
   variable_del('domain_user');
+  variable_del('domain_user_root');
+  variable_del('domain_user_scheme');  
+  variable_del('domain_user_prefixing');  
 }
