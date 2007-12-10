@@ -46,6 +46,13 @@ This module requires some advanced understanding of Drupal and of
 how DNS servers behave.  If you simply untar the download and 
 activate the module, it may not work correctly.
 
+When you enable the module, it will create a {domain} table in your Drupal
+database.
+
+All existing nodes on your site will be assigned to the default domain for your
+web site and to all affiliates.  If you wish to alter this behavior, see sections
+2.4 through 2.6 of README.txt
+
 ----
 2.1  Before Installing
 
@@ -120,9 +127,8 @@ This setting controls the default behavior for affiliate editors.  If
 DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
 intend to use editing controls.
 
-If this is set to TRUE and DOMAIN_INSTALL_RULE is set to FALSE, all existing 
-nodes on your site will be editable by users who are assigned as editors of your
-root domain.
+If this is set to TRUE, all existing nodes on your site will be editable by users who 
+are assigned as editors of your root domain.
 
 See section 3 and section 5 of README.txt for more information.
 

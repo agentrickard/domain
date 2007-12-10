@@ -10,13 +10,13 @@
  * Defines how to handle access permissions when installing the module.
  * You may alter this variable before installing the module. See README.txt.
  */
-define('DOMAIN_INSTALL_RULE', TRUE);
+define('DOMAIN_INSTALL_RULE', FALSE);
 
 /**
  * Defines how to handle editor permissions when installing the module.
  * You may alter this variable before installing the module. See README.txt.
  */
-define('DOMAIN_EDITOR_RULE', FALSE);
+define('DOMAIN_EDITOR_RULE', TRUE);
 
 /**
  * Defines whether to show affiliated content on all domains..
@@ -766,8 +766,9 @@ function domain_node_access_records($node) {
   }
   // At least one option must be present, and it is the default site 
   // this prevents null values in the form.
-  // There is probably a more elegant way to do this, earlier in the routine.
-  if (empty($grants)) {
+  // If we are enabling the module for the first time, we set the 
+  // default domain of all existing nodes to the root domain.
+  if (empty($grants) || domain_enabling()) {
     $grants[] = array(
     'realm' => 'domain_id',
     'gid' => 0,
@@ -813,7 +814,16 @@ function domain_node_access_records($node) {
  */
 function domain_enable() {
   domain_enabling(TRUE);
+  $modules = module_implements('node_grants');
+  // If this is the only node access module, delete all records from {node_access}
+  if (count($modules) == 1 && $modules[0] == 'domain') {
+    db_query("DELETE FROM {node_access}");
+  }  
+  // Rebuild the node access table with our rules.
+  node_access_rebuild();
+  // Clean up the {node_access} table and add our default grant.
   $check = db_result(db_query("SELECT COUNT(nid) FROM {node_access} WHERE realm = 'domain_all' AND gid = 0"));
+  db_query("DELETE FROM {node_access} WHERE nid = 0 AND realm = 'all'");
   if (!$check) {
     db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");
   }
@@ -844,7 +854,15 @@ function domain_disable() {
   // This lets us control how the module updates the {node_access} table.
   variable_del('domain_behavior');
   variable_del('domain_editors');
-  node_access_rebuild();
+  $modules = module_implements('node_grants');
+  // If this is the only node access module, delete all records from {node_access}
+  if (count($modules) == 1 && $modules[0] == 'domain') {
+    db_query("DELETE FROM {node_access}");
+    db_query("INSERT INTO {node_access} VALUES (0, 0, 'all', 1, 0, 0)");
+  }
+  else {
+    node_access_rebuild();
+  }  
 }  
 
 /**

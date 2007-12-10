@@ -135,6 +135,10 @@ modules directory.  After reading this document, enable the module normally.
 When you enable the module, it will create a {domain} table in your Drupal
 database.
 
+All existing nodes on your site will be assigned to the default domain for your
+web site and to all affiliates.  If you wish to alter this behavior, see sections
+2.4 through 2.6.
+
 ----
 2.1 Patches to Drupal Core
 
@@ -258,9 +262,8 @@ This setting controls the default behavior for affiliate editors.  If
 DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
 intend to use editing controls.
 
-If this is set to TRUE and DOMAIN_INSTALL_RULE is set to FALSE, all existing 
-nodes on your site will be editable by users who are assigned as editors of your
-root domain.
+If this is set to TRUE, all existing nodes on your site will be editable by users who 
+are assigned as editors of your root domain.
 
 See section 3 and section 5 for more information.
 

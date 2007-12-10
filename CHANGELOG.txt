@@ -1,5 +1,12 @@
 // $Id$
 
+10-DEC-2007 (2)
+
+-- Disabling the Domain module will now reset the {node_access} table to default state
+    unless other node access modules are enabled.
+-- Fixes the install sequence so that all nodes are added to domain_site and the default
+    domain_id.
+
 10-DEC-2007
 
 -- Moves secondary domain CRUD functions from domain_admin to hook implementations.  This
