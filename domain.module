@@ -10,13 +10,13 @@
  * Defines how to handle access permissions when installing the module.
  * You may alter this variable before installing the module. See README.txt.
  */
-define('DOMAIN_INSTALL_RULE', FALSE);
+define('DOMAIN_INSTALL_RULE', TRUE);
 
 /**
  * Defines how to handle editor permissions when installing the module.
  * You may alter this variable before installing the module. See README.txt.
  */
-define('DOMAIN_EDITOR_RULE', TRUE);
+define('DOMAIN_EDITOR_RULE', FALSE);
 
 /**
  * Defines whether to show affiliated content on all domains..
@@ -65,7 +65,7 @@ function domain_menu($may_cache) {
   $admin = user_access('administer domains');
   if ($may_cache) {
     $items[] = array(
-      'title' => t('Domain access'),
+      'title' => t('Domains'),
       'path' => 'admin/build/domain',
       'access' => $admin,
       'callback' => 'domain_admin',

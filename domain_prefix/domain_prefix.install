@@ -30,7 +30,7 @@ function domain_prefix_install() {
        status smallint NOT NULL default 0,
        tablename varchar(80) NOT NULL default '',
        module varchar(80) NOT NULL default '',
-       status smallint NOT NULL default 0       
+       source smallint NOT NULL default 0       
       )");     
       db_query("CREATE INDEX {domain_prefix}_domain_id_idx ON {domain_prefix} (domain_id)");
       break;

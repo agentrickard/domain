@@ -1,5 +1,15 @@
 // $Id$
 
+10-DEC-2007 (4)
+
+-- Accidentally committed the module with the default rules reversed. 
+-- Changes default admin menu item string to --Domains-- to match 
+    the other items in admin/build.
+-- Fixes pgSQL install errors in Domain Prefix and Domain User.
+-- Adds user_access checks to hook_domainlinks implementations.
+-- pgSQL table copying and creating work in Domain Prefix.  However, the
+    table Sequences and Indexes are not being copied and require more work.
+
 10-DEC-2007 (3)
 
 -- #191785 by skizzo. Allows the setting of an administrative theme in Domain Conf.

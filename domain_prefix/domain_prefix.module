@@ -27,7 +27,7 @@ function domain_prefix_menu($may_cache) {
     $items[] = array(
       'title' => t('Table prefixing'),
       'path' => 'admin/build/domain/prefix',
-      'access' => user_access('prefix tables'),
+      'access' => user_access('administer table prefixing'),
       'type' => MENU_LOCAL_TASK,
       'callback' => 'drupal_get_form',
       'callback arguments' => array('domain_prefix_configure_form')      
@@ -37,7 +37,7 @@ function domain_prefix_menu($may_cache) {
     $items[] = array(
       'title' => t('Domain prefix settings'),
       'path' => 'admin/build/domain/prefix/'. arg(4),
-      'access' => user_access('prefix tables'),
+      'access' => user_access('administer table prefixing'),
       'type' => MENU_CALLBACK,
       'callback' => 'drupal_get_form',
       'callback arguments' => array('domain_prefix_form', arg(4))      
@@ -95,13 +95,26 @@ function domain_prefix_get_tables($prefix = NULL) {
   if (empty($prefix)) {
     $prefix = domain_prefix_get_prefix();
   }
-  // This currently won't work in pgsql
-  if (empty($prefix)) {
-    $result = db_query("SHOW TABLES");
+  switch ($GLOBALS['db_type']) {
+    case 'pgsql':
+      if (empty($prefix)) {
+        $result = db_query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+      }
+      else {
+        $result = db_query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name LIKE '{$prefix}%%'");
+      }
+      break;
+    default:
+      // MySQL and MySQLi implementation.
+      if (empty($prefix)) {
+        $result = db_query("SHOW TABLES");
+      }
+      else {
+        $result = db_query("SHOW TABLES LIKE '{$prefix}%%'");  
+      }
+      break;
   }
-  else {
-    $result = db_query("SHOW TABLES LIKE '{$prefix}%%'");  
-  }
+   
   $tables = array();
   $disallow = domain_prefix_disallow();
   while ($data = db_fetch_array($result)) {
@@ -233,11 +246,13 @@ function domain_prefix_configure_form() {
  * @ingroup prefix
  */
 function domain_prefix_domainlinks($domain) {
-  $links[] = array(
-    'title' => t('tables'),
-    'path' => 'admin/build/domain/prefix/'. $domain['domain_id']
-  );
-  return $links;
+  if (user_access('administer table prefixing')) {
+    $links[] = array(
+      'title' => t('tables'),
+      'path' => 'admin/build/domain/prefix/'. $domain['domain_id']
+    );
+    return $links;
+  }  
 }
 
 /**
@@ -454,8 +469,8 @@ function domain_prefix_table_exists($prefix, $table) {
   global $db_type;
   $string = db_escape_table($prefix . $table);
   switch($db_type) {
-    case 'pgsql':
-      $query = "SELECT relname FROM pg_class WHERE relname = '{%s}'";
+    case 'pgsql':   
+      $query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '{%s}'";
       break;
     default:
       $query = "SHOW TABLES LIKE '{%s}'";
@@ -489,7 +504,9 @@ function domain_prefix_form_submit($form_id, $form_values) {
     // Delete existing records, but get the existing values first.
     $current = domain_prefix_lookup($form_values['domain_id']);
     db_query("DELETE FROM {domain_prefix} WHERE domain_id = %d", $form_values['domain_id']);
-  
+    // Get the database type.
+    $db_type = $GLOBALS['db_type'];
+    
     foreach ($data as $key => $value) {
       // Do not process tables for the source elements.
       // But be sure to set the proper source table prefix for copying data.
@@ -515,7 +532,13 @@ function domain_prefix_form_submit($form_id, $form_values) {
         $sourcetable = db_escape_table($source_prefix . $key);
         if ($value == DOMAIN_PREFIX_CREATE) {
           if (!$exists) {
-            db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
+            if ($db_type == 'pgsql') {
+              db_query("CREATE TABLE {%s} AS SELECT * FROM {%s}", $newtable, $sourcetable);     
+              db_query("TRUNCATE TABLE {%s}", $newtable);
+            }
+            else {
+              db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
+            }  
             if ($msg) {
               drupal_set_message(t('!string table created.', array('!string' => $newtable)));
             }
@@ -527,8 +550,13 @@ function domain_prefix_form_submit($form_id, $form_values) {
         }
         else if ($value == DOMAIN_PREFIX_COPY) {
           if (!$exists) {
-            db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
-            db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
+            if ($db_type == 'pgsql') {
+              db_query("CREATE TABLE {%s} AS SELECT * FROM {%s}", $newtable, $sourcetable);
+            }
+            else {
+              db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
+              db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
+            }
             if ($msg) {          
               drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
             }

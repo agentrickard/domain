@@ -186,6 +186,9 @@ function hook_domainupdate($op, $domain = array(), $edit = array()) {
 /**
  * Returns links to additional functions for the Domain Access module's admin screen
  *
+ * Note that if your page requires a user_access check other than 'administer domains'
+ * you should explictly check permissions before returning the array.
+ *
  * @param $domain
  *  An array of data for the active domain, taken from the {domain} table.
  *    - domain_id -- the unique identifier of this domain
@@ -201,11 +204,13 @@ function hook_domainupdate($op, $domain = array(), $edit = array()) {
  * @ingroup hooks
  */
 function hook_domainlinks($domain) {
-  $links[] = array(
-    'title' => t('settings'),
-    'path' => 'admin/build/domain/conf/'. $domain['domain_id']
-  );
-  return $links;
+  if (user_access('my permission')) {
+    $links[] = array(
+      'title' => t('settings'),
+      'path' => 'admin/build/domain/myaction/'. $domain['domain_id']
+    );
+    return $links;
+  }  
 }  
 
 /**
