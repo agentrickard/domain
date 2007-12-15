@@ -35,20 +35,24 @@ CONTENTS
 4.1.2   Site Name
 4.1.3   Domain URL Scheme
 4.2   Domain Module Behaviors
-4.2.1   Debugging Status
-4.2.2   New Content Settings
-4.2.3   Sort Domain Lists
+4.2.1   New Content Settings
+4.2.2   Content Editing Forms
+4.2.3   Debugging Status
+4.2.4   Sort Domain Lists
 4.3   Advanced Settings
 4.3.1   Domain-based Editing Controls
 4.3.2   Search Settings
 4.3.3   Search Engine Optimization
-4.3.4   Node Access Settings
-4.4   The Domain List
-4.5   Creating Domain Records
-4.6   Node Settings
-4.6.1   Domain Node Editing
-4.6.2   Domain Node Types
-4.7   Block -- Domain Switcher
+4.3.4   WWW Prefix Handling
+4.3.5   Node Access Settings
+4.4   Special Page Requests
+4.5   Node Link Patterns
+4.6   The Domain List
+4.7   Creating Domain Records
+4.8   Node Settings
+4.8.1   Domain Node Editing
+4.8.2   Domain Node Types
+4.9   Block -- Domain Switcher
 5.  Node Access
 5.1   Assigning Domain Access
 5.2.  Editor Access
@@ -176,8 +180,11 @@ This patch is only needed if:
   -- You wish to allow searching of all domains from any domain.
   -- You use a content aggregation module such as MySite.
   -- You get "access denied" errors when linking to items on a 
-  user's Track page.
-  
+      user's Track page.
+  -- You want to turn on the advanced setting "Search Engine 
+      Optimization" to avoid content from being indexed on multiple
+      domains.
+   
 This patch allows modules to edit the path to a Drupal object.  In the
 above cases, some content can only be viewed from certain domains, so
 we must write absolute links to that content.  
@@ -186,6 +193,8 @@ Developers: see http://drupal.org/node/189797 for more information.
 
 This patch introduces hook_url_alter(), which is being submitted to
 Drupal core for version 7.
+
+See section 4.5 Node Link Patterns for more details.
 
 ----
 2.2 Server Configuration
@@ -201,12 +210,12 @@ The two basic methods for doing this are either to:
     resolve to your Drupal site.
 
 For example, on my local testing machine, I have VirtualHosts to the following
-sites setup in httpd.conf (and my hosts file, to allow the .test TLD):
+sites setup in httpd.conf:
 
-  - ken.test => 127.0.0.1
-  - one.ken.test => 127.0.0.1
-  - two.ken.test => 127.0.0.1
-  - three.ken.test => 127.0.0.1
+  - example.com => 127.0.0.1
+  - one.example.com => 127.0.0.1
+  - two.example.com => 127.0.0.1
+  - three.example.com => 127.0.0.1
   
 It is beyond the scope of this document to explain how to configure your DNS 
 server.  For more information, see:
@@ -306,7 +315,7 @@ The Domain Access module has three standard permissions.
   interface for assigning users and nodes to specific domains.  Users without
   this permission cannot assign domain access; their nodes will automatically 
   be assigned to the currently active domain.
-  
+
   For example, if a user has this permission and creates a book page on   
   one.example.com, the user will be given a series of options to assign that
   book page to any or all of the registered domains on the site.
@@ -314,6 +323,14 @@ The Domain Access module has three standard permissions.
   If the user does not have this permission, the book page will only be shown
   to users who are on http://one.example.com.
   
+  - 'view domain publishing'
+  This permission provides a limited set of options for users to create and
+  edit content on your site.  Users who have this permission will have their
+  node editing forms processed according to the "Content Editing Form"
+  settings described in section 4.2.2.
+  
+  This feature was added in response to http://drupal.org/node/188275.
+    
 ----
 3.2 Normal Usage
 
@@ -404,15 +421,7 @@ Allows the site to use 'http' or 'https' as the URL scheme.  Default is
 These options affect the basic options for how the module behaves.
 
 ----
-4.2.1   Debugging Status
-
-If enabled, this will append node access information to the bottom of each   
-node.  This data is only viewable by uses with the 'set domain access'
-privilege.  It is provided for debugging, since 'adminiseter nodes' will make
-all nodes viewable to some users.
-
-----
-4.2.2   New Content Settings
+4.2.1   New Content Settings
 
 Defines the default behavior for content added to your site.  By design, the 
 module automatically assigns all content to the currently active subdomain.  
@@ -420,7 +429,57 @@ If this value is set to 'Show on all sites,' then all new content will be
 assigned to all sites _in addition to_ the active subdomain.
 
 ----
-4.2.3   Sort Domain Lists
+4.2.2   Content Editing Forms
+
+Defines how to present the forms for node creation and editing to users
+who do not have permission to 'set domain access' but need some control
+over where their content is published.
+
+Users with the 'view domain publishing' permission will be subject to the
+rules defined below.
+
+  -- Pass the default form values as hidden fields
+  The default option.  It will assign all content to the root domain and to
+  the domain from which the form is entered.  
+  
+  -- Take user to the default domain
+  Before being presented the editing form, users will be taken to the root
+  domain.  If the node is not visible on the root domain, the user may not be 
+  able to edit the node.  
+  
+  -- Take user to their assigned domain
+  Before being presented the editing form, users will be taken to the 
+  first domain assigned to their user account.  This function is most useful
+  when you users are only allowed to enter content from a single domain.
+  
+  Note that for users who have more than one assigned domain, this option
+  will take them to the first match and the user will not be allowed to 
+  change the domain affiliation.
+  
+  -- Show user their publishing options 
+  The node editing form is shown normally, and the user is presented a 
+  list of checkboxes.  These options represent the affilaite domains that 
+  the user is allowed to publish content to, acording to the domains 
+  assigned to their user account. 
+  
+  Note that if this option is selected, users with the 'view domain publshing'
+  permission will also be shown a list of affilates to which the node is assigned.  
+  This list shows only the affiliates that the user cannot edit.
+
+Note also that the user is not given the ability to promote content to
+'all affiliates'.  Users who need this ability should be given the 'set domain
+access' permission instead.
+
+----
+4.2.3   Debugging Status
+
+If enabled, this will append node access information to the bottom of each   
+node.  This data is only viewable by uses with the 'set domain access'
+privilege.  It is provided for debugging, since 'adminiseter nodes' will make
+all nodes viewable to some users.
+
+----
+4.2.4   Sort Domain Lists
 
 Both the Domain Switcher block and the Domain Nav module provide an
 end-user visible list of domains.  The domain sorting settings control how
@@ -456,9 +515,9 @@ Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2
 ----
 4.3.3   Search Engine Optimization
 
-  There is a risk with these modules that your site could be penalized by search engines
-  such as Google for having duplicate content.  This setting controls the behavior of
-  URLs written for nodes on your affiliated sites.
+There is a risk with these modules that your site could be penalized by search engines
+such as Google for having duplicate content.  This setting controls the behavior of
+URLs written for nodes on your affiliated sites.
   
     - If SEO settings are turned on, all node links are rewritten as absolute URLs.
     - If assigned to 'all affiliates' the node link goes to the root domain.
@@ -468,7 +527,24 @@ Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2
 Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2.
 
 ----
-4.3.4   Node Access Settings
+4.3.4   WWW Prefix Handling
+
+This setting controls how requests to www.example.com are treated with
+respect to example.com.  The default behavior is to process all host names 
+against the registered domain list.  
+
+If you set this value to 'Treat www.*.example.com as an 
+alias of *.example.com' then all host requests will have the 'www.' string
+stripped before the domain lookup is processed.
+
+Users going to a www.one.example.com in this case will not automatically
+be sent to one.example.com, but your Drupal site will behave as if they
+had requested one.example.com.
+
+This feature was requested by Rick and Matt at DZone.com
+
+----
+4.3.5  Node Access Settings
 
 This setting controls how you want Domain Access to interact with other
 node access modules.  
@@ -509,7 +585,81 @@ Enabling this feature requires the multiple_node_access patch discussed
 in 2.1.1.
 
 ----
-4.4 Domain List
+4.4   Special Page Requests
+
+In normal uses, such as the default home page, you want to restrict access
+to content based on the active domain.  However, in certain cases, this
+behavior is not desired.
+
+Take the Track page for each user, for example.  The Track page is at
+'user/UID/track' and shows a list of all posts by that user.  By design, this 
+page may show different results if seen from different domains:
+
+  -- one.example.com/user/1/track
+  Shows all posts by user 1 assigned to the domain one.example.com
+  
+  -- two.example.com/user/1/track
+  Shows all posts by user 1 assigned to the domain two.example.com
+  
+The behavior we really want is to show ALL posts by the user regardless of
+the active domain.
+
+The Special Page Requests setting lets you specify Drupal paths for which
+this behavior is active.  These paths are entered in the same way as block
+settings for page visibility.
+
+Some sample pages that might require this setting.  Note, some of these
+are contributed modules:
+
+  -- user/*/track
+  -- mysite/* -- the MySite module
+  -- popular/alltime -- a View
+  -- popular/latest -- a View
+  -- taxonomy/term/*  -- to show all taxonomy terms at all times
+  -- taxonomy/term/10 -- to show only term 10 at all times
+  -- taxonomy/term/*/feed/* -- all taxonomy term feeds
+
+Default and custom Views are often good candidates here as well.
+
+By default, 'user/*/track' is in this list.
+
+Note that the 'search' path is handled separately and need not be added here.
+
+----
+4.5   Node Link Patterns
+
+When using this module, there are times when hook_url_alter() will need
+to rewrite a node link.
+
+Note that these settings are not available if the hook_url_alter() patch
+is not applied.
+
+Since Drupal is an extensible system, we cannot account for all possible 
+links to specific nodes.  Node Link Patterns are designed to allow you to
+extend the module as you add new contributed modules.
+
+By default, the following core link paths will be rewritten as needed if you 
+have installed the hook_url_alter() patch.
+
+  -- node/%n
+  -- comment/reply/%n
+  -- node/add/book/parent/%n
+  -- book/export/html/%n
+
+Where %n is a placeholder for the node id.
+
+If you install additional modules such as Forward (http://drupal.org/project/forward)
+or Print (http://drupal.org/project/print), you will want to add their paths to this 
+list:
+
+  -- forward/%n
+  -- print/%n
+
+This is an advanced, but necessary feature.  Please report any core node path
+omissions at http://drupal.org/project/issues/domain.
+
+----
+4.6 Domain List
 
 This screen shows all active subdomains registered for use with the site.
 
@@ -517,7 +667,7 @@ Record zero (0) is hardcoded to refer to the "root" site defined as your
 Primary domain name.
 
 ----
-4.5 Create domain record
+4.7 Create domain record
 
 As noted above, this screen does not register DNS records with Apache.
 
@@ -542,12 +692,12 @@ Both the Domain and the Site name are required to be unique values.
 After you create a record, you may edit or delete it as you see fit.
 
 ----
-4.6 Node Settings
+4.8 Node Settings
 
 The Node settings page is divided into two parts, each with a different purpose.
 
 ----
-4.6.1 Domain Node Editing
+4.8.1 Domain Node Editing
 
 The top section 'Domain node editing' is required for those sites that use the
 advanced editing techniques outlined in section 3.
@@ -561,7 +711,7 @@ By default, 'Comment settings', 'Delete node', 'Publshing options', and 'Path
 aliasing' are enabled.  
 
 ----
-4.6.2 Domain Node Types
+4.8.2 Domain Node Types
 
 The lower section 'Domain node types' is used to extend the 'New content 
 settings' described in 4.1.
@@ -571,7 +721,7 @@ checking the box, nodes for that given type will automatically be assigned to
 'all affiliate sites' during node creation and editing.  
 
 ----
-4.7 Block -- Domain Switcher
+4.9 Block -- Domain Switcher
 
 The Domain Access module provides on block, which can be used to help you
 debug your use of the module.

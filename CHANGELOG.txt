@@ -1,5 +1,28 @@
 // $Id$
 
+15-DEC-2007
+
+-- Adds partial pgSQL functionality to Domain Prefix.  See #200279.
+-- #188275. Adds new permission 'view domain publishing' to provide domain 
+    selection options for node creation to users with limited permissions.
+    These options are controlled by a new Content Editing Form setting.
+-- Adds the ability to ignore the www. prefix when determining the validty of
+    a domain request.
+-- Adds configuration for pages that should allows the domain_all grant, such
+    as mysite/* or user/*/track.
+-- #197757. Fixes default values and form positioning on Domain Content batch editor form.    
+-- Adds configuration for node links that should be made absolute by hook_url_alter, such
+    as node/%n, comment/reply/%n and book/add/child/%n, where %n is a placeholder
+    for the node id.  Allows the module to be extended through the UI.
+-- Removes the domain_enable check from the configuration page.
+-- Automatically adds and removed domain_editor grants when that feature is enabled and
+    disabled.
+-- Moves some settings options so that the default choice is always on top.    
+-- Removes the variable check from domain_perm().  Now shows all permission options
+    at all times.
+-- #200714 patch by mrichar1. Adds the Domain Views module by mrichar1.
+-- #199846 by gfconsult. Adds the Domain Strict module suggested by comment #2.
+
 10-DEC-2007 (4)
 
 -- Accidentally committed the module with the default rules reversed. 

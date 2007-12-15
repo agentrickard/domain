@@ -153,7 +153,6 @@ function _domain_prefix_sort($a, $b) {
  * @ingroup prefix
  */
 function domain_prefix_configure_form() {
-  drupal_set_title(t('Default table prefix settings'));
   // We must be on the root domain!
   $default = domain_default();
   domain_goto($default);
@@ -524,7 +523,7 @@ function domain_prefix_form_submit($form_id, $form_values) {
           $value = DOMAIN_PREFIX_IGNORE;
           $update = TRUE;
         }
-        
+
         $newtable = db_escape_table($prefix . $key);
         $module = domain_prefix_module_lookup($key);
         $exists = domain_prefix_table_exists($prefix, $key);
@@ -533,7 +532,7 @@ function domain_prefix_form_submit($form_id, $form_values) {
         if ($value == DOMAIN_PREFIX_CREATE) {
           if (!$exists) {
             if ($db_type == 'pgsql') {
-              db_query("CREATE TABLE {%s} AS SELECT * FROM {%s}", $newtable, $sourcetable);     
+              db_query("CREATE TABLE {%s} AS SELECT * FROM {%s}", $newtable, $sourcetable);   
               db_query("TRUNCATE TABLE {%s}", $newtable);
             }
             else {
@@ -551,7 +550,7 @@ function domain_prefix_form_submit($form_id, $form_values) {
         else if ($value == DOMAIN_PREFIX_COPY) {
           if (!$exists) {
             if ($db_type == 'pgsql') {
-              db_query("CREATE TABLE {%s} AS SELECT * FROM {%s}", $newtable, $sourcetable);
+              db_query("CREATE TABLE {%s} AS SELECT * FROM {%s}", $newtable, $sourcetable);           
             }
             else {
               db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);

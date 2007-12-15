@@ -291,9 +291,10 @@ function domain_content_form() {
     if (user_access('set domain access')) {
       $form['domain'] = array(
         '#type' => 'fieldset',
-        '#title' => t('Domain access options'),
+        '#title' => t('Affiliate publishing options'),
         '#collapsible' => TRUE,
-        '#collapsed' => FALSE
+        '#collapsed' => TRUE,
+        '#prefix' => '<div class="description">'. t('If you select <em>Change affiliate publishing options</em> above, you should confirm the <em>Affiliate publishing options</em> settings below.') .'</div>'
       );
       $form['domain']['domain_site'] = array(
         '#type' => 'checkbox',
@@ -302,7 +303,7 @@ function domain_content_form() {
         '#title' => t('Send to all affiliates'),
         '#required' => FALSE,
         '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
-        '#default_value' => 0,
+        '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
       );    
       $form['domain']['domains'] = array(
         '#type' => 'checkboxes',
@@ -310,7 +311,7 @@ function domain_content_form() {
         '#options' => $options,
         '#required' => FALSE,
         '#description' => t('Select which affiliates can access this content.'),
-        '#default_value' => array(),
+        '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
       );
     }  
   }
@@ -391,7 +392,7 @@ function domain_content_node_operations() {
   if (arg(0) == 'admin' &&  arg(1) == 'domain' && user_access('set domain access')) {
     $operations = array(
       'domain' => array(
-      'label' => t('Change Domain Access rules'),
+      'label' => t('Change affiliate publishing options'),
       'callback' => 'domain_content_node_operations_access',
       )
     );  
@@ -438,6 +439,7 @@ function theme_domain_content_admin_nodes($form) {
   $header = array(theme('table_select_header_cell'), t('Title'), t('Affiliates'), t('Type'), t('Author'), t('Status'), t('Operations'));
 
   $output .= drupal_render($form['options']);
+  $output .= drupal_render($form['domain']);  
   if (isset($form['title']) && is_array($form['title'])) {
     foreach (element_children($form['title']) as $key) {
       $row = array();

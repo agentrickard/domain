@@ -54,7 +54,18 @@
 /**
  * @defgroup user Domain User: personal subdomains
  * Creates unique subdomains for registered users.
+ */
 
+/**
+ * @defgroup views Domain Views: views integration
+ * Provides a Views filter for the Domain Access module.
+ */
+
+/**
+ * @defgroup strict Domain Strict: strict access control
+ * Forces users to be assigned to a domain in order to view content on that domain.
+ */ 
+ 
  /**
   * @mainpage
    Welcome to the API documentation for the Domain Access module, I hope you find it useful.
@@ -69,6 +80,8 @@
  *
  * This hook allows Domain Access modules to overwrite default behaviors.
  * See http://api.drupal.org/api/function/hook_node_grants/5 for more detail.
+ *
+ * @see domain_strict_domaingrants() for example usage.
  * 
  * @param &$grants
  *  The existing default $grants, passed by reference.

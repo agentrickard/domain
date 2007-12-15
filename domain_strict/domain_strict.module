@@ -1,0 +1,33 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Forces users to be assigned to a domain in order to view content on that domain.
+ */
+
+/**
+ * Implements hook_domaingrants()
+ *
+ * In Domain Strict, we onl let users see content on domains that
+ * they are registered with.  So we check the $user object in order
+ * to set our grants rather than using the default module grants.
+ *
+ * @ingroup strict
+ */
+function domain_strict_domaingrants(&$grants, $account, $op) {
+  global $_domain;
+  // Erase the default domain_id grants.
+  unset($grants['domain_id']);
+  $domains = $account->domain_user;
+  if (!empty($domains)) {
+    foreach ($domains as $key => $value) {
+      // The -1 is the root domain, since 0 cannot be stored by checkboxes.
+      ($value == -1) ? $id = 0 : $id = $value;
+      // If the user has access to the current domain, set that grant.
+      if (abs($value) > 0 && $id == $_domain['domain_id']) {
+        $grants['domain_id'][] = $id;
+      }
+    }
+  }
+}

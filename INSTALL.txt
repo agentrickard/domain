@@ -183,7 +183,10 @@ This patch is only needed if:
   -- You wish to allow searching of all domains from any domain.
   -- You use a content aggregation module such as MySite.
   -- You get "access denied" errors when linking to items on a 
-  user's Track page.
+      user's Track page.
+  -- You want to turn on the advanced setting "Search Engine 
+      Optimization" to avoid content from being indexed on multiple
+      domains.  
   
 This patch allows modules to edit the path to a Drupal object.  In the
 above cases, some content can only be viewed from certain domains, so

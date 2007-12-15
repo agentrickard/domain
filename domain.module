@@ -37,6 +37,11 @@ function domain_init() {
   $_domain = array();
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
   $_subdomain = implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.'))));
+
+  // Strip the www. off the subdomain, if required.
+  if (variable_get('domain_www', 0)) {
+    $_subdomain = str_ireplace('www.', '', $_subdomain);
+  }
   // Lookup the active domain against our allowed hosts record.
   $data = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
   // Get the domain data.
@@ -136,13 +141,8 @@ function domain_menu($may_cache) {
  * @ingroup drupal 
  */
 function domain_perm() {
-  $rule = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
-  if ($rule) {
-    return array('administer domains', 'set domain access', 'edit domain nodes');
-  }
-  else {
-    return array('administer domains', 'set domain access');
-  }  
+  $perms = array('administer domains', 'edit domain nodes', 'set domain access', 'view domain publishing');
+  return $perms;
 }
 
 /**
@@ -503,7 +503,7 @@ function domain_get_path($domain) {
 }
 
 /**
- * Determine a relative path to the current page
+ * Determine an absolute path to the current page
  */
 function domain_get_uri($domain) {
   global $base_url;
@@ -691,7 +691,7 @@ function domain_node_grants($account, $op) {
       $function($grants, $account, $op);
     }  
   }
-  
+  print_r($grants);
   return $grants;
 }
 
@@ -714,16 +714,25 @@ function domain_node_access_records($node) {
   if (domain_enabling() && $behavior == 1) {
     $node->domain_site = TRUE;
   }
-  
+
+  // Define the $grants array.
   $grants = array();
-  
+
   // If the form is hidden, we are passed the 'domains_raw' variable.
+  // We need to append unique values from this variable to the existing
+  // stored values.  See the logic for 'view domain publshing' in domain_form_alter().
   if (is_array($node->domains_raw)) {
-    $node->domains = array();
+    if (!isset($node->domains)) {
+      $node->domains = array();
+    }  
     foreach ($node->domains_raw as $value) {
-      $node->domains[$value] = $value;
+      // Only add this if it is not present already.
+      if (!in_array($value, $node->domains)) {
+        $node->domains[$value] = $value;
+      }  
     }
   }
+  
   // If set, grant access to the core site, otherwise 
   // The grant must be explicitly given to a domain.
   if ($node->domain_site) {
@@ -801,7 +810,7 @@ function domain_node_access_records($node) {
       $function($grants, $node);
     }  
   }
-  
+
   return $grants;
 }
 
@@ -830,7 +839,7 @@ function domain_enable() {
 }
 
 /**
- * Writes the default grants when the module is frist enabled.
+ * Writes the default grants when the module is first enabled.
  *
  * @ingroup node
  */
@@ -901,7 +910,7 @@ function domain_form_alter($form_id, &$form) {
 
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
   if ($form['#id'] == 'node-form' && !$form['#node']->cck_dummy_node_form) {
-    global $_domain;
+    global $_domain, $user;
     // By default, the requesting domain is assigned.
     $default = array($_domain['domain_id']);
     // How is core content handled for this site?
@@ -909,6 +918,15 @@ function domain_form_alter($form_id, &$form) {
     if ($behavior == 1 || $_domain['domain_id'] == 0) {
       $default[] = -1;
     }
+
+    // Some options will be passed as hidden values, we need to run some checks on those.
+    if ($form['#node']->nid) {
+      $raw = $form['#node']->domains;
+    }  
+    else {
+      $raw = $default;
+    }
+    
     $options = array();
     foreach (domain_domains() as $data) {
       // Cannot pass zero in checkboxes.
@@ -944,17 +962,110 @@ function domain_form_alter($form_id, &$form) {
         '#default_value' => ($form['#node']->nid) ? $form['#node']->domains : $default,
       );
     }
+    // If the user has limited permissions, show that form or obey the settings.
     else {
+      if (user_access('view domain publishing')) {
+        $action = variable_get('domain_options', 0);
+        $user_domains = array();
+        foreach ($user->domain_user as $key => $value) {
+          if (abs($value) > 0) {
+            $user_domains[] = $value;
+          }
+        }
+        $first_domain = current($user_domains);
+        $user_options = array();
+        foreach ($options as $key => $value) {
+          if (in_array($key, $user_domains)) {
+            $user_options[$key] = $value;
+          }
+        }  
+        // Raw data checks for published nodes.
+        foreach ($raw as $key => $value) {
+          if (in_array($value, $user_domains)) {
+            $default_options[] = $value;
+          }
+          // This is only used in case 3, below.  It means that some options 
+          // are present that the user cannot access but that must be preserved.
+          else {
+            $raw_options[] = $value;
+          }
+        }        
+        // Act on the behavior desired by the site admin.
+        switch ($action) {
+          // 1 == go to the default domain.
+          case 1:
+            $root = domain_default();
+            if ($root['domain_id'] != $_domain['domain_id']) {
+              domain_goto($root);
+            }  
+            break;
+          // 2 == go to the user's assigned domain.  
+          case 2:
+            $domain = domain_lookup($first_domain);
+            if ($domain['domain_id'] != $_domain['domain_id']) {
+              domain_goto($domain);
+            }            
+            break;    
+          // 3 == show checkboxes of available domains.           
+          case 3:
+            $form['domain'] = array(
+              '#type' => 'fieldset',
+              '#title' => t('Affiliate publishing options'),
+              '#collapsible' => TRUE,
+              '#collapsed' => FALSE
+            );             
+            // We must preserve publishing options that the user cannot access, but only for
+            // existing nodes.
+            if ($form['#node']->nid) {
+              $raw = $raw_options;
+            }
+            else {
+              $raw = array();
+            }
+            // If the raw options are being passed, then no input is technically required.
+            (empty($raw)) ? $required = TRUE : $required = FALSE;
+
+            $form['domain']['domains'] = array(
+             '#type' => 'checkboxes',
+              '#title' => t('Publish to'),
+              '#options' => $user_options,
+              '#required' => $required,
+              '#description' => t('Select which affiliates can access this content.'),
+              '#default_value' => ($form['#node']->nid) ? $form['#node']->domains : $default_options,
+            );
+
+            // Show the options that cannot be changed.
+            $list = array();
+            if ($form['#node']->domain_site) {
+              $list[]['data'] = t('All affiliates');
+            }
+            if (!empty($raw)) {
+              foreach ($raw as $did) {
+                ($did == -1) ? $id = 0 : $id = $did;
+                $raw_domains = domain_lookup($id);
+                $list[]['data'] = $raw_domains['sitename'];
+              }
+            }
+            if (!empty($list)) {
+              $form['domain']['domains_notes'] = array(
+               '#value' => '<label><b>'. t('Publishing status:') .'</b></label>'. theme('item_list', $list) .'<div class="description">'. t('This content has also been published to these affiliates.') .'</div>',
+              );            
+            }
+            break;
+        }  
+      }
+      // These form elements are hidden from non-privileged users, by design.
       $form['domain_site'] = array(
         '#type' => 'value',
         '#value' => ($form['#node']->nid) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );
-      // Name this element for special handling.
+      // Domains that have been assigned and cannot be changed.
       $form['domains_raw'] = array(
         '#type' => 'value',
-        '#value' => ($form['#node']->nid) ? $form['#node']->domains : $default
+        '#value' => $raw,
       );
     }
+
     // THIS SECTION BREAKS CCK if we don't check for cck_dummy_node_form!  See http://drupal.org/node/186624
     // Some editors cannot administer nodes, so we have to add these form elements.
     if (variable_get('domain_editors', DOMAIN_EDITOR_RULE) == 1 && user_access('edit domain nodes')) {
@@ -975,7 +1086,7 @@ function domain_form_alter($form_id, &$form) {
 function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   global $_domain;
   // Set static variables for the node lookups, to remove redundant queries.
-  static $domain_site, $domain;
+  static $domain_site, $domain, $nodepaths;
   
   // Check to see that this function is installed.
   $skip = FALSE;
@@ -991,19 +1102,30 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   $check = domain_grant_all();
   $seo = variable_get('domain_seo', 0);
 
-  if (!$skip && ($check || $seo)) {
+  if (TRUE || !$skip && ($check || $seo)) {
     // Check to see if this is a node or comment link and set $nid accordingly.
     // We static the $nid results to make this more efficient.
     $pattern = explode('/', $path);    
-    // Known paths that use the format 'node/NID'.
-    $match = array('node', 'print', 'forward');
-    if ((in_array($pattern[0], $match) && is_numeric($pattern[1])) || ($pattern[0] == 'comment' && $pattern[1] == 'reply' && is_numeric($pattern[2]))) {
-      $root = domain_default();  
-      // Get the node id as $nid.
-      $nid = $pattern[1];
-      if ($pattern[0] == 'comment') {
-        $nid = $pattern[2];
+    
+    // Advanced pattern matching, we find the node id based on token %n in the path string.
+    if (!isset($nodepaths)) {
+      $pathdata = variable_get('domain_paths', "node/%n\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n");
+      $path_match = preg_replace('/(\r\n?|\n)/', '|', $pathdata);
+      $nodepaths = explode("|", $path_match);
+    }  
+    $nid = FALSE;
+    foreach ($nodepaths as $match) {
+      $match_array = explode('/', $match);
+      $placeholder = array_search('%n', $match_array);
+      $match_array[$placeholder] = $pattern[$placeholder];
+      if (is_numeric($pattern[$placeholder]) && $match_array == $pattern) {
+        $nid = (int) $pattern[$placeholder];
+        break;
       }
+    }
+    // This path has matched a node id, so it may need to be rewritten.
+    if ($nid) {
+      $root = domain_default();  
       // Remove redundancy from the domain_site check.
       if (!isset($domain_site[$nid])) {
         // If this check works, we don't need to rewrite the path unless SEO rules demand it.
@@ -1035,20 +1157,36 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
 /**
  * Activate the hidden grant for searches.
  *
+ * @param $rest
+ *   A boolean flag indicating whether to reset the static variable or not.
+ * @return
+ *  TRUE or FALSE, depending on whether the grants should be executed for this page.
  * @ingroup domain
  */
-function domain_grant_all() {
+function domain_grant_all($reset= FALSE) {
   static $grant;
-  if (!isset($grant)) {
+  if (!isset($grant) || $reset) {
+    // Search is the easy case, so we check it first.
     $search = variable_get('domain_search', 0);
-    // Proof of concept.
-    if ((arg(0) == 'search' && $search) || arg(0) == 'mysite' || (arg(0) == 'user' && arg(2) == 'track')) {
+    if ($search && arg(0) == 'search') {
       $grant = TRUE;
     }
     else {
+      // We check the paths registered by the special pages setting.
       $grant = FALSE;
-    }
-  }
+      $pages = variable_get('domain_grant_all', "user/*/track");
+      $path = drupal_get_path_alias($_GET['q']);
+      $regexp = '/^('. preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/', '/(^|\|)\\\\<front\\\\>($|\|)/'), array('|', '.*', '\1'. preg_quote(variable_get('site_frontpage', 'node'), '/') .'\2'), preg_quote($pages, '/')) .')$/';
+      // Compare with the internal and path alias (if any).
+      $page_match = preg_match($regexp, $path);
+      if ($path != $_GET['q']) {
+        $page_match || preg_match($regexp, $_GET['q']);
+      }    
+      if ($page_match) {
+        $grant = TRUE;
+      }
+    }  
+  }  
   return $grant;
 }
 

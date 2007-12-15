@@ -128,8 +128,11 @@ You may use this form to batch update the Domain Access rules for your nodes.
 If you have the 'set domain access' permission, you will see the Domain Access
 Options form elements beneath the node list.
 
-If you select the operation "Change Domain Access rules", any nodes that you
+If you select the operation "Change affiliate publishing options", any nodes that you
 select can be batch updated to the new settings you select.
+
+By default, the currently active domain will be chosen, as will the value set for
+promoting new nodes to all affiliates.
 
 WARNING: It is possible that you may move some nodes to domains other
 than the currently active domain.  If so, some nodes will be reomved from

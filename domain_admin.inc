@@ -105,8 +105,7 @@ function domain_view() {
  * @ingroup domain 
  */
 function domain_configure() {
-  // Ensure that the default grant is present.
-  domain_enable();
+  // Is the module installed correctly?
   module_invoke_all('domaininstall');
   // Return the configuration form.
   return drupal_get_form('domain_configure_form');
@@ -158,23 +157,37 @@ function domain_configure_form($user_submitted = FALSE) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE
   );
-  $form['domain_behavior']['domain_debug'] = array(
-    '#type' => 'radios',
-    '#title' => t('Debugging status'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_debug', 0),
-    '#options' => array(1 => t('Show debugging output on node view'), 0 => t('Do not show debugging output')),
-    '#description' => t('If set, users with the <em>set domain access</em> permission will be able to view the node access rules for each node. See the README for more details.')    
-  );   
 
   $form['domain_behavior']['domain_behavior'] = array(
     '#type' => 'radios',
     '#title' => t('New content settings'),
     '#required' => TRUE,
     '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
-    '#options' => array(1 => t('Show on all sites'), 2 => t('Only show on selected sites')),
+    '#options' => array(1 => t('Show on all affiliate sites'), 2 => t('Only show on selected sites')),
     '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
   );
+  
+  $form['domain_behavior']['domain_options'] = array(
+    '#type' => 'radios',
+    '#title' => t('Content editing forms'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_options', 0),
+    '#options' => array(
+      0 => t('Pass the default form values as hidden fields'), 
+      1 => t('Take user to the default domain'), 
+      2 => t('Take user to their assigned domain'), 
+      3 => t('Show user their publishing options')),      
+    '#description' => t('Controls the behavior of forms for users with the <em>view domain publishing</em> permission when creating or editing content. See the README for more details.')    
+  );    
+  
+   $form['domain_behavior']['domain_debug'] = array(
+    '#type' => 'radios',
+    '#title' => t('Debugging status'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_debug', 0),
+    '#options' => array(0 => t('Do not show debugging output'), 1 => t('Show debugging output on node view')),
+    '#description' => t('If set, users with the <em>set domain access</em> permission will be able to view the node access rules for each node. See the README for more details.')    
+  );   
   
   $options = array(
     'id' => t('Creation order, oldest > newest'),
@@ -204,9 +217,14 @@ function domain_configure_form($user_submitted = FALSE) {
     '#type' => 'radios',
     '#title' => t('Domain-based editing controls'),
     '#default_value' => variable_get('domain_editors', intval(DOMAIN_EDITOR_RULE)),
-    '#options' => array(1 => t('Use access control for editors'), 0 => t('Do not use access control for editors')),
+    '#options' => array(0 => t('Do not use access control for editors'), 1 => t('Use access control for editors')),
     '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
   );    
+  // When turning on and off editing rules, we rebuild part of the node_access table.
+  $form['#submit']['domain_admin_editor_form'] = array();  
+  $form['domain_editors_status'] = array('#type' => 'value', '#value' => variable_get('domain_editors', 0));
+  // Adding this submit behavior disabled the default, so we add that explictly.
+  $form['#submit']['system_settings_form_submit'] = array();
   
   // Check to see if the node_access patch is enabled.  If it is, then
   // we need to know if more than one node_access module is running.
@@ -254,7 +272,80 @@ function domain_configure_form($user_submitted = FALSE) {
       option reduces the chance that search engines will recognize duplicate content.  
       This feature requires the hook_url_alter() patch.')
   );    
+  
+   $form['domain_advanced']['domain_www'] = array(
+    '#type' => 'radios',
+    '#title' => t('WWW prefix handling'),
+    '#default_value' => variable_get('domain_www', 0),
+    '#options' => array(0 => t('Process all host requests normally'), 1 => t('Treat www.*.example.com as an alias of *.example.com')),
+    '#description' => t('If set, calls to www.* will be treated as if the www. did not exist.')    
+  );      
+  
+  $form['domain_all'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Special page requests'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE  
+  );
+  
+   $form['domain_all']['domain_grant_all'] = array(
+    '#type' => 'textarea',
+    '#rows' => 5,
+    '#cols' => 40,
+    '#default_value' => variable_get('domain_grant_all', "user/*/track"),
+    '#description' => t('Content on these pages should be viewable on any domain.  Enter one path per line. 
+      You may use the * as a wildcard.  Use this for aggregate pages like those provided by <a href="!url">MySite</a> or if you
+      intend to show all user posts on a specific page.  See the README for more details.', array('!url' => 'http://drupal.org/project/mysite'))    
+  ); 
+  // The hook_url_alter() patch must be present for these settings to be applied.
+  if (!$disabled) {
+    $form['domain_paths'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Node link patterns'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE  
+    );
+  
+     $form['domain_paths']['domain_paths'] = array(
+      '#type' => 'textarea',
+      '#rows' => 5,
+      '#cols' => 40,
+      '#default_value' => variable_get('domain_paths', "node/%n\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n"),
+      '#description' => t('When using SEO or other path rewrites, the following link paths should be turned into absolute URLs.  Enter 
+        the Drupal path of the link, using the <em>%n</em> placeholder to represent the node id.  
+        Enter one path per line.  See the README for more details.')    
+    );   
+  }
   return system_settings_form($form);
+}
+
+/**
+ * FormsAPI for enabling domain editors
+ *
+ * This function writes straight to the {node_access} table because we are
+ * adding a grant in addition to one that already exists.
+ *
+ * @ingroup domain
+ */
+function domain_admin_editor_form($form_id, $form_values) {
+  $clear = FALSE;
+  if ($form_values['domain_editors_status'] == 0 && $form_values['domain_editors'] == 1) {
+    // Apply rules
+    $result = db_query("SELECT nid, gid FROM {node_access} WHERE realm = 'domain_site'");
+    while ($data = db_fetch_array($result)) {
+      db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $data['nid'], $data['gid']);
+    }
+    $clear = TRUE;
+  }
+  else if ($form_values['domain_editors_status'] == 1 && $form_values['domain_editor'] == 0) {
+    // Remove rules
+    db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor'");
+    $clear = TRUE;
+  }
+  // We have reset the node_access table and need to clear the cache.
+  if ($clear) {
+    cache_clear_all();
+  }
 }
 
 /**

@@ -1,0 +1,117 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Provides a Views filter for the Domain Access module.
+ *
+ * Original code by mrichar1 see http://drupal.org/node/200714
+ */
+
+/**
+ * Implementation of hook_views_tables().
+ * Provide a filter that restricts a view to only show nodes from a specific domain (by domain_id).
+ * Relevant for authenticated users who have superuser permissions and can therefore see all nodes.
+ * @ingroup views
+ */
+function domain_views_tables() {
+  $domains = domain_domains();
+  $domain_options = array();
+  foreach ($domains as $domain){
+    $domain_options[$domain['domain_id']] = $domain['sitename'];
+  }
+  $domain_form = array(
+    '#type' => 'select',
+    '#options' => $domain_options,
+    '#multiple' => TRUE,
+    '#size' => 'size="'. min(8, count($domain_options)) .'"',
+  );
+  
+  $tables['domain_access'] = array(
+    'name' => 'node_access',
+    'join' => array(
+      'left' => array(
+        'table' => 'node',
+        'field' => 'nid'
+      ),
+      'right' => array(
+        'field' => 'nid'
+      ),
+      'extra' => array(
+        'realm' => 'domain_id'
+      ),
+    ),
+    'filters' => array(
+      'gid' => array(
+        'name' => t('Domain Access: Domain'),
+        'value' => $domain_form,
+        'operator' => 'views_handler_operator_or',
+        'help' => t('This will filter a view to only show nodes from the specified domain.'),
+      ),
+    ),
+  );
+  $tables['domain'] = array(
+    'name' => 'domain',
+    'join' => array(
+      'left' => array(
+        'table' => 'domain_access',
+        'field' => 'gid'
+      ),
+      'right' => array(
+        'field' => 'domain_id'
+      ),
+      'extra' => array(
+        'valid' => '1'
+      ),
+    ),
+  );
+  return $tables;
+}
+
+/**
+ * Implementation of hook_views_arguments().
+ * Provide a filter that restricts a view to only show nodes from a specific domain (by domain_id).
+ * If you pass "current" as the argument, it filters according to the domain the page is being viewed from.
+ * @ingroup views 
+ */
+function domain_views_arguments() {
+  $arguments = array(
+    'domain_access' => array(
+      'name' => t('Domain Access: Domain'),
+      'handler' => 'domain_views_handler_arg_domain_id', // This is the function that handles all the work
+      'help' => t('The argument will filter a view to only show nodes from the specified domain.'),
+    ),
+  );
+  return $arguments;
+}
+
+/**
+ * This is the function that handles all the work for dealing with view arguments
+ * There is some *very rough* documentation on argument handlers for views here http://drupal.org/node/99566.   
+ * @ingroup views 
+ */
+function domain_views_handler_arg_domain_id($op, &$query, $argtype, $arg = '') {
+  switch($op) {
+    case 'summary':
+      $query->add_table('domain_access'); // Re-uses the node_access table info from the domain_views_tables() function
+      $query->add_table('domain');        // Re-uses the domain table info from the domain_views_tables() function
+      $query->add_field('sitename', 'domain');
+      $query->add_field('domain_id', 'domain');
+      $query->add_where("domain.valid = '%s'", 1);  // don't show summary item for inactive domains
+      $fieldinfo['field'] = "domain.domain_id";
+      return $fieldinfo;
+    case 'sort':
+      $query->add_orderby('domain', 'sitename', $argtype);
+      break;
+    case 'filter':
+      $domain_id = ($arg == 'current') ? (int) $GLOBALS['_domain']['domain_id'] : (int) $arg;
+      $query->add_table('domain_access');
+      $query->add_where("domain_access.gid = '%s'", $domain_id);  // domain_access is an alias for the node_access table
+      $query->set_distinct(); 
+      break;
+    case 'link':
+      return l($query->sitename, "$arg/" . intval($query->domain_id));
+    case 'title':
+      return '';
+  }
+}
