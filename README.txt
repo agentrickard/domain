@@ -14,7 +14,8 @@ CONTENTS
 1.  Introduction
 1.1   Use-Case
 1.2   Examples
-1.3   Sponsors
+1.3   Using Multiple Node Access Modules
+1.4   Sponsors
 2.  Installation
 2.1   Patches to Drupal Core
 2.1.1   multiple_node_access.patch
@@ -123,7 +124,41 @@ editors have no control over which subdomains their content is published to.
 For the original example of the module in use, see http://skirt.com/
 
 ----
-1.3 Sponsors
+1.3   Using Multiple Node Access Modules
+
+Node Access is a complex issue in Drupal.  Typically, sites will only use
+one node access module at a time.  In some cases, you may require 
+more advances acceess control rules.
+
+Domain Access attempts to integrate with other node access modules 
+in two ways:
+
+  -- First, the multiple_node_access patch allows you to configure the
+      Domain Access module to use AND logic instead of OR logic when
+      adding Domain Access controls to your site.
+  -- Second, Domain Access does not use db_rewrite_sql in any way.
+      The module lets Drupal's core node access system handle this.
+      
+As a result, there may exist conflicts between Domain Access and other
+contributed modules that try to solve this issue.  Notably, the OG User
+Roles module introduces a patch to the node_access() function that
+seems to be incompatible with Domain Access.
+
+Domain Access has been tested to work with the Organic Groups module.
+
+If you experience conflicts with other node access modules, you 
+should uninstall the multiple_node_access patch.  This will restore the
+default Drupal behavior that your other modules are expecting.
+
+For background, see:
+
+  -- http://drupal.org/node/196922
+  -- http://drupal.org/node/191375
+  -- http://drupal.org/node/122173  
+  -- http://drupal.org/node/201156
+
+----
+1.4 Sponsors
 
 Domain Access is sponsored by Morris DigitalWorks.
   http://morrisdigitalworks.com
