@@ -691,7 +691,6 @@ function domain_node_grants($account, $op) {
       $function($grants, $account, $op);
     }  
   }
-  print_r($grants);
   return $grants;
 }
 
