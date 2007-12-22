@@ -1,5 +1,9 @@
 // $Id$
 
+22-DEC-2007
+
+-- Fixes logic error in domain_conf_warning_check().
+
 21-DEC-2007
 
 -- Adds hook_domainconf() to Domain Conf; inspired by #202917 and #202671.

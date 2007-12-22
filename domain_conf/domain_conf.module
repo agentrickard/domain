@@ -243,8 +243,10 @@ function domain_conf_warning_check($form_id) {
     $forms = module_invoke_all('domainwarnings');
     if (arg(2) != 'domain' && in_array($form_id, $forms)) {
       $default = domain_default();
-      $_path = domain_get_uri($default);
-      drupal_set_message(t('You are viewing #this. This form may need to be entered from <a href="!url">!domain</a>', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'])));
+      if ($_domain['domain_id'] != $default['domain_id']) {
+        $_path = domain_get_uri($default);
+        drupal_set_message(t('You are viewing #this. This form may need to be entered from <a href="!url">!domain</a>', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'])));
+      }  
     }
     $_warning = TRUE;
   }  

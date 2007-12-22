@@ -366,6 +366,9 @@ function hook_domainwarnings() {
  * the variable that you wish to alter.  The example below changes the default
  * user picture depending on the active domain.
  *
+ * Preferred use is to wrap your form elements in a named fieldset, for easier
+ * viewing.
+ *
  *  This hook is implemented by the Domain Conf module.
  *
  * @param $domain
