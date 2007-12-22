@@ -336,3 +336,53 @@ function hook_domainview($op, $domain = array()) {
       break;
   }
 }
+
+/**
+ *  Allows a warning message to be printed when entering specific forms that
+ *  may have values that vary on each domain.
+ *
+ *  This hook is implemented by the Domain Conf module.
+ *
+ * @return
+ *  An array of form_id values representing forms that require warnings.
+ *
+ * @ingroup hooks
+ */
+function hook_domainwarnings() { 
+  // These are the forms for variables set by Domain Conf.
+  return array(
+    'system_admin_theme_settings',
+    'system_date_time_settings',
+    'system_site_information_settings',
+    'system_site_maintenance_settings'
+  );
+} 
+
+/**
+ * Allows modules to add additional form elements for saving as domain-specific
+ * settings. 
+ *
+ * When naming your form arrays, remember that the final key is the name of 
+ * the variable that you wish to alter.  The example below changes the default
+ * user picture depending on the active domain.
+ *
+ *  This hook is implemented by the Domain Conf module.
+ *
+ * @param $domain
+ *  The $domain object prepared by hook_domainload().
+ * @return
+ *  A $form array element as defined by the FormsAPI.
+ *
+ *  @ingroup hooks 
+ */
+function hook_domainconf($domain) {
+  $form['pictures']['user_picture_default'] = array(
+    '#type' => 'textfield', 
+    '#title' => t('Default picture'), 
+    '#default_value' => variable_get('user_picture_default', ''), 
+    '#size' => 30, 
+    '#maxlength' => 255, 
+    '#description' => t('URL of picture to display for users with no custom picture selected. Leave blank for none.')
+  );
+  return $form;
+} 

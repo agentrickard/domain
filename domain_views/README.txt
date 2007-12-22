@@ -53,16 +53,41 @@ To install, you simply enable the module at Admin > Build > Modules.
 No database tables are installed and no configuration is required.
 
 ----
-3.  Arguments
+3. Arguments
 
-The module provides a default Domain Access argument that can be added
-to any View.
+This module provides a Domain Access argument that can be added to any View. 
+Arguments can be thought of as "dynamic filters" that are applied to the view at run-time.
 
-If the argument value is not set in your View, it will automatically use the
-currently active domain.
+The Domain Views Argument currently accepts two types of arguments:
 
-For more on Views Arguments, see the documentation on argument handlers for 
-views at http://drupal.org/node/99566.   
+    -- a numerical domain_id 
+    -- the string "current" [without quotation marks]
+    
+Assume we have page view that shows a listing of all nodes of node-type "car", and 
+you enable the "Domain Access" argument type:
+
+    -- If you go to www.example.com/cars/3 you will see a listing of all nodes of type 
+        car that are assigned to domain 3.
+
+    -- If you go to domain4.example.com/cars/current you will see a listing of all nodes of 
+        type car that are assigned to domain4.
+
+    -- If the argument value is not set in your View, it will display the default view which can 
+        be "page not found", a summary view or any of the other defaults.
+
+You can get the view to filter by the current domain by default by pasting the following 
+code in "Argument Handling Code" text box . This will cause the view to always see the id of 
+the current domain as first argument if no argument has been passed in.
+
+    // Make the first argument "current" if it is not already set
+    if (!$args[0]) {
+      $args[0] = 'current';
+    }
+    return $args;
+
+For more on Views Arguments, see the documentation on argument handlers for views at:
+
+    http://drupal.org/node/54455. 
 
 ----
 4.  Filters
@@ -74,3 +99,6 @@ However, for users without the 'administer nodes' permission, the content must
 be viewable on the active domain.  If you wish to make all content in the View
 available to all domains, you should configure the 'Special page requests'
 setting provided by the Domain Access module.
+
+When using Views filters, you must select at least one criteria for the filter to 
+be applied.

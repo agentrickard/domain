@@ -75,7 +75,7 @@ function domain_conf_domainlinks($domain) {
  */
 function domain_conf_form_alter($form_id, &$form) {
   // Set a message if we are on an admin page.
-  domain_conf_warning();
+  domain_conf_warning_check($form_id);
   // We use the system_site_information_settings form as a base, and add the elements we need
   // from other forms.  The default values are altered based on stored settings.
   if ($form_id == 'system_site_information_settings') {
@@ -182,6 +182,10 @@ function domain_conf_form_alter($form_id, &$form) {
       
       // Domain information, for saving.
       $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+      
+      // Grab any extra elements defined by other modules.
+      $extra = module_invoke_all('domainconf', $domain);
+      $form = array_merge($form, $extra);
   
       // Submit functions
       $form['#submit']['domain_conf_form_submit'] = array();
@@ -194,6 +198,7 @@ function domain_conf_form_alter($form_id, &$form) {
     }  
   }
 }
+
 
 /**
  * FormsAPI
@@ -228,22 +233,34 @@ function domain_conf_form_submit($form_id, $form_values) {
  *
  * @ingroup conf
  */
-function domain_conf_warning() {
+function domain_conf_warning_check($form_id) {
   static $_warning;
-  if (empty($_warning)) {
+  // If $_POST is set, we are submitting the form and should not set a message.
+  if (!$_POST && empty($_warning)) {
     global $_domain;
-    $arg = arg(0);
-    $type = arg(1);
-    $module = arg(2);
-    $action = arg(3);
-    // The default domain has domain_id zero.
-    if ($arg == 'admin' && $module != 'domain' && $_domain['domain_id'] != 0) {
+    // Add the list of forms
+    $forms = array();     
+    $forms = module_invoke_all('domainwarnings');
+    if (arg(2) != 'domain' && in_array($form_id, $forms)) {
       $default = domain_default();
       $_path = domain_get_uri($default);
       drupal_set_message(t('You are viewing #this. This form may need to be entered from <a href="!url">!domain</a>', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'])));
     }
     $_warning = TRUE;
   }  
+}
+
+/**
+ * Implements hook_domainwarnings()
+ */
+function domain_conf_domainwarnings() { 
+  // These are the forms for variables set by Domain Conf.
+  return array(
+    'system_admin_theme_settings',
+    'system_date_time_settings',
+    'system_site_information_settings',
+    'system_site_maintenance_settings'
+  );
 }
 
 /**

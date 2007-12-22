@@ -1,5 +1,5 @@
 ;  $Id $
 name = Domain Content
-description = Provides a Content list screen for each active domain.
+description = Provides a content batch editing screen for each active domain.
 package = Domain Access
 dependencies = domain

@@ -1,9 +1,22 @@
 // $Id$
 
-16-DEV-2007
+21-DEC-2007
+
+-- Adds hook_domainconf() to Domain Conf; inspired by #202917 and #202671.
+-- #202286 by mrichar1.  Improves the documentation for Domain Views.
+-- #202714 by derjochenmeyer.  The Domain Content form accidentally acted
+    on nid == 0 and created errors in the {node_access} table.
+-- #202392 by derjochenmeyer.  str_ireplace() is PHP 5 only.  We also need to 
+    strtolower() the incoming url host.  Fix applies to Domain Conf and Domain Prefix 
+    as well.
+-- Adds hook_domainwarnings() to Domain Conf to print form messages only
+    for select forms.
+
+16-DEC-2007
 
 -- Removes a stray debug print_r.
 -- Updates documentation with regard to #201156.
+-- Creates rc1.
 
 15-DEC-2007
 
