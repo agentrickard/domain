@@ -1101,7 +1101,7 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   $check = domain_grant_all();
   $seo = variable_get('domain_seo', 0);
 
-  if (TRUE || !$skip && ($check || $seo)) {
+  if (!$skip && ($check || $seo)) {
     // Check to see if this is a node or comment link and set $nid accordingly.
     // We static the $nid results to make this more efficient.
     $pattern = explode('/', $path);    

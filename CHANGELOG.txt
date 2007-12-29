@@ -1,5 +1,9 @@
 // $Id$
 
+29-DEC-2007
+
+-- A leftover TRUE check inside domain_url_alter() was removed.
+
 22-DEC-2007
 
 -- Fixes logic error in domain_conf_warning_check().
