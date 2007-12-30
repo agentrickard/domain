@@ -42,5 +42,6 @@ function domain_user_uninstall() {
   variable_del('domain_user');
   variable_del('domain_user_root');
   variable_del('domain_user_scheme');  
+  variable_del('domain_user_login');    
   variable_del('domain_user_prefixing');  
 }

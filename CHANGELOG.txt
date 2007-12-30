@@ -1,5 +1,10 @@
 // $Id$
 
+30-DEC-2007
+
+-- Removes DANGEROUS_SKIP_CHECK from Domain Prefix.  Good.
+-- Fixes Domain User module.
+
 29-DEC-2007
 
 -- A leftover TRUE check inside domain_url_alter() was removed.

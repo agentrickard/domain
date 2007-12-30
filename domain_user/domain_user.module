@@ -6,6 +6,21 @@
  * Creates unique subdomains for registered users.
  */
 
+/** 
+ * Implements hook_init()
+ *
+ * We have to do this because we cannot redirect on login.
+ *
+ * @ingroup user
+ */
+function domain_user_init() {
+  if (isset($_SESSION['domain_user'])) {
+    $domain = domain_user_lookup($_SESSION['domain_user']);
+    unset($_SESSION['domain_user']);
+    domain_goto($domain);
+  }
+}
+
 /**
  * Implements hook_menu()
  *
@@ -63,11 +78,17 @@ function domain_user_configure_form() {
   $form['domain_user_scheme'] = array(
     '#type' => 'radios',
     '#title' => t('User Domain URL scheme'),
-    '#required' => TRUE,
     '#options' => array('http' => 'http://', 'https' => 'https://'),
     '#default_value' => variable_get('domain_user_scheme', 'http'),
     '#description' => t('The URL scheme for accessing user domains.')
   );     
+  $form['domain_user_login'] = array(
+    '#type' => 'radios',
+    '#title' => t('User Login behavior'),
+    '#options' => array(1 => t('On login, go to personal domain'), 0 => t('Do not go to personal domain on login')),
+    '#default_value' => variable_get('domain_user_login', 1),
+    '#description' => t('The domain users should go to when they login to the site.')
+  );      
   if (module_exists('domain_prefix')) {
     $form['domain_user_prefixing'] = array(
       '#type' => 'radios',
@@ -89,7 +110,7 @@ function domain_user_configure_form() {
   $form['rules'] = array(
     '#type' => 'markup',
     '#weight' => 20,
-    '#value' => '<br /><br />'. t('<h3>Reserved Usernames</h3><p>The following usernames cannot be registered, since they are used as subdomains:</p></div>'). $output,
+    '#value' => '<p>'. t('<h3>Reserved Usernames</h3><p>The following usernames cannot be registered, since they are used as unique subdomains:</p></div>'). $output . '</p>',
   );
   return system_settings_form($form);
 }
@@ -189,37 +210,48 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
     case 'register':
     case 'form':
       // This function will return -1 if no domain exists.
-      $domain = domain_user_lookup(NULL, $account->uid);    
+      $domain = domain_user_lookup($account->uid);    
       if ($domain == -1) {
         // The module must be configured properly. 
         $default = domain_default();
         $root = variable_get('domain_user_root', $default['subdomain']);
         $create_domain = variable_get('domain_user', 0);
-        if ($create_domain == 1 && !empty($root)) {
-          $form['domain_user']['domain_create_user'] = array(
-            '#type' => 'value',
-            '#value' => 1,
-          );
+        print $create_domain;
+        if (user_access('create personal domain')) {
+          if ($create_domain == 1 && !empty($root)) {
+            $form['domain_user_domain']['domain_create_user'] = array(
+              '#type' => 'value',
+              '#value' => 1,
+            );
+          }  
+          else if ($create_domain == 2 && !empty($root)) {
+            $form['domain_user_domain'] = array(
+              '#type' => 'fieldset',
+              '#title' => t('Personal web site'),
+              '#collapsible' => TRUE,
+              '#collapsed' => FALSE,
+              '#weight' => 1
+            );            
+            $name = t('username');            
+            if (isset($account->name)) {
+              $name = domain_user_strip_chars($account->name);
+            }
+            $form['domain_user_domain']['domain_create_user'] = array(
+              '#type' => 'checkbox',
+              '#return_value' => 1,
+              '#title' => t('Yes, I want to create my own site at <b>!user.!site</b>', array('!user' => $name, '!site' => $root)),
+            );      
+          }
+          return $form;
         }  
-        else if ($create_domain == 2 && !empty($root)) {
-          $form['domain_user']['domain_create_user'] = array(
-            '#type' => 'checkbox',
-            '#return_value' => 1,
-            '#title' => t('Would you like to create your own site at <b>YOURNAME.!site</b>', array('!site' => $root)),
-          );      
-        }
-        return $form;
       }  
       break;
-    case 'submit':
     case 'insert':
+    case 'update':
+                print 'yo';
       if ($edit['domain_create_user'] && user_access('create personal domain', $account)) {
         $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
-        $name = $account->name;
-        // Only alphanumeric characters are allowed.
-        $pattern = '/[^a-zA-Z0-9]/';
-        $name = preg_replace($pattern, '-', $name);
-        $name = strtolower($name);
+        $name = domain_user_strip_chars($account->name);
         $form_values['sitename'] = $account->name;
         $form_values['subdomain'] = $name .'.'. $user_root;
         $form_values['valid'] = $account->status;
@@ -246,10 +278,12 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
         }
         // Set the user's default domain to their subdomain.
         if ($domain['domain_id']) {
-          // TODO:
-          // If the user has no special privileges, then they can only edit their domain?
-          // This section of code needs work.
-          $edit['domains'][] = $domain['domain_id'];
+          // If the user cannot set domain access, only allow their unique domain.
+          if (!user_access('set domain access')) {
+            print 'yo';
+            $edit['domain_user'] = array();
+          }
+          $edit['domain_user'][$domain['domain_id']] = $domain['domain_id'];
           // If the user account is blocked, set the domain to invalid.
           if ($account->status == 0) {
             db_query("UPDATE {domain} SET valid = 0 WHERE domain_id = %d", $domain['domain_id']);
@@ -258,6 +292,18 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       }
       if ($edit['domain_create_user'] && !user_access('create personal domain', $account)) {
         drupal_set_message(t('Your personal URL could not be created.'));
+      }
+      // Throw away what we do not need.
+      $edit['domain_create_user'] = NULL;
+      $edit['domains'] = NULL;
+      break;
+    case 'login':
+      // If the user has a personal domain, take them there.
+      $domain = domain_user_lookup($account->uid);
+      if (variable_get('domain_user_login', 1) && $domain != -1) {
+        // We cannot do a redirect on login, which forces us to use a $_SESSION variable.
+        // Only store the uid here, no need to store extra data where it can get hijacked.
+        $_SESSION['domain_user'] = $account->uid;
       }
       break;
     case 'delete':
@@ -271,6 +317,23 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       }
       break;
   }
+}
+
+/**
+ * Turn a user name into a domain-safe string.
+ *
+ * @param $name
+ * The user name to process.
+ * @return
+ * A string with only alphanumeric characters and dashes.
+ *
+ * @ingroup user
+ */
+function domain_user_strip_chars($name) {
+  // Only alphanumeric characters are allowed.
+  $pattern = '/[^a-zA-Z0-9]/';
+  $name = preg_replace($pattern, '-', $name);
+  return strtolower($name);  
 }
 
 /**

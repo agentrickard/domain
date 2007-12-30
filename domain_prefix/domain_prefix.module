@@ -221,7 +221,6 @@ function domain_prefix_configure_form() {
         '#title' => '',
         '#options' => $sources,
         '#default_value' => $source_defaults['_source_'. $table],
-        '#DANGEROUS_SKIP_CHECK'=> TRUE, // I don't know why this is needed!        
       );
     }  
   }
@@ -440,7 +439,6 @@ function domain_prefix_form($domain_id, $arguments = array()) {
         '#title' => '',
         '#options' => $sources,
         '#default_value' => $source_defaults['_source_'. $table],
-        '#DANGEROUS_SKIP_CHECK'=> TRUE, // I don't know why this is needed!        
       );      
     }  
   }
