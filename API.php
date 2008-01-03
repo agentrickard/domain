@@ -98,7 +98,6 @@
 function hook_domaingrants(&$grants, $account, $op) {
   // Add a sample grant privilege to let a user see their content at all times.
   $grants['domain_example'][] = $account->uid;
-  return $grants;
 }
 
 
@@ -135,7 +134,6 @@ function hook_domainrecords(&$grants, $node) {
       unset($grants[$key]);
     }
   }  
-  return $grants;
 }
 
 /**

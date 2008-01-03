@@ -1,5 +1,11 @@
 // $Id$
 
+02-JAN-2008
+
+-- Adds documentation to Domain User.
+-- Creates rc2.
+-- Fixes minor API documentation issues.
+
 30-DEC-2007
 
 -- Removes DANGEROUS_SKIP_CHECK from Domain Prefix.  Good.

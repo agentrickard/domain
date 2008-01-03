@@ -84,7 +84,7 @@ function domain_user_configure_form() {
   );     
   $form['domain_user_login'] = array(
     '#type' => 'radios',
-    '#title' => t('User Login behavior'),
+    '#title' => t('User login behavior'),
     '#options' => array(1 => t('On login, go to personal domain'), 0 => t('Do not go to personal domain on login')),
     '#default_value' => variable_get('domain_user_login', 1),
     '#description' => t('The domain users should go to when they login to the site.')
@@ -216,7 +216,6 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
         $default = domain_default();
         $root = variable_get('domain_user_root', $default['subdomain']);
         $create_domain = variable_get('domain_user', 0);
-        print $create_domain;
         if (user_access('create personal domain')) {
           if ($create_domain == 1 && !empty($root)) {
             $form['domain_user_domain']['domain_create_user'] = array(
@@ -248,7 +247,6 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       break;
     case 'insert':
     case 'update':
-                print 'yo';
       if ($edit['domain_create_user'] && user_access('create personal domain', $account)) {
         $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
         $name = domain_user_strip_chars($account->name);
@@ -280,7 +278,6 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
         if ($domain['domain_id']) {
           // If the user cannot set domain access, only allow their unique domain.
           if (!user_access('set domain access')) {
-            print 'yo';
             $edit['domain_user'] = array();
           }
           $edit['domain_user'][$domain['domain_id']] = $domain['domain_id'];

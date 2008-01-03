@@ -163,7 +163,7 @@ Some issues:
 ----
 4.1   Database Schema
 
-Installing the module creates a {domain_conf} table that contains:
+Installing the module creates a {domain_prefix} table that contains:
 
   - domain_id
   Integer, unique
