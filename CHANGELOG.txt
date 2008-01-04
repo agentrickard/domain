@@ -1,5 +1,20 @@
 // $Id$
 
+03-JAN-2008
+
+-- #197488 by Daryljames with special assistance from salvis.
+    Fixes Domain Access to step aside during cron runs.  This allows
+    modules such as Subscriptions to function correctly.
+-- Adds the {domain_access} table to prevent issues related to
+    node_access_rebuild().  See http://groups.drupal.org/node/7956
+    and #205045 by chaldar.
+-- Updates the README.
+-- Cleans up domain_enable() based on the above.   
+-- Edits Domain Content to make changes to {domain_access} as well.
+-- Requires update.php.   
+-- More information in the Domain User README.
+-- Removed a debugging line.
+
 02-JAN-2008
 
 -- Adds documentation to Domain User.

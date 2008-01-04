@@ -130,7 +130,11 @@ function domain_menu($may_cache) {
       'type' => MENU_CALLBACK,
       'callback' => 'domain_admin',
       'callback arguments' => array('delete', arg(4))      
-    );    
+    );
+    // Make sure that our default grant is set at all times.
+    if (arg(0) == 'admin') {
+      domain_set_default_grant();
+    }  
   }
   return $items;
 }
@@ -536,7 +540,7 @@ function domain_goto($domain) {
  * Implements hook_nodeapi().
  *
  * This function is used to provide debugging information and to prep values from
- * the {node_access} table when editing nodes.  Since not all users can see the 
+ * the {domain_access} table when editing nodes.  Since not all users can see the 
  * domain access editing checkboxes, we pass some node_access values as hidden elements.
  *
  * @ingroup node
@@ -549,10 +553,9 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       $node->domains = array();
       $node->editors = array();
       $node->domain_site = FALSE;
-      $node->url = 'test';
-      $result = db_query("SELECT gid, realm, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = %d AND (realm = '%s' OR realm = '%s' OR realm = '%s')", $node->nid, 'domain_id', 'domain_site', 'domain_editor');
+      $result = db_query("SELECT gid, realm, grant_view, grant_update, grant_delete FROM {domain_access} WHERE nid = %d AND (realm = '%s' OR realm = '%s' OR realm = '%s')", $node->nid, 'domain_id', 'domain_site', 'domain_editor');
       while ($data = db_fetch_object($result)) {
-        // Transform the 0 to -1, since {node_access} is unsigned.
+        // Transform the 0 to -1, since {domain_access} is unsigned.
         ($data->gid == 0) ? $gid = -1 : $gid = $data->gid;
         if ($data->realm == 'domain_id') {
           $node->domains[] = $gid;
@@ -609,6 +612,10 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
           }
         }
       }  
+      break;
+    case 'delete':
+      // Remove records from the {domain_access} table.
+      db_query("DELETE FROM {domain_access} WHERE nid = %d", $node->nid);
       break;
   }
 } 
@@ -809,29 +816,56 @@ function domain_node_access_records($node) {
       $function($grants, $node);
     }  
   }
-
+  // Store these records in our own table as well.
+  _domain_write_records($node->nid, $grants);
+  
   return $grants;
 }
+
+/**
+ * Store node_access records in the {domain_access{} table.
+ *
+ * @param $nid
+ * The node id being acted upon.
+ * @param $grants
+ * The grants passed by hook_node_access_records().
+ *
+ * @ingroup node
+ */
+function _domain_write_records($nid, $grants = array()) { 
+  if ($nid > 0 && !empty($grants)) {
+    db_query("DELETE FROM {domain_access} WHERE nid = %d", $nid);
+    foreach ($grants as $grant) {
+      db_query("INSERT INTO {domain_access} 
+      (nid, gid, realm, grant_view, grant_update, grant_delete)
+      VALUES (%d, %d, '%s', %d, %d, %d)",
+      $nid, $grant['gid'], $grant['realm'], $grant['grant_view'], $grant['grant_update'], $grant['grant_delete']);
+    }
+  }
+}  
 
 /**
  * Upon enabling this module, store the default view grant
  * in the {node_access} table. 
  * @see domain_grant_all()
  *
- * @ingroup domain
+ * @ingroup node
  */
 function domain_enable() {
   domain_enabling(TRUE);
-  $modules = module_implements('node_grants');
-  // If this is the only node access module, delete all records from {node_access}
-  if (count($modules) == 1 && $modules[0] == 'domain') {
-    db_query("DELETE FROM {node_access}");
-  }  
   // Rebuild the node access table with our rules.
   node_access_rebuild();
-  // Clean up the {node_access} table and add our default grant.
+  // Set the default 'domain_all' grant for special pages.
+  domain_set_default_grant();  
+}
+
+/**
+ * Ensure that the 'domain_all' grant is present.
+ *
+ * @ingroup domain
+ */
+function domain_set_default_grant() {
   $check = db_result(db_query("SELECT COUNT(nid) FROM {node_access} WHERE realm = 'domain_all' AND gid = 0"));
-  db_query("DELETE FROM {node_access} WHERE nid = 0 AND realm = 'all'");
   if (!$check) {
     db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");
   }
@@ -857,20 +891,11 @@ function domain_enabling($set = NULL) {
  */
 function domain_disable() {
   domain_disabling(TRUE);
-  // Delete our all access row from {node_access}.
-  db_query("DELETE FROM {node_access} WHERE realm = 'domain_all' AND gid = 0");
   // This lets us control how the module updates the {node_access} table.
   variable_del('domain_behavior');
   variable_del('domain_editors');
-  $modules = module_implements('node_grants');
-  // If this is the only node access module, delete all records from {node_access}
-  if (count($modules) == 1 && $modules[0] == 'domain') {
-    db_query("DELETE FROM {node_access}");
-    db_query("INSERT INTO {node_access} VALUES (0, 0, 'all', 1, 0, 0)");
-  }
-  else {
-    node_access_rebuild();
-  }  
+  // Rebuild the node access table.  Other modules have to fend for themselves here.
+  node_access_rebuild();
 }  
 
 /**
@@ -1128,13 +1153,13 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
       // Remove redundancy from the domain_site check.
       if (!isset($domain_site[$nid])) {
         // If this check works, we don't need to rewrite the path unless SEO rules demand it.
-        $domain_site[$nid] = db_result(db_query("SELECT grant_view FROM {node_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
+        $domain_site[$nid] = db_result(db_query("SELECT grant_view FROM {domain_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
       }  
       if (!$domain_site[$nid]) {
         // Remove rendundancy from the domain_id check.
         if (!isset($domain[$nid])) {
           // Load the domain data for this node -- but we're only taking the first match.
-          $id = db_result(db_query_range("SELECT gid FROM {node_access} WHERE nid = %d AND realm = '%s' AND grant_view = 1", $nid, 'domain_id', 0, 1));
+          $id = db_result(db_query_range("SELECT gid FROM {domain_access} WHERE nid = %d AND realm = '%s' AND grant_view = 1", $nid, 'domain_id', 0, 1));
           $domain[$nid] = domain_lookup($id);
         }  
         // Can we and do we need to rewrite this path?
@@ -1156,7 +1181,7 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
 /**
  * Activate the hidden grant for searches.
  *
- * @param $rest
+ * @param $reset
  *   A boolean flag indicating whether to reset the static variable or not.
  * @return
  *  TRUE or FALSE, depending on whether the grants should be executed for this page.
@@ -1164,11 +1189,17 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
  */
 function domain_grant_all($reset= FALSE) {
   static $grant;
-  if (!isset($grant) || $reset) {
+  if (!isset($grant['set']) || $reset) {
     // Search is the easy case, so we check it first.
     $search = variable_get('domain_search', 0);
     if ($search && arg(0) == 'search') {
       $grant = TRUE;
+    }
+    // On cron runs, we normally have to disable Domain Access.  See http://drupal.org/node/197488.
+    else if (variable_get('domain_cron_rule', 1)) {
+      if ($script == 'cron.php') {
+        $grant = TRUE;
+      }
     }
     else {
       // We check the paths registered by the special pages setting.
@@ -1185,8 +1216,9 @@ function domain_grant_all($reset= FALSE) {
         $grant = TRUE;
       }
     }  
+    $grant['set'] = $grant;
   }  
-  return $grant;
+  return $grant['set'];
 }
 
 /**
@@ -1208,7 +1240,9 @@ function domain_domainupdate($op, $domain = array(), $edit = array()) {
       if ($domain != -1) {
         // Remove domain-specific entries from the {node_access} table and clear the cache.
         db_query("DELETE FROM {node_access} WHERE realm = 'domain_id' AND gid = %d", $domain['domain_id']);
-        db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);  
+        db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);
+        db_query("DELETE FROM {domain_access} WHERE realm = 'domain_id' AND gid = %d", $domain['domain_id']);
+        db_query("DELETE FROM {domain_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);          
         cache_clear_all();
       }  
       break;

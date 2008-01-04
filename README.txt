@@ -14,8 +14,12 @@ CONTENTS
 1.  Introduction
 1.1   Use-Case
 1.2   Examples
-1.3   Using Multiple Node Access Modules
-1.4   Sponsors
+1.3   Sponsors
+1.4   Using Multiple Node Access Modules
+1.5   Known Issues
+1.5.1   Logging In To Multiple Domains
+1.5.2   Cron Handling
+1.5.3   Updating Your Site
 2.  Installation
 2.1   Patches to Drupal Core
 2.1.1   multiple_node_access.patch
@@ -47,6 +51,7 @@ CONTENTS
 4.3.4   WWW Prefix Handling
 4.3.5   Node Access Settings
 4.4   Special Page Requests
+4.4.1   Cron Handling
 4.5   Node Link Patterns
 4.6   The Domain List
 4.7   Creating Domain Records
@@ -124,7 +129,13 @@ editors have no control over which subdomains their content is published to.
 For the original example of the module in use, see http://skirt.com/
 
 ----
-1.3   Using Multiple Node Access Modules
+1.3 Sponsors
+
+Domain Access is sponsored by Morris DigitalWorks.
+  http://morrisdigitalworks.com
+  
+----
+1.4   Using Multiple Node Access Modules
 
 Node Access is a complex issue in Drupal.  Typically, sites will only use
 one node access module at a time.  In some cases, you may require 
@@ -158,11 +169,64 @@ For background, see:
   -- http://drupal.org/node/201156
 
 ----
-1.4 Sponsors
+1.5   Known Issues
 
-Domain Access is sponsored by Morris DigitalWorks.
-  http://morrisdigitalworks.com
+There are some issues that occur when Domain Access is used outside
+of its original use case.  These are probably fixable, but may not work
+as you expect.  You should pay careful attention to your site behavior.
+
+----
+1.5.1   Logging In To Multiple Domains
+
+The Domain Access module allows the creation of domains with different
+hosts.  However, security standards dictate that cookies can only be
+read from the issuing domain.
+
+As a result, you may configure your site as follows, but when you do so, 
+users cannot be logged through a single sign in.  
+
+  example.com
+  one.example.com
+  myexample.com
+  thisexample.com
+
+While example.com and one.example.com can share a login cookie, the
+other two domains cannot read that cookie.  This is an internet standard,
+not a bug.
+
+This issue is looking for solutions.
+
+Note: See the INSTALL.txt for instructions regarding Drupal's default
+cookie handling.
+
+----
+1.5.2   Cron Handling
+
+When Drupal's cron function runs, it operates on the domain from which
+the cron.php script is invoked.  That is, if you setup cron to run from:
+
+  http://one.example.com/cron.php
   
+In this case, Domain Access will check the access settings for that domain.
+
+This behavior has been known to cause issues with other contributed modules. 
+As a solution, we normally disable Domain Access rules when cron runs.
+
+For more information, see section 4.4.1 Cron Handling.
+
+If you encounter any cron-related issues, please report them at:
+
+http://drupal.org/project/issues/domain
+
+----
+1.5.3   Updating Your Site
+
+This issue only occurs if you use the Domain Prefix module.  It is possible
+that database updates will not be applied to prefixed tables.
+
+For more information, see the Drupal Upgrades section of the Domain Prefix
+README.txt file.
+
 ----
 2.  Installation
 
@@ -661,6 +725,26 @@ By default, 'user/*/track' is in this list.
 Note that the 'search' path is handled separately and need not be added here.
 
 ----
+4.4.1  Cron Handling
+
+When Drupal's cron function runs, it runs on a specific domain.  This forces
+Domain Access to invoke its access control rules, which may not be desired.
+
+In most use cases, you will want Domain Access to allow access to all nodes 
+during cron runs.  For modules such as Subscriptions, this behavior is 
+required unless all your content is assigned to "all affiliates."
+
+To reflect this, Domain Access provides a configuration option labelled:
+
+  [x] Treat cron.php as a special page request
+  
+This option is turned on by default.  In almost all cases, you should leave
+this option checked.  Doing so allows Domain Access to ignore access checks
+for nodes when cron runs.  
+
+Note that this does not affect node access permissions set by other modules.
+
+----
 4.5   Node Link Patterns
 
 When using this module, there are times when hook_url_alter() will need
@@ -942,10 +1026,15 @@ required, but each adds functionality to the core module.
   - Domain Prefix -- A powerful module that allows for selective table prefixing
   for each subdomain in your installation.
   
+  - Domain Strict -- Forces users to be assigned to a domain in order to view
+  content on that domain.
+  
   - Domain Theme -- Allows separate themes for each subdomain.
 
   - Domain User -- Allows the creation of specific subdomains for each active
   site user.
+  
+  - Domain Views -- Provides a Views filter for the Domain Access module.  
 
 ----
 6.2 The $_domain Global
@@ -973,7 +1062,7 @@ Some uses for this global variable might include:
 ----
 6.3 Database Schema
 
-The Domain Access module creates one table in a Drupal installation.  It 
+The Domain Access module creates two tables in a Drupal installation.  {domain} 
 contains the following structure:
 
   - domain_id
@@ -998,6 +1087,28 @@ contains the following structure:
   Char, 1 default 1
   Indicates that this domain is active and can be accessed by site users.
   
+The {domain_access} table is a mirror of the {node_access} table and stores 
+information specific to Domain Access.  Its structure is:
+
+  - nid 
+  Integer, unsigned NOT NULL default '0,
+
+  - gid 
+  Integer, unsigned NOT NULL default '0'
+  
+  - realm 
+  Varchar, 255 NOT NULL default ''
+  
+  - grant_view 
+  Integer, unsigned NOT NULL default '0',
+
+  - grant_update
+  Integer, unsigned NOT NULL default '0',
+
+  - grant_delete 
+  Integer, unsigned NOT NULL default '0',
+
+  
 ----
 6.4 API
 
@@ -1005,6 +1116,10 @@ The Domain Access module has an API for internal module hooks.  Documentation is
 included in the download as API.php and can be viewed online at:
 
   http://therickards.com/api
+  
+The most important developer functions are the internal module hooks:
+
+  http://therickards.com/api/group/hooks/Domain
 
 ----
 7. To Do

@@ -367,16 +367,21 @@ function domain_content_update_nodes($form_id, $form_values) {
     foreach ($form_values['nodes'] as $nid) {
       if ($nid > 0) {
         // Delete anything not selected.
+        // We have to update both the {node_access} and {domain_access} tables.
         db_query("DELETE FROM {node_access} WHERE nid = %d AND realm IN ('domain_id', 'domain_site', 'domain_editor')", $nid);
+        db_query("DELETE FROM {domain_access} WHERE nid = %d", $nid);
         if ($domain_site) {
           db_query("INSERT INTO {node_access} VALUES (%d, 0, 'domain_site', 1, 0, 0)", $nid);
+          db_query("INSERT INTO {domain_access} VALUES (%d, 0, 'domain_site', 1, 0, 0)", $nid);          
         }
         if (!empty($domains)) {
           foreach ($domains as $id) {
             db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_id', 1, 0, 0)", $nid, $id);
+            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_id', 1, 0, 0)", $nid, $id);            
           }
           if ($editor) {
             db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $nid, $id);
+            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $nid, $id);            
           }
         }
       }

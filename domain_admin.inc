@@ -288,7 +288,7 @@ function domain_configure_form($user_submitted = FALSE) {
     '#collapsed' => TRUE  
   );
   
-   $form['domain_all']['domain_grant_all'] = array(
+  $form['domain_all']['domain_grant_all'] = array(
     '#type' => 'textarea',
     '#rows' => 5,
     '#cols' => 40,
@@ -297,6 +297,13 @@ function domain_configure_form($user_submitted = FALSE) {
       You may use the * as a wildcard.  Use this for aggregate pages like those provided by <a href="!url">MySite</a> or if you
       intend to show all user posts on a specific page.  See the README for more details.', array('!url' => 'http://drupal.org/project/mysite'))    
   ); 
+  
+  $form['domain_all']['domain_cron_rule'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('domain_cron_rule', 1),
+    '#title' => t('Treat cron.php as a special page request.'),
+    '#description' => t('Normally, you should leave this setting active.  See the README for more information.')
+  );
   // The hook_url_alter() patch must be present for these settings to be applied.
   if (!$disabled) {
     $form['domain_paths'] = array(
@@ -334,12 +341,14 @@ function domain_admin_editor_form($form_id, $form_values) {
     $result = db_query("SELECT nid, gid FROM {node_access} WHERE realm = 'domain_site'");
     while ($data = db_fetch_array($result)) {
       db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $data['nid'], $data['gid']);
+      db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $data['nid'], $data['gid']);      
     }
     $clear = TRUE;
   }
   else if ($form_values['domain_editors_status'] == 1 && $form_values['domain_editor'] == 0) {
     // Remove rules
     db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor'");
+    db_query("DELETE FROM {domain_access} WHERE realm = 'domain_editor'");    
     $clear = TRUE;
   }
   // We have reset the node_access table and need to clear the cache.

@@ -16,6 +16,7 @@ CONTENTS
 2.1   Dependencies
 2.2   Domain User and User Registration
 3.  Permissions
+3.1   Edit Domain Nodes
 4.   Configuration Options
 4.1   Module Behavior
 4.2   Root Domain Name
@@ -108,6 +109,14 @@ this permission to anonymous users.
 
 Users with this permission will have their personal domain created either:
 on registration or on updating their account.
+
+----
+3.1   Edit Domain Nodes
+
+By design, all users will be assigned to the Domain that they create.  This 
+grants them access to edit nodes posted to their domain.  To enable this
+feature, a user must have the "edit domain nodes" permission granted by
+the core Domain Access module.
 
 ----
 4.   Configuration Options

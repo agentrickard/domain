@@ -21,7 +21,17 @@ function domain_install() {
         valid varchar(1) NOT NULL default 1,        
         PRIMARY KEY  (domain_id),
         KEY subdomain (subdomain)
-        ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
+      db_query("CREATE TABLE {domain_access} (
+        nid int unsigned NOT NULL default '0',
+        gid int unsigned NOT NULL default '0',
+        realm varchar(255) NOT NULL default '',
+        grant_view tinyint unsigned NOT NULL default '0',
+        grant_update tinyint unsigned NOT NULL default '0',
+        grant_delete tinyint unsigned NOT NULL default '0',
+        PRIMARY KEY (nid,gid,realm),
+        INDEX (nid)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");        
       break;
     case 'pgsql':
       db_query("CREATE TABLE {domain} (
@@ -33,6 +43,16 @@ function domain_install() {
         PRIMARY KEY (domain_id)
         )");   
       db_query("CREATE INDEX {domain}_subdomain_idx ON {domain} (subdomain)");
+      db_query("CREATE TABLE {domain_access} (
+        nid int_unsigned NOT NULL default '0',
+        gid int_unsigned NOT NULL default '0',
+        realm varchar(255) NOT NULL default '',
+        grant_view smallint_unsigned NOT NULL default '0',
+        grant_update smallint_unsigned NOT NULL default '0',
+        grant_delete smallint_unsigned NOT NULL default '0',
+        PRIMARY KEY (nid,gid,realm)
+      )");      
+      db_query("CREATE INDEX {domain_access}_nid_idx ON {domain_access} (nid)");      
       break;
   } 
   // Create the 'all' realm for Domain Access.
@@ -44,6 +64,7 @@ function domain_install() {
  */
 function domain_uninstall() {
   db_query("DROP TABLE {domain}");
+  db_query("DROP TABLE {domain_access}");  
   db_query("DELETE from {variable} WHERE name LIKE '%s%%'", 'domain_');
 }
 
@@ -63,7 +84,56 @@ function domain_update_1() {
       db_add_column($ret, 'domain', 'valid', 'varchar(1)', array('not null' => TRUE, 'default' => 1));
       break;
   }
-
   return $ret;  
 }
- 
+
+/**
+ * Updates from rc2 to rc3.  Adds the {domain_access} table and copies
+ * data from {node_access} to {domain_access}.
+ *
+ * Required to prevent deletions during node_access_rebuild().
+ * See http://groups.drupal.org/node/7956
+ */
+function domain_update_2() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':     
+      $ret[] = update_sql("CREATE TABLE {domain_access} (
+        nid int unsigned NOT NULL default '0',
+        gid int unsigned NOT NULL default '0',
+        realm varchar(255) NOT NULL default '',
+        grant_view tinyint unsigned NOT NULL default '0',
+        grant_update tinyint unsigned NOT NULL default '0',
+        grant_delete tinyint unsigned NOT NULL default '0',
+        PRIMARY KEY (nid,gid,realm),
+        INDEX (nid)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");      
+      break;
+    case 'pgsql':
+      $ret[] = update_sql("CREATE TABLE {domain_access} (
+        nid int_unsigned NOT NULL default '0',
+        gid int_unsigned NOT NULL default '0',
+        realm varchar(255) NOT NULL default '',
+        grant_view smallint_unsigned NOT NULL default '0',
+        grant_update smallint_unsigned NOT NULL default '0',
+        grant_delete smallint_unsigned NOT NULL default '0',
+        PRIMARY KEY (nid,gid,realm)
+      )");     
+      $ret[] = update_sql("CREATE INDEX {domain_access}_nid_idx ON {domain_access} (nid)");   
+      break;
+  }
+  $realms = array('domain_site', 'domain_id', 'domain_editor');
+  foreach ($realms as $realm) {
+    $result = db_query("SELECT * FROM {node_access} WHERE realm = '%s'", $realm);
+    while ($data = db_fetch_array($result)) {
+      db_query("INSERT INTO {domain_access} 
+      (nid, gid, realm, grant_view, grant_update, grant_delete)
+      VALUES
+      (%d, %d, '%s', %d, %d, %d)",
+      $data['nid'], $data['gid'], $data['realm'], $data['grant_view'], $data['grant_update'], $data['grant_delete']);
+    }
+  }
+  return $ret;
+}
