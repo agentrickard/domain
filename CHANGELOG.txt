@@ -1,5 +1,12 @@
 // $Id$
 
+05-JAN-2008
+
+-- {domain_access} table does not need to store grant information.
+-- Moves invocation of _domain_write_access_records() to domain_nodeapi().
+-- Bug in domain_nodeapi() caused error during node_access_rebuild().
+-- Creates rc3.
+
 03-JAN-2008
 
 -- #197488 by Daryljames with special assistance from salvis.

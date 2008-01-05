@@ -372,16 +372,16 @@ function domain_content_update_nodes($form_id, $form_values) {
         db_query("DELETE FROM {domain_access} WHERE nid = %d", $nid);
         if ($domain_site) {
           db_query("INSERT INTO {node_access} VALUES (%d, 0, 'domain_site', 1, 0, 0)", $nid);
-          db_query("INSERT INTO {domain_access} VALUES (%d, 0, 'domain_site', 1, 0, 0)", $nid);          
+          db_query("INSERT INTO {domain_access} VALUES (%d, 0, 'domain_site')", $nid);          
         }
         if (!empty($domains)) {
           foreach ($domains as $id) {
             db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_id', 1, 0, 0)", $nid, $id);
-            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_id', 1, 0, 0)", $nid, $id);            
+            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_id')", $nid, $id);            
           }
           if ($editor) {
             db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $nid, $id);
-            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $nid, $id);            
+            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor')", $nid, $id);            
           }
         }
       }

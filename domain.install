@@ -26,9 +26,6 @@ function domain_install() {
         nid int unsigned NOT NULL default '0',
         gid int unsigned NOT NULL default '0',
         realm varchar(255) NOT NULL default '',
-        grant_view tinyint unsigned NOT NULL default '0',
-        grant_update tinyint unsigned NOT NULL default '0',
-        grant_delete tinyint unsigned NOT NULL default '0',
         PRIMARY KEY (nid,gid,realm),
         INDEX (nid)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");        
@@ -47,9 +44,6 @@ function domain_install() {
         nid int_unsigned NOT NULL default '0',
         gid int_unsigned NOT NULL default '0',
         realm varchar(255) NOT NULL default '',
-        grant_view smallint_unsigned NOT NULL default '0',
-        grant_update smallint_unsigned NOT NULL default '0',
-        grant_delete smallint_unsigned NOT NULL default '0',
         PRIMARY KEY (nid,gid,realm)
       )");      
       db_query("CREATE INDEX {domain_access}_nid_idx ON {domain_access} (nid)");      
@@ -104,9 +98,6 @@ function domain_update_2() {
         nid int unsigned NOT NULL default '0',
         gid int unsigned NOT NULL default '0',
         realm varchar(255) NOT NULL default '',
-        grant_view tinyint unsigned NOT NULL default '0',
-        grant_update tinyint unsigned NOT NULL default '0',
-        grant_delete tinyint unsigned NOT NULL default '0',
         PRIMARY KEY (nid,gid,realm),
         INDEX (nid)
       ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");      
@@ -116,9 +107,6 @@ function domain_update_2() {
         nid int_unsigned NOT NULL default '0',
         gid int_unsigned NOT NULL default '0',
         realm varchar(255) NOT NULL default '',
-        grant_view smallint_unsigned NOT NULL default '0',
-        grant_update smallint_unsigned NOT NULL default '0',
-        grant_delete smallint_unsigned NOT NULL default '0',
         PRIMARY KEY (nid,gid,realm)
       )");     
       $ret[] = update_sql("CREATE INDEX {domain_access}_nid_idx ON {domain_access} (nid)");   
@@ -128,11 +116,7 @@ function domain_update_2() {
   foreach ($realms as $realm) {
     $result = db_query("SELECT * FROM {node_access} WHERE realm = '%s'", $realm);
     while ($data = db_fetch_array($result)) {
-      db_query("INSERT INTO {domain_access} 
-      (nid, gid, realm, grant_view, grant_update, grant_delete)
-      VALUES
-      (%d, %d, '%s', %d, %d, %d)",
-      $data['nid'], $data['gid'], $data['realm'], $data['grant_view'], $data['grant_update'], $data['grant_delete']);
+      db_query("INSERT INTO {domain_access} VALUES (%d, %d, '%s')", $data['nid'], $data['gid'], $data['realm']);
     }
   }
   return $ret;

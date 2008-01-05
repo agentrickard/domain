@@ -341,7 +341,7 @@ function domain_admin_editor_form($form_id, $form_values) {
     $result = db_query("SELECT nid, gid FROM {node_access} WHERE realm = 'domain_site'");
     while ($data = db_fetch_array($result)) {
       db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $data['nid'], $data['gid']);
-      db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $data['nid'], $data['gid']);      
+      db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor')", $data['nid'], $data['gid']);      
     }
     $clear = TRUE;
   }

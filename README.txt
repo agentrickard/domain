@@ -1087,8 +1087,8 @@ contains the following structure:
   Char, 1 default 1
   Indicates that this domain is active and can be accessed by site users.
   
-The {domain_access} table is a mirror of the {node_access} table and stores 
-information specific to Domain Access.  Its structure is:
+The {domain_access} table is a partial mirror of the {node_access} table and
+stores information specific to Domain Access.  Its structure is:
 
   - nid 
   Integer, unsigned NOT NULL default '0,
@@ -1098,16 +1098,6 @@ information specific to Domain Access.  Its structure is:
   
   - realm 
   Varchar, 255 NOT NULL default ''
-  
-  - grant_view 
-  Integer, unsigned NOT NULL default '0',
-
-  - grant_update
-  Integer, unsigned NOT NULL default '0',
-
-  - grant_delete 
-  Integer, unsigned NOT NULL default '0',
-
   
 ----
 6.4 API
