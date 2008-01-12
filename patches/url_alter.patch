@@ -1,6 +1,6 @@
---- /Users/ken/Drupal Development/drupal-5.3/includes/common.inc	2007-10-17 17:28:59.000000000 -0400
-+++ includes/common.inc	2007-11-21 14:02:57.000000000 -0500
-@@ -1142,6 +1142,21 @@ function format_date($timestamp, $type =
+--- includes/common.inc.orig	2007-12-27 04:21:23.000000000 -0500
++++ includes/common.inc	2008-01-11 14:27:20.000000000 -0500
+@@ -1147,6 +1147,21 @@ function format_date($timestamp, $type =
   * alternative than url().
   */
  function url($path = NULL, $query = NULL, $fragment = NULL, $absolute = FALSE) {

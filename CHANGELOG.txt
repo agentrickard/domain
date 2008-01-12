@@ -4,6 +4,8 @@
 
 -- #208550 patch by smk-ka.   Cleans up code and logic errors in
     domain_grant_all() that causes nodes to be visible on all domains.
+--  Updates the patches to Drupal 5.6.
+--  Adds stubs for simpletests.
 
 05-JAN-2008
 

@@ -1,0 +1,23 @@
+<?php
+
+// $Id$
+
+/**
+ * @file 
+ * Simpletest for Domain Access
+ */
+class DomainCreateTest extends DrupalTestCase {
+
+  function get_info() {
+    return array(
+      'name' => t('Domain creation'),
+      'desc' => t('Create domain record and verify its consistency in the database.'),
+      'group' => t('Domain Access'),
+    );
+  }
+
+  function testCreateDomain() {
+    $domain = $this->randomName();
+  }
+
+}

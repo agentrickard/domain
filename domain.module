@@ -1252,3 +1252,13 @@ function domain_domainupdate($op, $domain = array(), $edit = array()) {
       break;
   }  
 }  
+
+/**
+* Implements hook_simpletest().
+*/
+function domain_simpletest() {
+  $module_name = 'domain';
+  $dir = drupal_get_path('module', $module_name). '/tests';
+  $tests = file_scan_directory($dir, '\.test$');
+  return array_keys($tests);
+}
