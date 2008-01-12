@@ -694,11 +694,11 @@ function domain_node_grants($account, $op) {
   
   // Let Domain Access module extensions act to override the defaults.
   static $_modules;
-  if (!isset($_modules['set'])) {
-    $_modules['set'] = module_implements('domaingrants');
+  if (!isset($_modules)) {
+    $_modules = module_implements('domaingrants');
   }
-  if (!empty($_modules['set'])) {
-    foreach ($_modules['set'] as $module) {
+  if (!empty($_modules)) {
+    foreach ($_modules as $module) {
       // Cannot use module_invoke_all() since these are passed by reference.
       $function = $module . '_domaingrants';
       $function($grants, $account, $op);
@@ -1189,36 +1189,40 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
  */
 function domain_grant_all($reset= FALSE) {
   static $grant;
-  if (!isset($grant['set']) || $reset) {
+  if (!isset($grant) || $reset) {
+    $grant = FALSE;
+
     // Search is the easy case, so we check it first.
-    $search = variable_get('domain_search', 0);
-    if ($search && arg(0) == 'search') {
+    if (variable_get('domain_search', 0) && arg(0) == 'search') {
       $grant = TRUE;
     }
+
     // On cron runs, we normally have to disable Domain Access.  See http://drupal.org/node/197488.
-    else if (variable_get('domain_cron_rule', 1)) {
+    if (!$grant && variable_get('domain_cron_rule', 1)) {
+      $script = array_pop(explode('/', request_uri()));
       if ($script == 'cron.php') {
         $grant = TRUE;
       }
     }
-    else {
+
+    if (!$grant) {
       // We check the paths registered by the special pages setting.
-      $grant = FALSE;
       $pages = variable_get('domain_grant_all', "user/*/track");
-      $path = drupal_get_path_alias($_GET['q']);
       $regexp = '/^('. preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/', '/(^|\|)\\\\<front\\\\>($|\|)/'), array('|', '.*', '\1'. preg_quote(variable_get('site_frontpage', 'node'), '/') .'\2'), preg_quote($pages, '/')) .')$/';
       // Compare with the internal and path alias (if any).
-      $page_match = preg_match($regexp, $path);
-      if ($path != $_GET['q']) {
-        $page_match || preg_match($regexp, $_GET['q']);
+      $page_match = preg_match($regexp, $_GET['q']);
+      if (!$page_match) {
+        $path = drupal_get_path_alias($_GET['q']);
+        if ($path != $_GET['q']) {
+          $page_match = preg_match($regexp, $path);
+        }
       }    
       if ($page_match) {
         $grant = TRUE;
       }
     }  
-    $grant['set'] = $grant;
   }  
-  return $grant['set'];
+  return $grant;
 }
 
 /**

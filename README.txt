@@ -558,7 +558,7 @@ rules defined below.
   -- Show user their publishing options 
   The node editing form is shown normally, and the user is presented a 
   list of checkboxes.  These options represent the affilaite domains that 
-  the user is allowed to publish content to, acording to the domains 
+  the user is allowed to publish content to, according to the domains 
   assigned to their user account. 
   
   Note that if this option is selected, users with the 'view domain publshing'

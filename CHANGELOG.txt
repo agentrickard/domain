@@ -1,5 +1,10 @@
 // $Id$
 
+12-JAN-2008
+
+-- #208550 patch by smk-ka.   Cleans up code and logic errors in
+    domain_grant_all() that causes nodes to be visible on all domains.
+
 05-JAN-2008
 
 -- {domain_access} table does not need to store grant information.
