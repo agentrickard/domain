@@ -18,11 +18,15 @@ function domain_content_menu($may_cache) {
   $items = array();
   $access = FALSE;
   $all = FALSE;
-  if (user_access('edit domain nodes') || user_access('set domain access') || user_access('administer nodes')) {
+  $extra = '';
+  if (user_access('edit domain nodes') && variable_get('domain_editors', DOMAIN_EDITOR_RULE)) { // || user_access('set domain access') 
     $access = TRUE;
+    $extra = '<p><em>'. t('You may not have editing permissions for all content shown on all affiliate sites.') .'</em></p>';
   }
-  if (user_access('administer nodes') || user_access('set domain access')) {
+  if (user_access('administer nodes')) { //  || user_access('set domain access')
+    $access = TRUE;  
     $all = TRUE;
+    $extra = '';
   }
   if ($may_cache) {
     $items[] = array(
@@ -36,7 +40,7 @@ function domain_content_menu($may_cache) {
       'title' => t('Content for all affiliate sites'),
       'path' => 'admin/domain/content/all',
       'callback' => 'domain_content_view',
-      'description' => t('View content assigned to all affiliate sites.'),
+      'description' => t('View content assigned to all affiliate sites.') . $extra,
       'callback arguments' => array(NULL, TRUE),      
       'access' => $access,
       'weight' => -10
@@ -48,7 +52,7 @@ function domain_content_menu($may_cache) {
       $items[] = array(
         'path' => 'admin/domain/content/'. $domain['subdomain'],
         'title' => t('!domain content', array('!domain' => $domain['sitename'])),
-        'description' => t('View content for !domain', array('!domain' => $domain['subdomain'])),
+        'description' => t('View content assigned to !domain', array('!domain' => $domain['subdomain'])),
         'callback' => 'domain_content_view',
         'callback arguments' => array($domain['domain_id'], FALSE),
         'access' => $check,
@@ -71,6 +75,10 @@ function domain_content_menu($may_cache) {
  */
 function domain_content_check($domain, $all) {
   global $user;
+  // If the user can administer nodes, just return TRUE.
+  if ($all) {
+    return TRUE;
+  }
   $rule = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
   $check = FALSE;
   $editor = FALSE;
@@ -82,7 +90,7 @@ function domain_content_check($domain, $all) {
   else if ($rule && $domain['domain_id'] > 0 && $domain['domain_id'] == $user->domain_user[$domain['domain_id']]) {
     $editor = TRUE;
   }
-  if ($all || $editor) {
+  if ($editor) {
     $check = TRUE;
   }
   return $check;

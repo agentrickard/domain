@@ -1,5 +1,16 @@
 // $Id$
 
+20-JAN-2008
+
+-- #210213 patch by nicholasThompson.  Documentation warning links did 
+    not use base_url() and do not work when Drupal is installed in a subfolder.
+-- Corrected logic error when adding or removing domain_editor grants
+    to the {node_access} table.
+-- #208160 by DZone.  Restricts the content viewing options of Domain Content
+    to only show content that a non-privileged user can edit.
+-- Type check === 0 in domain_lookup() caused errors.  Function refactored.
+-- #210313.  domain_url_alter() did not respect path aliases when writing new paths.
+
 12-JAN-2008
 
 -- #208550 patch by smk-ka.   Cleans up code and logic errors in

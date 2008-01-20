@@ -56,6 +56,12 @@ modules directory.  After reading this document, enable the module normally.
 When you enable the module, no new tables will be created in your Drupal 
 database.
 
+If you wish for users with the 'edit domain nodes' permission to access the
+Domain Content interface, you must enable the 'Use access control for
+editors' option under Advanced Settings on the Domains configuration page:
+  
+  Administer > Site Building > Domains
+
 ----
 2.1 Permissions
 
@@ -73,16 +79,21 @@ This menu is titled 'Affiliated Content'.
 3.1 Access Control
 
 The Access Control permissions for the module are set by the root Domain Access
-module. They are:
+module. The relevant permissions are:
 
   - 'edit domain nodes'
   - 'set domain access'
   
 Users with the 'edit domain nodes' permission can view content for domains where
 they are assigned editors.  Users with the 'set domain access' permission can 
-view content for all active domains.
+view content for domains where they are assigned editors _and_ reassign content
+to one or more affiliates.
 
-Either permission is required to access the 'Affiliate content' screen.
+Users with the core 'administer nodes' permission may view and edit content on any 
+affiliate.
+
+Either the 'administer nodes' or the 'edit domain nodes' permission is required to 
+access the 'Affiliate content' screen.
 
 ----
 3.2 Affiliated Content

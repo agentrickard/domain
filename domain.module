@@ -331,7 +331,7 @@ function domain_admin($action, $id = NULL) {
  *  The domain_id taken from {domain}. Optional.
  * @param $subdomain
  *  The string representation of a {domain} entry. Optional.
- * @param $clear
+ * @param $reset
  *  A boolean flag to clear the static variable if necessary.
  * @return
  *  An array containing the requested row from the {domain} table, plus the
@@ -339,27 +339,27 @@ function domain_admin($action, $id = NULL) {
  *
  * @ingroup domain
  */
-function domain_lookup($domain_id = NULL, $subdomain = NULL, $clear = FALSE) {
+function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   static $domains;
   // If both are NULL, no lookup can be run.
   if (is_null($domain_id) && is_null($subdomain)) {
     return -1;
   }
   // Create a unique key so we can static cache all requests.
-  else {
-    $key = $domain_id . $subdomain;
-  }  
-  if ($clear || !isset($domains[$key])) {
-    if ($domain_id === 0) {
-      $domain = domain_default();
-    }
-    else if ($domain_id) {
-      $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE domain_id = %d", $domain_id));
-    }
-    else if ($subdomain) {
+  $key = $domain_id . $subdomain;
+  // Run the lookup, if needed.
+  if (!isset($domains[$key]) || $reset) {
+    if ($subdomain) {
       $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE subdomain = '%s'", $subdomain));
     }
-    if (!is_null($domain['domain_id'])) {
+    else if ($domain_id == 0) {
+      $domain = domain_default();
+    }
+    else {
+      $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE domain_id = %d", $domain_id));
+    }
+    // Did we get a valid result?
+    if (isset($domain['domain_id'])) {
       // Let submodules overwrite the defaults, if they wish.
       $extra = module_invoke_all('domainload', $domain);
       $domain = array_merge($domain, $extra);
@@ -1091,6 +1091,7 @@ function domain_form_alter($form_id, &$form) {
     }
 
     // THIS SECTION BREAKS CCK if we don't check for cck_dummy_node_form!  See http://drupal.org/node/186624
+    // and note the !$form['#node']->cck_dummy_node_form in the IF check at the top of the function.
     // Some editors cannot administer nodes, so we have to add these form elements.
     if (variable_get('domain_editors', DOMAIN_EDITOR_RULE) == 1 && user_access('edit domain nodes')) {
       $access = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
@@ -1111,7 +1112,10 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
   global $_domain;
   // Set static variables for the node lookups, to remove redundant queries.
   static $domain_site, $domain, $nodepaths;
-  
+
+  // Store the original path for later use.
+  $original_path = $path;
+
   // Check to see that this function is installed.
   $skip = FALSE;
   $arg = arg(0);
@@ -1165,14 +1169,14 @@ function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
         // Can we and do we need to rewrite this path?
         if ($domain[$nid] != -1 && $domain[$nid]['domain_id'] != $_domain['domain_id']) {
           $absolute = TRUE;
-          $path = $domain[$nid]['path'] . $path;
+          $path = $domain[$nid]['path'] . drupal_get_path_alias($original_path);
         }  
       }  
       // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
       // Only needed if we are not on the root domain.
       else if ($seo && $_domain['domain_id'] != $root['domain_id']) {
         $absolute = TRUE;
-        $path = $root['path'] . $path;
+        $path = $root['path'] . drupal_get_path_alias($original_path);
       }
     }  
   }  
@@ -1231,7 +1235,7 @@ function domain_grant_all($reset= FALSE) {
 function domain_domaininstall() {
   // Check to see if the hook_url_alter() patch is installed.
   if (url('domain_access_test_path') != url('domain_access_path_test')) {
-    drupal_set_message(t('The hook_url_rewrite() patch is not installed.  Some features are not available. See the Patches to Drupal Core section of <a href="!url">README.txt</a>', array('!url' => drupal_get_path('module', 'domain') .'/README.txt')));
+    drupal_set_message(t('The hook_url_rewrite() patch is not installed.  Some features are not available. See the Patches to Drupal Core section of <a href="!url">README.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/README.txt')));
   }
 }
 

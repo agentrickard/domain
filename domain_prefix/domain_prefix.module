@@ -746,6 +746,6 @@ function domain_prefix_string($domain_id) {
 function domain_prefix_domaininstall() {
   // If Domain Prefix is being used, check to see that it is installed correctly.
   if (module_exists('domain_prefix') && !function_exists('_domain_prefix_load')) {
-    drupal_set_message(t('The Domain Prefix module is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => drupal_get_path('module', 'domain_prefix') .'/INSTALL.txt')));
+    drupal_set_message(t('The Domain Prefix module is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain_prefix') .'/INSTALL.txt')));
   }
 }

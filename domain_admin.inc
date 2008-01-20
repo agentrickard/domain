@@ -338,7 +338,7 @@ function domain_admin_editor_form($form_id, $form_values) {
   $clear = FALSE;
   if ($form_values['domain_editors_status'] == 0 && $form_values['domain_editors'] == 1) {
     // Apply rules
-    $result = db_query("SELECT nid, gid FROM {node_access} WHERE realm = 'domain_site'");
+    $result = db_query("SELECT nid, gid FROM {node_access} WHERE realm = 'domain_id'");
     while ($data = db_fetch_array($result)) {
       db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $data['nid'], $data['gid']);
       db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor')", $data['nid'], $data['gid']);      
@@ -488,6 +488,7 @@ function domain_edit($domain_id) {
  * @ingroup domain 
  */
 function domain_edit_form($domain) { 
+  domain_check_response($domain);
   $form = array();
   $form['domain'] = array(
     '#type' => 'fieldset',
@@ -678,4 +679,23 @@ function domain_advanced_form($node_types) {
     );
   }
   return system_settings_form($form);
+}
+
+/**
+ * Checks to see if the webserver returns a valid response
+ * for a request to a domain.
+ *
+ * @param $domain
+ * An array containing the record from the {domain} table
+ *
+ * @ingroup domain
+ */
+function domain_check_response($domain) {
+  $url = domain_get_path($domain);
+  $response = drupal_http_request($url);
+  if ($response->code != 200) {
+    drupal_set_message(t('%server is not responding and may not be configured correctly at the server level.
+      Server code !code was returned.',
+    array('%server' => $url, '!code' => $response->code)), 'warning');
+  }
 }
