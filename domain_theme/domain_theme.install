@@ -38,4 +38,5 @@ function domain_theme_install() {
  */
 function domain_theme_uninstall() {
   db_query("DROP TABLE {domain_theme}");
+  variable_del('domain_theme_weight');
 }

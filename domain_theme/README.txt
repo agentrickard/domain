@@ -16,6 +16,8 @@ CONTENTS
 2.  Installation
 2.1   Dependencies
 3.  Configuration Options
+3.1   Theme Settings
+3.2   Domain-Specific Themes
 4.  Developer Notes
 4.1   Database Schema
 
@@ -49,6 +51,25 @@ Domain Theme requires the Domain Access module be installed and active.
 
 ----
 3.  Configuration Options
+
+The Domain Theme modules adds configuration options to the main module and
+to each of your subdomains.
+
+----
+3.1 Theme Settings
+
+This module edits the global $custom_theme variable for your site.  Other modules
+-- especially the Organic Groups module -- may also attempt to modify this variable.
+
+If you use other modules that allow custom user or group themes, you may experience
+conflicts with the Domain Theme module.  Use this setting to vary the execution order 
+of the Domain Theme module.  Lower (negative) values will execute earlier in the Drupal 
+page building process.
+
+You may need to experiment with this setting to get the desired result.
+
+----
+3.2 Domain-Specific Themes
 
 When active, the Domain Theme module will add a 'theme' link to the Domain List
 screen.

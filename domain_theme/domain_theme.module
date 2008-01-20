@@ -102,3 +102,30 @@ function domain_theme_domainlinks($domain) {
   );
   return $links;
 }
+
+/**
+ * Implements hook_domainform()
+ */
+function domain_theme_domainform(&$form) {
+  // Set the module weight for Domain Theme,
+  $module_weight = variable_get('domain_theme_weight', 0);
+  db_query("UPDATE {system} SET weight = %d WHERE name = 'domain_theme' AND type = 'module'", $module_weight);
+  
+  // Add the form element to the main screen.
+  $form['domain_theme'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Theme settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE  
+  );
+  $options = drupal_map_assoc(array(-100, -25, -10, -5, -1, 0, 1, 5, 10, 25, 100));
+  $form['domain_theme']['domain_theme_weight'] = array(
+    '#type' => 'select',
+    '#title' => t('Domain Theme execution order'),
+    '#options' => $options,
+    '#default_value' => $module_weight,
+    '#description' => t('If you use other modules that allow custom user or group themes, you may experience conflicts
+      with the Domain Theme module.  Use this setting to vary the execution order of the Domain Theme module.  Lower
+      (negative) values will execute earlier in the Drupal page building process.')
+  );
+}

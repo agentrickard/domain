@@ -336,6 +336,34 @@ function hook_domainview($op, $domain = array()) {
 }
 
 /**
+ * Allows other modules to add elements to the default Domain settings page.
+ *
+ * @param &$form
+ *  The $form array generated for the Domain settings page.  This must
+ *  be passed by reference.
+ *  Normally, you should include your form elements inside a new fieldset.
+ * @return
+ *  No rerturn value.  The $form is modified by reference, as needed.
+ */
+function hook_domainform(&$form) {
+  // Add the form element to the main screen.
+  $form['domain_myfmodule'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Mymodule settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE  
+  );
+  $options = drupal_map_assoc(array(-100, -25, -10, -5, -1, 0, 1, 5, 10, 25, 100));
+  $form['domain_mymodule']['domain_mymodule'] = array(
+    '#type' => 'select',
+    '#title' => t('Mymodule settings variable'),
+    '#options' => $options,
+    '#default_value' => variable_get('domain_mymodule', 0),
+    '#description' => t('You description goes here.')
+  );
+} 
+
+/**
  *  Allows a warning message to be printed when entering specific forms that
  *  may have values that vary on each domain.
  *

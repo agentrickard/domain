@@ -323,6 +323,14 @@ function domain_configure_form($user_submitted = FALSE) {
         Enter one path per line.  See the README for more details.')    
     );   
   }
+  // Allow submodules to add elements to the form.
+  $modules = module_implements('domainform');
+  if (!empty($modules)) {
+    foreach ($modules as $module) {
+      $func = $module .'_domainform';
+      $func($form);
+    }
+  }
   return system_settings_form($form);
 }
 
