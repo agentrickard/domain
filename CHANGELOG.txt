@@ -1,5 +1,13 @@
 // $Id$
 
+20-JAN-2008 (2)
+
+-- Separates an -assign domain editors- permission from the -set domain access-
+    permission.  DZone reports that these are two distinct actions, and need to be
+    separated.
+--  DZone reported that the domain editor option were being shown on category
+    pages of the user/#/edit screen.  
+
 20-JAN-2008
 
 -- #210213 patch by nicholasThompson.  Documentation warning links did 

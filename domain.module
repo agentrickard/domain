@@ -145,7 +145,7 @@ function domain_menu($may_cache) {
  * @ingroup drupal 
  */
 function domain_perm() {
-  $perms = array('administer domains', 'edit domain nodes', 'set domain access', 'view domain publishing');
+  $perms = array('administer domains', 'assign domain editors', 'edit domain nodes', 'set domain access', 'view domain publishing');
   return $perms;
 }
 
@@ -210,49 +210,51 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'form':
     case 'register':
-      global $_domain;
-      $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain}");
-      $options = array();
-      // By default, the requesting domain is assigned.
-      if (empty($account->domain_user)) {
-        ($_domain['domain_id'] == 0) ? $default  = array(-1) : $default = array($_domain['domain_id']);
+      if (is_null($category) || $category == 'account') {
+        global $_domain;
+        $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain}");
+        $options = array();
+        // By default, the requesting domain is assigned.
+        if (empty($account->domain_user)) {
+          ($_domain['domain_id'] == 0) ? $default  = array(-1) : $default = array($_domain['domain_id']);
+        }
+        else {
+          $default = $account->domain_user;
+        }
+        $options[-1] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+        while ($data = db_fetch_array($result)) {
+          $options[$data['domain_id']] = $data['sitename'];
+        }    
+        if (user_access('assign domain editors')) {
+          $form['domain_user'] = array(
+            '#type' => 'fieldset',
+            '#title' => t('Domain access'),
+            '#collapsible' => TRUE,
+            '#collapsed' => FALSE,
+            '#weight' => 1
+          );        
+          $form['domain_user']['domain_user'] = array(
+            '#type' => 'checkboxes',
+            '#options' => $options,
+            '#title' => t('Domain access setttings'),
+            '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain nodes" permission.'),
+            '#default_value' => $default
+          );      
+        }
+        else {
+          $form['domain_user'] = array(
+            '#type' => 'value',
+            '#value' => $default
+          );      
+        }
+        return $form;
       }
-      else {
-        $default = $account->domain_user;
-      }
-      $options[-1] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
-      while ($data = db_fetch_array($result)) {
-        $options[$data['domain_id']] = $data['sitename'];
-      }    
-      if (user_access('set domain access')) {
-        $form['domain_user'] = array(
-          '#type' => 'fieldset',
-          '#title' => t('Domain access'),
-          '#collapsible' => TRUE,
-          '#collapsed' => FALSE,
-          '#weight' => 1
-        );        
-        $form['domain_user']['domain_user'] = array(
-          '#type' => 'checkboxes',
-          '#options' => $options,
-          '#title' => t('Domain access setttings'),
-          '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain nodes" permission.'),
-          '#default_value' => $default
-        );      
-      }
-      else {
-        $form['domain_user'] = array(
-          '#type' => 'value',
-          '#value' => $default
-        );      
-      }
-      return $form;
       break;
     case 'validate':
       return array('domain_user' => $edit['domain_user']);
       break;
     case 'view':
-      if (user_access('set domain access') && !empty($account->domain_user)) {
+      if (user_access('assign domain editors') && !empty($account->domain_user)) {
         $output = '<ul>';
         foreach ($account->domain_user as $id) {
           if (abs($id) > 0) {

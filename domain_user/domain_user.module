@@ -276,8 +276,8 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
         }
         // Set the user's default domain to their subdomain.
         if ($domain['domain_id']) {
-          // If the user cannot set domain access, only allow their unique domain.
-          if (!user_access('set domain access')) {
+          // If the user cannot assign domain editors, only allow their unique domain.
+          if (!user_access('assign domain editors')) {
             $edit['domain_user'] = array();
           }
           $edit['domain_user'][$domain['domain_id']] = $domain['domain_id'];

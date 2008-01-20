@@ -404,6 +404,11 @@ The Domain Access module has three standard permissions.
   This permission allows users to create and manage subdomain records
   and settings.  
   
+  'assign domain editors'
+  This permission allows users to assign themselves and other users as
+  affiliate editors.  For those users to act as editors, their role(s) must also
+  have the 'edit domain nodes' permission.
+  
   - 'edit domain nodes'
   This permission is for advanced use and substitutes for the normal
   'administer nodes' permission for sites that give restricted administrative
