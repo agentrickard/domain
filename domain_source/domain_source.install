@@ -1,0 +1,39 @@
+<?php
+// $Id$
+
+/** 
+* @file
+* Install file for the Domain Source module
+*/
+
+/**
+ * Implements hook_install()
+ *
+ * @ingroup drupal
+ */
+function domain_source_install() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysqli':
+    case 'mysql':
+      db_query("CREATE TABLE IF NOT EXISTS {domain_source} (
+       nid int(11) NOT NULL default 0,
+       domain_id int(11) NOT NULL default 0,
+       PRIMARY KEY (nid)
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {domain_source} (
+       nid integer NOT NULL default 0,
+       domain_id integer NOT NULL default 0,
+       PRIMARY KEY (nid)
+      )");     
+      break;
+  }
+}
+
+/**
+ * Implements hook_uninstall()
+ */
+function domain_source_uninstall() {
+  db_query("DROP TABLE {domain_source}");
+}

@@ -1,0 +1,99 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Creates a source domain for linking to content from other domains.
+ */
+
+/**
+ * Implements hook_form_alter()
+ * @ingroup source
+ */
+function domain_source_form_alter($form_id, &$form) {
+  // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
+  // See http://drupal.org/node/186624.
+  if ($form['#id'] == 'node-form' && !$form['#node']->cck_dummy_node_form) {
+    global $_domain;
+    $options = array();
+    $domains = domain_domains();
+    $show = FALSE;
+    if (user_access('set domain access')) {
+      $show = TRUE;
+      foreach ($domains as $domain) {
+        $options[$domain['domain_id']] = $domain['sitename'];
+      }
+    }
+    // In the case of users with limited permissions, option 3 is the "show options" value.
+    else if (user_access('view domain publishing') && variable_get('domain_options', 0) == 3) {
+      global $user;
+      $show = TRUE;
+      foreach ($domains as $domain) {
+        if ($user->domain_user[$domain['domain_id']] != 0 && $domain['domain_id'] == $user->domain_user[$domain['domain_id']]) {
+          $options[$domain['domain_id']] = $domain['sitename'];        
+        }
+      }
+    }
+    // Determine how to show the form element.
+    if ($show) {
+      $form['domain']['domain_source'] = array(
+        '#type' => 'select',
+        '#title' => t('Source domain'),
+        '#options' => $options,
+        '#default_value' => ($form['#node']->domain_source) ? $form['#node']->domain_source : $_domain['domain_id'],
+        '#description' => t('This affiliate will be used to write links to this content from other affiliates, as needed.')
+      );
+    }
+    // Non-privileged users just have the current domain assigned.
+    else {
+      $form['domain']['domain_source'] = array(
+        '#type' => 'value',
+        '#value' => (isset($form['#node']->domain_source)) ? $form['#node']->domain_source : $_domain['domain_id'],
+      );  
+    }
+  }
+}
+
+/**
+ * Implements hook_nodeapi()
+ */
+function domain_source_nodeapi(&$node, $op, $a3, $a4) {
+  switch ($op) {
+    case 'validate':
+      // Transform the 0 into a -1 for checking.
+      ($node->domain_source == 0) ? $key = -1 : $key = $node->domain_source;
+      // Here we account for both the 'domains_raw' and 'domains' options.
+      if ($key != $node->domains[$key] && $key != $node->domains_raw[$key]) {
+        form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
+      }
+      break;
+    
+    case 'insert':
+    case 'update':
+      db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);
+      db_query("INSERT INTO {domain_source} (nid, domain_id) VALUES (%d, %d)", $node->nid, $node->domain_source);
+      break;
+    
+    case 'delete':
+      db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);    
+      break;
+      
+    case 'load':
+      if ($node->nid) {
+        $node->domain_source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
+      }  
+      break;
+      
+    case 'view':
+      // Search module casts both $a3 and $a4 as FALSE, not NULL.
+      // We check that to hide this data from search and other nodeapi
+      // calls that are neither a teaser nor a page view.
+      if ($a3 !== FALSE || $a4 !== FALSE) {
+        if (variable_get('domain_debug', 0) && user_access('set domain access') && isset($node->domain_source)) {
+        $source = domain_lookup($node->domain_source);
+        $node->content['domain_source'] = array('#value' => '<p>'. t('<b>Source domain</b>: %source', array('%source' => $source['sitename'])) .'</b></p>', '#weight' => 25);        
+        }
+      }  
+      break;
+  }
+}

@@ -15,6 +15,8 @@ CONTENTS
 2.  Installation
 2.1   Option 1 -- Preferred
 2.2   Option 2
+2.3   Testing Your Configuration
+2.4   Additional Resources
 3.  Reminder
 4.  Unistalling
 
@@ -65,7 +67,6 @@ stored.  Typically this will be 'sites/all/modules', which makes the lines:
 require_once './sites/all/modules/domain/domain_conf/settings_domain_conf.inc'; 
 ====
 
-
 ----
 2.2 Option 2
 
@@ -83,6 +84,25 @@ add the following lines:
  */
 require_once 'settings_domain_conf.inc';
 ====
+
+----
+2.3   Testing Your Configuration
+
+After editing your settings.php file, go to Admin > Build > Domains.  If you
+see a warning at the top of the page beginning:
+
+  "The Domain Configuration module is not installed correctly..."
+  
+This message means that your PHP server cannot find the include file.  You
+may need to test other path options for the include code.
+
+----
+2.4   Additional Resources
+
+If you are having trouble configuring the module, you should check your
+PHP include path.  You may need to use an absolute path to your server root.
+
+  http://us3.php.net/manual/en/ini.core.php#ini.include-path
 
 ----
 3.  Reminder

@@ -1,5 +1,12 @@
 // $Id$
 
+27-JAN-2008
+
+-- #214762.  Adds the Domain Source module to allow editors to
+    specify links from external domains.
+--  Cleans up some documentation errors.
+--  Adds note about PHP includes in response to #214181.
+
 20-JAN-2008 (3)
 
 -- #211374 by v1nce.  Allows the Domain Theme module weight to be

@@ -400,7 +400,7 @@ permissions.
 
 The Domain Access module has three standard permissions.
 
-  - 'adminster domains'
+  - 'administer domains'
   This permission allows users to create and manage subdomain records
   and settings.  
   
@@ -447,7 +447,7 @@ editing controls provided by Domain Access.  Under the module settings, leave
 the setting 'Domain-based editing controls' as 'Do not use access control for
 editors'.  In this case, the 'edit domain nodes' permission becomes irrelevant.
 
-The only choices for permissions would be who gets to adminster the module 
+The only choices for permissions would be who gets to administer the module 
 settings and who gets to assign nodes to specific domains.  Generally, only 
 users who you trust to 'administer site configuration' should be given the 
 'administer domains' permission.  As for 'set domain access,' that can be given
@@ -1030,6 +1030,9 @@ required, but each adds functionality to the core module.
   
   - Domain Prefix -- A powerful module that allows for selective table prefixing
   for each subdomain in your installation.
+  
+  - Domain Source -- Allows editors to specify a primary "source" domain to be
+  used when linking to content from another domain.
   
   - Domain Strict -- Forces users to be assigned to a domain in order to view
   content on that domain.
