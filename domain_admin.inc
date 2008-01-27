@@ -105,8 +105,10 @@ function domain_view() {
  * @ingroup domain 
  */
 function domain_configure() {
-  // Is the module installed correctly?
-  module_invoke_all('domaininstall');
+  if (!$_POST) {
+    // Is the module installed correctly?
+    module_invoke_all('domaininstall');
+  }  
   // Return the configuration form.
   return drupal_get_form('domain_configure_form');
 }
@@ -353,7 +355,7 @@ function domain_admin_editor_form($form_id, $form_values) {
     }
     $clear = TRUE;
   }
-  else if ($form_values['domain_editors_status'] == 1 && $form_values['domain_editor'] == 0) {
+  else if ($form_values['domain_editors_status'] == 1 && $form_values['domain_editors'] == 0) {
     // Remove rules
     db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor'");
     db_query("DELETE FROM {domain_access} WHERE realm = 'domain_editor'");    

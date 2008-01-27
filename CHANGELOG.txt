@@ -1,5 +1,11 @@
 // $Id$
 
+27-JAN-2008 (2)
+
+-- Typo in domain_admin.inc caused domain editor rules
+    to be erased if settings resaved.
+-- Prevents hook_domaininstall from running during $_POST.
+
 27-JAN-2008
 
 -- #214762.  Adds the Domain Source module to allow editors to
