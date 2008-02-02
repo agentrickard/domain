@@ -2,4 +2,4 @@
 name = Domain Views
 description = Provides a Views filter for the Domain Access module.
 package = Domain Access
-dependencies = domain
+dependencies = domain views

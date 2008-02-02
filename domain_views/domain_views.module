@@ -16,7 +16,7 @@
  */
 function domain_views_tables() {
   $domains = domain_domains();
-  $domain_options = array();
+  $domain_options = array('***CURRENT_DOMAIN***' => 'Current Domain');
   foreach ($domains as $domain){
     $domain_options[$domain['domain_id']] = $domain['sitename'];
   }
@@ -45,6 +45,7 @@ function domain_views_tables() {
       'gid' => array(
         'name' => t('Domain Access: Domain'),
         'value' => $domain_form,
+        'value-type' => 'array',
         'operator' => 'views_handler_operator_or',
         'help' => t('This will filter a view to only show nodes from the specified domain.'),
       ),
@@ -114,4 +115,12 @@ function domain_views_handler_arg_domain_id($op, &$query, $argtype, $arg = '') {
     case 'title':
       return '';
   }
+}
+
+/**
+ * Substitute current domain; this works with cached queries.
+ * @ingroup views  
+ */
+function domain_views_query_substitutions($view) {
+  return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);
 }

@@ -1,17 +1,22 @@
 // $Id$
 
-02-FEB-2007 (3)
+02-FEB-2008 (4)
+
+-- #213390 patch by mrichar1.  Fixed Domain Views query implementation.
+    Also added a Views dependency to domain_views.info.
+
+02-FEB-2008 (3)
 
 -- #214065 by chaldar.  Adds the $arguments array to domain_edit_form()
     and domain_delete_form() so that extension modules may pass their
     own custom redirects and messages using the USER_SUBMITTED flag.
 
-02-FEB-2007 (2)
+02-FEB-2008 (2)
 
 -- #215657 by wayland76.  Adds more explict instructions regarding
     the primary domain name setting and root domain for user domains.
 
-02-FEB-2007
+02-FEB-2008
 
 -- #216847 by ben soo.  Moves $custom_theme routine into hook_menu()
     and removes domain_theme_init(), allowing Domain Theme to interoperate
