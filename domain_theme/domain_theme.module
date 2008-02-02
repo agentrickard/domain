@@ -9,17 +9,6 @@
  */
 
 /**
- * Implements hook_init()
- *
- * @ingroup drupal
- */
-function domain_theme_init() {
-  global $_domain, $custom_theme;
-  $theme = domain_theme_lookup($_domain['domain_id']);
-  $custom_theme = $theme['theme'];
-}
-
-/**
  * Implements hook_menu()
  *
  * @ingroup drupal
@@ -27,6 +16,7 @@ function domain_theme_init() {
 function domain_theme_menu($may_cache) {
   $items = array();
   if (!$may_cache) {
+    // Menu items for configuring themes.
     $items[] = array(
       'title' => t('Domain theme settings'),
       'path' => 'admin/build/domain/theme',
@@ -34,7 +24,15 @@ function domain_theme_menu($may_cache) {
       'type' => MENU_CALLBACK,
       'callback' => 'domain_theme_page',
       'callback arguments' => array(arg(4))      
-    );    
+    ); 
+    // Assign the theme selected, based on the active domain.
+    global $_domain, $custom_theme;
+    $default_theme = variable_get('theme_default', 'garland');    
+    $theme = domain_theme_lookup($_domain['domain_id']);
+    // The above returns -1 on failure.
+    if ($theme != -1) {
+      $custom_theme = $theme['theme']; 
+    }  
   }
   return $items;
 }

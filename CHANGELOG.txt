@@ -1,5 +1,11 @@
 // $Id$
 
+02-FEB-2007
+
+-- #216847 by ben soo.  Moves $custom_theme routine into hook_menu()
+    and removes domain_theme_init(), allowing Domain Theme to interoperate
+    with other custom theme modules.
+
 27-JAN-2008 (2)
 
 -- Typo in domain_admin.inc caused domain editor rules
