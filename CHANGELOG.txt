@@ -1,5 +1,11 @@
 // $Id$
 
+02-FEB-2007 (3)
+
+-- #214065 by chaldar.  Adds the $arguments array to domain_edit_form()
+    and domain_delete_form() so that extension modules may pass their
+    own custom redirects and messages using the USER_SUBMITTED flag.
+
 02-FEB-2007 (2)
 
 -- #215657 by wayland76.  Adds more explict instructions regarding

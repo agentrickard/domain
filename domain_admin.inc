@@ -495,13 +495,25 @@ function domain_edit($domain_id) {
  * FormsAPI for editing a domain record
  *
  * @param $domain
- * An array containing the record from the {domain} table
+ * An array containing the record from the {domain} table.
+ * @param $arguments
+ *  An array of additional hidden key/value pairs to pass to the form.
+ *  Used by child modules to control behaviors.
+ *  Currently supported arguments are:
+ *    'user_submitted' => TRUE
+ *    Indicates that a form should not process administrative messages and paths
+ *    upon form submit.  Used by the Domain User module.
  *
  * @ingroup domain 
  */
-function domain_edit_form($domain) { 
+function domain_edit_form($domain, $arguments = array()) { 
   domain_check_response($domain);
   $form = array();
+  // The $arguments arrray allows other modules to pass values to change the bahavior
+  // of submit and validate functions.
+  if (!empty($arguments)) {
+    $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
+  }    
   $form['domain'] = array(
     '#type' => 'fieldset',
     '#title' => t('Edit domain record'),
@@ -574,8 +586,11 @@ function domain_edit_form_submit($form_id, $form_values) {
   // Let other modules act.
   $domain = domain_lookup($form_values['domain_id']);
   module_invoke_all('domainupdate', 'update', $domain, $form_values);
-  drupal_set_message(t('Domain record updated.'));
-  drupal_goto('admin/build/domain/view');  
+  // The user_submitted flag is needed for Domain User.
+  if (!$form_values['domain_arguments']['user_submitted']) {   
+    drupal_set_message(t('Domain record updated.'));
+    drupal_goto('admin/build/domain/view');  
+  }  
 }
 
 /**
@@ -595,12 +610,24 @@ function domain_delete($domain_id) {
  * FormsAPI
  *
  * @param $domain
- * An array containing the record from the {domain} table
+ * An array containing the record from the {domain} table.
+ * @param $arguments
+ *  An array of additional hidden key/value pairs to pass to the form.
+ *  Used by child modules to control behaviors.
+ *  Currently supported arguments are:
+ *    'user_submitted' => TRUE
+ *    Indicates that a form should not process administrative messages and paths
+ *    upon form submit.  Used by the Domain User module. 
  *
  * @ingroup domain 
  */
-function domain_delete_form($domain) { 
+function domain_delete_form($domain, $argumants = array()) { 
   $form = array(); 
+  // The $arguments arrray allows other modules to pass values to change the bahavior
+  // of submit and validate functions.
+  if (!empty($arguments)) {
+    $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
+  }      
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);  
   $form['domain'] = array('#value' => t('<p>Are you sure you wish to delete the domain record for <b>%domain</b>?</p>', array('%domain' => $domain['subdomain'])));
   $form['cancel'] = array('#value' => '<p>'. l(t('Cancel action'), 'admin/build/domain') .'<br />');
@@ -619,15 +646,18 @@ function domain_delete_form_submit($form_id, $form_values) {
   db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_values['domain_id']);
   // Let other modules act.
   module_invoke_all('domainupdate', 'delete', $domain, $form_values);
-  drupal_set_message(t('Domain record deleted.'));
-  // Some tortured logic to return to the root domain and the domain list.
-  $default = domain_default();
-  $uri = request_uri();
-  $_path = explode('/', $uri);
-  $_slice = array_slice($_path, 0, -2);
-  $path = implode('/', $_slice) . '/view';
-  $goto = $default['scheme'] .'://'. $default['subdomain'] . $path;
-  drupal_goto($goto);  
+  // The user_submitted flag is needed for Domain User.
+  if (!$form_values['domain_arguments']['user_submitted']) {   
+    drupal_set_message(t('Domain record deleted.'));
+    // Some tortured logic to return to the root domain and the domain list.
+    $default = domain_default();
+    $uri = request_uri();
+    $_path = explode('/', $uri);
+    $_slice = array_slice($_path, 0, -2);
+    $path = implode('/', $_slice) . '/view';
+    $goto = $default['scheme'] .'://'. $default['subdomain'] . $path;
+    drupal_goto($goto);  
+  }  
 }
 
 /**
