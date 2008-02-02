@@ -503,9 +503,13 @@ user tries to access an invalid domain, this domain will be used.
 ----
 4.1.1   Primary Domain Name
 
-Enter the primary domain for your site.  Typically, you will also enter this
-value into settings.php for cookie handling.  Do not use http:// or a trailing
-slash when entering this value.
+The primary domain for your site. Typically example.com or www.example.com. 
+Do not use http or slashes. This domain will be used as the default URL for your 
+site.  If an invalid domain is requested, users will be sent to the primary domain.
+
+Enter the primary domain for your site here.  Typically, you will also enter
+this value into settings.php for cookie handling.  Do not use http:// or a 
+trailing slash when entering this value.
 
 ----
 4.1.2   Site Name

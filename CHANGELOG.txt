@@ -1,5 +1,10 @@
 // $Id$
 
+02-FEB-2007 (2)
+
+-- #215657 by wayland76.  Adds more explict instructions regarding
+    the primary domain name setting and root domain for user domains.
+
 02-FEB-2007
 
 -- #216847 by ben soo.  Moves $custom_theme routine into hook_menu()

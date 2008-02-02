@@ -134,7 +134,9 @@ function domain_configure_form($user_submitted = FALSE) {
     '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => variable_get('domain_root', ''),
-    '#description' => t('The root domain for example.com.  No http or slashes.')
+    '#description' => t('The primary domain for your site.  Typically <em>example.com</em> or <em>www.example.com</em>.  Do not use http or slashes.  
+      <br />This domain will be used as the default URL for your site. 
+      <br />If an invalid domain is requested, users will be sent to the primary domain.')
   );    
   $form['domain']['domain_sitename'] = array(
     '#type' => 'textfield',
@@ -143,7 +145,7 @@ function domain_configure_form($user_submitted = FALSE) {
     '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => variable_get('domain_sitename', $sitename),    
-    '#description' => t('The human-readable name of this domain.')    
+    '#description' => t('The site name to display for this domain.')    
   );    
   $form['domain']['domain_scheme'] = array(
     '#type' => 'radios',

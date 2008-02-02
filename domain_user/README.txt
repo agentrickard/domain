@@ -150,6 +150,12 @@ account is deleted, the user domain record is also deleted.
 ----
 4.2   Root Domain Name
 
+The root domain to use for creating user domains, typically example.com.  No 
+http or slashes.
+
+When users create domains, their username will be added to the root domain to 
+create a custom domain.  For example, user.example.com or administrator.example.com.
+
 All user domains follow the pattern:
 
   username.example.com
@@ -160,8 +166,12 @@ In theory, you may use a multi-level domain scheme here, such as:
 
   username.personal.example.com
 
-When entering your root domain, you need not include the username
+When entering your root domain, you should not include the username
 string.
+
+WARNING: Your web server must be configured to recognize these domains
+for them to function.  Wildcard DNS is the preferred solution for handling 
+user domains.
 
 ----
 4.3   User Domain URL Scheme
