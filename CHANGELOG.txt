@@ -1,5 +1,11 @@
 // $Id$
 
+02-FEB-2008 (5)
+
+-- #215148.  Domain Prefix failed to empty the $sources array when
+    iterating through tables, allowing the copying of tables that did not
+    exist.
+
 02-FEB-2008 (4)
 
 -- #213390 patch by mrichar1.  Fixed Domain Views query implementation.

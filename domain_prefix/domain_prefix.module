@@ -209,6 +209,7 @@ function domain_prefix_configure_form() {
       ); 
       // Get the table copying options for this entry.
       // Can't pass a zero through FormAPI select.
+      $sources = array();
       $sources[0] = $root['sitename'];
       // Check to see if other table prefixes have been created.
       $result = db_query("SELECT dp.domain_id, d.sitename FROM {domain_prefix} dp INNER JOIN {domain} d ON dp.domain_id = d.domain_id WHERE dp.tablename = '%s' AND dp.status > 1", $table);
@@ -424,6 +425,7 @@ function domain_prefix_form($domain_id, $arguments = array()) {
       ); 
       // Get the table copying options for this entry.
       // Can't pass a zero through FormAPI select.
+      $sources = array();      
       $sources[0] = $root['sitename'];
       // Check to see if other table prefixes have been created.
       $result = db_query("SELECT dp.domain_id, d.sitename FROM {domain_prefix} dp INNER JOIN {domain} d ON dp.domain_id = d.domain_id WHERE dp.tablename = '%s' AND dp.status > 1", $table);
