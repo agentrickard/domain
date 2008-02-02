@@ -23,7 +23,7 @@ CONTENTS
 2.  Installation
 2.1   Patches to Drupal Core
 2.1.1   multiple_node_access.patch
-2.1.2   url_alter.patch
+2.1.2   custom_url_rewrite_outbound.patch
 2.2   Server Configuration
 2.3   Creating Subdomain Records
 2.4   Setting DOMAIN_INSTALL_RULE
@@ -272,7 +272,7 @@ Developers: see http://drupal.org/node/191375 for more information.
 This patch is being submitted to Drupal core for version 7.
 
 ----
-2.1.2 url_alter.patch
+2.1.2 custom_url_rewrite_outbound.patch
 
 This patch is only needed if:
 
@@ -282,16 +282,24 @@ This patch is only needed if:
       user's Track page.
   -- You want to turn on the advanced setting "Search Engine 
       Optimization" to avoid content from being indexed on multiple
-      domains.
-   
+      domains.  
+  
 This patch allows modules to edit the path to a Drupal object.  In the
 above cases, some content can only be viewed from certain domains, so
 we must write absolute links to that content.  
 
-Developers: see http://drupal.org/node/189797 for more information.
+This patch introduces backports custom_url_rewrite_outbound() to Drupal 5.
 
-This patch introduces hook_url_alter(), which is being submitted to
-Drupal core for version 7.
+After you install this patch, you must copy the function:
+
+  custom_url_rewrite_outbound()
+  
+And paste it into your site's settings.php file.   This function can be found
+at the bottom of INSTALL.txt
+
+The entire function can be found at the end of this document.
+
+Developers: see http://drupal.org/node/207330 for more information.
 
 See section 4.5 Node Link Patterns for more details.
 
@@ -720,6 +728,7 @@ Some sample pages that might require this setting.  Note, some of these
 are contributed modules:
 
   -- user/*/track
+  -- blog/* -- the user blog page
   -- mysite/* -- the MySite module
   -- popular/alltime -- a View
   -- popular/latest -- a View

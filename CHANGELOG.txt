@@ -1,5 +1,11 @@
 // $Id$
 
+02-FEB-2008 (6)
+
+-- #210248.  Backports custom_url_rewrite_outbound() to Drupal 5.
+    This patch replaces the hook_url_alter() patch, bringing the Domain
+    module in line with Drupal 6 core.  See #207330.
+
 02-FEB-2008 (5)
 
 -- #215148.  Domain Prefix failed to empty the $sources array when

@@ -1105,86 +1105,6 @@ function domain_form_alter($form_id, &$form) {
 }  
 
 /**
- * Implements hook_url_alter().
- *
- * Forces absolute paths for domains when needed.
- * We run this in all cases, if we exclude $absolute = TRUE, node_search fails. 
- */
-function domain_url_alter(&$path, &$query, &$fragment, &$absolute) {
-  global $_domain;
-  // Set static variables for the node lookups, to remove redundant queries.
-  static $domain_site, $domain, $nodepaths;
-
-  // Store the original path for later use.
-  $original_path = $path;
-
-  // Check to see that this function is installed.
-  $skip = FALSE;
-  $arg = arg(0);
-  if ($arg == 'admin' && ($path == 'domain_access_test_path' || $path == 'domain_access_path_test')) {
-    $path = 'yes';
-    $skip = TRUE;
-  }
-
-  // This routine only needs to be run from certain urls or if we want to
-  // force all links to go to a single domain for SEO.
-  // See http://drupal.org/node/195366 for the background.
-  $check = domain_grant_all();
-  $seo = variable_get('domain_seo', 0);
-
-  if (!$skip && ($check || $seo)) {
-    // Check to see if this is a node or comment link and set $nid accordingly.
-    // We static the $nid results to make this more efficient.
-    $pattern = explode('/', $path);    
-    
-    // Advanced pattern matching, we find the node id based on token %n in the path string.
-    if (!isset($nodepaths)) {
-      $pathdata = variable_get('domain_paths', "node/%n\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n");
-      $path_match = preg_replace('/(\r\n?|\n)/', '|', $pathdata);
-      $nodepaths = explode("|", $path_match);
-    }  
-    $nid = FALSE;
-    foreach ($nodepaths as $match) {
-      $match_array = explode('/', $match);
-      $placeholder = array_search('%n', $match_array);
-      $match_array[$placeholder] = $pattern[$placeholder];
-      if (is_numeric($pattern[$placeholder]) && $match_array == $pattern) {
-        $nid = (int) $pattern[$placeholder];
-        break;
-      }
-    }
-    // This path has matched a node id, so it may need to be rewritten.
-    if ($nid) {
-      $root = domain_default();  
-      // Remove redundancy from the domain_site check.
-      if (!isset($domain_site[$nid])) {
-        // If this check works, we don't need to rewrite the path unless SEO rules demand it.
-        $domain_site[$nid] = db_result(db_query("SELECT grant_view FROM {node_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
-      }  
-      if (!$domain_site[$nid]) {
-        // Remove rendundancy from the domain_id check.
-        if (!isset($domain[$nid])) {
-          // Load the domain data for this node -- but we're only taking the first match.
-          $id = db_result(db_query_range("SELECT gid FROM {node_access} WHERE nid = %d AND realm = '%s' AND grant_view = 1", $nid, 'domain_id', 0, 1));
-          $domain[$nid] = domain_lookup($id);
-        }  
-        // Can we and do we need to rewrite this path?
-        if ($domain[$nid] != -1 && $domain[$nid]['domain_id'] != $_domain['domain_id']) {
-          $absolute = TRUE;
-          $path = $domain[$nid]['path'] . drupal_get_path_alias($original_path);
-        }  
-      }  
-      // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
-      // Only needed if we are not on the root domain.
-      else if ($seo && $_domain['domain_id'] != $root['domain_id']) {
-        $absolute = TRUE;
-        $path = $root['path'] . drupal_get_path_alias($original_path);
-      }
-    }  
-  }  
-}
-
-/**
  * Activate the hidden grant for searches.
  *
  * @param $reset
@@ -1233,16 +1153,18 @@ function domain_grant_all($reset= FALSE) {
 
 /**
  * Implements hook_domaininstall()
+ * @ingroup domain 
  */
 function domain_domaininstall() {
   // Check to see if the hook_url_alter() patch is installed.
   if (url('domain_access_test_path') != url('domain_access_path_test')) {
-    drupal_set_message(t('The hook_url_rewrite() patch is not installed.  Some features are not available. See the Patches to Drupal Core section of <a href="!url">README.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/README.txt')));
+    drupal_set_message(t('The <em>custom_url_rewrite_outbound()</em> patch is not installed.  Some features are not available. See the Patches to Drupal Core section of <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/INSTALL.txt')));
   }
 }
 
 /**
  * Implements hook_domainupdate()
+ * @ingroup domain 
  */
 function domain_domainupdate($op, $domain = array(), $edit = array()) {
   switch ($op) {
@@ -1260,7 +1182,8 @@ function domain_domainupdate($op, $domain = array(), $edit = array()) {
 }  
 
 /**
-* Implements hook_simpletest().
+* Implements hook_simpletest()
+ * @ingroup domain
 */
 function domain_simpletest() {
   $module_name = 'domain';
