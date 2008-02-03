@@ -400,6 +400,9 @@ function domain_default() {
 /**
  * Return all active domains (including the default) as an array.
  *
+ * @return
+ * An array of all active domains, with the domain_id as the key.
+ *
  * @ingroup domain 
  */
 function domain_domains() {
@@ -411,7 +414,7 @@ function domain_domains() {
     $result = db_query("SELECT domain_id FROM {domain}");
     while ($data = db_fetch_array($result)) {
       $domain = domain_lookup($data['domain_id']);   
-      $domains[] = $domain;
+      $domains[$domain['domain_id']] = $domain;
     }
   }
   $sort = variable_get('domain_sort', 'id');

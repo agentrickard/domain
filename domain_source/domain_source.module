@@ -27,10 +27,22 @@ function domain_source_form_alter($form_id, &$form) {
     // In the case of users with limited permissions, option 3 is the "show options" value.
     else if (user_access('view domain publishing') && variable_get('domain_options', 0) == 3) {
       global $user;
-      $show = TRUE;
+      // Get the user's allowed domains.
       foreach ($domains as $domain) {
         if ($user->domain_user[$domain['domain_id']] != 0 && $domain['domain_id'] == $user->domain_user[$domain['domain_id']]) {
-          $options[$domain['domain_id']] = $domain['sitename'];        
+          $options[$domain['domain_id']] = $domain['sitename'];
+        }
+      }       
+      // Is this node assigned to a source that the user can control?
+      $source = $form['#node']->domain_source;
+      if (isset($source)) {
+        if ($user->domain_user[$domain['domain_id']] == $source) {
+          $show = TRUE;
+        }
+        else {
+          $form['domain']['domain_source_notes'] = array(
+            '#value' => '<label><b>'. t('Source domain:') .'</b></label><div class="description">'. t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $domains[$source]['sitename'])) .'</div>',
+          );     
         }
       }
     }
@@ -60,30 +72,26 @@ function domain_source_form_alter($form_id, &$form) {
 function domain_source_nodeapi(&$node, $op, $a3, $a4) {
   switch ($op) {
     case 'validate':
-      // Transform the 0 into a -1 for checking.
-      ($node->domain_source == 0) ? $key = -1 : $key = $node->domain_source;
+     $key = $node->domain_source;
       // Here we account for both the 'domains_raw' and 'domains' options.
-      if ($key != $node->domains[$key] && $key != $node->domains_raw[$key]) {
+      // If selected, these calues will not be zero.
+      if (!$node->domains[$key] && !$node->domains_raw[$key]) {
         form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
       }
       break;
-    
     case 'insert':
     case 'update':
       db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);
       db_query("INSERT INTO {domain_source} (nid, domain_id) VALUES (%d, %d)", $node->nid, $node->domain_source);
       break;
-    
     case 'delete':
       db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);    
       break;
-      
     case 'load':
       if ($node->nid) {
         $node->domain_source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
       }  
       break;
-      
     case 'view':
       // Search module casts both $a3 and $a4 as FALSE, not NULL.
       // We check that to hide this data from search and other nodeapi

@@ -1,5 +1,10 @@
 // $Id$
 
+03-FEB-2008
+
+-- domain_domains() now sets the domain_id as the array key.
+-- Domain Source updates to allow proper content editing.
+
 02-FEB-2008 (6)
 
 -- #210248.  Backports custom_url_rewrite_outbound() to Drupal 5.
