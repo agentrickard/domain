@@ -113,13 +113,9 @@ function domain_content_page() {
       $items[] = l($item['title'], $item['path']) . '<br />'. $item['description'];
     }  
   }
-  // If more than one, print the list of options.
-  if (count($items) > 1) {
+  // Print the list of options.
+  if (!empty($items)) {
     $output = theme('item_list', $items);
-  }
-  // If only one, go to the right edit screen.
-  else if (count($items) == 1) {
-    drupal_goto($items[0]['path']);
   }
   // There was an error or invalid request.
   else {
@@ -271,11 +267,18 @@ function domain_content_form() {
     // If we have multiple domains, print them.
     $items = array();
     if ($node->domain_site) {
-      $items[] = t('All affiliates');
+      $items[-1] = t('All affiliates');
     }
     if (!empty($node_domains)) {
       foreach ($node_domains as $item) {
-        $items[] = $item['sitename'];
+        $items[$item['domain_id']] = $item['sitename'];
+      }
+    }
+    if (module_exists('domain_source')) {
+      $source = NULL;
+      $source = db_fetch_object(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
+      if (!empty($source) && isset($items[$source->domain_id])) {
+        $items[$source->domain_id] .= '*';
       }
     }
     $form['domains'][$node->nid] =  array('#value' => theme('item_list', $items)); 
@@ -455,13 +458,13 @@ function theme_domain_content_admin_nodes($form) {
   $header = array(theme('table_select_header_cell'), t('Title'), t('Affiliates'), t('Type'), t('Author'), t('Status'), t('Operations'));
 
   $output .= drupal_render($form['options']);
-  $output .= drupal_render($form['domain']);  
+  $output .= drupal_render($form['domain']); 
   if (isset($form['title']) && is_array($form['title'])) {
     foreach (element_children($form['title']) as $key) {
       $row = array();
       $row[] = drupal_render($form['nodes'][$key]);
       $row[] = drupal_render($form['title'][$key]);
-      $row[] = drupal_render($form['domains'][$key]);      
+      $row[] = drupal_render($form['domains'][$key]);   
       $row[] = drupal_render($form['name'][$key]);
       $row[] = drupal_render($form['username'][$key]);
       $row[] = drupal_render($form['status'][$key]);

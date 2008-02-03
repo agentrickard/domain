@@ -41,7 +41,8 @@ function domain_source_form_alter($form_id, &$form) {
         }
         else {
           $form['domain']['domain_source_notes'] = array(
-            '#value' => '<label><b>'. t('Source domain:') .'</b></label><div class="description">'. t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $domains[$source]['sitename'])) .'</div>',
+            '#value' => '<label><b>'. t('Source domain:') .'</b></label><div class="description">'. 
+              t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $domains[$source]['sitename'])) .'</div>',
           );     
         }
       }
@@ -64,6 +65,27 @@ function domain_source_form_alter($form_id, &$form) {
       );  
     }
   }
+  // Integration with Domain Content
+  else if ($form_id == 'domain_content_form') {
+    global $_domain;
+    $options = array();
+    $domains = domain_domains();
+    $show = FALSE;
+    if (user_access('set domain access')) {
+      foreach ($domains as $domain) {
+        $options[$domain['domain_id']] = $domain['sitename'];
+      }  
+      $form['domain']['domain_source'] = array(
+        '#type' => 'select',
+        '#title' => t('Source domain'),
+        '#options' => $options,
+        '#default_value' => $_domain['domain_id'],
+        '#description' => t('This affiliate will be linked to from other affiliates, as needed.')
+      );      
+      $form['#validate']['domain_source_validate'] = array();      
+      $form['#submit']['domain_source_update_nodes'] = array();    
+    }
+  }  
 }
 
 /**
@@ -72,10 +94,14 @@ function domain_source_form_alter($form_id, &$form) {
 function domain_source_nodeapi(&$node, $op, $a3, $a4) {
   switch ($op) {
     case 'validate':
-     $key = $node->domain_source;
+      $key = $node->domain_source;
+      if ($node->domain_site && $key == 0) {
+        // This case is acceptable, so we let it pass.
+        // I find this code easier to read than a compound IF statement.
+      }
       // Here we account for both the 'domains_raw' and 'domains' options.
       // If selected, these calues will not be zero.
-      if (!$node->domains[$key] && !$node->domains_raw[$key]) {
+      else if (!$node->domains[$key] && !$node->domains_raw[$key]) {
         form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
       }
       break;
@@ -103,5 +129,55 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
         }
       }  
       break;
+  }
+}
+
+/**
+ * FormAPI function that lets us update access rules.
+ *
+ * @ingroup source
+ */
+function domain_source_update_nodes($form_id, $form_values) {
+  // If our operation is flagged, then we have to manually change the 
+  // {node_access} table.  The rest of the process will clear the cache,
+  // so this should be a safe operation.
+  if ($form_values['operation'] == 'domain') {
+    $source = $form_values['domain_source'];
+    foreach ($form_values['nodes'] as $key => $value) {
+      if ($key == $value) {
+        db_query("DELETE FROM {domain_source} WHERE nid = %d", $key);
+        db_query("INSERT INTO {domain_source} (nid, domain_id) VALUES (%d, %d)", $key, $source);
+      }
+    }
+  }
+}  
+
+/**
+ * Form validation step
+ *
+ * @ingroup source 
+ */
+function domain_source_validate($form_id, $form_values) {
+  if ($form_values['operation'] == 'domain') {
+    $source = $form_values['domain_source'];
+    if ($form_values['domain_site'] && $source == 0) {    
+      // This case is acceptable.  I find this code easier than a compound IF.
+    }
+    else if (!isset($source) || !$form_values['domains'][$source]) {
+      form_set_error('domain_source', t('The source domain must also be selected as an affiliate publishing option.'));
+    }
+  }
+}
+
+/**
+ * Implements hook_domainupdate()
+ *
+ * When deleting domain records, we remove all traces from the {domain_source} table. 
+ *
+ * @ingroup source
+ */
+function domain_source_domainupdate($op, $domain = array(), $edit = array()) {
+  if ($op == 'delete' && $domain['domain_id'] > 0) {
+    db_query("DELETE FROM {domain_source} WHERE domain_id = %d", $domain['domain_id']);
   }
 }

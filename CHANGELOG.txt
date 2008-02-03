@@ -1,5 +1,10 @@
 // $Id$
 
+03-FEB-2008 (2)
+
+-- Integrated Domain Source with Domain Content.
+-- Fixes a bad menu behavior with Domain Content.
+
 03-FEB-2008
 
 -- domain_domains() now sets the domain_id as the array key.

@@ -15,10 +15,11 @@ CONTENTS
 1.1  Sponsos
 2.  Installation
 2.1   Dependencies
-2.2   Editing settings.php
+2.2   Warning
 3.  Module Behavior
 3.1   Inherited Permissions
 3.2   Content Editing Forms
+3.3   Integration with Domain Content
 4.  Developer Notes
 4.1   Database Schema
 
@@ -51,9 +52,13 @@ This section is not finished.  It requires http://drupal.org/node/210248.
 Domain Source requires the Domain Access module be installed and active.
 
 ----
-2.2 Editing settings.php
+2.2 Warning
 
-This section is not finished.  It requires http://drupal.org/node/210248.
+When this module is enabled, existing content is not automatically assigned
+to a source domain.
+
+You must either edit the nodes individually or use the Domain Content
+module to perform batch edits.
 
 ----
 3.  Module Behaviors
@@ -112,6 +117,15 @@ a "source" domain only if the "Content editing forms" setting on Admin > Build
 
 Otherwise, domain assignments will be done automatically, based on the currently
 active domain.
+
+----
+3.3 Integration with Domain Content
+
+This module adds an element to the Domain Content batch editing screen to
+allow for the batch assignment of source domains.
+
+However, this feature is currently only available to users with the 'set domain
+access' permission.
 
 ----
 4.  Developer Notes
