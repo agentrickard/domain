@@ -1,5 +1,10 @@
 // $Id$
 
+03-FEB-2008 (3)
+
+-- Change to the custom_url_rewrite_outbound function.  We
+    now check to ensure that the Domain module has loaded.
+
 03-FEB-2008 (2)
 
 -- Integrated Domain Source with Domain Content.
