@@ -1,5 +1,10 @@
 // $Id$
 
+09-FEB-2008 (4)
+
+-- Creates Domain Access 1.0 stable.
+-- Creates the Drupal-5 branch of the code.
+
 09-FEB-2008 (3)
 
 -- Moves custom_url_rewrite_outbound() into its own include file.
