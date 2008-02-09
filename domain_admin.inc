@@ -409,7 +409,7 @@ function domain_create_form($arguments = array()) {
     '#size' => 40,
     '#maxlength' => 80,
     '#required' => TRUE,
-    '#description' => t('The allowed subdomain, using the full path.example.com format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
+    '#description' => t('The allowed subdomain, using the full <em>path.example.com</em> format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
@@ -527,7 +527,7 @@ function domain_edit_form($domain, $arguments = array()) {
     '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => $domain['subdomain'],
-    '#description' => t('The allowed subdomain, using the full path.example.com format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
+    '#description' => t('The allowed subdomain, using the full <em>path.example.com</em> format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',

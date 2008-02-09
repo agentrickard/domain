@@ -1,5 +1,13 @@
 // $Id$
 
+09-FEB-2008 (3)
+
+-- Moves custom_url_rewrite_outbound() into its own include file.
+    settings_custom_url.inc now needs to be loaded by settings.php.
+    This approach seems easier than pasting the entire function.
+-- Cleans up install documentation.
+-- Minor description change to some admin forms.
+
 09-FEB-2008 (2)
 
 -- Documentation update, including #218947.
