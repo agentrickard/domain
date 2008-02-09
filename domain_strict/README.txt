@@ -14,6 +14,7 @@ CONTENTS
 1.  Introduction
 2.  Installation
 3.  Configuration
+4.  Anonymous and Authenticated Users
 
 ----
 1. Introduction
@@ -65,3 +66,15 @@ If you want this module to restrict all content viewing, you should:
   
 Both these options allow users to see all nodes on specific pages on
 any active domain.
+
+----
+4.  Anonymous and Authenticated Users
+
+Under Domain Strict, only authenticated users (those who have registered)
+are given any domain-specific privileges.
+
+Anonymous users will only be able to view content that is assigned to "all
+affiliates."
+
+As a result, enabling this module may cause content to disappear from your
+site for users who are not logged in.  This is by design.

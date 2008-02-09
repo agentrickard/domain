@@ -1,5 +1,9 @@
 // $Id$
 
+09-FEB-2008 (2)
+
+-- Documentation update, including #218947.
+
 09-FEB-2008
 
 -- Enabling the module now populates the {domain_access} table correctly.

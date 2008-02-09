@@ -622,14 +622,23 @@ See section 3.3 for a full discussion of this feature.
 ----
 4.3.2   Search Settings
 
+For this feature to work, you must follow the instructions in INSTALL.txt
+regarding custom_url_rewrite().  If you have not followed the instructions,
+you should see a warning at the top of the Admin > Build > Domains page.
+
 Allows the admin to decide if content searches should be run across all 
 affiliates or just the currently active domain.  By design, Drupal will only
 find matches for the current domain.  
 
-Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2
+Enabling this feature requires the custom_url_rewrite_outbound patch 
+discussed in 2.1.2
 
 ----
 4.3.3   Search Engine Optimization
+
+For this feature to work, you must follow the instructions in INSTALL.txt
+regarding custom_url_rewrite().  If you have not followed the instructions,
+you should see a warning at the top of the Admin > Build > Domains page.
 
 There is a risk with these modules that your site could be penalized by search engines
 such as Google for having duplicate content.  This setting controls the behavior of
@@ -639,6 +648,11 @@ URLs written for nodes on your affiliated sites.
     - If assigned to 'all affiliates' the node link goes to the root domain.
     - If assigned to a single affiliate, the node link goes to that affiliate.
     - If assigned to multiple affiliates, the node link goes to the first matching domain.  
+      (Determined by the order in which domains were created, with your primary
+      domain matched first.)
+
+The optional Domain Source module (included in the download) allows you to
+assign the link to specific domains.
 
 Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2.
 
@@ -703,6 +717,10 @@ in 2.1.1.
 ----
 4.4   Special Page Requests
 
+For this feature to work, you must follow the instructions in INSTALL.txt
+regarding custom_url_rewrite().  If you have not followed the instructions,
+you should see a warning at the top of the Admin > Build > Domains page.
+
 In normal uses, such as the default home page, you want to restrict access
 to content based on the active domain.  However, in certain cases, this
 behavior is not desired.
@@ -730,8 +748,8 @@ are contributed modules:
   -- user/*/track
   -- blog/* -- the user blog page
   -- mysite/* -- the MySite module
-  -- popular/alltime -- a View
-  -- popular/latest -- a View
+  -- popular/alltime -- a View page
+  -- popular/latest -- a View page
   -- taxonomy/term/*  -- to show all taxonomy terms at all times
   -- taxonomy/term/10 -- to show only term 10 at all times
   -- taxonomy/term/*/feed/* -- all taxonomy term feeds
@@ -739,6 +757,9 @@ are contributed modules:
 Default and custom Views are often good candidates here as well.
 
 By default, 'user/*/track' is in this list.
+
+The logic for how these links are written is documented in 4.3.3 Search Engine 
+Optimization.
 
 Note that the 'search' path is handled separately and need not be added here.
 
@@ -1048,7 +1069,8 @@ required, but each adds functionality to the core module.
   used when linking to content from another domain.
   
   - Domain Strict -- Forces users to be assigned to a domain in order to view
-  content on that domain.
+  content on that domain.  Note that anonymous users may only see content
+  assigned to "all affiliates" if this module is enabled.
   
   - Domain Theme -- Allows separate themes for each subdomain.
 
