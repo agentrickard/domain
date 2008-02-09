@@ -1,5 +1,12 @@
 // $Id$
 
+09-FEB-2008
+
+-- Enabling the module now populates the {domain_access} table correctly.
+    When the module is disabled, this table is emptied along with the {node_access}
+    table.  If no other node access modules are present. the {node_access} table is
+    reset to its default state.
+
 03-FEB-2008 (3)
 
 -- Change to the custom_url_rewrite_outbound function.  We

@@ -862,6 +862,14 @@ function domain_enable() {
   node_access_rebuild();
   // Set the default 'domain_all' grant for special pages.
   domain_set_default_grant();  
+  // Put all the grant records into the {domain_access} table.
+  $realms = array('domain_site', 'domain_id', 'domain_editor');
+  foreach ($realms as $realm) {
+    $result = db_query("SELECT * FROM {node_access} WHERE realm = '%s'", $realm);
+    while ($data = db_fetch_array($result)) {
+      db_query("INSERT INTO {domain_access} VALUES (%d, %d, '%s')", $data['nid'], $data['gid'], $data['realm']);
+    }
+  }  
 }
 
 /**
@@ -901,6 +909,14 @@ function domain_disable() {
   variable_del('domain_editors');
   // Rebuild the node access table.  Other modules have to fend for themselves here.
   node_access_rebuild();
+  // Empty the {domain_access} table.
+  db_query("DELETE FROM {domain_access}");
+  // If {node_access} just contains the 'all' grant, then reset it to default.
+  $result = db_result(db_query("SELECT COUNT(realm) FROM {node_access} WHERE realm != 'all'"));
+  if ($result == 0) {
+    db_query("DELETE FROM {node_access}");
+    db_query("INSERT INTO {node_access} VALUES (0, 0, 'all', 1, 0, 0)");
+  }
 }  
 
 /**
