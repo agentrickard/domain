@@ -3,7 +3,11 @@
 
 /**
  * @file
- * API documentation file.
+ * Welcome to the API documentation for the Domain Access module, I hope you find it useful.
+ *
+ * If you find errors in the documentation, please file an issue at http://drupal.org/project/issues/domain.
+ *
+ * -- agentrickard
  */
 
 /**
@@ -66,15 +70,6 @@
  * Forces users to be assigned to a domain in order to view content on that domain.
  */ 
  
- /**
-  * @mainpage
-   Welcome to the API documentation for the Domain Access module, I hope you find it useful.
-  
-   If you find errors in the documentation, please file an issue at http://drupal.org/project/issues/domain.
-  
-   -- agentrickard
-  */
-
 /**
  * Notify other modules that we are granting access to a node.
  *
