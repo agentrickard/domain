@@ -490,7 +490,6 @@ function domain_domainload(&$domain) {
   $domain['site_grant'] = DOMAIN_SITE_GRANT;
   return $domain;
 }
- 
 
 /**
  * Determine an absolute path for a domain
@@ -503,6 +502,10 @@ function domain_domainload(&$domain) {
 function domain_get_path($domain) {
   global $base_url;
   $_url = parse_url($base_url);
+  // PHP 5 does not return an empty path element.
+  if (!isset($_url['path'])) {
+    $_url['path'] = '/';
+  }
   // We need a trailing slash at the end of the path
   if (substr($_url['path'], -1) != '/') {
     $_url['path'] .= '/';
@@ -515,11 +518,9 @@ function domain_get_path($domain) {
  * Determine an absolute path to the current page
  */
 function domain_get_uri($domain) {
-  global $base_url;
-  $_url = parse_url($base_url);
   $path = $domain['scheme'] .'://'. $domain['subdomain'] . request_uri();
   return $path;
-}  
+}
 
 /**
  * Determine if we must switch the active domain.

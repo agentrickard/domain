@@ -1,5 +1,11 @@
 // $Id$
 
+11-MAR-2008 (3)
+
+-- #227999 by skizzo and torgosPizza.  Fixes empty 'path' passed by
+    parse_url() in PHP 5.
+-- Cleans up domain_get_uri().
+
 11-MAR-2008 (2)
 
 -- #203776 by MatBoy.  Updates documentation of Domain User.
