@@ -69,6 +69,11 @@ You will need to do the following before you install the module.
   - Read this document
   - Configure your web server DNS records appropriately
   - Read the supplied README.txt
+  - Install and configure Drupal normally.
+  
+WARNING: The Domain Access module series instructs you to add several
+file includes to your settings.php file.  Do not add these commands until
+after you have installed Drupal.
   
 ----
 2.2   Server Configuration

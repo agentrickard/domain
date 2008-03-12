@@ -230,6 +230,9 @@ README.txt file.
 ----
 2.  Installation
 
+WARNING: The Domain Access module assumes that you have already installed
+and configured your Drupal site.  Please do so before continuing.
+
 For detailed instructions, see INSTALL.txt.
 
 To install the module, simply untar the download and put it in your site's
