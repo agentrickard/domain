@@ -30,10 +30,10 @@
  * Core functions for the Domain Conf module.
  */
  
- /**
-  * @defgroup hooks Domain API hooks
-  * Internal module hooks for Domain Access.
-  */
+/**
+ * @defgroup hooks Domain API hooks
+ * Internal module hooks for Domain Access.
+ */
 
 /**
  * @defgroup nav Domain Navigation: navigation block and menu options
@@ -69,6 +69,11 @@
  * @defgroup strict Domain Strict: strict access control
  * Forces users to be assigned to a domain in order to view content on that domain.
  */ 
+ 
+/**
+ * @defgroup source Domain Source: editor-defined links.
+ * Creates a source domain for linking to content from other domains.
+ */  
  
 /**
  * Notify other modules that we are granting access to a node.

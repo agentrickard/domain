@@ -1,5 +1,12 @@
 // $Id$
 
+11-MAR-2008 (2)
+
+-- #203776 by MatBoy.  Updates documentation of Domain User.
+-- #224079 by GearedDesign.  Documents that Drupal must be installed
+    before adding any of the Domain includes to settings.php.
+-- #221012.  Adds Doxygen for Doamin Source to the API.    
+
 11-MAR-2008
 
 -- #227003 by NeuZeitgeist and triskelion.  Logic errors in Domain Source
