@@ -1,5 +1,10 @@
 // $Id$
 
+11-MAR-2008
+
+-- #227003 by NeuZeitgeist and triskelion.  Logic errors in Domain Source
+    cause form validation errors.
+
 09-FEB-2008 (4)
 
 -- Creates Domain Access 1.0 stable.
