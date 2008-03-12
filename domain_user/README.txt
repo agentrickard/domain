@@ -105,11 +105,12 @@ Domain User adds one permission to your Access Control page:
  
 Only roles that have this permission can create personal subdomains. 
 
-If you want users to be able to create subdomains when they register, you must give
-this permission to the 'anonymous users' role and to the 'authenticated users' role.
+If you want users to be able to create subdomains when they register, you must
+give this permission to the 'anonymous users' role and to the 'authenticated
+users' role.
 
-If you are assigning additional roles during account creation, you may also need to
-grant the 'create personal domain' permission to those roles as well.
+If you are assigning additional roles during account creation, you may also need
+to grant the 'create personal domain' permission to those roles as well.
 
 Users with this permission will have their personal domain created either:
 on registration or on updating their account.
