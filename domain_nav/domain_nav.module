@@ -175,12 +175,14 @@ function domain_nav_render($paths = 0, $style = 'default') {
  * @ingroup themes
  */
 function theme_domain_nav_default($options) {
+  global $_domain;
+  $current = $options[$_domain['domain_id']];
   $output = '<form class="domain-list" action="">';
   $output .= '<select onchange="if (this.value) location.href=this.value;">';
-  $output .= '<option>'. t('Jump to...') .'</option>';
+  $output .= '<option value="'. $current['path'] .'">'. t('Jump to...') .'</option>';
   foreach ($options as $key => $value) {
     ($value['active']) ? $selected = ' selected' : $selected = '';
-    $output .= '<option value="'. $value['path'] .'"'. $selected .'>'. $value['sitename'] .'</option>';
+    $output .= '<option value="'. $value['path'] .'"'. $selected .'>'. filter_xss_admin($value['sitename']) .'</option>';
   }
   $output .= '</select>';
   $output .= '</form>';  

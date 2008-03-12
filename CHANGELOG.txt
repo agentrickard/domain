@@ -1,5 +1,10 @@
 // $Id$
 
+11-MAR-2008 (4)
+
+-- #223912 by skizzo.  Make the -Jump to- navigator element go to
+    the currently active domain.
+
 11-MAR-2008 (3)
 
 -- #227999 by skizzo and torgosPizza.  Fixes empty -path- passed by

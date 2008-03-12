@@ -80,7 +80,7 @@ function domain_view() {
     }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
-    $row = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, $domain['sitename'], $valid, $domain['scheme']);
+    $row = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
     // Let other modules add data.
     foreach (module_implements('domainview') as $module) {
       $row[] = module_invoke($module, 'domainview', 'data', $domain);
