@@ -21,10 +21,6 @@ function _domain_prefix_load() {
   if ($check) {
     // Cribbed from bootstrap.inc -- removes port protocols from the host value.
     $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
-    // Strip the www. off the subdomain, if required.
-    if (variable_get('domain_www', 0)) {
-      $_subdomain = str_replace('www.', '', $_subdomain);
-    }
     // Lookup the active domain against our allowed hosts record.
     $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
     if ($domain['domain_id']) {
