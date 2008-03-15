@@ -1,5 +1,10 @@
 // $Id$
 
+15-MAR-2008 (2)
+
+-- Adds some clarifying text with regard to #227751.
+-- Cleans up some code style issues.
+
 15-MAR-2008
 
 -- Clarifies API for hook_domainupdate().

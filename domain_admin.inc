@@ -232,7 +232,6 @@ function domain_configure_form($user_submitted = FALSE) {
   
   // Check to see if the node_access patch is enabled.  If it is, then
   // we need to know if more than one node_access module is running.
-  $disabled = FALSE;
   $modules = count(module_implements('node_grants'));
 
   if (!function_exists('node_access_grants_sql') ||  $modules < 2) {
@@ -706,6 +705,7 @@ function domain_advanced_form($node_types) {
       '#type' => 'checkboxes',
       '#default_value' => variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path')),
       '#options' => $options,
+      '#description' => t('Some elements may not be editable for all users due to permission restrictions, specifically <em>authoring</a> and <em>menu</em> settings.'),
     );
   }
   $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
