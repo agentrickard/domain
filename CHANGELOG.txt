@@ -1,5 +1,12 @@
 // $Id$
 
+15-MAR-2008
+
+-- Clarifies API for hook_domainupdate().
+-- #228813.  Generates access rules more often and accurately when
+    using Domain User.
+-- Adds $reset flags to domain_domains(), domain_default()    
+
 11-MAR-2008 (4)
 
 -- #223912 by skizzo.  Make the -Jump to- navigator element go to
