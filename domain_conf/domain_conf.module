@@ -55,6 +55,17 @@ function domain_conf_page($domain_id) {
   } 
 }
 
+/** 
+ * Special configuration options for the main domain.
+ *
+ * @param $domain
+ * The $domain object for the default domain.
+ * @return
+ * A $form array according to the FormsAPI, if unique configuration is possible.
+ *
+ * @ingroup conf
+ */
+
 function domain_conf_default($domain) {
   drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
   $form = array();
@@ -230,19 +241,6 @@ function domain_conf_form_alter($form_id, &$form) {
     }  
   }
 }
-
-
-function domain_conf_domainconf($domain) {
-  $form['pictures']['user_picture_default'] = array(
-    '#type' => 'textfield', 
-    '#title' => t('Default picture'), 
-    '#default_value' => variable_get('user_picture_default', ''), 
-    '#size' => 30, 
-    '#maxlength' => 255, 
-    '#description' => t('URL of picture to display for users with no custom picture selected. Leave blank for none.')
-  );
-  return $form;
-} 
 
 /**
  * FormsAPI

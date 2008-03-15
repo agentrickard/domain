@@ -23,7 +23,7 @@ function _domain_prefix_load() {
     $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
     // Lookup the active domain against our allowed hosts record.
     $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
-    if ($domain['domain_id']) {
+    if (isset($domain['domain_id'])) {
       $tables = array();
       $prefix = 'domain_'. $domain['domain_id'] .'_';
       $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > 1", $domain['domain_id']);

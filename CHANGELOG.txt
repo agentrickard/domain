@@ -1,5 +1,10 @@
 // $Id$
 
+15-MAR-2008 (4)
+
+-- Removes some test functions from Domain Conf and cleans some code style.
+    This update incorporated into the last for the 5 branch.
+
 15-MAR-2008 (3)
 
 -- Allows hook_domainconf() settings to be applied ot the main domain.
