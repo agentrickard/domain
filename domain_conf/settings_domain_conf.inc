@@ -28,25 +28,23 @@ _domain_conf_load();
  */
 function _domain_conf_load() {
   $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain_conf'"));
-  if ($check) {
+  if ($check > 0) {
     // Cribbed from bootstrap.inc -- removes port protocols from the host value.
     $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
-    // Strip the www. off the subdomain, if required.
-    if (variable_get('domain_www', 0)) {
-      $_subdomain = str_replace('www.', '', $_subdomain);
-    }
     // Lookup the active domain against our allowed hosts record.
     $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
-    if ($domain['domain_id']) {
-      $data = array();
-      $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
-      if (!empty($data)) {
-        global $conf;
-        $settings = unserialize($data['settings']);
-        // Overwrite the $conf variables.
-        foreach ($settings as $key => $value) {
-            $conf[$key] = $value;
-        }
+    // If nothing was found, use the default domain.
+    if (!isset($domain['domain_id'])) {
+      $domain['domain_id'] = 0;
+    }
+    $data = array();
+    $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+    if (!empty($data)) {
+      global $conf;
+      $settings = unserialize($data['settings']);
+      // Overwrite the $conf variables.
+      foreach ($settings as $key => $value) {
+        $conf[$key] = $value;
       }
     }
   }

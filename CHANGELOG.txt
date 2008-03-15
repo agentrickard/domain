@@ -1,5 +1,11 @@
 // $Id$
 
+15-MAR-2008 (3)
+
+-- Allows hook_domainconf() settings to be applied ot the main domain.
+-- Removes useless code from domain_prefix and domain_conf include files;
+    the variables array is not loaded yet, so variable_get() fails to work here.
+
 15-MAR-2008 (2)
 
 -- Adds some clarifying text with regard to #227751.

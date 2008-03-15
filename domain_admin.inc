@@ -65,6 +65,12 @@ function domain_view() {
     $link = l($domain['subdomain'], domain_get_uri($domain), array(), NULL, NULL, TRUE);
     if ($domain['domain_id'] == 0) {
       $actions = l(t('Default settings'), 'admin/build/domain/settings');
+      // Grab any extra elements defined by other modules.  If so, allow configuration.
+      $extra = array();
+      $extra = module_invoke_all('domainconf', $domain);      
+      if (!empty($extra)) {
+        $actions .= ' | '. l(t('settings'), 'admin/build/domain/conf/0');
+      }
     }
     else {
       $actions = l(t('edit'), 'admin/build/domain/edit/'. $domain['domain_id']);

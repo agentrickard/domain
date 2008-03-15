@@ -41,15 +41,58 @@ function domain_conf_menu($may_cache) {
 function domain_conf_page($domain_id) {
   global $_domain;
   $domain = domain_lookup($domain_id);
-  if ($domain['domain_id']) {
+  if ($domain['domain_id'] > 0) {
     // Ensure we are on the proper domain.
     domain_goto($domain);
     drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
     return drupal_get_form('system_site_information_settings');
   }
+  else if ($domain['domain_id'] == 0) {
+    return drupal_get_form('domain_conf_default', $domain);
+  }
   else {
     return t('Invalid domain request.');
   } 
+}
+
+/** 
+ * Special configuration options for the main domain.
+ *
+ * @param $domain
+ * The $domain object for the default domain.
+ * @return
+ * A $form array according to the FormsAPI, if unique configuration is possible.
+ *
+ * @ingroup conf
+ */
+
+function domain_conf_default($domain) {
+  drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
+  $form = array();
+  // Grab any extra elements defined by other modules.
+  $extra = module_invoke_all('domainconf', $domain);
+  $form = array_merge($form, $extra);
+  if (!empty($form)) {
+    $form['domain_conf_message'] = array(
+      '#type' => 'markup', 
+      '#value' => t('<p>The following custom settings may be applied to the main domain.  These options are specific to the Domain module and do not have standard configuration pages.</p>'),
+      '#weight' => -100,
+    );      
+    // Domain information, for saving.
+    $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+    // Submit functions
+    $form['#submit']['domain_conf_form_submit'] = array();
+    $form['#validate']['domain_conf_form_validate'] = array();      
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save domain settings'),
+      '#weight' => 10
+    );   
+  }
+  else {
+    $form['domain_conf_message'] = array('#type' => 'markup', '#value' => t('There are no custom domain settings to configure.'));
+  }
+  return $form;
 }
 
 /**
@@ -199,7 +242,6 @@ function domain_conf_form_alter($form_id, &$form) {
   }
 }
 
-
 /**
  * FormsAPI
  *
@@ -214,7 +256,7 @@ function domain_conf_form_submit($form_id, $form_values) {
   }
   // INSERT or UPDATE?
   $check = db_result(db_query("SELECT domain_id FROM {domain_conf} WHERE domain_id = %d", $form_values['domain_id']));  
-  if ($check) {
+  if (isset($check)) {
     $sql = "UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d";
     db_query($sql, serialize($settings), $form_values['domain_id']);
   }
