@@ -101,7 +101,7 @@ function domain_user_configure_form() {
     );    
   }
   // Show the rules for username restrictions
-  $rules =  domain_user_rules(FALSE);
+  $rules =  domain_user_rules();
   if (!empty($rules)) {
     $output = '<ul>';
     foreach ($rules as $rule) {
@@ -130,7 +130,8 @@ function domain_user_configure_form() {
  */
 function domain_user_rules($generate = TRUE) { 
   // Find domains that are not user domains.  These are blacklisted in user rules.
-  $domains = domain_domains();
+  // We set the $reset flag to TRUE, to be sure we catch all changes.
+  $domains = domain_domains(TRUE);
   $reserved = array();
   // Get the root user domain.
   $root = variable_get('domain_user_root', variable_get('domain_root', ''));
@@ -341,7 +342,19 @@ function domain_user_strip_chars($name) {
  * @ingroup user
  */
 function domain_user_domainupdate($op, $domain = array(), $edit = array()) {
+  $root = variable_get('domain_user_root', variable_get('domain_root', ''));
   switch ($op) {
+    case 'create':
+      domain_user_rules();
+      break;
+    case 'update':
+      // If these are different, then we must delete a row from {access}.
+      if ($domain['subdomain'] != $edit['subdomain']) {
+        $mask = str_replace('.'. $root, '', $domain['subdomain']);
+        db_query("DELETE FROM {access} WHERE mask = '%s'", $mask);
+      }
+      domain_user_rules();      
+      break;
     case 'delete':
       // Delete from {domain_user}
       db_query("DELETE FROM {domain_user} WHERE domain_id = %d", $domain['domain_id']);

@@ -105,7 +105,7 @@ function domain_view() {
  * @ingroup domain 
  */
 function domain_configure() {
-  if (!$_POST) {
+  if (empty($_POST)) {
     // Is the module installed correctly?
     module_invoke_all('domaininstall');
   }  
@@ -507,7 +507,9 @@ function domain_edit($domain_id) {
  * @ingroup domain 
  */
 function domain_edit_form($domain, $arguments = array()) { 
-  domain_check_response($domain);
+  if (empty($_POST)) {
+    domain_check_response($domain);
+  }  
   $form = array();
   // The $arguments arrray allows other modules to pass values to change the bahavior
   // of submit and validate functions.

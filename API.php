@@ -176,7 +176,10 @@ function hook_domainload($domain) {
  * Notify other modules that we have created a new domain or 
  * updated a domain record.  
  *
- * NOTE: Where possible, use the $domain values in preference to the $edit values.
+ * For 'update' and 'delete' operations, the $domain array holds the
+ * original values of the domain record.  The $edit array will hold the
+ * new, replacement values.  This is useful when making changes to 
+ * records, such as in domain_user_domainupdate().
  *
  * @param $op
  *  The operation being performed: 'create', 'update', 'delete'
