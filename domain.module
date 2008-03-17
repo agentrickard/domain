@@ -112,7 +112,32 @@ function domain_menu($may_cache) {
       'callback' => 'domain_admin',
       'callback arguments' => array('advanced'),
       'weight' => -2
-    );         
+    );      
+    // Register the batch actions as menu callbacks
+    $batch = module_invoke_all('domainbatch');
+    if (!empty($batch)) {
+      $items[] = array(
+        'title' => t('Batch updating'),
+        'path' => 'admin/build/domain/batch',
+        'access' => $admin,
+        'type' => MENU_LOCAL_TASK,
+        'callback' => 'domain_admin',
+        'callback arguments' => array('batch'),
+        'weight' => 0
+      );
+      // Get the submenu items
+      foreach ($batch as $key => $value) {
+        $items[] = array(
+          'title' => $value['#form']['#title'],
+          'path' => 'admin/build/domain/batch/'. $key,
+          'access' => $admin,
+          'type' => MENU_LOCAL_TASK,
+          'callback' => 'domain_admin',
+          'callback arguments' => array('batch', $key),
+          'weight' => $value['#weight']
+        );      
+      }  
+    }  
   }  
   else {    
     $items[] = array(
@@ -1205,6 +1230,63 @@ function domain_domainupdate($op, $domain = array(), $edit = array()) {
       break;
   }  
 }  
+
+/**
+ * Implements hook_domainbatch()
+ *
+ * @ingroup domain
+ */
+function domain_domainbatch() {
+  // Change all the domain names at once.
+  $batch = array();
+  $batch['subdomain'] = array(
+    '#form' => array(
+      '#title' => t('Domains'),
+      '#type' => 'textfield',
+      '#size' => 40,
+      '#maxlength' => 80,
+      '#description' => t('Enter the host value of the domain.  No http:// or slashes.'),
+      '#required' => TRUE,
+    ),  
+    '#domain_action' => 'domain',
+    '#meta_description' => t('Edit all domain values.'),
+    '#variable' => 'domain_root',
+    '#data_type' => 'string',
+    '#weight' => -10,
+  );
+  //Change all the sitenames at once.
+  $batch['sitename'] = array(
+    '#form' => array(
+      '#title' => t('Site names'),
+      '#type' => 'textfield',
+      '#size' => 40,
+      '#maxlength' => 80,
+      '#description' => t('The site name to display for this domain.'),
+      '#required' => TRUE,
+    ),  
+    '#domain_action' => 'domain',
+    '#meta_description' => t('Edit all domain site names.'),
+    '#variable' => 'domain_sitename',
+    '#data_type' => 'string',
+    '#weight' => -10,
+  );
+  // Change all the schemes at once.
+  $batch['scheme'] = array(
+    '#form' => array(
+      '#title' => t('URL Schemes'),
+      '#type' => 'radios',
+      '#options' => array('http' => 'http://', 'https' => 'https://'),
+      '#description' => t('The URL scheme for accessing this domain.')
+    ),  
+    '#domain_action' => 'domain',
+    '#meta_description' => t('Edit all domain URL schemes.'),
+    '#system_default' => variable_get('domain_scheme', 'http://'),
+    '#variable' => 'domain_scheme',
+    '#data_type' => 'string',
+    '#weight' => -10,
+  );    
+  return $batch;
+}
 
 /**
 * Implements hook_simpletest()

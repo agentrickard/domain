@@ -405,6 +405,9 @@ function hook_domainwarnings() {
  *
  *  This hook is implemented by the Domain Conf module.
  *
+ * You may wish to pair this hook with hook_domainbatch() to allow the mass update
+ * of your settings.
+ *
  * @param $domain
  *  The $domain object prepared by hook_domainload().
  * @return
@@ -413,6 +416,12 @@ function hook_domainwarnings() {
  *  @ingroup hooks 
  */
 function hook_domainconf($domain) {
+  $form['pictures'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User picture'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,    
+  );
   $form['pictures']['user_picture_default'] = array(
     '#type' => 'textfield', 
     '#title' => t('Default picture'), 
@@ -425,94 +434,83 @@ function hook_domainconf($domain) {
 } 
 
 /**
- * Implements custom_url_rewrite_outbound().
- * Forces absolute paths for domains when needed.
+ * Allows modules to expose batch editing functions.  
  *
- * This function goes in your settings.php file.
+ * This hook makes it easier for site administrators to perform
+ * bulk updates.  It is most useful for handling settings changes
+ * caused by moving from a staging to a production server.
  *
- * @ingroupd domain
+ * The function works by defining a $batch array that serves as a combination
+ * of menu hook and form element.  The $batch array contains all the information
+ * needed to create an administrative page and form that will process your settings.
+ *
+ * For a basic example, see domain_domainbatch().
+ *
+ * For a more complex example, with custom processing, see domain_theme_domainbatch().
+ *
+ * The $batch array is formatted according to the following rules:
+ *
+ * - '#form' [required] An array that defines the form element for this item.  It accepts any
+ * values defined by the FormsAPI.  Do not, however, pass the #default_value element
+ * here.  That value will be computed dynamically for each domain when the hook is processed.
+ *
+ *  - '#system_default' [required] Used to fill the #default_value parameter for domains that do not have custom settings.
+ *  Typically, this will be the result of a variable_get().  For domain_delete operations, this value should be set to zero (0).
+ *
+ * - '#meta_description' [required] Used to describe your action to end users. 
+ *
+ * - '#domain_action' [required] Indicates what submit action will be invoked for this setting.  Allowed values are:
+ * --- 'domain' == writes the value to the {domain} table.  Normally, contributed modules will not use this option.
+ * --- 'domain_conf' == writes the value to the {domain_conf} table.  Use in connection with hook_domainconf().
+ * --- 'domain_delete' == used to delete rows from specific tables.  If this is used, the #table value must be present.
+ * --- 'custom' == used if you need your own submit handler. Must be paired with a #submit parameter.
+ * 
+ * - '#submit' [optional] Used with the 'custom' #domain_action to define a custom submit handler for the form.  This value
+ * should be a valid function name.
+ *
+ * - '#lookup' [optional] Used with the 'custom' #domain_action to perform a default value lookup against a custom function.
+ * This value should be a valid function name.  Your function must accept the $domain array as a parameter.
+ *
+ * - '#table' [optional] Used with the 'domain_delete' #domain_action to specify which table a row should be deleted from. 
+ * This value may be a string or an array, if you need to perform multiple deletes.  Deletes are performed against the domain_id
+ * of the selected domains.
+ *
+ * - '#variable' [optional] Used to perform changes for the default domain, which is stored in the {variables} table. If this
+ * value is not set, the root domain will not be exposed for batch editing.
+ *
+ * - '#data_type' [optional] Used to tell the system how to build your data entry query.  Defaults to 'string'; possible values are:
+ * --- 'string' == the query will use '%s' to insert the data.
+ * --- 'integer' == the query will use %d to insert the data.
+ * --- 'float' == the query will use %f to insert the data.
+ * --- 'binary' == the query will use %b to insert the data.
+ * For more information, see db_query() in the Drupal API documentation.
+ *
+ * - '#weight' [optional] Used to weight the item in the menu system.  Should normally be set to zero.  Negative values
+ * are reserved for use by the core Domain Access module.  The following values are in use:
+ * --- (-10) items used by Domain Access core.
+ * --- (-8) items used by Domain Configuration.
+ * --- (-6) items used by Domain Theme.
+ * --- (-2) items reserved for batch delete actions.
+ *
+ * @ingroup hooks
  */
-function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$base_url, $original_path) {
-  global $_domain;
-  // Set static variables for the node lookups, to remove redundant queries.
-  static $domain_site, $domain, $nodepaths;
-
-  // Store the original path for later use.
-  $original_path = $path;
-
-  // Check to see that this function is installed.
-  $skip = FALSE;
-  $arg = arg(0);
-  if ($arg == 'admin' && ($path == 'domain_access_test_path' || $path == 'domain_access_path_test')) {
-    $path = 'yes';
-    $skip = TRUE;
-  }
-
-  // This routine only needs to be run from certain urls or if we want to
-  // force all links to go to a single domain for SEO.
-  // See http://drupal.org/node/195366 for the background.
-  $check = domain_grant_all();
-  $seo = variable_get('domain_seo', 0);
-
-  if (!$skip && ($check || $seo)) {
-    // Check to see if this is a node or comment link and set $nid accordingly.
-    // We static the $nid results to make this more efficient.
-    $pattern = explode('/', $path);    
-    
-    // Advanced pattern matching, we find the node id based on token %n in the path string.
-    if (!isset($nodepaths)) {
-      $pathdata = variable_get('domain_paths', "node/%n\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n");
-      $path_match = preg_replace('/(\r\n?|\n)/', '|', $pathdata);
-      $nodepaths = explode("|", $path_match);
-    }  
-    $nid = FALSE;
-    foreach ($nodepaths as $match) {
-      $match_array = explode('/', $match);
-      $placeholder = array_search('%n', $match_array);
-      $match_array[$placeholder] = $pattern[$placeholder];
-      if (is_numeric($pattern[$placeholder]) && $match_array == $pattern) {
-        $nid = (int) $pattern[$placeholder];
-        break;
-      }
-    }
-    // This path has matched a node id, so it may need to be rewritten.
-    if ($nid) {
-      $root = domain_default();  
-      // Remove redundancy from the domain_site check.
-      if (!isset($domain_site[$nid])) {
-        // If this check works, we don't need to rewrite the path unless SEO rules demand it.
-        $domain_site[$nid] = db_result(db_query("SELECT grant_view FROM {node_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
-      }  
-      if (!$domain_site[$nid]) {
-        // Remove rendundancy from the domain_id check.
-        if (!isset($domain[$nid])) {
-          // The Domain Source module is optional, and allows nodes to be assigned to specific domains for the 
-          // purpose of this check.
-          if (module_exists('domain_source')) {
-            $source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $nid));
-            $domain[$nid] = domain_lookup($source);
-            print_r($source_domain);
-          }
-          else {
-            // Load the domain data for this node -- but we're only taking the first match.
-            $id = db_result(db_query_range("SELECT gid FROM {node_access} WHERE nid = %d AND realm = '%s' AND grant_view = 1", $nid, 'domain_id', 0, 1));
-            $domain[$nid] = domain_lookup($id);
-          }  
-        }  
-        // Can we and do we need to rewrite this path?
-        if ($domain[$nid] != -1 && $domain[$nid]['domain_id'] != $_domain['domain_id']) {
-          $absolute = TRUE;
-          // In this case, the $base_url cannot have a trailing slash
-          $base_url = rtrim($domain[$nid]['path'], '/');
-        }  
-      }  
-      // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
-      // Only needed if we are not on the root domain.
-      else if ($seo && $_domain['domain_id'] != $root['domain_id']) {
-        $absolute = TRUE;
-          // In this case, the $base_url cannot have a trailing slash
-          $base_url = rtrim($root['path'], '/');
-      }
-    }  
-  }  
-}
+function hook_domainbatch() {
+  // A simple function to rename my setting in Domain Configuration.
+  $batch = array();
+  $batch['mysetting'] = array(
+    '#form' => array(
+      '#title' => t('My Settings'),
+      '#type' => 'textfield',
+      '#size' => 40,
+      '#maxlength' => 80,
+      '#description' => t('A description for the form'),
+      '#required' => TRUE,
+    ),  
+    '#domain_action' => 'domain_conf',
+    '#meta_description' => t('Edit my setting value.'),
+    '#variable' => 'domain_mysetting',
+    '#data_type' => 'string',
+    '#weight' => 0,
+  );
+  return $batch;
+}  
