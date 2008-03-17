@@ -24,7 +24,15 @@ function domain_theme_menu($may_cache) {
       'type' => MENU_CALLBACK,
       'callback' => 'domain_theme_page',
       'callback arguments' => array(arg(4))      
-    ); 
+    );
+    $items[] = array(
+      'title' => t('Domain site settings'),
+      'path' => 'admin/build/domain/theme-reset',
+      'access' => user_access('administer domains'),
+      'type' => MENU_CALLBACK,
+      'callback' => 'domain_theme_reset',
+      'callback arguments' => array(arg(4))      
+    );        
     // Assign the theme selected, based on the active domain.
     global $_domain, $custom_theme;
     $default_theme = variable_get('theme_default', 'garland');    
@@ -48,16 +56,84 @@ function domain_theme_menu($may_cache) {
 function domain_theme_page($domain_id) {
   global $_domain;
   $domain = domain_lookup($domain_id);
+  $output = theme_domain_theme_reset($domain);  
   if ($domain['domain_id']) {
     // Ensure we are on the proper domain.
     domain_goto($domain);
     drupal_set_title(t('!site : Domain theme settings', array('!site' => $domain['sitename'])));    
     include_once('domain_theme_form.inc');
-    return drupal_get_form('system_themes');
+    return $output . drupal_get_form('system_themes');
   }
   else {
     return t('Invalid domain request.');
   } 
+}
+
+/**
+ * Resets theme settings by removing the domain row from {domain_theme}.
+ * 
+ * @param $domain_id
+ * The domain_id of the requested domain.
+ * @return
+ * A confirmation form.
+ *
+ * @ingroup theme
+ */
+
+function domain_theme_reset($domain_id) {
+  $domain = domain_lookup($domain_id);
+  if ($domain == -1) {
+    return t('An invalid request has been made.');
+  }
+  return drupal_get_form('domain_theme_reset_form', $domain);
+}
+
+/**
+ * FormsAPI for resetting a domain themes.
+ *
+ * @param $domain
+ * The $domain object for the selected domain.
+ * @return
+ * Themed HTML form.
+ *
+ * @ingroup theme
+ */
+
+function domain_theme_reset_form($domain) {
+  $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+  $extra['#redirect'] = 'admin/build/domain/theme/'. $domain['domain_id'];
+  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/build/domain/theme/'. $domain_id, t('Submitting this form will restore default theme for this domain.'));
+  return $form;
+}
+
+/**
+ * FormsAPI for domain_theme_reset_form.
+ *
+ * @ingroup theme
+ */
+function domain_theme_reset_form_submit($form_id, $form_values) {
+  db_query("DELETE FROM {domain_theme} WHERE domain_id = %d", $form_values['domain_id']);
+  drupal_set_message(t('Domain theme settings have been reset.'));
+}
+
+/**
+ * Theme a message at the top of domain theme pages.
+ *
+ * @param $domain
+ * The $domain object for the selected domain.
+ * @return
+ * Themed HTML messages.
+ *
+ * @ingroup conf
+ */
+function theme_domain_theme_reset($domain) {
+  $output = '';
+  $output .= '<p>'. t('These settings will replace your default site theme when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
+  $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE domain_id = %d", $domain['domain_id']));
+  if (!empty($data)) {
+    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => 'admin/build/domain/theme-reset/'. $domain['domain_id'])) .'</p>';
+  }
+  return $output;
 }
 
 /** 
@@ -103,6 +179,8 @@ function domain_theme_domainlinks($domain) {
 
 /**
  * Implements hook_domainform()
+ *
+ * @ingroup theme 
  */
 function domain_theme_domainform(&$form) {
   // Set the module weight for Domain Theme,
@@ -126,4 +204,77 @@ function domain_theme_domainform(&$form) {
       with the Domain Theme module.  Use this setting to vary the execution order of the Domain Theme module.  Lower
       (negative) values will execute earlier in the Drupal page building process.')
   );
+}
+
+/**
+ * Implements hook_domainbatch()
+ *
+ * @ingroup theme
+ */
+function domain_theme_domainbatch() {
+  $batch = array();
+  // Allows the deletion of all Domain Theme rows.
+  $batch['domain_theme'] = array(
+    '#form' => array(
+      '#title' => t('Reset themes'),
+      '#type' => 'checkbox',
+      '#options' => array(t('Reset')),
+      '#description' => t('Delete custom theme settings for this domain.'),
+    ),  
+    '#domain_action' => 'domain_delete',
+    '#system_default' => 0,
+    '#meta_description' => t('Delete custom theme settings for domains as supplied by Domain Theme.'),
+    '#table' => 'domain_theme',
+    '#weight' => -2,
+  );
+  // Change themes for sites.
+  $themes = list_themes();
+  $options = array();
+  foreach ($themes as $theme) {
+    if ($theme->status == 1) {
+      $options[$theme->name] = $theme->name;
+    }
+  }
+  $batch['site_theme'] = array(
+    '#form' => array(  
+      '#title' => t('Theme settings'),
+      '#type' => 'select',
+      '#options' => $options,
+      '#description' => t('Select the theme for this domain.'),
+    ),
+    '#domain_action' => 'custom',
+    '#lookup' => 'domain_theme_lookup',
+    '#submit' => 'domain_theme_batch',
+    '#system_default' => variable_get('theme_default', 'garland'),
+    '#variable' => 'theme_default',
+    '#meta_description' => t('Change the themes for all domains.'),
+    '#data_type' => 'integer',    
+    '#weight' => -6,
+  );  
+  return $batch;  
+}
+
+/**
+ * Custom handler for domain_theme_domainbatch().
+ *
+ * @param $form_values
+ * The form values passed by the FormsAPI.
+ *
+ * @ingroup theme
+ */
+function domain_theme_batch($form_values) {
+  foreach ($form_values['domain_batch'] as $key => $value) {
+    if ($key > 0) {
+      $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE domain_id = %d", $key));
+      if (isset($data['theme'])) {
+        db_query("UPDATE {domain_theme} SET theme = '%s' WHERE domain_id = %d", $value, $key);
+      }
+      else {
+        db_query("INSERT INTO {domain_theme} (domain_id, theme) VALUES (%d, '%s')", $key, $value);
+      }
+    }
+    else {
+      variable_set('theme_default', $value);
+    }
+  }
 }

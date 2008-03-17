@@ -1,5 +1,12 @@
 // $Id$
 
+16-MAR-2008
+
+-- Fixes error in new logic for domain_conf_form_submit().
+-- Adds the ability to delete Domain Conf settings per domain.
+-- Adds the ability to delete Domain Theme settings per domain.
+-- Adds hook_domainbatch(), for performing batch actions.
+
 15-MAR-2008 (4)
 
 -- Removes some test functions from Domain Conf and cleans some code style.
