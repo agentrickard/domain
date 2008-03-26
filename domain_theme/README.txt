@@ -18,8 +18,9 @@ CONTENTS
 3.  Configuration Options
 3.1   Theme Settings
 3.2   Domain-Specific Themes
-4.  Developer Notes
-4.1   Database Schema
+4.  Batch Updates
+5.  Developer Notes
+5.1   Database Schema
 
 ----
 1.  Introduction
@@ -83,13 +84,22 @@ theme selection form, with the following notes:
       no domain-specific settings for themes.
 
 ----
-4.  Developer Notes
+4.  Batch Updates
+
+Domain Theme allows you to make batch changes to settings for all domains.
+
+You may also choose to remove domain-specific theme settings.
+
+This feature is useful if you wish to roll back custom changes.
+
+----
+5.  Developer Notes
 
 We intend to enable domain-specific theme settings in a later release.  If you 
 are interested in helping, see http://drupal.org/node/180264.
 
 ----
-4.1  Database Schema
+5.1  Database Schema
 
 Installing the module creates a {domain_theme} table that contains:
 
