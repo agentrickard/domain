@@ -18,10 +18,11 @@ CONTENTS
 2.  Installation
 2.1   Dependencies
 2.2   Configuration Options
-3.  Drupal Upgrades
-4.  Developer Notes
-4.1   Database Schema
-4.2   PostgreSQL Users
+3.  Table Prefix Options
+4.  Drupal Upgrades
+5.  Developer Notes
+5.1   Database Schema
+5.2   PostgreSQL Users
 
 ----
 1.  Introduction
@@ -45,37 +46,38 @@ For more information, see http://drupal.org/node/2622.
 This module may cause unexpected behavior.  Test any changes to your database
 carefully.
 
-To test basic functionality, I recommend prefixing the 'watchdog' table.  Then test 
-Drupal's error logging on variuous subdomains.
+To test basic functionality, I recommend prefixing the 'watchdog' table.  Then 
+test Drupal's error logging on variuous subdomains.
 
 THIS MODULE WILL NOT WORK CORRECTLY ON pgSQL.  See 4.2 for details.
 
 ----
 1.2 Use-Case
 
-For affiliated sites, there are times when you want to use a different configuration
-or data set for each site (or for a select site).
+For affiliated sites, there are times when you want to use a different 
+configuration or data set for each site (or for a select site).
 
-In the original use-case, we needed to have different block settings for each affiliate.
+In the original use-case, we needed to have different block settings for each
+affiliate.
 
 ----
 1.3 Example
 
-To have different block settings for each affiliate, you would set the following tables 
-to 'copy':
+To have different block settings for each affiliate, you would set the following 
+tables to 'copy':
 
   - blocks
   - blocks_roles
   - boxes
 
-When you create a new domain, these root tables will be copied, using the pattern:
+When you create a new domain, these root tables will be copied, using the 
+pattern:
 
   - domain_ID_tablename
   
 In the Domain Prefix UI, tables are grouped by module (or by default function).
-This grouping should help you decide which tables must be kept together to ensure
-proper functionality.
-
+This grouping should help you decide which tables must be kept together to 
+ensure proper functionality.
 
 ----
 1.3 Sponsors
@@ -89,10 +91,11 @@ Domain Prefix is sponsored by Morris DigitalWorks.
 The Domain Prefix module is included in the Domain Access download.  To install,
 untar the domain package and place the entire folder in your modules directory.
 
-When you enable the module, it will create a {domain_prefix} table in your Drupal
-database.
+When you enable the module, it will create a {domain_prefix} table in your 
+Drupal database.
 
-For the module to function correctly, you must follow the instructions in INSTALL.txt.
+For the module to function correctly, you must follow the instructions in 
+INSTALL.txt.
 
 ----
 2.1   Dependencies
@@ -105,7 +108,8 @@ directions in INSTALL.txt
 ----
 2.2   Configuration Options
 
-Clicking on the 'Table prefixing' tab takes you to a screen with configuration options:
+Clicking on the 'Table prefixing' tab takes you to a screen with configuration 
+options:
 
  Domain creation options: *
    [] Generate tables as defined below
@@ -116,10 +120,48 @@ This setting controls the behavior of newly created domain records.  If set to
 'Generate', then the module will attempt to create prefixed tables as defined.
 
 When selecting options for table prefixing, you can now select which data source
-to use when copying tables.  Use the select list to determine the source for data.
+to use when copying tables.  Use the select list to determine the source for 
+data.
 
 ----
-3. Drupal Upgrades
+3.  Table Prefix Options
+
+When using Domain Prefix, you have the following options for table creation.
+
+  - Source
+  Indicates the origin of the table structure and data.  This element defaults 
+  to your primary domain.  After you have prefixed tables for additional 
+  domains, you may choose a different source domain to use.
+  
+  - Ignore
+  If selected, no table prefix actions will be taken for the specified table.
+  
+  - Create
+  If selected, a prefixed table will be created for the active domain if none 
+  exists.  The new table will copy the schema from its designated source table.  
+  If a table has been created, this field will be selected by default.  When a 
+  table is created, no data is copied from the source table to the new table.
+  
+  - Copy
+  If selected, a prefixed table will be created for the active domain if none
+  exists.   The new table will copy the schema from its designated source 
+  table.  Data from the source table will also be copied to the new table.  If
+  a table has been copied, this field will be selected by default.
+  
+  - Drop
+  If a table has been created or copied, a "Drop" option appears.  Selecting 
+  this option will cause the selected table to be dropped (deleted) from the
+  database. This action only affects the prefixed table, not its source.
+  
+  - Update
+  If a table has been created or copied, an "Update" option appears.  Selecting
+  this option will cause the selected table to be truncated (emptied) and the
+  current data from the source table will be copied into the now-empty table.
+  This action is useful for re-synchronizing tables with the primary domain.
+  If a table has been updated, the "copy" option will be selected by default.
+
+----
+4. Drupal Upgrades
 
 Running Drupal's upgrade script [update.php] respects the table prefixing provided
 by Domain Prefix.  That is, if you run the script from one.example.com, it will update
@@ -149,19 +191,19 @@ Then you must follow these instructions for _each_ domain that uses table prefix
 There does not appear to be an automated way of doing this process.
 
 ----
-4.  Developer Notes
+5.  Developer Notes
 
 Some issues:
 
   - I have not found a way to run a function any time hook_uninstall() is run.
-  Attempts to add a #submit handler using hook_form_alter() failed.  As a resut
+  Attempts to add a #submit handler using hook_form_alter() failed.  As a result
   I may have to create an admin page for uninstalling domain_prefix tables.
   
   - I also failed to find a way to automate the update.php process -- hook_form_alter()
   also fails to add a #submit handler in that case.
 
 ----
-4.1   Database Schema
+5.1   Database Schema
 
 Installing the module creates a {domain_prefix} table that contains:
 
@@ -190,7 +232,7 @@ Installing the module creates a {domain_prefix} table that contains:
   the domain_id of the source domain.
   
 ----
-4.2 PostgreSQL Users
+5.2 PostgreSQL Users
 
 Apologies.  This module is not fully functional on pgSQL.  Here are the 
 features that work, and the issues that remain.

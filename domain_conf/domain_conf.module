@@ -1,5 +1,4 @@
 <?php
-
 // $Id$
 
 /**
@@ -33,7 +32,15 @@ function domain_conf_menu($may_cache) {
       'type' => MENU_CALLBACK,
       'callback' => 'domain_conf_reset',
       'callback arguments' => array(arg(4))      
-    );        
+    ); 
+    // Allow sites to add implementations of hook_domainconf() without hacking.
+    // See http://drupal.org/node/236877.
+    if (arg(0) == 'admin') {
+      $extra = drupal_get_path('module', 'domain_conf') .'/domain_conf.inc';
+      if (file_exists($extra)) {
+        include_once($extra);
+      }
+    }
   }
   return $items;
 }
@@ -79,9 +86,10 @@ function domain_conf_default($domain) {
   drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
   $form = array();
   // Grab any extra elements defined by other modules.
-  $extra = module_invoke_all('domainconf', $domain);
-  $form = array_merge($form, $extra);
-  if (!empty($form)) {
+  $extra = domain_conf_api();
+  if (!empty($extra)) {
+    // Convert the $extra array to the $form array.
+    $form = $extra;
     $form['domain_conf_message'] = array(
       '#type' => 'markup', 
       '#value' => t('<p>The following custom settings may be applied to the main domain.  These options are specific to the Domain module and do not have standard configuration pages.</p>'),
@@ -236,7 +244,8 @@ function domain_conf_form_alter($form_id, &$form) {
       $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
       
       // Grab any extra elements defined by other modules.
-      $extra = module_invoke_all('domainconf', $domain);
+      $extra = domain_conf_api(TRUE);
+      // Merge the $extra and $form arrays.
       $form = array_merge($form, $extra);
   
       // Submit functions
@@ -392,7 +401,7 @@ function theme_domain_conf_reset($domain) {
   $output .= '<p>'. t('These settings will replace or supplement your default site settings when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
   $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
   if (!empty($data)) {
-    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => 'admin/build/domain/conf-reset/'. $domain['domain_id'])) .'</p>';
+    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/build/domain/conf-reset/'. $domain['domain_id']))) .'</p>';
   }
   return $output;
 }
@@ -493,7 +502,7 @@ function domain_conf_domainbatch() {
       '#description' => t('The home page displays content from this relative URL. If unsure, specify "node".'),
     ),
     '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('site_frontpage', ''),
+    '#system_default' => variable_get('site_frontpage', 'node'),
     '#variable' => 'site_frontpage',
     '#meta_description' => t('Set the site frontpage for all domains.'),
     '#data_type' => 'string',    
@@ -509,17 +518,38 @@ function domain_conf_domainbatch() {
       '#description' => t('The name used to indicate anonymous users for this domain.'),
     ),
     '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('anonymous', ''),
+    '#system_default' => variable_get('anonymous', 'Anonymous'),
     '#variable' => 'anonymous',
     '#meta_description' => t('Set the anonymous user label for all domains.'),
     '#data_type' => 'string',    
     '#weight' => -8,
   );
+  // Change the administrative theme.
+  $themes = list_themes();
+  ksort($themes);
+  $options[] = t('Use domain default theme');
+  foreach ($themes as $key => $value) {
+    $options[$key] = $key;
+  }
+  $batch['admin_theme'] = array(
+    '#form' => array(  
+      '#title' => t('Administrative theme'),
+      '#type' => 'select',
+      '#options' => $options,
+      '#description' => t('Select the administrative theme for this domain.'),
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('admin_theme', 0),
+    '#variable' => 'admin_theme',
+    '#meta_description' => t('Set the administrative theme for all domains.'),
+    '#data_type' => 'string',    
+    '#weight' => -8,
+  );    
   // Change the timezone.
   $zones = _system_zonelist();   
   $batch['date_default_timezone'] = array(
     '#form' => array(  
-      '#title' => t('Timezone defaults'),
+      '#title' => t('Timezone default'),
       '#type' => 'select',
       '#options' => $zones,
       '#description' => t('Select the default site time zone.'),
@@ -527,7 +557,7 @@ function domain_conf_domainbatch() {
     '#domain_action' => 'domain_conf',
     '#system_default' => variable_get('date_default_timezone', 0),
     '#variable' => 'date_default_timezone',
-    '#meta_description' => t('Set the default timezones for all domains.'),
+    '#meta_description' => t('Set the default timezone for all domains.'),
     '#data_type' => 'string',    
     '#weight' => -8,
   );
@@ -563,4 +593,34 @@ function domain_conf_domainbatch() {
     '#weight' => -8,
   );
   return $batch;  
+}
+
+/**
+ * Retrieves elements from hook_domainconf() and formats them
+ * as needed.
+ *
+ * @param $all
+ * Should the function return all hook implementations or just those marked
+ * with the domain_settings flag.  Defaults to FALSE.  Used to determine if
+ * we are loading configuration options specific to the Domain Access module.
+ *
+ * @return
+ * An array of form elements according to the FormsAPI or an empty array.
+ *
+ * @ingroup conf
+ */
+ function domain_conf_api($all = FALSE) {
+  $options = array();
+  $extra = module_invoke_all('domainconf', $domain);
+  if (!empty($extra)) {
+    foreach ($extra as $key => $value) {
+      if ($value['#domain_setting'] == TRUE || $all == TRUE) {
+        // Discard the #domain_setting flag; it is not needed.
+        unset($value['#domain_setting']);
+        // Set the $options array.
+        $options[$key] = $value;
+      }
+    }
+  }
+  return $options;
 }

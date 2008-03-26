@@ -120,11 +120,15 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
  *
  * @ingroup nav
  */
-function domain_nav_render($paths = 0, $style = 'default') { 
+function domain_nav_render($paths = NULL, $style = NULL) { 
   global $_domain;
   // Get the options and set the variables.
-  $paths = variable_get('domain_nav_block', $paths);
-  $style = variable_get('domain_nav_theme', $style);
+  if (empty($paths)) {
+    $paths = variable_get('domain_nav_block', 0);
+  }
+  if (empty($style)) {
+    $style = variable_get('domain_nav_theme', 'default');
+  }  
   $options = array();
   $domains = domain_domains();
   // Select which path calculation to use.
