@@ -1,5 +1,10 @@
 // $Id$
 
+25-MAR-2008 (2)
+
+-- Adds batch function documentation.
+-- Creates the 5.x.1.1 release.
+
 25-MAR-2008
 
 -- Cleans up menu handling for batch actions.

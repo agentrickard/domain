@@ -103,6 +103,16 @@ defaults. If you do not adjust these settings, defaults will be used for all
 affiliates.
 
 ----
+3.  Batch Updates
+
+Domain Conf allows you to make batch changes to settings for all domains.
+
+All of the current settings are available in batch mode.
+
+You may also choose to remove domain-specific configurations.  This feature
+is useful if you wish to roll back custom changes.
+
+----
 4.  Developer Notes
 
 The Domain Conf module is the model for extending Domain Acccess.
