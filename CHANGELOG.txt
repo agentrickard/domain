@@ -1,5 +1,12 @@
 // $Id$
 
+25-MAR-2008
+
+-- Cleans up menu handling for batch actions.
+-- Corrects behaviors associated with hook_domainconf().
+-- Updates README.txt for Domain, Domain Prefix and Domain Conf.
+-- Fixes error in domain_nav_render().
+
 16-MAR-2008
 
 -- Fixes error in new logic for domain_conf_form_submit().

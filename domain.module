@@ -131,7 +131,7 @@ function domain_menu($may_cache) {
           'title' => $value['#form']['#title'],
           'path' => 'admin/build/domain/batch/'. $key,
           'access' => $admin,
-          'type' => MENU_LOCAL_TASK,
+          'type' => MENU_CALLBACK,
           'callback' => 'domain_admin',
           'callback arguments' => array('batch', $key),
           'weight' => $value['#weight']
@@ -550,7 +550,7 @@ function domain_get_path($domain) {
 function domain_get_uri($domain) {
   $path = $domain['scheme'] .'://'. $domain['subdomain'] . request_uri();
   return $path;
-}  
+}
 
 /**
  * Determine if we must switch the active domain.
@@ -1251,6 +1251,7 @@ function domain_domainbatch() {
     '#domain_action' => 'domain',
     '#meta_description' => t('Edit all domain values.'),
     '#variable' => 'domain_root',
+    '#validate' => 'domain_batch_validate',
     '#data_type' => 'string',
     '#weight' => -10,
   );
@@ -1267,13 +1268,14 @@ function domain_domainbatch() {
     '#domain_action' => 'domain',
     '#meta_description' => t('Edit all domain site names.'),
     '#variable' => 'domain_sitename',
+    '#validate' => 'domain_batch_validate',    
     '#data_type' => 'string',
     '#weight' => -10,
   );
   // Change all the schemes at once.
   $batch['scheme'] = array(
     '#form' => array(
-      '#title' => t('URL Schemes'),
+      '#title' => t('URL schemes'),
       '#type' => 'radios',
       '#options' => array('http' => 'http://', 'https' => 'https://'),
       '#description' => t('The URL scheme for accessing this domain.')
@@ -1285,12 +1287,55 @@ function domain_domainbatch() {
     '#data_type' => 'string',
     '#weight' => -10,
   );    
+  // Change all the valid flags at once.
+  $batch['valid'] = array(
+    '#form' => array(
+      '#title' => t('Valid domains'),
+      '#type' => 'radios',
+      '#options' => array(1 => t('Active'), 0 => t('Inactive')),
+      '#description' => t('Allows users to access this domain.')
+    ),  
+    '#domain_action' => 'domain',
+    '#meta_description' => t('Edit all domain status flags.'),
+    '#system_default' => 1,
+    '#data_type' => 'integer',
+    '#weight' => -10,
+  );   
   return $batch;
 }
 
 /**
+ * Validate handler for hook_domainbatch()
+ * @ingroup domain 
+ */
+function domain_batch_validate($form_values) {
+  $case = $form_values['variable'];
+  $batch = $form_values['domain_batch'];
+  switch ($case) {
+    case 'domain_root':
+      foreach ($batch as $key => $value) {
+        $subdomain = strtolower(urlencode($value));
+        $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id != %d", $value, $key));
+        if ($check > 0 || ($key > 0 && $value = variable_get('domain_root', ''))) {
+          form_set_error('domain_batch', t('Each domain value must be unique.'));
+        }      
+      }
+      break;
+    case 'domain_sitename':
+      foreach ($batch as $key => $value) {    
+        $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id != %d", $value, $key));
+        if ($check > 0 || ($key > 0 && $value = variable_get('domain_sitename', 'Drupal'))) {
+          form_set_error('domain_batch', t('Each site name value must be unique.'));
+        }
+      }  
+      break;
+  }
+#  exit;
+}
+
+/**
 * Implements hook_simpletest()
- * @ingroup domain
+* @ingroup domain
 */
 function domain_simpletest() {
   $module_name = 'domain';
@@ -1298,4 +1343,3 @@ function domain_simpletest() {
   $tests = file_scan_directory($dir, '\.test$');
   return array_keys($tests);
 }
-

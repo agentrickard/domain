@@ -58,7 +58,8 @@ CONTENTS
 4.8   Node Settings
 4.8.1   Domain Node Editing
 4.8.2   Domain Node Types
-4.9   Block -- Domain Switcher
+4.9   Batch Updating
+4.10   Block -- Domain Switcher
 5.  Node Access
 5.1   Assigning Domain Access
 5.2.  Editor Access
@@ -882,7 +883,23 @@ checking the box, nodes for that given type will automatically be assigned to
 'all affiliate sites' during node creation and editing.  
 
 ----
-4.9 Block -- Domain Switcher
+4.9   Batch Updating
+
+The module provides for batch actions for common tasks.  These actions are
+useful for making rapid changes across all domains.  The following actions
+are available by default.
+
+  - Edit all domain values
+  - Edit all site names
+  - Edit all URL schemes
+  - Edit all domain status flags
+
+Additional batch actions are made available for the Domain Configuration
+module.  Other modules may implement hook_domainbatch() to provide
+additional batch actions.
+
+----
+4.10 Block -- Domain Switcher
 
 The Domain Access module provides on block, which can be used to help you
 debug your use of the module.

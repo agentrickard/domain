@@ -1,4 +1,4 @@
-;  $Id $
+;  $Id$
 name = Domain Navigation
 description = Navigation block and menu options for Domain Access
 package = Domain Access

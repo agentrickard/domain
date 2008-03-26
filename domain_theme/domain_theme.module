@@ -131,7 +131,7 @@ function theme_domain_theme_reset($domain) {
   $output .= '<p>'. t('These settings will replace your default site theme when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
   $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE domain_id = %d", $domain['domain_id']));
   if (!empty($data)) {
-    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => 'admin/build/domain/theme-reset/'. $domain['domain_id'])) .'</p>';
+    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/build/domain/theme-reset/'. $domain['domain_id']))) .'</p>';
   }
   return $output;
 }

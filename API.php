@@ -408,6 +408,23 @@ function hook_domainwarnings() {
  * You may wish to pair this hook with hook_domainbatch() to allow the mass update
  * of your settings.
  *
+ * If you wish to store settings that are not related to another module, you must pass
+ * the following parameter:
+ *
+ * $form['myform']['#domain_setting'] = TRUE;
+ *
+ * Doing so will tell Domain Access that no default settings page exists, and that values 
+ * must be stored for the primary domain.  This feature is useful for creating special data
+ * that needs to be associated with a domain record but does not need a separate table.
+ *
+ * Using the variable override of hook_domainconf() is an alternative to creating a module
+ * and database table for use with hook_domainload().
+ *
+ * For site managers who wish to implement this hook in other modules, but cannot wait for
+ * patches, you do not need to hack the code.  Simply put your functions inside a domain_conf.inc
+ * file and place that inside the domain_conf directory.  This file should begin with <?php and conform
+ * to Drupal coding standards.
+ *
  * @param $domain
  *  The $domain object prepared by hook_domainload().
  * @return
@@ -466,7 +483,10 @@ function hook_domainconf($domain) {
  * --- 'custom' == used if you need your own submit handler. Must be paired with a #submit parameter.
  * 
  * - '#submit' [optional] Used with the 'custom' #domain_action to define a custom submit handler for the form.  This value
- * should be a valid function name.
+ * should be a valid function name.  It will be passed the $form_values array for processing.
+ *
+ * - '#validate' [optional] Used to define a validate handler for the form.  This value
+ * should be a valid function name.  It will be passed the $form_values array for processing.
  *
  * - '#lookup' [optional] Used with the 'custom' #domain_action to perform a default value lookup against a custom function.
  * This value should be a valid function name.  Your function must accept the $domain array as a parameter.
@@ -509,6 +529,7 @@ function hook_domainbatch() {
     '#domain_action' => 'domain_conf',
     '#meta_description' => t('Edit my setting value.'),
     '#variable' => 'domain_mysetting',
+    '#validate' => 'domain_mysetting_validate',
     '#data_type' => 'string',
     '#weight' => 0,
   );

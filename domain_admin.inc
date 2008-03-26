@@ -1,5 +1,4 @@
 <?php
-
 // $Id$
 
 /**
@@ -66,11 +65,13 @@ function domain_view() {
     if ($domain['domain_id'] == 0) {
       $actions = l(t('Default settings'), 'admin/build/domain/settings');
       // Grab any extra elements defined by other modules.  If so, allow configuration.
-      $extra = array();
-      $extra = module_invoke_all('domainconf', $domain);      
-      if (!empty($extra)) {
-        $actions .= ' | '. l(t('settings'), 'admin/build/domain/conf/0');
-      }
+      if (module_exists('domain_conf')) {
+        $extra = array();
+        $extra = domain_conf_api();      
+        if (!empty($extra)) {
+          $actions .= ' | '. l(t('settings'), 'admin/build/domain/conf/0');
+        }
+      }  
     }
     else {
       $actions = l(t('edit'), 'admin/build/domain/edit/'. $domain['domain_id']);
@@ -711,7 +712,7 @@ function domain_advanced_form($node_types) {
       '#type' => 'checkboxes',
       '#default_value' => variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path')),
       '#options' => $options,
-      '#description' => t('Some elements may not be editable for all users due to permission restrictions, specifically <em>authoring</a> and <em>menu</em> settings.'),
+      '#description' => t('Some elements may not be editable for all users due to permission restrictions, specifically <em>authoring</a> and menu</em> settings.'),
     );
   }
   $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
@@ -720,7 +721,7 @@ function domain_advanced_form($node_types) {
     '#title' => t('Domain node types'),
     '#collapsible' => TRUE
   );  
-  $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.</p>'));
+  $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.  <br /><em>NOTE: These settings only apply if the "New content settings" option is set to "Only show on selected sites."</em></p>'));
   foreach ($node_types as $key => $value) {
     $form['domain_node']['domain_node_'. $key] = array(
       '#type' => 'checkbox',
@@ -899,8 +900,9 @@ function domain_batch_form($action, $batch, $domains) {
   $form['variable'] = array('#type' => 'value', '#value' => $batch['#variable']);
   $form['table'] = array('#type' => 'value', '#value' => $batch['#table']);
   $form['submit_handler'] = array('#type' => 'value', '#value' => $batch['#submit']);     
+  $form['validate_handler'] = array('#type' => 'value', '#value' => $batch['#validate']);
   $form['data_type'] = array('#type' => 'value', '#value' => domain_batch_data_type($batch['#data_type']));  
-  $form['batch_item'] = array('#type' => 'value', '#value' => $action);  
+  $form['batch_item'] = array('#type' => 'value', '#value' => $action);
   $form['submit'] = array('#type' => 'submit', '#value' => t('Update domain settings'));
   return $form;
 }
@@ -938,11 +940,24 @@ function theme_domain_batch_form($form) {
  */
 function theme_domain_batch_title($batch) {
   $output = '';
-  $output = '<h3>'. $batch['#form']['#title'] . '</h3>' . $batch['#meta_description'];
+  $output = '<p>'. $batch['#meta_description'] .'</p>';
   if (!empty($batch['#required'])) {
     $output .= '<p><em>'. t('All values are required.') . '</em></p>';
   }
   return $output;
+}
+
+/**
+ * FormsAPI
+ *
+ * @ingroup $domain
+ */
+function domain_batch_form_validate($form_id, $form_values) {
+  // Define the validation function and call it.
+  $validate = $form_values['validate_handler'];
+  if (function_exists($validate)) {
+    $validate($form_values);
+  }
 }
 
 /**
@@ -1002,7 +1017,7 @@ function domain_batch_form_submit($form_id, $form_values) {
       }
       break;
     case 'custom':
-      if (isset($form_values['submit_handler'])) {
+      if (function_exists($form_values['submit_handler'])) {
         $func = $form_values['submit_handler'];
         $func($form_values);
       }

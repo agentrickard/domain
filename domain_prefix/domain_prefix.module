@@ -15,6 +15,7 @@ define(DOMAIN_PREFIX_IGNORE, 1);
 define(DOMAIN_PREFIX_CREATE, 2);
 define(DOMAIN_PREFIX_COPY, 4);
 define(DOMAIN_PREFIX_DROP, 8);
+define(DOMAIN_PREFIX_UPDATE, 16);
 
 /**
  * Implements hook_menu()
@@ -298,6 +299,7 @@ function theme_domain_prefix_configure_form($form) {
   $output = t('<p>These settings control advanced functions.  Please read the documentation carefully.</p>');
   $header = array(t('Table'), t('Source'), t('Ignore'), t('Create'), t('Copy'));
   if ($form['prefix_theme']['#value'] > 0) {
+    $header[] = t('Update');
     $header[] = t('Drop');
     unset($form['prefix_theme']);
   }
@@ -405,6 +407,7 @@ function domain_prefix_form($domain_id, $arguments = array()) {
       if ($settings[$table] > 0) {
         $exists = domain_prefix_table_exists($prefix, $table);
         if ($exists > 0) {
+          $options[DOMAIN_PREFIX_UPDATE] = t('update');        
           $options[DOMAIN_PREFIX_DROP] = t('drop');
           $delete_flag++;
         }  
@@ -563,6 +566,18 @@ function domain_prefix_form_submit($form_id, $form_values) {
           }
           else if ($current[$oldtable]['status'] == DOMAIN_PREFIX_CREATE) {
             drupal_set_message(t('!string table cannot be copied, since it already exists.', array('!string' => $newtable)));
+          }
+        }
+        else if ($value == DOMAIN_PREFIX_UPDATE) {
+          if ($exists > 0) {
+            db_query("TRUNCATE TABLE {%s}", $newtable);
+            db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);            
+            if ($msg) {          
+              drupal_set_message(t('!string table updated from source.', array('!string' => $newtable)));
+            }
+            $update = TRUE;
+            // Set the stored value to "copy" for record keeping.
+            $value = DOMAIN_PREFIX_COPY;
           }
         }
         else if ($value == DOMAIN_PREFIX_DROP) {

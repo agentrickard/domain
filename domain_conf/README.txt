@@ -18,9 +18,11 @@ CONTENTS
 2.  Installation
 2.1   Dependencies
 2.2   Configuration Options
-3.  Developer Notes
-3.1   Additional Form Elements
-3.2   Database Schema
+3.  Batch Updates
+4.  Developer Notes
+4.1   Extending Options with hook_domainconf()
+4.2   Using domain_conf.inc
+4.3   Database Schema
 
 ----
 1.  Introduction
@@ -101,7 +103,7 @@ defaults. If you do not adjust these settings, defaults will be used for all
 affiliates.
 
 ----
-3.  Developer Notes
+4.  Developer Notes
 
 The Domain Conf module is the model for extending Domain Acccess.
 
@@ -113,15 +115,76 @@ The following form elements were removed during beta testing:
 See http://drupal.org/node/197692 for the reasons.
 
 ----
-3.1   Additional Form Elements
+4.1   Extending Options with hook_domainconf()
 
 The module works by applying hook_form_alter() to the form: 
 'system_settings_form' and then adding addiitonal fields from other forms.
 
-A hook for adding new form elements will be developed shortly.
+hook_domainconf() allows developers to add additional form elements.
+
+Note that you may use this hook to create variables that are independent
+of other Drupal modules.  To do so, be sure to set the '#domain_setting' flag
+to TRUE before returning your $form array.
+
+ - $form['myform']['#domain_setting'] = TRUE;
+
+Please see the full documentation in the API.
+
+http://therickards.com/api/function/hook_domainconf/Domain
 
 ----
-3.2   Database Schema
+4.2   Using domain_conf.inc
+
+The normal method for using hook_domainconf() is to have the hook implemented
+in other modules.
+
+However, the community development process may mean that it will take time for 
+the hook to be implemented in modules that you may be using.
+
+To allow for this fact without harming the upgrade path for Domain
+Configuration, it is possible to create a domain_conf.inc file that you place 
+inside the domain_conf directory.
+
+This file should be a PHP file, and it should conform to Drupal coding 
+standards.
+
+For example, to add the user picture default setting to the module without 
+patching user.module or domain_conf.module, you may create the following
+file:
+
+====
+<?php
+/**
+ * Implements hook_domainconf() to add the user picture.
+ */
+function user_domainconf($domain) {
+  $form['pictures'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('User picture'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,    
+  );
+  $form['pictures']['user_picture_default'] = array(
+    '#type' => 'textfield', 
+    '#title' => t('Default picture'), 
+    '#default_value' => variable_get('user_picture_default', ''), 
+    '#size' => 30, 
+    '#maxlength' => 255, 
+    '#description' => t('URL of picture to display for users with no custom 
+      picture selected. Leave blank for none.')
+  );
+  return $form;
+} 
+====
+
+NOTE: Before upgrading the Domain module, be sure to save this file
+so that it may be replaced in the event it is deleted.  Note also that the
+domain_conf.inc file is not included in the module package.
+
+See http://drupal.org/node/236877 for additional background.
+
+----
+4.3   Database Schema
 
 Installing the module creates a {domain_conf} table that contains:
 
@@ -132,5 +195,3 @@ Installing the module creates a {domain_conf} table that contains:
   - settings
   Blob (bytea)
   A serialized array of settings for this domain.
-
-  
