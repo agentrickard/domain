@@ -10,29 +10,25 @@
  * Implements hook_install()
  */
 function domain_conf_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysqli':
-    case 'mysql':
-      db_query(
-        "CREATE TABLE IF NOT EXISTS {domain_conf} (
-           domain_id int(11) NOT NULL default '0',
-           settings blob,
-           PRIMARY KEY (domain_id)
-           ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {domain_conf} (
-        domain_id integer NOT NULL default '0',
-        settings bytea,
-        PRIMARY KEY (domain_id)        
-        )");     
-      break;
-  }  
+  drupal_install_schema('domain_conf');
+}
+
+/**
+ * Implements hook_schema()
+ */
+function domain_conf_schema() {
+  $schema['domain_conf'] = array(
+    'fields' => array(
+      'domain_id' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'settings' => array('type' => 'blob', 'not null' => FALSE)),
+    'primary key' => array('domain_id'),
+  );
+  return $schema;
 }
 
 /**
  * Implements hook_uninstall()
  */
 function domain_conf_uninstall() {
-  db_query("DROP TABLE {domain_conf}");
+  drupal_uninstall_schema('domain_conf');
 }

@@ -2,4 +2,5 @@
 name = Domain Source
 description = Creates a source domain for linking to content from other domains.
 package = Domain Access
-dependencies = domain
+dependencies[] = domain
+core = 6.x

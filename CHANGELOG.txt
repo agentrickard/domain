@@ -1,5 +1,9 @@
 // $Id$
 
+25-MAR-2008 (3)
+
+-- Begins the Drupal 6 port.  HEAD is now considered unstable.
+
 25-MAR-2008 (2)
 
 -- Adds batch function documentation.

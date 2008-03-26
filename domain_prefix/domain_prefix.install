@@ -12,29 +12,24 @@
  * @ingroup drupal
  */
 function domain_prefix_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysqli':
-    case 'mysql':
-      db_query("CREATE TABLE IF NOT EXISTS {domain_prefix} (
-       domain_id int(11) NOT NULL default 0,
-       status smallint NOT NULL default 0,
-       tablename varchar(80) NOT NULL default '',
-       module varchar(80) NOT NULL default '', 
-       source smallint NOT NULL default 0,       
-       INDEX (domain_id)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {domain_prefix} (
-       domain_id integer NOT NULL default 0,
-       status smallint NOT NULL default 0,
-       tablename varchar(80) NOT NULL default '',
-       module varchar(80) NOT NULL default '',
-       source smallint NOT NULL default 0       
-      )");     
-      db_query("CREATE INDEX {domain_prefix}_domain_id_idx ON {domain_prefix} (domain_id)");
-      break;
-  }
+  drupal_install_schema('domain_prefix');
+}
+
+/**
+ * Implements hook_schema()
+ */
+function domain_prefix_schema() {
+  $schema['domain_prefix'] = array(
+    'fields' => array(
+      'domain_id' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'status' => array('type' => 'int', 'size' => 'small', 'not null' => TRUE, 'default' => 0),
+      'tablename' => array('type' => 'varchar', 'length' => '80', 'not null' => TRUE, 'default' => ''),
+      'module' => array('type' => 'varchar', 'length' => '80', 'not null' => TRUE, 'default' => ''),
+      'source' => array('type' => 'int', 'size' => 'small', 'not null' => TRUE, 'default' => 0)),
+    'indexes' => array(
+      'domain_id' => array('domain_id')),
+  );
+  return $schema;
 }
 
 /**
@@ -48,28 +43,20 @@ function domain_prefix_uninstall() {
     db_query("DROP TABLE {%s}", $name);
   }
   // Now drop the storage table.
-  db_query("DROP TABLE {domain_prefix}");
+  drupal_uninstall_schema('domain_prefix');
   variable_del('domain_prefix');
   variable_del('domain_prefix_options');  
 }
 
 
 /**
- * Update from beta6 to beta7.
- * Adds the source column to the database.
+ * Update note.
+ *
+ * Since versions prior to 5.x.1.0 are not supported, and ther are no schema changes from
+ * 5.x.1 to 6.x.1, no update functions have been provided for Drupal 6.
+ *
+ * To upgrade from a release candidate, first upgrade the module to 5.x.1.0.  Then upgrade
+ * to Drupal 6.
+ *
+ * Developer note: the next update will be update 2.
  */
-function domain_prefix_update_1() {
-  $ret = array();
-
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {domain_prefix} ADD COLUMN source smallint NOT NULL DEFAULT 0");
-      break;
-    case 'pgsql':
-      db_add_column($ret, 'domain_prefix', 'source', 'smallint', array('not null' => TRUE, 'default' => 0));
-      break;
-  }
-
-  return $ret;  
-}

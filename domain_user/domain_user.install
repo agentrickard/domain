@@ -8,29 +8,24 @@
 
 /**
  * Implements hook_install()
- *
- * @ingroup drupal
  */
 function domain_user_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysqli':
-    case 'mysql':
-      db_query("CREATE TABLE IF NOT EXISTS {domain_user} (
-       domain_id int(11) NOT NULL default '0',
-       uid int(11) NOT NULL default '0',
-       INDEX (domain_id),
-       INDEX (uid)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {domain_user} (
-       domain_id integer NOT NULL default 0,
-       uid integer NOT NULL default 0    
-      )");     
-      db_query("CREATE INDEX {domain_user}_domain_id_idx ON {domain_user} (domain_id)");
-      db_query("CREATE INDEX {domain_user}_uid_idx ON {domain_user} (uid)");      
-      break;
-  }
+  drupal_install_schema('domain_user');
+}
+
+/**
+ * Implements hook_schema()
+ */
+function domain_user_schema() {
+  $schema['domain_user'] = array(
+    'fields' => array(
+      'domain_id' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'uid' => array('type' => 'int', 'not null' => TRUE, 'default' => 0)),
+    'indexes' => array(
+      'domain_id' => array('domain_id'),
+      'uid' => array('uid')),
+  );
+  return $schema;
 }
 
 /**
@@ -38,7 +33,7 @@ function domain_user_install() {
  */
 function domain_user_uninstall() {
   // Drop the storage table.
-  db_query("DROP TABLE {domain_user}");
+  drupal_uninstall_schema('domain_user');
   variable_del('domain_user');
   variable_del('domain_user_root');
   variable_del('domain_user_scheme');  

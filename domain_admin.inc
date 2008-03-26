@@ -854,7 +854,7 @@ function domain_batch_sort($a, $b) {
  *
  * @ingroup domain
  */ 
-function domain_batch_form($action, $batch, $domains) {
+function domain_batch_form($form_state, $action, $batch, $domains) {
   $default = array();
   drupal_set_title($batch['#form']['#title']);
 

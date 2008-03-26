@@ -2,4 +2,5 @@
 name = Domain Configuration
 description = Advanced site configuration options for Domain Access.
 package = Domain Access
-dependencies = domain
+dependencies[] = domain
+core = 6.x

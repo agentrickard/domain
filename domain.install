@@ -10,114 +10,52 @@
  * Implements hook_install()
  */
 function domain_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysqli':
-    case 'mysql':
-      db_query("CREATE TABLE {domain} (
-        domain_id int(11) NOT NULL AUTO_INCREMENT,
-        subdomain varchar(40) NOT NULL default '',
-        sitename varchar(80) NOT NULL default '',
-        scheme varchar(8) NOT NULL default 'http',
-        valid varchar(1) NOT NULL default 1,        
-        PRIMARY KEY  (domain_id),
-        KEY subdomain (subdomain)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
-      db_query("CREATE TABLE {domain_access} (
-        nid int unsigned NOT NULL default '0',
-        gid int unsigned NOT NULL default '0',
-        realm varchar(255) NOT NULL default '',
-        PRIMARY KEY (nid,gid,realm),
-        INDEX (nid)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");        
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {domain} (
-        domain_id serial,
-        subdomain varchar(40) NOT NULL default '',
-        sitename varchar(80) NOT NULL default '',
-        scheme varchar(8) NOT NULL default 'http',   
-        valid varchar(1) NOT NULL default 1,                
-        PRIMARY KEY (domain_id)
-        )");   
-      db_query("CREATE INDEX {domain}_subdomain_idx ON {domain} (subdomain)");
-      db_query("CREATE TABLE {domain_access} (
-        nid int_unsigned NOT NULL default '0',
-        gid int_unsigned NOT NULL default '0',
-        realm varchar(255) NOT NULL default '',
-        PRIMARY KEY (nid,gid,realm)
-      )");      
-      db_query("CREATE INDEX {domain_access}_nid_idx ON {domain_access} (nid)");      
-      break;
-  } 
-  // Create the 'all' realm for Domain Access.
-  db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");    
+  drupal_install_schema('domain');
+}
+
+/**
+ * Implements hook_schema()
+ */
+function domain_schema() {
+  $schema['domain'] = array(
+    'fields' => array(
+      'domain_id' => array('type' => 'serial', 'not null' => TRUE),
+      'subdomain' => array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => ''),
+      'sitename' => array('type' => 'varchar', 'length' => '80', 'not null' => TRUE, 'default' => ''),
+      'scheme' => array('type' => 'varchar', 'length' => '8', 'not null' => TRUE, 'default' => 'http'),
+      'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1')),
+    'primary key' => array('domain_id'),
+    'indexes' => array(
+      'subdomain' => array('subdomain')),
+  );
+  $schema['domain_access'] = array(
+    'fields' => array(
+      'nid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+      'gid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+      'realm' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '')),
+    'primary key' => array('nid', 'gid', 'realm'),
+    'indexes' => array(
+      'nid' => array('nid')),
+  );
+  return $schema;
 }
 
 /**
  * Implements hook_uninstall()
  */
 function domain_uninstall() {
-  db_query("DROP TABLE {domain}");
-  db_query("DROP TABLE {domain_access}");  
+  drupal_uninstall_schema('domain');
   db_query("DELETE from {variable} WHERE name LIKE '%s%%'", 'domain_');
 }
 
 /**
- * Updates from beta6 to beta 7
- * Adds the valid column to the database.
- */
-function domain_update_1() {
-  $ret = array();
-
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      $ret[] = update_sql("ALTER TABLE {domain} ADD COLUMN valid varchar(1) NOT NULL DEFAULT 1");
-      break;
-    case 'pgsql':
-      db_add_column($ret, 'domain', 'valid', 'varchar(1)', array('not null' => TRUE, 'default' => 1));
-      break;
-  }
-  return $ret;  
-}
-
-/**
- * Updates from rc2 to rc3.  Adds the {domain_access} table and copies
- * data from {node_access} to {domain_access}.
+ * Update note.
  *
- * Required to prevent deletions during node_access_rebuild().
- * See http://groups.drupal.org/node/7956
+ * Since versions prior to 5.x.1.0 are not supported, and ther are no schema changes from
+ * 5.x.1 to 6.x.1, no update functions have been provided for Drupal 6.
+ *
+ * To upgrade from a release candidate, first upgrade the module to 5.x.1.0.  Then upgrade
+ * to Drupal 6.
+ *
+ * Developer note: the next update will be update 3.
  */
-function domain_update_2() {
-  $ret = array();
-
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':     
-      $ret[] = update_sql("CREATE TABLE {domain_access} (
-        nid int unsigned NOT NULL default '0',
-        gid int unsigned NOT NULL default '0',
-        realm varchar(255) NOT NULL default '',
-        PRIMARY KEY (nid,gid,realm),
-        INDEX (nid)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");      
-      break;
-    case 'pgsql':
-      $ret[] = update_sql("CREATE TABLE {domain_access} (
-        nid int_unsigned NOT NULL default '0',
-        gid int_unsigned NOT NULL default '0',
-        realm varchar(255) NOT NULL default '',
-        PRIMARY KEY (nid,gid,realm)
-      )");     
-      $ret[] = update_sql("CREATE INDEX {domain_access}_nid_idx ON {domain_access} (nid)");   
-      break;
-  }
-  $realms = array('domain_site', 'domain_id', 'domain_editor');
-  foreach ($realms as $realm) {
-    $result = db_query("SELECT * FROM {node_access} WHERE realm = '%s'", $realm);
-    while ($data = db_fetch_array($result)) {
-      db_query("INSERT INTO {domain_access} VALUES (%d, %d, '%s')", $data['nid'], $data['gid'], $data['realm']);
-    }
-  }
-  return $ret;
-}

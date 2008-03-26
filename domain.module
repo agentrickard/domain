@@ -25,14 +25,14 @@ define('DOMAIN_EDITOR_RULE', FALSE);
 define('DOMAIN_SITE_GRANT', TRUE);
 
 /**
- * Implements hook_init()
+ * Implements hook_boot()
  *
  * Inititalizes a global $_domain variable and set it based on the 
  * third-level domain used to access the page.
  *
  * @ingroup drupal
  */
-function domain_init() {
+function domain_boot() {
   global $_domain, $conf;
   $_domain = array();
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
@@ -61,86 +61,89 @@ function domain_init() {
 }
 
 /**
+ * Implements hook_init()
+ *
+ * @ingroup drupal
+ */
+function domain_init() {
+  // Make sure that our default grant is set at all times.
+  if (arg(0) == 'admin') {
+    domain_set_default_grant();
+  }
+}
+
+/**
  * Implements hook_menu()
  *
  * @ingroup drupal
  */
-function domain_menu($may_cache) {
+function domain_menu() {
   $items = array();
   $admin = user_access('administer domains');
-  if ($may_cache) {
-    $items[] = array(
-      'title' => t('Domains'),
-      'path' => 'admin/build/domain',
-      'access' => $admin,
-      'callback' => 'domain_admin',
-      'callback arguments' => array('configure'),
-      'description' => t('Settings for the Domain Access module.')
+  $items['admin/build/domain'] = array(
+    'title' => t('Domains'),
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_configure',
+    'file' => 'domain_admin.inc',
+    'description' => t('Settings for the Domain Access module.')
+  );    
+  $items['admin/build/domain/settings'] = array(
+    'title' => t('Settings'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_configure',
+    'file' => 'domain_admin.inc',
+    'weight' => -10
+  );     
+  $items['admin/build/domain/view'] = array(
+    'title' => t('Domain list'),
+    'type' => MENU_LOCAL_TASK, 
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_view',
+    'file' => 'domain_admin.inc',    
+    'weight' => -8
+  );    
+  $items['admin/build/domain/create'] = array(
+    'title' => t('Create domain record'),
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_create',
+    'file' => 'domain_admin.inc',      
+    'weight' => -4      
     );    
-    $items[] = array(
-      'title' => t('Settings'),
-      'path' => 'admin/build/domain/settings',
-      'access' => $admin,
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'callback' => 'domain_admin',
-      'callback arguments' => array('configure'),
-      'weight' => -10
-    );     
-    $items[] = array(
-      'title' => t('Domain list'),
-      'path' => 'admin/build/domain/view',
-      'access' => $admin,
-      'type' => MENU_LOCAL_TASK,      
-      'callback' => 'domain_admin',
-      'callback arguments' => array('view'),
-      'weight' => -8
-    );    
-    $items[] = array(
-      'title' => t('Create domain record'),
-      'path' => 'admin/build/domain/create',
-      'access' => $admin,
+  $items['admin/build/domain/advanced'] = array(
+    'title' => t('Node settings'),
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_advanced',
+    'file' => 'domain_admin.inc',      
+    'weight' => -2
+  );      
+  // Register the batch actions as menu callbacks
+  $batch = module_invoke_all('domainbatch');
+  if (!empty($batch)) {
+    $items['admin/build/domain/batch'] = array(
+      'title' => t('Batch updating'),
       'type' => MENU_LOCAL_TASK,
-      'callback' => 'domain_admin',
-      'callback arguments' => array('create'),
-      'weight' => -4      
-    );    
-    $items[] = array(
-      'title' => t('Node settings'),
-      'path' => 'admin/build/domain/advanced',
-      'access' => $admin,
-      'type' => MENU_LOCAL_TASK,
-      'callback' => 'domain_admin',
-      'callback arguments' => array('advanced'),
-      'weight' => -2
-    );      
-    // Register the batch actions as menu callbacks
-    $batch = module_invoke_all('domainbatch');
-    if (!empty($batch)) {
-      $items[] = array(
-        'title' => t('Batch updating'),
-        'path' => 'admin/build/domain/batch',
-        'access' => $admin,
-        'type' => MENU_LOCAL_TASK,
-        'callback' => 'domain_admin',
-        'callback arguments' => array('batch'),
-        'weight' => 0
-      );
-      // Get the submenu items
-      foreach ($batch as $key => $value) {
-        $items[] = array(
-          'title' => $value['#form']['#title'],
-          'path' => 'admin/build/domain/batch/'. $key,
-          'access' => $admin,
-          'type' => MENU_CALLBACK,
-          'callback' => 'domain_admin',
-          'callback arguments' => array('batch', $key),
-          'weight' => $value['#weight']
-        );      
-      }  
+      'access arguments' => array('administer domains'),
+      'page callback' => 'domain_batch',
+      'file' => 'domain_admin.inc',    
+      'weight' => 0
+    );
+    // Get the submenu items
+    foreach ($batch as $key => $value) {
+      $items['admin/build/domain/batch/'. $key] = array(
+        'title' => $value['#form']['#title'],
+        'type' => MENU_CALLBACK,
+        'access arguments' => array('administer domains'),
+        'page callback' => 'domain_batch',
+        'page arguments' => array($key),
+        'file' => 'domain_admin.inc',            
+        'weight' => $value['#weight']
+      );      
     }  
   }  
-  else {    
-    $items[] = array(
+  $items[] = array(
       'title' => t('Edit domain record'),
       'path' => 'admin/build/domain/edit',
       'access' => $admin,
@@ -156,11 +159,6 @@ function domain_menu($may_cache) {
       'callback' => 'domain_admin',
       'callback arguments' => array('delete', arg(4))      
     );
-    // Make sure that our default grant is set at all times.
-    if (arg(0) == 'admin') {
-      domain_set_default_grant();
-    }  
-  }
   return $items;
 }
 

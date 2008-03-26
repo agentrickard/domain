@@ -8,35 +8,29 @@
 
 /**
  * Implements hook_install()
- *
- * @ingroup drupal
  */
 function domain_theme_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysqli':
-    case 'mysql':
-      db_query("CREATE TABLE IF NOT EXISTS {domain_theme} (
-       domain_id int(11) NOT NULL default '0',
-       theme varchar(32) NOT NULL default '',
-       settings blob,
-       PRIMARY KEY (domain_id)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {domain_theme} (
-       domain_id integer NOT NULL default 0,
-       theme varchar(32) NOT NULL default '',
-       settings bytea,
-       PRIMARY KEY (domain_id)
-      )");     
-      break;
-  }
+  drupal_install_schema('domain_theme');
+}
+
+/**
+ * Implements hook_schema()
+ */
+function domain_theme_schema() {
+  $schema['domain_theme'] = array(
+    'fields' => array(
+      'domain_id' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'theme' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
+      'settings' => array('type' => 'blob', 'not null' => FALSE)),
+    'primary key' => array('domain_id'),
+  );
+  return $schema;
 }
 
 /**
  * Implements hook_uninstall()
  */
 function domain_theme_uninstall() {
-  db_query("DROP TABLE {domain_theme}");
+  drupal_uninstall_schema('domain_theme');
   variable_del('domain_theme_weight');
 }
