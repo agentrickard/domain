@@ -1,5 +1,11 @@
 // $Id$
 
+30-MAR-2008 (2)
+
+-- domain_default() not using domainload correctly.
+-- Recreate domain_user_rules() on domain update.
+-- Domain Views used DOS linebreaks.
+
 30-MAR-2008
 
 -- First full port to Drupal 6.

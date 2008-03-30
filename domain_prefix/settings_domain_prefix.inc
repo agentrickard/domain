@@ -6,6 +6,8 @@
  * Dynamic domain table prefix loading.
  *
  * Loads the table prefixes for the current domain.
+ *
+ * @ingroup domain_prefix
  */
 
 _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);

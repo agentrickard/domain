@@ -402,8 +402,7 @@ function domain_default($reset = FALSE) {
     // Set the valid flag.
     $default['valid'] = TRUE;
     // Let submodules overwrite the defaults, if they wish.
-    $extra = module_invoke_all('domainload', $default);
-    $default = array_merge($default, $extra);
+    $extra = domain_api($default);
   }
   return $default;
 }

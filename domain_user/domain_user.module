@@ -272,6 +272,7 @@ function domain_user_domainupdate($op, $domain = array(), $edit = array()) {
         $mask = str_replace('.'. $root, '', $domain['subdomain']);
         db_query("DELETE FROM {access} WHERE mask = '%s'", $mask);
       }
+      domain_user_rules();
       break;
     case 'delete':
       // Delete from {domain_user}

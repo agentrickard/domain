@@ -16,6 +16,7 @@
  * Then we run our function, overriding the default $conf variables, as
  * indicated in settings.php
  *
+ * @ingroup domain_conf
  */
 
 _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
