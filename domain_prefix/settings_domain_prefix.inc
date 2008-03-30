@@ -6,8 +6,10 @@
  * Dynamic domain table prefix loading.
  *
  * Loads the table prefixes for the current domain.
+ *
+ * @ingroup domain_prefix
  */
- 
+
 _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 _domain_prefix_load();
 
@@ -38,7 +40,7 @@ function _domain_prefix_load() {
           $new_prefix['default'] = $db_prefix;
           $prefix = $db_prefix . $prefix;
         }
-        foreach($tables as $table) {
+        foreach ($tables as $table) {
           $new_prefix[$table] = $prefix;
         }
         $db_prefix = $new_prefix;

@@ -2,17 +2,22 @@
 // $Id$
 
 /**
+ * @defgroup domain_conf Domain Conf: configuration extension
+ * Functions for the Domain Conf module.
+ */
+
+/**
  * @file
  * Domain manager configuration options.
  *
- * For this module to work correctly, you will need to follow the INSTALL.txt 
+ * For this module to work correctly, you will need to follow the INSTALL.txt
  * instructions for editing your settings.php file.
+ *
+ * @ingroup domain_conf
  */
 
 /**
  * Implements hook_menu()
- *
- * @ingroup drupal
  */
 function domain_conf_menu($may_cache) {
   $items = array();
@@ -23,16 +28,16 @@ function domain_conf_menu($may_cache) {
       'access' => user_access('administer domains'),
       'type' => MENU_CALLBACK,
       'callback' => 'domain_conf_page',
-      'callback arguments' => array(arg(4))      
-    );    
+      'callback arguments' => array(arg(4))
+    );
     $items[] = array(
       'title' => t('Domain site settings'),
       'path' => 'admin/build/domain/conf-reset',
       'access' => user_access('administer domains'),
       'type' => MENU_CALLBACK,
       'callback' => 'domain_conf_reset',
-      'callback arguments' => array(arg(4))      
-    ); 
+      'callback arguments' => array(arg(4))
+    );
     // Allow sites to add implementations of hook_domainconf() without hacking.
     // See http://drupal.org/node/236877.
     if (arg(0) == 'admin') {
@@ -50,8 +55,6 @@ function domain_conf_menu($may_cache) {
  *
  * @param $domain_id
  *  The unique identifier for this domain, taken from {domain}.
- *
- * @ingroup conf
  */
 function domain_conf_page($domain_id) {
   global $_domain;
@@ -68,18 +71,16 @@ function domain_conf_page($domain_id) {
   }
   else {
     return t('Invalid domain request.');
-  } 
+  }
 }
 
-/** 
+/**
  * Special configuration options for the main domain.
  *
  * @param $domain
  * The $domain object for the default domain.
  * @return
  * A $form array according to the FormsAPI, if unique configuration is possible.
- *
- * @ingroup conf
  */
 
 function domain_conf_default($domain) {
@@ -91,20 +92,20 @@ function domain_conf_default($domain) {
     // Convert the $extra array to the $form array.
     $form = $extra;
     $form['domain_conf_message'] = array(
-      '#type' => 'markup', 
+      '#type' => 'markup',
       '#value' => t('<p>The following custom settings may be applied to the main domain.  These options are specific to the Domain module and do not have standard configuration pages.</p>'),
       '#weight' => -100,
-    );      
+    );
     // Domain information, for saving.
     $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
     // Submit functions
     $form['#submit']['domain_conf_form_submit'] = array();
-    $form['#validate']['domain_conf_form_validate'] = array();      
+    $form['#validate']['domain_conf_form_validate'] = array();
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Save domain settings'),
       '#weight' => 10
-    );   
+    );
   }
   else {
     $form['domain_conf_message'] = array('#type' => 'markup', '#value' => t('There are no custom domain settings to configure.'));
@@ -114,8 +115,6 @@ function domain_conf_default($domain) {
 
 /**
  * Implements hook_domainlinks()
- *
- * @ingroup conf
  */
 function domain_conf_domainlinks($domain) {
   $links[] = array(
@@ -130,8 +129,6 @@ function domain_conf_domainlinks($domain) {
  *
  * Since this function is only loaded at the path admin/build/domain/conf, we
  * don't have to worry about hook_form_alter() being called when not wanted.
- *
- * @ingroup conf
  */
 function domain_conf_form_alter($form_id, &$form) {
   // Set a message if we are on an admin page.
@@ -144,7 +141,7 @@ function domain_conf_form_alter($form_id, &$form) {
     $action = arg(3);
     if ($module == 'domain' && $action == 'conf') {
       $domain_id = arg(4);
-      $domain = domain_lookup($domain_id);  
+      $domain = domain_lookup($domain_id);
       $data = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
       if (!empty($data)) {
         $settings = unserialize($data);
@@ -161,7 +158,7 @@ function domain_conf_form_alter($form_id, &$form) {
         '#title' => t('Domain information'),
         '#collapsible' => TRUE,
         '#weight' => -10
-      );    
+      );
       // Put the defaults in the fieldset
       $fields = array('site_name', 'site_mail', 'site_slogan', 'site_mission', 'site_footer', 'site_frontpage', 'anonymous', 'xcoord', 'ycoord');
       foreach ($fields as $field) {
@@ -171,11 +168,11 @@ function domain_conf_form_alter($form_id, &$form) {
 
       // Change the path for the frontpage.
       $prefix = $form['main']['site_frontpage']['#field_prefix'];
-      $_path = parse_url($prefix);    
+      $_path = parse_url($prefix);
       $str = $_path['host'];
       $fix = preg_replace("/$str/", $domain['subdomain'], $prefix, 1);
       $form['main']['site_frontpage']['#field_prefix'] = $fix;
-      
+
       // Admin theme settings
       $themes = list_themes();
       ksort($themes);
@@ -188,7 +185,7 @@ function domain_conf_form_alter($form_id, &$form) {
         '#title' => t('Administrative theme'),
         '#options' => $options,
         '#default_value' => variable_get('admin_theme', '0'),
-      );        
+      );
 
       // Date settings: set the default timezone
       $form['date'] = array(
@@ -196,22 +193,22 @@ function domain_conf_form_alter($form_id, &$form) {
         '#title' => t('Timezone settings'),
         '#collapsible' => TRUE,
         '#weight' => -5
-      );  
-      $zones = _system_zonelist();    
+      );
+      $zones = _system_zonelist();
       $form['date']['date_default_timezone'] = array(
         '#type' => 'select',
         '#title' => t('Default time zone'),
         '#default_value' => isset($settings['date_default_timezone']) ? $settings['date_default_timezone'] : variable_get('date_default_timezone', 0),
         '#options' => $zones,
         '#description' => t('Select the default site time zone.')
-      );    
+      );
       // Offline notices.
       $form['offline'] = array(
         '#type' => 'fieldset',
         '#title' => t('Maintenance settings'),
         '#collapsible' => TRUE,
         '#weight' => 5
-      );      
+      );
       $form['offline']['site_offline'] = array(
         '#type' => 'radios',
         '#title' => t('Site status'),
@@ -219,14 +216,14 @@ function domain_conf_form_alter($form_id, &$form) {
         '#options' => array(t('Online'), t('Off-line')),
         '#description' => t('When set to "Online", all visitors will be able to browse your site normally. When set to "Off-line", only users with the "administer site configuration" permission will be able to access your site to perform maintenance; all other visitors will see the site off-line message configured below. Authorized users can log in during "Off-line" mode directly via the <a href="@user-login">user login</a> page.', array('@user-login' => url('user'))),
       );
-    
+
       $form['offline']['site_offline_message'] = array(
         '#type' => 'textarea',
         '#title' => t('Site off-line message'),
         '#default_value' => isset($settings['site_offline_message']) ? $settings['site_offline_message'] : variable_get('site_offline_message', t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => $domain['sitename']))),
         '#description' => t('Message to show visitors when the site is in off-line mode.')
-      );    
-      
+      );
+
       // Site name must be edited at the domain creation screen.
       $form['main']['site_name']['#disabled'] = TRUE;
       $form['main']['site_name']['#description'] = t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/'. $domain['domain_id'])));
@@ -234,36 +231,34 @@ function domain_conf_form_alter($form_id, &$form) {
       // Reset the provided form defaults, if needed
       $form['main']['site_name']['#default_value'] = $domain['sitename'];
       $form['main']['site_mail']['#default_value'] = isset($settings['site_mail']) ? $settings['site_mail'] : variable_get('site_mail', ini_get('sendmail_from'));
-      $form['main']['site_slogan']['#default_value'] = isset($settings['site_slogan']) ? $settings['site_slogan'] : variable_get('site_slogan', '');    
-      $form['main']['site_mission']['#default_value'] = isset($settings['site_mission']) ? $settings['site_mission'] : variable_get('site_mission', '');    
-      $form['main']['site_footer']['#default_value'] = isset($settings['site_footer']) ? $settings['site_footer'] : variable_get('site_footer', '');    
-      $form['main']['site_frontpage']['#default_value'] = isset($settings['site_frontpage']) ? $settings['site_frontpage'] : variable_get('site_frontpage', 'node');    
-      $form['main']['anonymous']['#default_value'] = isset($settings['anonymous']) ? $settings['anonymous'] : variable_get('anonymous', t('Guest'));    
-      
+      $form['main']['site_slogan']['#default_value'] = isset($settings['site_slogan']) ? $settings['site_slogan'] : variable_get('site_slogan', '');
+      $form['main']['site_mission']['#default_value'] = isset($settings['site_mission']) ? $settings['site_mission'] : variable_get('site_mission', '');
+      $form['main']['site_footer']['#default_value'] = isset($settings['site_footer']) ? $settings['site_footer'] : variable_get('site_footer', '');
+      $form['main']['site_frontpage']['#default_value'] = isset($settings['site_frontpage']) ? $settings['site_frontpage'] : variable_get('site_frontpage', 'node');
+      $form['main']['anonymous']['#default_value'] = isset($settings['anonymous']) ? $settings['anonymous'] : variable_get('anonymous', t('Guest'));
+
       // Domain information, for saving.
       $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-      
+
       // Grab any extra elements defined by other modules.
       $extra = domain_conf_api(TRUE);
       // Merge the $extra and $form arrays.
       $form = array_merge($form, $extra);
-  
+
       // Submit functions
       $form['#submit']['domain_conf_form_submit'] = array();
-      $form['#validate']['domain_conf_form_validate'] = array();      
+      $form['#validate']['domain_conf_form_validate'] = array();
       $form['submit'] = array(
         '#type' => 'submit',
         '#value' => t('Save domain settings'),
         '#weight' => 10
-      );    
-    }  
+      );
+    }
   }
 }
 
 /**
  * FormsAPI
- *
- * @ingroup conf
  */
 function domain_conf_form_submit($form_id, $form_values) {
   // Throw away what we don't need.
@@ -273,13 +268,13 @@ function domain_conf_form_submit($form_id, $form_values) {
     unset($settings[$key]);
   }
   // INSERT or UPDATE?
-  $check = db_fetch_array(db_query("SELECT domain_id FROM {domain_conf} WHERE domain_id = %d", $form_values['domain_id']));  
+  $check = db_fetch_array(db_query("SELECT domain_id FROM {domain_conf} WHERE domain_id = %d", $form_values['domain_id']));
   if (isset($check['domain_id'])) {
     $sql = "UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d";
     db_query($sql, serialize($settings), $form_values['domain_id']);
   }
   else {
-    $sql = "INSERT INTO {domain_conf} VALUES (%d, %b)"; 
+    $sql = "INSERT INTO {domain_conf} VALUES (%d, %b)";
     db_query($sql, $form_values['domain_id'], serialize($settings));
   }
   drupal_set_message(t('Domain options saved successfully.'));
@@ -288,10 +283,8 @@ function domain_conf_form_submit($form_id, $form_values) {
 /**
  * Sets a message to the site admin.
  *
- * If our module changes $conf settings, they may be reflected 
+ * If our module changes $conf settings, they may be reflected
  * on admin pages when we don't want them to be.
- *
- * @ingroup conf
  */
 function domain_conf_warning_check($form_id) {
   static $_warning;
@@ -299,25 +292,23 @@ function domain_conf_warning_check($form_id) {
   if (!$_POST && empty($_warning)) {
     global $_domain;
     // Add the list of forms
-    $forms = array();     
+    $forms = array();
     $forms = module_invoke_all('domainwarnings');
     if (arg(2) != 'domain' && in_array($form_id, $forms)) {
       $default = domain_default();
       if ($_domain['domain_id'] != $default['domain_id']) {
         $_path = domain_get_uri($default);
         drupal_set_message(t('You are viewing #this. This form may need to be entered from <a href="!url">!domain</a>', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'])));
-      }  
+      }
     }
     $_warning = TRUE;
-  }  
+  }
 }
 
 /**
  * Implements hook_domainwarnings()
- *
- * @ingroup conf
  */
-function domain_conf_domainwarnings() { 
+function domain_conf_domainwarnings() {
   // These are the forms for variables set by Domain Conf.
   return array(
     'system_admin_theme_settings',
@@ -329,8 +320,6 @@ function domain_conf_domainwarnings() {
 
 /**
  * Implements hook_domaininstall()
- *
- * @ingroup conf
  */
 function domain_conf_domaininstall() {
   // If Domain Conf is being used, check to see that it is installed correctly.
@@ -341,13 +330,11 @@ function domain_conf_domaininstall() {
 
 /**
  * Resets configuration settings by removing the domain row from {domain_conf}.
- * 
+ *
  * @param $domain_id
  * The domain_id of the requested domain.
  * @return
  * A confirmation form.
- *
- * @ingroup conf
  */
 
 function domain_conf_reset($domain_id) {
@@ -365,8 +352,6 @@ function domain_conf_reset($domain_id) {
  * The $domain object for the selected domain.
  * @return
  * Themed HTML form.
- *
- * @ingroup conf
  */
 
 function domain_conf_reset_form($domain) {
@@ -378,8 +363,6 @@ function domain_conf_reset_form($domain) {
 
 /**
  * FormsAPI for domain_conf_reset_form.
- *
- * @ingroup conf
  */
 function domain_conf_reset_form_submit($form_id, $form_values) {
   db_query("DELETE FROM {domain_conf} WHERE domain_id = %d", $form_values['domain_id']);
@@ -393,8 +376,6 @@ function domain_conf_reset_form_submit($form_id, $form_values) {
  * The $domain object for the selected domain.
  * @return
  * Themed HTML messages.
- *
- * @ingroup conf
  */
 function theme_domain_conf_reset($domain) {
   $output = '';
@@ -408,8 +389,6 @@ function theme_domain_conf_reset($domain) {
 
 /**
  * Implements hook_domainbatch()
- *
- * @ingroup conf
  */
 function domain_conf_domainbatch() {
   $batch = array();
@@ -420,7 +399,7 @@ function domain_conf_domainbatch() {
       '#type' => 'checkbox',
       '#options' => array(t('Reset')),
       '#description' => t('Delete custom settings for this domain.'),
-    ),  
+    ),
     '#domain_action' => 'domain_delete',
     '#system_default' => 0,
     '#variable' => 'domain_conf',
@@ -430,7 +409,7 @@ function domain_conf_domainbatch() {
   );
   // Change the email address.
   $batch['site_mail'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Email address'),
       '#type' => 'textfield',
       '#size' => 40,
@@ -441,12 +420,12 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_mail', ''),
     '#variable' => 'site_mail',
     '#meta_description' => t('Set the email address for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
   // Change the site slogan.
   $batch['site_slogan'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Site slogan'),
       '#type' => 'textfield',
       '#size' => 60,
@@ -457,12 +436,12 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_slogan', ''),
     '#variable' => 'site_slogan',
     '#meta_description' => t('Set the site slogan for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
   // Change the site slogan.
   $batch['site_mission'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Site mission'),
       '#type' => 'textarea',
       '#cols' => 30,
@@ -473,12 +452,12 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_mission', ''),
     '#variable' => 'site_mission',
     '#meta_description' => t('Set the site mission for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
   // Change the site footer.
   $batch['site_footer'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Site footer'),
       '#type' => 'textarea',
       '#cols' => 30,
@@ -489,12 +468,12 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_footer', ''),
     '#variable' => 'site_footer',
     '#meta_description' => t('Set the site footer for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
   // Change the site frontpage.
   $batch['site_frontpage'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Site frontpage'),
       '#type' => 'textfield',
       '#size' => 30,
@@ -505,12 +484,12 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_frontpage', 'node'),
     '#variable' => 'site_frontpage',
     '#meta_description' => t('Set the site frontpage for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
   // Change the anonymous user name.
   $batch['anonymous'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Anonymous user'),
       '#type' => 'textfield',
       '#size' => 30,
@@ -521,7 +500,7 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('anonymous', 'Anonymous'),
     '#variable' => 'anonymous',
     '#meta_description' => t('Set the anonymous user label for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
   // Change the administrative theme.
@@ -532,7 +511,7 @@ function domain_conf_domainbatch() {
     $options[$key] = $key;
   }
   $batch['admin_theme'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Administrative theme'),
       '#type' => 'select',
       '#options' => $options,
@@ -542,13 +521,13 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('admin_theme', 0),
     '#variable' => 'admin_theme',
     '#meta_description' => t('Set the administrative theme for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
-  );    
+  );
   // Change the timezone.
-  $zones = _system_zonelist();   
+  $zones = _system_zonelist();
   $batch['date_default_timezone'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Timezone default'),
       '#type' => 'select',
       '#options' => $zones,
@@ -558,12 +537,12 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('date_default_timezone', 0),
     '#variable' => 'date_default_timezone',
     '#meta_description' => t('Set the default timezone for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
   // Toggle the site offline status.
   $batch['site_offline'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Site status'),
       '#type' => 'radios',
       '#options' => array(t('Online'), t('Off-line')),
@@ -573,12 +552,12 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_offline', 0),
     '#variable' => 'site_offline',
     '#meta_description' => t('Set the online / offline status for all domains.'),
-    '#data_type' => 'integer',    
+    '#data_type' => 'integer',
     '#weight' => -8,
-  );    
+  );
   // Change the site offline message.
   $batch['site_offline_message'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Site offline message'),
       '#type' => 'textarea',
       '#cols' => 30,
@@ -589,10 +568,10 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_offline_message', ''),
     '#variable' => 'site_offline_message',
     '#meta_description' => t('Set the site offline message for all domains.'),
-    '#data_type' => 'string',    
+    '#data_type' => 'string',
     '#weight' => -8,
   );
-  return $batch;  
+  return $batch;
 }
 
 /**
@@ -606,10 +585,8 @@ function domain_conf_domainbatch() {
  *
  * @return
  * An array of form elements according to the FormsAPI or an empty array.
- *
- * @ingroup conf
  */
- function domain_conf_api($all = FALSE) {
+function domain_conf_api($all = FALSE) {
   $options = array();
   $extra = module_invoke_all('domainconf', $domain);
   if (!empty($extra)) {

@@ -13,11 +13,12 @@
  *
  * In order for this to work, we must leap ahead in the boostrap process.
  * This step ensures that the database functions are active.
- * Then we run our function, overriding the default $conf variables, as 
+ * Then we run our function, overriding the default $conf variables, as
  * indicated in settings.php
  *
+ * @ingroup domain_conf
  */
- 
+
 _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 _domain_conf_load();
 

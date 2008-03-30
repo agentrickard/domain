@@ -2,29 +2,36 @@
 // $Id$
 
 /**
+ * @defgroup domain_content Domain Content : administer nodes for affiliate sites
+ *
+ * Allows for the batch editing of select node settings.  Refactors the default content
+ * editng screen to show content only from selected domains.
+ */
+
+/**
  * @file
  * Editorial overview module.
  *
  * Provides batch node editing for users with 'edit domain nodes' permission
  * but without the 'administer nodes' permission.
+ *
+ * @ingroup domain_content
  */
 
 /**
  * Implements hook_menu()
- *
- * @ingroup drupal
  */
 function domain_content_menu($may_cache) {
   $items = array();
   $access = FALSE;
   $all = FALSE;
   $extra = '';
-  if (user_access('edit domain nodes') && variable_get('domain_editors', DOMAIN_EDITOR_RULE)) { // || user_access('set domain access') 
+  if (user_access('edit domain nodes') && variable_get('domain_editors', DOMAIN_EDITOR_RULE)) { // || user_access('set domain access')
     $access = TRUE;
     $extra = '<p><em>'. t('You may not have editing permissions for all content shown on all affiliate sites.') .'</em></p>';
   }
   if (user_access('administer nodes')) { //  || user_access('set domain access')
-    $access = TRUE;  
+    $access = TRUE;
     $all = TRUE;
     $extra = '';
   }
@@ -33,18 +40,18 @@ function domain_content_menu($may_cache) {
       'title' => t('Affiliated content'),
       'path' => 'admin/domain/content',
       'callback' => 'domain_content_page',
-      'type' => MENU_NORMAL_ITEM,      
+      'type' => MENU_NORMAL_ITEM,
       'access' => $access
-    );  
+    );
     $items[] = array(
       'title' => t('Content for all affiliate sites'),
       'path' => 'admin/domain/content/all',
       'callback' => 'domain_content_view',
       'description' => t('View content assigned to all affiliate sites.') . $extra,
-      'callback arguments' => array(NULL, TRUE),      
+      'callback arguments' => array(NULL, TRUE),
       'access' => $access,
       'weight' => -10
-    );    
+    );
     // Generate the list of active domains as menu items
     $domains = domain_domains();
     foreach ($domains as $domain) {
@@ -58,7 +65,7 @@ function domain_content_menu($may_cache) {
         'access' => $check,
         'weight' => $domain['domain_id']
       );
-    } 
+    }
   }
   return $items;
 }
@@ -70,8 +77,6 @@ function domain_content_menu($may_cache) {
  *  An array representing the currently active domain record.
  * @param $all
  *  A boolean flag indicating whether this user can access all domains.
- *
- * @ingroup content 
  */
 function domain_content_check($domain, $all) {
   global $user;
@@ -100,9 +105,7 @@ function domain_content_check($domain, $all) {
  * The domain content page of menu callbacks.
  *
  * @return
- *  A link group for each domain the user can access. 
- *
- * @ingroup content 
+ *  A link group for each domain the user can access.
  */
 function domain_content_page() {
   // Get the menu items and iterate through the children.
@@ -110,8 +113,8 @@ function domain_content_page() {
   foreach ($menu['children'] as $mid) {
     $item = menu_get_item($mid);
     if ($item['access']) {
-      $items[] = l($item['title'], $item['path']) . '<br />'. $item['description'];
-    }  
+      $items[] = l($item['title'], $item['path']) .'<br />'. $item['description'];
+    }
   }
   // Print the list of options.
   if (!empty($items)) {
@@ -137,8 +140,6 @@ function domain_content_page() {
  *
  * @return
  *  A link group for each domain the user can access.
- *
- * @ingroup content 
  */
 function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   global $_domain;
@@ -170,8 +171,6 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
  *
  * @return
  *  A themed HTML batch content editing form.
- *
- * @ingroup content 
  */
 function domain_content_admin() {
   $output = drupal_get_form('node_filter_form');
@@ -180,8 +179,8 @@ function domain_content_admin() {
     return drupal_get_form('node_multiple_delete_confirm');
   }
   // Call the form first, to allow for the form_values array to be populated.
-  $output .= drupal_get_form('domain_content_form');  
-  
+  $output .= drupal_get_form('domain_content_form');
+
   return $output;
 }
 
@@ -190,8 +189,6 @@ function domain_content_admin() {
  *
  * @return
  *  A form array according to the FormsAPI.
- *
- * @ingroup content 
  */
 function domain_content_form() {
   global $user, $_domain;
@@ -200,12 +197,12 @@ function domain_content_form() {
   // Bypass the superuser permissions by forcing an AND on {node_access}.
   $filter['join'] .= " INNER JOIN {node_access} nac ON nac.nid = n.nid ";
   $arg = arg(3);
-  
+
   if ($arg != 'all') {
     // In this case, we must check the domain_id grant.
     // We use intval() here for security, since we are not filtering the query parameter otherwise.
     if (empty($filter['where'])) {
-      $filter['where'] = " WHERE nac.realm = 'domain_id' AND nac.gid = ". intval($_domain['domain_id'])." ";
+      $filter['where'] = " WHERE nac.realm = 'domain_id' AND nac.gid = ". intval($_domain['domain_id']) ." ";
     }
     else {
       $filter['where'] .= " AND nac.realm = 'domain_id' AND nac.gid = ". intval($_domain['domain_id']) ." ";
@@ -225,25 +222,25 @@ function domain_content_form() {
 
   $destination = drupal_get_destination();
   $check = array();
-  
+
   // Some existing permissions alter the node access rules.
   $message = FALSE;
   $set = 0;
-  $all = FALSE;  
+  $all = FALSE;
   if (user_access('administer nodes') || user_access('set domain access')) {
     $all = TRUE;
     $message = TRUE;
-  }  
+  }
   // Loop through the nodes to build the form
   while ($node = db_fetch_object($result)) {
     // Can the user edit all nodes of this type?
     if (user_access('edit '. $node->type .' nodes')) {
       $message = TRUE;
-    }  
+    }
     // Flag a message if user has extra permissions
     if ($message) {
       $check[$node->nid] = TRUE;
-    }    
+    }
     $form['title'][$node->nid] = array('#value' => l($node->title, 'node/'. $node->nid) .' '. theme('mark', node_mark($node->nid, $node->changed)));
     $form['name'][$node->nid] =  array('#value' => check_plain(node_get_types('name', $node)));
     $form['username'][$node->nid] = array('#value' => theme('username', $node));
@@ -263,7 +260,7 @@ function domain_content_form() {
         // Convert the domain ids to data so we can print them.
         $node_domains[] = domain_lookup($key);
       }
-    }  
+    }
     // If we have multiple domains, print them.
     $items = array();
     if ($node->domain_site) {
@@ -281,11 +278,11 @@ function domain_content_form() {
         $items[$source->domain_id] .= '*';
       }
     }
-    $form['domains'][$node->nid] =  array('#value' => theme('item_list', $items)); 
+    $form['domains'][$node->nid] =  array('#value' => theme('item_list', $items));
     if (!empty($check[$node->nid])) {
       $form['operations'][$node->nid] = array('#value' => l(t('edit'), 'node/'. $node->nid .'/edit', array(), $destination));
       $nodes[$node->nid] = '';
-    }  
+    }
   }
   // Privileged users can make global changes to Domain Access permissions.
   if (user_access('set domain access')) {
@@ -296,7 +293,7 @@ function domain_content_form() {
       // The domain must be valid.
       if ($data['valid'] || user_access('administer domains')) {
         $options[$key] = $data['sitename'];
-      }  
+      }
     }
     // If the user is a site admin, show the form, otherwise pass it silently.
     if (user_access('set domain access')) {
@@ -315,7 +312,7 @@ function domain_content_form() {
         '#required' => FALSE,
         '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
         '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
-      );    
+      );
       $form['domain']['domains'] = array(
         '#type' => 'checkboxes',
         '#title' => t('Publish to'),
@@ -324,10 +321,10 @@ function domain_content_form() {
         '#description' => t('Select which affiliates can access this content.'),
         '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
       );
-    }  
+    }
   }
   // Users must have passed at least one access check to have batch options.
-  if (!empty($check)) {  
+  if (!empty($check)) {
     $form['options'] = array('#type' => 'fieldset',
       '#title' => t('Update options'),
       '#prefix' => '<div class="container-inline">',
@@ -339,24 +336,22 @@ function domain_content_form() {
       $options[$operation] = $array['label'];
     }
     $form['options']['operation'] = array('#type' => 'select', '#options' => $options,  '#default_value' => 'approve');
-    $form['options']['submit'] = array('#type' => 'submit', '#value' => t('Update'));  
+    $form['options']['submit'] = array('#type' => 'submit', '#value' => t('Update'));
     $form['nodes'] = array('#type' => 'checkboxes', '#options' => $nodes);
-  }  
+  }
   $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
   $form['#theme'] = 'domain_content_admin_nodes';
-  $form['#validate']['node_admin_nodes_validate'] = array();    
-  $form['#submit']['node_admin_nodes_submit'] = array();  
-  $form['#submit']['domain_content_update_nodes'] = array();    
+  $form['#validate']['node_admin_nodes_validate'] = array();
+  $form['#submit']['node_admin_nodes_submit'] = array();
+  $form['#submit']['domain_content_update_nodes'] = array();
   return $form;
 }
 
 /**
  * FormAPI function that lets us update access rules.
- *
- * @ingroup content
  */
 function domain_content_update_nodes($form_id, $form_values) {
-  // If our operation is flagged, then we have to manually change the 
+  // If our operation is flagged, then we have to manually change the
   // {node_access} table.  The rest of the process will clear the cache,
   // so this should be a safe operation.
   if ($form_values['operation'] == 'domain') {
@@ -369,7 +364,7 @@ function domain_content_update_nodes($form_id, $form_values) {
       if (abs($key) > 0 && $key == $value) {
         ($key == -1) ? $id = 0 : $id = $value;
         $domains[] = $id;
-      }  
+      }
     }
     $editor = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
     if ($editor) {
@@ -383,27 +378,25 @@ function domain_content_update_nodes($form_id, $form_values) {
         db_query("DELETE FROM {domain_access} WHERE nid = %d", $nid);
         if ($domain_site) {
           db_query("INSERT INTO {node_access} VALUES (%d, 0, 'domain_site', 1, 0, 0)", $nid);
-          db_query("INSERT INTO {domain_access} VALUES (%d, 0, 'domain_site')", $nid);          
+          db_query("INSERT INTO {domain_access} VALUES (%d, 0, 'domain_site')", $nid);
         }
         if (!empty($domains)) {
           foreach ($domains as $id) {
             db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_id', 1, 0, 0)", $nid, $id);
-            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_id')", $nid, $id);            
+            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_id')", $nid, $id);
           }
           if ($editor) {
             db_query("INSERT INTO {node_access} VALUES (%d, %d, 'domain_editor', 0, 1, 1)", $nid, $id);
-            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor')", $nid, $id);            
+            db_query("INSERT INTO {domain_access} VALUES (%d, %d, 'domain_editor')", $nid, $id);
           }
         }
       }
-    }  
+    }
   }
 }
 
 /**
  * Implements hook_node_operations()
- *
- * @ingroup content 
  */
 function domain_content_node_operations() {
   // Only privileged users can perform this operation.
@@ -414,26 +407,22 @@ function domain_content_node_operations() {
       'label' => t('Change affiliate publishing options'),
       'callback' => 'domain_content_node_operations_access',
       )
-    );  
+    );
     return $operations;
-  }  
-}  
+  }
+}
 
 /**
  * Callback for domain_content_node_operations().
  *
  * This callback is required, but we actually do our action inside
  * of domain_content_update_nodes().
- *
- * @ingroup content
  */
 function domain_content_node_operations_access($nodes) {
 }
 
 /**
  * Implements hook_domainupdate()
- *
- * @ingroup content 
  */
 function domain_content_domainupdate($op, $domain = array(), $edit = array()) {
   // We rebuild the menu, since the domain records have changed.
@@ -450,21 +439,19 @@ function domain_content_domainupdate($op, $domain = array(), $edit = array()) {
  *  FormsAPI representation of the batch node edit form.
  * @return
  *  A themed HTML form.
- *
- * @ingroup themes
  */
 function theme_domain_content_admin_nodes($form) {
   // Overview table:
   $header = array(theme('table_select_header_cell'), t('Title'), t('Affiliates'), t('Type'), t('Author'), t('Status'), t('Operations'));
 
   $output .= drupal_render($form['options']);
-  $output .= drupal_render($form['domain']); 
+  $output .= drupal_render($form['domain']);
   if (isset($form['title']) && is_array($form['title'])) {
     foreach (element_children($form['title']) as $key) {
       $row = array();
       $row[] = drupal_render($form['nodes'][$key]);
       $row[] = drupal_render($form['title'][$key]);
-      $row[] = drupal_render($form['domains'][$key]);   
+      $row[] = drupal_render($form['domains'][$key]);
       $row[] = drupal_render($form['name'][$key]);
       $row[] = drupal_render($form['username'][$key]);
       $row[] = drupal_render($form['status'][$key]);
@@ -485,4 +472,4 @@ function theme_domain_content_admin_nodes($form) {
   $output .= drupal_render($form);
 
   return $output;
-} 
+}

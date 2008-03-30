@@ -35,27 +35,27 @@ CONTENTS
 ----
 1.  Introduction
 
-The Domain User module is a node access module that allows for the automatic 
+The Domain User module is a node access module that allows for the automatic
 creation of subdomains for your users.
 
-By design, this module will allow user "JohnDoe" to create the following active 
+By design, this module will allow user "JohnDoe" to create the following active
 domain:
 
   johndoe.example.com
-  
-Note that all non-alphanumeric characters will be replaced with a dash, so that 
+
+Note that all non-alphanumeric characters will be replaced with a dash, so that
 the user "John Doe 222" will create the subdomain:
 
   john-doe-222.example.com
-  
-I recommend that you set the "Content editing forms" setting in the main Domain 
-module to "Take user to their assigned domain."  Doing so will force all content 
+
+I recommend that you set the "Content editing forms" setting in the main Domain
+module to "Take user to their assigned domain."  Doing so will force all content
 that  a user creates to be assigned to his or her personal domain.
 
 Please read the documentation for the main Domain Access module carefully before
-you attempt to install and use this module.  
+you attempt to install and use this module.
 
-This module is not intended for use if you do not wish to perform node access 
+This module is not intended for use if you do not wish to perform node access
 control.  It is not suitable simply for creating subdomains for your users.
 
 ----
@@ -64,7 +64,7 @@ control.  It is not suitable simply for creating subdomains for your users.
 Domain User is included in the Domain Access download.  To install,
 untar the domain package and place the entire folder in your modules directory.
 
-When you enable the module, it will create a {domain_user} table in your 
+When you enable the module, it will create a {domain_user} table in your
 Drupal database.
 
 ----
@@ -83,8 +83,8 @@ For example, you have used the Domain Access module to create the following:
   -- boston.example.com
   -- newyork.example.com
   -- sydney.example.com
-  
-If a user tries to register for your site using the username "boston" or 
+
+If a user tries to register for your site using the username "boston" or
 "sydney," the Domain User module would try to create a domain that already
 exists.
 
@@ -102,8 +102,8 @@ the Domain User settings page.
 Domain User adds one permission to your Access Control page:
 
   -- 'create personal domain'
- 
-Only roles that have this permission can create personal subdomains. 
+
+Only roles that have this permission can create personal subdomains.
 
 If you want users to be able to create subdomains when they register, you must
 give this permission to the 'anonymous users' role and to the 'authenticated
@@ -118,7 +118,7 @@ on registration or on updating their account.
 ----
 3.1   Edit Domain Nodes
 
-By design, all users will be assigned to the Domain that they create.  This 
+By design, all users will be assigned to the Domain that they create.  This
 grants them access to edit nodes posted to their domain.  To enable this
 feature, a user must have the "edit domain nodes" permission granted by
 the core Domain Access module.
@@ -137,17 +137,17 @@ are available:
 
   -- Do not create domains for users [Default]
   -- Automatically create domains for new users
-  -- Ask users if they would like to create a domain 
+  -- Ask users if they would like to create a domain
 
 Note that "do not create" is the default setting.  This prevents domains from
-being created before you finish configuring the module.  
+being created before you finish configuring the module.
 
 If you select "ask users," then a checkbox option will appear to users during
 registration (or account editing) if the following conditions are true:
 
   -- The user has permission to create a domain.
   -- The user has not created a personal domain.
-  
+
 Note that currently there is no way for a user to delete their own domain.  If
 a user account is blocked, access to the user domain is blocked.  If a user
 account is deleted, the user domain record is also deleted.
@@ -155,16 +155,16 @@ account is deleted, the user domain record is also deleted.
 ----
 4.2   Root Domain Name
 
-The root domain to use for creating user domains, typically example.com.  No 
+The root domain to use for creating user domains, typically example.com.  No
 http or slashes.
 
-When users create domains, their username will be added to the root domain to 
+When users create domains, their username will be added to the root domain to
 create a custom domain.  For example, user.example.com or administrator.example.com.
 
 All user domains follow the pattern:
 
   username.example.com
-  
+
 Where example.com is the "Root domain name" configured here.
 
 In theory, you may use a multi-level domain scheme here, such as:
@@ -175,7 +175,7 @@ When entering your root domain, you should not include the username
 string.
 
 WARNING: Your web server must be configured to recognize these domains
-for them to function.  Wildcard DNS is the preferred solution for handling 
+for them to function.  Wildcard DNS is the preferred solution for handling
 user domains.
 
 ----
@@ -194,7 +194,7 @@ Controls the behavior of the module when a user with an existing personal
 domain logs in to the site.  Options are:
 
   -- On login, go to personal domain [Default]
-  -- Do not go to personal domain on login 
+  -- Do not go to personal domain on login
 
 Because of how Drupal login works, this feature uses a session variable to
 trigger the redirect.
@@ -217,7 +217,7 @@ since Domain Prefix has its own behavior settings.
 ----
 4.6   Reserved Usernames
 
-At the bottom of the Domain User settings page is a list of all reserved 
+At the bottom of the Domain User settings page is a list of all reserved
 usernames.  This list is derived from the administrator-created list of domains.
 
 Users should not be able to register or login with any username listed here.
@@ -227,7 +227,7 @@ Users should not be able to register or login with any username listed here.
 
 Note that on the main Domain list page at Admin > Build > Domains > Domain
 list, a new column is added to the domain table.  This column shows the username
-of the 
+of the
 
 ----
 5.  Developer Notes
@@ -251,7 +251,7 @@ Domain User leverages some of the internal APIs of the Domain Access module.
 
   -- domain_user_domainload() adds the UID to the global $_domain array and
       to all $domain lookups.
-      
+
   --  domain_user_domainupdate() implements the 'delete' hook in order to
       delete records from {domain_user} in the event that the administrator
       deletes a user domain record.
@@ -268,7 +268,7 @@ Installing the module creates a {domain_user} table that contains:
   - domain_id
   Integer, unique (enforced by code)
   The lookup key for this record, foreign key to the {domain} table.
-  
+
   - uid
   Integer, unique (enforced by code)
-  The lookup key for this record, foreign key to the {users} table.  
+  The lookup key for this record, foreign key to the {users} table.

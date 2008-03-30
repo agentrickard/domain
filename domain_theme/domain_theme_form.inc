@@ -3,7 +3,9 @@
 
 /**
  * @file
- * Include file to handle theme configration screen
+ * Include file to handle theme configration screen.
+ *
+ * @ingroup domain_theme
  */
 
 /**
@@ -29,14 +31,14 @@ function domain_theme_form_alter($form_id, &$form) {
         }
         unset($form[$key]);
         unset($form['status']['#options'][$key]);
-        unset($form['theme_default']['#options'][$key]);        
+        unset($form['theme_default']['#options'][$key]);
       }
       else {
         $form['status']['#disabled'] = TRUE;
       }
     }
     // Use our own submit buttons.
-    $unset = array('buttons', '#submit',);
+    $unset = array('buttons', '#submit');
     foreach ($unset as $key) {
       unset($form[$key]);
     }

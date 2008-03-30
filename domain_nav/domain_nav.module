@@ -2,20 +2,26 @@
 // $Id$
 
 /**
- * @file
- * Navigation block and menu options for Domain Access
+ * @defgroup domain_nav Domain Navigation: navigation block and menu options
+ *
+ * Configurable navigation and block based on active domains.
  */
 
 /**
- * Killswitch for hook_menu().  
+ * @file
+ * Navigation block and menu options for Domain Access
+ *
+ * @ingroup domain_nav
+ */
+
+/**
+ * Killswitch for hook_menu().
  * Set this value to FALSE to disable the Domain Nav menu items.
  */
-define('DOMAIN_NAV_MENU', TRUE); 
+define('DOMAIN_NAV_MENU', TRUE);
 
 /**
  * Implements hook_menu()
- *
- * @ingroup drupal
  */
 function domain_nav_menu($may_cache) {
   global $base_url;
@@ -30,7 +36,7 @@ function domain_nav_menu($may_cache) {
       'callback arguments' => array($root['path']),
       'type' => MENU_SUGGESTED_ITEM,
       'access' => TRUE
-    );  
+    );
     // Generate the list of active domains as menu items
     $domains = domain_domains();
     foreach ($domains as $domain) {
@@ -47,20 +53,18 @@ function domain_nav_menu($may_cache) {
         'callback arguments' => array($domain['path']),
         'type' => $type,
         'access' => TRUE
-      );  
-    }  
+      );
+    }
   }
-  
+
   // In the Garland header, we have to force the block to appear correctly.
   drupal_add_css(drupal_get_path('module', 'domain_nav') .'/domain_nav.css');
-  
+
   return $items;
 }
 
 /**
  * Implements hook_block()
- *
- * @ingroup drupal
  */
 function domain_nav_block($op='list', $delta = 0, $edit = array()) {
   switch ($op) {
@@ -87,16 +91,16 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
           'menus' => t('Menu-style tab links'),
           'ul' => t('Unordered list of links'),
         ),
-      );      
-      return $form;    
+      );
+      return $form;
       break;
     case 'save':
       variable_set('domain_nav_block', $edit['domain_nav_block']);
-      variable_set('domain_nav_theme', $edit['domain_nav_theme']);      
+      variable_set('domain_nav_theme', $edit['domain_nav_theme']);
       break;
   }
   return $block;
-} 
+}
 
 /**
  * Renders output for the block.
@@ -117,10 +121,8 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
  *
  * @return
  *  A themed HTML object for navigation.
- *
- * @ingroup nav
  */
-function domain_nav_render($paths = NULL, $style = NULL) { 
+function domain_nav_render($paths = NULL, $style = NULL) {
   global $_domain;
   // Get the options and set the variables.
   if (empty($paths)) {
@@ -128,7 +130,7 @@ function domain_nav_render($paths = NULL, $style = NULL) {
   }
   if (empty($style)) {
     $style = variable_get('domain_nav_theme', 'default');
-  }  
+  }
   $options = array();
   $domains = domain_domains();
   // Select which path calculation to use.
@@ -141,7 +143,7 @@ function domain_nav_render($paths = NULL, $style = NULL) {
         $value['sitename'] .= ' *';
       }
       else {
-        $allow = FALSE;        
+        $allow = FALSE;
       }
     }
     if ($allow) {
@@ -156,10 +158,10 @@ function domain_nav_render($paths = NULL, $style = NULL) {
       $value = array_merge($value, $extra);
       $options[$value['domain_id']] = $value;
     }
-  }  
+  }
   $theme = 'domain_nav_'. $style;
   $content = theme($theme, $options);
-  return $content; 
+  return $content;
 }
 
 /**
@@ -172,11 +174,9 @@ function domain_nav_render($paths = NULL, $style = NULL) {
  *    - subdomain -- the host path of the url for this domain
  *    - sitename -- the human-readable name of this domain
  *    - path -- the link path (a Drupal-formatted path)
- *    - active -- a boolean flag indicating the currently active domain 
- *    
- *  If hook_domainnav() is invoked, additonal elements may be present.
+ *    - active -- a boolean flag indicating the currently active domain
  *
- * @ingroup themes
+ *  If hook_domainnav() is invoked, additonal elements may be present.
  */
 function theme_domain_nav_default($options) {
   global $_domain;
@@ -189,7 +189,7 @@ function theme_domain_nav_default($options) {
     $output .= '<option value="'. $value['path'] .'"'. $selected .'>'. filter_xss_admin($value['sitename']) .'</option>';
   }
   $output .= '</select>';
-  $output .= '</form>';  
+  $output .= '</form>';
   return $output;
 }
 
@@ -198,12 +198,10 @@ function theme_domain_nav_default($options) {
  *
  * @param $options
  *  An array of information about each domain.
- *
- * @ingroup themes
  */
-function theme_domain_nav_ul($options) { 
+function theme_domain_nav_ul($options) {
   foreach ($options as $key => $value) {
-    $items[] = l($value['sitename'], $value['path']); 
+    $items[] = l($value['sitename'], $value['path']);
   }
   return theme('item_list', $items);
 }
@@ -213,24 +211,20 @@ function theme_domain_nav_ul($options) {
  *
  * @param $options
  *  An array of information about each domain.
- *
- * @ingroup themes
  */
-function theme_domain_nav_menus($options) { 
+function theme_domain_nav_menus($options) {
   foreach ($options as $key => $value) {
     ($value['active']) ? $active = 'active' : $active =  '';
     $items[] = array(
       'data' => l($value['sitename'], $value['path']),
       'class' => $active
-    ); 
+    );
   }
   return theme('item_list', $items, NULL, 'ul', array('class' => 'tabs primary'));
-} 
+}
 
 /**
  * Implements hook_domainupdate()
- *
- * @ingroup nav
  */
 function domain_nav_domainupdate($op, $domain = array(), $edit = array()) {
   // Only execute if the menu is turned on.
@@ -240,5 +234,5 @@ function domain_nav_domainupdate($op, $domain = array(), $edit = array()) {
     cache_clear_all('*', 'cache_page', TRUE);
     // Also clear the menu cache.
     cache_clear_all('*', 'cache_menu', TRUE);
-  }  
+  }
 }

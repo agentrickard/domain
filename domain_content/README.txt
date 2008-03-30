@@ -4,7 +4,7 @@
  * @file
  * README file for Domain Content
  */
- 
+
 Domain Access: Content Administration
 Provides a Content list screen for each active domain.
 
@@ -46,20 +46,20 @@ pages that respect the node access rules set by the Doamin Access module.
 
 Domain Content is sponsored by Morris DigitalWorks.
   http://morrisdigitalworks.com
-  
+
 ----
 2.  Installation
 
 To install the module, simply untar the download and put it in your site's
 modules directory.  After reading this document, enable the module normally.
 
-When you enable the module, no new tables will be created in your Drupal 
+When you enable the module, no new tables will be created in your Drupal
 database.
 
 If you wish for users with the 'edit domain nodes' permission to access the
 Domain Content interface, you must enable the 'Use access control for
 editors' option under Advanced Settings on the Domains configuration page:
-  
+
   Administer > Site Building > Domains
 
 ----
@@ -83,22 +83,22 @@ module. The relevant permissions are:
 
   - 'edit domain nodes'
   - 'set domain access'
-  
+
 Users with the 'edit domain nodes' permission can view content for domains where
-they are assigned editors.  Users with the 'set domain access' permission can 
+they are assigned editors.  Users with the 'set domain access' permission can
 view content for domains where they are assigned editors _and_ reassign content
 to one or more affiliates.
 
-Users with the core 'administer nodes' permission may view and edit content on any 
+Users with the core 'administer nodes' permission may view and edit content on any
 affiliate.
 
-Either the 'administer nodes' or the 'edit domain nodes' permission is required to 
+Either the 'administer nodes' or the 'edit domain nodes' permission is required to
 access the 'Affiliate content' screen.
 
 ----
 3.2 Affiliated Content
 
-The Affiliated Content link resides at the path 'admin/domain/content'.  This 
+The Affiliated Content link resides at the path 'admin/domain/content'.  This
 page returns a list of all domains for which the user can edit or view content.
 
 By design, the first menu item under Affiliated Content is the 'Content for all

@@ -1,10 +1,10 @@
 <?php
 // $Id$
 
-/** 
-* @file
-* Install file for the Domain Prefix module
-*/
+/**
+ * @file
+ * Install file for the Domain Prefix module
+ */
 
 /**
  * Implements hook_install()
@@ -19,10 +19,10 @@ function domain_prefix_install() {
        domain_id int(11) NOT NULL default 0,
        status smallint NOT NULL default 0,
        tablename varchar(80) NOT NULL default '',
-       module varchar(80) NOT NULL default '', 
-       source smallint NOT NULL default 0,       
+       module varchar(80) NOT NULL default '',
+       source smallint NOT NULL default 0,
        INDEX (domain_id)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
       break;
     case 'pgsql':
       db_query("CREATE TABLE {domain_prefix} (
@@ -30,8 +30,8 @@ function domain_prefix_install() {
        status smallint NOT NULL default 0,
        tablename varchar(80) NOT NULL default '',
        module varchar(80) NOT NULL default '',
-       source smallint NOT NULL default 0       
-      )");     
+       source smallint NOT NULL default 0
+      )");
       db_query("CREATE INDEX {domain_prefix}_domain_id_idx ON {domain_prefix} (domain_id)");
       break;
   }
@@ -50,7 +50,7 @@ function domain_prefix_uninstall() {
   // Now drop the storage table.
   db_query("DROP TABLE {domain_prefix}");
   variable_del('domain_prefix');
-  variable_del('domain_prefix_options');  
+  variable_del('domain_prefix_options');
 }
 
 
@@ -71,5 +71,5 @@ function domain_prefix_update_1() {
       break;
   }
 
-  return $ret;  
+  return $ret;
 }

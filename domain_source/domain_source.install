@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-/** 
+/**
 * @file
 * Install file for the Domain Source module
 */
@@ -19,14 +19,14 @@ function domain_source_install() {
        nid int(11) NOT NULL default 0,
        domain_id int(11) NOT NULL default 0,
        PRIMARY KEY (nid)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
       break;
     case 'pgsql':
       db_query("CREATE TABLE {domain_source} (
        nid integer NOT NULL default 0,
        domain_id integer NOT NULL default 0,
        PRIMARY KEY (nid)
-      )");     
+      )");
       break;
   }
 }

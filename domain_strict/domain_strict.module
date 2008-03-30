@@ -2,8 +2,15 @@
 // $Id$
 
 /**
+ * @defgroup domain_strict Domain Strict: strict access control
+ * Forces users to be assigned to a domain in order to view content on that domain.
+ */
+
+/**
  * @file
  * Forces users to be assigned to a domain in order to view content on that domain.
+ *
+ * @ingroup domain_strict
  */
 
 /**
@@ -12,8 +19,6 @@
  * In Domain Strict, we only let users see content on domains that
  * they are registered with.  So we check the $user object in order
  * to set our grants rather than using the default module grants.
- *
- * @ingroup strict
  */
 function domain_strict_domaingrants(&$grants, $account, $op) {
   global $_domain;

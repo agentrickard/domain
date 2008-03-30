@@ -4,7 +4,7 @@
  * @file
  * README file for Domain Theme
  */
- 
+
 Domain Access: Theme
 Assign themes to domains created by the Domain Access modules.
 
@@ -25,7 +25,7 @@ CONTENTS
 ----
 1.  Introduction
 
-The Domain Theme module is a small module that allows you to assign 
+The Domain Theme module is a small module that allows you to assign
 different themes for each active domain created with the Domain Access
 module.
 
@@ -38,8 +38,8 @@ of this module.  The current release version is based on that work.
 ----
 2.  Installation
 
-The Domain Theme module is included in the Domain Access download.  
-To install, untar the domain package and place the entire folder in your modules 
+The Domain Theme module is included in the Domain Access download.
+To install, untar the domain package and place the entire folder in your modules
 directory.
 
 When you enable the module, it will create a {domain_theme} table in your Drupal
@@ -63,8 +63,8 @@ This module edits the global $custom_theme variable for your site.  Other module
 -- especially the Organic Groups module -- may also attempt to modify this variable.
 
 If you use other modules that allow custom user or group themes, you may experience
-conflicts with the Domain Theme module.  Use this setting to vary the execution order 
-of the Domain Theme module.  Lower (negative) values will execute earlier in the Drupal 
+conflicts with the Domain Theme module.  Use this setting to vary the execution order
+of the Domain Theme module.  Lower (negative) values will execute earlier in the Drupal
 page building process.
 
 You may need to experiment with this setting to get the desired result.
@@ -75,8 +75,8 @@ You may need to experiment with this setting to get the desired result.
 When active, the Domain Theme module will add a 'theme' link to the Domain List
 screen.
 
-When you click the 'theme' link for a domain record, you can set the default 
-theme for use by that domain.  This form works just like the default system 
+When you click the 'theme' link for a domain record, you can set the default
+theme for use by that domain.  This form works just like the default system
 theme selection form, with the following notes:
 
   -- You cannot enable themes from this screen.
@@ -95,7 +95,7 @@ This feature is useful if you wish to roll back custom changes.
 ----
 5.  Developer Notes
 
-We intend to enable domain-specific theme settings in a later release.  If you 
+We intend to enable domain-specific theme settings in a later release.  If you
 are interested in helping, see http://drupal.org/node/180264.
 
 ----
@@ -106,11 +106,11 @@ Installing the module creates a {domain_theme} table that contains:
   - domain_id
   Integer, unique
   The lookup key for this record, foreign key to the {domain} table.
-  
+
   - theme
   String, unique
   The theme name assigned as the default for this domain.
-  
+
   - settings
   Blob (bytea)
   A serialized array of theme settings for this domain.  Currently not used.

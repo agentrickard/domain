@@ -18,16 +18,16 @@ function domain_conf_install() {
            domain_id int(11) NOT NULL default '0',
            settings blob,
            PRIMARY KEY (domain_id)
-           ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+           ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
       break;
     case 'pgsql':
       db_query("CREATE TABLE {domain_conf} (
         domain_id integer NOT NULL default '0',
         settings bytea,
-        PRIMARY KEY (domain_id)        
-        )");     
+        PRIMARY KEY (domain_id)
+        )");
       break;
-  }  
+  }
 }
 
 /**

@@ -2,13 +2,21 @@
 // $Id$
 
 /**
- * @file
+ * @defgroup domain_source Domain Source: editor-defined links.
+ *
  * Creates a source domain for linking to content from other domains.
  */
 
 /**
+ * @file
+ * Creates a source domain for linking to content from other domains.
+ *
+ * @ingroup domain_source
+ */
+
+
+/**
  * Implements hook_form_alter()
- * @ingroup source
  */
 function domain_source_form_alter($form_id, &$form) {
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
@@ -32,7 +40,7 @@ function domain_source_form_alter($form_id, &$form) {
         if ($user->domain_user[$domain['domain_id']] != 0 && $domain['domain_id'] == $user->domain_user[$domain['domain_id']]) {
           $options[$domain['domain_id']] = $domain['sitename'];
         }
-      }       
+      }
       // Is this node assigned to a source that the user can control?
       $source = $form['#node']->domain_source;
       if (isset($source)) {
@@ -41,9 +49,9 @@ function domain_source_form_alter($form_id, &$form) {
         }
         else {
           $form['domain']['domain_source_notes'] = array(
-            '#value' => '<label><b>'. t('Source domain:') .'</b></label><div class="description">'. 
+            '#value' => '<label><b>'. t('Source domain:') .'</b></label><div class="description">'.
               t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $domains[$source]['sitename'])) .'</div>',
-          );     
+          );
         }
       }
     }
@@ -62,7 +70,7 @@ function domain_source_form_alter($form_id, &$form) {
       $form['domain']['domain_source'] = array(
         '#type' => 'value',
         '#value' => (isset($form['#node']->domain_source)) ? $form['#node']->domain_source : $_domain['domain_id'],
-      );  
+      );
     }
   }
   // Integration with Domain Content
@@ -74,18 +82,18 @@ function domain_source_form_alter($form_id, &$form) {
     if (user_access('set domain access')) {
       foreach ($domains as $domain) {
         $options[$domain['domain_id']] = $domain['sitename'];
-      }  
+      }
       $form['domain']['domain_source'] = array(
         '#type' => 'select',
         '#title' => t('Source domain'),
         '#options' => $options,
         '#default_value' => $_domain['domain_id'],
         '#description' => t('This affiliate will be linked to from other affiliates, as needed.')
-      );      
-      $form['#validate']['domain_source_validate'] = array();      
-      $form['#submit']['domain_source_update_nodes'] = array();    
+      );
+      $form['#validate']['domain_source_validate'] = array();
+      $form['#submit']['domain_source_update_nodes'] = array();
     }
-  }  
+  }
 }
 
 /**
@@ -112,12 +120,12 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       db_query("INSERT INTO {domain_source} (nid, domain_id) VALUES (%d, %d)", $node->nid, $node->domain_source);
       break;
     case 'delete':
-      db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);    
+      db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);
       break;
     case 'load':
       if ($node->nid) {
         $node->domain_source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
-      }  
+      }
       break;
     case 'view':
       // Search module casts both $a3 and $a4 as FALSE, not NULL.
@@ -126,20 +134,18 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       if ($a3 !== FALSE || $a4 !== FALSE) {
         if (variable_get('domain_debug', 0) && user_access('set domain access') && isset($node->domain_source)) {
         $source = domain_lookup($node->domain_source);
-        $node->content['domain_source'] = array('#value' => '<p>'. t('<b>Source domain</b>: %source', array('%source' => $source['sitename'])) .'</b></p>', '#weight' => 25);        
+        $node->content['domain_source'] = array('#value' => '<p>'. t('<b>Source domain</b>: %source', array('%source' => $source['sitename'])) .'</b></p>', '#weight' => 25);
         }
-      }  
+      }
       break;
   }
 }
 
 /**
  * FormAPI function that lets us update access rules.
- *
- * @ingroup source
  */
 function domain_source_update_nodes($form_id, $form_values) {
-  // If our operation is flagged, then we have to manually change the 
+  // If our operation is flagged, then we have to manually change the
   // {node_access} table.  The rest of the process will clear the cache,
   // so this should be a safe operation.
   if ($form_values['operation'] == 'domain') {
@@ -151,12 +157,10 @@ function domain_source_update_nodes($form_id, $form_values) {
       }
     }
   }
-}  
+}
 
 /**
  * Form validation step
- *
- * @ingroup source 
  */
 function domain_source_validate($form_id, $form_values) {
   if ($form_values['operation'] == 'domain') {
@@ -169,16 +173,14 @@ function domain_source_validate($form_id, $form_values) {
     // If selected, these clauses will not be zero.
     else if (!$form_values['domains'][$key] && (!empty($form_values['domains_raw']) && !in_array($key, $form_values['domains_raw']))) {
       form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
-    }    
+    }
   }
 }
 
 /**
  * Implements hook_domainupdate()
  *
- * When deleting domain records, we remove all traces from the {domain_source} table. 
- *
- * @ingroup source
+ * When deleting domain records, we remove all traces from the {domain_source} table.
  */
 function domain_source_domainupdate($op, $domain = array(), $edit = array()) {
   if ($op == 'delete' && $domain['domain_id'] > 0) {

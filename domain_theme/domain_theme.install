@@ -1,10 +1,10 @@
 <?php
 // $Id$
 
-/** 
-* @file
-* Install file for the Domain Theme module
-*/
+/**
+ * @file
+ * Install file for the Domain Theme module
+ */
 
 /**
  * Implements hook_install()
@@ -20,7 +20,7 @@ function domain_theme_install() {
        theme varchar(32) NOT NULL default '',
        settings blob,
        PRIMARY KEY (domain_id)
-      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");     
+      ) /*!40100 DEFAULT CHARACTER SET UTF8 */ ");
       break;
     case 'pgsql':
       db_query("CREATE TABLE {domain_theme} (
@@ -28,7 +28,7 @@ function domain_theme_install() {
        theme varchar(32) NOT NULL default '',
        settings bytea,
        PRIMARY KEY (domain_id)
-      )");     
+      )");
       break;
   }
 }
