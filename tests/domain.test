@@ -3,7 +3,7 @@
 // $Id$
 
 /**
- * @file 
+ * @file
  * Simpletest for Domain Access
  */
 class DomainCreateTest extends DrupalTestCase {

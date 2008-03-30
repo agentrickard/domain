@@ -1,10 +1,10 @@
 // $Id$
-  
+
 /**
  * @file
  * INSTALL file for Domain Prefix
  */
- 
+
 Domain Access: Table Prefixing
 Dynamic table prefixing for Domain Access.
 
@@ -29,9 +29,9 @@ experienced admins or by those willing to learn how table prefixing functions.
 For more information, see http://drupal.org/node/2622.
 
 This module replaces the default $db_prefix routine documented inside
-settings.php.  
+settings.php.
 
-IT IS ADVISED THAT YOU DO NOT USE THE $db_prefix VARIABLE IF 
+IT IS ADVISED THAT YOU DO NOT USE THE $db_prefix VARIABLE IF
 YOU ARE USING THIS MODULE.
 
 If you must prefix all tables, do not set $db_prefix as an array.  This module
@@ -43,14 +43,14 @@ should still work if $db_prefix = 'string_'.
 In the Domain Access download, find the following file:
 
   domain > domain_prefix > settings_domain_prefix.inc
-  
+
 You will need to load this file from inside your settings.php file. There
 are normally two methods for this.
 
 ----
 2.1 Option 1 -- Preferred
 
-This method is preferred, since any updates to the module release 
+This method is preferred, since any updates to the module release
 will be reflected in this file.
 
 NOTE: the elements inside the ==== marks are php code that
@@ -62,7 +62,7 @@ Add the following lines to the end of your settings.php file:
 /**
  * Add the domain_prefix tables
  */
-require_once './path/to/modules/domain/domain_prefix/settings_domain_prefix.inc'; 
+require_once './path/to/modules/domain/domain_prefix/settings_domain_prefix.inc';
 ====
 
 In this case, change 'path/to/modules' with the directory where your modules are
@@ -70,9 +70,9 @@ stored.  Typically this will be 'sites/all/modules', which makes the lines:
 
 ====
 /**
- * Add the domain_prefix tables 
+ * Add the domain_prefix tables
  */
-require_once './sites/all/modules/domain/domain_prefix/settings_domain_prefix.inc'; 
+require_once './sites/all/modules/domain/domain_prefix/settings_domain_prefix.inc';
 ====
 
 ----
@@ -82,7 +82,7 @@ If you are having difficulty determining the correct path, copy the file
 into your settings folder.
 
   domain > domain_prefix > settings_domain_prefix_inc
-  
+
 The file should be in the same directory as your active settings.php file.  Then
 add the following lines:
 
@@ -100,7 +100,7 @@ After editing your settings.php file, go to Admin > Build > Domains.  If you
 see a warning at the top of the page beginning:
 
   "The Domain Prefix module is not installed correctly..."
-  
+
 This message means that your PHP server cannot find the include file.  You
 may need to test other path options for the include code.
 
@@ -122,5 +122,5 @@ affect all active domains configured with this module.
 ----
 4. Uninstalling
 
-When you disable this module, you must remove the lines from your settings.php 
+When you disable this module, you must remove the lines from your settings.php
 file.

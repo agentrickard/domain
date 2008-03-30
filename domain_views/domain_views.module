@@ -17,7 +17,7 @@
 function domain_views_tables() {
   $domains = domain_domains();
   $domain_options = array('***CURRENT_DOMAIN***' => 'Current Domain');
-  foreach ($domains as $domain){
+  foreach ($domains as $domain) {
     $domain_options[$domain['domain_id']] = $domain['sitename'];
   }
   $domain_form = array(
@@ -26,7 +26,7 @@ function domain_views_tables() {
     '#multiple' => TRUE,
     '#size' => 'size="'. min(8, count($domain_options)) .'"',
   );
-  
+
   $tables['domain_access'] = array(
     'name' => 'node_access',
     'join' => array(
@@ -73,7 +73,7 @@ function domain_views_tables() {
  * Implementation of hook_views_arguments().
  * Provide a filter that restricts a view to only show nodes from a specific domain (by domain_id).
  * If you pass "current" as the argument, it filters according to the domain the page is being viewed from.
- * @ingroup views 
+ * @ingroup views
  */
 function domain_views_arguments() {
   $arguments = array(
@@ -88,11 +88,11 @@ function domain_views_arguments() {
 
 /**
  * This is the function that handles all the work for dealing with view arguments
- * There is some *very rough* documentation on argument handlers for views here http://drupal.org/node/99566.   
- * @ingroup views 
+ * There is some *very rough* documentation on argument handlers for views here http://drupal.org/node/99566.
+ * @ingroup views
  */
 function domain_views_handler_arg_domain_id($op, &$query, $argtype, $arg = '') {
-  switch($op) {
+  switch ($op) {
     case 'summary':
       $query->add_table('domain_access'); // Re-uses the node_access table info from the domain_views_tables() function
       $query->add_table('domain');        // Re-uses the domain table info from the domain_views_tables() function
@@ -108,7 +108,7 @@ function domain_views_handler_arg_domain_id($op, &$query, $argtype, $arg = '') {
       $domain_id = ($arg == 'current') ? (int) $GLOBALS['_domain']['domain_id'] : (int) $arg;
       $query->add_table('domain_access');
       $query->add_where("domain_access.gid = '%s'", $domain_id);  // domain_access is an alias for the node_access table
-      $query->set_distinct(); 
+      $query->set_distinct();
       break;
     case 'link':
       return l($query->sitename, "$arg/" . intval($query->domain_id));
@@ -119,7 +119,7 @@ function domain_views_handler_arg_domain_id($op, &$query, $argtype, $arg = '') {
 
 /**
  * Substitute current domain; this works with cached queries.
- * @ingroup views  
+ * @ingroup views
  */
 function domain_views_query_substitutions($view) {
   return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);

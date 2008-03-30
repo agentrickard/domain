@@ -1,10 +1,10 @@
 // $Id$
-  
+
 /**
  * @file
  * README file for Domain Conf
  */
- 
+
 Domain Access: Site Configuration
 Advanced site configuration options for Domain Access.
 
@@ -28,7 +28,7 @@ CONTENTS
 1.  Introduction
 
 The Domain Access: Site Configuration module (called Domain Conf), is an
-optional extension of the Domain Access module.  Domain Conf provides options 
+optional extension of the Domain Access module.  Domain Conf provides options
 for configuring basic settings of your affiliate sites to be different.
 
 ----
@@ -43,7 +43,7 @@ So the Domain Conf module was written as an optional extension for Domain
 Access.
 
 This module allows each affiliate site to set specific configuration options,
-which will override the default site settings as needed.  See section 2.2 for 
+which will override the default site settings as needed.  See section 2.2 for
 more details.
 
 ----
@@ -88,7 +88,7 @@ replace the system settings for your root site.  The currently available
 settings are:
 
   - Name [of site]
-  - E-mail address 
+  - E-mail address
   - Slogan
   - Mission
   - Footer message
@@ -98,8 +98,8 @@ settings are:
   - Site status
   - Site off-line message
 
-On page load, these values are dynamically loaded to replace your site's 
-defaults. If you do not adjust these settings, defaults will be used for all 
+On page load, these values are dynamically loaded to replace your site's
+defaults. If you do not adjust these settings, defaults will be used for all
 affiliates.
 
 ----
@@ -127,7 +127,7 @@ See http://drupal.org/node/197692 for the reasons.
 ----
 4.1   Extending Options with hook_domainconf()
 
-The module works by applying hook_form_alter() to the form: 
+The module works by applying hook_form_alter() to the form:
 'system_settings_form' and then adding addiitonal fields from other forms.
 
 hook_domainconf() allows developers to add additional form elements.
@@ -148,17 +148,17 @@ http://therickards.com/api/function/hook_domainconf/Domain
 The normal method for using hook_domainconf() is to have the hook implemented
 in other modules.
 
-However, the community development process may mean that it will take time for 
+However, the community development process may mean that it will take time for
 the hook to be implemented in modules that you may be using.
 
 To allow for this fact without harming the upgrade path for Domain
-Configuration, it is possible to create a domain_conf.inc file that you place 
+Configuration, it is possible to create a domain_conf.inc file that you place
 inside the domain_conf directory.
 
-This file should be a PHP file, and it should conform to Drupal coding 
+This file should be a PHP file, and it should conform to Drupal coding
 standards.
 
-For example, to add the user picture default setting to the module without 
+For example, to add the user picture default setting to the module without
 patching user.module or domain_conf.module, you may create the following
 file:
 
@@ -172,19 +172,19 @@ function user_domainconf($domain) {
     '#type' => 'fieldset',
     '#title' => t('User picture'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,    
+    '#collapsed' => FALSE,
   );
   $form['pictures']['user_picture_default'] = array(
-    '#type' => 'textfield', 
-    '#title' => t('Default picture'), 
-    '#default_value' => variable_get('user_picture_default', ''), 
-    '#size' => 30, 
-    '#maxlength' => 255, 
-    '#description' => t('URL of picture to display for users with no custom 
+    '#type' => 'textfield',
+    '#title' => t('Default picture'),
+    '#default_value' => variable_get('user_picture_default', ''),
+    '#size' => 30,
+    '#maxlength' => 255,
+    '#description' => t('URL of picture to display for users with no custom
       picture selected. Leave blank for none.')
   );
   return $form;
-} 
+}
 ====
 
 NOTE: Before upgrading the Domain module, be sure to save this file
@@ -201,7 +201,7 @@ Installing the module creates a {domain_conf} table that contains:
   - domain_id
   Integer, unique
   The lookup key for this record, foreign key to the {domain} table.
-  
+
   - settings
   Blob (bytea)
   A serialized array of settings for this domain.

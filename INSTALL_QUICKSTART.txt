@@ -1,0 +1,66 @@
+// $Id$
+
+/**
+ * @file
+ * Quickstart INSTALL file for Domain Access.
+ */
+
+This file is a quickstart guide for using the Domain Access
+suite of modules.
+
+For full documentation, see INSTALL.txt and README.txt
+
+INSTALLATION INSTRUCTIONS
+
+1. Before proceeding, you must install and configure Drupal
+    without installing this module.
+
+    Note that you only need one settings directory and file.
+
+2. Unpack the download and place it in your modules directory.
+
+    Note the path to this directory, it is normally:
+
+      'sites/all/modules'
+
+3. Add the following four lines of code to your settings.php file:
+
+/**
+ * Add the custom_url_rewrite_outbound function.
+ */
+require_once './sites/all/modules/domain/settings_custom_url.inc';
+
+    NOTE: You may need to alter the file path above based on your
+    site configuration.  See INSTALL.txt for further help.
+
+4. Go to Admin > Build > Modules.  Therre you will see the Domain
+    module group.
+
+    Only enable the Domain Acccess module.
+
+5. Configure permissions for the module, normally you will give your
+    site administrators the following permissions:
+
+    -- 'administer domains'
+    -- 'set domain access'
+
+    If you intend to use access control for editors, you may wish to set
+    the following permissions:
+
+    -- 'assign domain editors'
+    -- 'edit domain nodes'
+
+    For more information see README.txt.
+
+6.  Read the main README.txt file for the Domain Access module.
+
+7. Go to Admin > Build > Domain and configure the module.
+
+8. Now you are ready to explore the options available to you.
+
+    The Domain Access suite contains a number of optional helper
+    modules.  You do not need to use any of these modules, but
+    they may add features that you desire.
+
+    Each of the modules has its own INSTALL.txt and README.txt files.
+    Please read them carefully before activating them.

@@ -1,10 +1,10 @@
 <?php
 // $Id$
 
-/** 
-* @file
-* Install file for the Domain Theme module
-*/
+/**
+ * @file
+ * Install file for the Domain Theme module
+ */
 
 /**
  * Implements hook_install()

@@ -1,10 +1,10 @@
 <?php
 // $Id$
 
-/** 
-* @file
-* Install file for the Domain User module
-*/
+/**
+ * @file
+ * Install file for the Domain User module
+ */
 
 /**
  * Implements hook_install()
@@ -36,7 +36,7 @@ function domain_user_uninstall() {
   drupal_uninstall_schema('domain_user');
   variable_del('domain_user');
   variable_del('domain_user_root');
-  variable_del('domain_user_scheme');  
-  variable_del('domain_user_login');    
-  variable_del('domain_user_prefixing');  
+  variable_del('domain_user_scheme');
+  variable_del('domain_user_login');
+  variable_del('domain_user_prefixing');
 }

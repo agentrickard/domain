@@ -2,16 +2,22 @@
 // $Id$
 
 /**
- * @file
+ * @defgroup domain_user Domain User: personal subdomains
+ *
  * Creates unique subdomains for registered users.
  */
 
-/** 
+/**
+ * @file
+ * Creates unique subdomains for registered users.
+ *
+ * @ingroup domain_user
+ */
+
+/**
  * Implements hook_init()
  *
  * We have to do this because we cannot redirect on login.
- *
- * @ingroup user
  */
 function domain_user_init() {
   if (isset($_SESSION['domain_user'])) {
@@ -23,98 +29,25 @@ function domain_user_init() {
 
 /**
  * Implements hook_menu()
- *
- * @ingroup user
  */
-function domain_user_menu($may_cache) {
+function domain_user_menu() {
   $items = array();
-  
-  if ($may_cache) {
-    $items[] = array(
-      'title' => t('User domains'),
-      'path' => 'admin/build/domain/user',
-      'type' => MENU_LOCAL_TASK,
-      'access' => user_access('administer domains'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('domain_user_configure_form')
-    );
-  }
+  $items['admin/build/domain/user'] = array(
+    'title' => 'User domains',
+    'type' => MENU_LOCAL_TASK,
+    'access arguments' => array('administer domains'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_user_configure_form'),
+    'file' => 'domain_user.admin.inc'
+  );
   return $items;
 }
 
 /**
  * Implements hook_perm()
- *
- * @ingroup user 
  */
 function domain_user_perm() {
   return array('create personal domain');
-}
-
-/**
- * FormsAPI
- *
- * @ingroup user
- */
-function domain_user_configure_form() { 
-  drupal_set_title(t('User domain settings'));
-  $form = array();
-  $form['domain_user'] = array(
-    '#type' => 'radios',
-    '#title' => t('Module behavior'),
-    '#options' => array(0 => t('Do not create domains for users'), 1 => t('Automatically create domains for new users'), 2=> t('Ask users if they would like to create a domain')),
-    '#description' => t('Should subdomains be created when users register?'),
-    '#default_value' => variable_get('domain_user', 0),
-  );
-  $form['domain_user_root'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Root domain name'),
-    '#size' => 40,
-    '#maxlength' => 80,
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_user_root', variable_get('domain_root', '')),
-    '#description' => t('The root domain to use for creating user domains, typically <em>example.com</em>.  No http or slashes.
-      <br /> When users create domains, their username will be added to the root domain to create a custom domain.
-      <br /> For example, <em>user1.example.com</em> or <em>administrator.example.com</em>.')
-  );    
-  $form['domain_user_scheme'] = array(
-    '#type' => 'radios',
-    '#title' => t('User Domain URL scheme'),
-    '#options' => array('http' => 'http://', 'https' => 'https://'),
-    '#default_value' => variable_get('domain_user_scheme', 'http'),
-    '#description' => t('The URL scheme for accessing user domains.')
-  );     
-  $form['domain_user_login'] = array(
-    '#type' => 'radios',
-    '#title' => t('User login behavior'),
-    '#options' => array(1 => t('On login, go to personal domain'), 0 => t('Do not go to personal domain on login')),
-    '#default_value' => variable_get('domain_user_login', 1),
-    '#description' => t('The domain users should go to when they login to the site.')
-  );      
-  if (module_exists('domain_prefix')) {
-    $form['domain_user_prefixing'] = array(
-      '#type' => 'radios',
-      '#title' => t('Domain table prefixing'),
-      '#options' => array(0 => t('Never create prefixed tabled for user domains'), 1 => t('Obey the settings in Domain Prefix')),
-      '#description' => t('Should user domains have detabase talbes created?'),
-      '#default_value' => variable_get('domain_user_prefixing', 0),
-    );    
-  }
-  // Show the rules for username restrictions
-  $rules =  domain_user_rules();
-  if (!empty($rules)) {
-    $output = '<ul>';
-    foreach ($rules as $rule) {
-      $output .= '<li>'. $rule .'</li>';
-    }
-    $output .= '</ul>';
-  }
-  $form['rules'] = array(
-    '#type' => 'markup',
-    '#weight' => 20,
-    '#value' => '<p>'. t('<h3>Reserved Usernames</h3><p>The following usernames cannot be registered, since they are used as unique subdomains:</p></div>'). $output . '</p>',
-  );
-  return system_settings_form($form);
 }
 
 /**
@@ -125,10 +58,8 @@ function domain_user_configure_form() {
  *  the current domain set.  Default to TRUE.
  * @return
  *  An array of reserved name strings or an empty array.
- *
- * @ingroup user 
  */
-function domain_user_rules($generate = TRUE) { 
+function domain_user_rules($generate = TRUE) {
   // Find domains that are not user domains.  These are blacklisted in user rules.
   // We set the $reset flag to TRUE, to be sure we catch all changes.
   $domains = domain_domains(TRUE);
@@ -144,8 +75,8 @@ function domain_user_rules($generate = TRUE) {
         $check = db_result(db_query("SELECT aid FROM {access} WHERE mask = '%s'", $name_string));
         if (!$check) {
           db_query("INSERT INTO {access} (mask, type, status) VALUES ('%s', '%s', %d)", $name_string, 'user', 0);
-        }  
-      }  
+        }
+      }
     }
   }
   return $reserved;
@@ -155,8 +86,6 @@ function domain_user_rules($generate = TRUE) {
  * Implements hook_enable()
  *
  * When the module is enabled, create the rules for existing domains.
- *
- * @ingroup user
  */
 function domain_user_enable() {
   domain_user_rules();
@@ -166,36 +95,33 @@ function domain_user_enable() {
  * Implements hook_disable()
  *
  * Deletes our user access masks.
- *
- * @ingroup user
  */
 function domain_user_disable() {
   $rules = domain_user_rules(FALSE);
-  foreach ($rules as $rule) {
-    db_query("DELETE FROM {access} WHERE mask = '%s'", $rule);
+  if (!empty($rules)) {
+    foreach ($rules as $rule) {
+      db_query("DELETE FROM {access} WHERE mask = '%s'", $rule);
+    }
   }
 }
 
 /**
  * Implements hook_domainload()
- *
- * @ingroup user
  */
-function domain_user_domainload($domain) {
+function domain_user_domainload(&$domain) {
   // Zero is the default domain, and we don't want to invalidate it.
   if ($domain['domain_id'] > 0) {
-    $data = db_fetch_array(db_query("SELECT du.uid, u.status FROM {domain_user} du INNER JOIN {users} u ON du.uid = u.uid WHERE du.domain_id = %d", $domain['domain_id']));
+    $data = db_fetch_array(db_query("SELECT du.uid, u.status FROM {domain_user} du
+      INNER JOIN {users} u ON du.uid = u.uid
+      WHERE du.domain_id = %d", $domain['domain_id']));
     if ($data['uid']) {
       $domain['uid'] = $data['uid'];
-    }  
-    return $domain;
-  }  
+    }
+  }
 }
 
 /**
  * Implements hook_user()
- *
- * @ingroup user
  */
 function domain_user_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
@@ -213,9 +139,9 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
     case 'register':
     case 'form':
       // This function will return -1 if no domain exists.
-      $domain = domain_user_lookup($account->uid);    
+      $domain = domain_user_lookup($account->uid);
       if ($domain == -1) {
-        // The module must be configured properly. 
+        // The module must be configured properly.
         $default = domain_default();
         $root = variable_get('domain_user_root', $default['subdomain']);
         $create_domain = variable_get('domain_user', 0);
@@ -225,7 +151,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
               '#type' => 'value',
               '#value' => 1,
             );
-          }  
+          }
           else if ($create_domain == 2 && !empty($root)) {
             $form['domain_user_domain'] = array(
               '#type' => 'fieldset',
@@ -233,8 +159,8 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
               '#collapsible' => TRUE,
               '#collapsed' => FALSE,
               '#weight' => 1
-            );            
-            $name = t('username');            
+            );
+            $name = t('username');
             if (isset($account->name)) {
               $name = domain_user_strip_chars($account->name);
             }
@@ -242,35 +168,35 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
               '#type' => 'checkbox',
               '#return_value' => 1,
               '#title' => t('Yes, I want to create my own site at <b>!user.!site</b>', array('!user' => $name, '!site' => $root)),
-            );      
+            );
           }
           return $form;
-        }  
-      }  
+        }
+      }
       break;
     case 'insert':
     case 'update':
       if ($edit['domain_create_user'] && user_access('create personal domain', $account)) {
         $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
         $name = domain_user_strip_chars($account->name);
-        $form_values['sitename'] = $account->name;
-        $form_values['subdomain'] = $name .'.'. $user_root;
-        $form_values['valid'] = $account->status;
-        $form_values['user_submitted'] = TRUE;
+        $form_state['values']['sitename'] = $account->name;
+        $form_state['values']['subdomain'] = $name .'.'. $user_root;
+        $form_state['values']['valid'] = $account->status;
+        $form_state['values']['user_submitted'] = TRUE;
         // This function will return -1 if no domain exists.
         $domain = domain_user_lookup($account->uid);
         if ($domain == -1) {
           // Set arguments to be passed to the form
           $arguments = array('user_submitted' => TRUE);
           // Include the form file.
-          include_once(drupal_get_path('module', 'domain') .'/domain_admin.inc');
+          include_once(drupal_get_path('module', 'domain') .'/domain.admin.inc');
           // Set the scheme as needed.
-          $form_values['domain_scheme'] = variable_get('domain_user_scheme', 'http');
-          drupal_execute('domain_create_form', $form_values, $arguments);
-          $domain = domain_lookup(NULL, $form_values['subdomain']);    
-          if ($domain['domain_id']) { 
-            db_query("INSERT INTO {domain_user} VALUES (%d, %d)", $domain['domain_id'], $account->uid);    
-            $edit['domains'][] = $domain['domain_id'];            
+          $form_state['values']['domain_scheme'] = variable_get('domain_user_scheme', 'http');
+          drupal_execute('domain_create_form', $form_state, $arguments);
+          $domain = domain_lookup(NULL, $form_state['values']['subdomain']);
+          if ($domain['domain_id']) {
+            db_query("INSERT INTO {domain_user} (domain_id, uid) VALUES (%d, %d)", $domain['domain_id'], $account->uid);
+            $edit['domains'][] = $domain['domain_id'];
             drupal_set_message(t('Your personal URL is <a href="!url">!url</a>.', array('!url' => url($domain['path']))));
           }
           else {
@@ -278,7 +204,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           }
         }
         // Set the user's default domain to their subdomain.
-        if ($domain['domain_id']) {
+        if ($domain['domain_id'] > 0) {
           // If the user cannot assign domain editors, only allow their unique domain.
           if (!user_access('assign domain editors')) {
             $edit['domain_user'] = array();
@@ -286,7 +212,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           $edit['domain_user'][$domain['domain_id']] = $domain['domain_id'];
           // If the user account is blocked, set the domain to invalid.
           if ($account->status == 0) {
-            db_query("UPDATE {domain} SET valid = 0 WHERE domain_id = %d", $domain['domain_id']);
+            db_query("UPDATE {domain} SET valid = %d WHERE domain_id = %d", 0, $domain['domain_id']);
           }
         }
       }
@@ -326,66 +252,58 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
  * The user name to process.
  * @return
  * A string with only alphanumeric characters and dashes.
- *
- * @ingroup user
  */
 function domain_user_strip_chars($name) {
   // Only alphanumeric characters are allowed.
   $pattern = '/[^a-zA-Z0-9]/';
   $name = preg_replace($pattern, '-', $name);
-  return strtolower($name);  
+  return strtolower($name);
 }
 
 /**
  * Implements hook_domainupdate()
- *
- * @ingroup user
  */
 function domain_user_domainupdate($op, $domain = array(), $edit = array()) {
   $root = variable_get('domain_user_root', variable_get('domain_root', ''));
   switch ($op) {
-    case 'create':
-      domain_user_rules();
-      break;
     case 'update':
       // If these are different, then we must delete a row from {access}.
       if ($domain['subdomain'] != $edit['subdomain']) {
         $mask = str_replace('.'. $root, '', $domain['subdomain']);
         db_query("DELETE FROM {access} WHERE mask = '%s'", $mask);
       }
-      domain_user_rules();      
       break;
     case 'delete':
       // Delete from {domain_user}
       db_query("DELETE FROM {domain_user} WHERE domain_id = %d", $domain['domain_id']);
       // Delete from the access rules.
-      $user_root = variable_get('domain_user_root', variable_get('domain_root', '')); 
+      $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
       $mask = str_replace('.'. $user_root, '', $domain['subdomain']);
       db_query("DELETE FROM {access} WHERE mask = '%s'", $mask);
       break;
-  }  
-}      
+  }
+}
 
 /**
  * Check to see if a user has created a domain record
  *
  * @param $uid
- *  The user id of the domain to be checked. Optional. 
+ *  The user id of the domain to be checked. Optional.
  * @param $name
- *  The username of the domain to be checked. Optional. 
+ *  The username of the domain to be checked. Optional.
  * @param $domain_id
  *  The domain_id taken from {domain}. Optional.
  * @param $clear
- *  A boolean flag to clear the static variable if necessary. Not used.  Here for consistency. 
- *
- * @ingroup user
+ *  A boolean flag to clear the static variable if necessary. Not used.  Here for consistency.
  */
 function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL, $clear = FALSE) {
   if ($uid) {
     $id = db_result(db_query("SELECT domain_id FROM {domain_user} WHERE uid = %d", $uid));
   }
   else if ($name) {
-    $id = db_result(db_query("SELECT du.domain_id FROM {domain_user} du INNER JOIN {users} u ON du.uid = u.uid WHERE u.name = '%s'", $name));
+    $id = db_result(db_query("SELECT du.domain_id FROM {domain_user} du
+      INNER JOIN {users} u ON du.uid = u.uid
+      WHERE u.name = '%s'", $name));
   }
   else if ($domain_id) {
     $id = db_result(db_query("SELECT domain_id FROM {domain_user} WHERE domain_id = %d", $domain_id));
@@ -401,8 +319,6 @@ function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL, $clear
 
 /**
  * Implements hook_domainview()
- *
- * @ingroup user
  */
 function domain_user_domainview($op, $domain = array()) {
   switch ($op) {
@@ -413,7 +329,7 @@ function domain_user_domainview($op, $domain = array()) {
       return 'du.uid';
     case 'join':
       return "LEFT JOIN {domain_user} du ON du.domain_id = d.domain_id";
-      break;      
+      break;
     case 'data':
       if ($domain['uid']) {
         $account = user_load(array('uid' => $domain['uid']));

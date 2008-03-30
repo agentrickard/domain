@@ -1,10 +1,10 @@
 <?php
 // $Id$
 
-/** 
-* @file
-* Install file for the Domain Prefix module
-*/
+/**
+ * @file
+ * Install file for the Domain Prefix module
+ */
 
 /**
  * Implements hook_install()
@@ -45,7 +45,7 @@ function domain_prefix_uninstall() {
   // Now drop the storage table.
   drupal_uninstall_schema('domain_prefix');
   variable_del('domain_prefix');
-  variable_del('domain_prefix_options');  
+  variable_del('domain_prefix_options');
 }
 
 

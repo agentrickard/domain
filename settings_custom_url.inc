@@ -12,16 +12,17 @@
  * Implements custom_url_rewrite_outbound().
  * Forces absolute paths for domains when needed.
  */
-function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$base_url, $original_path) {
+function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
   global $_domain;
+  // &$query, &$fragment, &$absolute, &$base_url
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.
   if (isset($_domain['domain_id'])) {
     // Set static variables for the node lookups, to remove redundant queries.
     static $domain_site, $domain, $nodepaths;
-  
+
     // Store the original path for later use.
     $original_path = $path;
-  
+
     // Check to see that this function is installed.
     $skip = FALSE;
     $arg = arg(0);
@@ -29,24 +30,24 @@ function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$
       $path = 'yes';
       $skip = TRUE;
     }
-  
+
     // This routine only needs to be run from certain urls or if we want to
     // force all links to go to a single domain for SEO.
     // See http://drupal.org/node/195366 for the background.
     $check = domain_grant_all();
     $seo = variable_get('domain_seo', 0);
-  
+
     if (!$skip && ($check || $seo)) {
       // Check to see if this is a node or comment link and set $nid accordingly.
       // We static the $nid results to make this more efficient.
-      $pattern = explode('/', $path);    
-      
+      $pattern = explode('/', $path);
+
       // Advanced pattern matching, we find the node id based on token %n in the path string.
       if (!isset($nodepaths)) {
         $pathdata = variable_get('domain_paths', "node/%n\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n");
         $path_match = preg_replace('/(\r\n?|\n)/', '|', $pathdata);
         $nodepaths = explode("|", $path_match);
-      }  
+      }
       $nid = FALSE;
       foreach ($nodepaths as $match) {
         $match_array = explode('/', $match);
@@ -59,16 +60,16 @@ function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$
       }
       // This path has matched a node id, so it may need to be rewritten.
       if ($nid) {
-        $root = domain_default();  
+        $root = domain_default();
         // Remove redundancy from the domain_site check.
         if (!isset($domain_site[$nid])) {
           // If this check works, we don't need to rewrite the path unless SEO rules demand it.
           $domain_site[$nid] = db_result(db_query("SELECT grant_view FROM {node_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
-        }  
+        }
         if (!$domain_site[$nid]) {
           // Remove rendundancy from the domain_id check.
           if (!isset($domain[$nid])) {
-            // The Domain Source module is optional, and allows nodes to be assigned to specific domains for the 
+            // The Domain Source module is optional, and allows nodes to be assigned to specific domains for the
             // purpose of this check.
             if (module_exists('domain_source')) {
               $source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $nid));
@@ -78,23 +79,23 @@ function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$
               // Load the domain data for this node -- but only take the first match.
               $id = db_result(db_query_range("SELECT gid FROM {node_access} WHERE nid = %d AND realm = '%s' AND grant_view = 1 ORDER BY gid", $nid, 'domain_id', 0, 1));
               $domain[$nid] = domain_lookup($id);
-            }  
-          }  
+            }
+          }
           // Can we and do we need to rewrite this path?
           if ($domain[$nid] != -1 && $domain[$nid]['domain_id'] != $_domain['domain_id']) {
-            $absolute = TRUE;
+            $options['absolute'] = TRUE;
             // In this case, the $base_url cannot have a trailing slash
             $base_url = rtrim($domain[$nid]['path'], '/');
-          }  
-        }  
+          }
+        }
         // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
         // Only needed if we are not on the root domain.
         else if ($seo && $_domain['domain_id'] != $root['domain_id']) {
-          $absolute = TRUE;
-            // In this case, the $base_url cannot have a trailing slash
-            $base_url = rtrim($root['path'], '/');
+          $options['absolute'] = TRUE;
+          // In this case, the $base_url cannot have a trailing slash
+          $base_url = rtrim($root['path'], '/');
         }
-      }  
-    }  
+      }
+    }
   }
 }

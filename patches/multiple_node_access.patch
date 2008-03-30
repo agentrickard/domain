@@ -1,12 +1,12 @@
---- modules/node/node.module.orig	2008-01-06 20:31:26.000000000 -0500
-+++ modules/node/node.module	2008-01-11 14:24:24.000000000 -0500
-@@ -2731,22 +2731,19 @@ function node_access($op, $node = NULL) 
+--- modules/node/node.module.orig	2008-03-28 20:26:17.000000000 -0400
++++ modules/node/node.module	2008-03-28 20:27:17.000000000 -0400
+@@ -2002,22 +2002,19 @@ function node_access($op, $node, $accoun
  
    // If the module did not override the access rights, use those set in the
    // node_access table.
 -  if ($op != 'create' && $node->nid && $node->status) {
 -    $grants = array();
--    foreach (node_access_grants($op) as $realm => $gids) {
+-    foreach (node_access_grants($op, $account) as $realm => $gids) {
 -      foreach ($gids as $gid) {
 -        $grants[] = "(gid = $gid AND realm = '$realm')";
 -      }
@@ -16,7 +16,7 @@
 -    if (count($grants)) {
 -      $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
 +  if ($op != 'create' && $node->nid) {
-+    $grants_sql = node_access_grants_sql($op, NULL, $user->uid, $node->status);
++    $grants_sql = node_access_grants_sql($op, NULL, $account, $node->status);
 +    // If the return value is FALSE, then the node status is unpublished and
 +    // none of the grants requested an access check be run.  In which case,
 +    // we should fall through to the final 'if' statement.
@@ -35,12 +35,12 @@
    }
  
    // Let authors view their own nodes.
-@@ -2793,17 +2790,7 @@ function _node_access_where_sql($op = 'v
+@@ -2067,17 +2064,7 @@ function _node_access_where_sql($op = 'v
      return;
    }
  
 -  $grants = array();
--  foreach (node_access_grants($op, $uid) as $realm => $gids) {
+-  foreach (node_access_grants($op, $account) as $realm => $gids) {
 -    foreach ($gids as $gid) {
 -      $grants[] = "($node_access_alias.gid = $gid AND $node_access_alias.realm = '$realm')";
 -    }
@@ -50,11 +50,11 @@
 -  if (count($grants)) {
 -    $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
 -  }
-+  $grants_sql = node_access_grants_sql('view', $node_access_alias, $uid);
++  $grants_sql = node_access_grants_sql($op, $node_access_alias, $account);
  
    $sql = "$node_access_alias.grant_$op >= 1 $grants_sql";
    return $sql;
-@@ -2844,18 +2831,7 @@ function node_access_view_all_nodes() {
+@@ -2115,18 +2102,7 @@ function node_access_view_all_nodes() {
    static $access;
  
    if (!isset($access)) {
@@ -74,7 +74,7 @@
      $sql = "SELECT COUNT(*) FROM {node_access} WHERE nid = 0 $grants_sql AND grant_view >= 1";
      $result = db_query($sql);
      $access = db_result($result);
-@@ -2865,6 +2841,85 @@ function node_access_view_all_nodes() {
+@@ -2136,6 +2112,90 @@ function node_access_view_all_nodes() {
  }
  
  /**
@@ -82,8 +82,9 @@
 + *
 + * @param $op
 + *   The operation that the user is trying to perform.
-+ * @param $uid
-+ *   The user ID performing the operation. If omitted, the current user is used.
++ * @param $account
++ *   The user object for the user performing the operation. If omitted, the
++ *   current user is used.
 + * @param $status
 + *   The publication status of the node being checked.  Typically, node_access
 + *   checks are not run for unpublished nodes.  However, some advanced uses
@@ -96,11 +97,14 @@
 + *   - Boolean FALSE, indicating that all nodes are unpublished and no module
 + *   has explicitly requested an access check.
 + */
-+function node_access_grants_sql($op = 'view', $node_access_alias = NULL, $uid = NULL, $status = TRUE) {
-+  // Define the grants array.
++function node_access_grants_sql($op = 'view', $node_access_alias = NULL, $account = NULL, $status = TRUE) {
++  // Define the grants array and variable strings.
 +  $grants = array();
++  $alias = '';
++  $grants_sql = '';
++
 +  // First, acquire all the grants as an array of rules.
-+  $rules = node_access_grants($op, $uid);
++  $rules = node_access_grants($op, $account);
 +
 +  // Prepare the table alias, if needed.
 +  if (!empty($node_access_alias)) {
@@ -115,7 +119,9 @@
 +    // Process the grants into logical groupings.
 +    foreach ($rules as $realm => $rule) {
 +      // Set the status flag.
-+      $status += $rule['check'];  
++      if (isset($rule['check'])) {
++        $status += $rule['check'];  
++      }
 +      // Set the default clause group.  Then check for options.
 +      $group = 'all';
 +      if (!empty($rule['group'])) {
@@ -134,7 +140,6 @@
 +    if (!$status) {
 +      return FALSE;
 +    }
-+    $grants_sql = '';
 +    // Run throught the $grants, if needed and generate the query SQL.
 +    if (count($grants)) {
 +      foreach ($grants as $group => $grant) {

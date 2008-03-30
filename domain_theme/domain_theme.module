@@ -2,141 +2,72 @@
 // $Id$
 
 /**
+ * @defgroup domain_theme Domain Theme: manage themes
+ *
+ * Switch themes based on active domain.
+ */
+
+/**
  * @file
  * Domain Theme module for the Domain Access module group.
  *
  * Originally written by canen; http://drupal.org/user/16188.
+ *
+ * @ingroup domain_theme
  */
 
 /**
- * Implements hook_menu()
- *
- * @ingroup drupal
+ * Implements hook_init()
  */
-function domain_theme_menu($may_cache) {
-  $items = array();
-  if (!$may_cache) {
-    // Menu items for configuring themes.
-    $items[] = array(
-      'title' => t('Domain theme settings'),
-      'path' => 'admin/build/domain/theme',
-      'access' => user_access('administer domains'),
-      'type' => MENU_CALLBACK,
-      'callback' => 'domain_theme_page',
-      'callback arguments' => array(arg(4))      
-    );
-    $items[] = array(
-      'title' => t('Domain site settings'),
-      'path' => 'admin/build/domain/theme-reset',
-      'access' => user_access('administer domains'),
-      'type' => MENU_CALLBACK,
-      'callback' => 'domain_theme_reset',
-      'callback arguments' => array(arg(4))      
-    );        
-    // Assign the theme selected, based on the active domain.
-    global $_domain, $custom_theme;
-    $default_theme = variable_get('theme_default', 'garland');    
-    $theme = domain_theme_lookup($_domain['domain_id']);
-    // The above returns -1 on failure.
-    if ($theme != -1) {
-      $custom_theme = $theme['theme']; 
-    }  
+function domain_theme_init() {
+  // Assign the theme selected, based on the active domain.
+  global $_domain, $custom_theme;
+  $default_theme = variable_get('theme_default', 'garland');
+  $theme = domain_theme_lookup($_domain['domain_id']);
+  // The above returns -1 on failure.
+  if ($theme != -1) {
+    $custom_theme = $theme['theme'];
   }
+}
+
+/**
+ * Implements hook_menu()
+ */
+function domain_theme_menu() {
+  $items = array();
+  // Menu items for configuring themes.
+  $items['admin/build/domain/theme/%domain'] = array(
+    'title' => 'Domain theme settings',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_theme_page',
+    'page arguments' => array(4),
+    'file' => 'domain_theme.admin.inc',
+  );
+  $items['admin/build/domain/theme-reset/%domain'] = array(
+    'title' => 'Domain theme settings',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_theme_reset',
+    'page arguments' => array(4),
+    'file' => 'domain_theme.admin.inc',
+  );
   return $items;
 }
 
 /**
- * The domain theme page callback router.
- *
- * @param $domain_id
- *  The unique identifier for this domain, taken from {domain}.
- *
- * @ingroup theme
+ * Implements hook_theme()
  */
-function domain_theme_page($domain_id) {
-  global $_domain;
-  $domain = domain_lookup($domain_id);
-  $output = theme_domain_theme_reset($domain);  
-  if ($domain['domain_id']) {
-    // Ensure we are on the proper domain.
-    domain_goto($domain);
-    drupal_set_title(t('!site : Domain theme settings', array('!site' => $domain['sitename'])));    
-    include_once('domain_theme_form.inc');
-    return $output . drupal_get_form('system_themes');
-  }
-  else {
-    return t('Invalid domain request.');
-  } 
+function domain_theme_theme() {
+  $themes = array(
+    'domain_theme_reset' => array(
+      'arguments' => array('domain' => array()),
+    ),
+  );
+  return $themes;
 }
 
 /**
- * Resets theme settings by removing the domain row from {domain_theme}.
- * 
- * @param $domain_id
- * The domain_id of the requested domain.
- * @return
- * A confirmation form.
- *
- * @ingroup theme
- */
-
-function domain_theme_reset($domain_id) {
-  $domain = domain_lookup($domain_id);
-  if ($domain == -1) {
-    return t('An invalid request has been made.');
-  }
-  return drupal_get_form('domain_theme_reset_form', $domain);
-}
-
-/**
- * FormsAPI for resetting a domain themes.
- *
- * @param $domain
- * The $domain object for the selected domain.
- * @return
- * Themed HTML form.
- *
- * @ingroup theme
- */
-
-function domain_theme_reset_form($domain) {
-  $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $extra['#redirect'] = 'admin/build/domain/theme/'. $domain['domain_id'];
-  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/build/domain/theme/'. $domain_id, t('Submitting this form will restore default theme for this domain.'));
-  return $form;
-}
-
-/**
- * FormsAPI for domain_theme_reset_form.
- *
- * @ingroup theme
- */
-function domain_theme_reset_form_submit($form_id, $form_values) {
-  db_query("DELETE FROM {domain_theme} WHERE domain_id = %d", $form_values['domain_id']);
-  drupal_set_message(t('Domain theme settings have been reset.'));
-}
-
-/**
- * Theme a message at the top of domain theme pages.
- *
- * @param $domain
- * The $domain object for the selected domain.
- * @return
- * Themed HTML messages.
- *
- * @ingroup conf
- */
-function theme_domain_theme_reset($domain) {
-  $output = '';
-  $output .= '<p>'. t('These settings will replace your default site theme when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
-  $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE domain_id = %d", $domain['domain_id']));
-  if (!empty($data)) {
-    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/build/domain/theme-reset/'. $domain['domain_id']))) .'</p>';
-  }
-  return $output;
-}
-
-/** 
  * Get domain theme information
  *
  * @param $domain_id
@@ -146,17 +77,15 @@ function theme_domain_theme_reset($domain) {
  * @param $clear
  *  A boolean flag to clear the static variable if necessary. Not used.  Here for consistency.
  * @return
- *  An array containing the requested row from the {domain_theme} table. 
+ *  An array containing the requested row from the {domain_theme} table.
  *  Returns -1 on failure.
- *
- * @ingroup theme
  */
 function domain_theme_lookup($domain_id = NULL, $theme = NULL, $clear = FALSE) {
   if (!is_null($domain_id)) {
     $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE domain_id = %d", $domain_id));
   }
   else if (!is_null($theme)) {
-    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE theme= '%s'", $theme));    
+    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE theme= '%s'", $theme));
   }
   if (empty($return)) {
     $return = -1;
@@ -166,8 +95,6 @@ function domain_theme_lookup($domain_id = NULL, $theme = NULL, $clear = FALSE) {
 
 /**
  * Implements hook_domainlinks()
- *
- * @ingroup theme
  */
 function domain_theme_domainlinks($domain) {
   $links[] = array(
@@ -179,20 +106,18 @@ function domain_theme_domainlinks($domain) {
 
 /**
  * Implements hook_domainform()
- *
- * @ingroup theme 
  */
 function domain_theme_domainform(&$form) {
   // Set the module weight for Domain Theme,
   $module_weight = variable_get('domain_theme_weight', 0);
   db_query("UPDATE {system} SET weight = %d WHERE name = 'domain_theme' AND type = 'module'", $module_weight);
-  
+
   // Add the form element to the main screen.
   $form['domain_theme'] = array(
     '#type' => 'fieldset',
     '#title' => t('Theme settings'),
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE  
+    '#collapsed' => TRUE
   );
   $options = drupal_map_assoc(array(-100, -25, -10, -5, -1, 0, 1, 5, 10, 25, 100));
   $form['domain_theme']['domain_theme_weight'] = array(
@@ -208,8 +133,6 @@ function domain_theme_domainform(&$form) {
 
 /**
  * Implements hook_domainbatch()
- *
- * @ingroup theme
  */
 function domain_theme_domainbatch() {
   $batch = array();
@@ -220,7 +143,7 @@ function domain_theme_domainbatch() {
       '#type' => 'checkbox',
       '#options' => array(t('Reset')),
       '#description' => t('Delete custom theme settings for this domain.'),
-    ),  
+    ),
     '#domain_action' => 'domain_delete',
     '#system_default' => 0,
     '#meta_description' => t('Delete custom theme settings for domains as supplied by Domain Theme.'),
@@ -236,7 +159,7 @@ function domain_theme_domainbatch() {
     }
   }
   $batch['site_theme'] = array(
-    '#form' => array(  
+    '#form' => array(
       '#title' => t('Theme settings'),
       '#type' => 'select',
       '#options' => $options,
@@ -248,22 +171,20 @@ function domain_theme_domainbatch() {
     '#system_default' => variable_get('theme_default', 'garland'),
     '#variable' => 'theme_default',
     '#meta_description' => t('Change the themes for all domains.'),
-    '#data_type' => 'integer',    
+    '#data_type' => 'integer',
     '#weight' => -6,
-  );  
-  return $batch;  
+  );
+  return $batch;
 }
 
 /**
  * Custom handler for domain_theme_domainbatch().
  *
- * @param $form_values
+ * @param $values
  * The form values passed by the FormsAPI.
- *
- * @ingroup theme
  */
-function domain_theme_batch($form_values) {
-  foreach ($form_values['domain_batch'] as $key => $value) {
+function domain_theme_batch($values) {
+  foreach ($values['domain_batch'] as $key => $value) {
     if ($key > 0) {
       $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE domain_id = %d", $key));
       if (isset($data['theme'])) {

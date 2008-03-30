@@ -2,8 +2,15 @@
 // $Id$
 
 /**
+ * @defgroup domain_strict Domain Strict: strict access control
+ * Forces users to be assigned to a domain in order to view content on that domain.
+ */
+
+/**
  * @file
  * Forces users to be assigned to a domain in order to view content on that domain.
+ *
+ * @ingroup domain_strict
  */
 
 /**

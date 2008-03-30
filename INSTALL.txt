@@ -4,7 +4,7 @@
  * @file
  * INSTALL file for Domain Access.
  */
- 
+
 Domain Access
 A subdomain-based access control system.
 
@@ -20,7 +20,6 @@ CONTENTS
 2.5   Setting DOMAIN_SITE_GRANT
 3.   Patches to Drupal Core
 3.1   multiple_node_access.patch
-3.2   custom_url_rewrite_outbound.patch
 4.  Configuring settings.php
 4.1   $base_url
 4.2   $db_prefix
@@ -41,17 +40,17 @@ CONTENTS
 ----
 1.  Introduction
 
-The Domain Access module is a Node Access module.  It is designed to 
+The Domain Access module is a Node Access module.  It is designed to
 restrict access to content.
 
-Failure to install or uninstall this module according to instructions may 
+Failure to install or uninstall this module according to instructions may
 cause errors in your site.
 
 ----
 2.  Installation
 
 This module requires some advanced understanding of Drupal and of
-how DNS servers behave.  If you simply untar the download and 
+how DNS servers behave.  If you simply untar the download and
 activate the module, it may not work correctly.
 
 When you enable the module, it will create a {domain} table in your Drupal
@@ -70,11 +69,11 @@ You will need to do the following before you install the module.
   - Configure your web server DNS records appropriately
   - Read the supplied README.txt
   - Install and configure Drupal normally.
-  
+
 WARNING: The Domain Access module series instructs you to add several
 file includes to your settings.php file.  Do not add these commands until
 after you have installed Drupal.
-  
+
 ----
 2.2   Server Configuration
 
@@ -85,7 +84,7 @@ installation.
 The two basic methods for doing this are either to:
 
   - Setup WildCard DNS, so that *.example.com resolves to your Drupal site.
-  - Setup VirtualHosts so that one.example.com, two.example.com, etc. all 
+  - Setup VirtualHosts so that one.example.com, two.example.com, etc. all
     resolve to your Drupal site.
 
 For example, on my local testing machine, I have VirtualHosts to the following
@@ -95,15 +94,15 @@ sites setup in httpd.conf (and my hosts file, to allow the .test TLD):
   - one.ken.test => 127.0.0.1
   - two.ken.test => 127.0.0.1
   - three.ken.test => 127.0.0.1
-  
-It is beyond the scope of this document to explain how to configure your DNS 
+
+It is beyond the scope of this document to explain how to configure your DNS
 server.  For more information, see:
 
   - http://en.wikipedia.org/wiki/Wildcard_DNS_record
-  - http://en.wikipedia.org/wiki/Virtual_hosting  
-  
+  - http://en.wikipedia.org/wiki/Virtual_hosting
+
 After you have enabled multiple DNS entries to resolve to your Drupal
-installation, you may activate the module and configure its settings.  
+installation, you may activate the module and configure its settings.
 
 NOTE: No matter how many domains resolve to the same IP, you only need one instance
 of Drupal's settings.php file.  The sites folder should be named 'default' or
@@ -120,10 +119,10 @@ At the top of the domain.module file, you will find this line:
 
 This setting controls the default behavior of the module when installing over
 an existing installation.  If set to TRUE, the Domain Access module will assign
-all existing nodes to be viewable by all affiliate sites.
+all existing nodes to be viewable by your primary domain.
 
-If you set this value to FALSE, existing nodes will only be visible to users on
-your root domain.
+If you set this value to FALSE, existing content will not be visible on your
+primary domain unless DOMAIN_SITE_GRANT is set to TRUE.
 
 For more details, see section 5 of README.txt.
 
@@ -136,12 +135,12 @@ At the top of the domain.module file, you will find this line:
 
   define('DOMAIN_EDITOR_RULE', FALSE);
 
-This setting controls the default behavior for affiliate editors.  If 
+This setting controls the default behavior for affiliate editors.  If
 DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
 intend to use editing controls.
 
-If this is set to TRUE, all existing nodes on your site will be editable by users who 
-are assigned as editors of your root domain.
+If this is set to TRUE, all existing nodes on your site will be editable by
+users who are assigned as editors of your root domain.
 
 See section 3 and section 5 of README.txt for more information.
 
@@ -157,12 +156,15 @@ By design, the Domain Access module allows site administrators to assign
 content to 'all affiliates.'  If this value is set to TRUE, then content
 assigned to all affiliates can be seen by all users on all current domains.
 
+On install, setting this value to TRUE will assign all current content to
+be viewable on all domains.
+
 Normally, you will not need to edit this value.
 
 ----
-3. Patches to Drupal Core
+3. Patch to Drupal Core
 
-The following patches are optional.  They affect advanced behavior of the 
+The following patches are optional.  They affect advanced behavior of the
 Domain Access module.
 
 Patches are distributed in the 'patches' folder of the download.
@@ -181,42 +183,9 @@ node access control scheme in parallel.  Instead of using OR logic to
 determine node access, this patch uses subselects to enable AND logic
 for multiple node access rules.
 
-WARNING: This patch uses subselect statements and requires pgSQL or
-MySQL 4.1 or higher.
-
 Developers: see http://drupal.org/node/191375 for more information.
 
 This patch is being submitted to Drupal core for version 7.
-
-----
-3.2 custom_url_rewrite_outbound.patch
-
-This patch is only needed if:
-
-  -- You wish to allow searching of all domains from any domain.
-  -- You use a content aggregation module such as MySite.
-  -- You get "access denied" errors when linking to items on a 
-      user's Track page.
-  -- You want to turn on the advanced setting "Search Engine 
-      Optimization" to avoid content from being indexed on multiple
-      domains.  
-  
-This patch allows modules to edit the path to a Drupal object.  In the
-above cases, some content can only be viewed from certain domains, so
-we must write absolute links to that content.  
-
-This patch introduces backports custom_url_rewrite_outbound() to Drupal 5.
-
-After you install this patch, you must copy the function:
-
-  custom_url_rewrite_outbound()
-  
-And paste it into your site's settings.php file.  
-
-The entire function can be found at the end of this document.
-
-Developers: see http://drupal.org/node/207330 for more information.
-
 
 ----
 4.  Configuring settings.php
@@ -234,7 +203,7 @@ The $base_url setting is normally not set.  With Domain Access, you
 cannot set this value manually.
 
 Since mutliple domains are involved, Drupal needs to be allowed to
-set this value.  (For the technical, this happens in the conf_init() 
+set this value.  (For the technical, this happens in the conf_init()
 function).
 
 ----
@@ -268,7 +237,7 @@ Typically, this value is '.example.com'.
 ----
 4.4   custom_url_rewrite_outbound()
 
-If you applied the custom_url_rewrite_outbound.patch, you must enable the 
+If you applied the custom_url_rewrite_outbound.patch, you must enable the
 function inside your settings.php file.  The easiest way to do this is by using
 a PHP include to the file provided.
 
@@ -278,14 +247,14 @@ a PHP include to the file provided.
 In the Domain Access download, find the following file:
 
   domain > settings_custom_url.inc
-  
+
 You will need to load this file from inside your settings.php file. There
 are two methods for this.
 
 ----
 4.4.2  Option 1 -- Preferred
 
-This method is preferred, since any updates to the module release 
+This method is preferred, since any updates to the module release
 will be reflected in this file.
 
 NOTE: the elements inside the ==== marks are php code that
@@ -297,7 +266,7 @@ Add the following lines to the end of your settings.php file:
 /**
  * Add the custom_url_rewrite_outbound function.
  */
-require_once './path/to/modules/domain/settings_custom_url.inc'; 
+require_once './path/to/modules/domain/settings_custom_url.inc';
 ====
 
 In this case, change 'path/to/modules' with the directory where your modules are
@@ -307,7 +276,7 @@ stored.  Typically this will be 'sites/all/modules', which makes the lines:
 /**
  * Add the custom_url_rewrite_outbound function.
  */
-require_once './sites/all/modules/domain/settings_custom_url.inc'; 
+require_once './sites/all/modules/domain/settings_custom_url.inc';
 ====
 
 ----
@@ -317,7 +286,7 @@ If you are having difficulty determining the correct path, copy the file
 into your settings folder.
 
   domain > settings_custom_url.inc
-  
+
 The file should be in the same directory as your active settings.php file.  Then
 add the following lines:
 
@@ -335,7 +304,7 @@ After editing your settings.php file, go to Admin > Build > Domains.  If you
 see a warning at the top of the page beginning:
 
   "The custom_url_rewrite_outbound() patch is not installed..."
-  
+
 This message means that your PHP server cannot find the include file.  You
 may need to test other path options for the include code.
 

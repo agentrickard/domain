@@ -7,7 +7,7 @@
  *
  * Loads the table prefixes for the current domain.
  */
- 
+
 _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
 _domain_prefix_load();
 
@@ -17,7 +17,7 @@ _domain_prefix_load();
  * @ingroup prefix
  */
 function _domain_prefix_load() {
-  $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain_prefix'"));
+  $check = db_result(db_query("SELECT status FROM {system} WHERE name = '%s'", 'domain_prefix'));
   if ($check) {
     // Cribbed from bootstrap.inc -- removes port protocols from the host value.
     $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
@@ -26,7 +26,7 @@ function _domain_prefix_load() {
     if (isset($domain['domain_id'])) {
       $tables = array();
       $prefix = 'domain_'. $domain['domain_id'] .'_';
-      $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > 1", $domain['domain_id']);
+      $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > %d", $domain['domain_id'], 1);
       while ($data = db_fetch_array($result)) {
         $tables[] = $data['tablename'];
       }
@@ -38,7 +38,7 @@ function _domain_prefix_load() {
           $new_prefix['default'] = $db_prefix;
           $prefix = $db_prefix . $prefix;
         }
-        foreach($tables as $table) {
+        foreach ($tables as $table) {
           $new_prefix[$table] = $prefix;
         }
         $db_prefix = $new_prefix;

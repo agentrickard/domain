@@ -1,5 +1,16 @@
 // $Id$
 
+30-MAR-2008
+
+-- First full port to Drupal 6.
+-- #785216 by ax. Cleans up API documentation according to http://drupal.org/node/1354#contrib.
+-- Changes hook_domainload() to properly work by reference.
+-- Replaces _ with . in file include names, in accord with Drupal 6 standards.
+-- Splits admin functions to .admin.inc files, in accord with Drupal 6 standards.
+-- Renames _domain_write_records() to avoid confusion with drupal_write_record.
+-- Renames domain_theme_form.inc to domain_theme.admin.inc.
+-- Adds the INSTALL_QUICKSTART.txt file.
+
 25-MAR-2008 (3)
 
 -- Begins the Drupal 6 port.  HEAD is now considered unstable.
@@ -44,7 +55,7 @@
 -- Clarifies API for hook_domainupdate().
 -- #228813.  Generates access rules more often and accurately when
     using Domain User.
--- Adds $reset flags to domain_domains(), domain_default()    
+-- Adds $reset flags to domain_domains(), domain_default()
 
 11-MAR-2008 (4)
 
@@ -62,7 +73,7 @@
 -- #203776 by MatBoy.  Updates documentation of Domain User.
 -- #224079 by GearedDesign.  Documents that Drupal must be installed
     before adding any of the Domain includes to settings.php.
--- #221012.  Adds Doxygen for Doamin Source to the API.    
+-- #221012.  Adds Doxygen for Doamin Source to the API.
 
 11-MAR-2008
 
@@ -162,7 +173,7 @@
     modules.
 --  Adds hook_domainform() to allow submodules to add elements to the
     default Domain settings page.  Use this hook sparingly.
---  Creates rc4.    
+--  Creates rc4.
 
 20-JAN-2008 (2)
 
@@ -170,11 +181,11 @@
     permission.  DZone reports that these are two distinct actions, and need to be
     separated.
 --  DZone reported that the domain editor option were being shown on category
-    pages of the user/#/edit screen.  
+    pages of the user/#/edit screen.
 
 20-JAN-2008
 
--- #210213 patch by nicholasThompson.  Documentation warning links did 
+-- #210213 patch by nicholasThompson.  Documentation warning links did
     not use base_url() and do not work when Drupal is installed in a subfolder.
 -- Corrected logic error when adding or removing domain_editor grants
     to the {node_access} table.
@@ -206,9 +217,9 @@
     node_access_rebuild().  See http://groups.drupal.org/node/7956
     and #205045 by chaldar.
 -- Updates the README.
--- Cleans up domain_enable() based on the above.   
+-- Cleans up domain_enable() based on the above.
 -- Edits Domain Content to make changes to {domain_access} as well.
--- Requires update.php.   
+-- Requires update.php.
 -- More information in the Domain User README.
 -- Removed a debugging line.
 
@@ -237,8 +248,8 @@
 -- #202286 by mrichar1.  Improves the documentation for Domain Views.
 -- #202714 by derjochenmeyer.  The Domain Content form accidentally acted
     on nid == 0 and created errors in the {node_access} table.
--- #202392 by derjochenmeyer.  str_ireplace() is PHP 5 only.  We also need to 
-    strtolower() the incoming url host.  Fix applies to Domain Conf and Domain Prefix 
+-- #202392 by derjochenmeyer.  str_ireplace() is PHP 5 only.  We also need to
+    strtolower() the incoming url host.  Fix applies to Domain Conf and Domain Prefix
     as well.
 -- Adds hook_domainwarnings() to Domain Conf to print form messages only
     for select forms.
@@ -252,21 +263,21 @@
 15-DEC-2007
 
 -- Adds partial pgSQL functionality to Domain Prefix.  See #200279.
--- #188275. Adds new permission 'view domain publishing' to provide domain 
+-- #188275. Adds new permission 'view domain publishing' to provide domain
     selection options for node creation to users with limited permissions.
     These options are controlled by a new Content Editing Form setting.
 -- Adds the ability to ignore the www. prefix when determining the validty of
     a domain request.
 -- Adds configuration for pages that should allows the domain_all grant, such
     as mysite/* or user/*/track.
--- #197757. Fixes default values and form positioning on Domain Content batch editor form.    
+-- #197757. Fixes default values and form positioning on Domain Content batch editor form.
 -- Adds configuration for node links that should be made absolute by hook_url_alter, such
     as node/%n, comment/reply/%n and book/add/child/%n, where %n is a placeholder
     for the node id.  Allows the module to be extended through the UI.
 -- Removes the domain_enable check from the configuration page.
 -- Automatically adds and removed domain_editor grants when that feature is enabled and
     disabled.
--- Moves some settings options so that the default choice is always on top.    
+-- Moves some settings options so that the default choice is always on top.
 -- Removes the variable check from domain_perm().  Now shows all permission options
     at all times.
 -- #200714 patch by mrichar1. Adds the Domain Views module by mrichar1.
@@ -274,8 +285,8 @@
 
 10-DEC-2007 (4)
 
--- Accidentally committed the module with the default rules reversed. 
--- Changes default admin menu item string to --Domains-- to match 
+-- Accidentally committed the module with the default rules reversed.
+-- Changes default admin menu item string to --Domains-- to match
     the other items in admin/build.
 -- Fixes pgSQL install errors in Domain Prefix and Domain User.
 -- Adds user_access checks to hook_domainlinks implementations.
@@ -298,7 +309,7 @@
 
 -- Moves secondary domain CRUD functions from domain_admin to hook implementations.  This
     allows other modules to call these functions directly without using drupal_execute().
--- First stable domain_user module.    
+-- First stable domain_user module.
 
 06-DEC-2007
 
@@ -318,7 +329,7 @@
     for subdomains using Domain Conf.  This feature did not work as expected.
     Trying to fix this issue will delay release unnecessarily.
 -- #197600 by Rogdor.  Advanced form elements may be disabled and cannot be required.
--- #197757 by derjochenmeyer [comment 3].  Delete related {node_access} records when 
+-- #197757 by derjochenmeyer [comment 3].  Delete related {node_access} records when
     a domain record is deleted.
 
 01-DEC-2007
@@ -358,15 +369,15 @@
     across all affiliates or just the currently active domain.
 -- Allows administrators to change domain access settings as a batch process, using
     the Domain Content module.
--- Fixed error in domain_user_domainload() -- this hook is not passed by reference.    
--- Creates the beta7 release.  
+-- Fixed error in domain_user_domainload() -- this hook is not passed by reference.
+-- Creates the beta7 release.
 -- Requires that update.php be run.
 -- Returns the domain_enabling() function, which is needed.
 
 25-NOV-2007
 
 -- #192452 by skizzo.  Allows domains to be set to inactive.  Inactive domains can only be
-    accessed by the site administrator. 
+    accessed by the site administrator.
 -- #192452 by skizzo.  Allows the lists of domains used in domain_block() and Domain Nav to
     be sorted according to an administrator setting.
 -- #189797 by moshub.  Introduces the domain_all() grant, which allows for search and similar
@@ -376,7 +387,7 @@
 
 -- #192353 by okday.  Domain Prefix fix. Allows the source table for data copying to be specified through the UI.
     Requires that update.php be run.
--- #194671 by skizzo.  Allows sorting of the domain list admin page.  Adds pagination, if needed.    
+-- #194671 by skizzo.  Allows sorting of the domain list admin page.  Adds pagination, if needed.
 
 21-NOV-2007
 
@@ -404,7 +415,7 @@
 
 -- Adds the Domain Prefix module, for advanced table prefixing options.
     The Domain Prefix module is unstable and needs testing.
--- #190605 by Martijnhaan.  UI issues related to the edit permissions and domain_editor grants.  Hides the 
+-- #190605 by Martijnhaan.  UI issues related to the edit permissions and domain_editor grants.  Hides the
     edit domain nodes permission if that feature is disabled.  Fixes issue with Domain Content showing edit links
     when the user does not have the edit grant.
 -- #188826 by trailerparkopera.  The site name is not changed dynamically unless Domain Conf settings have been saved.
@@ -417,7 +428,7 @@
 -- #188160 by skizzo.  Disabling the domain_conf module does not stop it from loading.  You must
     uninstall the module.  Added a check of the {system} table as a safety measure if users forget
     to remove the code from settings.php.
--- #188268. The domain_nav_menu lookup routine is outside of the $may_cache loop. Needs to be inside.    
+-- #188268. The domain_nav_menu lookup routine is outside of the $may_cache loop. Needs to be inside.
 -- Fixes empty form value for DOMAIN_EDITOR_RULE.
 -- #188825. Error reading default node promotion settings.
 
@@ -425,7 +436,7 @@
 
 -- #187593.  Sets warning message when editing an admin form when you might be
     on the wrong domain.
--- file domain_conf/domain_conf_form.inc deprecated and removed.    
+-- file domain_conf/domain_conf_form.inc deprecated and removed.
 
 29-OCT-2007 (2)
 
@@ -456,7 +467,7 @@
 28-OCT-2007
 
 -- Adds hook_domainload() to allow submodules to modify the $domain array.
--- Adds domain_goto($domain).  This function allows developers to pop users to the 
+-- Adds domain_goto($domain).  This function allows developers to pop users to the
     correct domain.  Useful when editors must be on their specific domain to edit content.
 
 26-OCT-2007
@@ -469,7 +480,7 @@
 
 -- #186153 by skizzo.  The Domain Conf module needs to be on the selected domain in order
     to load the correct setings for the form.
--- Related to the above.  After deleting a domain record, return to the root domain.    
+-- Related to the above.  After deleting a domain record, return to the root domain.
 -- #186321.  Logic error in domain_init() causes the site_grant variable to be unset, causing the
     module not to function properly.
 -- #186255.  Lookup the domain data before deleting the record and firing hook_domainrecord().
@@ -491,7 +502,7 @@
 -- Cleans up some additional redundancy.
 
 10-OCT-2007
- 
+
 -- Shortens module names in info files.
 -- Cleans up some redundant functions.
 
@@ -518,7 +529,7 @@
 -- Cleans up README errors.
 -- Introduces internal hooks for settings links -- hook_domainlinks(), to be used by submodules to
     add links to admin/build/domain/list.
--- Moves the domain access element of the user form into a fieldset.    
+-- Moves the domain access element of the user form into a fieldset.
 
 04-OCT-2007
 
@@ -548,9 +559,9 @@
     A single Drupal installation and database are required.  The module uses hook_node_access() to determine
     how content should be presented.  Originally developed for www.skirt.com, the module was introduced
     at DrupalCON Barcelona.
-    
+
 /**
  * @file
  * Changelog file.
  */
-    
+

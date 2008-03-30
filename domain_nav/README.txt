@@ -4,7 +4,7 @@
  * @file
  * README file for Domain Navigation
  */
- 
+
 Domain Access: Navigation
 Navigation block and menu options for Domain Access.
 
@@ -26,7 +26,7 @@ CONTENTS
 1.  Introduction
 
 The Domain Access: Navigation module is a small module that generates
-a block of themed HTML with links to the currently available domains used 
+a block of themed HTML with links to the currently available domains used
 by your site.
 
 The default implementation is a JavaScript-enabled select form that sends
@@ -35,8 +35,8 @@ users to a different domain when selected.
 ----
 2.  Installation
 
-The Domain Navigation module is included in the Domain Access download.  
-To install, untar the domain package and place the entire folder in your modules 
+The Domain Navigation module is included in the Domain Access download.
+To install, untar the domain package and place the entire folder in your modules
 directory.
 
 The Domain Navigation module does not add any database tables.
@@ -50,23 +50,23 @@ Domain Navigation requires the Domain Access module be installed and active.
 3.  Configuration Options
 
 When active, the Domain Navigation module provides a block for use with your
-Drupal themes.  By default, this block presents a Javascript-powered 
+Drupal themes.  By default, this block presents a Javascript-powered
 select list.
 
-If you click 'configure' for the block, you can set the block title (which 
+If you click 'configure' for the block, you can set the block title (which
 is empty by default) and control the following behaviors.
 
 ----
 3.1 Link Paths
 
-Indicates whether to link to the home page of each domain or to the active 
+Indicates whether to link to the home page of each domain or to the active
 url on the domain.
 
 If set to 'Link to site home page' (the default option), all links will go to
 http://example.com/, http://one.example.com, and so forth, regardless of the
 current url.
 
-If set to 'Link to active url,' all links will go to the equivalent url on the 
+If set to 'Link to active url,' all links will go to the equivalent url on the
 selected domain.  That is, if the user is at http://example.com/?q=node, then
 lnks will be written to http://one.example.com/?q=node.
 
@@ -80,20 +80,20 @@ Indicates how to format the HTML output.  There are three options:
 
   - JavaScript select list
   Creates a select-list form that uses JavaScript to goto the selected domain.
-  Requires JavaScript and does not include a submit button.  
+  Requires JavaScript and does not include a submit button.
   Note: This is _not_ a drupal-generated form element.
-  
+
   - Menu-style tab links
   Creates a list of links formatted like primary tabs, with the active domain
   highlighted.
-  
-  - Unordered list of links 
+
+  - Unordered list of links
   Creates a simple unordered list of links.
 
 ----
 3.3 Menu Items
 
-The Domain Navigation module creates a group of menu items that correspond to 
+The Domain Navigation module creates a group of menu items that correspond to
 the home pages of your active domains.
 
 By design, the root menu element is disabled, since it is only used to group
@@ -108,18 +108,18 @@ enable this feature, use the following steps:
   - Assign the menu item to Primary or Secondary links, as desired.
   - Save the changes.
   - Disable the top-level 'Domain' menu item, but leave the others intact.
+  - Sort the menu items so that the active links are at the top level of the menu.
 
-Following these steps will display all active subdomains in your Primary or 
-Secondary links menu.
+This final step is new in Drupal 6.
 
 NOTE: If you wish to disable the menu entirely, but keep the block functions
 for this module, you may edit the following line at the top of the module:
 
-  define('DOMAIN_NAV_MENU', TRUE); 
-  
+  define('DOMAIN_NAV_MENU', TRUE);
+
 If you set this value to FALSE before you install the module, the menu items
 will not be created.  If you have already installed the module, you may also set
-this value to FALSE and then navigate to 'admin/build/menu'.  Note that updated 
+this value to FALSE and then navigate to 'admin/build/menu'.  Note that updated
 module releases will always reset this value to TRUE.
 
 ----
@@ -145,7 +145,7 @@ And $style indicates which theme function to invoke.  Default options are:
   'default' == theme_domain_nav_default()
   'menus' == theme_domain_nav_menus()
   'ul' == theme_domain_nav_ul()
- 
+
 ----
 4.2 hook_domainnav()
 
