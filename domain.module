@@ -59,7 +59,7 @@ function domain_init() {
   }
   // If we stripped the www. send the user to the proper domain.  This should only
   // happen once, on an inbound link or typed URL, so the overhead is acceptable.
-  else if ($raw_domain != $_subdomain) {
+  if ($raw_domain != $_subdomain) {
     drupal_goto($_domain['path']);
   }
   

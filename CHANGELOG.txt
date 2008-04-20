@@ -1,5 +1,10 @@
 // $Id$
 
+20-APR-2008 (2)
+
+-- Better fix for www. stripping.
+-- Creates the 5.x.1.4 release.
+
 20-APR-2008
 
 -- #247684 fixes error in domain_default().
