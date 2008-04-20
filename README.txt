@@ -523,6 +523,11 @@ Enter the primary domain for your site here.  Typically, you will also enter
 this value into settings.php for cookie handling.  Do not use http:// or a
 trailing slash when entering this value.
 
+NOTE: If you have installed Drupal in a subfolder, such as 
+http://example.com/drupal you should not include the folder path
+as part of the primary domain.  Simply use example.com -- Drupal
+will automatically detect the presence of the subfolder.
+
 ----
 4.1.2   Site Name
 

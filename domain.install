@@ -15,8 +15,8 @@ function domain_install() {
     case 'mysql':
       db_query("CREATE TABLE {domain} (
         domain_id int(11) NOT NULL AUTO_INCREMENT,
-        subdomain varchar(40) NOT NULL default '',
-        sitename varchar(80) NOT NULL default '',
+        subdomain varchar(255) NOT NULL default '',
+        sitename varchar(255) NOT NULL default '',
         scheme varchar(8) NOT NULL default 'http',
         valid varchar(1) NOT NULL default 1,
         PRIMARY KEY  (domain_id),
@@ -33,8 +33,8 @@ function domain_install() {
     case 'pgsql':
       db_query("CREATE TABLE {domain} (
         domain_id serial,
-        subdomain varchar(40) NOT NULL default '',
-        sitename varchar(80) NOT NULL default '',
+        subdomain varchar(255) NOT NULL default '',
+        sitename varchar(255) NOT NULL default '',
         scheme varchar(8) NOT NULL default 'http',
         valid varchar(1) NOT NULL default 1,
         PRIMARY KEY (domain_id)
@@ -118,6 +118,27 @@ function domain_update_2() {
     while ($data = db_fetch_array($result)) {
       db_query("INSERT INTO {domain_access} VALUES (%d, %d, '%s')", $data['nid'], $data['gid'], $data['realm']);
     }
+  }
+  return $ret;
+}
+
+/**
+ * Updates from 5.x.1.2 to 5.x.1.3.  This change affects the size
+ * of the columns for 'subdomain' and 'sitename'.  See http://drupal.org/node/244142
+ */
+function domain_update_3() {
+  $ret = array();
+
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {domain} CHANGE subdomain subdomain varchar(255) NOT NULL default ''");
+      $ret[] = update_sql("ALTER TABLE {domain} CHANGE sitename sitename varchar(255) NOT NULL default ''");
+      break;
+    case 'pgsql':
+      db_change_column($ret, 'domain', 'subdomain', 'subdomain', 'varchar(255)', array('not null' => TRUE, 'default' => "''"));
+      db_change_column($ret, 'domain', 'sitename', 'sitename', 'varchar(255)', array('not null' => TRUE, 'default' => "''"));
+      break;
   }
   return $ret;
 }

@@ -1,9 +1,19 @@
 // $Id$
 
+20-APR-2008
+
+-- #247684 fixes error in domain_default().
+-- #240897 by skirr@drupal.ru.  Clarifies documentation of primary domain name string.
+-- #244142 by a_c_m.  Sets varchar(255) for subdomain and sitename columns.
+-- #243731 by Somebody Sysop.  Fixes logic error in multiple_node_access.patch.
+-- #242648 fixes issue with www stripping for Domain Conf and Domain Prefix.
+-- Requires running update.php.
+-- Creates the 5.x.1.3 release.
+
 30-MAR-2008
 
 -- Fixes errors in Domain User.
--- #785216 by ax. Cleans up API documentation according to http://drupal.org/node/1354#contrib.
+-- #23943 by ax. Cleans up API documentation according to http://drupal.org/node/1354#contrib.
 -- Changes hook_domainload() to properly work by reference.
 -- Adds the INSTALL_QUICKSTART.txt file.
 -- Cleans up code style.
