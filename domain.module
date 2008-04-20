@@ -43,7 +43,8 @@ function domain_init() {
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
   $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
 
-  // Strip the www. off the subdomain, if required.
+  // Strip the www. off the subdomain, if required by the module settings.
+  $raw_domain = $_subdomain;
   if (variable_get('domain_www', 0)) {
     $_subdomain = str_replace('www.', '', $_subdomain);
   }
@@ -51,10 +52,18 @@ function domain_init() {
   $data = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
   // Get the domain data.
   $_domain = domain_lookup($data['domain_id']);
+
   // If return is -1, then the DNS didn't match anything, so use defaults.
   if ($_domain == -1) {
     $_domain = domain_default();
   }
+
+  // If we stripped the www. send the user to the proper domain.  This should only
+  // happen once, on an inbound link or typed URL, so the overhead is acceptable.
+  if ($raw_domain != $_subdomain) {
+    drupal_goto($_domain['path']);
+  }
+  
   // For Domain User, we check the validity of accounts, so the 'valid' flag must be TRUE.
   // If this check fails, we send users to the default site homepage.
   if (!$_domain['valid'] && !user_access('administer domains')) {
@@ -80,6 +89,7 @@ function domain_menu() {
   );
   $items['admin/build/domain/settings'] = array(
     'title' => 'Settings',
+    'access arguments' => array('administer domains'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'page callback' => 'domain_configure',
     'file' => 'domain.admin.inc',
@@ -87,6 +97,7 @@ function domain_menu() {
   );
   $items['admin/build/domain/view'] = array(
     'title' => 'Domain list',
+    'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'domain_view',
     'file' => 'domain.admin.inc',
@@ -94,6 +105,7 @@ function domain_menu() {
   );
   $items['admin/build/domain/create'] = array(
     'title' => 'Create domain record',
+    'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'domain_create',
     'file' => 'domain.admin.inc',
@@ -101,6 +113,7 @@ function domain_menu() {
     );
   $items['admin/build/domain/advanced'] = array(
     'title' => 'Node settings',
+    'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'domain_advanced',
     'file' => 'domain.admin.inc',
@@ -111,6 +124,7 @@ function domain_menu() {
   if (!empty($batch)) {
     $items['admin/build/domain/batch'] = array(
       'title' => 'Batch updating',
+      'access arguments' => array('administer domains'),
       'type' => MENU_LOCAL_TASK,
       'page callback' => 'domain_batch',
       'file' => 'domain.admin.inc',
@@ -120,6 +134,7 @@ function domain_menu() {
     foreach ($batch as $key => $value) {
       $items['admin/build/domain/batch/'. $key] = array(
         'title' => $value['#form']['#title'],
+        'access arguments' => array('administer domains'),
         'type' => MENU_CALLBACK,
         'page callback' => 'domain_batch',
         'page arguments' => array($key),
@@ -130,6 +145,7 @@ function domain_menu() {
   }
   $items['admin/build/domain/edit/%domain'] = array(
     'title' => 'Edit domain record',
+    'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,
     'page callback' => 'domain_edit',
     'page arguments' => array(4),
@@ -137,6 +153,7 @@ function domain_menu() {
   );
   $items['admin/build/domain/delete/%domain'] = array(
     'title' => 'Delete domain record',
+    'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,
     'page callback' => 'domain_delete',
     'page arguments' => array(4),
@@ -402,7 +419,7 @@ function domain_default($reset = FALSE) {
     // Set the valid flag.
     $default['valid'] = TRUE;
     // Let submodules overwrite the defaults, if they wish.
-    $extra = domain_api($default);
+    $default = domain_api($default);
   }
   return $default;
 }

@@ -1,5 +1,15 @@
 // $Id$
 
+20-APR-2008
+
+-- #243418 (assisted by georgw).  Updates menu system to Drupal 6.2.
+-- #242648 fixes issue with www stripping for Domain Conf and Domain Prefix.
+-- #240897 by skirr@drupal.ru.  Clarifies documentation of primary domain name string.
+-- #244142 by a_c_m.  Sets varchar(255) for subdomain and sitename columns.
+-- #243731 by Somebody Sysop.  Fixes logic error in multiple_node_access.patch.
+-- Requires running update.php.
+-- Creates the 6.x.1-beta2 release.
+
 30-MAR-2008 (2)
 
 -- domain_default() not using domainload correctly.
@@ -9,7 +19,7 @@
 30-MAR-2008
 
 -- First full port to Drupal 6.
--- #785216 by ax. Cleans up API documentation according to http://drupal.org/node/1354#contrib.
+-- #23943 by ax. Cleans up API documentation according to http://drupal.org/node/1354#contrib.
 -- Changes hook_domainload() to properly work by reference.
 -- Replaces _ with . in file include names, in accord with Drupal 6 standards.
 -- Splits admin functions to .admin.inc files, in accord with Drupal 6 standards.

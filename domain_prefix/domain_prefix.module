@@ -40,6 +40,7 @@ function domain_prefix_menu() {
   );
   $items['admin/build/domain/prefix/%domain'] = array(
     'title' => 'Domain prefix settings',
+    'access arguments' => array('administer table prefixing'),
     'type' => MENU_CALLBACK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_prefix_form', 4),
@@ -47,6 +48,7 @@ function domain_prefix_menu() {
   );
   $items['domain_prefix_update'] = array(
     'title' => 'Domain prefix update',
+    'access arguments' => array('administer table prefixing'),
     'type' => MENU_CALLBACK,
     'page callback' => 'domain_prefix_update',
     'file' => 'domain_prefix.admin.inc',

@@ -493,6 +493,11 @@ Enter the primary domain for your site here.  Typically, you will also enter
 this value into settings.php for cookie handling.  Do not use http:// or a
 trailing slash when entering this value.
 
+NOTE: If you have installed Drupal in a subfolder, such as 
+http://example.com/drupal you should not include the folder path
+as part of the primary domain.  Simply use example.com -- Drupal
+will automatically detect the presence of the subfolder.
+
 ----
 4.1.2   Site Name
 
@@ -597,21 +602,18 @@ See section 3.3 for a full discussion of this feature.
 4.3.2   Search Settings
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite().  If you have not followed the instructions,
+regarding custom_url_rewrite_outbound().  If you have not followed the instructions,
 you should see a warning at the top of the Admin > Build > Domains page.
 
 Allows the admin to decide if content searches should be run across all
 affiliates or just the currently active domain.  By design, Drupal will only
 find matches for the current domain.
 
-Enabling this feature requires the custom_url_rewrite_outbound patch
-discussed in 2.1.2
-
 ----
 4.3.3   Search Engine Optimization
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite().  If you have not followed the instructions,
+regarding custom_url_rewrite_outbound().  If you have not followed the instructions,
 you should see a warning at the top of the Admin > Build > Domains page.
 
 There is a risk with these modules that your site could be penalized by search engines
@@ -692,7 +694,7 @@ in 2.1.1.
 4.4   Special Page Requests
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite().  If you have not followed the instructions,
+regarding custom_url_rewrite_outbound().  If you have not followed the instructions,
 you should see a warning at the top of the Admin > Build > Domains page.
 
 In normal uses, such as the default home page, you want to restrict access

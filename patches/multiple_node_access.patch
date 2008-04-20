@@ -1,7 +1,7 @@
---- modules/node/node.module.orig	2008-03-28 20:26:17.000000000 -0400
-+++ modules/node/node.module	2008-03-28 20:27:17.000000000 -0400
+--- modules/node/node.module	2008-03-28 20:32:18.000000000 -0400
++++ modules/node/node.module.new	2008-04-16 21:30:08.000000000 -0400
 @@ -2002,22 +2002,19 @@ function node_access($op, $node, $accoun
- 
+
    // If the module did not override the access rights, use those set in the
    // node_access table.
 -  if ($op != 'create' && $node->nid && $node->status) {
@@ -18,12 +18,12 @@
 +  if ($op != 'create' && $node->nid) {
 +    $grants_sql = node_access_grants_sql($op, NULL, $account, $node->status);
 +    // If the return value is FALSE, then the node status is unpublished and
-+    // none of the grants requested an access check be run.  In which case,
++    // none of the grants requested an access check be run. In which case,
 +    // we should fall through to the final 'if' statement.
 +    if ($grants_sql !== FALSE) {
 +      if (!empty($grants_sql)) {
 +        $grants_sql .= ' AND';
-+      }  
++      }
 +      $sql = "SELECT COUNT(*) FROM {node_access} WHERE (nid = 0 OR nid = %d) $grants_sql grant_$op >= 1";
 +      $result = db_query($sql, $node->nid);
 +      return (db_result($result));
@@ -33,12 +33,12 @@
 -    $result = db_query($sql, $node->nid);
 -    return (db_result($result));
    }
- 
+
    // Let authors view their own nodes.
 @@ -2067,17 +2064,7 @@ function _node_access_where_sql($op = 'v
      return;
    }
- 
+
 -  $grants = array();
 -  foreach (node_access_grants($op, $account) as $realm => $gids) {
 -    foreach ($gids as $gid) {
@@ -51,12 +51,12 @@
 -    $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
 -  }
 +  $grants_sql = node_access_grants_sql($op, $node_access_alias, $account);
- 
+
    $sql = "$node_access_alias.grant_$op >= 1 $grants_sql";
    return $sql;
 @@ -2115,18 +2102,7 @@ function node_access_view_all_nodes() {
    static $access;
- 
+
    if (!isset($access)) {
 -    $grants = array();
 -    foreach (node_access_grants('view') as $realm => $gids) {
@@ -74,11 +74,11 @@
      $sql = "SELECT COUNT(*) FROM {node_access} WHERE nid = 0 $grants_sql AND grant_view >= 1";
      $result = db_query($sql);
      $access = db_result($result);
-@@ -2136,6 +2112,90 @@ function node_access_view_all_nodes() {
+@@ -2136,6 +2112,92 @@ function node_access_view_all_nodes() {
  }
- 
+
  /**
-+ * Check the logic of node grants and prepare the sql statement.
++ * Check the logic of node grants and prepare the SQL statement.
 + *
 + * @param $op
 + *   The operation that the user is trying to perform.
@@ -86,8 +86,8 @@
 + *   The user object for the user performing the operation. If omitted, the
 + *   current user is used.
 + * @param $status
-+ *   The publication status of the node being checked.  Typically, node_access
-+ *   checks are not run for unpublished nodes.  However, some advanced uses
++ *   The publication status of the node being checked. Typically, node_access
++ *   checks are not run for unpublished nodes. However, some advanced uses
 + *   require that users can act on unpublished nodes.
 + * @return
 + *   There are three possible return values.
@@ -110,54 +110,56 @@
 +  if (!empty($node_access_alias)) {
 +    $alias = $node_access_alias .'.';
 +  }
-+  // It may be that only the default rule is active.  In that case, we can skip the
++  // It may be that only the default rule is active. In that case, we can skip the
 +  // process below.
 +  if (count($rules) == 1 && key($rules) == 'all') {
-+    $grants_sql .= "AND (". $alias ."realm = 'all' AND ". $alias ."gid = 0)";    
++    $grants_sql .= "AND (". $alias ."realm = 'all' AND ". $alias ."gid = 0)";
 +  }
 +  else {
 +    // Process the grants into logical groupings.
 +    foreach ($rules as $realm => $rule) {
 +      // Set the status flag.
 +      if (isset($rule['check'])) {
-+        $status += $rule['check'];  
++        $status += $rule['check'];
 +      }
-+      // Set the default clause group.  Then check for options.
++      // Set the default clause group. Then check for options.
 +      $group = 'all';
 +      if (!empty($rule['group'])) {
 +        $group = $rule['group'];
 +      }
 +      foreach ($rule as $gid) {
-+        // Grants ids must be numeric.
++        // Grants ids must be numeric, and we place them into logical groups.
 +        if (is_numeric($gid)) {
-+          $grants[$group][$realm] = $gid;
-+        }  
-+      }  
++          $grants[$group][$realm][] = $gid;
++        }
++      }
 +    }
-+    // In most cases, node status must be set to TRUE.  However, there are use-cases where 
-+    // we allow access to unpublished nodes.  So we check the status to see if we need to 
-+    // continue with the logic or end this IF statement.  
++    // In most cases, node status must be set to TRUE. However, there are use-cases where
++    // we allow access to unpublished nodes. So we check the status to see if we need to
++    // continue with the logic or end this IF statement.
 +    if (!$status) {
 +      return FALSE;
 +    }
-+    // Run throught the $grants, if needed and generate the query SQL.
++    // Run through the $grants, if needed, and generate the query SQL.
 +    if (count($grants)) {
 +      foreach ($grants as $group => $grant) {
 +        $clauses = array();
 +        foreach ($grant as $key => $value) {
-+          $clauses[] = "(". $alias ."realm = '$key' AND ". $alias ."gid = $value)";
++          foreach ($value as $gid) {
++            $clauses[] = "(". $alias ."realm = '$key' AND ". $alias ."gid = $gid)";
++          }
 +        }
 +        if ($group == 'all') {
-+          $grants_sql .= 'AND ('. implode(' OR ', $clauses) .') ';            
++          $grants_sql .= 'AND ('. implode(' OR ', $clauses) .') ';
 +        }
 +        else {
 +          // Required elements must go into a subquery.  Will not work prior to MySQL 4.1.x.
 +          $subquery = "AND ". $alias ."nid IN (SELECT ". $alias ."nid FROM {node_access} ". $node_access_alias ." WHERE ";
-+          $grants_sql .= $subquery .'('. implode(' OR ', $clauses) .')) ';            
++          $grants_sql .= $subquery .'('. implode(' OR ', $clauses) .')) ';
 +        }
-+      }  
++      }
 +    }
-+  }  
++  }
 +  return $grants_sql;
 +}
 +
