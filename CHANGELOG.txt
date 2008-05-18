@@ -1,5 +1,9 @@
 // $Id$
 
+18-MAY-2008
+
+-- #255067 by scedwar.  Adds node/%n/edit to default node patterns.
+
 20-APR-2008 (2)
 
 -- Better fix for www. stripping.

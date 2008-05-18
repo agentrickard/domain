@@ -321,7 +321,7 @@ function domain_configure_form($user_submitted = FALSE) {
       '#type' => 'textarea',
       '#rows' => 5,
       '#cols' => 40,
-      '#default_value' => variable_get('domain_paths', "node/%n\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n"),
+      '#default_value' => variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n"),
       '#description' => t('When using SEO or other path rewrites, the following link paths should be turned into absolute URLs.  Enter
         the Drupal path of the link, using the <em>%n</em> placeholder to represent the node id.
         Enter one path per line.  See the README for more details.')
