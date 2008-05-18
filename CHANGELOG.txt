@@ -1,5 +1,9 @@
 // $Id$
 
+18-MAY-2008 (2)
+
+-- #255067 by scedwar.  Adds node/%n/edit to default node patterns.
+
 18-MAY-2008
 
 -- #243670 by nonsie.  Fixes form handling change needed for hook_domainupdate.
