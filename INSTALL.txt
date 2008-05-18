@@ -237,9 +237,12 @@ Typically, this value is '.example.com'.
 ----
 4.4   custom_url_rewrite_outbound()
 
-If you applied the custom_url_rewrite_outbound.patch, you must enable the
+For links to be written to the proper domain, you must enable the
 function inside your settings.php file.  The easiest way to do this is by using
 a PHP include to the file provided.
+
+For more information, see
+  http://api.drupal.org/api/function/custom_url_rewrite_outbound/6
 
 ----
 4.4.1  Installation
