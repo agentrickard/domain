@@ -455,7 +455,7 @@ function domain_create_form_submit($form, &$form_state) {
   db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_state['values']['subdomain'], $form_state['values']['sitename'], $form_state['values']['scheme'], $form_state['values']['valid']);
   // Let other modules act.
   $domain = domain_lookup(NULL, $form_state['values']['subdomain']);
-  module_invoke_all('domainupdate', 'create', $domain, $form_state['values']);
+  module_invoke_all('domainupdate', 'create', $domain, $form_state);
   // The user_submitted flag is needed for Domain User.
   if (!$form_state['values']['domain_arguments']['user_submitted']) {
     drupal_set_message(t('Domain record created.'));
@@ -570,7 +570,7 @@ function domain_edit_form_submit($form, &$form_state) {
   db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = %d WHERE domain_id = %d", $form_state['values']['subdomain'], $form_state['values']['sitename'], $form_state['values']['scheme'], $form_state['values']['valid'], $form_state['values']['domain_id']);
   // Let other modules act.
   $domain = domain_lookup($form_state['values']['domain_id']);
-  module_invoke_all('domainupdate', 'update', $domain, $form_state['values']);
+  module_invoke_all('domainupdate', 'update', $domain, $form_state);
   // The user_submitted flag is needed for Domain User.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message(t('Domain record updated.'));
@@ -631,7 +631,7 @@ function domain_delete_form_submit($form, &$form_state) {
   $domain = domain_lookup($form_state['values']['domain_id']);
   db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_state['values']['domain_id']);
   // Let other modules act.
-  module_invoke_all('domainupdate', 'delete', $domain, $form_state['values']);
+  module_invoke_all('domainupdate', 'delete', $domain, $form_state);
   // The user_submitted flag is needed for Domain User.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message(t('Domain record deleted.'));

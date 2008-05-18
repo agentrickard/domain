@@ -115,12 +115,12 @@ function hook_domainload(&$domain) {
  *
  * @param $op
  *  The operation being performed: 'create', 'update', 'delete'
- * @param $edit
+ * @param &$form_state
  *  The form values processed by the form.
  *
  * @ingroup domain_hooks
  */
-function hook_domainupdate($op, $domain = array(), $edit = array()) {
+function hook_domainupdate($op, $domain = array(), &$form_state = array()) {
   switch ($op) {
     case 'create':
       db_query("INSERT INTO {mytable} (subdomain, sitename) VALUES ('%s', '%s')", $domain['subdomain'], $domain['sitename']);

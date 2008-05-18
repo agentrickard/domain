@@ -181,7 +181,7 @@ function domain_source_validate($form, &$form_state) {
  *
  * When deleting domain records, we remove all traces from the {domain_source} table.
  */
-function domain_source_domainupdate($op, $domain = array(), $edit = array()) {
+function domain_source_domainupdate($op, $domain = array(), &$form_state = array()) {
   if ($op == 'delete' && $domain['domain_id'] > 0) {
     db_query("DELETE FROM {domain_source} WHERE domain_id = %d", $domain['domain_id']);
   }

@@ -104,7 +104,7 @@ function domain_prefix_domainlinks($domain) {
 /**
  * Implements hook_domainupdate().
  */
-function domain_prefix_domainupdate($op, $domain = array(), $edit = array()) {
+function domain_prefix_domainupdate($op, $domain = array(), &$form_state = array()) {
   switch ($op) {
     case 'create':
       $rule = variable_get('domain_prefix_options', 1);
@@ -113,7 +113,7 @@ function domain_prefix_domainupdate($op, $domain = array(), $edit = array()) {
         $settings = unserialize(variable_get('domain_prefix', NULL));
         if (!empty($settings)) {
           $settings['domain_id'] = $domain['domain_id'];
-          drupal_execute('domain_prefix_form', $settings, $domain['domain_id'], $edit['domain_arguments']);
+          drupal_execute('domain_prefix_form', $settings, $domain['domain_id'], $form_state['values']['domain_arguments']);
         }
       }
       break;
