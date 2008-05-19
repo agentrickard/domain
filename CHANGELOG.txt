@@ -1,5 +1,9 @@
 // $Id$
 
+19-MAY-2008
+
+-- #206293 by augsburgde.  Fixes $base_url change in custom_url_rewrite_outbound().
+
 18-MAY-2008 (3)
 
 -- #253467 by skirr@drupal.ru.  Cleans up documentation of custom_url_rewrite_outbound.

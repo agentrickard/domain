@@ -87,7 +87,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
           if ($domain[$nid] != -1 && $domain[$nid]['domain_id'] != $_domain['domain_id']) {
             $options['absolute'] = TRUE;
             // In this case, the $base_url cannot have a trailing slash
-            $base_url = rtrim($domain[$nid]['path'], '/');
+            $options['base_url'] = rtrim($domain[$nid]['path'], '/');
           }
         }
         // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
@@ -95,7 +95,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
         else if ($seo && $_domain['domain_id'] != $root['domain_id']) {
           $options['absolute'] = TRUE;
           // In this case, the $base_url cannot have a trailing slash
-          $base_url = rtrim($root['path'], '/');
+          $options['base_url'] = rtrim($root['path'], '/');
         }
       }
     }
