@@ -58,20 +58,20 @@ CONTENTS
 4.8.1   Domain Node Editing
 4.8.2   Domain Node Types
 4.9   Batch Updating
-4.10   Block -- Domain Switcher
-5.  Node Access
-5.1   Assigning Domain Access
-5.2.  Editor Access
-5.3   Realms
-5.4   Grants
-5.5   Warnings
-6.  Developer Notes
-6.1   Extension Modules
-6.2   The $_domain Global
-6.3   Database Schema
-6.4   API
-7.  To Do
-
+5.  Blocks
+5.1   Block -- Domain Switcher
+5.2   Block -- Domain Access Information
+6.  Node Access
+6.1   Assigning Domain Access
+6.2.  Editor Access
+6.3   Realms
+6.4   Grants
+6.5   Warnings
+7.  Developer Notes
+7.1   Extension Modules
+7.2   The $_domain Global
+7.3   Database Schema
+7.4   API
 
 
 ----
@@ -151,11 +151,10 @@ in two ways:
       The module lets Drupal's core node access system handle this.
 
 As a result, there may exist conflicts between Domain Access and other
-contributed modules that try to solve this issue.  Notably, the OG User
-Roles module introduces a patch to the node_access() function that
-seems to be incompatible with Domain Access.
+contributed modules that try to solve this issue.
 
-Domain Access has been tested to work with the Organic Groups module.
+Domain Access has been tested to work with the Organic Groups module, 
+but may require the solution in http://drupal.org/node/234087.
 
 If you experience conflicts with other node access modules, you
 should uninstall the multiple_node_access patch.  This will restore the
@@ -167,6 +166,7 @@ For background, see:
   -- http://drupal.org/node/191375
   -- http://drupal.org/node/122173
   -- http://drupal.org/node/201156
+  -- http://drupal.org/node/234087
 
 ----
 1.5   Known Issues
@@ -194,7 +194,8 @@ While example.com and one.example.com can share a login cookie, the
 other two domains cannot read that cookie.  This is an internet standard,
 not a bug.
 
-This issue is looking for solutions.
+The single sign-on module is a good solution to this limitation:
+  http://drupal.org/project/singlesignon
 
 Note: See the INSTALL.txt for instructions regarding Drupal's default
 cookie handling.
@@ -871,10 +872,13 @@ module.  Other modules may implement hook_domainbatch() to provide
 additional batch actions.
 
 ----
-4.10 Block -- Domain Switcher
+5.  Blocks
 
-The Domain Access module provides on block, which can be used to help you
+The Domain Access module provides two blocks, which can be used to help you
 debug your use of the module.
+
+----
+5.1 Block -- Domain Switcher
 
 The Domain Switcher block presents a list of all active domains.  Clicking
 on one of the links will take you from your current URL to the same URL on
@@ -890,7 +894,18 @@ NOTE: This block is for debugging purposes.  The included Domain Navigation
 module provides block and menu items intended for end users.
 
 ----
-5.  Node Access
+5.2 Block -- Domain Access Information
+
+The Domain Access Information block lets you view node access rules for any
+node when you are viewing that node.  This block can help you debug the 
+module for user accounts that do not have the 'set domain access' permission.
+
+NOTE: By design, this block is viewable by all users.  However, its content 
+should only be shown to site developers or during debugging.  You should use
+the normal block visiblity settings as appropriate to your site.
+
+----
+6.  Node Access
 
 The Domain Access module is a node_access() module.  For additional developer
 information, see http://api.drupal.org/api/group/node_access/5.
@@ -900,7 +915,7 @@ a user is viewing.  If a user is at one.example.com, they can see content that
 is assigned to that domain or to all domains.
 
 ----
-5.1   Assigning Domain Access
+6.1   Assigning Domain Access
 
 Users who have the 'set domain access' permission can assign any node to any or
 all registered sites.  During node editing, a series of options will be
@@ -931,7 +946,7 @@ will be done through a hidden form element.  The node will be assigned to the
 currently active domain or, if configured , to all domains.
 
 ----
-5.2.  Editor Access
+6.2.  Editor Access
 
 Whenever a user account is created and the Domain Access module is active, user
 accounts will automatically be tagged with the name of the active domain from
@@ -946,7 +961,7 @@ belong to multiple domains.)  However, nodes that are assigned to 'all
 affiliates' do not grant editing privileges to all editors.
 
 ----
-5.3   Realms
+6.3   Realms
 
 This section contains technical details about Drupal's node access system.
 
@@ -971,7 +986,7 @@ In Domain Access, the following realms are defined:
   domain.  This advanced usage is optional.
 
 ----
-5.4   Grants
+6.4   Grants
 
 In each of the realms, there are specific rules for node access grants, as follows.
 
@@ -1000,7 +1015,7 @@ In each of the realms, there are specific rules for node access grants, as follo
   grants both the 'grant_edit' and 'grant_delete' permission.
 
 ----
-5.5   Warnings
+6.5   Warnings
 
 Node access in Drupal is a permissive system.  Once a grant has been issued, it
 cannot be revoked.  As a result, it is possible for multiple editors to be able
@@ -1031,13 +1046,13 @@ Since Domain Access implements node_access() fully, if you uninstall the module
 to grant 'grant_view' to realm 'all' with gid '0'.
 
 ----
-6.  Developer Notes
+7.  Developer Notes
 
 The Domain Access module is meant to be the core module for a system of small
 modules which add functionality.
 
 ----
-6.1  Extension Modules
+7.1  Extension Modules
 
 Currently, the following modules are included in the download.  They are not
 required, but each adds functionality to the core module.
@@ -1072,7 +1087,7 @@ required, but each adds functionality to the core module.
   - Domain Views -- Provides a Views filter for the Domain Access module.
 
 ----
-6.2 The $_domain Global
+7.2 The $_domain Global
 
 During hook_init(), the Domain Access module creates a nwe global variable,
 $_domain, which can be used by other Drupal elements (themes, blocks, modules).
@@ -1095,7 +1110,7 @@ Some uses for this global variable might include:
   - Theme switching based on subdomain.
 
 ----
-6.3 Database Schema
+7.3 Database Schema
 
 The Domain Access module creates two tables in a Drupal installation.  {domain}
 contains the following structure:
@@ -1135,7 +1150,7 @@ stores information specific to Domain Access.  Its structure is:
   Varchar, 255 NOT NULL default ''
 
 ----
-6.4 API
+7.4 API
 
 The Domain Access module has an API for internal module hooks.  Documentation is
 included in the download as API.php and can be viewed online at:
@@ -1145,24 +1160,3 @@ included in the download as API.php and can be viewed online at:
 The most important developer functions are the internal module hooks:
 
   http://therickards.com/api/group/hooks/Domain
-
-----
-7. To Do
-
-Currently, the module does not support logins across more than one top-level
-domain.  That is, it will only work for the following:
-
-  - example.com
-  - one.example.com
-  - two.example.com
-
-Even though domains are registered with fully-qualifed names, this setup will
-not work, since Drupal's login cookie is domain-specific.
-
-  - example.com
-  - one.example.com
-  - myexample.com [will fail login because it cannot read *.example.com cookie]
-
-Possible soultions for this issue are welcome -- the Single SignOn module may
-work, with some modification.  Solutions should be rolled as separate
-sub-modules.

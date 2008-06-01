@@ -18,7 +18,7 @@ CONTENTS
 2.3   Setting DOMAIN_INSTALL_RULE
 2.4   Setting DOMAIN_EDITOR_RULE
 2.5   Setting DOMAIN_SITE_GRANT
-3.   Patches to Drupal Core
+3.   Patch to Drupal Core (optional)
 3.1   multiple_node_access.patch
 4.  Configuring settings.php
 4.1   $base_url
@@ -35,7 +35,6 @@ CONTENTS
 5.2   Domain Prefix
 5.3   Domain Strict
 6.  Uninstalling
-7.  custom_url_rewrite_outbound() function
 
 ----
 1.  Introduction
@@ -162,14 +161,14 @@ be viewable on all domains.
 Normally, you will not need to edit this value.
 
 ----
-3. Patch to Drupal Core
+3. Patch to Drupal Core (optional)
 
-The following patches are optional.  They affect advanced behavior of the
+The following patch is optional.  The patch affects advanced behavior of the
 Domain Access module.
 
-Patches are distributed in the 'patches' folder of the download.
+The patch is distributed in the 'patches' folder of the download.
 
-To apply these patches, place them in your root Drupal folder.
+To apply this patch, place it in your root Drupal folder.
 Then follow the instructions at: http://drupal.org/patch/apply
 
 ----
@@ -185,7 +184,7 @@ for multiple node access rules.
 
 Developers: see http://drupal.org/node/191375 for more information.
 
-This patch is being submitted to Drupal core for version 7.
+This patch has being submitted to Drupal core for version 7.
 
 ----
 4.  Configuring settings.php

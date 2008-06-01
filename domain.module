@@ -200,33 +200,63 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
       $blocks[0] = array(
         'info' => t('Domain switcher'),
       );
+      $blocks[1] = array(
+       'info' => t('Domain access information'),
+      );
       return $blocks;
       break;
     case 'view':
-      $block['subject'] = t('Domain switcher');
-      $items = array();
-      $domains = domain_domains();
-      $msg = FALSE;
-      foreach ($domains as $domain) {
-        if ($domain['valid']) {
-          $title = $domain['sitename'];
-          $allow = TRUE;
-        }
-        else {
-          $title = $domain['sitename'] .' *';
-          $allow = FALSE;
-          if (user_access('administer domains')) {
-            $msg = TRUE;
-            $allow = TRUE;
+      switch ($delta) {
+        case 0:
+          $block['subject'] = t('Domain switcher');
+          $items = array();
+          $domains = domain_domains();
+          $msg = FALSE;
+          foreach ($domains as $domain) {
+            if ($domain['valid']) {
+              $title = $domain['sitename'];
+              $allow = TRUE;
+            }
+            else {
+              $title = $domain['sitename'] .' *';
+              $allow = FALSE;
+              if (user_access('administer domains')) {
+                $msg = TRUE;
+                $allow = TRUE;
+              }
+            }
+            if ($allow) {
+              $items[] = l($title, domain_get_uri($domain));
+            }
           }
-        }
-        if ($allow) {
-          $items[] = l($title, domain_get_uri($domain));
-        }
-      }
-      $block['content'] = theme('item_list', $items);
-      if ($msg) {
-        $block['content'] .= t('<em>* Inactive domain.</em>');
+          $block['content'] = theme('item_list', $items);
+          if ($msg) {
+            $block['content'] .= t('<em>* Inactive domain.</em>');
+          }
+          break;
+        case 1:
+          $block['content'] = '';
+          if (arg(0) == 'node' && is_numeric(arg(1))) {
+            $block['subject'] = t('Domain access information');
+            $this_node = node_load(arg(1));
+            $output = '';
+            if (!empty($this_node->subdomains)) {
+              $output .= theme('item_list', $this_node->subdomains, t('Subdomains'));
+            }
+            if (!empty($this_node->editors)) {
+              $output .= theme('item_list', $this_node->editors, t('Editors'));
+            }
+            if (isset($this_node->domain_source)) {
+              $this_domain = domain_lookup($this_node->domain_source);
+              $output .= theme('item_list', array($this_domain['sitename']), t('Source domain'));
+            }
+            if (empty($output)) {
+              $output = t('This node is not assigned to a domain.');
+            }
+            $block['content'] = '<p>'. t('%node is published with the following Domain Access rules:', array('%node' => $this_node->title)) .'</p>'. $output;
+          }  
+          return $block;
+          break;
       }
       return $block;
       break;
@@ -634,19 +664,11 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         $debug = variable_get('domain_debug', 0);
         if ($debug && user_access('set domain access')) {
           if (!empty($node->subdomains)) {
-            $output .= '<p><b>Subdomains</b></p><ul>';
-            foreach ($node->subdomains as $name) {
-              $output .= '<li>'. $name .'</li>';
-            }
-            $output .= '</ul>';
+            $output = theme('item_list', $node->subdomains, t('Subdomains'));
             $node->content['subdomains'] = array('#value' => $output, '#weight' => 20);
           }
           if (!empty($node->editors)) {
-            $output = '<p><b>Editors</b></p><ul>';
-            foreach ($node->editors as $name) {
-              $output .= '<li>'. $name .'</li>';
-            }
-            $output .= '</ul>';
+           	$output = theme('item_list', $node->editors, t('Editors'));
             $node->content['editors'] = array('#value' => $output, '#weight' => 21);
           }
           if (empty($output)) {

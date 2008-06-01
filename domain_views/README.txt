@@ -21,6 +21,7 @@ CONTENTS
 1. Introduction
 
 The Domain Views module is a small extension to the Domain Access module.
+The module requires Views 6.x.2 or higher.
 
 It provides a Views argument and filter for Domain Access.  This feature allows
 Views to filter content based on the access privlieges set by Domain Access.
@@ -38,6 +39,7 @@ a predefined filter or by passing arguments to the view e.g. example.com/myview/
 1.1 Authors
 
 This module was written by Drupal user mrichar1.  http://drupal.org/user/60123
+It was updgraded to Views 2 by nonsie.  http://drupal.org/user/29899
 
 See http://drupal.org/node/200714 for the background on this module.
 
