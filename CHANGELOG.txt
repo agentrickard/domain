@@ -1,5 +1,11 @@
 // $Id$
 
+08-JUN-2008 (2)
+
+-- #266166 patch by grndlvl.  hook_domaincron() now provides table prefix and settings loading.
+    For users who were performing cron actions across multiple domain or using hook_domaincron(),
+    you will need to pay attention to potential changes in behavior.
+    
 08-JUN-2008
 
 -- #228985 by 1.kenthomas.  Adds warnings to theme forms entered from the wrong domain.
