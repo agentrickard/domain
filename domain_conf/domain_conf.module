@@ -84,8 +84,6 @@ function domain_conf_domainlinks($domain) {
  * don't have to worry about hook_form_alter() being called when not wanted.
  */
 function domain_conf_form_alter(&$form, &$form_state, $form_id) {
-  // Set a message if we are on an admin page.
-  domain_conf_warning_check($form_id);
   // TODO: Replace with hook_domainbatch()?
   // Check to be certain that we are on the right form page.
   $module = arg(2);
@@ -93,31 +91,6 @@ function domain_conf_form_alter(&$form, &$form_state, $form_id) {
   // If we are making the form, load our alterations.
   if ($form_id == 'system_site_information_settings' && $module == 'domain' && $action == 'conf') {
     domain_conf_system($form, $form_state, $form_id);
-  }
-}
-
-/**
- * Sets a message to the site admin.
- *
- * If our module changes $conf settings, they may be reflected
- * on admin pages when we don't want them to be.
- */
-function domain_conf_warning_check($form_id) {
-  static $_warning;
-  // If $_POST is set, we are submitting the form and should not set a message.
-  if (!$_POST && empty($_warning)) {
-    global $_domain;
-    // Add the list of forms
-    $forms = array();
-    $forms = module_invoke_all('domainwarnings');
-    if (arg(2) != 'domain' && in_array($form_id, $forms)) {
-      $default = domain_default();
-      if ($_domain['domain_id'] != $default['domain_id']) {
-        $_path = domain_get_uri($default);
-        drupal_set_message(t('You are viewing #this. This form may need to be entered from <a href="!url">!domain</a>', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'])));
-      }
-    }
-    $_warning = TRUE;
   }
 }
 

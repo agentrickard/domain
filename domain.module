@@ -955,6 +955,8 @@ function domain_disable() {
  * For users without the "set domain access" permission, this happens silently.
  */
 function domain_form_alter(&$form, &$form_state, $form_id) {
+  // Set a message if we are on an admin page.
+  domain_warning_check($form_id);
   // If SEO is turned on, then form actions need to be absolute paths
   // to the currently active domain.  See http://drupal.org/node/196217.
   $seo = variable_get('domain_seo', 0);
@@ -1317,4 +1319,29 @@ function domain_simpletest() {
   $dir = drupal_get_path('module', $module_name) .'/tests';
   $tests = file_scan_directory($dir, '\.test$');
   return array_keys($tests);
+}
+
+/**
+ * Sets a message to the site admin.
+ *
+ * If our module changes $conf settings, they may be reflected
+ * on admin pages when we don't want them to be.
+ */
+function domain_warning_check($form_id) {
+  static $_warning;
+  // If $_POST is set, we are submitting the form and should not set a message.
+  if (!$_POST && empty($_warning)) {
+    global $_domain;
+    // Add the list of forms
+    $forms = array();
+    $forms = module_invoke_all('domainwarnings');
+    if (arg(2) != 'domain' && in_array($form_id, $forms)) {
+      $default = domain_default();
+      if ($_domain['domain_id'] != $default['domain_id']) {
+        $_path = domain_get_uri($default);
+        drupal_set_message(t('You are viewing #this. This form may need to be entered from <a href="!url">!domain</a>', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'])));
+      }
+    }
+    $_warning = TRUE;
+  }
 }

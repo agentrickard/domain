@@ -199,3 +199,13 @@ function domain_theme_batch($values) {
     }
   }
 }
+
+/**
+ * Implements hook_domainwarnings()
+ */
+function domain_theme_domainwarnings() {
+  return array(
+    'system_themes_form',
+    'system_theme_settings',
+  );
+}

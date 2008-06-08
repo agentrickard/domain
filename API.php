@@ -307,8 +307,6 @@ function hook_domainform(&$form) {
  *  Allows a warning message to be printed when entering specific forms that
  *  may have values that vary on each domain.
  *
- *  This hook is implemented by the Domain Conf module.
- *
  * @return
  *  An array of form_id values representing forms that require warnings.
  *
