@@ -1,5 +1,9 @@
 // $Id$
 
+08-JUN-2008
+
+-- #228985 by 1.kenthomas.  Adds warnings to theme forms entered from the wrong domain.
+
 18-MAY-2008
 
 -- #255067 by scedwar.  Adds node/%n/edit to default node patterns.

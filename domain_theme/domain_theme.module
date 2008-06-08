@@ -264,3 +264,13 @@ function domain_theme_batch($form_values) {
     }
   }
 }
+
+/**
+ * Implements hook_domainwarnings()
+ */
+function domain_theme_domainwarnings() {
+  return array(
+    'system_themes',
+    'system_theme_settings',
+  );
+}
