@@ -18,13 +18,15 @@ _domain_prefix_load();
  *
  * @ingroup prefix
  */
-function _domain_prefix_load() {
+function _domain_prefix_load($domain = NULL) {
   $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain_prefix'"));
-  if ($check) {
-    // Cribbed from bootstrap.inc -- removes port protocols from the host value.
-    $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
-    // Lookup the active domain against our allowed hosts record.
-    $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
+  if ($check > 0) {
+    if (is_null($domain)) {
+      // Cribbed from bootstrap.inc -- removes port protocols from the host value.
+      $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
+      // Lookup the active domain against our allowed hosts record.
+      $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));      
+    }
     if (isset($domain['domain_id'])) {
       $tables = array();
       $prefix = 'domain_'. $domain['domain_id'] .'_';

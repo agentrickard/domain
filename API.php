@@ -199,6 +199,10 @@ function hook_domainnav($domain) {
  * This function is especially useful if you need to run node queries
  * that obey node access rules.
  *
+ * Note that Domain Prefix and Domain Conf are activated by this hook.
+ * That means each domain will have its tables and variables loaded before
+ * your function fires.
+ *
  * @param $domain
  *  The information for the current domain record, taken from {domain}.
  *

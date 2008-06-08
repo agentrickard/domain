@@ -27,13 +27,15 @@ _domain_conf_load();
  *
  * @ingroup conf
  */
-function _domain_conf_load() {
+function _domain_conf_load($domain = NULL) {
   $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain_conf'"));
   if ($check > 0) {
-    // Cribbed from bootstrap.inc -- removes port protocols from the host value.
-    $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
-    // Lookup the active domain against our allowed hosts record.
-    $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
+    if (is_null($domain)) {
+      // Cribbed from bootstrap.inc -- removes port protocols from the host value.
+      $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
+      // Lookup the active domain against our allowed hosts record.
+      $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
+    }
     // If nothing was found, use the default domain.
     if (!isset($domain['domain_id'])) {
       $domain['domain_id'] = 0;
