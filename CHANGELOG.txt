@@ -1,5 +1,11 @@
 // $Id$
 
+08-JUN-2008 (3)
+
+-- #265221 by hardfocus.  Catches a change in custom_url_rewrite() when paths are aliased.
+-- Adds node/%n/outline to default node paths.
+-- Creates rc3.
+
 08-JUN-2008 (2)
 
 -- #266166 patch by grndlvl.  hook_domaincron() now provides table prefix and settings loading.

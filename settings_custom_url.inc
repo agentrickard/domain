@@ -16,14 +16,11 @@
  */
 function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
   global $_domain;
-  // &$query, &$fragment, &$absolute, &$base_url
+  
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.
   if (isset($_domain['domain_id'])) {
     // Set static variables for the node lookups, to remove redundant queries.
     static $domain_site, $domain, $nodepaths;
-
-    // Store the original path for later use.
-    $original_path = $path;
 
     // Check to see that this function is installed.
     $skip = FALSE;
@@ -42,11 +39,11 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
     if (!$skip && ($check || $seo)) {
       // Check to see if this is a node or comment link and set $nid accordingly.
       // We static the $nid results to make this more efficient.
-      $pattern = explode('/', $path);
+      $pattern = explode('/', $original_path);
 
       // Advanced pattern matching, we find the node id based on token %n in the path string.
       if (!isset($nodepaths)) {
-        $pathdata = variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n");
+        $pathdata = variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n\r\nnode\%n\outline");
         $path_match = preg_replace('/(\r\n?|\n)/', '|', $pathdata);
         $nodepaths = explode("|", $path_match);
       }
