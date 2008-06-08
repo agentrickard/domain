@@ -1,5 +1,11 @@
 // $Id$
 
+08-JUN-2008 (3)
+
+-- #249809 by scedwar.  Removes note about OGUR from documentation.
+-- #253112 patch by nonsie, idea by scedwar.  Adds node debugging block.
+-- Updates documentation.
+
 08-JUN-2008 (2)
 
 -- #266166 patch by grndlvl.  hook_domaincron() now provides table prefix and settings loading.
