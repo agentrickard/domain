@@ -72,7 +72,7 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
       $block[0]['info'] = t('Domain list navigator');
       break;
     case 'view':
-      $block['subject'] = '<none>';
+      $block['subject'] = '';
       $block['content'] = domain_nav_render();
       break;
     case 'configure':
