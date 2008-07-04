@@ -1,5 +1,9 @@
 // $Id$
 
+04-JUL-2008 (5)
+
+-- #278593 by nirvanajyothi.  We need to sanity check domain_goto() in domain_form_alter.
+
 04-JUL-2008 (4)
 
 -- #278240 by nirvanajyothi.  Allows Domain User to respond to changes in usernames.
