@@ -1,5 +1,9 @@
 // $Id$
 
+04-JUL-2008 (3)
+
+-- #278240 by nirvanajyothi.  Allows Domain User to respond to changes in usernames.
+
 04-JUL-2008 (2)
 
 -- #277202 by bforchhammer. Removes invalid HTML from Domain Nav.
