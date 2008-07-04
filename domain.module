@@ -1095,7 +1095,11 @@ function domain_form_alter($form_id, &$form) {
           // 2 == go to the user's assigned domain.
           case 2:
             $domain = domain_lookup($first_domain);
-            if ($domain['domain_id'] != $_domain['domain_id']) {
+            // If the domain is invalid, go to the primary domain.
+            if ($domain == -1 || $domain['valid'] == 0) {
+              domain_goto(domain_default());
+            }
+            else if ($domain['domain_id'] != $_domain['domain_id']) {
               domain_goto($domain);
             }
             break;
