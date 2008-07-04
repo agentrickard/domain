@@ -1,5 +1,9 @@
 // $Id$
 
+04-JUL-2008 (2)
+
+-- #278200 by gcassie.  WWW prefix handling now follows the current path.
+
 04-JUL-2008
 
 -- #278238 by nirvanajyothi.  Fixes error in domain_user_user().
