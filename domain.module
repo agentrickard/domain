@@ -40,9 +40,9 @@ define('DOMAIN_SITE_GRANT', TRUE);
 function domain_init() {
   global $_domain, $conf;
   $_domain = array();
-  // Cribbed from bootstrap.inc -- removes port protocols from the host value.
-  $_subdomain = strtolower(implode('.', array_reverse(explode(':', rtrim($_SERVER['HTTP_HOST'], '.')))));
-
+  // We lower case this, since EXAMPLE.com == example.com.
+  $_subdomain = strtolower(rtrim($_SERVER['HTTP_HOST']));
+  
   // Strip the www. off the subdomain, if required by the module settings.
   $raw_domain = $_subdomain;
   if (variable_get('domain_www', 0)) {
