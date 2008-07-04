@@ -1,5 +1,9 @@
 // $Id$
 
+04-JUL-2008 (6)
+
+-- #277046 by hardfocus.  Changes domain_init() to domain_boot() to avoide update issues.
+
 04-JUL-2008 (5)
 
 -- #278593 by nirvanajyothi.  We need to sanity check domain_goto() in domain_form_alter.

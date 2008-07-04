@@ -32,12 +32,12 @@ define('DOMAIN_EDITOR_RULE', FALSE);
 define('DOMAIN_SITE_GRANT', TRUE);
 
 /**
- * Implements hook_init()
+ * Implements hook_boot()
  *
  * Inititalizes a global $_domain variable and set it based on the
  * third-level domain used to access the page.
  */
-function domain_init() {
+function domain_boot() {
   global $_domain, $conf;
   $_domain = array();
   // Cribbed from bootstrap.inc -- removes port protocols from the host value.
