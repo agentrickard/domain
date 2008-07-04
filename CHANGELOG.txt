@@ -1,5 +1,9 @@
 // $Id$
 
+04-JUL-2008
+
+-- #278200 by gcassie.  WWW prefix handling now follows the current path.
+
 08-JUN-2008 (3)
 
 -- #249809 by scedwar.  Removes note about OGUR from documentation.
