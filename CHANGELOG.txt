@@ -1,5 +1,9 @@
 // $Id$
 
+04-JUL-2008 (3)
+
+-- #277202 by bforchhammer. Removes invalid HTML from Domain Nav.
+
 04-JUL-2008 (2)
 
 -- #278200 by gcassie.  WWW prefix handling now follows the current path.
