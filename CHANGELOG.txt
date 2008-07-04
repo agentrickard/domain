@@ -1,5 +1,9 @@
 // $Id$
 
+04-JUL-2008 (7)
+
+-- #270983 by ariflukito.  Keeps the domain port intact, allowing non-standard ports.
+
 04-JUL-2008 (6)
 
 -- #277046 by hardfocus.  Changes domain_init() to domain_boot() to avoide update issues.
