@@ -1,5 +1,10 @@
 // $Id$
 
+04-JUL-2008
+
+-- #278238 by nirvanajyothi.  Fixes error in domain_user_user().
+-- #278589.  Fixes issue with domain.prefix.admin.inc.
+
 08-JUN-2008 (3)
 
 -- #265221 by hardfocus.  Catches a change in custom_url_rewrite() when paths are aliased.

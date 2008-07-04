@@ -128,12 +128,12 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
     case 'view':
       $domain = domain_user_lookup($account->uid);
       if ($domain != -1) {
-        $items['domain'] = array(
-          'title' => t(''),
-          'value' => l($domain['path'], $domain['path']),
-          'class' => ''
+        $account->content['summary']['domain_user'] = array(
+          '#type' => 'user_profile_item',
+          '#title' => t('Personal web site'),
+          '#weight' => 6,          
+          '#value' => l($domain['path'], $domain['path']),
         );
-        return array(t('Personal web site') => $items);
       }
       break;
     case 'register':
