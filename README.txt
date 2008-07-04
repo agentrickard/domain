@@ -500,7 +500,7 @@ as part of the primary domain.  Simply use example.com -- Drupal
 will automatically detect the presence of the subfolder.
 
 NOTE: As of 5.x.1.5 and higher, you may use a port protocol as part
-of any domain.  So you could set example.cpm:8080 as the primary
+of any domain.  So you could set example.com:8080 as the primary
 domain name.  Note that port protocols will not be stripped, so that
 example.com and example.com:8080 are two separate domains.
 
