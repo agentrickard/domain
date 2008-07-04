@@ -222,6 +222,16 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       // Throw away what we do not need.
       $edit['domain_create_user'] = NULL;
       $edit['domains'] = NULL;
+      // Special case if the username has changed.
+      if ($op == 'update' && $edit['name'] != $account->name) {
+        $domain = domain_user_lookup($account->uid, TRUE);
+        if ($domain != -1) {
+          $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
+          $name = domain_user_strip_chars($edit['name']);
+          $string = $name .'.'. $user_root;
+          db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s' WHERE domain_id = %d", $string, $edit['name'], $domain['domain_id']);
+        }
+      }
       break;
     case 'login':
       // If the user has a personal domain, take them there.
