@@ -345,7 +345,7 @@ function domain_prefix_form($domain_id, $arguments = array()) {
   }
   // Get the root source table data.
   $root = domain_default();
-  if (empty($settings)) {
+  if (empty($settings) && !$_POST) {
     drupal_set_message(t('There are no default settings configured.'));
   }
 
@@ -353,7 +353,7 @@ function domain_prefix_form($domain_id, $arguments = array()) {
   $tables = domain_prefix_lookup($domain_id);
   $submit = t('Update domain tables');
   if (empty($tables)) {
-    if (!$form_values['execute'] && !$arguments['user_submitted']) {
+    if (!$_POST && !$form_values['execute'] && !$arguments['user_submitted']) {
       drupal_set_message(t('The table creation sequence has not run for this domain.'));
     }
     $submit = t('Generate domain tables');
@@ -543,6 +543,8 @@ function domain_prefix_form_submit($form_id, $form_values) {
               db_query("CREATE TABLE {%s} LIKE {%s}", $newtable, $sourcetable);
               db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
             }
+            // Update {sequences} table.
+            domain_prefix_update_sequences('update', $newtable, $sourcetable);
             if ($msg) {
               drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
             }
@@ -556,6 +558,8 @@ function domain_prefix_form_submit($form_id, $form_values) {
           if ($exists > 0) {
             db_query("TRUNCATE TABLE {%s}", $newtable);
             db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
+            // Update {sequences} table.
+            domain_prefix_update_sequences('update', $newtable, $sourcetable);
             if ($msg) {
               drupal_set_message(t('!string table updated from source.', array('!string' => $newtable)));
             }
@@ -568,6 +572,8 @@ function domain_prefix_form_submit($form_id, $form_values) {
           if ($exists > 0) {
             db_query("DROP TABLE {%s}", $newtable);
             $value = DOMAIN_PREFIX_IGNORE;
+            // Update {sequences} table.
+            domain_prefix_update_sequences('drop', $newtable, $sourcetable);
             if ($msg) {
               drupal_set_message(t('!string table dropped.', array('!string' => $newtable)));
             }
@@ -582,6 +588,45 @@ function domain_prefix_form_submit($form_id, $form_values) {
           $value = $current[$oldtable]['status'];
         }
         db_query("INSERT INTO {domain_prefix} (domain_id, status, tablename, module, source) VALUES (%d, %d, '%s', '%s', %d)", $form_values['domain_id'], $value, $key, $module, $form_values['_source_'. $key]);
+      }
+    }
+  }
+}
+
+/**
+ * Correct the {sequences} table if doing an update.
+ *
+ * @param $op
+ * The operation to perform, either 'update' or 'drop.'
+ * @param $newtable
+ * The name of the table being updated.
+ * @param $sourcetable
+ * The name of the table providing the tempalte for the update
+ */
+function domain_prefix_update_sequences($op, $newtable, $sourcetable) {
+  $result = db_query("SELECT name, id FROM {sequences} WHERE name LIKE '{%s%}'", $sourcetable);
+  $dbprefix = domain_prefix_get_prefix();
+  $source = explode('_', $dbprefix . $sourcetable);
+  while ($variable = db_fetch_array($result)) {
+    // We have to match the variable source name, to prevent duplicates.
+    $var = explode('_', $variable['name']);
+    array_pop($var); // Toss out the last element.
+    $diff = array_diff($var, $source);
+    if (empty($diff)) {
+      $newvariable = $newtable . substr($variable['name'], strlen($dbprefix . $sourcetable));
+      $target = db_result(db_query("SELECT id FROM {sequences} WHERE name = '{%s}'", $newvariable));
+      if (!$target) {
+        if ($op == 'update') {
+          db_query("INSERT INTO {sequences} (name, id) VALUES ('{%s}', %d)", $newvariable, $variable['id']);
+        }  
+      }
+      else {
+        if ($op == 'update') {      
+          db_query("UPDATE {sequences} SET id = %d WHERE name = '{%s}'", $variable['id'], $newvariable);
+        }
+        else {
+          db_query("DELETE FROM {sequences} WHERE name = '{%s}'", $newvariable);
+        }
       }
     }
   }

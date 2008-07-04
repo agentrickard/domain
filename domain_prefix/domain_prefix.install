@@ -47,6 +47,11 @@ function domain_prefix_uninstall() {
     $name = db_escape_table('domain_'. $table['domain_id'] .'_'. $table['tablename']);
     db_query("DROP TABLE {%s}", $name);
   }
+  // If there are values in the sequences table, delete them.
+  $result = db_query("SELECT DISTINCT(domain_id) FROM {domain_prefix} WHERE status > 1");
+  while ($domain = db_fetch_array($result)) {
+    db_query("DELETE FROM {sequences} WHERE name LIKE '{%s%}'", db_escape_table('domain_'. $domain['domain_id']));
+  }  
   // Now drop the storage table.
   db_query("DROP TABLE {domain_prefix}");
   variable_del('domain_prefix');
