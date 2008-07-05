@@ -32,12 +32,12 @@ define('DOMAIN_EDITOR_RULE', FALSE);
 define('DOMAIN_SITE_GRANT', TRUE);
 
 /**
- * Implements hook_boot()
+ * Implements hook_init()
  *
  * Inititalizes a global $_domain variable and set it based on the
  * third-level domain used to access the page.
  */
-function domain_boot() {
+function domain_init() {
   global $_domain, $conf;
   $_domain = array();
   // We lower case this, since EXAMPLE.com == example.com.
@@ -430,7 +430,7 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
     // Did we get a valid result?
     if (isset($domain['domain_id'])) {
       // Let Domain Access module extensions act to override the defaults.
-      $domains[$key] = domain_api($domain);
+      $domains[$key] = domain_api($domain, $reset);
     }
     else {
       $domains[$key] = -1;
@@ -534,12 +534,14 @@ function _domain_rurl_sort($a, $b) {
  *
  * @param $domain
  * The domain array defined by domain_lookup().
+ * @param $reset
+ *  A boolean flag to clear the static variable if necessary. 
  * @return
  * The $domain array, modified by reference by hook_domainload() implementations.
  */
-function domain_api($domain) {
+function domain_api($domain, $reset = FALSE) {
   static $_modules;
-  if (!isset($_modules)) {
+  if (!isset($_modules) || $reset) {
     $_modules = module_implements('domainload');
   }
   if (!empty($_modules)) {
@@ -963,6 +965,11 @@ function domain_disable() {
  * For users without the "set domain access" permission, this happens silently.
  */
 function domain_form_alter(&$form, &$form_state, $form_id) {
+  // There are forms that we never want to alter, and they are passed here.
+  $forms = module_invoke_all('domainignore');
+  if (in_array($form_id, $forms)) {
+    return;
+  }
   // Set a message if we are on an admin page.
   domain_warning_check($form_id);
   // If SEO is turned on, then form actions need to be absolute paths
@@ -1356,4 +1363,12 @@ function domain_warning_check($form_id) {
     }
     $_warning = TRUE;
   }
+}
+
+/**
+ * Implements hook_domainignore().
+ */
+function domain_domainignore() {
+  // In Drupal 6, the update script behaves differently than D5, so we ignore it.
+  return array('update_script_selection_form');
 }

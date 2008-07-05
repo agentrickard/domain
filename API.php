@@ -80,9 +80,11 @@ function hook_domainrecords(&$grants, $node) {
  * Modules may overwrite or add to the $domain array for each subdomain.
  *
  * WARNING: If you need to make revisions to the $_domain global before it is processed
- * by other modules, you must implement hook_init().  Only modules that implement hook_init()
+ * by other modules, you must implement hook_boot().  Only modules that implement hook_boot()
  * are loaded during the creation routine for the $_domain global.  If your module has not
  * been loaded, then hook_domainload() will skip your implementation.
+ *
+ * @see domain_user_boot()
  *
  * When loading lists of domains or generating domain information, either use the proper
  * functions -- domain_default(), domain_lookup(), and domain_domains() -- or invoke this hook.
@@ -468,4 +470,14 @@ function hook_domainbatch() {
     '#weight' => 0,
   );
   return $batch;
+}
+
+/**
+ * Return an array of forms for which we cannot run hook_form_alter().
+ * @return
+ * An array of form ids that should not run through domain_form_alter.
+ */
+function hook_domainignore() {
+  // User login should always be from the current domain.
+  return array('user_login');
 }

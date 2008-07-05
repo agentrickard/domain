@@ -1,5 +1,14 @@
 // $Id$
 
+05-JUL-2008
+
+-- Moving domain_init() to domain_boot() broke hook_domainload(). So
+    we have to keep domaion_init().  We also have to implement hook_boot()
+    in modules that use hook_domainload().  See the API for details.
+-- Fixes issue with Domain User.  We do strip the ports off of restricted usernames.
+-- #277046 by hardfocus.  Implements a new hook_domainignore() to tell the
+    module not to apply hook_form_alter() in some cases.  Notably update.php.
+
 04-JUL-2008 (7)
 
 -- #270983 by ariflukito.  Keeps the domain port intact, allowing non-standard ports.
