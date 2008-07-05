@@ -986,6 +986,11 @@ function domain_disabling($set = NULL) {
  * For users without the "set domain access" permission, this happens silently.
  */
 function domain_form_alter($form_id, &$form) {
+  // There are forms that we never want to alter, and they are passed here.
+  $forms = module_invoke_all('domainignore');
+  if (in_array($form_id, $forms)) {
+    return;
+  }
   // Set a message if we are on an admin page.
   domain_warning_check($form_id);
   

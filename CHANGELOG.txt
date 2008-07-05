@@ -1,5 +1,10 @@
 // $Id$
 
+05-JUL-2008
+
+-- Strips port protocols when creating access rules in Domain User.
+-- Backports hook_domainignore(), but does not implement it.
+
 04-JUL-2008 (6)
 
 -- #270983 by ariflukito.  Keeps the domain port intact, allowing non-standard ports.

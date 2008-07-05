@@ -136,7 +136,10 @@ function domain_user_rules($generate = TRUE) {
   foreach ($domains as $domain) {
     if ($domain['domain_id'] > 0 && !$domain['uid'] && !empty($root)) {
       // Chop the name of domains to find the username equivalent.
-      $name_string = str_replace('.'. $root, '', $domain['subdomain']);
+      $string = str_replace('.'. $root, '', $domain['subdomain']);
+      // In this case, we do strip port protocols, since they make no sense as usernames.
+      $str = explode(':', $string);
+      $name_string = $str[0];
       $reserved[] = $name_string;
       if ($generate && !empty($name_string)) {
         $check = db_result(db_query("SELECT aid FROM {access} WHERE mask = '%s'", $name_string));

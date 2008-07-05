@@ -470,3 +470,13 @@ function hook_domainbatch() {
   );
   return $batch;
 }
+
+/**
+ * Return an array of forms for which we cannot run hook_form_alter().
+ * @return
+ * An array of form ids that should not run through domain_form_alter.
+ */
+function hook_domainignore() {
+  // User login should always be from the current domain.
+  return array('user_login');
+}
