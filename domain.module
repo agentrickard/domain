@@ -1043,6 +1043,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       if (user_access('view domain publishing')) {
         $action = variable_get('domain_options', 0);
         $user_domains = array();
+        $default_options = array();
         foreach ($user->domain_user as $key => $value) {
           if (abs($value) > 0) {
             $user_domains[] = $value;
@@ -1088,6 +1089,10 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             break;
           // 3 == show checkboxes of available domains.
           case 3:
+            // If the user has no available domains, then they cannot post.
+            if (empty($user_options)) {
+              return drupal_access_denied();
+            }
             $form['domain'] = array(
               '#type' => 'fieldset',
               '#title' => t('Affiliate publishing options'),
