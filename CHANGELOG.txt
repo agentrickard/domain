@@ -1,5 +1,10 @@
 // $Id$
 
+05-JUL-2008 (2)
+
+-- #278836 by nirvanajyothi.  Array error in node forms when users were not
+    assigned to any valid domains.
+
 05-JUL-2008
 
 -- Strips port protocols when creating access rules in Domain User.

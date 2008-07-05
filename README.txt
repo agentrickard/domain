@@ -594,8 +594,11 @@ rules defined below.
   assigned to their user account.
 
   Note that if this option is selected, users with the 'view domain publshing'
-  permission will also be shown a list of affilates to which the node is assigned.
-  This list shows only the affiliates that the user cannot edit.
+  permission will also be shown a list of affilates to which the node is
+  assigned. This list shows only the affiliates that the user cannot edit.
+
+  Warning: If this option is selected and the user has no domain publishing
+  options, the user will not be allowed to post or edit!
 
 Note also that the user is not given the ability to promote content to
 'all affiliates'.  Users who need this ability should be given the 'set domain
