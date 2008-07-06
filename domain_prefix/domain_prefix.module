@@ -19,11 +19,11 @@
 /**
  * Constant definitions for the various actions.
  */
-define(DOMAIN_PREFIX_IGNORE, 1);
-define(DOMAIN_PREFIX_CREATE, 2);
-define(DOMAIN_PREFIX_COPY, 4);
-define(DOMAIN_PREFIX_DROP, 8);
-define(DOMAIN_PREFIX_UPDATE, 16);
+define('DOMAIN_PREFIX_IGNORE', 1);
+define('DOMAIN_PREFIX_CREATE', 2);
+define('DOMAIN_PREFIX_COPY', 4);
+define('DOMAIN_PREFIX_DROP', 8);
+define('DOMAIN_PREFIX_UPDATE', 16);
 
 /**
  * Implements hook_menu()
@@ -112,10 +112,10 @@ function domain_prefix_domainupdate($op, $domain = array(), &$form_state = array
       $rule = variable_get('domain_prefix_options', 1);
       if ($rule) {
         // Get the current settings.
-        $settings = unserialize(variable_get('domain_prefix', NULL));
+        $settings = variable_get('domain_prefix', NULL);
         if (!empty($settings)) {
           $settings['domain_id'] = $domain['domain_id'];
-          drupal_execute('domain_prefix_form', $settings, $domain['domain_id'], $form_state['values']['domain_arguments']);
+          drupal_execute('domain_prefix_form', $settings, $domain['domain_id'], $form_state);
         }
       }
       break;

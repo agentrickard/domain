@@ -1,7 +1,7 @@
---- modules/node/node.module	2008-04-09 17:11:48.000000000 -0400
-+++ modules/node/node.module.new	2008-06-01 09:30:29.000000000 -0400
+--- modules/node/node.module  2008-04-09 17:11:48.000000000 -0400
++++ modules/node/node.module.new  2008-06-01 09:30:29.000000000 -0400
 @@ -2007,22 +2007,19 @@ function node_access($op, $node, $accoun
- 
+
    // If the module did not override the access rights, use those set in the
    // node_access table.
 -  if ($op != 'create' && $node->nid && $node->status) {
@@ -32,12 +32,12 @@
 -    $result = db_query($sql, $node->nid);
 -    return (db_result($result));
    }
- 
+
    // Let authors view their own nodes.
 @@ -2072,17 +2069,7 @@ function _node_access_where_sql($op = 'v
      return;
    }
- 
+
 -  $grants = array();
 -  foreach (node_access_grants($op, $account) as $realm => $gids) {
 -    foreach ($gids as $gid) {
@@ -50,12 +50,12 @@
 -    $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
 -  }
 +  $grants_sql = node_access_grants_sql($op, $node_access_alias, $account);
- 
+
    $sql = "$node_access_alias.grant_$op >= 1 $grants_sql";
    return $sql;
 @@ -2120,18 +2107,7 @@ function node_access_view_all_nodes() {
    static $access;
- 
+
    if (!isset($access)) {
 -    $grants = array();
 -    foreach (node_access_grants('view') as $realm => $gids) {
@@ -75,7 +75,7 @@
      $access = db_result($result);
 @@ -2141,6 +2117,92 @@ function node_access_view_all_nodes() {
  }
- 
+
  /**
 + * Check the logic of node grants and prepare the SQL statement.
 + *

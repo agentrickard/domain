@@ -48,7 +48,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   // as the content we are looking up.  Will return -1 if it fails.
   $domain = domain_lookup($domain_id);
   domain_goto($domain);
-
+  $output = '';
   // Override the $_domain global so we can see the appropriate content
   if (!is_null($domain_id)) {
     $_domain['site_grant'] = FALSE;
@@ -61,7 +61,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   // KILLSWITCH CASE: returns an error
   else {
     drupal_set_message(t('Invalid request'), 'error');
-    $output = t('<p>The specified domain does not exist.</p>');
+    $output .= t('<p>The specified domain does not exist.</p>');
     return $output;
   }
   $output .= domain_content_admin();
@@ -80,7 +80,7 @@ function domain_content_admin() {
 
   $output = drupal_get_form('node_filter_form');
 
-  if ($_POST['operation'] == 'delete' && $_POST['nodes']) {
+  if (isset($_POST['nodes']) && $_POST['operation'] == 'delete') {
     return drupal_get_form('node_multiple_delete_confirm');
   }
   // Call the form first, to allow for the form_values array to be populated.
@@ -281,7 +281,7 @@ function domain_content_update_nodes($form, &$form_state) {
         // We have to update both the {node_access} and {domain_access} tables.
         db_query("DELETE FROM {node_access} WHERE nid = %d AND realm IN ('domain_id', 'domain_site', 'domain_editor')", $nid);
         db_query("DELETE FROM {domain_access} WHERE nid = %d", $nid);
-        if ($domain_site) {
+        if (isset($domain_site)) {
           db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, 0, 'domain_site', 1, 0, 0);
           db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_site');
         }
@@ -313,7 +313,7 @@ function domain_content_update_nodes($form, &$form_state) {
 function theme_domain_content_admin_nodes($form) {
   // Overview table:
   $header = array(theme('table_select_header_cell'), t('Title'), t('Affiliates'), t('Type'), t('Author'), t('Status'), t('Operations'));
-
+  $output = '';
   $output .= drupal_render($form['options']);
   $output .= drupal_render($form['domain']);
   if (isset($form['title']) && is_array($form['title'])) {

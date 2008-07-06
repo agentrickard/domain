@@ -101,7 +101,7 @@ function domain_conf_system(&$form, &$form_state, $form_id) {
     '#weight' => -10
   );
   // Put the defaults in the fieldset
-  $fields = array('site_name', 'site_mail', 'site_slogan', 'site_mission', 'site_footer', 'site_frontpage', 'anonymous', 'xcoord', 'ycoord');
+  $fields = array('site_name', 'site_mail', 'site_slogan', 'site_mission', 'site_footer', 'site_frontpage', 'anonymous');
   foreach ($fields as $field) {
     $form['main'][$field] = $form[$field];
     unset($form[$field]);

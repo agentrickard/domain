@@ -79,13 +79,6 @@ function hook_domainrecords(&$grants, $node) {
  *
  * Modules may overwrite or add to the $domain array for each subdomain.
  *
- * WARNING: If you need to make revisions to the $_domain global before it is processed
- * by other modules, you must implement hook_boot().  Only modules that implement hook_boot()
- * are loaded during the creation routine for the $_domain global.  If your module has not
- * been loaded, then hook_domainload() will skip your implementation.
- *
- * @see domain_user_boot()
- *
  * When loading lists of domains or generating domain information, either use the proper
  * functions -- domain_default(), domain_lookup(), and domain_domains() -- or invoke this hook.
  *
@@ -361,14 +354,12 @@ function hook_domainwarnings() {
  * file and place that inside the domain_conf directory.  This file should begin with <?php and conform
  * to Drupal coding standards.
  *
- * @param $domain
- *  The $domain object prepared by hook_domainload().
  * @return
  *  A $form array element as defined by the FormsAPI.
  *
  *  @ingroup domain_hooks
  */
-function hook_domainconf($domain) {
+function hook_domainconf() {
   $form['pictures'] = array(
     '#type' => 'fieldset',
     '#title' => t('User picture'),

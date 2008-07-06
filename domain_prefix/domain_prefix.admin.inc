@@ -75,12 +75,12 @@ function domain_prefix_configure_form() {
   $default = domain_default();
   domain_goto($default);
   // Get the tables for the root installation.
-  $tables = domain_prefix_get_tables($prefix);
+  $tables = domain_prefix_get_tables();
 
   // Remove the disallowed tables.
   $disallow = domain_prefix_disallow();
   // Get the current settings.
-  $info = unserialize(variable_get('domain_prefix', NULL));
+  $info = variable_get('domain_prefix', NULL);
   $settings = $info['settings'];
   $source_defaults = $info['sources'];
 
@@ -181,11 +181,10 @@ function domain_prefix_configure_form_submit($form, &$form_state) {
         $info['settings'][$key] = $value;
       }
     }
-    $settings = serialize($info);
-    variable_set('domain_prefix', $settings);
+    variable_set('domain_prefix', $info);
     drupal_set_message(t('Default prefix settings changed.'));
   }
-  variable_set('domain_prefix_options', $options);
+  variable_set('domain_prefix_options', $form_state['values']['domain_prefix_options']);
 }
 
 
@@ -195,7 +194,7 @@ function domain_prefix_configure_form_submit($form, &$form_state) {
 function theme_domain_prefix_configure_form($form) {
   $output = t('<p>These settings control advanced functions.  Please read the documentation carefully.</p>');
   $header = array(t('Table'), t('Source'), t('Ignore'), t('Create'), t('Copy'));
-  if ($form['prefix_theme']['#value'] > 0) {
+  if (!empty($form['prefix_theme']['#value'])) {
     $header[] = t('Update');
     $header[] = t('Drop');
     unset($form['prefix_theme']);
@@ -244,7 +243,7 @@ function domain_prefix_form($form_state, $domain, $arguments = array()) {
   // Get the default table set and settings.
   $default = domain_prefix_get_tables();
   // Get the current settings.
-  $info = unserialize(variable_get('domain_prefix', NULL));
+  $info = variable_get('domain_prefix', NULL);
   $settings = $info['settings'];
   $source_defaults = $info['sources'];
 
@@ -401,7 +400,7 @@ function domain_prefix_form_submit($form, &$form_state) {
       // Do not process tables for the source elements.
       // But be sure to set the proper source table prefix for copying data.
       if (substr($key, 0, 8) != '_source_') {
-        $source = $data['_source_'. $key];
+        $source = (isset($data['_source_'. $key])) ? $data['_source_'. $key] : 0;
         if ($source > 0) {
           $source_prefix = domain_prefix_string($source);
         }
@@ -476,7 +475,7 @@ function domain_prefix_form_submit($form, &$form_state) {
           }
         }
         // Update our records.
-        if (!$update && $value != 1) {
+        if (!$update && $value != 1 && isset($current[$oldtable]['status'])) {
           $value = $current[$oldtable]['status'];
         }
         db_query("INSERT INTO {domain_prefix} (domain_id, status, tablename, module, source) VALUES (%d, %d, '%s', '%s', %d)", $form_state['values']['domain_id'], $value, $key, $module, $form_state['values']['_source_'. $key]);
@@ -508,7 +507,7 @@ function domain_prefix_lookup($domain_id, $clear = FALSE) {
 /**
  * Return the human-readable name of a module.
  *
- *@param $module
+ * @param $module
  *  Module information proivided by the SchemaAPI.
  * @return
  * A human-readable string identifying the module.

@@ -282,6 +282,21 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#description' => t('If set, calls to www.* will be treated as if the www. did not exist.')
   );
 
+  $options = array('-1' => t('Do not change domain'));
+  foreach (domain_domains() as $data) {
+    // The domain must be valid.
+    if ($data['valid']) {
+      $options[$data['domain_id']] = $data['sitename'];
+    }
+  }
+  $form['domain_advanced']['domain_default_source'] = array(
+    '#type' => 'select',
+    '#title' => t('Default source domain'),
+    '#options' => $options,
+    '#default_value' => variable_get('domain_default_source', 0),
+    '#description' => t('When rewriting urls, nodes assigned to all affiliates will be sent to this domain.'),
+  );
+
   $form['domain_all'] = array(
     '#type' => 'fieldset',
     '#title' => t('Special page requests'),
@@ -457,7 +472,7 @@ function domain_create_form_submit($form, &$form_state) {
   $domain = domain_lookup(NULL, $form_state['values']['subdomain']);
   module_invoke_all('domainupdate', 'create', $domain, $form_state);
   // The user_submitted flag is needed for Domain User.
-  if (!$form_state['values']['domain_arguments']['user_submitted']) {
+  if (!isset($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message(t('Domain record created.'));
     $form_state['redirect'] = 'admin/build/domain/view';
   }
@@ -812,6 +827,8 @@ function domain_batch_sort($a, $b) {
  * returned by hook_domainbatch().
  * @param $batch
  * The batch data for this $action, as defined by hook_domainbatch().
+ * @param $domains
+ * The current settings for each domain.
  * @return
  * A themed table of links and descriptions for batch actions.
  */
@@ -832,7 +849,9 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
 
   foreach ($domains as $domain) {
     // Set the current value according to the stored values.
-    $default[$domain['domain_id']] = $domain[$action];
+    if (isset($domain[$action])) {
+      $default[$domain['domain_id']] = $domain[$action];
+    }
     if ($batch['#domain_action'] == 'domain_conf') {
       // Set the default value to the main settings.
       $default[$domain['domain_id']] = variable_get($action, $batch['#system_default']);
@@ -855,14 +874,24 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
     $form['domain_batch'][$domain['domain_id']] = $batch['#form'];
     // Add the domain-specific elements.
     $form['domain_batch'][$domain['domain_id']]['#sitename'] = $domain['sitename'];
-    $form['domain_batch'][$domain['domain_id']]['#default_value'] = $default[$domain['domain_id']];
+    if (isset($default[$domain['domain_id']])) {
+      $form['domain_batch'][$domain['domain_id']]['#default_value'] = $default[$domain['domain_id']];
+    }
+  }
+  $api_keys = array('variable', 'table', 'data_type');
+  // These are optional elements, only passed if present.
+  foreach ($api_keys as $key) {
+    if (isset($batch['#'. $key])) {
+      $form[$key] = array('#type' => 'value', '#value' => $batch['#'. $key]);
+    }
+  }
+  // Custom submit and validate handlers.
+  foreach (array('submit', 'validate') as $key) {
+    if (isset($batch['#'. $key])) {
+      $form[$key .'_handler'] = array('#type' => 'value', '#value' => $batch['#'. $key]);
+    }
   }
   $form['handler'] = array('#type' => 'value', '#value' => $batch['#domain_action']);
-  $form['variable'] = array('#type' => 'value', '#value' => $batch['#variable']);
-  $form['table'] = array('#type' => 'value', '#value' => $batch['#table']);
-  $form['submit_handler'] = array('#type' => 'value', '#value' => $batch['#submit']);
-  $form['validate_handler'] = array('#type' => 'value', '#value' => $batch['#validate']);
-  $form['data_type'] = array('#type' => 'value', '#value' => $batch['#data_type']);
   $form['batch_item'] = array('#type' => 'value', '#value' => $action);
   $form['submit'] = array('#type' => 'submit', '#value' => t('Update domain settings'));
   return $form;
@@ -909,8 +938,7 @@ function theme_domain_batch_title($batch) {
  */
 function domain_batch_form_validate($form, &$form_state) {
   // Define the validation function and call it.
-  $validate = $form_state['values']['validate_handler'];
-  if (function_exists($validate)) {
+  if (isset($form_state['values']['validate_handler']) && function_exists($form_state['values']['validate_handler'])) {
     $validate($form_state['values']);
   }
 }
@@ -920,25 +948,22 @@ function domain_batch_form_validate($form, &$form_state) {
  */
 function domain_batch_form_submit($form, &$form_state) {
   $item = $form_state['values']['batch_item'];
-  $type = $form_state['values']['data_type'];
-  $variable = $form_state['values']['variable'];
-  $table = $form_state['values']['table'];
   switch ($form_state['values']['handler']) {
     case 'domain':
       foreach ($form_state['values']['domain_batch'] as $key => $value) {
         if ($key > 0) {
           // Note that $type in the query below is a sanitzed value passed from domain_batch_data_type().
-          db_query("UPDATE {domain} SET %s = ". domain_batch_data_type($type) ." WHERE domain_id = %d", $item, $value, $key);
+          db_query("UPDATE {domain} SET %s = ". domain_batch_data_type($form_state['values']['data_type']) ." WHERE domain_id = %d", $item, $value, $key);
         }
-        else if (!empty($variable)) {
-          variable_set($variable, $value);
+        else if (!empty($form_state['values']['variable'])) {
+          variable_set($form_state['values']['variable'], $value);
         }
       }
       break;
     case 'domain_conf':
       foreach ($form_state['values']['domain_batch'] as $key => $value) {
         $settings = array();
-        if ($key > 0 || empty($variable)) {
+        if ($key > 0 || empty($form_state['values']['variable'])) {
           $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $key));
           if (isset($data['settings'])) {
             $settings = unserialize($data['settings']);
@@ -950,12 +975,13 @@ function domain_batch_form_submit($form, &$form_state) {
             db_query("INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)", $key, serialize($settings));
           }
         }
-        else if (!empty($variable)) {
-          variable_set($variable, $value);
+        else if (!empty($form_state['values']['variable'])) {
+          variable_set($form_state['values']['variable'], $value);
         }
       }
       break;
     case 'domain_delete':
+      $table = $form_state['values']['table'];
       foreach ($form_state['values']['domain_batch'] as $key => $value) {
         if ($value == 1) {
           if (is_array($table)) {
@@ -970,7 +996,7 @@ function domain_batch_form_submit($form, &$form_state) {
       }
       break;
     case 'custom':
-      if (function_exists($form_state['values']['submit_handler'])) {
+      if (isset($form_state['values']['submit_handler']) && function_exists($form_state['values']['submit_handler'])) {
         $func = $form_state['values']['submit_handler'];
         $func($form_state['values']);
       }

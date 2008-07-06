@@ -127,7 +127,7 @@ function domain_conf_domainbatch() {
     '#form' => array(
       '#title' => t('Reset configurations'),
       '#type' => 'checkbox',
-      '#options' => array(t('Reset')),
+      '#options' => array(0 => 1, 1 => t('Reset')),
       '#description' => t('Delete custom settings for this domain.'),
     ),
     '#domain_action' => 'domain_delete',
@@ -317,8 +317,9 @@ function domain_conf_domainbatch() {
  * An array of form elements according to the FormsAPI or an empty array.
  */
 function domain_conf_api($all = FALSE) {
+  global $_domain;
   $options = array();
-  $extra = module_invoke_all('domainconf', $domain);
+  $extra = module_invoke_all('domainconf', $_domain);
   if (!empty($extra)) {
     foreach ($extra as $key => $value) {
       if ($value['#domain_setting'] == TRUE || $all == TRUE) {

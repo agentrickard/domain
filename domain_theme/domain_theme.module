@@ -141,7 +141,7 @@ function domain_theme_domainbatch() {
     '#form' => array(
       '#title' => t('Reset themes'),
       '#type' => 'checkbox',
-      '#options' => array(t('Reset')),
+      '#options' => array(0 => 1, 1 => t('Reset')),
       '#description' => t('Delete custom theme settings for this domain.'),
     ),
     '#domain_action' => 'domain_delete',

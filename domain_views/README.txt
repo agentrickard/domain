@@ -104,3 +104,12 @@ setting provided by the Domain Access module.
 
 When using Views filters, you must select at least one criteria for the filter to
 be applied.
+
+The filters available to Domain Access include all active domains plus:
+
+ -- The currently active domain.
+ -- Any domain
+ 
+ If you use the "Any domain" option, the filter must be set to "not one of" in
+ order to return all nodes.
+

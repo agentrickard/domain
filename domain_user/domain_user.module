@@ -15,14 +15,6 @@
  */
 
 /**
- * Implements hook_boot()
- */
-function domain_user_boot() {
-  // This is a dummy registry function, needed to make hook_domainload()
-  // present when domain_init() runs.
-}
-
-/**
  * Implements hook_init()
  *
  * We have to do this because we cannot redirect on login.
@@ -75,7 +67,7 @@ function domain_user_rules($generate = TRUE) {
   // Get the root user domain.
   $root = variable_get('domain_user_root', variable_get('domain_root', ''));
   foreach ($domains as $domain) {
-    if ($domain['domain_id'] > 0 && !$domain['uid'] && !empty($root)) {
+    if ($domain['domain_id'] > 0 && empty($domain['uid']) && !empty($root)) {
       // Chop the name of domains to find the username equivalent.
       $string = str_replace('.'. $root, '', $domain['subdomain']);
       // In this case, we do strip port protocols, since they make no sense as usernames.
@@ -142,7 +134,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
         $account->content['summary']['domain_user'] = array(
           '#type' => 'user_profile_item',
           '#title' => t('Personal web site'),
-          '#weight' => 6,          
+          '#weight' => 6,
           '#value' => l($domain['path'], $domain['path']),
         );
       }
@@ -187,7 +179,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       break;
     case 'insert':
     case 'update':
-      if ($edit['domain_create_user'] && user_access('create personal domain', $account)) {
+      if (isset($edit['domain_create_user']) && user_access('create personal domain', $account)) {
         $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
         $name = domain_user_strip_chars($account->name);
         $form_state['values']['sitename'] = $account->name;
@@ -227,14 +219,14 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           }
         }
       }
-      if ($edit['domain_create_user'] && !user_access('create personal domain', $account)) {
+      if (isset($edit['domain_create_user']) && !user_access('create personal domain', $account)) {
         drupal_set_message(t('Your personal URL could not be created.'));
       }
       // Throw away what we do not need.
       $edit['domain_create_user'] = NULL;
       $edit['domains'] = NULL;
       // Special case if the username has changed.
-      if ($op == 'update' && $edit['name'] != $account->name) {
+      if ($op == 'update' && isset($edit['name']) && $edit['name'] != $account->name) {
         $domain = domain_user_lookup($account->uid, TRUE);
         if ($domain != -1) {
           $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
@@ -353,7 +345,7 @@ function domain_user_domainview($op, $domain = array()) {
       return "LEFT JOIN {domain_user} du ON du.domain_id = d.domain_id";
       break;
     case 'data':
-      if ($domain['uid']) {
+      if (isset($domain['uid'])) {
         $account = user_load(array('uid' => $domain['uid']));
         return l($account->name, 'user/'. $account->uid);
       }

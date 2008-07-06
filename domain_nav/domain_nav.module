@@ -99,6 +99,7 @@ function domain_nav_theme() {
  * Implements hook_block()
  */
 function domain_nav_block($op='list', $delta = 0, $edit = array()) {
+  $block = array();
   switch ($op) {
     case 'list':
       $block[0]['info'] = t('Domain list navigator');
@@ -217,7 +218,7 @@ function theme_domain_nav_default($options) {
   $output .= '<select onchange="if (this.value) location.href=this.value;">';
   $output .= '<option value="'. $current['path'] .'">'. t('Jump to...') .'</option>';
   foreach ($options as $key => $value) {
-    ($value['active']) ? $selected = ' selected' : $selected = '';
+    (isset($value['active'])) ? $selected = ' selected' : $selected = '';
     $output .= '<option value="'. $value['path'] .'"'. $selected .'>'. filter_xss_admin($value['sitename']) .'</option>';
   }
   $output .= '</select>';
@@ -246,7 +247,7 @@ function theme_domain_nav_ul($options) {
  */
 function theme_domain_nav_menus($options) {
   foreach ($options as $key => $value) {
-    ($value['active']) ? $active = 'active' : $active =  '';
+    (isset($value['active'])) ? $active = 'active' : $active =  '';
     $items[] = array(
       'data' => l($value['sitename'], $value['path']),
       'class' => $active

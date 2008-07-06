@@ -167,7 +167,7 @@ file:
 /**
  * Implements hook_domainconf() to add the user picture.
  */
-function user_domainconf($domain) {
+function user_domainconf() {
   $form['pictures'] = array(
     '#type' => 'fieldset',
     '#title' => t('User picture'),

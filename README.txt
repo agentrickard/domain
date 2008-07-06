@@ -153,7 +153,7 @@ in two ways:
 As a result, there may exist conflicts between Domain Access and other
 contributed modules that try to solve this issue.
 
-Domain Access has been tested to work with the Organic Groups module, 
+Domain Access has been tested to work with the Organic Groups module,
 but may require the solution in http://drupal.org/node/234087.
 
 If you experience conflicts with other node access modules, you
@@ -494,7 +494,7 @@ Enter the primary domain for your site here.  Typically, you will also enter
 this value into settings.php for cookie handling.  Do not use http:// or a
 trailing slash when entering this value.
 
-NOTE: If you have installed Drupal in a subfolder, such as 
+NOTE: If you have installed Drupal in a subfolder, such as
 http://example.com/drupal you should not include the folder path
 as part of the primary domain.  Simply use example.com -- Drupal
 will automatically detect the presence of the subfolder.
@@ -566,7 +566,7 @@ rules defined below.
   Note that if this option is selected, users with the 'view domain publshing'
   permission will also be shown a list of affilates to which the node is assigned.
   This list shows only the affiliates that the user cannot edit.
-  
+
   Warning: If this option is selected and the user has no domain publishing
   options, the user will not be allowed to post or edit!
 
@@ -905,10 +905,10 @@ module provides block and menu items intended for end users.
 5.2 Block -- Domain Access Information
 
 The Domain Access Information block lets you view node access rules for any
-node when you are viewing that node.  This block can help you debug the 
+node when you are viewing that node.  This block can help you debug the
 module for user accounts that do not have the 'set domain access' permission.
 
-NOTE: By design, this block is viewable by all users.  However, its content 
+NOTE: By design, this block is viewable by all users.  However, its content
 should only be shown to site developers or during debugging.  You should use
 the normal block visiblity settings as appropriate to your site.
 

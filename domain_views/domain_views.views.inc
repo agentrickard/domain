@@ -1,5 +1,5 @@
 <?php
-// $Id:
+// $Id$
 
 /**
  * @file
@@ -7,11 +7,11 @@
  *
  * Original code by mrichar1.  Port to Drupal 6 by nonsie.
  *
- * @ingroup domain_views 
+ * @ingroup domain_views
  */
 
 /**
- * Implementation of hook_views_data()
+ * Implementation of hook_views_data().
  *
  */
 function domain_views_data() {
@@ -70,37 +70,36 @@ function domain_views_data() {
 }
 
 /**
-* Filter handler to accept a domain ID.
-*/
+ * Filter handler to accept a domain ID.
+ */
 class domain_views_handler_filter_domain_id extends views_handler_filter_in_operator {
   function get_value_options() {
     if (!isset($this->value_options)) {
       $this->value_title = t('Domain');
-      $domain_options = array('***CURRENT_DOMAIN***' => 'Current Domain');
-      $domains= domain_domains();
+      $domain_options = array('-1' => t('Any domain -- use with "Is not one of"'), '***CURRENT_DOMAIN***' => t('Current Domain'));
+      $domains = domain_domains();
       foreach ($domains as $domain) {
         $domain_options[$domain['domain_id']] = $domain['sitename'];
         }
       $this->value_options = $domain_options;
-      }
+    }
   }
 }
 
 /**
-* Implementation of hook_views_query_substitutions ()
-*
-*/
+ * Implementation of hook_views_query_substitutions ()
+ */
 function domain_views_query_substitutions($view) {
   return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);
 }
 
 /**
-* This is the function that handles all the work for dealing with view arguments based on domain ID
-*/
+ * This is the function that handles all the work for dealing with view arguments based on domain ID
+ */
 class domain_views_handler_argument_domain_id extends views_handler_argument {
   // If you pass "current" as the argument, it filters according to the domain the page is being viewed from
   function set_argument($arg) {
-    if($arg == 'current') {
+    if ($arg == 'current') {
       $arg = $GLOBALS['_domain']['domain_id'];
     }
     return parent::set_argument($arg);

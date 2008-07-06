@@ -1,5 +1,23 @@
 // $Id$
 
+06-JULY-2008
+
+-- Coder style cleanup.
+-- E_ALL Strict compliance.
+-- Fixes logic error in implementation of url rewrites for Domain Source.
+-- Removed the $domain argument from hook_domainconf().
+-- Batch operations changes for E_ALL.
+-- Removes legacy xcoord, ycoord from domain_conf_system().
+-- Removes serialize|unserialize from variable_set|get.
+-- Adds hook_node_access_explain() for Devel module.
+-- Removes domain_user_boot() -- not needed.
+-- #271340 typo on user page.
+-- Fixes domain_user view changes for D6.
+-- FormsAPI fixes for batch processing in D6.
+-- #268779 allows the setting of default domains for URL rewrites.
+-- #246497 by scedwar.  Adds empty domain gid for use with Domain Views.
+-- Created 6.x.1.0rc4
+
 05-JUL-2008 (2)
 
 -- #278836 by nirvanajyothi.  Array error in node forms when users were not
@@ -54,7 +72,7 @@
 -- #266166 patch by grndlvl.  hook_domaincron() now provides table prefix and settings loading.
     For users who were performing cron actions across multiple domain or using hook_domaincron(),
     you will need to pay attention to potential changes in behavior.
-    
+
 08-JUN-2008
 
 -- #228985 by 1.kenthomas.  Adds warnings to theme forms entered from the wrong domain.
