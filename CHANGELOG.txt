@@ -1,5 +1,9 @@
 // $Id$
 
+09-JULY-2008
+
+-- #278854 E_ALL error in Domain User.
+
 06-JULY-2008
 
 -- Coder style cleanup.

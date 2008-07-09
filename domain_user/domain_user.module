@@ -141,8 +141,11 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       break;
     case 'register':
     case 'form':
-      // This function will return -1 if no domain exists.
-      $domain = domain_user_lookup($account->uid);
+      // This function will return -1 if no domain exists. If no user exists yet, assume -1.
+      $domain = -1;
+      if (isset($account->uid)) {
+        $domain = domain_user_lookup($account->uid);
+      }
       if ($domain == -1) {
         // The module must be configured properly.
         $default = domain_default();
@@ -322,7 +325,7 @@ function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL, $clear
   else if ($domain_id) {
     $id = db_result(db_query("SELECT domain_id FROM {domain_user} WHERE domain_id = %d", $domain_id));
   }
-  if ($id) {
+  if (!empty($id)) {
     $return = domain_lookup($id);
   }
   else {
