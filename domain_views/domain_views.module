@@ -22,7 +22,7 @@
  */
 function domain_views_tables() {
   $domains = domain_domains();
-  $domain_options = array('***CURRENT_DOMAIN***' => 'Current Domain');
+  $domain_options = array('-1' => t('Any domain -- use with "Is not one of"'), '***CURRENT_DOMAIN***' => t('Current Domain'));
   foreach ($domains as $domain) {
     $domain_options[$domain['domain_id']] = $domain['sitename'];
   }

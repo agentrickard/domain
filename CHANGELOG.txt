@@ -1,5 +1,13 @@
 // $Id$
 
+25-JUL-2008 (2)
+
+-- #280908 by nirvanajyothi. Fixes domain_disable(), which caused
+    issues when doing an upgrade.
+-- #284398 by bforchhammer.  Domain Nav called deprecated hook.
+-- #286399 by mikeshanley.  Fixes HTML format error in Domain User.
+-- #246497 by scedwar.  Adds empty domain gid for use with Domain Views.
+
 25-JUL-2008
 
 -- #280596 updates patches to Drupal 5.9.

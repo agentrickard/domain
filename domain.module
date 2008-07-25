@@ -953,13 +953,8 @@ function domain_enabling($set = NULL) {
  */
 function domain_disable() {
   domain_disabling(TRUE);
-  // This lets us control how the module updates the {node_access} table.
-  variable_del('domain_behavior');
-  variable_del('domain_editors');
   // Rebuild the node access table.  Other modules have to fend for themselves here.
   node_access_rebuild();
-  // Empty the {domain_access} table.
-  db_query("DELETE FROM {domain_access}");
   // If {node_access} just contains the 'all' grant, then reset it to default.
   $result = db_result(db_query("SELECT COUNT(realm) FROM {node_access} WHERE realm <> 'all'"));
   if ($result == 0) {
