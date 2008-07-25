@@ -187,7 +187,7 @@ function domain_nav_render($paths = NULL, $style = NULL) {
       $value['path'] = $path;
       // Allow other modules to add elements to the array.
       $extra = array();
-      $extra = module_invoke_all('domainlist', $value);
+      $extra = module_invoke_all('domainnav', $value);
       $value = array_merge($value, $extra);
       $options[$value['domain_id']] = $value;
     }

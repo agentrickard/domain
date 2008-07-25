@@ -1,5 +1,11 @@
 // $Id$
 
+25-JUL-2008 (3)
+
+-- #284398 by bforchhammer.  Domain Nav called deprecated hook.
+-- #283919 by nirvanajyothi.  Domain User form handling error, plus users
+    were allowed to create domains even if those names were reserved.
+
 25-JUL-2008 (2)
 
 -- #286399 by mikeshanley.  Fixes HTML format error in Domain User.
