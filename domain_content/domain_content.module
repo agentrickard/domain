@@ -153,7 +153,7 @@ function domain_content_node_operations_access($nodes) {
 /**
  * Implements hook_domainupdate()
  */
-function domain_content_domainupdate($op, $domain = array(), &$form_state = array()) {
+function domain_content_domainupdate($op, $domain, $form_state = array()) {
   // We rebuild the menu, since the domain records have changed.
   // Clear the page cache, so that changed menus are reflected for anonymous users.
   cache_clear_all('*', 'cache_page', TRUE);

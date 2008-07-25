@@ -110,12 +110,16 @@ function hook_domainload(&$domain) {
  *
  * @param $op
  *  The operation being performed: 'create', 'update', 'delete'
- * @param &$form_state
- *  The form values processed by the form.
+ * @param $domain
+ * The domain record taken from {domain}, as an array.
+ * @param $form_state
+ *  The form values processed by the form.  Note that these are not editable since 
+ *  module_invoke_all() cannot pass by reference.  We set $form_state to an array
+ *  by default in case this hook gets called by a non-form function.
  *
  * @ingroup domain_hooks
  */
-function hook_domainupdate($op, $domain = array(), &$form_state = array()) {
+function hook_domainupdate($op, $domain, $form_state = array()) {
   switch ($op) {
     case 'create':
       db_query("INSERT INTO {mytable} (subdomain, sitename) VALUES ('%s', '%s')", $domain['subdomain'], $domain['sitename']);

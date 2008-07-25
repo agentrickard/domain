@@ -1,5 +1,10 @@
 // $Id$
 
+25-JUL-2008
+
+-- #283376 by jaxpax and Garrett Albright.  Cannot pass variable by reference
+    and set a default value in PHP 4.
+
 09-JULY-2008
 
 -- #278854 E_ALL error in Domain User.

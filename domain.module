@@ -1239,7 +1239,7 @@ function domain_domaininstall() {
 /**
  * Implements hook_domainupdate()
  */
-function domain_domainupdate($op, $domain = array(), &$form_state = array()) {
+function domain_domainupdate($op, $domain, $form_state = array()) {
   switch ($op) {
     case 'delete':
       if ($domain != -1) {

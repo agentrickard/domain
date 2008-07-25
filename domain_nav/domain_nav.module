@@ -259,7 +259,7 @@ function theme_domain_nav_menus($options) {
 /**
  * Implements hook_domainupdate()
  */
-function domain_nav_domainupdate($op, $domain = array(), &$form_state = array()) {
+function domain_nav_domainupdate($op, $domain, $form_state = array()) {
   // Only execute if the menu is turned on.
   if (DOMAIN_NAV_MENU == TRUE) {
     // We rebuild the menu, since the domain records have changed.

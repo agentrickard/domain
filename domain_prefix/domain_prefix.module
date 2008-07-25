@@ -104,7 +104,7 @@ function domain_prefix_domainlinks($domain) {
 /**
  * Implements hook_domainupdate().
  */
-function domain_prefix_domainupdate($op, $domain = array(), &$form_state = array()) {
+function domain_prefix_domainupdate($op, $domain, $form_state = array()) {
   // Include the extra functions.
   include_once(drupal_get_path('module', 'domain_prefix') .'/domain_prefix.admin.inc');
   switch ($op) {

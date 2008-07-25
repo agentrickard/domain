@@ -279,7 +279,7 @@ function domain_user_strip_chars($name) {
 /**
  * Implements hook_domainupdate()
  */
-function domain_user_domainupdate($op, $domain = array(), &$form_state = array()) {
+function domain_user_domainupdate($op, $domain, $form_state = array()) {
   $root = variable_get('domain_user_root', variable_get('domain_root', ''));
   switch ($op) {
     case 'update':
