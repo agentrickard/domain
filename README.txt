@@ -47,8 +47,9 @@ CONTENTS
 4.3.1   Domain-based Editing Controls
 4.3.2   Search Settings
 4.3.3   Search Engine Optimization
-4.3.4   WWW Prefix Handling
-4.3.5   Node Access Settings
+4.3.4   Default Source Domain
+4.3.5   WWW Prefix Handling
+4.3.6   Node Access Settings
 4.4   Special Page Requests
 4.4.1   Cron Handling
 4.5   Node Link Patterns
@@ -243,8 +244,8 @@ When you enable the module, it will create a {domain} table in your Drupal
 database.
 
 All existing nodes on your site will be assigned to the default domain for your
-web site and to all affiliates.  If you wish to alter this behavior, see sections
-2.4 through 2.6.
+web site and to all affiliates.  If you wish to alter this behavior, see
+sections 2.4 through 2.6.
 
 ----
 2.1 Patches to Drupal Core
@@ -350,8 +351,8 @@ This setting controls the default behavior for affiliate editors.  If
 DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
 intend to use editing controls.
 
-If this is set to TRUE, all existing nodes on your site will be editable by users who
-are assigned as editors of your root domain.
+If this is set to TRUE, all existing nodes on your site will be editable by
+users who are assigned as editors of your root domain.
 
 See section 3 and section 5 for more information.
 
@@ -488,7 +489,8 @@ user tries to access an invalid domain, this domain will be used.
 
 The primary domain for your site. Typically example.com or www.example.com.
 Do not use http or slashes. This domain will be used as the default URL for your
-site.  If an invalid domain is requested, users will be sent to the primary domain.
+site.  If an invalid domain is requested, users will be sent to the primary
+domain.
 
 Enter the primary domain for your site here.  Typically, you will also enter
 this value into settings.php for cookie handling.  Do not use http:// or a
@@ -564,8 +566,8 @@ rules defined below.
   assigned to their user account.
 
   Note that if this option is selected, users with the 'view domain publshing'
-  permission will also be shown a list of affilates to which the node is assigned.
-  This list shows only the affiliates that the user cannot edit.
+  permission will also be shown a list of affilates to which the node is
+  assigned.  This list shows only the affiliates that the user cannot edit.
 
   Warning: If this option is selected and the user has no domain publishing
   options, the user will not be allowed to post or edit!
@@ -611,8 +613,9 @@ See section 3.3 for a full discussion of this feature.
 4.3.2   Search Settings
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite_outbound().  If you have not followed the instructions,
-you should see a warning at the top of the Admin > Build > Domains page.
+regarding custom_url_rewrite_outbound().  If you have not followed the
+instructions, you should see a warning at the top of the Admin > Build > Domains
+page.
 
 Allows the admin to decide if content searches should be run across all
 affiliates or just the currently active domain.  By design, Drupal will only
@@ -622,27 +625,38 @@ find matches for the current domain.
 4.3.3   Search Engine Optimization
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite_outbound().  If you have not followed the instructions,
-you should see a warning at the top of the Admin > Build > Domains page.
+regarding custom_url_rewrite_outbound().  If you have not followed the
+instructions, you should see a warning at the top of the Admin > Build > Domains
+page.
 
-There is a risk with these modules that your site could be penalized by search engines
-such as Google for having duplicate content.  This setting controls the behavior of
-URLs written for nodes on your affiliated sites.
+There is a risk with these modules that your site could be penalized by search
+engines such as Google for having duplicate content.  This setting controls the
+behavior of URLs written for nodes on your affiliated sites.
 
-    - If SEO settings are turned on, all node links are rewritten as absolute URLs.
-    - If assigned to 'all affiliates' the node link goes to the root domain.
+    - If SEO settings are turned on, all node links are rewritten as absolute
+      URLs.
+    - If assigned to 'all affiliates' the node link goes to the 'default source
+      domain' defined in 4.3.4.  Normally. this is your primary domain.
     - If assigned to a single affiliate, the node link goes to that affiliate.
-    - If assigned to multiple affiliates, the node link goes to the first matching domain.
+    - If assigned to multiple affiliates, the node link goes to the first
+      matching domain.
       (Determined by the order in which domains were created, with your primary
       domain matched first.)
 
 The optional Domain Source module (included in the download) allows you to
 assign the link to specific domains.
 
-Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2.
+----
+4.3.4   Default Source Domain
+
+This setting allows you to control the domain to use when rewriting links that
+are sent to 'all affiliates.'  Simple select the domain that you wish to use as
+the primary domain for URL rewrites.
+
+By default this value is your primary domain.
 
 ----
-4.3.4   WWW Prefix Handling
+4.3.5   WWW Prefix Handling
 
 This setting controls how requests to www.example.com are treated with
 respect to example.com.  The default behavior is to process all host names
@@ -659,7 +673,7 @@ had requested one.example.com.
 This feature was requested by Rick and Matt at DZone.com
 
 ----
-4.3.5  Node Access Settings
+4.3.6  Node Access Settings
 
 This setting controls how you want Domain Access to interact with other
 node access modules.
@@ -703,8 +717,9 @@ in 2.1.1.
 4.4   Special Page Requests
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite_outbound().  If you have not followed the instructions,
-you should see a warning at the top of the Admin > Build > Domains page.
+regarding custom_url_rewrite_outbound().  If you have not followed the
+instructions, you should see a warning at the top of the Admin > Build > Domains
+page.
 
 In normal uses, such as the default home page, you want to restrict access
 to content based on the active domain.  However, in certain cases, this
@@ -791,12 +806,15 @@ have installed the hook_url_alter() patch.
 
 Where %n is a placeholder for the node id.
 
-If you install additional modules such as Forward (http://drupal.org/project/forward)
-or Print (http://drupal.org/project/print), you will want to add their paths to this
-list:
+If you install additional modules such as Forward
+  (http://drupal.org/project/forward)
+or Print
+  (http://drupal.org/project/print)
+you will want to add their paths to this list:
 
   -- forward/%n
   -- print/%n
+
 
 This is an advanced, but necessary feature.  Please report any core node path
 omissions at http://drupal.org/project/issues/domain.
@@ -996,12 +1014,13 @@ In Domain Access, the following realms are defined:
 ----
 6.4   Grants
 
-In each of the realms, there are specific rules for node access grants, as follows.
+In each of the realms, there are specific rules for node access grants, as
+follows.
 
   - domain_all
   In some specific cases, like Search, or MySite, or the user's Tracker page
-  we want people to be able to see content across all affiliates.  Only the domain_all
-  grant is assigned in these cases.  This grants only 'grant_view'.
+  we want people to be able to see content across all affiliates.  Only the
+  domain_all grant is assigned in these cases.  This grants only 'grant_view'.
 
   - domain_site
   By design, all site users, including anonymous users, are granted access to

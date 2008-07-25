@@ -80,7 +80,7 @@ class domain_views_handler_filter_domain_id extends views_handler_filter_in_oper
       $domains = domain_domains();
       foreach ($domains as $domain) {
         $domain_options[$domain['domain_id']] = $domain['sitename'];
-        }
+      }
       $this->value_options = $domain_options;
     }
   }

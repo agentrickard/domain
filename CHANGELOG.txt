@@ -1,5 +1,10 @@
 // $Id$
 
+25-JUL-2008 (6)
+
+-- Fixes default domain source debug message.
+-- Adds default domain documentation.
+
 25-JUL-2008 (5)
 
 -- #280596. Updates multiple_node_access.patch to Drupal 6.3.

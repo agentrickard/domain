@@ -123,7 +123,14 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       break;
     case 'load':
       if ($node->nid) {
-        $node->domain_source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
+        $source = array();
+        $source = db_fetch_array(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
+      }
+      if (empty($source)) {
+        $node->domain_source = variable_get('domain_default_source', 0);
+      }
+      else {
+        $node->domain_source = $source['domain_id'];
       }
       break;
     case 'view':
