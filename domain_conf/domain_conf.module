@@ -158,7 +158,7 @@ function domain_conf_form_alter($form_id, &$form) {
         '#weight' => -10
       );
       // Put the defaults in the fieldset
-      $fields = array('site_name', 'site_mail', 'site_slogan', 'site_mission', 'site_footer', 'site_frontpage', 'anonymous', 'xcoord', 'ycoord');
+      $fields = array('site_name', 'site_mail', 'site_slogan', 'site_mission', 'site_footer', 'site_frontpage', 'anonymous');
       foreach ($fields as $field) {
         $form['main'][$field] = $form[$field];
         unset($form[$field]);
@@ -561,7 +561,7 @@ function domain_conf_domainbatch() {
  */
 function domain_conf_api($all = FALSE) {
   $options = array();
-  $extra = module_invoke_all('domainconf', $domain);
+  $extra = module_invoke_all('domainconf');
   if (!empty($extra)) {
     foreach ($extra as $key => $value) {
       if ($value['#domain_setting'] == TRUE || $all == TRUE) {

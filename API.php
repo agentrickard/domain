@@ -338,7 +338,7 @@ function hook_domainwarnings() {
  * Preferred use is to wrap your form elements in a named fieldset, for easier
  * viewing.
  *
- *  This hook is implemented by the Domain Conf module.
+ * This hook is implemented by the Domain Conf module.
  *
  * You may wish to pair this hook with hook_domainbatch() to allow the mass update
  * of your settings.
@@ -360,14 +360,12 @@ function hook_domainwarnings() {
  * file and place that inside the domain_conf directory.  This file should begin with <?php and conform
  * to Drupal coding standards.
  *
- * @param $domain
- *  The $domain object prepared by hook_domainload().
  * @return
  *  A $form array element as defined by the FormsAPI.
  *
  *  @ingroup domain_hooks
  */
-function hook_domainconf($domain) {
+function hook_domainconf() {
   $form['pictures'] = array(
     '#type' => 'fieldset',
     '#title' => t('User picture'),

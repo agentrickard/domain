@@ -1,5 +1,11 @@
 // $Id$
 
+25-JUL-2008 (5)
+
+-- Removes legacy xcoord, ycoord from domain_conf_system().
+-- Removed the $domain argument from hook_domainconf().
+-- Adds hook_node_access_explain() for Devel module.
+
 25-JUL-2008 (4)
 
 -- Fixes default domain source debug message.
