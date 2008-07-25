@@ -1,5 +1,12 @@
 // $Id$
 
+25-JUL-2008 (4)
+
+-- Fixes default domain source debug message.
+-- Fixes logic error in implementation of url rewrites for Domain Source.
+-- #268779 allows the setting of default domains for URL rewrites.
+-- Adds default domain documentation.
+
 25-JUL-2008 (3)
 
 -- #283919 by nirvanajyothi.  Domain User form handling error, plus users

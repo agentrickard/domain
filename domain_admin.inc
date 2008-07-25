@@ -277,6 +277,21 @@ function domain_configure_form($user_submitted = FALSE) {
       This feature requires the hook_url_alter() patch.')
   );
 
+  $options = array();
+  foreach (domain_domains() as $data) {
+    // The domain must be valid.
+    if ($data['valid']) {
+      $options[$data['domain_id']] = $data['sitename'];
+    }
+  }
+  $form['domain_advanced']['domain_default_source'] = array(
+    '#type' => 'select',
+    '#title' => t('Default source domain'),
+    '#options' => $options,
+    '#default_value' => variable_get('domain_default_source', 0),
+    '#description' => t('When rewriting urls, nodes assigned to all affiliates will be sent to this domain.'),
+  );
+
   $form['domain_advanced']['domain_www'] = array(
     '#type' => 'radios',
     '#title' => t('WWW prefix handling'),
