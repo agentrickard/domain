@@ -5,6 +5,7 @@
 -- Removes legacy xcoord, ycoord from domain_conf_system().
 -- Removed the $domain argument from hook_domainconf().
 -- Adds hook_node_access_explain() for Devel module.
+-- Creates the 5.x.1.5 release.
 
 25-JUL-2008 (4)
 
