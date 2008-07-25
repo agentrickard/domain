@@ -1,5 +1,10 @@
 // $Id$
 
+25-JUL-2008 (4)
+
+-- #280908 by nirvanajyothi. Deprecates domain_disable(), which caused
+    issues when doing an upgrade and is not needed.
+
 25-JUL-2008 (3)
 
 -- #284398 by bforchhammer.  Domain Nav called deprecated hook.

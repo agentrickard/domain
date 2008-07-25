@@ -149,7 +149,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       $root = variable_get('domain_user_root', $default['subdomain']);
       // If the user name is on the ban list, we do not create a domain.
       // TODO: Maybe we should set a message here.
-      if ($domain == -1 && domain_lookup(NULL,domain_user_strip_chars($account->name) .'.'. $root) == -1) {
+      if ($domain == -1 && domain_lookup(NULL, domain_user_strip_chars($account->name) .'.'. $root) == -1) {
         // The module must be configured properly.
         $default = domain_default();
         $create_domain = variable_get('domain_user', 0);

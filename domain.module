@@ -963,17 +963,6 @@ function domain_enable() {
 }
 
 /**
- * Implements hook_disable()
- */
-function domain_disable() {
-  // This lets us control how the module updates the {node_access} table.
-  variable_del('domain_behavior');
-  variable_del('domain_editors');
-  // Empty the {domain_access} table.
-  db_query("DELETE FROM {domain_access}");
-}
-
-/**
  * Implements hook_form_alter()
  *
  * This function is crucial, as it appends our node access elements to the node edit form.
