@@ -1,5 +1,11 @@
 // $Id$
 
+25-JUL-2008
+
+-- #280596 updates patches to Drupal 5.9.
+-- #280042 by smk-ka.  Fixes custom_url_rewrite_outbound alteration of the
+    $base_url global.
+
 05-JUL-2008 (2)
 
 -- #278836 by nirvanajyothi.  Array error in node forms when users were not

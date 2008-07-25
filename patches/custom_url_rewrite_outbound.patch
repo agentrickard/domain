@@ -1,17 +1,21 @@
---- includes/common.inc	2008-02-02 16:32:15.000000000 -0500
-+++ includes/common_new.inc	2008-02-02 16:06:15.000000000 -0500
-@@ -1186,6 +1186,14 @@ function url($path = NULL, $query = NULL
+--- includes/common.inc	2008-07-09 15:34:30.000000000 -0400
++++ includes/common.inc.new	2008-07-25 11:17:49.000000000 -0400
+@@ -1189,7 +1189,17 @@ function url($path = NULL, $query = NULL
      $clean_url = (bool)variable_get('clean_url', '0');
    }
  
+-  $base = ($absolute ? $base_url . '/' : base_path());
 +  // Preserve the original path before aliasing.
 +  $original_path = $path;
-+
++  // Prevent the global $base_url from being altered.
++  $current_base_url = $base_url;
++  
 +  if (function_exists('custom_url_rewrite_outbound')) {
 +    // Modules may alter outbound links by reference.
-+    custom_url_rewrite_outbound($path, $query, $fragment, $absolute, $base_url, $original_path);
++    custom_url_rewrite_outbound($path, $query, $fragment, $absolute, $current_base_url, $original_path);
 +  }
 +
-   $base = ($absolute ? $base_url . '/' : base_path());
++  $base = ($absolute ? $current_base_url . '/' : base_path());
  
    // The special path '<front>' links to the default front page.
+   if (!empty($path) && $path != '<front>') {
