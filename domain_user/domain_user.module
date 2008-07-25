@@ -204,12 +204,17 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       break;
     case 'register':
     case 'form':
-      // This function will return -1 if no domain exists.
-      $domain = domain_user_lookup($account->uid);
-      if ($domain == -1) {
+      // This function will return -1 if no domain exists. If no user exists yet, assume -1.
+      $domain = -1;
+      if (isset($account->uid)) {
+        $domain = domain_user_lookup($account->uid);
+      }
+      $root = variable_get('domain_user_root', $default['subdomain']);
+      // If the user name is on the ban list, we do not create a domain.
+      // TODO: Maybe we should set a message here.
+      if ($domain == -1 && domain_lookup(NULL, domain_user_strip_chars($account->name) .'.'. $root) == -1) {
         // The module must be configured properly.
         $default = domain_default();
-        $root = variable_get('domain_user_root', $default['subdomain']);
         $create_domain = variable_get('domain_user', 0);
         if (user_access('create personal domain')) {
           if ($create_domain == 1 && !empty($root)) {
@@ -242,7 +247,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       break;
     case 'insert':
     case 'update':
-      if ($edit['domain_create_user'] && user_access('create personal domain', $account)) {
+      if (!empty($edit['domain_create_user']) && user_access('create personal domain', $account)) {
         $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
         $name = domain_user_strip_chars($account->name);
         $form_values['sitename'] = $account->name;
