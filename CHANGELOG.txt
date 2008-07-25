@@ -1,5 +1,9 @@
 // $Id$
 
+25-JUL-2008 (5)
+
+-- #280596. Updates multiple_node_access.patch to Drupal 6.3.
+
 25-JUL-2008 (4)
 
 -- #280908 by nirvanajyothi. Deprecates domain_disable(), which caused
