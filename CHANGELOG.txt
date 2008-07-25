@@ -1,5 +1,9 @@
 // $Id$
 
+25-JUL-2008 (2)
+
+-- #286399 by mikeshanley.  Fixes HTML format error in Domain User.
+
 25-JUL-2008
 
 -- #283376 by jaxpax and Garrett Albright.  Cannot pass variable by reference
