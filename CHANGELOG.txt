@@ -1,5 +1,9 @@
 // $Id$
 
+28-JUL-2008
+
+-- #287782 by nirvanajyothi.  Fixes logic error in Domain User, introduced in rc5.
+
 25-JUL-2008 (6)
 
 -- Fixes default domain source debug message.

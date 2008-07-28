@@ -86,6 +86,9 @@ content, and configurations across a group of sites such as:
   - one.example.com
   - two.example.com
   - my.example.com
+  - thisexample.com
+  - anothersite.com
+  - example.com:3000 <-- non-standard ports are treated as unique domains.
 
 By default, these sites share all tables in your Drupal installation.
 

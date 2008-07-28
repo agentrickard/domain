@@ -146,12 +146,17 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       if (isset($account->uid)) {
         $domain = domain_user_lookup($account->uid);
       }
+      // New users throw E_ALL errors.
+      $name = t('username');
+      if (isset($account->name)) {
+        // Sanitize the username according to the host RFC.
+        $name = domain_user_strip_chars($account->name);
+      }
+      $default = domain_default();
       $root = variable_get('domain_user_root', $default['subdomain']);
       // If the user name is on the ban list, we do not create a domain.
       // TODO: Maybe we should set a message here.
-      if ($domain == -1 && domain_lookup(NULL, domain_user_strip_chars($account->name) .'.'. $root) == -1) {
-        // The module must be configured properly.
-        $default = domain_default();
+      if ($domain == -1 && domain_lookup(NULL, $name .'.'. $root) == -1) {
         $create_domain = variable_get('domain_user', 0);
         if (user_access('create personal domain')) {
           if ($create_domain == 1 && !empty($root)) {
@@ -168,10 +173,6 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
               '#collapsed' => FALSE,
               '#weight' => 1
             );
-            $name = t('username');
-            if (isset($account->name)) {
-              $name = domain_user_strip_chars($account->name);
-            }
             $form['domain_user_domain']['domain_create_user'] = array(
               '#type' => 'checkbox',
               '#return_value' => 1,
@@ -201,7 +202,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           // Set the scheme as needed.
           $form_state['values']['domain_scheme'] = variable_get('domain_user_scheme', 'http');
           drupal_execute('domain_create_form', $form_state, $arguments);
-          $domain = domain_lookup(NULL, $form_state['values']['subdomain']);
+          $domain = domain_lookup(NULL, $form_state['values']['subdomain'], TRUE);
           if ($domain['domain_id']) {
             db_query("INSERT INTO {domain_user} (domain_id, uid) VALUES (%d, %d)", $domain['domain_id'], $account->uid);
             $edit['domains'][] = $domain['domain_id'];
