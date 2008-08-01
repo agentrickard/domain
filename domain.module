@@ -1008,7 +1008,7 @@ function domain_form_alter($form_id, &$form) {
     $default = array($_domain['domain_id']);
     // How is core content handled for this site?
     $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
-    if ($behavior == 1 || $_domain['domain_id'] == 0) {
+    if ($_domain['domain_id'] == 0) {
       $default[] = -1;
     }
 
@@ -1044,7 +1044,7 @@ function domain_form_alter($form_id, &$form) {
         '#title' => t('Send to all affiliates'),
         '#required' => FALSE,
         '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
-        '#default_value' => ($form['#node']->nid) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
+        '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );
       $form['domain']['domains'] = array(
         '#type' => 'checkboxes',
@@ -1052,7 +1052,7 @@ function domain_form_alter($form_id, &$form) {
         '#options' => $options,
         '#required' => TRUE,
         '#description' => t('Select which affiliates can access this content.'),
-        '#default_value' => ($form['#node']->nid) ? $form['#node']->domains : $default,
+        '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domains : $default,
       );
     }
     // If the user has limited permissions, show that form or obey the settings.
@@ -1133,7 +1133,7 @@ function domain_form_alter($form_id, &$form) {
               '#options' => $user_options,
               '#required' => $required,
               '#description' => t('Select which affiliates can access this content.'),
-              '#default_value' => ($form['#node']->nid) ? $form['#node']->domains : $default_options,
+              '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domains : $default_options,
             );
 
             // Show the options that cannot be changed.
@@ -1159,7 +1159,7 @@ function domain_form_alter($form_id, &$form) {
       // These form elements are hidden from non-privileged users, by design.
       $form['domain_site'] = array(
         '#type' => 'value',
-        '#value' => ($form['#node']->nid) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
+        '#value' => (isset($form['#node']->nid)) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );
       // Domains that have been assigned and cannot be changed.
       $form['domains_raw'] = array(

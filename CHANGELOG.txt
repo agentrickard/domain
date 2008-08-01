@@ -1,5 +1,12 @@
 // $Id$
 
+01-AUG-2008
+
+-- #290017. Fixes error in Domain Source validation logic.
+-- #290014. Fixes default checkbox errors.
+-- Cleans up some E_ALL issues.
+-- Cleans up some documentation.
+
 25-JUL-2008 (5)
 
 -- Removes legacy xcoord, ycoord from domain_conf_system().

@@ -110,7 +110,7 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       }
       // Here we account for both the 'domains_raw' and 'domains' options.
       // If selected, these clauses will not be zero.
-      else if (!$node->domains[$key] && (!empty($node->domains_raw) && !in_array($key, $node->domains_raw))) {
+      else if ((!empty($node->domains && !$node->domains[$key]) || (!empty($node->domains_raw) && !in_array($key, $node->domains_raw))) {
         form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
       }
       break;
