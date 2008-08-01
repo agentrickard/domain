@@ -339,7 +339,7 @@ all existing nodes to be viewable by your primary domain.
 If you set this value to FALSE, existing content will not be visible on your
 primary domain unless DOMAIN_SITE_GRANT is set to TRUE.
 
-For more details, see section 5.
+For more details, see section 6.
 
 ----
 2.5 Setting DOMAIN_EDITOR_RULE
