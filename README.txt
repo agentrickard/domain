@@ -1116,8 +1116,8 @@ Currently, the following modules are included in the download.  They are not
 required, but each adds functionality to the core module.
 
   - Domain Configuration -- Allows you to change select system variables for
-  each subdomain, such as files directory, offline status, footer message and
-  default home page.
+  each subdomain, such as offline status, footer message and default home 
+  page.
 
   - Domain Content -- Provides a content administration page for each subdomain,
   so that affiliate editors can administer content for their section of the
