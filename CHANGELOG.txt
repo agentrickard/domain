@@ -1,5 +1,9 @@
 // $Id$
 
+05-AUG=2008
+
+-- #290306 by nirvanajyothi.  Fixes documentation error.
+
 01-AUG-2008
 
 -- #290017. Fixes error in Domain Source validation logic.
