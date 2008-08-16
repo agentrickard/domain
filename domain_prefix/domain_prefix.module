@@ -115,7 +115,7 @@ function domain_prefix_domainupdate($op, $domain, $form_state = array()) {
         $settings = variable_get('domain_prefix', NULL);
         if (!empty($settings)) {
           $settings['domain_id'] = $domain['domain_id'];
-          drupal_execute('domain_prefix_form', $settings, $domain['domain_id'], $form_state);
+          drupal_execute('domain_prefix_form', $form_state, $domain, $settings);
         }
       }
       break;
