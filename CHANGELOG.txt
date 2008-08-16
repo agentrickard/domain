@@ -6,6 +6,7 @@
 -- #293453 by scedwar.  Pops users from invalid wildcard domains to the primary domain.
 -- #295543 by nirvanajyothi.  Duplicate key errors on module enable.
 -- #295398 patch by nonsie.  Wrong parameter order in Domain Prefix usage of drupal_execute.
+-- Fixes editor installation sequence.
 
 05-AUG-2008
 

@@ -945,6 +945,7 @@ function domain_enable() {
   $count = db_result(db_query("SELECT COUNT(*) FROM {domain_access}"));
   if ($count == 0) {
     $rule = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+    $edit = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
     $site = DOMAIN_SITE_GRANT;
     $nids = db_query("SELECT nid FROM {node}");
     while ($nid = db_result($nids)) {
@@ -952,8 +953,13 @@ function domain_enable() {
         db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_site');
       }
       if (!empty($rule)) {
-        // By desgin, all nodes are assigned to the master domain.
+        // By design, all nodes are assigned to the master domain.
         db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_id');
+        // Editor rules only apply is nodes are assigned to a domain.
+        if (!empty($edit)) {
+          variable_set('domain_editors', TRUE);
+          db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_editor');
+        }
       }
     }
   }
