@@ -5,6 +5,7 @@
 -- Verifies that Domain works with Drupal 5.10
 -- #293453 by scedwar.  Pops users from invalid wildcard domains to the primary domain.
 -- #295543 by nirvanajyothi.  Duplicate key errors on module enable.
+-- Fixes editor installation sequence.
 
 05-AUG-2008
 
