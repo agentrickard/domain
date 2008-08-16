@@ -1,5 +1,11 @@
 // $Id$
 
+16-AUG-2008
+
+-- Verifies that Domain works with Drupal 5.10
+-- #293453 by scedwar.  Pops users from invalid wildcard domains to the primary domain.
+-- #295543 by nirvanajyothi.  Duplicate key errors on module enable.
+
 05-AUG-2008
 
 -- #290306 by nirvanajyothi.  Fixes documentation error.

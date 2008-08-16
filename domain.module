@@ -56,7 +56,14 @@ function domain_init() {
   // If return is -1, then the DNS didn't match anything, so use defaults.
   if ($_domain == -1) {
     $_domain = domain_default();
+    // If the request was not for the primary domain, send the user there.  See http://drupal.org/node/293453.
+    if ($_subdomain != $_domain['subdomain']) {
+      $request = domain_get_uri($_domain);
+      drupal_set_message(t('You have followed an incorrect link to this website.  Please update your links and bookmarks to <a href="!url">!url</a>.', array('!url' => $request)));
+      drupal_goto($request);
+    }
   }
+  
   // If we stripped the www. send the user to the proper domain.  This should only
   // happen once, on an inbound link or typed URL, so the overhead is acceptable.
   if ($raw_domain != $_subdomain) {
@@ -784,13 +791,6 @@ function domain_node_access_records($node) {
     return;
   }
 
-  // How is core content handled for this site?  We need to run this
-  // check when the module is first enabled.
-  $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
-  if (domain_enabling() && $behavior == 1) {
-    $node->domain_site = TRUE;
-  }
-
   // Define the $grants array.
   $grants = array();
 
@@ -853,7 +853,7 @@ function domain_node_access_records($node) {
   // this prevents null values in the form.
   // If we are enabling the module for the first time, we set the
   // default domain of all existing nodes to the root domain.
-  if (empty($grants) || domain_enabling()) {
+  if (empty($grants)) {
     $grants[] = array(
     'realm' => 'domain_id',
     'gid' => 0,
@@ -886,6 +886,7 @@ function domain_node_access_records($node) {
       $function($grants, $node);
     }
   }
+
   return $grants;
 }
 
@@ -913,18 +914,27 @@ function _domain_write_records($nid, $grants = array()) {
  */
 function domain_enable() {
   domain_enabling(TRUE);
+  // Thanks to the new way that batch processing of node grants is handled, we have to
+  // manually define our records if none are present.
+  $count = db_result(db_query("SELECT COUNT(*) FROM {domain_access}"));
+  if ($count == 0) {
+    $rule = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+    $site = DOMAIN_SITE_GRANT;
+    $nids = db_query("SELECT nid FROM {node}");
+    while ($nid = db_result($nids)) {
+      if (!empty($site)) {
+        db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_site');
+      }
+      if (!empty($rule)) {
+        // By desgin, all nodes are assigned to the master domain.
+        db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_id');
+      }
+    }
+  }
   // Rebuild the node access table with our rules.
   node_access_rebuild();
   // Set the default 'domain_all' grant for special pages.
   domain_set_default_grant();
-  // Put all the grant records into the {domain_access} table.
-  $realms = array('domain_site', 'domain_id', 'domain_editor');
-  foreach ($realms as $realm) {
-    $result = db_query("SELECT * FROM {node_access} WHERE realm = '%s'", $realm);
-    while ($data = db_fetch_array($result)) {
-      db_query("INSERT INTO {domain_access} VALUES (%d, %d, '%s')", $data['nid'], $data['gid'], $data['realm']);
-    }
-  }
 }
 
 /**
