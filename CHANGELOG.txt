@@ -1,5 +1,9 @@
 // $Id$
 
+22-AUG-2008
+
+-- Creates release 6.x.1.0!
+
 16-AUG-2008
 
 -- Verifies that Domain works with Drupal 6.4
