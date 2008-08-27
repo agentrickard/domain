@@ -1,5 +1,10 @@
 // $Id$
 
+27-AUG-2008
+
+-- #300311 by Garrett Albright. Fixes redirect error if module not configured.
+-- Creates release 5.x.1.7.
+
 22-AUG-2008
 
 -- Creates release 5.x.1.6
