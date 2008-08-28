@@ -1,5 +1,9 @@
 // $Id$
 
+28-AUG-2008
+
+-- #288803 by nonsie.  Batch validation functions fail.
+
 27-AUG-2008
 
 -- #300311 by Garrett Albright. Fixes redirect error if module not configured.
