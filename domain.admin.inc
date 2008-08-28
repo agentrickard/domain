@@ -938,8 +938,8 @@ function theme_domain_batch_title($batch) {
  */
 function domain_batch_form_validate($form, &$form_state) {
   // Define the validation function and call it.
-  if (isset($form_state['values']['validate']) && function_exists($form_state['values']['validate'])) {
-    $form_state['values']['validate']($form_state['values']);
+  if (isset($form_state['values']['validate_handler']) && function_exists($form_state['values']['validate_handler'])) {
+    $form_state['values']['validate_handler']($form_state['values']);
   }
 }
 
