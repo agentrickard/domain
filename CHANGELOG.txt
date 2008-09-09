@@ -1,5 +1,9 @@
 // $Id$
 
+09-SEP-2008 (2)
+
+-- #300702 patch by Garrett Albright.  Fixes calls to wrong variable name (sitename | site_name).
+
 09-SEP-2008
 
 -- #301244 patch by ariflukito.  Fixes D6 menu error in Domain Content.

@@ -1155,7 +1155,7 @@ currently active domain. If no active domain is found, default values are used:
 
   $_domain['domain_id'] = 0;
   $_domain['sitename'] = variable_get('domain_sitename',
-    variable_get('sitename', 'Drupal'))
+    variable_get('site_name', 'Drupal'))
   $_domain['subdomain'] = variable_get('domain_root', '')
   $_domain['scheme'] = 'http'
   $_domain['valid'] = TRUE
