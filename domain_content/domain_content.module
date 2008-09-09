@@ -23,23 +23,11 @@
  */
 function domain_content_menu() {
   $items = array();
-  $access = FALSE;
-  $all = FALSE;
-  $extra = '';
-  if (user_access('edit domain nodes') && variable_get('domain_editors', DOMAIN_EDITOR_RULE)) { // || user_access('set domain access')
-    $access = TRUE;
-    $extra = '<p><em>'. t('You may not have editing permissions for all content shown on all affiliate sites.') .'</em></p>';
-  }
-  if (user_access('administer nodes')) { //  || user_access('set domain access')
-    $access = TRUE;
-    $all = TRUE;
-    $extra = '';
-  }
   $items['admin/domain/content'] = array(
     'title' => 'Affiliated content',
     'page callback' => 'domain_content_page',
     'access callback' => 'domain_content_menu_check',
-    'access arguments' => array($access),
+    'access arguments' => array(),
     'file' => 'domain_content.admin.inc',
   );
   $items['admin/domain/content/all'] = array(
@@ -47,7 +35,7 @@ function domain_content_menu() {
     'page callback' => 'domain_content_view',
     'page arguments' => array(NULL, TRUE),
     'access callback' => 'domain_content_menu_check',
-    'access arguments' => array($access),
+    'access arguments' => array(),
     'file' => 'domain_content.admin.inc',
     'description' => 'View content assigned to all affiliate sites.'. $extra,
     'weight' => -10
@@ -55,13 +43,12 @@ function domain_content_menu() {
   // Generate the list of active domains as menu items
   $domains = domain_domains();
   foreach ($domains as $domain) {
-    $check = domain_content_check($domain, $all);
     $items['admin/domain/content/'. filter_xss_admin($domain['subdomain'])] = array(
       'title' => filter_xss_admin($domain['subdomain']) .' content',
       'page callback' => 'domain_content_view',
       'page arguments' => array($domain['domain_id'], FALSE),
-      'access callback' => 'domain_content_menu_check',
-      'access arguments' => array($check),
+      'access callback' => 'domain_content_check',
+      'access arguments' => array($domain),
       'file' => 'domain_content.admin.inc',
       'description' => 'View content assigned to '. filter_xss_admin($domain['subdomain']),
       'weight' => $domain['domain_id']
@@ -89,8 +76,14 @@ function domain_content_theme() {
  * @param $check
  * The access check value passed from hook_menu().
  */
-function domain_content_menu_check($check = FALSE) {
-  return $check;
+function domain_content_menu_check() {
+  if (user_access('administer nodes')) {
+    return TRUE;
+  }
+  if (user_access('edit domain nodes') && variable_get('domain_editors', DOMAIN_EDITOR_RULE)) { // || user_access('set domain access')
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**
@@ -101,11 +94,15 @@ function domain_content_menu_check($check = FALSE) {
  * @param $all
  *  A boolean flag indicating whether this user can access all domains.
  */
-function domain_content_check($domain, $all) {
+function domain_content_check($domain, $all = FALSE) {
   global $user;
   // If the user can administer nodes, just return TRUE.
-  if ($all) {
+  if ($all || user_access('administer nodes')) {
     return TRUE;
+  }
+  // Otherwise, the user must be able to edit domain nodes.
+  if (!user_access('edit domain nodes')) {
+    return FALSE;
   }
   $rule = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
   $check = FALSE;

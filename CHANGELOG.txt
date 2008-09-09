@@ -1,5 +1,9 @@
 // $Id$
 
+09-SEP-2008
+
+-- #303339 patch by ariflukito.  Fixes form error with batch delete for Domain Content.
+
 28-AUG-2008
 
 -- #288803 by nonsie.  Batch validation functions fail.

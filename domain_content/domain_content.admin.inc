@@ -81,7 +81,7 @@ function domain_content_admin() {
   $output = drupal_get_form('node_filter_form');
 
   if (isset($_POST['nodes']) && $_POST['operation'] == 'delete') {
-    return drupal_get_form('node_multiple_delete_confirm');
+    return drupal_get_form('node_multiple_delete_confirm', $_POST['nodes']);
   }
   // Call the form first, to allow for the form_values array to be populated.
   $output .= drupal_get_form('domain_content_form');
