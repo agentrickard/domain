@@ -197,7 +197,8 @@ While example.com and one.example.com can share a login cookie, the
 other two domains cannot read that cookie.  This is an internet standard,
 not a bug.
 
-This issue is looking for solutions.
+The single sign-on module is a good solution to this limitation:
+  http://drupal.org/project/singlesignon
 
 Note: See the INSTALL.txt for instructions regarding Drupal's default
 cookie handling.
@@ -364,10 +365,10 @@ At the top of the domain.module file, you will find this line:
 
 This setting controls the default behavior of the module when installing over
 an existing installation.  If set to TRUE, the Domain Access module will assign
-all existing nodes to be viewable by all affiliate sites.
+all existing nodes to be viewable by your primary domain.
 
-If you set this value to FALSE, existing nodes will only be visible to users on
-your root domain.
+If you set this value to FALSE, existing content will not be visible on your
+primary domain unless DOMAIN_SITE_GRANT is set to TRUE.
 
 For more details, see section 5.
 
@@ -401,6 +402,9 @@ By design, the Domain Access module allows site administrators to assign
 content to 'all affiliates.'  If this value is set to TRUE, then content
 assigned to all affiliates can be seen by all users on all current domains.
 
+On install, setting this value to TRUE will assign all current content to
+be viewable on all domains.
+
 Normally, you will not need to edit this value.
 
 ----
@@ -412,7 +416,7 @@ permissions.
 ----
 3.1 Module Permissions
 
-The Domain Access module has three standard permissions.
+The Domain Access module has the following permissions:
 
   - 'administer domains'
   This permission allows users to create and manage subdomain records
@@ -595,7 +599,7 @@ rules defined below.
   the user is allowed to publish content to, according to the domains
   assigned to their user account.
 
-  Note that if this option is selected, users with the 'view domain publshing'
+  Note that if this option is selected, users with the 'view domain publishing'
   permission will also be shown a list of affilates to which the node is
   assigned. This list shows only the affiliates that the user cannot edit.
 
@@ -643,8 +647,9 @@ See section 3.3 for a full discussion of this feature.
 4.3.2   Search Settings
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite().  If you have not followed the instructions,
-you should see a warning at the top of the Admin > Build > Domains page.
+regarding custom_url_rewrite_outbound().  If you have not followed the
+instructions, you should see a warning at the top of the Admin > Build > Domains
+page.
 
 Allows the admin to decide if content searches should be run across all
 affiliates or just the currently active domain.  By design, Drupal will only
@@ -657,8 +662,9 @@ discussed in 2.1.2
 4.3.3   Search Engine Optimization
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite().  If you have not followed the instructions,
-you should see a warning at the top of the Admin > Build > Domains page.
+regarding custom_url_rewrite_outbound().  If you have not followed the
+instructions, you should see a warning at the top of the Admin > Build > Domains
+page.
 
 There is a risk with these modules that your site could be penalized by search
 engines such as Google for having duplicate content.  This setting controls the
@@ -677,13 +683,13 @@ behavior of URLs written for nodes on your affiliated sites.
 The optional Domain Source module (included in the download) allows you to
 assign the link to specific domains.
 
-Enabling this feature requires the hook_url_alter() patch discussed in 2.1.2.
+Enabling this feature requires the custom_url_rewrite_outbound() patch discussed in 2.1.2.
 
 ----
 4.3.4   Default Source Domain
 
 This setting allows you to control the domain to use when rewriting links that
-are sent to 'all affiliates.'  Simple select the domain that you wish to use as
+are sent to 'all affiliates.'  Simply select the domain that you wish to use as
 the primary domain for URL rewrites.
 
 By default this value is your primary domain.
@@ -750,8 +756,9 @@ in 2.1.1.
 4.4   Special Page Requests
 
 For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite().  If you have not followed the instructions,
-you should see a warning at the top of the Admin > Build > Domains page.
+regarding custom_url_rewrite_outbound().  If you have not followed the
+instructions, you should see a warning at the top of the Admin > Build > Domains
+page.
 
 In normal uses, such as the default home page, you want to restrict access
 to content based on the active domain.  However, in certain cases, this
