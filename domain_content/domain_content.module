@@ -84,6 +84,10 @@ function domain_content_check($domain, $all) {
   if ($all) {
     return TRUE;
   }
+  // Otherwise, the user must be able to edit domain nodes.
+  if (!user_access('edit domain nodes')) {
+    return FALSE;
+  }
   $rule = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
   $check = FALSE;
   $editor = FALSE;

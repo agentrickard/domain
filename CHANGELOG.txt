@@ -1,5 +1,9 @@
 // $Id$
 
+09-SEP-2008
+
+-- #301244 patch by ariflukito.  Fixes D6 menu error in Domain Content.
+
 27-AUG-2008
 
 -- #300311 by Garrett Albright. Fixes redirect error if module not configured.
