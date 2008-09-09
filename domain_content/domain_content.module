@@ -27,7 +27,6 @@ function domain_content_menu() {
     'title' => 'Affiliated content',
     'page callback' => 'domain_content_page',
     'access callback' => 'domain_content_menu_check',
-    'access arguments' => array(),
     'file' => 'domain_content.admin.inc',
   );
   $items['admin/domain/content/all'] = array(
@@ -35,7 +34,6 @@ function domain_content_menu() {
     'page callback' => 'domain_content_view',
     'page arguments' => array(NULL, TRUE),
     'access callback' => 'domain_content_menu_check',
-    'access arguments' => array(),
     'file' => 'domain_content.admin.inc',
     'description' => 'View content assigned to all affiliate sites.'. $extra,
     'weight' => -10

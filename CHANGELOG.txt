@@ -1,5 +1,9 @@
 // $Id$
 
+09-SEP-2008 (2)
+
+-- #301244 patch by ariflukito.  Fixes D6 menu error in Domain Content.
+
 09-SEP-2008
 
 -- #303339 patch by ariflukito.  Fixes form error with batch delete for Domain Content.
