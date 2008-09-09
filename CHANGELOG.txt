@@ -3,6 +3,7 @@
 09-SEP-2008 (4)
 
 -- #299511 patch by BWPanda.  Fixes some documentation errors.
+-- Creates the 6.x.1.2 release.
 
 09-SEP-2008 (3)
 
