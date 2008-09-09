@@ -385,7 +385,7 @@ permissions.
 ----
 3.1 Module Permissions
 
-The Domain Access module has three standard permissions.
+The Domain Access module has the following permissions:
 
   - 'administer domains'
   This permission allows users to create and manage subdomain records
@@ -568,7 +568,7 @@ rules defined below.
   the user is allowed to publish content to, according to the domains
   assigned to their user account.
 
-  Note that if this option is selected, users with the 'view domain publshing'
+  Note that if this option is selected, users with the 'view domain publishing'
   permission will also be shown a list of affilates to which the node is
   assigned.  This list shows only the affiliates that the user cannot edit.
 
@@ -653,7 +653,7 @@ assign the link to specific domains.
 4.3.4   Default Source Domain
 
 This setting allows you to control the domain to use when rewriting links that
-are sent to 'all affiliates.'  Simple select the domain that you wish to use as
+are sent to 'all affiliates.'  Simply select the domain that you wish to use as
 the primary domain for URL rewrites.
 
 By default this value is your primary domain.
@@ -817,7 +817,6 @@ you will want to add their paths to this list:
 
   -- forward/%n
   -- print/%n
-
 
 This is an advanced, but necessary feature.  Please report any core node path
 omissions at http://drupal.org/project/issues/domain.

@@ -1,5 +1,9 @@
 // $Id$
 
+09-SEP-2008 (4)
+
+-- #299511 patch by BWPanda.  Fixes some documentation errors.
+
 09-SEP-2008 (3)
 
 -- #300702 patch by Garrett Albright.  Fixes calls to wrong variable name (sitename | site_name).
