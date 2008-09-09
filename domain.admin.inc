@@ -126,7 +126,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#title' => t('Default domain settings'),
     '#collapsible' => TRUE
   );
-  $sitename = variable_get('sitename', 'Drupal');
+  $sitename = variable_get('site_name', 'Drupal');
   $form['domain']['domain_root'] = array(
     '#type' => 'textfield',
     '#title' => t('Primary domain name'),

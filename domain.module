@@ -291,7 +291,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
         else {
           $default = $account->domain_user;
         }
-        $options[-1] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+        $options[-1] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
         while ($data = db_fetch_array($result)) {
           $options[$data['domain_id']] = $data['sitename'];
         }
@@ -342,7 +342,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
                 $output .= '<li>'. $domain['sitename'] .'</li>';
               }
               else {
-                $output .= '<li>'. variable_get('domain_sitename', variable_get('sitename', 'Drupal')) .'</li>';
+                $output .= '<li>'. variable_get('domain_sitename', variable_get('site_name', 'Drupal')) .'</li>';
               }
             }
           }
@@ -468,7 +468,7 @@ function domain_default($reset = FALSE) {
   static $default;
   if (empty($default) || $reset) {
     $default['domain_id'] = 0;
-    $default['sitename'] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+    $default['sitename'] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
     $default['subdomain'] = variable_get('domain_root', '');
     $default['scheme'] = variable_get('domain_scheme', 'http');
     // Set the valid flag.
@@ -667,7 +667,7 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             $node->subdomains[] = $domain['sitename'];
           }
           else {
-            $node->subdomains[] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+            $node->subdomains[] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
           }
         }
         else if ($data->realm == 'domain_site') {
@@ -681,7 +681,7 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             $node->editors[] = $domain['sitename'];
           }
           else {
-            $node->editors[] = variable_get('domain_sitename', variable_get('sitename', 'Drupal'));
+            $node->editors[] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
           }
         }
       }
