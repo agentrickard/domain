@@ -1,5 +1,9 @@
 // $Id$
 
+11-SEP-2008
+
+-- #300454 patch by ariflukito. Backports Domain Source changes from D6.
+
 09-SEP-2008 (3)
 
 -- #299511 patch by BWPanda.  Fixes some documentation errors.

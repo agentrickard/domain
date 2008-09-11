@@ -96,7 +96,7 @@ function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$
         }
         // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
         // Only needed if we are not on the default source domain.
-        else if ($seo && $_domain['domain_id'] != $root['domain_id']) {
+        else if ($root != -1 && $seo && $_domain['domain_id'] != $root['domain_id']) {
           $absolute = TRUE;
             // In this case, the $base_url cannot have a trailing slash
             $base_url = rtrim($root['path'], '/');
