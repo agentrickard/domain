@@ -1,5 +1,12 @@
 // $Id$
 
+17-SEP-2008
+
+-- #306322 patch by ariflukito. Filtering problem for Domain Content.
+-- #307663.  Bad logic when displaying editor domain list in hook_user().
+-- #306551 patch by zttt.  Do not set action on forms that already are set to an external host.
+-- #309258 by nirvanajyothi. Clarifies documentation of content editing forms.
+
 09-SEP-2008 (4)
 
 -- #299511 patch by BWPanda.  Fixes some documentation errors.

@@ -119,7 +119,7 @@ function domain_content_form($form_state) {
       $filter['where'] = " WHERE nac.realm = 'domain_site' AND nac.gid = 0 ";
     }
     else {
-      $filter['where'] .= " AND nac.realm = 'domain_id' AND nac.gid = 0 ";
+      $filter['where'] .= " AND nac.realm = 'domain_site' AND nac.gid = 0 ";
     }
   }
 

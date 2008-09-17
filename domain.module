@@ -330,7 +330,9 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
           '#weight' => 10,
           '#title' => t('Domain status'),
         );
-        if (empty($account->domain_user) || array_sum($account->domain_user) == 0) {
+        // Filter out all the emoty options.
+        $account->domain_user = array_filter($account->domain_user);
+        if (empty($account->domain_user)) {
           $output = t('This user is not assiged to a domain.');
         }
         else {
@@ -991,7 +993,11 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     else {
       $action['query'] = '';
     }
-    $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
+    // We cannot reset this if it has already been set by another module.
+    // See http://drupal.org/node/306551
+    if (empty($action['host'])) {
+      $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
+    }
   }
 
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
