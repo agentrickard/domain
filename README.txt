@@ -595,7 +595,7 @@ rules defined below.
 
   The advantage of this option is the user cannot modify the URL of a 
   content edit form to match the URL of other domains, forcing all of her 
-  posts to be made to a signled domain. Users trying to enter content 
+  posts to be made to a single domain. Users trying to enter content 
   from another domain will always be transferred to their assigned domain.
   
   In effect, a user assigned to 'one.example.com' will only be able to post
