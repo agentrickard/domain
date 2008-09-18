@@ -1,5 +1,15 @@
 // $Id$
 
+18-SEP-2008
+
+-- #310103 by ariflukito.  Add css class to hook_user.
+
+17-SEP-2008
+
+-- #306322 patch by ariflukito. Filtering problem for Domain Content.
+-- #306551 patch by zttt.  Do not set action on forms that already are set to an external host.
+-- #309258 by nirvanajyothi. Clarifies documentation of content editing forms.
+
 11-SEP-2008
 
 -- #300454 patch by ariflukito. Backports Domain Source changes from D6.

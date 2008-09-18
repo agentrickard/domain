@@ -335,8 +335,10 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
           }
         }
         $output .= '</ul>';
-        $items['domain'] = array('title' => t('Domain settings'),
+        $items['domain'] = array(
+          'title' => t('Domain settings'),
           'value' => $output,
+          'class' => 'status',
         );
         return array(t('Domain status') => $items);
       }
@@ -1014,7 +1016,11 @@ function domain_form_alter($form_id, &$form) {
     if ($action['query']) {
       $action['path'] .= '?';
     }
-    $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
+    // We cannot reset this if it has already been set by another module.
+    // See http://drupal.org/node/306551
+    if (empty($action['host'])) {
+      $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
+    }
   }
 
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
