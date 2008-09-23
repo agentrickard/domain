@@ -4,7 +4,7 @@
 
 -- #276303 patch by bforchhammer.  Commits the Domain Bootstrap patch for testing.
 -- #284422 patch by bforchhammer.  Commits the Domain Alias module for testing.
--- Updates INSTALL instruvtions but not the README.
+-- Updates INSTALL instructions but not the README.
 -- WARNING -- HEAD is now unstable.
 
 17-SEP-2008
