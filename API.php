@@ -476,3 +476,51 @@ function hook_domainignore() {
   // User login should always be from the current domain.
   return array('user_login');
 }
+
+/**
+ * Hook domain_bootstrap_lookup allows modules to modify the domain record used on the
+ * current page on bootstrap level, that is, before it is used anywhere else.
+ *
+ * This for example allows to change the domain_id matched to the current
+ * domain name before related information is retrieved during domain_init().
+ *
+ * Note: Because this function is usually called VERY early, many Drupal
+ * functions or modules won't be loaded yet.
+ *
+ * In order for this hook to work your module needs to be registered in
+ * domain/settings.inc.
+ *
+ * @param $domain
+ * An array containing current domain (host) name (used during bootstrap) and
+ * the results of lookup against {domain} table.
+ * @return
+ * An array containing at least a valid domain_id.
+ */
+function hook_domain_bootstrap_lookup($domain) {
+  // match en.example.org to default domain (id:0)
+  if ($domain['subdomain'] == 'en.example.org') {
+    $domain['domain_id'] = 0;
+  }
+
+  return $domain;
+}
+
+/**
+ * Hook hook_domain_bootstrap_full allows modules to execute code after the domain
+ * bootstrap phases which (usually) is even before drupal's hook_boot().
+ *
+ * This can be used to modify drupal's variables system or prefix database
+ * tables, as used in modules domain_conf and domain_prefix.
+ *
+ * Note: Because this function is usually called VERY early, many Drupal
+ * functions or modules won't be loaded yet.
+ *
+ * In order for this hook to work your module needs to be registered in
+ * domain/settings.inc.
+ *
+ * @param $domain
+ * An array containing current subdomain and domain_id and any other values
+ * added during domain bootstrap phase 2 (DOMAIN_BOOTSTRAP_DOMAINNAME_RESOLVE).
+ */
+function hook_domain_bootstrap_full($domain) {
+}

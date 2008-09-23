@@ -1,0 +1,76 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Implementations of module installation related hooks.
+ *
+ * @ingroup domain_alias
+ */
+
+/**
+ * Implementation of hook_schema().
+ */
+function domain_alias_schema() {
+  $schema['domain_alias'] = array('description' => 'Subdomain aliases and patterns for domain entries in {domain}.',
+    'fields' => array(
+      'alias_id' => array('type' => 'serial',
+        'description' => 'The primary identifier for an alias/pattern.',
+        'not null' => TRUE,
+        ),
+      'domain_id' => array('type' => 'int',
+        'description' => 'The related domain entry in the {domain} table.',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        ),
+      'pattern' => array('type' => 'varchar',
+        'description' => 'The subdomain alias/pattern',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        ),
+      'redirect' => array('type' => 'int',
+        'description' => 'Boolean flag indicating whether the alias should be redireced to the main domain.',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        ),
+      ),
+    'primary key' => array('alias_id'),
+    'indexes' => array('pattern' => array('pattern'), 'domain' => array('domain_id')),
+    );
+
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function domain_alias_install() {
+  drupal_install_schema('domain_alias');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function domain_alias_uninstall() {
+  drupal_uninstall_schema('domain_alias');
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Register domain_alias with domain bootstrap so we can use domain_bootstrap hooks.
+ */
+function domain_alias_enable() {
+  domain_bootstrap_register('domain_alias');
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function domain_alias_disable() {
+  domain_bootstrap_unregister('domain_alias');
+}

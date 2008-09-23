@@ -32,3 +32,21 @@ function domain_conf_schema() {
 function domain_conf_uninstall() {
   drupal_uninstall_schema('domain_conf');
 }
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Register the domain_conf with the domain module so it's loaded during domain
+ * bootstrap and can implement domain_bootstrap hooks.
+ */
+function domain_conf_enable() {
+  domain_bootstrap_register('domain_conf');
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function domain_conf_disable() {
+  domain_bootstrap_unregister('domain_conf');
+}
+

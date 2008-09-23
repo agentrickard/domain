@@ -85,7 +85,7 @@ function domain_view() {
     }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
-    $row = array($domain['domain_id'], ($domain['subdomain'] == $_domain['subdomain']) ? '<b>'. $link .'</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
+    $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<b>'. $link .'</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
     // Let other modules add data.
     foreach (module_implements('domainview') as $module) {
       $row[] = module_invoke($module, 'domainview', 'data', $domain);
@@ -111,6 +111,8 @@ function domain_configure() {
   if (empty($_POST)) {
     // Is the module installed correctly?
     module_invoke_all('domaininstall');
+    // Register the bootstrap plugins.
+    domain_bootstrap_modules_cleanup();
   }
   // Return the configuration form.
   return drupal_get_form('domain_configure_form');

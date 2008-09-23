@@ -32,41 +32,34 @@ define('DOMAIN_EDITOR_RULE', FALSE);
 define('DOMAIN_SITE_GRANT', TRUE);
 
 /**
- * Implements hook_init()
+ * Implementation of hook_init().
  *
- * Inititalizes a global $_domain variable and set it based on the
- * third-level domain used to access the page.
- */
+ * Inititalizes a global $_domain variable if necessary (usually that's done in
+ * domain_bootstrap.inc) and loads information on current domain.
+ *
+ * Also handles www stripping, checks the validity of user domains and updates
+ * $conf['site_name'].
+*/
 function domain_init() {
   global $_domain, $conf;
-  $_domain = array();
-  // We lower case this, since EXAMPLE.com == example.com.
-  $_subdomain = strtolower(rtrim($_SERVER['HTTP_HOST']));
+
+  // if $_domain is empty start domain bootstrap (by including settings.inc)
+  if (!isset($_domain['domain_id'])) {
+    include drupal_get_path('module', 'domain') .'/settings.inc';
+  }
 
   // Strip the www. off the subdomain, if required by the module settings.
-  $raw_domain = $_subdomain;
-  if (variable_get('domain_www', 0)) {
-    $_subdomain = str_replace('www.', '', $_subdomain);
-  }
-  // Lookup the active domain against our allowed hosts record.
-  $data = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s'", $_subdomain));
-  // Get the domain data.
-  $_domain = domain_lookup($data['domain_id']);
-
-  // If return is -1, then the DNS didn't match anything, so use defaults.
-  if ($_domain == -1) {
-    $_domain = domain_default();
-    // If the request was not for the primary domain, send the user there.  See http://drupal.org/node/293453.
-    if (!empty($_domain['subdomain']) && $_subdomain != $_domain['subdomain']) {
-      $request = domain_get_uri($_domain);
-      drupal_set_message(t('You have followed an incorrect link to this website.  Please update your links and bookmarks to <a href="!url">!url</a>.', array('!url' => $request)));
-      drupal_goto($request);
-    }
+  if (variable_get('domain_www', 0) && strpos($_domain['subdomain'], 'www.') !== FALSE) {
+    $_domain['subdomain'] = str_replace('www.', '', $_domain['subdomain']);
+    $www_replaced = TRUE;
   }
 
-  // If we stripped the www. send the user to the proper domain.  This should only
-  // happen once, on an inbound link or typed URL, so the overhead is acceptable.
-  if ($raw_domain != $_subdomain) {
+  // add information from domain_lookup but keep existing values (domain_id and subdomain)
+  $domain = domain_lookup($_domain['domain_id']);
+  $_domain = array_merge($domain, $_domain);
+
+  // If we have replaced 'www.' in the url, redirect to the clean domain.
+  if ($www_replaced) {
     drupal_goto(domain_get_uri($_domain));
   }
 
@@ -330,7 +323,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
           '#weight' => 10,
           '#title' => t('Domain status'),
         );
-        // Filter out all the emoty options.
+        // Filter out all the empty options.
         $account->domain_user = array_filter($account->domain_user);
         if (empty($account->domain_user)) {
           $output = t('This user is not assiged to a domain.');
@@ -1228,6 +1221,9 @@ function domain_grant_all($reset= FALSE) {
  * Implements hook_domaininstall()
  */
 function domain_domaininstall() {
+  // Cleanup list of bootstrap modules (remove disabled ones)
+  domain_bootstrap_modules_cleanup();
+
   // Check to see if the hook_url_alter() patch is installed.
   if (url('domain_access_test_path') != url('domain_access_path_test')) {
     drupal_set_message(t('The <em>custom_url_rewrite_outbound()</em> function is not installed.  Some features are not available. See the <em>custom_url_rewrite_outbound()</em> section of <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/INSTALL.txt')));

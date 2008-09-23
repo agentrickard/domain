@@ -26,6 +26,60 @@ define('DOMAIN_PREFIX_DROP', 8);
 define('DOMAIN_PREFIX_UPDATE', 16);
 
 /**
+ * Implementation of hook_domain_bootstrap_full().
+ *
+ * Dynamic domain settings loading: Loads the settings for the current domain.
+ *
+ * This routine was in hook_init(), but there are cases where
+ * the $conf array needs to be loaded in early phases of bootstrap.
+ * In particular, these variables need to be available during variable_init().
+ *
+ * Hook hook_domain_bootstrap_full allows to execute code at domain bootstrap
+ * time which is before drupal's hook_boot() and before variable_init().
+ *
+ * In order for this to work correctly settings.inc needs to be included
+ * in settings.php.
+ *
+ * @param $domain
+ * Array containing domain_id for current hostname
+ *
+ * @return void
+ */
+function domain_prefix_domain_bootstrap_full($domain) {
+  // To work properly this function needs to be loaded before variable_init(),
+  // therefore we check that domain bootstrap was setup correctly.
+  if (!domain_settings_setup_ok()) {
+    drupal_set_message(t('The Domain module is not installed correctly. Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/INSTALL.txt')), 'error', FALSE);
+    return;
+  }
+  else if (!is_numeric($domain['domain_id'])) {
+    drupal_set_message('Domain Prefix: domain_prefix_domain_bootstrap_full, no valid id given. ', 'error');
+    return;
+  }
+  else {
+    $tables = array();
+    $prefix = 'domain_'. $domain['domain_id'] .'_';
+    $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > %d", $domain['domain_id'], 1);
+    while ($data = db_fetch_array($result)) {
+      $tables[] = $data['tablename'];
+    }
+    if (!empty($tables)) {
+      global $db_prefix;
+      $new_prefix = array();
+      // There might be global prefixing; if so, prepend the global.
+      if (is_string($db_prefix)) {
+        $new_prefix['default'] = $db_prefix;
+        $prefix = $db_prefix . $prefix;
+      }
+      foreach ($tables as $table) {
+        $new_prefix[$table] = $prefix;
+      }
+      $db_prefix = $new_prefix;
+    }
+  }
+}
+
+/**
  * Implements hook_menu()
  */
 function domain_prefix_menu() {
@@ -76,16 +130,6 @@ function domain_prefix_theme() {
 }
 
 /**
- * Implements hook_domaininstall()
- */
-function domain_prefix_domaininstall() {
-  // If Domain Prefix is being used, check to see that it is installed correctly.
-  if (module_exists('domain_prefix') && !function_exists('_domain_prefix_load')) {
-    drupal_set_message(t('The Domain Prefix module is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain_prefix') .'/INSTALL.txt')));
-  }
-}
-
-/**
  * Implements hook_domainlinks()
  *
  * @param $domain
@@ -124,3 +168,4 @@ function domain_prefix_domainupdate($op, $domain, $form_state = array()) {
       break;
   }
 }
+

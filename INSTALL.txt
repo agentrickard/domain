@@ -31,9 +31,7 @@ CONTENTS
 4.4.4   Testing Your Configuration
 4.4.5   Additional Resources
 5.  Additional Module Installation
-5.1   Domain Configuration
-5.2   Domain Prefix
-5.3   Domain Strict
+5.1   Domain Strict
 6.  Uninstalling
 
 ----
@@ -248,7 +246,7 @@ For more information, see
 
 In the Domain Access download, find the following file:
 
-  domain > settings_custom_url.inc
+  domain > settings.inc
 
 You will need to load this file from inside your settings.php file. There
 are two methods for this.
@@ -266,9 +264,9 @@ Add the following lines to the end of your settings.php file:
 
 ====
 /**
- * Add the custom_url_rewrite_outbound function.
+ * Add the domain module setup routine.
  */
-require_once './path/to/modules/domain/settings_custom_url.inc';
+include './path/to/modules/domain/settings.inc';
 ====
 
 In this case, change 'path/to/modules' with the directory where your modules are
@@ -276,9 +274,9 @@ stored.  Typically this will be 'sites/all/modules', which makes the lines:
 
 ====
 /**
- * Add the custom_url_rewrite_outbound function.
+ * Add the domain module setup routine.
  */
-require_once './sites/all/modules/domain/settings_custom_url.inc';
+include './sites/all/modules/domain/settings.inc';
 ====
 
 ----
@@ -287,7 +285,7 @@ require_once './sites/all/modules/domain/settings_custom_url.inc';
 If you are having difficulty determining the correct path, copy the file
 into your settings folder.
 
-  domain > settings_custom_url.inc
+  domain > settings.inc
 
 The file should be in the same directory as your active settings.php file.  Then
 add the following lines:
@@ -296,7 +294,7 @@ add the following lines:
 /**
  * Add the custom_url_rewrite_outbound function.
  */
-require_once 'settings_custom_url.inc';
+include 'settings.inc';
 ====
 
 ----
@@ -328,17 +326,7 @@ The Domain Access module includes several sub-modules.  Two of these
 have their own INSTALL.txt instructions.
 
 ----
-5.1   Domain Configuration
-
-Refer to domain > domain_conf > INSTALL.txt
-
-----
-5.2   Domain Prefix
-
-Refer to domain > domain_prefix > INSTALL.txt
-
-----
-5.3   Domain Strict
+5.1   Domain Strict
 
 While this module requires no additional installation, it fundamentally
 changes the behavior of the Domain Access module.

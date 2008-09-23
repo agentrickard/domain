@@ -1,0 +1,6 @@
+; $Id$
+name = "Domain Alias"
+description = "Advanced subdomain matching methods for Domain Access."
+core = 6.x
+package = Domain Access
+dependencies[] = domain
