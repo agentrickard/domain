@@ -1,5 +1,11 @@
 // $Id$
 
+03-OCT-2008
+
+-- Updates domain.bootstrap.inc for code style.
+-- Cleans up hook_domain_bootstrap_full() implementations.
+-- Updates API docs.
+
 23-SEP-2008
 
 -- #276303 patch by bforchhammer.  Commits the Domain Bootstrap patch for testing.

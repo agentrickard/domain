@@ -16,7 +16,7 @@
  */
 
 /**
- * Domain bootstrap phase 1: makes sure that database is initialised and
+ * Domain bootstrap phase 1: makes sure that database is initialized and
  * loads all necessary module files.
  */
 define('DOMAIN_BOOTSTRAP_INIT', 0);
@@ -25,7 +25,7 @@ define('DOMAIN_BOOTSTRAP_INIT', 0);
  * Domain bootstrap phase 2: resolves host and does a lookup in the {domain}
  * table. Also invokes hook "hook_domain_bootstrap_lookup".
  */
-define('DOMAIN_BOOTSTRAP_DOMAINNAME_RESOLVE', 1);
+define('DOMAIN_BOOTSTRAP_NAME_RESOLVE', 1);
 
 /**
  * Domain bootstrap phase 3: invokes bootstrap hook "hook_domain_bootstrap_full".
@@ -41,10 +41,19 @@ define('DOMAIN_BOOTSTRAP_FULL', 2);
  * Maybe php:trigger_error() is an option?
  */
 function domain_bootstrap() {
-  $phases = array(DOMAIN_BOOTSTRAP_INIT, DOMAIN_BOOTSTRAP_DOMAINNAME_RESOLVE, DOMAIN_BOOTSTRAP_FULL);
+  global $_domain;
+  $phases = array(DOMAIN_BOOTSTRAP_INIT, DOMAIN_BOOTSTRAP_NAME_RESOLVE, DOMAIN_BOOTSTRAP_FULL);
   foreach ($phases as $phase) {
-    if (!_domain_bootstrap($phase)) {
-      die('Domain Module: Error during domain_bootstrap(), Phase '.$phase);
+    // We return NULL if the domain module is not enabled.  This prevents
+    // load errors during module enable / disable.
+    if (_domain_bootstrap($phase) === NULL) {
+      $_domain['error'] = -1;
+      break;
+    }
+    else if (_domain_bootstrap($phase) === FALSE) {
+      // watchdog() is not available here, and there may be other logging.
+      // So we have to write an error message global variable and pick them up in settings,inc.
+      $_domain['error'] = $phase;
     }
   }
 }
@@ -61,38 +70,46 @@ function domain_bootstrap() {
 function _domain_bootstrap($phase) {
   global $_domain;
   switch ($phase) {
-  case DOMAIN_BOOTSTRAP_INIT:
-    // make sure database is loaded
-    _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
+    case DOMAIN_BOOTSTRAP_INIT:
+      // Make sure database is loaded
+      _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
+      // If the modukes has been disabled, stop loading.
+      $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain' AND type = 'module'"));
+      if (empty($check)) {
+        return NULL;
+      }
 
-    // load bootstrap modules
-    _domain_bootstrap_modules_load();
-    // if essential core module file has not been loaded, bootstrap fails.
-    if (!function_exists('domain_load')) {
-      return FALSE;
-    }
+      // Load bootstrap modules registered by Domain Access.
+      _domain_bootstrap_modules_load();
+      // if essential core module file has not been loaded, bootstrap fails.
+      if (!function_exists('domain_load')) {
+        return FALSE;
+      }
+      break;
 
-    break;
+    case DOMAIN_BOOTSTRAP_NAME_RESOLVE:
+      // Get the domain_id of the request.
+      $_domain = domain_resolve_host();
+      // If we don't have a valid domain id now, we can't really go on, bootstrap fails.
+      if (empty($_domain) || !is_numeric($_domain['domain_id'])) {
+        return FALSE;
+      }
+      break;
 
-  case DOMAIN_BOOTSTRAP_DOMAINNAME_RESOLVE:
-    // get domain_id
-    $_domain = domain_resolve_host();
-    // if we don't have a valid domain id now, we can't really go on, bootstrap fails.
-    if (empty($_domain) || !is_numeric($_domain['domain_id'])) {
-      return FALSE;
-    }
-    break;
-
-  case DOMAIN_BOOTSTRAP_FULL:
-    _domain_bootstrap_invoke_all('full', $_domain);
-    break;
+    case DOMAIN_BOOTSTRAP_FULL:
+      // Make sure the load process worked correctly before invoking the hook.
+      if (!domain_settings_setup_ok()) {
+        return FALSE;
+      }
+      _domain_bootstrap_invoke_all('full', $_domain);
+      break;
   }
   return TRUE;
 }
 
 /**
- * Registers a module so it is loaded during domain_bootstrap and invoked
- * domain_bootstrap hooks on.
+ * Registers a module so it is loaded during domain_bootstrap and call respond
+ * to domain_boostrap_invoke_all().
  *
  * This function should be called from within hook_enable() implementations.
  *
@@ -103,23 +120,23 @@ function _domain_bootstrap($phase) {
  * respective value from the {system} table. Optional.
  */
 function domain_bootstrap_register($name, $weight = NULL) {
-  // load old list of modules
+  // Load the current list of modules
   $modules = _domain_bootstrap_modules_get();
 
-  // if $weight is not an integer load the weight from the {system} table.
+  // If $weight is not an integer load the weight from the {system} table.
   if (!is_integer($weight)) {
     $weight = db_result(db_query("SELECT weight FROM {system} WHERE name = '%s'", $name));
   }
 
-  // update/add the module and its weight:
+  // Update or add the module and its weight.
   $modules[$weight.'-'.$name] = $name;
 
-  // and store the new list of modules.
+  // Store the new list of modules.
   _domain_bootstrap_modules_set($modules);
 }
 
 /**
- * Removes a module so it is not loaded during domain_bootstrap anymore.
+ * Removes a module so it is not loaded during domain_bootstrap.
  *
  * This function should be called from within hook_disable() implementations.
  *
@@ -139,8 +156,7 @@ function domain_bootstrap_unregister($name) {
 }
 
 /**
- * Returns a list of modules which are loaded during domain_bootstrap phases and
- * called respective hooks on.
+ * Returns a list of modules which are loaded during domain_bootstrap phases.
  *
  * The domain module is always in the list of modules and has weight -99 so it
  * should usually be first one as well.
@@ -154,8 +170,7 @@ function domain_bootstrap_unregister($name) {
  */
 function domain_bootstrap_modules($reset = FALSE) {
   static $modules = NULL;
-
-  // if parameter is not given but $bootstrap_modules empty load modules from db
+  // If parameter is not given but $bootstrap_modules empty load modules from db
   if ($reset || is_null($modules)) {
     $modules = _domain_bootstrap_modules_get();
     if (!is_array($modules)) {
@@ -166,16 +181,15 @@ function domain_bootstrap_modules($reset = FALSE) {
     }
     ksort($modules);
   }
-
   return $modules;
 }
 
 /**
- * Tries to load all domain bootstrap modules (see _domain_bootstrap_modules()).
+ * Tries to load all domain bootstrap modules.
+ * @see _domain_bootstrap_modules().
  */
 function _domain_bootstrap_modules_load() {
   $modules = domain_bootstrap_modules();
-
   foreach ($modules as $module) {
     drupal_load('module', $module);
   }
@@ -207,17 +221,14 @@ function _domain_bootstrap_modules_get() {
  */
 function _domain_bootstrap_modules_set($modules = NULL) {
   $key = 'domain_bootstrap_modules';
-
   if (!is_array($modules)) {
     $modules = array();
   }
-
   $serialized_value = serialize($modules);
   db_query("UPDATE {variable} SET value = '%s' WHERE name = '%s'", $serialized_value, $key);
   if (!db_affected_rows()) {
     db_query("INSERT INTO {variable} (name, value) VALUES ('%s', '%s')", $key, $serialized_value);
   }
-
   $conf[$key] = $modules;
 }
 
@@ -240,8 +251,8 @@ function domain_bootstrap_modules_cleanup() {
  * Tries to call specified hook on all domain_bootstrap modules.
  *
  * The hook function names are of the following format:
- * {$module}_domain_bootstrap_{$hook}
- * where {$module} is the name of the module implementing the hook and {$hook}
+ * {$module}_domain_bootstrap_{$hook} where {$module}
+ * is the name of the module implementing the hook and {$hook}
  * is the identifier for the concrete domain bootstrap hook.
  *
  * This function is basically a copy of module_invoke_all() adjusted to our
@@ -249,6 +260,8 @@ function domain_bootstrap_modules_cleanup() {
  *
  * @param $hook
  * The name of the bootstrap hook to invoke.
+ *
+ * ... Arguments to pass to the hook.
  *
  * @link http://api.drupal.org/api/function/module_invoke_all/6
  */
@@ -273,39 +286,39 @@ function _domain_bootstrap_invoke_all() {
 }
 
 /**
- * Tries to match the current (host) domainname to a domain in the {domain}
+ * Tries to match the current (host) domain name to a domain in the {domain}
  * table and returns a respective domain_id.
  *
- * @param $_domainname
- * The domainname to match against. Optional.
+ * @param $_name
+ * The domain name to match against. Optional.
  *
  * @return
- * An array containing a domain_id matching the current domainname.
+ * An array containing a domain_id matching the current domain name.
  */
-function domain_resolve_host($_domainname = "") {
-  if (empty($_domainname)) {
-    $_domainname = domain_current_domainname();
+function domain_resolve_host($_name = '') {
+  if (empty($_name)) {
+    $_name = domain_request_name();
   }
 
-  return _domain_lookup_simple($_domainname);
+  return _domain_lookup_simple($_name);
 }
 
 /**
- * Determines current fully qualified domainname.
+ * Determines current fully qualified domain name.
  *
  * @return
- * The current (host) domainname as a String.
+ * The current (host) domain name as a String.
  */
-function domain_current_domainname() {
+function domain_request_name() {
   // We lower case this, since EXAMPLE.com == example.com.
   return strtolower(rtrim($_SERVER['HTTP_HOST']));
 }
 
 /**
- * Determines a domain_id matching given $_domainname.
+ * Determines a domain_id matching given $_name.
  *
  * This function runs a lookup against the {domain} table matching the
- * subdomain column against the given parameter $_domainname. If a match is
+ * subdomain column against the given parameter $_name. If a match is
  * found the function returns an array containing the subdomain (= $_domainname)
  * and the matching domain_id from the {domain} table.
  *
@@ -314,7 +327,7 @@ function domain_current_domainname() {
  * During the process hook_domain_bootstrap_lookup() is invoked to allow other
  * modules to modify that result.
  *
- * @param $domainname
+ * @param $_name
  * The string representation of a {domain} entry.
  *
  * @param $reset
@@ -323,31 +336,30 @@ function domain_current_domainname() {
  * @return
  * An array containing a domain_id from {domain} matching the given domainname
  */
-function _domain_lookup_simple($_domainname, $reset = false) {
+function _domain_lookup_simple($_name, $reset = false) {
   static $cache = array();
 
-  if (empty($_domainname)) return 0;
+  if (empty($_name)) {
+    return 0;
+  }
 
-  if ($reset || !isset($cache[$_domainname])) {
+  if ($reset || !isset($cache[$_name])) {
     // Lookup the given domainname against our allowed hosts record.
-    $domain = db_fetch_array(db_query_range("SELECT domain_id FROM {domain} WHERE subdomain = '%s' ", $_domainname, 0, 1));
-
+    $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s' ", $_name));
     if (!is_array($domain)) {
       $domain = array();
     }
-
-    $domain['subdomain'] = $_domainname;
-    // invoke hook_domain_bootstrap_lookup()
+    // If No match => use default (0)
+    if (!isset($domain['domain_id'])) {
+      $domain['domain_id'] = 0;
+    }
+    $domain['subdomain'] = $_name;
+    // Invoke hook_domain_bootstrap_lookup()
     $domain_new = _domain_bootstrap_invoke_all('lookup', $domain);
     if (is_array($domain_new)) {
       $domain = array_merge($domain, $domain_new);
     }
-    // no match => use default (0)
-    if (!isset($domain['domain_id'])) {
-      $domain['domain_id'] = 0;
-    }
-
-    $cache[$_domainname] = $domain;
+    $cache[$_name] = $domain;
   }
-  return $cache[$_domainname];
+  return $cache[$_name];
 }

@@ -49,7 +49,41 @@ function domain_settings_setup_ok() {
  */
 function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
   global $_domain;
+  static $error, $quit = FALSE;
 
+  // This routine is error handling for misconfiguration. We put it here 
+  // because the reporting functions are not available during bootstrap.
+  // The statis $quit variable makes this not kill tte system.
+  // If you see this error, you should correct it immediately.
+
+  // Faster handling in cases where this function should not load.
+  if ($quit) {
+    return;
+  }
+  // If $_domain['error'] is present, then set a message and stop.
+  if (!isset($error) && isset($_domain['error'])) {
+    if ($_domain['error'] == -1 && !module_exists('domain')) {
+      $error =  'The domain module is not installed; please remove the call to settings.inc from your settings.php file.';
+    }
+    else {
+       $error = 'Domain access failed to load during phase: '. $_domain['error'] .'. Please check your settings.php file and site configuration.';
+    }
+    // Do not show on form submissions, when enabling the module.
+    if (empty($_POST)) {
+      // Show a warning to admin users.
+      if (user_access('administer domains')) {
+        drupal_set_message($error, 'error');
+      }
+      watchdog('Domain Access', $error, NULL, WATCHDOG_ERROR);
+    }
+  }
+  // If the $_domain global is not present, we cannot act.
+  if (empty($_domain) || isset($error)) {
+    $quit = TRUE;
+    return;
+  }
+  // End of the error handling routine.
+  
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.
   if (isset($_domain['domain_id'])) {
     // Set static variables for the node lookups, to remove redundant queries.

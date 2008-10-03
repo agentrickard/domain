@@ -481,14 +481,16 @@ function hook_domainignore() {
  * Hook domain_bootstrap_lookup allows modules to modify the domain record used on the
  * current page on bootstrap level, that is, before it is used anywhere else.
  *
- * This for example allows to change the domain_id matched to the current
+ * This allows modules like Domain Alias to change the domain_id matched to the current
  * domain name before related information is retrieved during domain_init().
  *
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
  *
- * In order for this hook to work your module needs to be registered in
- * domain/settings.inc.
+ * In order for this hook to work your module needs to be registered with
+ * domain_bootstrap_register('mymodule) during hook_enable();
+ *
+ * Modules must also use domain_bootsrap_unregister() during hook_disable().
  *
  * @param $domain
  * An array containing current domain (host) name (used during bootstrap) and
@@ -497,11 +499,10 @@ function hook_domainignore() {
  * An array containing at least a valid domain_id.
  */
 function hook_domain_bootstrap_lookup($domain) {
-  // match en.example.org to default domain (id:0)
+  // Match en.example.org to default domain (id:0)
   if ($domain['subdomain'] == 'en.example.org') {
     $domain['domain_id'] = 0;
   }
-
   return $domain;
 }
 
@@ -515,12 +516,33 @@ function hook_domain_bootstrap_lookup($domain) {
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
  *
- * In order for this hook to work your module needs to be registered in
- * domain/settings.inc.
+ * In order for this hook to work your module needs to be registered with
+ * domain_bootstrap_register('mymodule) during hook_enable();
+ *
+ * Modules must also use domain_bootsrap_unregister() during hook_disable().
  *
  * @param $domain
  * An array containing current subdomain and domain_id and any other values
  * added during domain bootstrap phase 2 (DOMAIN_BOOTSTRAP_DOMAINNAME_RESOLVE).
+ *
+ * @return
+ * No return value. However, if you wish to set an error message on failure, you
+ * should load and modify the $_domain global and add an 'error' element to the array.
+ * This element should only include the name of your module.
+ * We do this because drupal_set_message() and t() are not yet loaded.
+ *
+ * Normally, you do not need to validate errors, since this function will not
+ * be called unless $domain is set properly.
  */
 function hook_domain_bootstrap_full($domain) {
+  global $conf;
+  // The language variable should not be set yet.
+  // Check for errors.
+  if (isset($conf['language'])) {
+    global $_domain;
+    $_domain['error'] = 'mymodule';
+    return;
+  }
+  // Our test module sets the default language to Spanish.
+  $conf['language'] = 'es';
 }

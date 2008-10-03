@@ -4,7 +4,7 @@
 /**
  * @defgroup domain_alias Domain Alias: Advanced subdomain matching
  *
- * Allows to specify subdomain aliases and domainname patterns for domain
+ * Allows to specify subdomain aliases and domain name patterns for domain
  * entries so multiple hostnames are matched on one single domain entry.
  */
 
@@ -21,7 +21,7 @@
 /**
  * Implementation of hook_domain_bootstrap_lookup().
  *
- * Tries to match the given domainname against patterns in the {domain_alias}
+ * Tries to match the given domain name against patterns in the {domain_alias}
  * table and if successful updates information in given parameter $domain.
  *
  * @param $domain

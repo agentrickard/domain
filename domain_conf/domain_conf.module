@@ -17,46 +17,17 @@
  */
 
 /**
- * Implementation of hook_domain_bootstrap_full().
- *
- * Dynamic domain settings loading: Loads the settings for the current domain.
- *
- * This routine was in hook_init(), but there are cases where
- * the $conf array needs to be loaded in early phases of bootstrap.
- * In particular, these variables need to be available during variable_init().
- *
- * Hook hook_domain_bootstrap_full allows to execute code at domain bootstrap
- * time which is before drupal's hook_boot() and before variable_init().
- *
- * In order for this to work correctly the settings.inc needs to be included
- * in settings.php (see readme)
- *
- * @param $domain
- * Array containing domain_id for current hostname
- *
- * @return void
+ * Implementats hook_domain_bootstrap_full().
  */
 function domain_conf_domain_bootstrap_full($domain) {
-  // To work properly this function needs to be loaded before variable_init(),
-  // therefore we check that domain bootstrap was setup correctly.
-  if (!domain_settings_setup_ok()) {
-    drupal_set_message(t('The Domain module is not installed correctly. Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/INSTALL.txt')), 'error', FALSE);
-    return;
-  }
-  if (!is_numeric($domain['domain_id'])) {
-    drupal_set_message('Domain Configuration: domain_conf_domain_bootstrap_full, no valid id given. ', 'error');
-    return;
-  }
-  else {
-    $data = array();
-    $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
-    if (!empty($data)) {
-      global $conf;
-      $settings = unserialize($data['settings']);
-      // Overwrite the $conf variables.
-      foreach ($settings as $key => $value) {
-        $conf[$key] = $value;
-      }
+  $data = array();
+  $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+  if (!empty($data)) {
+    global $conf;
+    $settings = unserialize($data['settings']);
+    // Overwrite the $conf variables.
+    foreach ($settings as $key => $value) {
+      $conf[$key] = $value;
     }
   }
 }

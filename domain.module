@@ -43,11 +43,6 @@ define('DOMAIN_SITE_GRANT', TRUE);
 function domain_init() {
   global $_domain, $conf;
 
-  // if $_domain is empty start domain bootstrap (by including settings.inc)
-  if (!isset($_domain['domain_id'])) {
-    include drupal_get_path('module', 'domain') .'/settings.inc';
-  }
-
   // Strip the www. off the subdomain, if required by the module settings.
   if (variable_get('domain_www', 0) && strpos($_domain['subdomain'], 'www.') !== FALSE) {
     $_domain['subdomain'] = str_replace('www.', '', $_domain['subdomain']);
