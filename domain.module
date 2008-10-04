@@ -1410,6 +1410,27 @@ function domain_node_access_explain($row) {
     case 'domain_editor':
       $return .= t('Editable by %domain editors.', array('%domain' => $domain['subdomain']));
       break;
+    default:
+      // This is not our grant, do not return anything.
+      $return = NULL;
+      break;
   }
   return $return;
+}
+
+/**
+ * Implements hook_content_extra_fields()
+ *
+ * CCK hook to allow sorting of the domain settings field.
+ */
+function domain_content_extra_fields($type_name = NULL) {
+  if (!empty($type_name)) {
+    return array(
+      'domain' => array(
+        'label' => t('Domain access'),
+        'description' => t('Domain-specific settings for posts.'),
+        'weight' => 1,
+      ),
+    );
+  }
 }

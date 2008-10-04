@@ -1,5 +1,10 @@
 // $Id$
 
+04-OCT-2008
+
+-- #316072 by BWPanda. Implements hook_content_extra_fields() to allow CCK field sorting.
+-- Cleans up hook_node_access_explain().
+
 03-OCT-2008
 
 -- Updates domain.bootstrap.inc for code style.
