@@ -12,6 +12,9 @@
  * systems like the variable or database/prefix system - before they are used by
  * any other modules.
  *
+ * Note that all functions in this file are _private, by design.  You should never
+ * call these functions directly.  Public functions are declared in domain.module.
+ *
  * @ingroup domain
  */
 
@@ -34,11 +37,6 @@ define('DOMAIN_BOOTSTRAP_FULL', 2);
 
 /**
  * Domain module bootstrap: calls all bootstrap phases.
- *
- * @todo
- * Change handling of bootstrap errors (atm it uses die() to send a msg
- * and exit the script; watchdog is not initialised yet and cannot be used.
- * Maybe php:trigger_error() is an option?
  */
 function domain_bootstrap() {
   global $_domain;
@@ -73,7 +71,7 @@ function _domain_bootstrap($phase) {
     case DOMAIN_BOOTSTRAP_INIT:
       // Make sure database is loaded
       _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
-      // If the modukes has been disabled, stop loading.
+      // If the module has been disabled, stop loading.
       $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain' AND type = 'module'"));
       if (empty($check)) {
         return NULL;
@@ -108,54 +106,6 @@ function _domain_bootstrap($phase) {
 }
 
 /**
- * Registers a module so it is loaded during domain_bootstrap and call respond
- * to domain_boostrap_invoke_all().
- *
- * This function should be called from within hook_enable() implementations.
- *
- * @param $name
- * The name of the module that is registered.
- * @param $weight
- * The weight of the module as an integer number. The default value is the
- * respective value from the {system} table. Optional.
- */
-function domain_bootstrap_register($name, $weight = NULL) {
-  // Load the current list of modules
-  $modules = _domain_bootstrap_modules_get();
-
-  // If $weight is not an integer load the weight from the {system} table.
-  if (!is_integer($weight)) {
-    $weight = db_result(db_query("SELECT weight FROM {system} WHERE name = '%s'", $name));
-  }
-
-  // Update or add the module and its weight.
-  $modules[$weight.'-'.$name] = $name;
-
-  // Store the new list of modules.
-  _domain_bootstrap_modules_set($modules);
-}
-
-/**
- * Removes a module so it is not loaded during domain_bootstrap.
- *
- * This function should be called from within hook_disable() implementations.
- *
- * @param $name
- * The name of the module that is un-registered.
- */
-function domain_bootstrap_unregister($name) {
-  $modules = _domain_bootstrap_modules_get();
-  if (is_array($modules)) {
-    foreach($modules as $k => $v){
-      if ($v == $name) {
-        unset($modules[$k]);
-      }
-    }
-  }
-  _domain_bootstrap_modules_set($modules);
-}
-
-/**
  * Returns a list of modules which are loaded during domain_bootstrap phases.
  *
  * The domain module is always in the list of modules and has weight -99 so it
@@ -168,16 +118,15 @@ function domain_bootstrap_unregister($name) {
  * @return
  * An array of module names.
  */
-function domain_bootstrap_modules($reset = FALSE) {
+function _domain_bootstrap_modules($reset = FALSE) {
   static $modules = NULL;
-  // If parameter is not given but $bootstrap_modules empty load modules from db
   if ($reset || is_null($modules)) {
     $modules = _domain_bootstrap_modules_get();
     if (!is_array($modules)) {
       $modules = array();
     }
     if (!in_array('domain', $modules)) {
-      $modules['-99-domain'] = 'domain';
+      $modules['-99'] = 'domain';
     }
     ksort($modules);
   }
@@ -189,7 +138,7 @@ function domain_bootstrap_modules($reset = FALSE) {
  * @see _domain_bootstrap_modules().
  */
 function _domain_bootstrap_modules_load() {
-  $modules = domain_bootstrap_modules();
+  $modules = _domain_bootstrap_modules();
   foreach ($modules as $module) {
     drupal_load('module', $module);
   }
@@ -200,51 +149,13 @@ function _domain_bootstrap_modules_load() {
  * {variable} table. This function does not use Drupal's variable system.
  *
  * @return
- * An array containing module names. (The keys are combined from module weight
- * and module name and used for sorting during domain_bootstrap_modules().)
+ * An array containing module names.
  */
 function _domain_bootstrap_modules_get() {
+  global $conf;
   $key = 'domain_bootstrap_modules';
   $conf[$key] = unserialize(db_result(db_query("SELECT value FROM {variable} WHERE name = '%s'", $key)));
   return $conf[$key];
-}
-
-/**
- * Set variable 'domain_bootstrap_modules' to given value.
- *
- * This function does not use drupal's variable system calls because they are not
- * yet available in all cases.
- *
- * @param $modules
- * An array containing module names. The keys should be of the format
- * {weight}-{module-name} to allow easy sorting by module weight later.
- */
-function _domain_bootstrap_modules_set($modules = NULL) {
-  $key = 'domain_bootstrap_modules';
-  if (!is_array($modules)) {
-    $modules = array();
-  }
-  $serialized_value = serialize($modules);
-  db_query("UPDATE {variable} SET value = '%s' WHERE name = '%s'", $serialized_value, $key);
-  if (!db_affected_rows()) {
-    db_query("INSERT INTO {variable} (name, value) VALUES ('%s', '%s')", $key, $serialized_value);
-  }
-  $conf[$key] = $modules;
-}
-
-/**
- * Removes all disabled or not installed modules from the
- * 'domain_bootstrap_modules' variable.
- */
-function domain_bootstrap_modules_cleanup() {
-  $modules = _domain_bootstrap_modules_get();
-  foreach($modules as $k => $name) {
-    $status = db_result(db_query("SELECT status FROM {system} WHERE name = '%s'", $name));
-    if (!$status) {
-      unset($modules[$k]);
-    }
-  }
-  _domain_bootstrap_modules_set($modules);
 }
 
 /**
@@ -270,7 +181,7 @@ function _domain_bootstrap_invoke_all() {
   $hook = $args[0];
   unset($args[0]);
   $return = array();
-  foreach (domain_bootstrap_modules() as $module) {
+  foreach (_domain_bootstrap_modules() as $module) {
     $function = $module . '_domain_bootstrap_' . $hook;
     if (function_exists($function)) {
       $result = call_user_func_array($function, $args);
@@ -281,85 +192,5 @@ function _domain_bootstrap_invoke_all() {
       }
     }
   }
-
   return $return;
-}
-
-/**
- * Tries to match the current (host) domain name to a domain in the {domain}
- * table and returns a respective domain_id.
- *
- * @param $_name
- * The domain name to match against. Optional.
- *
- * @return
- * An array containing a domain_id matching the current domain name.
- */
-function domain_resolve_host($_name = '') {
-  if (empty($_name)) {
-    $_name = domain_request_name();
-  }
-
-  return _domain_lookup_simple($_name);
-}
-
-/**
- * Determines current fully qualified domain name.
- *
- * @return
- * The current (host) domain name as a String.
- */
-function domain_request_name() {
-  // We lower case this, since EXAMPLE.com == example.com.
-  return strtolower(rtrim($_SERVER['HTTP_HOST']));
-}
-
-/**
- * Determines a domain_id matching given $_name.
- *
- * This function runs a lookup against the {domain} table matching the
- * subdomain column against the given parameter $_name. If a match is
- * found the function returns an array containing the subdomain (= $_domainname)
- * and the matching domain_id from the {domain} table.
- *
- * If no match is found domain_id is set to 0 for the default domain.
- *
- * During the process hook_domain_bootstrap_lookup() is invoked to allow other
- * modules to modify that result.
- *
- * @param $_name
- * The string representation of a {domain} entry.
- *
- * @param $reset
- * Set TRUE to ignore cached versions and look the name up again. Optional.
- *
- * @return
- * An array containing a domain_id from {domain} matching the given domainname
- */
-function _domain_lookup_simple($_name, $reset = false) {
-  static $cache = array();
-
-  if (empty($_name)) {
-    return 0;
-  }
-
-  if ($reset || !isset($cache[$_name])) {
-    // Lookup the given domainname against our allowed hosts record.
-    $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s' ", $_name));
-    if (!is_array($domain)) {
-      $domain = array();
-    }
-    // If No match => use default (0)
-    if (!isset($domain['domain_id'])) {
-      $domain['domain_id'] = 0;
-    }
-    $domain['subdomain'] = $_name;
-    // Invoke hook_domain_bootstrap_lookup()
-    $domain_new = _domain_bootstrap_invoke_all('lookup', $domain);
-    if (is_array($domain_new)) {
-      $domain = array_merge($domain, $domain_new);
-    }
-    $cache[$_name] = $domain;
-  }
-  return $cache[$_name];
 }

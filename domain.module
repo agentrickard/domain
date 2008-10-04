@@ -1213,16 +1213,126 @@ function domain_grant_all($reset= FALSE) {
 }
 
 /**
+ * Register the modules needed to load during bootstrap.
+ * Stores results in the 'domain_bootstrap_modules' variable.
+ */
+function domain_bootstrap_register() {
+  $modules = array();
+  $lookup = module_implements('domain_bootstrap_lookup');
+  $full = module_implements('domain_bootstrap_full');
+  $modules = array_merge($lookup, $full);
+  variable_set('domain_bootstrap_modules', $modules);
+}
+
+/**
+ * Removes a module so it is not loaded during domain_bootstrap.
+ *
+ * This function should be called from within hook_disable() implementations.
+ *
+ * @param $name
+ * The name of the module that is un-registered.
+ */
+function domain_bootstrap_unregister($name) {
+  $modules = variable_get('domain_bootstrap_modules', array());
+  if (is_array($modules)) {
+    foreach($modules as $k => $v){
+      if ($v == $name) {
+        unset($modules[$k]);
+      }
+    }
+  }
+  variable_set('domain_bootstrap_modules', $modules);
+}
+
+/**
+ * Tries to match the current (host) domain name to a domain in the {domain}
+ * table and returns a respective domain_id.
+ *
+ * @param $name
+ * The domain name to match against. Optional.
+ *
+ * @return
+ * An array containing a domain_id matching the current domain name.
+ */
+function domain_resolve_host($name = '') {
+  if (empty($name)) {
+    $name = domain_request_name();
+  }
+
+  return domain_lookup_simple($name);
+}
+
+/**
+ * Determines current fully qualified domain name.
+ *
+ * @return
+ * The current (host) domain name as a String.
+ */
+function domain_request_name() {
+  // We lower case this, since EXAMPLE.com == example.com.
+  return strtolower(rtrim($_SERVER['HTTP_HOST']));
+}
+
+/**
+ * Determines a domain_id matching given $_name.
+ *
+ * This function runs a lookup against the {domain} table matching the
+ * subdomain column against the given parameter $_name. If a match is
+ * found the function returns an array containing the subdomain (= $_domainname)
+ * and the matching domain_id from the {domain} table.
+ *
+ * If no match is found domain_id is set to 0 for the default domain.
+ *
+ * During the process hook_domain_bootstrap_lookup() is invoked to allow other
+ * modules to modify that result.
+ *
+ * @param $_name
+ * The string representation of a {domain} entry.
+ *
+ * @param $reset
+ * Set TRUE to ignore cached versions and look the name up again. Optional.
+ *
+ * @return
+ * An array containing a domain_id from {domain} matching the given domainname
+ */
+function domain_lookup_simple($name, $reset = false) {
+  static $cache = array();
+
+  if (empty($name)) {
+    return 0;
+  }
+
+  if ($reset || !isset($cache[$name])) {
+    // Lookup the given domainname against our allowed hosts record.
+    $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s' ", $name));
+    if (!is_array($domain)) {
+      $domain = array();
+    }
+    // If No match => use default (0)
+    if (!isset($domain['domain_id'])) {
+      $domain['domain_id'] = 0;
+    }
+    $domain['subdomain'] = $name;
+    // Invoke hook_domain_bootstrap_lookup()
+    $domain_new = _domain_bootstrap_invoke_all('lookup', $domain);
+    if (is_array($domain_new)) {
+      $domain = array_merge($domain, $domain_new);
+    }
+    $cache[$name] = $domain;
+  }
+  return $cache[$name];
+}
+
+/**
  * Implements hook_domaininstall()
  */
 function domain_domaininstall() {
-  // Cleanup list of bootstrap modules (remove disabled ones)
-  domain_bootstrap_modules_cleanup();
-
   // Check to see if the hook_url_alter() patch is installed.
   if (url('domain_access_test_path') != url('domain_access_path_test')) {
     drupal_set_message(t('The <em>custom_url_rewrite_outbound()</em> function is not installed.  Some features are not available. See the <em>custom_url_rewrite_outbound()</em> section of <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/INSTALL.txt')));
   }
+  // Set the proper variables for our bootstrap load, as a precaution.
+  domain_bootstrap_register();
 }
 
 /**
@@ -1342,16 +1452,6 @@ function domain_batch_validate($values) {
 }
 
 /**
- * Implements hook_simpletest()
- */
-function domain_simpletest() {
-  $module_name = 'domain';
-  $dir = drupal_get_path('module', $module_name) .'/tests';
-  $tests = file_scan_directory($dir, '\.test$');
-  return array_keys($tests);
-}
-
-/**
  * Sets a message to the site admin.
  *
  * If our module changes $conf settings, they may be reflected
@@ -1433,4 +1533,14 @@ function domain_content_extra_fields($type_name = NULL) {
       ),
     );
   }
+}
+
+/**
+ * Implements hook_simpletest()
+ */
+function domain_simpletest() {
+  $module_name = 'domain';
+  $dir = drupal_get_path('module', $module_name) .'/tests';
+  $tests = file_scan_directory($dir, '\.test$');
+  return array_keys($tests);
 }

@@ -107,7 +107,7 @@ function domain_prefix_theme() {
  * bootstrap and can implement domain_bootstrap hooks.
  */
 function domain_prefix_enable() {
-  domain_bootstrap_register('domain_prefix');
+  domain_bootstrap_register();
 }
 
 /**

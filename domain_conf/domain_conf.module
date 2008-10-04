@@ -89,7 +89,7 @@ function domain_conf_theme() {
  * bootstrap and can implement domain_bootstrap hooks.
  */
 function domain_conf_enable() {
-  domain_bootstrap_register('domain_conf');
+  domain_bootstrap_register();
 }
 
 /**

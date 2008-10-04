@@ -111,8 +111,6 @@ function domain_configure() {
   if (empty($_POST)) {
     // Is the module installed correctly?
     module_invoke_all('domaininstall');
-    // Register the bootstrap plugins.
-    domain_bootstrap_modules_cleanup();
   }
   // Return the configuration form.
   return drupal_get_form('domain_configure_form');

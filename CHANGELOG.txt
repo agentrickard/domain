@@ -4,6 +4,8 @@
 
 -- #316072 by BWPanda. Implements hook_content_extra_fields() to allow CCK field sorting.
 -- Cleans up hook_node_access_explain().
+-- Cleans up domain.bootstrap.inc, making all internal functions private.
+-- Documents the Domain Bootstrap Process.
 
 03-OCT-2008
 

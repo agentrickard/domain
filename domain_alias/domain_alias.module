@@ -75,6 +75,22 @@ function domain_alias_menu() {
 }
 
 /**
+ * Implementation of hook_enable().
+ *
+ * Register domain_alias with domain bootstrap so we can use domain_bootstrap hooks.
+ */
+function domain_alias_enable() {
+  domain_bootstrap_register();
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function domain_alias_disable() {
+  domain_bootstrap_unregister('domain_alias');
+}
+
+/**
  * Runs a lookup against the {domain_alias} table.  One of the two values must
  * be present. The database result is limited to one row.
  *

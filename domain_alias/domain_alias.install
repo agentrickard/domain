@@ -58,19 +58,3 @@ function domain_alias_install() {
 function domain_alias_uninstall() {
   drupal_uninstall_schema('domain_alias');
 }
-
-/**
- * Implementation of hook_enable().
- *
- * Register domain_alias with domain bootstrap so we can use domain_bootstrap hooks.
- */
-function domain_alias_enable() {
-  domain_bootstrap_register('domain_alias');
-}
-
-/**
- * Implementation of hook_disable().
- */
-function domain_alias_disable() {
-  domain_bootstrap_unregister('domain_alias');
-}

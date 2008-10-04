@@ -478,6 +478,39 @@ function hook_domainignore() {
 }
 
 /**
+ * The Domain Bootstrap Process.
+ *
+ * There are some variables that Domain Access and its modules
+ * need to set before Drupal finishes loading. In effect, we have to add
+ * stages to the Drupal bootstrap process.
+ *
+ * These processes are initiated after settings.php is loaded, during
+ * DRUPAL_BOOTSTRAP_CONFIGURATION. We skip ahead and
+ * load DRUPAL_BOOTSTRAP_DATABASE to access db_query() and
+ * similar functions.  However, the majority of Drupal functions are
+ * not yet available.
+ *
+ * The following modules will load during the bootstrap process, if enabled:
+ *  -- domain
+ *  -- domain_alias
+ *  -- domain_conf
+ *  -- domain_prefix
+ *
+ * If you create a custom module, it must be registered with the Domain
+ * Bootstrap Process. To register, you must:
+ *
+ * 1) Implement either or both of the following hooks:
+ *  -- hook_domain_bootstrap_load().
+ *  -- hook_domain_bootstrap_full().
+ * 2) Run domain_bootstrap_register() in mymodule_enable().
+ * 3) Run domain_bootstrap_unregister('mymodule') in mymodule_disable().
+ *
+ */
+function hook_domain_bootstrap() {
+  // Documentation function.
+}
+
+/**
  * Hook domain_bootstrap_lookup allows modules to modify the domain record used on the
  * current page on bootstrap level, that is, before it is used anywhere else.
  *
@@ -488,9 +521,9 @@ function hook_domainignore() {
  * functions or modules won't be loaded yet.
  *
  * In order for this hook to work your module needs to be registered with
- * domain_bootstrap_register('mymodule) during hook_enable();
+ * domain_bootstrap_register() during hook_enable();
  *
- * Modules must also use domain_bootsrap_unregister() during hook_disable().
+ * Modules must also use domain_bootsrap_unregister('mymodule') during hook_disable().
  *
  * @param $domain
  * An array containing current domain (host) name (used during bootstrap) and
@@ -508,18 +541,18 @@ function hook_domain_bootstrap_lookup($domain) {
 
 /**
  * Hook hook_domain_bootstrap_full allows modules to execute code after the domain
- * bootstrap phases which (usually) is even before drupal's hook_boot().
+ * bootstrap phases which is called before drupal's hook_boot().
  *
- * This can be used to modify drupal's variables system or prefix database
- * tables, as used in modules domain_conf and domain_prefix.
+ * This hook can be used to modify drupal's variables system or prefix database
+ * tables, as used in the modules domain_conf and domain_prefix.
  *
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
  *
  * In order for this hook to work your module needs to be registered with
- * domain_bootstrap_register('mymodule) during hook_enable();
+ * domain_bootstrap_register() during hook_enable();
  *
- * Modules must also use domain_bootsrap_unregister() during hook_disable().
+ * Modules must also use domain_bootsrap_unregister('mymodule') during hook_disable().
  *
  * @param $domain
  * An array containing current subdomain and domain_id and any other values
