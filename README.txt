@@ -14,12 +14,11 @@ CONTENTS
 1.  Introduction
 1.1   Use-Case
 1.2   Examples
-1.3   Sponsors
-1.4   Using Multiple Node Access Modules
-1.5   Known Issues
-1.5.1   Logging In To Multiple Domains
-1.5.2   Cron Handling
-1.5.3   Updating Your Site
+1.3   Using Multiple Node Access Modules
+1.4   Known Issues
+1.4.1   Logging In To Multiple Domains
+1.4.2   Cron Handling
+1.4.3   Updating Your Site
 2.  Installation
 2.1   Patches to Drupal Core
 2.1.1   multiple_node_access.patch
@@ -133,13 +132,7 @@ editors have no control over which subdomains their content is published to.
 For the original example of the module in use, see http://skirt.com/
 
 ----
-1.3 Sponsors
-
-Domain Access is sponsored by Morris DigitalWorks.
-  http://morrisdigitalworks.com
-
-----
-1.4   Using Multiple Node Access Modules
+1.3   Using Multiple Node Access Modules
 
 Node Access is a complex issue in Drupal.  Typically, sites will only use
 one node access module at a time.  In some cases, you may require
@@ -173,14 +166,14 @@ For background, see:
   -- http://drupal.org/node/234087
 
 ----
-1.5   Known Issues
+1.4   Known Issues
 
 There are some issues that occur when Domain Access is used outside
 of its original use case.  These are probably fixable, but may not work
 as you expect.  You should pay careful attention to your site behavior.
 
 ----
-1.5.1   Logging In To Multiple Domains
+1.4.1   Logging In To Multiple Domains
 
 The Domain Access module allows the creation of domains with different
 hosts.  However, security standards dictate that cookies can only be
@@ -205,7 +198,7 @@ Note: See the INSTALL.txt for instructions regarding Drupal's default
 cookie handling.
 
 ----
-1.5.2   Cron Handling
+1.4.2   Cron Handling
 
 When Drupal's cron function runs, it operates on the domain from which
 the cron.php script is invoked.  That is, if you setup cron to run from:
@@ -224,7 +217,7 @@ If you encounter any cron-related issues, please report them at:
 http://drupal.org/project/issues/domain
 
 ----
-1.5.3   Updating Your Site
+1.4.3   Updating Your Site
 
 This issue only occurs if you use the Domain Prefix module.  It is possible
 that database updates will not be applied to prefixed tables.

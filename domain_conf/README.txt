@@ -14,7 +14,6 @@ CONTENTS
 1.  Introduction
 1.1   Use-Case
 1.2   Example
-1.3   Sponsors
 2.  Installation
 2.1   Dependencies
 2.2   Configuration Options
@@ -51,12 +50,6 @@ more details.
 
 For an example, see http://skirt.com/map.  Note that some of the affiliates
 may be in "offline" mode.  This is accomplished using the Domain Conf module.
-
-----
-1.3 Sponsors
-
-Domain Conf is sponsored by Morris DigitalWorks.
-  http://morrisdigitalworks.com
 
 ----
 2.  Installation

@@ -14,7 +14,7 @@ CONTENTS
 1.  Introduction
 1.1   WARNING!
 1.2   Use-Case
-1.3   Sponsors
+1.3   Example
 2.  Installation
 2.1   Dependencies
 2.2   Configuration Options
@@ -78,12 +78,6 @@ pattern:
 In the Domain Prefix UI, tables are grouped by module (or by default function).
 This grouping should help you decide which tables must be kept together to
 ensure proper functionality.
-
-----
-1.3 Sponsors
-
-Domain Prefix is sponsored by Morris DigitalWorks.
-  http://morrisdigitalworks.com
 
 ----
 2.  Installation

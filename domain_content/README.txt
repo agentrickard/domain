@@ -13,7 +13,6 @@ CONTENTS
 
 1.  Introduction
 1.1   Use-Case
-1.2   Sponsors
 2.  Installation
 2.1   Permissions
 3.  Menu Items
@@ -40,12 +39,6 @@ administration page does not respect node access rules.
 
 The Domain Content provides an additional set of batch content administration
 pages that respect the node access rules set by the Doamin Access module.
-
-----
-1.2 Sponsors
-
-Domain Content is sponsored by Morris DigitalWorks.
-  http://morrisdigitalworks.com
 
 ----
 2.  Installation
