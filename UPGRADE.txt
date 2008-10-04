@@ -1,0 +1,103 @@
+// $Id$
+
+
+/**
+ * @file
+ * UPGRADE instructions for Domain Access 6.x.2
+ */
+
+CONTENTS
+--------
+
+1. Who Needs to Upgrade?
+2. How to Upgrade
+3. Error Notices
+4. Change Summary
+
+
+----
+1. Who Needs to Upgrade?
+
+If you are using Domain Access prior to 6.x.2.0, then you should
+follow these upgrade instructions.
+
+----
+2. How to Upgrade
+
+In previous versions, Domain Access asked you to make several
+changes to your site's settings.php file.  The 6.x.2.0 version
+has made this process easier.
+
+To upgrade, follow the steps below.
+
+
+STEP  1:  Update the module source code
+
+Replace your existing module files with the new downloaded source.
+
+
+STEP  2:   Add new code to settings.php
+  
+Add the following code to your site's settings.php file:
+  
+/**
+ * Add the domain module setup routine.
+ */
+include './sites/all/modules/domain/settings.inc';  
+  
+See INSTALL.txt for additional information.
+  
+
+STEP  3:  Remove old code from settings.php
+  
+If you have any of the following code in settings.php from eariler
+versions, you should remove it:
+  
+/**
+ * Add the custom_url_rewrite_outbound function.
+ */
+require_once './sites/all/modules/domain/settings_custom_url.inc';
+
+/**
+ * Add the domain_conf settings override
+ */
+require_once './sites/all/modules/domain/domain_conf/settings_domain_conf.inc';
+
+/**
+ * Add the domain_prefix tables
+ */
+require_once './sites/all/modules/domain/domain_prefix/settings_domain_prefix.inc';
+
+
+STEP  4:  Register the module updates
+
+There is a new variable setting that must be loaded.  To do so, you
+have two options:
+
+Option 1: Run update.php from your primary domain.
+
+Option 2: Visit Admin > Build > Domains from you primary domain.
+
+Either option should rebuild the variables needed to run Domain Access.
+
+
+----
+3. Error Notices
+
+If your module is not configured correctly, you should see an error notice
+on the top of the page -- this message is shown only to users with the
+'administer domains' permission.  The error is also written to your site's 
+error logs, if any.
+
+If you encourter this error, please check that you have installed or upgraded
+the module correctly.  If the problem persists, please file a support request
+at http://drupal.org/project/domain
+
+
+----
+4. Change Summary
+
+Below are some notes about the changes to the new version.
+
+-- Pre-load functions are now handled automatically.
+-- Domain Alias has been added.
