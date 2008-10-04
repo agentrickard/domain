@@ -13,12 +13,6 @@ CONTENTS
 
 1.  Introduction
 2.  Installation
-2.1   Option 1 -- Preferred
-2.2   Option 2
-2.3   Testing Your Configuration
-2.4   Additional Resources
-3.  Reminder
-4.  Unistalling
 
 ----
 1.  Introduction
@@ -31,5 +25,5 @@ In particular, these variables need to be available during variable_init().
 ----
 2.  Installation
 
-This file is now loaded directly from settings.php when you install the
-Domain module correctly.
+As of 6.x.2, this module is now loaded directly from settings.php when you 
+install the Domain module correctly.

@@ -60,20 +60,3 @@ function domain_prefix_uninstall() {
  *
  * Developer note: the next update will be update 2.
  */
-
-/**
- * Implementation of hook_enable().
- *
- * Register the domain_prefix with the domain module so it's loaded during domain
- * bootstrap and can implement domain_bootstrap hooks.
- */
-function domain_prefix_enable() {
-  domain_bootstrap_register('domain_prefix');
-}
-
-/**
- * Implementation of hook_disable().
- */
-function domain_prefix_disable() {
-  domain_bootstrap_unregister('domain_prefix');
-}

@@ -94,9 +94,6 @@ untar the domain package and place the entire folder in your modules directory.
 When you enable the module, it will create a {domain_prefix} table in your
 Drupal database.
 
-For the module to function correctly, you must follow the instructions in
-INSTALL.txt.
-
 ----
 2.1   Dependencies
 

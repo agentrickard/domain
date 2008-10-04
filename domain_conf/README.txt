@@ -74,9 +74,6 @@ For the module to function correctly, you must follow the instructions in INSTAL
 
 Domain Conf requires the Domain Access module be installed and active.
 
-Domain Conf requires a change to your settings.php file, as indicated by the
-directions in INSTALL.txt
-
 ----
 2.2   Configuration Options
 
@@ -92,7 +89,7 @@ settings are:
   - Slogan
   - Mission
   - Footer message
-  - Default front page [untested]
+  - Default front page
   - Anonymous user
   - Default time zone
   - Site status

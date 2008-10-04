@@ -25,7 +25,6 @@ define('DOMAIN_PREFIX_COPY', 4);
 define('DOMAIN_PREFIX_DROP', 8);
 define('DOMAIN_PREFIX_UPDATE', 16);
 
-
 /**
  * Implementats hook_domain_bootstrap_full().
  */
@@ -99,6 +98,23 @@ function domain_prefix_theme() {
     ),
   );
   return $themes;
+}
+
+/**
+ * Implementation of hook_enable().
+ *
+ * Register the domain_prefix with the domain module so it's loaded during domain
+ * bootstrap and can implement domain_bootstrap hooks.
+ */
+function domain_prefix_enable() {
+  domain_bootstrap_register('domain_prefix');
+}
+
+/**
+ * Implementation of hook_disable().
+ */
+function domain_prefix_disable() {
+  domain_bootstrap_unregister('domain_prefix');
 }
 
 /**
