@@ -484,7 +484,7 @@ The settings for Domain Access are listed under Site Building.  The path is
 ----
 4.1   Default Domain Settings
 
-These elements define the 'root' domain for your site.  In the event that a
+These elements define the 'primary' domain for your site.  In the event that a
 user tries to access an invalid domain, this domain will be used.
 
 ----
@@ -623,22 +623,12 @@ See section 3.3 for a full discussion of this feature.
 ----
 4.3.2   Search Settings
 
-For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite_outbound().  If you have not followed the
-instructions, you should see a warning at the top of the Admin > Build > Domains
-page.
-
 Allows the admin to decide if content searches should be run across all
 affiliates or just the currently active domain.  By design, Drupal will only
 find matches for the current domain.
 
 ----
 4.3.3   Search Engine Optimization
-
-For this feature to work, you must follow the instructions in INSTALL.txt
-regarding custom_url_rewrite_outbound().  If you have not followed the
-instructions, you should see a warning at the top of the Admin > Build > Domains
-page.
 
 There is a risk with these modules that your site could be penalized by search
 engines such as Google for having duplicate content.  This setting controls the
@@ -1094,6 +1084,9 @@ modules which add functionality.
 Currently, the following modules are included in the download.  They are not
 required, but each adds functionality to the core module.
 
+  - Domain Alias -- Allows advanced handling of domain name matching.  Use
+  this module to treat multiple domains as though they were identical.
+
   - Domain Configuration -- Allows you to change select system variables for
   each subdomain, such as offline status, footer message and default home 
   page.
@@ -1139,12 +1132,17 @@ currently active domain. If no active domain is found, default values are used:
   $_domain['scheme'] = 'http'
   $_domain['valid'] = TRUE
   $_domain['path'] = http://example.com
+  $_domain['error'] = ''
 
 Some uses for this global variable might include:
 
   - Block placement based on active subdomain (using PHP for block visibility).
   - Ad tags inserted based on active subdomain.
   - Theme switching based on subdomain.
+
+The 'error' element is new in 6.x.2 and is used to signal installation problems.
+Normally the 'error' element should not be set. See the API documentation of 
+hook_domain_bootstrap_ful() for details.
 
 ----
 7.3 Database Schema

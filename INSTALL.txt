@@ -67,8 +67,8 @@ You will need to do the following before you install the module.
   - Read the supplied README.txt
   - Install and configure Drupal normally.
 
-WARNING: The Domain Access module series instructs you to add several
-file includes to your settings.php file.  Do not add these commands until
+WARNING: The Domain Access module series instructs you to add a
+file include to your settings.php file.  Do not add this command until
 after you have installed Drupal.
 
 ----
@@ -103,7 +103,7 @@ installation, you may activate the module and configure its settings.
 
 NOTE: No matter how many domains resolve to the same IP, you only need one instance
 of Drupal's settings.php file.  The sites folder should be named 'default' or
-named for your root domain.
+named for your primary domain.
 
 ----
 2.3 Setting DOMAIN_INSTALL_RULE
@@ -234,9 +234,13 @@ Typically, this value is '.example.com'.
 ----
 4.4   custom_url_rewrite_outbound()
 
-For links to be written to the proper domain, you must enable the
-function inside your settings.php file.  The easiest way to do this is by using
-a PHP include to the file provided.
+Domain Access implements this function inside its settings.inc file.
+Domain Access has not been tested with other uses of 
+custom_url_rewrite_outbound().
+
+If your site currently implements this function, you will need to make custom
+edits to your current file.  Either move the function from domain/settings.inc
+into your current function, or vice versa.
 
 For more information, see
   http://api.drupal.org/api/function/custom_url_rewrite_outbound/6
