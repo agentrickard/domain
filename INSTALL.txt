@@ -286,12 +286,13 @@ include './sites/all/modules/domain/settings.inc';
 ----
 4.4.3 Option 2
 
-If you are having difficulty determining the correct path, copy the file
+If you are having difficulty determining the correct path, copy the following files
 into your settings folder.
 
   domain > settings.inc
+  domain > settings_custom_url.inc
 
-The file should be in the same directory as your active settings.php file.  Then
+The files should be in the same directory as your active settings.php file.  Then
 add the following lines:
 
 ====
@@ -304,10 +305,11 @@ include 'settings.inc';
 ----
 4.4.4   Testing Your Configuration
 
-After editing your settings.php file, go to Admin > Build > Domains.  If you
-see a warning at the top of the page beginning:
+After editing your settings.php file, go to Admin > Build > Domains.  You may
+see a warning at the top of the page:
 
-  "The custom_url_rewrite_outbound() patch is not installed..."
+  "Domain access failed to load during phase: -1. Please check your settings.php 
+  file and site configuration."
 
 This message means that your PHP server cannot find the include file.  You
 may need to test other path options for the include code.

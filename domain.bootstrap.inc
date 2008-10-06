@@ -44,15 +44,21 @@ function domain_bootstrap() {
   foreach ($phases as $phase) {
     // We return NULL if the domain module is not enabled.  This prevents
     // load errors during module enable / disable.
-    if (_domain_bootstrap($phase) === NULL) {
+    $error = _domain_bootstrap($phase);
+    if ($error === NULL) {
       $_domain['error'] = -1;
       break;
     }
-    else if (_domain_bootstrap($phase) === FALSE) {
+    else if ($error === FALSE) {
       // watchdog() is not available here, and there may be other logging.
       // So we have to write an error message global variable and pick them up in settings,inc.
       $_domain['error'] = $phase;
+      break;
     }
+  }
+  if (!isset($_domain['error'])) {
+    // All the load phases worked, so load custom_url_rewrite_outbound().
+    include 'settings_custom_url.inc';
   }
 }
 
@@ -80,6 +86,7 @@ function _domain_bootstrap($phase) {
       // Load bootstrap modules registered by Domain Access.
       _domain_bootstrap_modules_load();
       // if essential core module file has not been loaded, bootstrap fails.
+
       if (!function_exists('domain_load')) {
         return FALSE;
       }

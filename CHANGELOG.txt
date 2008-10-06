@@ -1,5 +1,10 @@
 // $Id$
 
+07-OCT-2008
+
+-- Cleans up the bootstrap process.
+-- Restores the settings_custom_url.inc file with a conditional load check.
+
 04-OCT-2008
 
 -- #316072 by BWPanda. Implements hook_content_extra_fields() to allow CCK field sorting.

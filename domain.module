@@ -42,6 +42,25 @@ define('DOMAIN_SITE_GRANT', TRUE);
 */
 function domain_init() {
   global $_domain, $conf;
+  
+  // Error handling in case the module is not installed correctly.
+  if (empty($_domain)) {
+    $_domain['error'] = '-1';
+  }
+  // If $_domain['error'] is present, then set a message and stop.
+  if (!isset($error) && isset($_domain['error'])) {
+    $error = 'Domain access failed to load during phase: '. $_domain['error'] .'. Please check your settings.php file and site configuration.';
+    // Do not show on form submissions, when enabling the module.
+    if (empty($_POST)) {
+      // Show a warning to admin users.
+      if (user_access('administer domains')) {
+        drupal_set_message($error, 'error');
+      }
+      watchdog('Domain Access', $error, NULL, WATCHDOG_ERROR);
+    }
+    return;
+  }
+  // End of the error handling routine.
 
   // Strip the www. off the subdomain, if required by the module settings.
   if (variable_get('domain_www', 0) && strpos($_domain['subdomain'], 'www.') !== FALSE) {
@@ -1327,10 +1346,6 @@ function domain_lookup_simple($name, $reset = false) {
  * Implements hook_domaininstall()
  */
 function domain_domaininstall() {
-  // Check to see if the hook_url_alter() patch is installed.
-  if (url('domain_access_test_path') != url('domain_access_path_test')) {
-    drupal_set_message(t('The <em>custom_url_rewrite_outbound()</em> function is not installed.  Some features are not available. See the <em>custom_url_rewrite_outbound()</em> section of <a href="!url">INSTALL.txt</a>', array('!url' => base_path() . drupal_get_path('module', 'domain') .'/INSTALL.txt')));
-  }
   // Set the proper variables for our bootstrap load, as a precaution.
   domain_bootstrap_register();
 }
