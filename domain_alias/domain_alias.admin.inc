@@ -43,7 +43,7 @@ function domain_alias_form($form_state, $domain, $arguments = array()) {
   );
   $form['domain'] = array(
     '#type' => 'markup',
-    '#value' => t('Registered aliases for <a href="!url"%title</a>', array('!url' => $record_edit_url, '%title' => $domain['subdomain'])),
+    '#value' => t('Registered aliases for <a href="!url"%title</a>', array('!url' => url($record_edit_url), '%title' => $domain['subdomain'])),
   );
   $form['domain_alias'] = array(
     '#tree' => TRUE,

@@ -1,5 +1,9 @@
 // $Id$
 
+07-OCT-2008 (2)
+
+-- #318133. Fixes bad link in domain alias edit screen.
+
 07-OCT-2008
 
 -- Polishes the form and form processing for Domain Alias.
