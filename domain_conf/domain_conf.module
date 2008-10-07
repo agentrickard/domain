@@ -10,9 +10,6 @@
  * @file
  * Domain manager configuration options.
  *
- * For this module to work correctly, you will need to follow the INSTALL.txt
- * instructions for editing your settings.php file.
- *
  * @ingroup domain_conf
  */
 

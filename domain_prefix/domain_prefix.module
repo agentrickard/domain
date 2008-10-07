@@ -10,8 +10,6 @@
 /**
  * @file
  * Interface for selective table prefixing for use with Domain Access.
- * For this module to work correctly, you will need to follow the INSTALL.txt
- * instructions for editing your settings.php file.
  *
  * @ingroup domain_prefix
  */

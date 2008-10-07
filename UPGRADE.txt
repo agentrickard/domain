@@ -37,22 +37,22 @@ Replace your existing module files with the new downloaded source.
 
 
 STEP  2:   Add new code to settings.php
-  
+
 Add the following code to your site's settings.php file:
-  
+
 /**
  * Add the domain module setup routine.
  */
-include './sites/all/modules/domain/settings.inc';  
-  
+include './sites/all/modules/domain/settings.inc';
+
 See INSTALL.txt for additional information.
-  
+
 
 STEP  3:  Remove old code from settings.php
-  
+
 If you have any of the following code in settings.php from eariler
 versions, you should remove it:
-  
+
 /**
  * Add the custom_url_rewrite_outbound function.
  */
@@ -71,14 +71,10 @@ require_once './sites/all/modules/domain/domain_prefix/settings_domain_prefix.in
 
 STEP  4:  Register the module updates
 
-There is a new variable setting that must be loaded.  To do so, you
-have two options:
+There is a new variable setting that must be loaded.  To do so, must
+visit Admin > Build > Domains from you primary domain.
 
-Option 1: Run update.php from your primary domain.
-
-Option 2: Visit Admin > Build > Domains from you primary domain.
-
-Either option should rebuild the variables needed to run Domain Access.
+This action will rebuild the variables needed to run Domain Access.
 
 
 ----
@@ -86,7 +82,7 @@ Either option should rebuild the variables needed to run Domain Access.
 
 If your module is not configured correctly, you should see an error notice
 on the top of the page -- this message is shown only to users with the
-'administer domains' permission.  The error is also written to your site's 
+'administer domains' permission.  The error is also written to your site's
 error logs, if any.
 
 If you encourter this error, please check that you have installed or upgraded

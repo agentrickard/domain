@@ -71,12 +71,3 @@ function domain_update_6100() {
   db_change_field($ret, 'domain', 'sitename', 'sitename', array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''));
   return $ret;
 }
-
-/**
- * Updates from 6.x.1 to 6.x.2 by registering the bootstrap modules.
- */
-function domain_update_6200() {
-  $ret = array();
-  domain_bootstrap_register();
-  return $ret;
-}

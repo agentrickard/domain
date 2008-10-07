@@ -2,8 +2,15 @@
 
 07-OCT-2008
 
+-- Polishes the form and form processing for Domain Alias.
+-- Creates README instructions for Domain Alias.
+-- Creates 6.x.2.0-rc2.
+
+06-OCT-2008
+
 -- Cleans up the bootstrap process.
 -- Restores the settings_custom_url.inc file with a conditional load check.
+-- Removes the module update function and changes the UPGRADE.txt docs.
 
 04-OCT-2008
 

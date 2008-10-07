@@ -12,24 +12,30 @@
  * @file
  * Interface for advanced subdomain matching for Domain Access.
  *
- * For this module to work correctly, you will need to follow the INSTALL.txt
- * instructions for editing your settings.php file.
+ * Original code by bforchhammer.-
+ * @link http://drupal.org/user/216396
+ * @link http://drupal.org/node/284422
  *
  * @ingroup domain_alias
  */
 
 /**
- * Implementation of hook_domain_bootstrap_lookup().
+ * Implements hook_domain_bootstrap_lookup().
  *
  * Tries to match the given domain name against patterns in the {domain_alias}
- * table and if successful updates information in given parameter $domain.
+ * table and, if successful, updates information in given parameter $domain.
  *
  * @param $domain
- * An array containing current domain (host) name (used during bootstrap) and
+ * An array containing current domain (host) name and
  * the results of lookup against {domain} table.
  *
+ * @see domain_resolve_name()
+ *
  * @return
- * An array containing at least a valid domain_id.
+ * An array containing at least a valid domain_id. Other values are:
+ * -- 'active_alias_id' => the currently active alias.
+ * -- 'redirect' => a bollean flag telling the module to redirect to the 
+ * registered domain name if accessed from an alias.
  */
 function domain_alias_domain_bootstrap_lookup($domain) {
   $alias = domain_alias_lookup($domain['subdomain']);
@@ -42,15 +48,14 @@ function domain_alias_domain_bootstrap_lookup($domain) {
 }
 
 /**
- * Implementation of hook_init().
+ * Implements hook_init().
  *
  * If redirection is enabled for the active domain alias then we redirect to the
  * main domain.
  */
 function domain_alias_init() {
   global $_domain;
-
-  // redirect to main domain if active domain alias is set to redirect.
+  // Redirect to main domain if active domain alias is set to redirect.
   // $_domain['redirect'] gets set in domain_alias_domain_bootstrap_lookup().
   if (isset($_domain['redirect']) && $_domain['redirect'] == TRUE) {
     $domain = domain_lookup($_domain['domain_id']);
@@ -59,7 +64,7 @@ function domain_alias_init() {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function domain_alias_menu() {
   $items = array();
@@ -75,7 +80,19 @@ function domain_alias_menu() {
 }
 
 /**
- * Implementation of hook_enable().
+ * Implements hook_theme().
+ */
+function domain_alias_theme() {
+  return array(
+    'domain_alias_form' => array(
+      'arguments' => array('form' => array()),
+      'file' => 'domain_alias.admin.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_enable().
  *
  * Register domain_alias with domain bootstrap so we can use domain_bootstrap hooks.
  */
@@ -84,7 +101,7 @@ function domain_alias_enable() {
 }
 
 /**
- * Implementation of hook_disable().
+ * Implements hook_disable().
  */
 function domain_alias_disable() {
   domain_bootstrap_unregister('domain_alias');
@@ -116,16 +133,19 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
   // Run the lookup, if needed.
   if (!isset($aliases[$key]) || $reset) {
     if (is_string($subdomain)) {
-      $alias = db_fetch_array(db_query_range("SELECT alias_id, domain_id, pattern, redirect".
-        " FROM {domain_alias} WHERE '%s' LIKE (pattern)", $subdomain, 0, 1));
+      // First, look for an exact match.
+      $alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE pattern = '%s'", $subdomain));
+      // If that fails, find the closest pattern.
+      if (!isset($alias)) {
+        $alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE '%s' LIKE (pattern)", $subdomain));
+      }
     }
     else if (intval($alias_id)) {
-      $alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern, redirect".
-        " FROM {domain_alias} WHERE alias_id = %d", $alias_id));
+      $alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE alias_id = %d", $alias_id));
     }
 
     if (isset($alias['alias_id'])) {
-      $alias['pattern'] = _domain_alias_placeholders_fromsql($alias['pattern']);
+      $alias['pattern'] = _domain_alias_placeholders_from_sql($alias['pattern']);
       $aliases[$key] = $alias;
       $key2 = $alias['alias_id'] .'_';
       $aliases[$key2] =& $aliases[$key];
@@ -138,15 +158,15 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
 }
 
 /**
- * Replace placeholders * and ? by SQL placeholders % and _
+ * Replace placeholders * and ? with SQL placeholders % and _
  *
  * @param $subdomain
  * String to work on.
  * @return
  * String with replaced values.
  */
-function _domain_alias_placeholders_tosql($subdomain, $reverse = FALSE) {
-  $placeholders = Array('*' => '%%', '?' => '_');
+function _domain_alias_placeholders_to_sql($subdomain, $reverse = FALSE) {
+  $placeholders = array('*' => '%%', '?' => '_');
   if ($reverse) {
     return str_replace($placeholders, array_keys($placeholders), $subdomain);
   }
@@ -157,15 +177,15 @@ function _domain_alias_placeholders_tosql($subdomain, $reverse = FALSE) {
 
 /**
  * Replace SQL placeholders % and _ by placeholders * and ?.
- * Opposite of _domain_alias_placeholder_tosql().
+ * Opposite of _domain_alias_placeholder_to_sql().
  *
  * @param $subdomain
  * String to work on.
  * @return
  * String with replaced values.
  */
-function _domain_alias_placeholders_fromsql($subdomain) {
-  return _domain_alias_placeholders_tosql($subdomain, TRUE);
+function _domain_alias_placeholders_from_sql($subdomain) {
+  return _domain_alias_placeholders_to_sql($subdomain, TRUE);
 }
 
 /**
@@ -181,11 +201,11 @@ function _domain_alias_placeholders_fromsql($subdomain) {
 function domain_alias_list($domain_id, $reset = FALSE) {
   static $aliases = Array();
   if (!isset($aliases[$domain_id]) || $reset) {
-    $aliases[$domain_id] = Array();
-    // Query the db for aliases
+    $aliases[$domain_id] = array();
+    // Query the db for aliases.
     $result = db_query("SELECT alias_id, pattern, redirect FROM {domain_alias} WHERE domain_id = %d", $domain_id);
     while ($data = db_fetch_array($result)) {
-      $data['pattern'] = _domain_alias_placeholders_fromsql($data['pattern']);
+      $data['pattern'] = _domain_alias_placeholders_from_sql($data['pattern']);
       $aliases[$domain_id][$data['alias_id']] = $data;
     }
   }
@@ -206,7 +226,7 @@ function domain_alias_domainload(&$domain) {
 }
 
 /**
- * Implementation of hook_domainupdate().
+ * Implements hook_domainupdate().
  *
  * When a {domain} entry is deleted also delete all related {domain_alias} entries.
  */
@@ -219,36 +239,13 @@ function domain_alias_domainupdate($op, $domain = array(), &$form_state = array(
 }
 
 /**
- * Implementation of hook_domainview().
- *
- * We need to use this one because hook_domainlinks wouldn't add a link to the
- * default domain.
- *
- * @param $op
- *  The operation being performed.  Valid requests are:
- *    -- 'header' defines a column header according to theme_table.
- *    -- 'select' defines a string of data to be returned.  Must be prefixed.
- *        The {domain} table is prefixed with 'd' -- do not select any columns
- *        from the domain table.  You must not select domain_id from your table.
- *    -- 'join' defines a sql join to use to pull extra data.  To properly enable
- *        sorting of all records, this MUST be a LEFT JOIN.
- *    -- 'data' defines the data to be written in the column for the
- *        specified domain.
- * @param $domain
- *  The $domain object prepared by hook_domainload().
- * @return
- *  Return values vary based on the $op value.
- *    -- 'header' return a $header array formatted as per theme_table().
- *    -- 'select' return a comman-separated list of fields to select from your table.
- *    -- 'join' return a LEFT JOIN statement for connecting your table to the {domain} table.
- *    -- 'data' return a $data element to print in the row.
+ * Implements hook_domainview().
  */
 function domain_alias_domainview($op, $domain = array()) {
   switch ($op) {
     case 'header':
       return array(array('data' => t('Aliases')));
       break;
-
     case 'data':
       if (empty($domain)) {
         return;
@@ -273,7 +270,7 @@ function domain_alias_domainview($op, $domain = array()) {
 }
 
 /**
- * Implementation of hook_domainnav().
+ * Implements hook_domainnav().
  *
  * Ensure that active domains are correctly marked as active.
  */

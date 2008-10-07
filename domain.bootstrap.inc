@@ -189,12 +189,13 @@ function _domain_bootstrap_invoke_all() {
   unset($args[0]);
   $return = array();
   foreach (_domain_bootstrap_modules() as $module) {
-    $function = $module . '_domain_bootstrap_' . $hook;
+    $function = $module .'_domain_bootstrap_'. $hook;
     if (function_exists($function)) {
       $result = call_user_func_array($function, $args);
       if (isset($result) && is_array($result)) {
         $return = array_merge_recursive($return, $result);
-      } else if (isset($result)) {
+      } 
+      else if (isset($result)) {
         $return[] = $result;
       }
     }

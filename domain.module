@@ -1254,7 +1254,7 @@ function domain_bootstrap_register() {
 function domain_bootstrap_unregister($name) {
   $modules = variable_get('domain_bootstrap_modules', array());
   if (is_array($modules)) {
-    foreach($modules as $k => $v){
+    foreach ($modules as $k => $v) {
       if ($v == $name) {
         unset($modules[$k]);
       }
