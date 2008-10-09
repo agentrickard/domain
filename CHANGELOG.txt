@@ -1,5 +1,9 @@
 // $Id$
 
+09-OCT-2008
+
+-- #319029. Updates multiple_node_access patch to Drupal 5.11.
+
 18-SEP-2008
 
 -- #310103 by ariflukito.  Add css class to hook_user.
