@@ -23,8 +23,9 @@ CONTENTS
 3.2   Updating Aliases
 3.3   Pattern Matching Options
 3.4   Redirecting Aliases
-4.  Developer Notes
-4.1   Database Schema
+4.  Domain Alias Switcher Block
+5.  Developer Notes
+5.1   Database Schema
 
 ----
 1.  Introduction
@@ -116,7 +117,8 @@ now see an "Aliases" column in your domain list.
 ----
 3.1  Creating Aliases
 
-To create a new alias, go to the Domain List at Admin > Build > Domains > Domain List.  You should see an "Aliases" column in your domain list.
+To create a new alias, go to the Domain List at Admin > Build > Domains > Domain
+List.  You should see an "Aliases" column in your domain list.
 
 Click on the 'add alias' link.  You will be presented with a form devided into
 two parts.  The top section, 'Registered aliases for *' will be empty initially.
@@ -182,12 +184,56 @@ following aliases:
 -- www.example.com [no redirect]
 -- *.example.com [redirect]
 
-This feature can be used in conjunction with the Domain Access setting for WWW Prefix Handling (see 4.3.5 WWW Prefix Handling in the main README.txt). However,
+This feature can be used in conjunction with the Domain Access setting for WWW
+Prefix Handling (see 4.3.5 WWW Prefix Handling in the main README.txt). However,
 you must take care not to set up an infinite redirect loop when configuring your
 aliases.
 
 ----
-4.  Developer Notes
+4.  Domain Alias Switcher Block
+
+Instead of using the Domain Switcher block provided by Domain Access, Domain
+Alias provides a substitute block for debugging.
+
+The block presents a nested list of domains and aliases, highlighting both the
+currently active domain (in boldface) and the active alias (in italics), if
+applicable.
+
+Note that the block uses string substitution and may write links that fail to
+resolve on your site -- this is intentional and is a DNS issue, not a bug. In
+some cases, the module will write the entry as plain text to avoid such 'dead'
+links. For example:
+
+Your site has the following domains and aliases:
+
+-- example.com
+  -- www.example.com
+-- one.example.com
+  -- *.example.com
+-- foo.one.example.com
+  -- foo.*.example.com
+  
+If you send a request to 'bar.example.com' the domain switcher will write
+the following links:
+
+-- example.com
+  -- www.example.com
+-- one.example.com
+  -- bar.example.com
+-- foo.one.example.com
+  -- foo.bar.example.com
+
+If your server is not configured to handle all of the above DNS requests, you
+may get a server error when you click on a link.
+
+NOTE: that this only works with the * wildcard, and assumes that the * reprsents
+an entire node of the host string.
+
+WARNING: The Domain Alias Switcher block should not be used as a navigation tool
+for normal site visitors. It is provided to site developers to aid in debugging.
+
+----
+5.  Developer Notes
 
 For information on the development of Domain Alias, see:
 
@@ -197,7 +243,7 @@ For information on the development of Domain Alias, see:
 
 
 ----
-4.3   Database Schema
+5.1  Database Schema
 
 Installing the module creates a {domain_conf} table that contains:
 

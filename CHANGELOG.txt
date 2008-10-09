@@ -1,5 +1,11 @@
 // $Id$
 
+09-OCT-2008
+
+-- Fixes logic error in domain_alias_lookup().
+-- Adds Domain Alias switcher block.
+-- Verifies that the module works with Drupal 6.5.
+
 07-OCT-2008 (2)
 
 -- #318133. Fixes bad link in domain alias edit screen.
