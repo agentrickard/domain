@@ -5,6 +5,7 @@
 -- Fixes logic error in domain_alias_lookup().
 -- Adds Domain Alias switcher block.
 -- Verifies that the module works with Drupal 6.5.
+-- Creates 6.x.2.0-rc3
 
 07-OCT-2008 (2)
 
