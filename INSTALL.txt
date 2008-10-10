@@ -233,14 +233,8 @@ From the command line, go to the Drupal root directory and run the command:
   
 For more information, see http://drupal.org/patch/apply
 
-After you install this patch, you must copy the following code to settings.php:
-
-/**
- * Add the custom_url_rewrite_outbound function.
- */
-include './sites/all/modules/domain/settings_custom_url.inc';
-
-The entire function can be found at the end of this document.
+After you install this patch, you must edit your settings.php file. See
+section 4.4 for detailed instructions.
 
 Developers: see http://drupal.org/node/207330 for more information.
 
