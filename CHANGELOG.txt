@@ -4,6 +4,7 @@
 
 -- #319542 by batigolix. Updates install instructions.
 -- Standardizes documentation use of the term domain instead of subdomain.
+-- Makes most include_once and require_once calls simple include statements.
 
 09-OCT-2008
 
