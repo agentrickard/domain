@@ -186,6 +186,18 @@ for multiple node access rules.
 WARNING: This patch uses subselect statements and requires pgSQL or
 MySQL 4.1 or higher.
 
+To apply to patch, find the file:
+
+  domain > patches > multiple_node_access.patch
+  
+Copy the file to your root Drupal directory.
+  
+From the command line, go to the Drupal root directory and run the command:
+
+  patch -p0 < multiple_node_access.patch
+  
+For more information, see http://drupal.org/patch/apply
+
 Developers: see http://drupal.org/node/191375 for more information.
 
 This patch is being submitted to Drupal core for version 7.
@@ -209,16 +221,28 @@ we must write absolute links to that content.
 
 This patch introduces backports custom_url_rewrite_outbound() to Drupal 5.
 
-After you install this patch, you must copy the function:
+To apply to patch, find the file:
 
-  custom_url_rewrite_outbound()
+  domain > patches > custom_url_rewrite_outbound.patch
+  
+Copy the file to your root Drupal directory.
+  
+From the command line, go to the Drupal root directory and run the command:
 
-And paste it into your site's settings.php file.
+  patch -p0 < custom_url_rewrite_outbound.patch
+  
+For more information, see http://drupal.org/patch/apply
+
+After you install this patch, you must copy the following code to settings.php:
+
+/**
+ * Add the custom_url_rewrite_outbound function.
+ */
+include './sites/all/modules/domain/settings_custom_url.inc';
 
 The entire function can be found at the end of this document.
 
 Developers: see http://drupal.org/node/207330 for more information.
-
 
 ----
 4.  Configuring settings.php

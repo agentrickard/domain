@@ -28,10 +28,13 @@ INSTALLATION INSTRUCTIONS
 /**
  * Add the custom_url_rewrite_outbound function.
  */
-require_once './sites/all/modules/domain/settings_custom_url.inc';
+include './sites/all/modules/domain/settings_custom_url.inc';
 
     NOTE: You may need to alter the file path above based on your
     site configuration.  See INSTALL.txt for further help.
+    
+    NOTE: For this code to be active, you must also apply the
+    custom_url_rewrite_outbound.patch distributed with the module.
 
 4. Go to Admin > Build > Modules.  Therre you will see the Domain
     module group.

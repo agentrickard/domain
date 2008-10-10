@@ -1436,6 +1436,10 @@ function domain_node_access_explain($row) {
     case 'domain_editor':
       $return .= t('Editable by %domain editors.', array('%domain' => $domain['subdomain']));
       break;
+    default:
+      // This is not our grant, do not return anything.
+      $return = NULL;
+      break;
   }
   return $return;
 }
