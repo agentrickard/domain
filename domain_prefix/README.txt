@@ -47,7 +47,7 @@ This module may cause unexpected behavior.  Test any changes to your database
 carefully.
 
 To test basic functionality, I recommend prefixing the 'watchdog' table.  Then
-test Drupal's error logging on variuous subdomains.
+test Drupal's error logging on variuous domains.
 
 THIS MODULE WILL NOT WORK CORRECTLY ON pgSQL.  See 4.2 for details.
 

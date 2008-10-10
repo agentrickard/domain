@@ -6,7 +6,7 @@
  */
 
 Domain Access: Domain Alias
-Advanced subdomain matching methods for Domain Access.
+Advanced domain matching methods for Domain Access.
 
 CONTENTS
 --------

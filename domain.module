@@ -2,7 +2,7 @@
 // $Id$
 
 /**
- * @defgroup domain Domain Access: A subdomain-based access control system
+ * @defgroup domain Domain Access: A domain-based access control system
  *
  * The core Domain Access module.
  */
@@ -62,7 +62,7 @@ function domain_init() {
   }
   // End of the error handling routine.
 
-  // Strip the www. off the subdomain, if required by the module settings.
+  // Strip the www. off the domain, if required by the module settings.
   if (variable_get('domain_www', 0) && strpos($_domain['subdomain'], 'www.') !== FALSE) {
     $_domain['subdomain'] = str_replace('www.', '', $_domain['subdomain']);
     $www_replaced = TRUE;
@@ -254,7 +254,7 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
             $this_node = node_load(arg(1));
             $output = '';
             if (!empty($this_node->subdomains)) {
-              $output .= theme('item_list', $this_node->subdomains, t('Subdomains'));
+              $output .= theme('item_list', $this_node->subdomains, t('Assigned domains'));
             }
             if (!empty($this_node->editors)) {
               $output .= theme('item_list', $this_node->editors, t('Editors'));
@@ -704,7 +704,7 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         $debug = variable_get('domain_debug', 0);
         if ($debug && user_access('set domain access')) {
           if (!empty($node->subdomains)) {
-            $output = theme('item_list', $node->subdomains, t('Subdomains'));
+            $output = theme('item_list', $node->subdomains, t('Assigned domains'));
             $node->content['subdomains'] = array('#value' => $output, '#weight' => 20);
           }
           if (!empty($node->editors)) {
@@ -746,7 +746,7 @@ function domain_node_grants($account, $op) {
       }
     }
 
-    // Grant based on active subdomain.
+    // Grant based on active domain.
     $grants['domain_id'][] = $_domain['domain_id'];
     if ($rules) {
       $grants['domain_id']['group'] = 'domain';
@@ -1297,7 +1297,7 @@ function domain_request_name() {
  *
  * This function runs a lookup against the {domain} table matching the
  * subdomain column against the given parameter $_name. If a match is
- * found the function returns an array containing the subdomain (= $_domainname)
+ * found the function returns an array containing the domain requested
  * and the matching domain_id from the {domain} table.
  *
  * If no match is found domain_id is set to 0 for the default domain.

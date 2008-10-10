@@ -198,7 +198,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           // Set arguments to be passed to the form
           $arguments = array('user_submitted' => TRUE);
           // Include the form file.
-          include_once(drupal_get_path('module', 'domain') .'/domain.admin.inc');
+          include_once drupal_get_path('module', 'domain') .'/domain.admin.inc';
           // Set the scheme as needed.
           $form_state['values']['domain_scheme'] = variable_get('domain_user_scheme', 'http');
           drupal_execute('domain_create_form', $form_state, $arguments);

@@ -38,7 +38,7 @@ function domain_conf_init() {
   if (arg(0) == 'admin') {
     $extra = drupal_get_path('module', 'domain_conf') .'/domain_conf.inc';
     if (file_exists($extra)) {
-      include_once($extra);
+      include $extra;
     }
   }
 }

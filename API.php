@@ -77,7 +77,7 @@ function hook_domainrecords(&$grants, $node) {
 /**
  * Notifies other modules that we are loading a domain record from the database.
  *
- * Modules may overwrite or add to the $domain array for each subdomain.
+ * Modules may overwrite or add to the $domain array for each domain.
  *
  * When loading lists of domains or generating domain information, either use the proper
  * functions -- domain_default(), domain_lookup(), and domain_domains() -- or invoke this hook.
@@ -555,7 +555,7 @@ function hook_domain_bootstrap_lookup($domain) {
  * Modules must also use domain_bootsrap_unregister('mymodule') during hook_disable().
  *
  * @param $domain
- * An array containing current subdomain and domain_id and any other values
+ * An array containing current domain and domain_id and any other values
  * added during domain bootstrap phase 2 (DOMAIN_BOOTSTRAP_DOMAINNAME_RESOLVE).
  *
  * @return

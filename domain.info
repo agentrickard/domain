@@ -1,5 +1,5 @@
 ;  $Id$
 name = Domain Access
-description = A subdomain-based access control system
+description = A domain-based access control system
 package = Domain Access
 core = 6.x

@@ -6,7 +6,7 @@
  */
 
 Domain Access
-A subdomain-based access control system.
+A domain-based access control system.
 
 CONTENTS
 --------
@@ -231,6 +231,9 @@ $cookie_domain value to the string indicating your root domain.
 
 Typically, this value is '.example.com'.
 
+If your domains do not share the top-level, then you may need to login to
+each site separately or use a module such as Single SignOn.
+
 ----
 4.4   custom_url_rewrite_outbound()
 
@@ -289,6 +292,7 @@ include './sites/all/modules/domain/settings.inc';
 If you are having difficulty determining the correct path, copy the following files
 into your settings folder.
 
+  domain > domain.bootstrap.inc
   domain > settings.inc
   domain > settings_custom_url.inc
 

@@ -12,7 +12,7 @@
  * Implementation of hook_schema().
  */
 function domain_alias_schema() {
-  $schema['domain_alias'] = array('description' => 'Subdomain aliases and patterns for domain entries in {domain}.',
+  $schema['domain_alias'] = array('description' => 'Domain aliases and patterns for domain entries in {domain}.',
     'fields' => array(
       'alias_id' => array('type' => 'serial',
         'description' => 'The primary identifier for an alias/pattern.',
@@ -25,7 +25,7 @@ function domain_alias_schema() {
         'default' => 0,
         ),
       'pattern' => array('type' => 'varchar',
-        'description' => 'The subdomain alias/pattern',
+        'description' => 'The domain alias/pattern',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',

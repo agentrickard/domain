@@ -4,7 +4,7 @@
 /**
  * @defgroup domain_views Domain Views: provides a views filter
  *
- * Creates unique subdomains for registered users.
+ * Views integration for Domain Access.
  */
 
 /**

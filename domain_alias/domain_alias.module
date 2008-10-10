@@ -2,15 +2,15 @@
 // $Id$
 
 /**
- * @defgroup domain_alias Domain Alias: Advanced subdomain matching
+ * @defgroup domain_alias Domain Alias: Advanced domain matching
  *
- * Allows to specify subdomain aliases and domain name patterns for domain
+ * Allows domain aliases and domain name patterns for domain
  * entries so multiple hostnames are matched on one single domain entry.
  */
 
 /**
  * @file
- * Interface for advanced subdomain matching for Domain Access.
+ * Interface for advanced domain matching for Domain Access.
  *
  * Original code by bforchhammer.-
  * @link http://drupal.org/user/216396
@@ -140,7 +140,7 @@ function domain_alias_block($op = 'list', $delta = 0, $edit = array()) {
  * be present. The database result is limited to one row.
  *
  * @param $subdomain
- * The subdomain to match the patterns in the {domain_alias} table against. Optional.
+ * The domain to match the patterns in the {domain_alias} table against. Optional.
  * @param $alias_id
  * The alias_id taken from {domain_alias}. Optional
  * @param $reset

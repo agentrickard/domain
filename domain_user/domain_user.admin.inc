@@ -67,7 +67,7 @@ function domain_user_configure_form() {
   $form['rules'] = array(
     '#type' => 'markup',
     '#weight' => 20,
-    '#value' => '<br /><br />'. t('<h3>Reserved Usernames</h3><p>The following usernames cannot be registered, since they are used as unique subdomains:</p>') . $output,
+    '#value' => '<br /><br />'. t('<h3>Reserved Usernames</h3><p>The following usernames cannot be registered, since they are used as unique domains:</p>') . $output,
   );
   return system_settings_form($form);
 }

@@ -454,7 +454,7 @@ function domain_create_form_validate($form, &$form_state) {
   $check = 0;
   $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
   if ($check > 0) {
-    form_set_error('subdomain', t('The subdomain value must be unique.'));
+    form_set_error('subdomain', t('The domain value must be unique.'));
   }
   $check = 0;
   $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s'", $form_state['values']['sitename']));
@@ -570,7 +570,7 @@ function domain_edit_form_validate($form, &$form_state) {
   $subdomain = strtolower(urlencode($form_state['values']['subdomain']));
   $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id <> %d", $subdomain, $form_state['values']['domain_id']));
   if ($check) {
-    form_set_error('subdomain', t('The subdomain value must be unique.'));
+    form_set_error('subdomain', t('The domain value must be unique.'));
   }
   $check2 = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id <> %d", $form_state['values']['sitename'], $form_state['values']['domain_id']));
   if ($check2) {

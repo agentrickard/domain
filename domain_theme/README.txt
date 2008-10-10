@@ -54,7 +54,7 @@ Domain Theme requires the Domain Access module be installed and active.
 3.  Configuration Options
 
 The Domain Theme modules adds configuration options to the main module and
-to each of your subdomains.
+to each of your domains.
 
 ----
 3.1 Theme Settings
