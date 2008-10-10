@@ -6,7 +6,7 @@
  */
 
 Domain Access
-A subdomain-based access control system.
+A domain-based access control system.
 
 CONTENTS
 --------
@@ -36,7 +36,6 @@ CONTENTS
 5.2   Domain Prefix
 5.3   Domain Strict
 6.  Uninstalling
-7.  custom_url_rewrite_outbound() function
 
 ----
 1.  Introduction
@@ -264,6 +263,9 @@ In order to provide for login across your active domains, you must set the
 $cookie_domain value to the string indicating your root domain.
 
 Typically, this value is '.example.com'.
+
+If your domains do not share the top-level, then you may need to login to
+each site separately or use a module such as Single SignOn.
 
 ----
 4.4   custom_url_rewrite_outbound()

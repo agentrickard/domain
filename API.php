@@ -78,7 +78,7 @@ function hook_domainrecords(&$grants, $node) {
 /**
  * Notifies other modules that we are loading a domain record from the database.
  *
- * Modules may overwrite or add to the $domain array for each subdomain.
+ * Modules may overwrite or add to the $domain array for each domain.
  *
  * WARNING: If you need to make revisions to the $_domain global before it is processed
  * by other modules, you must implement hook_init().  Only modules that implement hook_init()

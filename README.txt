@@ -6,7 +6,7 @@
  */
 
 Domain Access
-A subdomain-based access control system.
+A domain-based access control system.
 
 CONTENTS
 --------
@@ -25,7 +25,7 @@ CONTENTS
 2.1.1   multiple_node_access.patch
 2.1.2   custom_url_rewrite_outbound.patch
 2.2   Server Configuration
-2.3   Creating Subdomain Records
+2.3   Creating Domain Records
 2.4   Setting DOMAIN_INSTALL_RULE
 2.5   Setting DOMAIN_EDITOR_RULE
 2.6   Setting DOMAIN_SITE_GRANT
@@ -95,13 +95,13 @@ By default, these sites share all tables in your Drupal installation.
 The module uses Drupal's node_access() system to determine what content is
 available on each site in the network.  Unlike other multi-domain modules for
 Drupal, the Domain Access module determines user access based on the active
-subdomain that the user is viewing, rather than which group or site the user
+domain that the user is viewing, rather than which group or site the user
 belongs to.
 
 Additionally, when a user creates content, that content will automatically be
-assigned to the currently active subdomain unless the user has specific
+assigned to the currently active domain unless the user has specific
 privileges to be able to assign domain access.  Under advanced setups, the
-ability to edit content for a specific subdomain can be segregated from the
+ability to edit content for a specific domain can be segregated from the
 typical Drupal privilege to 'administer nodes.'
 
 For more information about Domain Access privileges, see section 3.
@@ -125,7 +125,7 @@ monthly magazine.  The publishing rules were as follows:
 These rules are enforced programmatically by the Domain Access module.  There
 was concern that, if given a choice to make, local editors would not assign the
 content correctly.  Therefore, the module handles this automatically, and local
-editors have no control over which subdomains their content is published to.
+editors have no control over which domains their content is published to.
 
 ----
 1.2 Examples
@@ -185,8 +185,17 @@ The Domain Access module allows the creation of domains with different
 hosts.  However, security standards dictate that cookies can only be
 read from the issuing domain.
 
-As a result, you may configure your site as follows, but when you do so,
-users cannot be logged through a single sign in.
+If you use the same top-level domain for all sites, setting the $cookie_domain
+as specified in INSTALL.txt will allow for multiple logins.  For example, a
+$cookie_domain = '.example.com' will work for the following domains:
+
+  example.com
+  one.example.com
+  two.example.com
+  my.user.example.com
+
+However, if configure your site as follows users cannot be logged in with a
+single login cookie.
 
   example.com
   one.example.com
@@ -297,14 +306,7 @@ we must write absolute links to that content.
 
 This patch introduces backports custom_url_rewrite_outbound() to Drupal 5.
 
-After you install this patch, you must copy the function:
-
-  custom_url_rewrite_outbound()
-
-And paste it into your site's settings.php file.   This function can be found
-at the bottom of INSTALL.txt
-
-The entire function can be found at the end of this document.
+After you install this patch, you must followi the instructions in INSTALL.txt
 
 Developers: see http://drupal.org/node/207330 for more information.
 
@@ -345,13 +347,13 @@ of Drupal's settings.php file.  The sites folder should be named 'default' or
 named for your root domain.
 
 ----
-2.3 Creating Subdomain Records
+2.3 Creating Domain Records
 
 After you enable the module, you will have a user interface for registering new
-subdomains with your site.  For these to work correctly, they must also be
+domains with your site.  For these to work correctly, they must also be
 configured by your DNS server.
 
-To be clear: creating a new subdomain record through this module will not alter
+To be clear: creating a new domain record through this module will not alter
 the DNS server of your web server.
 
 ----
@@ -419,7 +421,7 @@ permissions.
 The Domain Access module has the following permissions:
 
   - 'administer domains'
-  This permission allows users to create and manage subdomain records
+  This permission allows users to create and manage domain records
   and settings.
 
   'assign domain editors'
@@ -492,8 +494,8 @@ under the Domain Access configuration screen.
 
 Due to the way node_access() works, the following limitations should be noted.
 
-  - Any node that is assigned to more than one subdomain can be edited
-    by any editor who belongs to one of the subdomains.
+  - Any node that is assigned to more than one domain can be edited
+    by any editor who belongs to one of the domains.
 
   - Users who look at the sites and have the 'administer nodes' permission
     can always see all content on all sites, which can be confusing.  This is
@@ -501,7 +503,7 @@ Due to the way node_access() works, the following limitations should be noted.
     authenticated user who does not have special permissions.
 
   - Users who have the 'edit TYPE nodes' permission will be able to edit nodes
-    that do not belong to their subdomain.
+    that do not belong to their domain.
 
 These limitations are due to the permissive nature of node_access().  If any
 access rule grants you permission, it cannot be taken away.
@@ -561,9 +563,9 @@ These options affect the basic options for how the module behaves.
 4.2.1   New Content Settings
 
 Defines the default behavior for content added to your site.  By design, the
-module automatically assigns all content to the currently active subdomain.
+module automatically assigns all content to the currently active domain.
 If this value is set to 'Show on all sites,' then all new content will be
-assigned to all sites _in addition to_ the active subdomain.
+assigned to all sites _in addition to_ the active domain.
 
 ----
 4.2.2   Content Editing Forms
@@ -868,7 +870,7 @@ omissions at http://drupal.org/project/issues/domain.
 ----
 4.6 Domain List
 
-This screen shows all active subdomains registered for use with the site.
+This screen shows all active domains registered for use with the site.
 
 Record zero (0) is hardcoded to refer to the "root" site defined as your
 Primary domain name.
@@ -878,7 +880,7 @@ Primary domain name.
 
 As noted above, this screen does not register DNS records with Apache.
 
-Use this screen to register new allowed subdomains with your site.  This
+Use this screen to register new allowed domains with your site.  This
 process is especially important for sites using Wildcard DNS, as it prevents
 non-registered sites from resolving.
 
@@ -1131,19 +1133,19 @@ Currently, the following modules are included in the download.  They are not
 required, but each adds functionality to the core module.
 
   - Domain Configuration -- Allows you to change select system variables for
-  each subdomain, such as offline status, footer message and default home 
+  each domain, such as offline status, footer message and default home 
   page.
 
-  - Domain Content -- Provides a content administration page for each subdomain,
+  - Domain Content -- Provides a content administration page for each domain,
   so that affiliate editors can administer content for their section of the
   site.
 
   - Domain Navigation -- Supplies a navigation block with three themes. Creates
-  menu items for each subdomain, suitable for using as primary or secondary
+  menu items for each domain, suitable for using as primary or secondary
   links.
 
   - Domain Prefix -- A powerful module that allows for selective table prefixing
-  for each subdomain in your installation.
+  for each domain in your installation.
 
   - Domain Source -- Allows editors to specify a primary "source" domain to be
   used when linking to content from another domain.
@@ -1152,7 +1154,7 @@ required, but each adds functionality to the core module.
   content on that domain.  Note that anonymous users may only see content
   assigned to "all affiliates" if this module is enabled.
 
-  - Domain Theme -- Allows separate themes for each subdomain.
+  - Domain Theme -- Allows separate themes for each domain.
 
   - Domain User -- Allows the creation of specific subdomains for each active
   site user.
@@ -1178,9 +1180,9 @@ currently active domain. If no active domain is found, default values are used:
 
 Some uses for this global variable might include:
 
-  - Block placement based on active subdomain (using PHP for block visibility).
-  - Ad tags inserted based on active subdomain.
-  - Theme switching based on subdomain.
+  - Block placement based on active domain (using PHP for block visibility).
+  - Ad tags inserted based on active domain.
+  - Theme switching based on domain.
 
 ----
 7.3 Database Schema

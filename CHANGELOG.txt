@@ -1,5 +1,10 @@
 // $Id$
 
+10-OCT-2008
+
+-- #319542 by batigolix. Updates install instructions.
+-- Standardizes documentation use of the term domain instead of subdomain.
+
 09-OCT-2008
 
 -- #319029. Updates multiple_node_access patch to Drupal 5.11.
