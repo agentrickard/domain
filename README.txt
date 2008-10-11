@@ -829,7 +829,20 @@ Use this screen to register new allowed domains with your site.  This
 process is especially important for sites using Wildcard DNS, as it prevents
 non-registered sites from resolving.
 
-When you create a new domain record, simply fill in the two fields:
+Note that as of 6.x.2.0, two domains are created for you on installation.
+The first is a placeholder for your default domain. The second is a 
+sample domain record.
+
+The first domain will use the HTTP_HOST value of the request made
+when installing the module. This value may be edited by going to
+Admin > Build > Domains and editing the Primary Domain value.
+
+The second domain will be given the value test.example.com, where
+example.com is the Primary Domain value. This domain is set to be
+'inactive' initially. You will need to edit this domain record in order to
+use it.
+
+When you create a new domain record, simply fill in the form:
 
   - Domain
   This is the full path.example.com, without http:// or a trailing slash.
@@ -844,6 +857,10 @@ When you create a new domain record, simply fill in the two fields:
 Both the Domain and the Site name are required to be unique values.
 
 After you create a record, you may edit or delete it as you see fit.
+
+NOTE: As a result of module installation, you will never have a Domain with
+the domain_id of 2 if you did not use Domain Access prior to 6.x.2.0. This
+is by design and will not affect the module.
 
 ----
 4.8 Node Settings

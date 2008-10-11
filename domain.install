@@ -11,6 +11,16 @@
  */
 function domain_install() {
   drupal_install_schema('domain');
+  // Now add the first two records, the primary domain
+  // and a sample domain.
+  $root = strtolower(rtrim($_SERVER['HTTP_HOST']));
+  $site = variable_get('site_name', 'Drupal');
+  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, $site, 'http', 1);
+  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", 'test.'. $root, t('Test for @site', array('@site' => $site)), 'http', 0);
+  // MySQL won't let us insert row 0 into an autoincrement table.
+  // Like the {users} table, this leaves us with no row 2.
+  db_query("UPDATE {domain} SET domain_id = domain_id - 1");
+  
 }
 
 /**
@@ -69,5 +79,21 @@ function domain_update_6100() {
   db_change_field($ret, 'domain', 'subdomain', 'subdomain', array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''));
   db_add_index($ret, 'domain', 'subdomain', array('subdomain'));
   db_change_field($ret, 'domain', 'sitename', 'sitename', array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''));
+  return $ret;
+}
+
+/**
+ * Updates to 6.x.2.
+ * Puts the primary domain into the domain table.
+ */
+function domain_update_6200() {
+  $ret = array();
+  // Update the new bootstrap information.
+  domain_bootstrap_register();
+  // Try to register the default domain.
+  $root = variable_get('domain_root', rtrim($_SERVER['HTTP_HOST']));
+  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, variable_get('domain_sitename', variable_get('site_name', 'Drupal')), variable_get('domain_scheme', 'http://'), 1);
+  // MySQL won't let us insert row 0 into an autoincrement table.
+  db_query("UPDATE {domain} SET domain_id = 0 WHERE subdomain = '%s'", $root);
   return $ret;
 }

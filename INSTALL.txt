@@ -18,21 +18,24 @@ CONTENTS
 2.3   Setting DOMAIN_INSTALL_RULE
 2.4   Setting DOMAIN_EDITOR_RULE
 2.5   Setting DOMAIN_SITE_GRANT
-3.   Patch to Drupal Core (optional)
-3.1   multiple_node_access.patch
-4.  Configuring settings.php
-4.1   $base_url
-4.2   $db_prefix
-4.3   $cookie_domain
-4.4   custom_url_rewrite_outbound()
-4.4.1   Installation
-4.4.2   Option 1
-4.4.3   Option 2
-4.4.4   Testing Your Configuration
-4.4.5   Additional Resources
-5.  Additional Module Installation
-5.1   Domain Strict
-6.  Uninstalling
+3.   Installing the Module
+3.1   After Installation
+4.   Patch to Drupal Core (optional)
+4.1   multiple_node_access.patch
+5.  Configuring settings.php
+5.1   $base_url
+5.2   $db_prefix
+5.3   $cookie_domain
+5.4   Add settings.inc
+5.4.1   Installation
+5.4.2   Option 1
+5.4.3   Option 2
+5.4.4   Testing Your Configuration
+5.4.5   Additional Resources
+5.5 custom_url_rewrite_outbound()
+6.  Additional Module Installation
+6.1   Domain Strict
+7.  Uninstalling
 
 ----
 1.  Introduction
@@ -159,7 +162,42 @@ be viewable on all domains.
 Normally, you will not need to edit this value.
 
 ----
-3. Patch to Drupal Core (optional)
+3.   Installing the Module
+
+After you have prepared your server and made any edits to the
+default module behavior, you may install Domain Access like any
+other Drupal module.
+
+----
+3.1   After Installation
+
+Note that as of 6.x.2.0, two domains are created for you on installation.
+The first is a placeholder for your default domain. The second is a 
+sample domain record.
+
+The first domain will use the HTTP_HOST value of the request made
+when installing the module. This value may be edited by going to
+Admin > Build > Domains and editing the Primary Domain value.
+
+The second domain will be given the value test.example.com, where
+example.com is the Primary Domain value. This domain is set to be
+'inactive' initially. You will need to edit this domain record in order to
+use it.
+
+After you install the module, you should visit Admin > Users > Permissions
+and set the module permissions; normally you will give your site 
+administrators the following permissions:
+
+    -- 'administer domains'
+    -- 'set domain access'
+
+After saving permissions, go to Admin > Build > Domains and configure
+your site's Primary Domain.
+
+For more information, see README.txt.
+
+----
+4. Patch to Drupal Core (optional)
 
 The following patch is optional.  The patch affects advanced behavior of the
 Domain Access module.
@@ -170,7 +208,7 @@ To apply this patch, place it in your root Drupal folder.
 Then follow the instructions at: http://drupal.org/patch/apply
 
 ----
-3.1 multiple_node_access.patch
+4.1 multiple_node_access.patch
 
 You should apply this patch only if you use Domain Access along with
 another Node Access module, such as Organic Groups (OG).
@@ -185,7 +223,7 @@ Developers: see http://drupal.org/node/191375 for more information.
 This patch has being submitted to Drupal core for version 7.
 
 ----
-4.  Configuring settings.php
+5.  Configuring settings.php
 
 Remember, the Domain Access module lets you run multiple sites
 from a single installation.  You only need one settings.php file.
@@ -194,7 +232,7 @@ As a result, some options in your settings.php file need to be
 considered carefully.
 
 ----
-4.1   $base_url
+5.1   $base_url
 
 The $base_url setting is normally not set.  With Domain Access, you
 cannot set this value manually.
@@ -204,7 +242,7 @@ set this value.  (For the technical, this happens in the conf_init()
 function).
 
 ----
-4.2   $db_prefix
+5.2   $db_prefix
 
 The $db_prefix value allows for table prefixing of your Drupal database
 in the event that you run more than one site from a single database.
@@ -218,7 +256,7 @@ you can only set $db_prefix as a string value, not an array.
 For more detail, see INSTALL.txt in the domain_prefix folder.
 
 ----
-4.3   $cookie_domain
+5.3   $cookie_domain
 
 By design, Drupal cookies are set for the current website on login.  That is, if
 you login from www.example.com, the cookie will be set from the domain
@@ -234,22 +272,21 @@ Typically, this value is '.example.com'.
 If your domains do not share the top-level, then you may need to login to
 each site separately or use a module such as Single SignOn.
 
-----
-4.4   custom_url_rewrite_outbound()
-
-Domain Access implements this function inside its settings.inc file.
-Domain Access has not been tested with other uses of 
-custom_url_rewrite_outbound().
-
-If your site currently implements this function, you will need to make custom
-edits to your current file.  Either move the function from domain/settings.inc
-into your current function, or vice versa.
-
-For more information, see
-  http://api.drupal.org/api/function/custom_url_rewrite_outbound/6
+NOTE: After you change your cookie value, you will need to logout and
+log back in for the new cookie to take effect.
 
 ----
-4.4.1  Installation
+5.4  Add settings.inc
+
+For Domain Access to work, you must add some code to your settings.php
+file. This code will load the Domain Access bootstrap routines that determine
+how your site is being requested. 
+
+If you do not add settings.inc to your settings.php file, Domain Access will
+fail to load and report an error message to site administrators.
+
+----
+5.4.1  Installation
 
 In the Domain Access download, find the following file:
 
@@ -259,7 +296,7 @@ You will need to load this file from inside your settings.php file. There
 are two methods for this.
 
 ----
-4.4.2  Option 1 -- Preferred
+5.4.2  Option 1 -- Preferred
 
 This method is preferred, since any updates to the module release
 will be reflected in this file.
@@ -287,7 +324,7 @@ include './sites/all/modules/domain/settings.inc';
 ====
 
 ----
-4.4.3 Option 2
+5.4.3 Option 2
 
 If you are having difficulty determining the correct path, copy the following files
 into your settings folder.
@@ -307,7 +344,7 @@ include 'settings.inc';
 ====
 
 ----
-4.4.4   Testing Your Configuration
+5.4.4   Testing Your Configuration
 
 After editing your settings.php file, go to Admin > Build > Domains.  You may
 see a warning at the top of the page:
@@ -319,7 +356,7 @@ This message means that your PHP server cannot find the include file.  You
 may need to test other path options for the include code.
 
 ----
-4.4.5   Additional Resources
+5.4.5   Additional Resources
 
 If you are having trouble configuring the include, you should check your
 PHP include path.  You may need to use an absolute path to your server root.
@@ -330,13 +367,27 @@ You may also copy the entire function custom_url_rewrite_outbound() directly
 into your settings.php file.
 
 ----
-5.  Additional Module Installation
+5.5 custom_url_rewrite_outbound()
+
+Domain Access implements this function inside its settings.inc file.
+Domain Access has not been tested with other uses of 
+custom_url_rewrite_outbound().
+
+If your site currently implements this function, you will need to make custom
+edits to your current file.  Either move the function from domain/settings.inc
+into your current function, or vice versa.
+
+For more information, see
+  http://api.drupal.org/api/function/custom_url_rewrite_outbound/6
+
+----
+6.  Additional Module Installation
 
 The Domain Access module includes several sub-modules.  Two of these
 have their own INSTALL.txt instructions.
 
 ----
-5.1   Domain Strict
+6.1   Domain Strict
 
 While this module requires no additional installation, it fundamentally
 changes the behavior of the Domain Access module.
@@ -353,7 +404,7 @@ site for users who are not logged in.  This is by design.
 Refer to domain > domain_strict > README.txt
 
 ----
-6.  Uninstalling
+7.  Uninstalling
 
 When you disable this module, it will reset your {node_access} tables and
 remove all records from the {domain_access} table.  This will remove all

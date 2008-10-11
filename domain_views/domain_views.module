@@ -19,3 +19,11 @@
 /**
  * This module file is a stub, all the work is done by domain_views.views.inc.
  */
+
+/**
+ * Implements hook_views_api().
+ */
+function domain_views_views_api() {
+
+  return array('api' => 2.0);
+}

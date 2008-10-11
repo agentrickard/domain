@@ -1,5 +1,13 @@
 // $Id$
 
+11-OCT-2008
+
+-- #320064. Places the default domain record into {domain} as record 0.
+-- Changes the installer to add domains 0 and 1 on install.
+-- Use of 6.x.2.0 now requires running update.php for users of lower versions.
+-- Begins to fix Domain Views for ViewsAPI 2.0. UNSTABLE.
+-- Fixes Domain Prefix README.
+
 10-OCT-2008
 
 -- #319542 by batigolix. Updates install instructions.

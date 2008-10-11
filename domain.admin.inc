@@ -18,8 +18,7 @@
 function domain_view() {
   global $_domain;
   $output = t('<p>The following domains have been created for your site.  The currently active domain <b>is shown in boldface</b>.  You
-                    may click on a domain to change the currently active domain.  Your default domain has an ID of zero (0) and is always
-                    at the top of the list below.</p>');
+                    may click on a domain to change the currently active domain.  Your default domain has an ID of zero (0).</p>');
   $header = array(
     array('data' => t('Id'), 'field' => 'd.domain_id'),
     array('data' => t('Domain'), 'field' => 'd.subdomain'),
@@ -34,7 +33,6 @@ function domain_view() {
 
   // Cannot use domain_domains() here because we need to sort the output.
   $domains = array();
-  $domains[] = domain_default();
 
   // Get any select sql from other modules.
   $select = module_invoke_all('domainview', 'select');
@@ -192,7 +190,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#options' => array(0 => t('Do not show debugging output'), 1 => t('Show debugging output on node view')),
     '#description' => t('If set, users with the <em>set domain access</em> permission will be able to view the node access rules for each node. See the README for more details.')
   );
-
+  
   $options = array(
     'id' => t('Creation order, oldest > newest'),
     'rid' => t('Creation order, newest > oldest'),
@@ -225,7 +223,6 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
   );
   // When turning on and off editing rules, we rebuild part of the node_access table.
-  $form['#submit'][] = 'domain_admin_editor_form_submit';
   $form['domain_editors_status'] = array('#type' => 'value', '#value' => variable_get('domain_editors', 0));
 
   // Check to see if the node_access patch is enabled.  If it is, then
@@ -347,8 +344,37 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
       $func($form);
     }
   }
+  // Add our additional submit handlers.
+  $form['#submit'] = array('domain_configure_form_submit', 'domain_admin_editor_form_submit');
   return system_settings_form($form);
 }
+
+function domain_configure_form_validate($form, &$form_state) {
+  $subdomain = strtolower(urlencode($form_state['values']['domain_root']));
+  if (empty($subdomain)) {
+    form_set_error('domain_root', t('Please enter a primary domain.'));
+  }
+  // TODO: Make this a proper regex for validation.
+  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id <> 0", $subdomain));
+  if ($check) {
+    form_set_error('domain_root', t('The domain value must be unique.'));
+  }
+  $check2 = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id <> 0", $form_state['values']['domain_sitename']));
+  if ($check2) {
+    form_set_error('domain_sitename', t('The site name value must be unique.'));
+  }
+}
+
+function domain_configure_form_submit($form, &$form_state) {
+  $subdomain = strtolower(urlencode($form_state['values']['domain_root']));
+  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme']);
+  if (!db_affected_rows()) {
+    db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme'], 1);
+    // MySQL won't let us insert row 0 into an autoincrement table.
+    db_query("UPDATE {domain} SET domain_id = 0 WHERE subdomain = '%s'", $form_state['values']['domain_root']);
+  }
+}
+
 
 /**
  * FormsAPI for enabling domain editors

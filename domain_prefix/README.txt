@@ -22,7 +22,6 @@ CONTENTS
 4.  Drupal Upgrades
 5.  Developer Notes
 5.1   Database Schema
-5.2   PostgreSQL Users
 
 ----
 1.  Introduction
@@ -48,8 +47,6 @@ carefully.
 
 To test basic functionality, I recommend prefixing the 'watchdog' table.  Then
 test Drupal's error logging on variuous domains.
-
-THIS MODULE WILL NOT WORK CORRECTLY ON pgSQL.  See 4.2 for details.
 
 ----
 1.2 Use-Case
@@ -222,27 +219,3 @@ Installing the module creates a {domain_prefix} table that contains:
   Indicates the source of data copied for this domain.  This value is
   the domain_id of the source domain.
 
-----
-5.2 PostgreSQL Users
-
-Apologies.  This module is not fully functional on pgSQL.  Here are the
-features that work, and the issues that remain.
-
-  -- Table creation works.
-  -- Table data copying works.
-  -- Table dropping works.
-
-However, the following issues make the above functions useless:
-
-  -- Copying table definitions (such as default values, NOT NULL)
-      does not work.
-  -- Creating indexes does not work.
-  -- Creating sequences (and copying sequence values when necessary)
-      does not work.
-
-I did research these issues and, frankly, they are delaying the release of the
-module.  I would love to support these features fully, but I suspect that it
-will have to wait for Drupal 6, when we can simply use the information
-contained in schema files.
-
-To contribute, see http://drupal.org/node/200279

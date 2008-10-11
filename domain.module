@@ -468,7 +468,10 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
 /**
  * Assigns the default settings to domain 0, the root domain.
  *
- * This value is used throughout the modules, so needed abstraction.
+ * This value is used throughout the modules. Even though this
+ * record is in the {domain} table, we use the value stored as
+ * a variable. Doing so prevents the module from firing when
+ * it has not been configured.
  *
  * @param $reset
  * A boolean flag indicating whether to reset the static array or not.
@@ -500,7 +503,6 @@ function domain_domains($reset = FALSE) {
   static $domains;
   if (empty($domains) || $reset) {
     $domains = array();
-    $domains[] = domain_default($reset);
     // Query the db for active domain records.
     $result = db_query("SELECT domain_id FROM {domain}");
     while ($data = db_fetch_array($result)) {

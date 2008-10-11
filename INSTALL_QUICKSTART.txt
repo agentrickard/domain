@@ -56,7 +56,11 @@ include './sites/all/modules/domain/settings.inc';
 
 7. Go to Admin > Build > Domain and configure the module.
 
-8. Now you are ready to explore the options available to you.
+8. Note that as of 6.x.2.0, two domains are created for you on installation.
+    The first is a placeholder for your default domain. The second is a 
+    sample domain record. See INSTALL.txt for details.
+
+9. Now you are ready to explore the options available to you.
 
     The Domain Access suite contains a number of optional helper
     modules.  You do not need to use any of these modules, but

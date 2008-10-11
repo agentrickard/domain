@@ -71,10 +71,10 @@ require_once './sites/all/modules/domain/domain_prefix/settings_domain_prefix.in
 
 STEP  4:  Register the module updates
 
-There is a new variable setting that must be loaded.  To do so, must
-visit Admin > Build > Domains from you primary domain.
+After your have editing settings.php, log in to your Primary Domain as user 1
+and run the Drupal update script.
 
-This action will rebuild the variables needed to run Domain Access.
+The update must be run from your primary domain.
 
 
 ----
@@ -97,3 +97,9 @@ Below are some notes about the changes to the new version.
 
 -- Pre-load functions are now handled automatically.
 -- Domain Alias has been added.
+-- The Primary Domain is now stored in both the {variables} and 
+    {domain} tables. Doing so allows full integration with Views and
+    simplifies some of the core code. However, it will also force the module
+    to skip a domain_id in the database. This change will not cause any
+    issues, but there will be a skipped domain_id for all sites.
+-- Fresh installs of Domain Access will never have a domain_id of 2.
