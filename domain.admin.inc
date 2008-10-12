@@ -215,16 +215,6 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#collapsed' => TRUE
   );
 
-  $form['domain_advanced']['domain_editors'] = array(
-    '#type' => 'radios',
-    '#title' => t('Domain-based editing controls'),
-    '#default_value' => variable_get('domain_editors', intval(DOMAIN_EDITOR_RULE)),
-    '#options' => array(0 => t('Do not use access control for editors'), 1 => t('Use access control for editors')),
-    '#description' => t('If set, users with the <em>edit domain nodes</em> permission will be able to edit all nodes assigned to their domain.')
-  );
-  // When turning on and off editing rules, we rebuild part of the node_access table.
-  $form['domain_editors_status'] = array('#type' => 'value', '#value' => variable_get('domain_editors', 0));
-
   // Check to see if the node_access patch is enabled.  If it is, then
   // we need to know if more than one node_access module is running.
   $modules = count(module_implements('node_grants'));
@@ -244,17 +234,9 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
       '#description' => t('Controls how Domain Access interacts with access control modules such as Organic Groups. Requires the multiple_node_access patch.')
     );
   }
-  // Check to see if the hook_url_alter() patch is installed.
-  $disabled = FALSE;
-  if (url('domain_access_test_path') != url('domain_access_path_test')) {
-    $disabled = TRUE;
-    variable_set('domain_search', 0);
-    variable_set('domain_seo', 0);
-  }
   $form['domain_advanced']['domain_search'] = array(
     '#type' => 'radios',
     '#title' => t('Search settings'),
-    '#disabled' => $disabled,
     '#default_value' => variable_get('domain_search', 0),
     '#options' => array(0 => t('Search content for the current domain only'), 1 => t('Search all domains from any URL')),
     '#description' => t('Options for content searching.  This feature requires custom_url_rewrite_outbound() to be installed.')
@@ -263,12 +245,10 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
   $form['domain_advanced']['domain_seo'] = array(
     '#type' => 'radios',
     '#title' => t('Search engine optimization'),
-    '#disabled' => $disabled,
     '#default_value' => variable_get('domain_seo', 0),
     '#options' => array(0 => t('Do not rewrite URLs'), 1 => t('Rewrite all URLs to point to a single source')),
     '#description' => t('If rewrite is turned on, all node links will point to a single instance of the node.  This
-      option reduces the chance that search engines will recognize duplicate content.
-      This feature requires custom_url_rewrite_outbound() to be installed.')
+      option reduces the chance that search engines will recognize duplicate content.')
   );
 
   $form['domain_advanced']['domain_www'] = array(
@@ -276,7 +256,8 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#title' => t('WWW prefix handling'),
     '#default_value' => variable_get('domain_www', 0),
     '#options' => array(0 => t('Process all host requests normally'), 1 => t('Treat www.*.example.com as an alias of *.example.com')),
-    '#description' => t('If set, calls to www.* will be treated as if the www. did not exist.')
+    '#description' => t('If set, calls to www.* will be treated as if the www. did not exist.
+    <em>Users will be taken from www.example.com to example.com, so your domains must be registered without the www. prefix.</em>')
   );
 
   $options = array('-1' => t('Do not change domain'));
@@ -286,6 +267,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
       $options[$data['domain_id']] = $data['sitename'];
     }
   }
+
   $form['domain_advanced']['domain_default_source'] = array(
     '#type' => 'select',
     '#title' => t('Default source domain'),
@@ -317,25 +299,23 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#title' => t('Treat cron.php as a special page request.'),
     '#description' => t('Normally, you should leave this setting active.  See the README for more information.')
   );
-  // Requires custom_url_rewrite_outbound() to be installed for these settings to be applied.
-  if (!$disabled) {
-    $form['domain_paths'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Node link patterns'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE
-    );
 
-    $form['domain_paths']['domain_paths'] = array(
-      '#type' => 'textarea',
-      '#rows' => 5,
-      '#cols' => 40,
-      '#default_value' => variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n\r\nnode\%n\outline"),
-      '#description' => t('When using SEO or other path rewrites, the following link paths should be turned into absolute URLs.  Enter
-        the Drupal path of the link, using the <em>%n</em> placeholder to represent the node id.
-        Enter one path per line.  See the README for more details.')
-    );
-  }
+  $form['domain_paths'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Node link patterns'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE
+  );
+  $form['domain_paths']['domain_paths'] = array(
+    '#type' => 'textarea',
+    '#rows' => 5,
+    '#cols' => 40,
+    '#default_value' => variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n\r\nnode\%n\outline"),
+    '#description' => t('When using SEO or other path rewrites, the following link paths should be turned into absolute URLs.  Enter
+      the Drupal path of the link, using the <em>%n</em> placeholder to represent the node id.
+      Enter one path per line.  See the README for more details.')
+  );
+ 
   // Allow submodules to add elements to the form.
   $modules = module_implements('domainform');
   if (!empty($modules)) {
@@ -345,7 +325,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     }
   }
   // Add our additional submit handlers.
-  $form['#submit'] = array('domain_configure_form_submit', 'domain_admin_editor_form_submit');
+  $form['#submit'] = array('domain_configure_form_submit');
   return system_settings_form($form);
 }
 
@@ -372,36 +352,6 @@ function domain_configure_form_submit($form, &$form_state) {
     db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme'], 1);
     // MySQL won't let us insert row 0 into an autoincrement table.
     db_query("UPDATE {domain} SET domain_id = 0 WHERE subdomain = '%s'", $form_state['values']['domain_root']);
-  }
-}
-
-
-/**
- * FormsAPI for enabling domain editors
- *
- * This function writes straight to the {node_access} table because we are
- * adding a grant in addition to one that already exists.
- */
-function domain_admin_editor_form_submit($form, &$form_state) {
-  $clear = FALSE;
-  if ($form_state['values']['domain_editors_status'] == 0 && $form_state['values']['domain_editors'] == 1) {
-    // Apply rules
-    $result = db_query("SELECT nid, gid FROM {node_access} WHERE realm = '%s'", 'domain_id');
-    while ($data = db_fetch_array($result)) {
-      db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $data['nid'], $data['gid'], 'domain_editor', 0, 1, 1);
-      db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $data['nid'], $data['gid'], 'domain_editor');
-    }
-    $clear = TRUE;
-  }
-  else if ($form_state['values']['domain_editors_status'] == 1 && $form_state['values']['domain_editors'] == 0) {
-    // Remove rules
-    db_query("DELETE FROM {node_access} WHERE realm = '%s'", 'domain_editor');
-    db_query("DELETE FROM {domain_access} WHERE realm = '%s'", 'domain_editor');
-    $clear = TRUE;
-  }
-  // We have reset the node_access table and need to clear the cache.
-  if ($clear) {
-    cache_clear_all();
   }
 }
 
@@ -698,33 +648,6 @@ function domain_advanced() {
  */
 function domain_advanced_form($form_state, $node_types) {
   $form = array();
-  // Some editors will not have full node editing permissions.  This allows us
-  // to give selected permissions for nodes within the editor's domain.
-  if (variable_get('domain_editors', DOMAIN_EDITOR_RULE) == 1) {
-    $form['domain_form'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Domain node editing'),
-      '#collapsible' => TRUE
-    );
-    $form['domain_form']['intro'] = array('#value' => t('<p>When editors view domain-access restricted nodes, which form elements should be exposed?</p>'));
-    $options = array(
-      'log' => t('Log messages'),
-      'author' => t('Authoring information'),
-      'options' => t('Publishing options'),
-      'delete' => t('Delete node'),
-      'comment_settings' => t('Comment settings'),
-      'path' => t('Path aliasing'),
-      'menu' => t('Menu settings'),
-      'attachments' => t('File attachments')
-    );
-    ksort($options);
-    $form['domain_form']['domain_form_elements'] = array(
-      '#type' => 'checkboxes',
-      '#default_value' => variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path')),
-      '#options' => $options,
-      '#description' => t('Some elements may not be editable for all users due to permission restrictions, specifically <em>authoring</a> and menu</em> settings.'),
-    );
-  }
   $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
   $form['domain_node'] = array(
     '#type' => 'fieldset',
@@ -739,6 +662,30 @@ function domain_advanced_form($form_state, $node_types) {
       '#default_value' => variable_get('domain_node_'. $key, $default),
     );
   }
+  // Some editors will not have full node editing permissions.  This allows us
+  // to give selected permissions for nodes within the editor's domain.
+  $form['domain_form'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Domain node editing'),
+    '#collapsible' => TRUE
+  );
+  $form['domain_form']['intro'] = array('#value' => t('<p>When editors view domain-access restricted nodes, which form elements should be exposed?</p>'));
+  $options = array(
+    'log' => t('Log messages'),
+    'author' => t('Authoring information'),
+    'options' => t('Publishing options'),
+    'comment_settings' => t('Comment settings'),
+    'path' => t('Path aliasing'),
+    'menu' => t('Menu settings'),
+    'attachments' => t('File attachments')
+  );
+  ksort($options);
+  $form['domain_form']['domain_form_elements'] = array(
+    '#type' => 'checkboxes',
+    '#default_value' => variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path')),
+    '#options' => $options,
+    '#description' => t('Some elements may not be editable for all users due to permission restrictions, specifically <em>authoring</a> and menu</em> settings.'),
+  );
   return system_settings_form($form);
 }
 

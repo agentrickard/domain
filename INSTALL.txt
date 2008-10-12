@@ -16,8 +16,7 @@ CONTENTS
 2.1   Before Installing
 2.2   Server Configuration
 2.3   Setting DOMAIN_INSTALL_RULE
-2.4   Setting DOMAIN_EDITOR_RULE
-2.5   Setting DOMAIN_SITE_GRANT
+2.4   Setting DOMAIN_SITE_GRANT
 3.   Installing the Module
 3.1   After Installation
 4.   Patch to Drupal Core (optional)
@@ -127,25 +126,7 @@ primary domain unless DOMAIN_SITE_GRANT is set to TRUE.
 For more details, see section 5 of README.txt.
 
 ----
-2.4 Setting DOMAIN_EDITOR_RULE
-
-This is an advanced instruction, and may be ignored.
-
-At the top of the domain.module file, you will find this line:
-
-  define('DOMAIN_EDITOR_RULE', FALSE);
-
-This setting controls the default behavior for affiliate editors.  If
-DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
-intend to use editing controls.
-
-If this is set to TRUE, all existing nodes on your site will be editable by
-users who are assigned as editors of your root domain.
-
-See section 3 and section 5 of README.txt for more information.
-
-----
-2.5 Setting DOMAIN_SITE_GRANT
+2.4 Setting DOMAIN_SITE_GRANT
 
 At the top of the domain.module file, you will find this line:
 

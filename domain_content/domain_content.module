@@ -78,7 +78,7 @@ function domain_content_menu_check() {
   if (user_access('administer nodes')) {
     return TRUE;
   }
-  if (user_access('edit domain nodes') && variable_get('domain_editors', DOMAIN_EDITOR_RULE)) { // || user_access('set domain access')
+  if (user_access('edit domain nodes')) { // || user_access('set domain access')
     return TRUE;
   }
   return FALSE;
@@ -98,19 +98,20 @@ function domain_content_check($domain, $all = FALSE) {
   if ($all || user_access('administer nodes')) {
     return TRUE;
   }
+  $rule = user_access('edit domain nodes');
   // Otherwise, the user must be able to edit domain nodes.
-  if (!user_access('edit domain nodes')) {
+  if (!$rule) {
     return FALSE;
   }
-  $rule = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
+  $domains = domain_get_user_domains($user->uid);
   $check = FALSE;
   $editor = FALSE;
   // Can this user see the default site?
-  if ($rule && $domain['domain_id'] == 0 && $user->domain_user['-1'] == -1) {
+  if ($rule && $domain['domain_id'] == 0 && $domains['-1'] == -1) {
     $editor = TRUE;
   }
   // Can this user see the active site?
-  else if ($rule && $domain['domain_id'] > 0 && $domain['domain_id'] == $user->domain_user[$domain['domain_id']]) {
+  else if ($rule && $domain['domain_id'] > 0 && $domain['domain_id'] == $domains[$domain['domain_id']]) {
     $editor = TRUE;
   }
   if ($editor) {

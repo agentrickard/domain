@@ -20,12 +20,6 @@
 define('DOMAIN_INSTALL_RULE', TRUE);
 
 /**
- * Defines how to handle editor permissions when installing the module.
- * You may alter this variable before installing the module. See README.txt.
- */
-define('DOMAIN_EDITOR_RULE', FALSE);
-
-/**
  * Defines whether to show affiliated content on all domains..
  * You may alter this variable before installing the module. See README.txt.
  */
@@ -179,7 +173,7 @@ function domain_menu() {
  * Implements hook_perm()
  */
 function domain_perm() {
-  $perms = array('administer domains', 'assign domain editors', 'edit domain nodes', 'set domain access', 'view domain publishing');
+  $perms = array('administer domains', 'assign domain editors', 'delete domain nodes', 'edit domain nodes', 'set domain access', 'view domain publishing');
   return $perms;
 }
 
@@ -256,9 +250,6 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
             if (!empty($this_node->subdomains)) {
               $output .= theme('item_list', $this_node->subdomains, t('Assigned domains'));
             }
-            if (!empty($this_node->editors)) {
-              $output .= theme('item_list', $this_node->editors, t('Editors'));
-            }
             if (isset($this_node->domain_source)) {
               $this_domain = domain_lookup($this_node->domain_source);
               $output .= theme('item_list', array($this_domain['sitename']), t('Source domain'));
@@ -281,25 +272,13 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
  *
  * Attached domain_id records to all registering users.  These
  * are used to determine which 'domain_editor' group that users
- * with the 'edit domain nodes' permission are in.
+ * with the 'edit domain nodes' and 'delete domain nodes' permissions are in.
  */
 function domain_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'load':
-      static $domains = array();
-      if (!isset($domains[$account->uid])) {
-        $domains[$account->uid] = array();
-        $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = %d", $account->uid);
-        while ($data = db_fetch_object($result)) {
-          if ($data->domain_id == 0) {
-            $domains[$account->uid]['-1'] = -1;
-          }
-          else {
-            $domains[$account->uid][$data->domain_id] = $data->domain_id;
-          }
-        }
-      }
-      $account->domain_user = $domains[$account->uid];
+      $domains = domain_get_user_domains($account->uid);
+      $account->domain_user = $domains;
       break;
     case 'form':
     case 'register':
@@ -593,6 +572,26 @@ function _domain_rurl_sort($a, $b) {
 }
 
 /**
+ * Get the domains a user is assigned to.
+ */
+function domain_get_user_domains($uid) {
+  static $domains = array();
+  if (!isset($domains[$uid])) {
+    $domains[$uid] = array();
+    $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = %d", $uid);
+    while ($data = db_fetch_object($result)) {
+      if ($data->domain_id == 0) {
+        $domains[$uid]['-1'] = -1;
+      }
+      else {
+        $domains[$uid][$data->domain_id] = $data->domain_id;
+      }
+    }
+  }
+  return $domains[$uid];
+}
+
+/**
  * Helper function for passing hook_domainload() by reference.
  *
  * @param $domain
@@ -700,9 +699,8 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       }
       // Append the domain grants to the node for editing.
       $node->domains = array();
-      $node->editors = array();
       $node->domain_site = FALSE;
-      $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = %d AND (realm = '%s' OR realm = '%s' OR realm = '%s')", $node->nid, 'domain_id', 'domain_site', 'domain_editor');
+      $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = %d AND (realm = '%s' OR realm = '%s')", $node->nid, 'domain_id', 'domain_site');
       while ($data = db_fetch_object($result)) {
         // Transform the 0 to -1, since {domain_access} is unsigned.
         ($data->gid == 0) ? $gid = -1 : $gid = $data->gid;
@@ -719,16 +717,6 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         else if ($data->realm == 'domain_site') {
           $node->domain_site = TRUE;
           $node->subdomains[] = t('All affiliates');
-        }
-        else if ($data->realm == 'domain_editor') {
-          $node->domain_editor = TRUE;
-          if ($gid > 0) {
-            $domain = domain_lookup($gid);
-            $node->editors[] = $domain['sitename'];
-          }
-          else {
-            $node->editors[] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
-          }
         }
       }
       break;
@@ -803,28 +791,31 @@ function domain_node_grants($account, $op) {
     }
   }
   else {
-    // Special permissions for editors
-    $editors = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
-    if ($editors && user_access('edit domain nodes', $account)) {
-      if (!empty($account->domain_user)) {
-        foreach ($account->domain_user as $id) {
+    // The $account may not have domain information loaded, so get it.
+    $domains = domain_get_user_domains($account->uid);
+    $perm = 'delete domain nodes';
+    if ($op == 'update') {
+      $perm = 'edit domain nodes';
+    }
+    if (user_access($perm, $account)) {
+      if (!empty($domains)) {
+        foreach ($domains as $id) {
           if (abs($id) > 0) {
             if ($id > 0) {
-              $grants['domain_editor'][] = $id;
+              $grants['domain_id'][] = $id;
             }
             else {
-              $grants['domain_editor'][] = 0;
+              $grants['domain_id'][] = 0;
             }
             // Advanced rules let us access check unpublished nodes for editing.
             if ($rules) {
-              $grants['domain_editor']['check'] = TRUE;
+              $grants['domain_id']['check'] = TRUE;
             }
           }
         }
       }
     }
   }
-
   // Let Domain Access module extensions act to override the defaults.
   static $_modules;
   if (!isset($_modules)) {
@@ -877,8 +868,7 @@ function domain_node_access_records($node) {
       'priority' => 0,         // If this value is > 0, then other grants will not be recorded
     );
   }
-  // Special permissions for editors, if activated.
-  $editors = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
+  // Set the domain-specific grants.
   if (!empty($node->domains)) {
     foreach ($node->domains as $key => $value) {
       // We can't use a 0 value in an $options list, so convert -1 to 0.
@@ -888,20 +878,10 @@ function domain_node_access_records($node) {
           'realm' => 'domain_id',
           'gid' => $key,
           'grant_view' => TRUE,
-          'grant_update' => FALSE,
-          'grant_delete' => FALSE,
+          'grant_update' => TRUE,
+          'grant_delete' => TRUE,
           'priority' => 0,
         );
-        if ($editors) {
-          $grants[] = array(
-            'realm' => 'domain_editor',
-            'gid' => $key,
-            'grant_view' => FALSE,
-            'grant_update' => TRUE,
-            'grant_delete' => TRUE,
-            'priority' => 0,
-          );
-        }
       }
     }
   }
@@ -914,20 +894,10 @@ function domain_node_access_records($node) {
     'realm' => 'domain_id',
     'gid' => 0,
     'grant_view' => TRUE,
-    'grant_update' => FALSE,
-    'grant_delete' => FALSE,
+    'grant_update' => TRUE,
+    'grant_delete' => TRUE,
     'priority' => 0,
     );
-    if ($editors) {
-      $grants[] = array(
-        'realm' => 'domain_editor',
-        'gid' => 0,
-        'grant_view' => FALSE,
-        'grant_update' => TRUE,
-        'grant_delete' => TRUE,
-        'priority' => 0,
-      );
-    }
   }
 
   // Let Domain Access module extensions act to override the defaults.
@@ -991,7 +961,6 @@ function domain_enable() {
   $count = db_result(db_query("SELECT COUNT(*) FROM {domain_access}"));
   if ($count == 0) {
     $rule = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
-    $edit = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
     $site = DOMAIN_SITE_GRANT;
     $nids = db_query("SELECT nid FROM {node}");
     while ($nid = db_result($nids)) {
@@ -1001,11 +970,6 @@ function domain_enable() {
       if (!empty($rule)) {
         // By design, all nodes are assigned to the master domain.
         db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_id');
-        // Editor rules only apply is nodes are assigned to a domain.
-        if (!empty($edit)) {
-          variable_set('domain_editors', TRUE);
-          db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_editor');
-        }
       }
     }
   }
@@ -1213,7 +1177,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     // THIS SECTION BREAKS CCK if we don't check for cck_dummy_node_form!  See http://drupal.org/node/186624
     // and note the !$form['#node']->cck_dummy_node_form in the IF check at the top of the function.
     // Some editors cannot administer nodes, so we have to add these form elements.
-    if (variable_get('domain_editors', DOMAIN_EDITOR_RULE) == 1 && user_access('edit domain nodes')) {
+    if (user_access('edit domain nodes')) {
       $access = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
       foreach ($access as $item) {
         $form[$item]['#access'] = TRUE;
@@ -1396,9 +1360,7 @@ function domain_domainupdate($op, $domain, $form_state = array()) {
       if ($domain != -1) {
         // Remove domain-specific entries from the {node_access} table and clear the cache.
         db_query("DELETE FROM {node_access} WHERE realm = '%s' AND gid = %d", 'domain_id', $domain['domain_id']);
-        db_query("DELETE FROM {node_access} WHERE realm = '%s' AND gid = %d", 'domain_editor', $domain['domain_id']);
         db_query("DELETE FROM {domain_access} WHERE realm = '%s' AND gid = %d", 'domain_id', $domain['domain_id']);
-        db_query("DELETE FROM {domain_access} WHERE realm = '%s' AND gid = %d", 'domain_editor', $domain['domain_id']);
         cache_clear_all();
       }
       break;
@@ -1557,10 +1519,7 @@ function domain_node_access_explain($row) {
       $return .= t('Viewable on all affiliate sites.');
       break;
     case 'domain_id':
-      $return .= t('Viewable on %domain.', array('%domain' => $domain['subdomain']));
-      break;
-    case 'domain_editor':
-      $return .= t('Editable by %domain editors.', array('%domain' => $domain['subdomain']));
+      $return .= t('Viewable on %domain<br />%domain privileged editors may edit and delete', array('%domain' => $domain['subdomain']));
       break;
     default:
       // This is not our grant, do not return anything.

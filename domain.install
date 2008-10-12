@@ -90,11 +90,23 @@ function domain_update_6100() {
 
 /**
  * Updates to 6.x.2.
+ *
+ * Deprecates the domain_editor grant.
+ * Adds the {domain_editor} table.
+ * Installs the new Domain Boostrap routine.
+ * Moves records from {user} (data) to {domain_editor}.
  */
 function domain_update_6200() {
   $ret = array();
+
+  // Remove the old editors information.
+  variable_del('domain_editors');
+  // Promopt the user to rebuild node access.
+  node_access_needs_rebuild(TRUE);
+
   // Update the new bootstrap information.
   domain_bootstrap_register();
+
   // Try to register the default domain.
   $root = variable_get('domain_root', rtrim($_SERVER['HTTP_HOST']));
   db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, variable_get('domain_sitename', variable_get('site_name', 'Drupal')), variable_get('domain_scheme', 'http://'), 1);

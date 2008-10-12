@@ -249,7 +249,38 @@ function domain_content_form($form_state) {
   $form['#validate'][] = 'node_admin_nodes_validate';
   $form['#submit'][] = 'node_admin_nodes_submit';
   $form['#submit'][] = 'domain_content_update_nodes';
+  // Filter the available operations based on user permissions.
+  domain_content_filter_operations($form['options']['operation']['#options']);
   return $form;
+}
+
+/**
+ * Filters the node batch operations based on the user's permissions.
+ *
+ * @param &$operations
+ * The complete list of operations, passed by reference.
+ * @return
+ * No return value. Modify by reference.
+ */
+function domain_content_filter_operations(&$operations) {
+  $settings = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
+  // Administer nodes can do anything.
+  if (user_access('administer nodes')) {
+    return;
+  }
+  // You must be able to edit to view this page, so check for the new delete perm.
+  if (!user_access('delete domain nodes')) {
+    unset($operations['delete']);
+  }
+  // The publish, promote and sticky operations all depend on having $settings['options'].
+  if (!in_array('options', array_filter($settings))) {
+    unset($operations['publish']);
+    unset($operations['unpublish']);
+    unset($operations['promote']);
+    unset($operations['demote']);
+    unset($operations['sticky']);
+    unset($operations['unsticky']);
+  }
 }
 
 /**
@@ -271,15 +302,11 @@ function domain_content_update_nodes($form, &$form_state) {
         $domains[] = $id;
       }
     }
-    $editor = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
-    if ($editor) {
-      $editors = $domains;
-    }
     foreach ($form_state['values']['nodes'] as $nid) {
       if ($nid > 0) {
         // Delete anything not selected.
         // We have to update both the {node_access} and {domain_access} tables.
-        db_query("DELETE FROM {node_access} WHERE nid = %d AND realm IN ('domain_id', 'domain_site', 'domain_editor')", $nid);
+        db_query("DELETE FROM {node_access} WHERE nid = %d AND realm IN ('domain_id', 'domain_site')", $nid);
         db_query("DELETE FROM {domain_access} WHERE nid = %d", $nid);
         if (isset($domain_site)) {
           db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, 0, 'domain_site', 1, 0, 0);
@@ -289,10 +316,6 @@ function domain_content_update_nodes($form, &$form_state) {
           foreach ($domains as $id) {
             db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, $id, 'domain_id', 1, 0, 0);
             db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, $id, 'domain_id');
-          }
-          if ($editor) {
-            db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, $id, 'domain_editor', 0, 1, 1);
-            db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, $id, 'domain_editor');
           }
         }
       }

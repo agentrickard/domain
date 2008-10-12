@@ -24,9 +24,14 @@
  */
 function domain_strict_domaingrants(&$grants, $account, $op) {
   global $_domain;
+  // We only act on the 'view' operation.
+  if ($op != 'view') {
+    return;
+  }
   // Erase the default domain_id grants.
   unset($grants['domain_id']);
-  $domains = (isset($account->domain_user)) ? $account->domain_user : array();
+  // Get the user-assigned domains.
+  $domains = domain_get_user_domains($account->uid);
   if (!empty($domains)) {
     foreach ($domains as $key => $value) {
       // The -1 is the root domain, since 0 cannot be stored by checkboxes.

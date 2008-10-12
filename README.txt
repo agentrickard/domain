@@ -25,8 +25,7 @@ CONTENTS
 2.2   Server Configuration
 2.3   Creating Domain Records
 2.4   Setting DOMAIN_INSTALL_RULE
-2.5   Setting DOMAIN_EDITOR_RULE
-2.6   Setting DOMAIN_SITE_GRANT
+2.5   Setting DOMAIN_SITE_GRANT
 3.  Permissons
 3.1   Module Permissions
 3.2   Normal Usage
@@ -43,12 +42,11 @@ CONTENTS
 4.2.3   Debugging Status
 4.2.4   Sort Domain Lists
 4.3   Advanced Settings
-4.3.1   Domain-based Editing Controls
-4.3.2   Search Settings
-4.3.3   Search Engine Optimization
-4.3.4   Default Source Domain
-4.3.5   WWW Prefix Handling
-4.3.6   Node Access Settings
+4.3.1   Search Settings
+4.3.2   Search Engine Optimization
+4.3.3   Default Source Domain
+4.3.4   WWW Prefix Handling
+4.3.5   Node Access Settings
 4.4   Special Page Requests
 4.4.1   Cron Handling
 4.5   Node Link Patterns
@@ -335,25 +333,7 @@ primary domain unless DOMAIN_SITE_GRANT is set to TRUE.
 For more details, see section 6.
 
 ----
-2.5 Setting DOMAIN_EDITOR_RULE
-
-This is an advanced instruction, and may be ignored.
-
-At the top of the domain.module file, you will find this line:
-
-  define('DOMAIN_EDITOR_RULE', FALSE);
-
-This setting controls the default behavior for affiliate editors.  If
-DOMAIN_INSTALL_RULE is set to FALSE, you may change this value to TRUE if you
-intend to use editing controls.
-
-If this is set to TRUE, all existing nodes on your site will be editable by
-users who are assigned as editors of your root domain.
-
-See section 3 and section 5 for more information.
-
-----
-2.6 Setting DOMAIN_SITE_GRANT
+2.5 Setting DOMAIN_SITE_GRANT
 
 At the top of the domain.module file, you will find this line:
 
@@ -390,6 +370,11 @@ The Domain Access module has the following permissions:
   have the 'edit domain nodes' permission.
 
   - 'edit domain nodes'
+  This permission is for advanced use and substitutes for the normal
+  'administer nodes' permission for sites that give restricted administrative
+  privileges.  See section 3.3 for more information.
+
+  - 'delete domain nodes'
   This permission is for advanced use and substitutes for the normal
   'administer nodes' permission for sites that give restricted administrative
   privileges.  See section 3.3 for more information.
@@ -437,17 +422,21 @@ to any user you trust to use the UI properly.
 3.3 Advanced Usage
 
 In the event that you wish to segregate which content certain editors can
-control, you should not use the normal 'edit TYPE nodes' permission provided
-by Drupal's core Node module.  This permisson grants the ability for a user
-to edit all nodes of a given type.
+control, you should not use the normal 'edit any TYPE nodes' and 'delete any
+TYPE nodes' permissions provided by Drupal's core Node module.  
+These permissons grant the ability for a user to edit and delete all nodes of a 
+given type.
 
-In the Domain Access model, this permission is not used in favor of the provided
-'edit domain nodes' permission.  This permission allows editors only to edit
-(and delete) nodes that belong to their domain.
+In the Domain Access model, these permissions are not used in favor of the provided
+'edit domain nodes' and 'delete domain nodes' permissions.  These permissions 
+allow editors only to edit (and delete) nodes that belong to their domain.
 
-To enable this feature, you should grant the 'edit domain nodes' permission to
-some roles.  Then you should enable the 'Use access control for editors' setting
-under the Domain Access configuration screen.
+To enable this feature, you should grant the 'edit domain nodes' and (optionally)
+the 'delete domain nodes' permission to some roles. Then assign individual
+users accounts to specific domains to assign them as Domain Editors.
+
+NOTE: Users with the 'delete domain nodes' permission must also be given
+the 'edit domain nodes' permission in order to delete content.
 
 ----
 3.4 Limitations
@@ -462,8 +451,8 @@ Due to the way node_access() works, the following limitations should be noted.
     unavoidable.  It is best to preview your site as an anonymous or
     authenticated user who does not have special permissions.
 
-  - Users who have the 'edit TYPE nodes' permission will be able to edit nodes
-    that do not belong to their domain.
+  - Users who have the 'edit any TYPE nodes' permission will be able to edit 
+    nodes that do not belong to their domain.
 
 These limitations are due to the permissive nature of node_access().  If any
 access rule grants you permission, it cannot be taken away.
@@ -608,20 +597,14 @@ have not been applied.
 By default, these features are all disabled.
 
 ----
-4.3.1   Domain-based Editing Controls
-
-Uses the Domain Access module to control which editors can edit content.
-See section 3.3 for a full discussion of this feature.
-
-----
-4.3.2   Search Settings
+4.3.1   Search Settings
 
 Allows the admin to decide if content searches should be run across all
 affiliates or just the currently active domain.  By design, Drupal will only
 find matches for the current domain.
 
 ----
-4.3.3   Search Engine Optimization
+4.3.2   Search Engine Optimization
 
 There is a risk with these modules that your site could be penalized by search
 engines such as Google for having duplicate content.  This setting controls the
@@ -641,7 +624,7 @@ The optional Domain Source module (included in the download) allows you to
 assign the link to specific domains.
 
 ----
-4.3.4   Default Source Domain
+4.3.3   Default Source Domain
 
 This setting allows you to control the domain to use when rewriting links that
 are sent to 'all affiliates.'  Simply select the domain that you wish to use as
@@ -650,7 +633,7 @@ the primary domain for URL rewrites.
 By default this value is your primary domain.
 
 ----
-4.3.5   WWW Prefix Handling
+4.3.4   WWW Prefix Handling
 
 This setting controls how requests to www.example.com are treated with
 respect to example.com.  The default behavior is to process all host names
@@ -667,7 +650,7 @@ had requested one.example.com.
 This feature was requested by Rick and Matt at DZone.com
 
 ----
-4.3.6  Node Access Settings
+4.3.5  Node Access Settings
 
 This setting controls how you want Domain Access to interact with other
 node access modules.
@@ -1017,10 +1000,6 @@ In Domain Access, the following realms are defined:
   Indicates that a node belongs to one or more registered domains.  The
   domain_id key is taken from the {domain} table and is unique.
 
-  - domain_editor
-  Indicates that a node can be edited or deleted by an editor for a specific
-  domain.  This advanced usage is optional.
-
 ----
 6.4   Grants
 
@@ -1035,7 +1014,10 @@ follows.
   - domain_site
   By design, all site users, including anonymous users, are granted access to
   the gid '0' for realm 'domain_site'.  This grant allows all users to see
-  content assigned to 'all affliates'.  This grants only 'grant_view'.
+  content assigned to 'all affliates'.  This grants 'grant_view' to all users.
+  Users who belong to the current domain and are assigned the
+  'edit domain nodes' or 'delete domain nodes' permissions will be given
+  'update' and 'delete' grants, respectively.
 
   - domain_id
   When a user, including anonymous users, views a page, the active domain is
@@ -1044,12 +1026,6 @@ follows.
   content to be partitioned to one or many affilaites.  This grants only
   'grant_view', since 'grant_edit' would allow content to appear to some users
   regardless of the active domain.
-
-  - domain_editor
-  Advanced.  If used, this sets the access for users who have the 'edit domain
-  nodes' permission.  This grant works like the domain_id grant, but only grants
-  editors access if the node belongs to one of their assigned domains.  This
-  grants both the 'grant_edit' and 'grant_delete' permission.
 
 ----
 6.5   Warnings
@@ -1194,6 +1170,16 @@ stores information specific to Domain Access.  Its structure is:
   - realm
   Varchar, 255 NOT NULL default ''
 
+The {domain_editor} table stores information about which users can edit and
+delete content on specific domains.  Its structure is:
+
+  - uid
+  Integer, unsigned NOT NULL default '0,
+  A foreign key to the {users} table.
+  
+  - domain_id
+  Integer, unsigned NOT NULL default '0'
+  A foreign key to the {domain} table.
 ----
 7.4 API
 

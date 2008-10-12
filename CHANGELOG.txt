@@ -5,6 +5,12 @@
 -- #320257. Moves domain user data into the new {domain_editor} table.
 -- Fixes new behavior of domain 0 storage with domain batch update functions.
 -- Note that update 6200 needs to be run for all sites upgrading from 6.x.1.
+-- Deprecates the domain_editor grant.
+-- Adds the _delete domain nodes_ permission.
+-- Tightens restrictions on operations run by Domain Content, based on the
+    new permissions.
+-- Fixes Domain Strict to only affect the view operation.
+-- Updates README.txt.
 
 11-OCT-2008
 
