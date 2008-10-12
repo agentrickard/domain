@@ -11,6 +11,7 @@
     new permissions.
 -- Fixes Domain Strict to only affect the view operation.
 -- Updates README.txt.
+-- Releases 6.x.2.0-rc4.
 
 11-OCT-2008
 
