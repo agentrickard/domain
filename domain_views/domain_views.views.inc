@@ -23,7 +23,14 @@ function domain_views_views_data() {
     'title' => t('Domain'),
     'help' => t('Domain Access uses domains to divide and display content on a group of related sites.'),
   );
-  // This table has no joins of its own.
+  // Define the joins.
+  $data['domain']['table']['join']['node'] = array(
+    'left_table' => 'domain_access',
+    'left_field' => 'gid',
+    'field' => 'domain_id',
+    'type' => 'INNER',
+    'extra' => "domain_access.realm = 'domain_id'",
+  );
   // Define the fields.
   $data['domain']['domain_id'] = array(
     'title' => t('Domain ID'),
@@ -102,22 +109,70 @@ function domain_views_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );  
+
   // Define the {domain_access} table.
   $data['domain_access']['table']['group'] = t('Domain');
   // Define the joins.
-  $data['domain_access']['table']['join'] = array(
-    'domain' => array(
-      'left_field' => 'domain_id',
-      'field' => 'domain_id',
-      'type' => 'INNER',
+  $data['domain_access']['table']['join']['node'] = array(
+    'left_field' => 'nid',
+    'field' => 'nid',
+  );
+  // Define the fields.
+  $data['domain_access']['nid'] = array(
+    'title' => t('Node ID'),
+    'help' => t('The node id.'),
+    'field' => array(
+      'click sortable' => TRUE,
     ),
-    'node' => array(
-      'left_field' => 'nid',
+    // Information for accepting a domain_id as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    // Information for sorting on a domain_id.
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'title' => t('Domain node'),
+      'help' => t("Bring in information about the domain this node is assigned to."),
+      'base' => 'node',
       'field' => 'nid',
-      'type' => 'INNER',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Domain node'),
     ),
   );
-
+  // Define the fields.
+  $data['domain_access']['gid'] = array(
+    'title' => t('Group ID'),
+    'help' => t('The group id of the record.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    // Information for accepting a domain_id as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    // Information for sorting on a domain_id.
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  // Define the fields.
+  $data['domain_access']['realm'] = array(
+    'title' => t('Access Type'),
+    'help' => t('The domain realm.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    // Information for accepting a domain_id as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+    ),
+    // Information for sorting on a domain_id.
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
   return $data;
 }
 
