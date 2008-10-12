@@ -285,6 +285,22 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
  */
 function domain_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
+    case 'load':
+      static $domains = array();
+      if (!isset($domains[$account->uid])) {
+        $domains[$account->uid] = array();
+        $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = %d", $account->uid);
+        while ($data = db_fetch_object($result)) {
+          if ($data->domain_id == 0) {
+            $domains[$account->uid]['-1'] = -1;
+          }
+          else {
+            $domains[$account->uid][$data->domain_id] = $data->domain_id;
+          }
+        }
+      }
+      $account->domain_user = $domains[$account->uid];
+      break;
     case 'form':
     case 'register':
       if (is_null($category) || $category == 'account') {
@@ -302,6 +318,8 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
         while ($data = db_fetch_array($result)) {
           $options[$data['domain_id']] = $data['sitename'];
         }
+        // Replace the zero record to -1.
+        unset($options[0]);
         if (user_access('assign domain editors')) {
           $form['domain_user'] = array(
             '#type' => 'fieldset',
@@ -330,6 +348,25 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
     case 'validate':
       return array('domain_user' => $edit['domain_user']);
       break;
+    case 'insert':
+    case 'update':
+      // Clear and reset the {domain_editor} table.
+      db_query("DELETE FROM {domain_editor} WHERE uid = %d", $account->uid);
+      if (empty($edit['domain_user'])) {
+        return;
+      }
+      foreach ($edit['domain_user'] as $domain_id => $status) {
+        if ($status != 0) {
+          // Convert the -1 checkboxes to a zero.
+          if ($domain_id == -1) {
+            $domain_id = 0;
+          }
+          db_query("INSERT INTO {domain_editor} (uid, domain_id) VALUES (%d, %d)", $account->uid, $domain_id);
+        }
+      }
+      // Clear the $edit field.
+      $edit['domain_user'] = NULL;
+      break;
     case 'view':
       if (user_access('assign domain editors')) {
         $account->content['domain'] = array(
@@ -337,10 +374,8 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
           '#weight' => 10,
           '#title' => t('Domain status'),
         );
-        // Filter out all the empty options.
-        $account->domain_user = array_filter($account->domain_user);
         if (empty($account->domain_user)) {
-          $output = t('This user is not assiged to a domain.');
+          $output = t('This user is not assigned to a domain.');
         }
         else {
           $output = '<ul>';

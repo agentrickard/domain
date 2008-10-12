@@ -977,11 +977,10 @@ function domain_batch_form_submit($form, &$form_state) {
   switch ($form_state['values']['handler']) {
     case 'domain':
       foreach ($form_state['values']['domain_batch'] as $key => $value) {
-        if ($key > 0) {
-          // Note that $type in the query below is a sanitzed value passed from domain_batch_data_type().
-          db_query("UPDATE {domain} SET %s = ". domain_batch_data_type($form_state['values']['data_type']) ." WHERE domain_id = %d", $item, $value, $key);
-        }
-        else if (!empty($form_state['values']['variable'])) {
+        // Note that $type in the query below is a sanitzed value passed from domain_batch_data_type().
+        db_query("UPDATE {domain} SET %s = ". domain_batch_data_type($form_state['values']['data_type']) ." WHERE domain_id = %d", $item, $value, $key);
+        // Update the variable for the root domain
+        if (!empty($form_state['values']['variable']) && $key == 0) {
           variable_set($form_state['values']['variable'], $value);
         }
       }

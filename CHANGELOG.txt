@@ -1,5 +1,11 @@
 // $Id$
 
+12-OCT-2008
+
+-- #320257. Moves domain user data into the new {domain_editor} table.
+-- Fixes new behavior of domain 0 storage with domain batch update functions.
+-- Note that update 6200 needs to be run for all sites upgrading from 6.x.1.
+
 11-OCT-2008
 
 -- #320064. Places the default domain record into {domain} as record 0.

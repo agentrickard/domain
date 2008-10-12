@@ -47,6 +47,12 @@ function domain_schema() {
     'indexes' => array(
       'nid' => array('nid')),
   );
+  $schema['domain_editor'] = array(
+    'fields' => array(
+      'uid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
+      'domain_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
+    'primary key' => array('uid', 'domain_id'),
+  );
   return $schema;
 }
 
@@ -84,7 +90,6 @@ function domain_update_6100() {
 
 /**
  * Updates to 6.x.2.
- * Puts the primary domain into the domain table.
  */
 function domain_update_6200() {
   $ret = array();
@@ -95,5 +100,30 @@ function domain_update_6200() {
   db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, variable_get('domain_sitename', variable_get('site_name', 'Drupal')), variable_get('domain_scheme', 'http://'), 1);
   // MySQL won't let us insert row 0 into an autoincrement table.
   db_query("UPDATE {domain} SET domain_id = 0 WHERE subdomain = '%s'", $root);
+
+  // Install the {domain_editor} table.
+  $schema = domain_schema();
+  db_create_table($ret, 'domain_editor', $schema['domain_editor']);
+
+  // Move records from $user->data to {domain_editor}.
+  if (!db_table_exists('domain_editor')) {
+    return;
+  }
+  $result = db_query("SELECT uid, data FROM {users}");
+  while ($account = db_fetch_object($result)) {
+    $data = unserialize($account->data);
+    if (!empty($data['domain_user'])) {
+      foreach ($data['domain_user'] as $domain_id => $status) {
+        // A zero flag indicated not selected.
+        if ($status != 0) {
+          // Convert the -1 checkbox to a zero.
+          if ($domain_id == -1) {
+            $domain_id = 0;
+          }
+          db_query("INSERT INTO {domain_editor} (uid, domain_id) VALUES (%d, %d)", $account->uid, $domain_id);
+        }
+      }
+    }
+  }
   return $ret;
 }
