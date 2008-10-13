@@ -31,7 +31,7 @@ function domain_strict_domaingrants(&$grants, $account, $op) {
   // Erase the default domain_id grants.
   unset($grants['domain_id']);
   // Get the user-assigned domains.
-  $domains = domain_get_user_domains($account->uid);
+  $domains = domain_get_user_domains($account);
   if (!empty($domains)) {
     foreach ($domains as $key => $value) {
       // The -1 is the root domain, since 0 cannot be stored by checkboxes.

@@ -1,5 +1,9 @@
 // $Id$
 
+13-OCT-2008
+
+-- #313629 by jsenzee. Adds default role settings and default domains for new users.
+
 12-OCT-2008
 
 -- #320257. Moves domain user data into the new {domain_editor} table.

@@ -1002,3 +1002,90 @@ function domain_batch_data_type($type) {
   }
   return $return;
 }
+
+/**
+ * FormsAPI to set default domain membership for each role.
+ *
+ * These settigns are added to the $user object.
+ *
+ * @see domain_get_user_domains().
+ */
+function domain_roles_form($form_state) {
+  $form = array();
+  $form['domain_add_roles'] = array(
+    '#type' => 'radios',
+    '#options' => array(
+      0 => t('Add default roles dynamically'),
+      1 => t('Add default roles to the user account'),
+    ),
+    '#title' => t('Role settings behavior'),
+    '#description' => t('Adding role settings to the user account will permanently save them for each user on account registration or account updates. Otherwise, role-based settings can be added or removed at will.'),
+    '#default_value' => variable_get('domain_add_roles', 0),
+  );
+
+  $roles = user_roles();
+  $defaults = variable_get('domain_roles', array());
+  $roles[0] = t('new user');
+  ksort($roles);
+
+  $form['domain_roles'] = array(
+    '#tree' => TRUE,
+    '#value' => '<p>'. t('You may set optional default domains for each site user role. These settings will be added to each user when determining the permissions the user has to view and edit content on your site. These settings are expressly needed if you allow <em?anonymouse users</em> to post content on your site.') .'</p>',
+  );
+  $domains = array();
+  foreach (domain_domains() as $key => $value) {
+    if ($key > 0) {
+      $domains[$key] = $value['sitename'];
+    }
+    else {
+      $domains[-1] = $value['sitename'];
+    }
+  }
+  foreach ($roles as $rid => $role) {
+    $form['domain_roles'][$rid]['#tree'] = TRUE;
+    foreach ($domains as $domain_id => $domain) {
+      $form['domain_roles'][$rid][$domain_id] = array(
+        '#title' => filter_xss_admin($domain),
+        '#type' => 'checkbox',
+        '#default_value' => (isset($defaults[$rid][$domain_id])) ? $defaults[$rid][$domain_id] : 0,
+      );
+    }
+  }
+
+  $form = system_settings_form($form);
+  // System settings form adds a theme we cannot use.
+  unset($form['#theme']);
+  return $form;
+}
+
+/**
+ * FormsAPI 
+ */
+function theme_domain_roles_form($form) {
+  $output = '';
+  $header = array(t('Domains'));
+  $rows = array();
+  $roles = user_roles();
+  $roles[0] = t('new user');
+  ksort($roles);
+  $domains = domain_domains();
+  foreach ($roles as $rid => $role) {
+    $header[] = $role;
+  }
+  foreach ($domains as $domain_id => $domain) {
+    $row = array();
+    if ($domain_id == 0) {
+      $domain_id = -1;
+    }
+    $row[] = filter_xss_admin($domain['sitename']);
+    foreach ($roles as $rid => $role) {
+      $form['domain_roles'][$rid][$domain_id]['#title'] = '';
+      $row[] = drupal_render($form['domain_roles'][$rid][$domain_id]);
+    }
+    $rows[] = $row;
+  }
+  $output .= drupal_render($form['domain_add_roles']);
+  $output .= theme('table', $header, $rows);
+  $output .= drupal_render($form);
+  return $output;
+}

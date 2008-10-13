@@ -56,6 +56,7 @@ CONTENTS
 4.8.1   Domain Node Editing
 4.8.2   Domain Node Types
 4.9   Batch Updating
+4.10  Assigning Users to Domains
 5.  Blocks
 5.1   Block -- Domain Switcher
 5.2   Block -- Domain Access Information
@@ -889,6 +890,50 @@ are available by default.
 Additional batch actions are made available for the Domain Configuration
 module.  Other modules may implement hook_domainbatch() to provide
 additional batch actions.
+
+----
+4.10  Assigning Users to Domains
+
+New in 6.x.2 is the concept of 'user defaults.' These settings are used to
+assign users to domains basd on the user's site roles.
+
+Click on the 'User defaults' tab to see the settings available.
+
+By design, these settings are always added to a user's domains when a page
+is requested. That is, if you assign all 'authenticated users' to your first domain,
+one.example.com, then all authenticated users will be assigned to that domain.
+
+This setting is most useful under the following conditions:
+
+  -- If you let anonymous users post content on your site. In this case, you
+  should assign at least one domain to the anonymous user role, so that
+  the module will assign anonymous posts to the appropirate domain(s).
+  
+  -- If you use Domain Strict, you can use this setting to assign default
+  access to specific roles.
+
+Note that there are two options for how this setting behaves:
+
+  -- Add default roles dynamically [default]
+  This setting is the normal use and does not write individual records to the
+  {domain_editor} table. Use this setting if you want to change options for
+  each role quickly, as these are global settings, so taking away a domain
+  will instantly apply to all users.
+  
+  -- Add default roles to the user account
+  Use this setting if you want to automatically register users to specific
+  domains or to save changes to a batch of users. When this setting is
+  active, domain assignments are saved permanently to the {domain_editor}
+  table and can only be removed by editing the user account.
+
+You may also assign default domains for all new users of your site. To do
+so, simply select the domains that new users should be assigned to. If you
+make no selection, new users will automatically be assigned to the domain
+from which they enter the registration form.
+
+Settings for the 'new user' are permanently saved to the user account.
+
+See http://drupal.org/node/313629 for some background about this feature.
 
 ----
 5.  Blocks
