@@ -36,7 +36,7 @@ define('DOMAIN_SITE_GRANT', TRUE);
 */
 function domain_init() {
   global $_domain, $conf;
-  
+
   // Error handling in case the module is not installed correctly.
   if (empty($_domain)) {
     $_domain['error'] = '-1';
@@ -1358,7 +1358,7 @@ function domain_request_name() {
  * During the process hook_domain_bootstrap_lookup() is invoked to allow other
  * modules to modify that result.
  *
- * @param $_name
+ * @param $name
  * The string representation of a {domain} entry.
  *
  * @param $reset
@@ -1367,7 +1367,7 @@ function domain_request_name() {
  * @return
  * An array containing a domain_id from {domain} matching the given domainname
  */
-function domain_lookup_simple($name, $reset = false) {
+function domain_lookup_simple($name, $reset = FALSE) {
   static $cache = array();
 
   if (empty($name)) {
@@ -1375,12 +1375,12 @@ function domain_lookup_simple($name, $reset = false) {
   }
 
   if ($reset || !isset($cache[$name])) {
-    // Lookup the given domainname against our allowed hosts record.
+    // Lookup the given domain name against our allowed hosts record.
     $domain = db_fetch_array(db_query("SELECT domain_id FROM {domain} WHERE subdomain = '%s' ", $name));
     if (!is_array($domain)) {
       $domain = array();
     }
-    // If No match => use default (0)
+    // If no match => use default (0)
     if (!isset($domain['domain_id'])) {
       $domain['domain_id'] = 0;
     }

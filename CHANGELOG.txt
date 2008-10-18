@@ -1,5 +1,15 @@
 // $Id$
 
+18-OCT-2008
+
+-- Creates the primary domain on install.
+-- Fixed domain alias matching issue.
+-- Fixes ? handling in domain alias block.
+
+14-OCT-2008
+
+-- #320909 by peterx. Fixes documentation issue with domain assignments.
+
 13-OCT-2008
 
 -- #313629 by jsenzee. Adds default role settings and default domains for new users.

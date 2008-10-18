@@ -11,16 +11,21 @@
  */
 function domain_install() {
   drupal_install_schema('domain');
-  // Now add the first two records, the primary domain
-  // and a sample domain.
-  $root = strtolower(rtrim($_SERVER['HTTP_HOST']));
+  // Now add the primary domain
+  $root = strtolower(rtrim($_SERVER['SERVER_NAME']));
   $site = variable_get('site_name', 'Drupal');
-  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, $site, 'http', 1);
-  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", 'test.'. $root, t('Test for @site', array('@site' => $site)), 'http', 0);
+  $scheme = 'http';
+  if (!empty($_SERVER['HTTPS'])) {
+    $scheme = 'https';
+  }
+  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, $site, $scheme, 1);
   // MySQL won't let us insert row 0 into an autoincrement table.
-  // Like the {users} table, this leaves us with no row 2.
+  // Similar to the {users} table, this leaves us with no row 1.
   db_query("UPDATE {domain} SET domain_id = domain_id - 1");
-  
+  // Set the default domain variables.
+  variable_set('domain_root', $root);
+  variable_set('domain_scheme', $scheme);
+  variable_set('domain_sitename', $site);
 }
 
 /**

@@ -163,9 +163,23 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
       // First, look for an exact match.
       $alias = array();
       $alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE pattern = '%s'", $subdomain));
-      // If that fails, find the closest pattern.
+      // If that fails, find the closest pattern(s).
       if (empty($alias)) {
-        $alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE '%s' LIKE (pattern)", $subdomain)); //implode(',', $patterns)));
+        $result = db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE '%s' LIKE (pattern)", $subdomain);
+        // If we returned more than one match, we have to find the most appropriate one.
+        $patterns = array();
+        while ($alias = db_fetch_array($result)) {
+          $patterns[] = $alias;
+        }
+        if (empty($patterns)) {
+          $alias = array();
+        }
+        else if (count($patterns) == 1) {
+          $alias = current($patterns);
+        }
+        else {
+          $alias = domain_alias_best_match($subdomain, $patterns);
+        }
       }
     }
     else if (intval($alias_id)) {
@@ -186,6 +200,31 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
 }
 
 /**
+ * Given multiple choices for an alias, find the best match.
+ *
+ * @param $subdomain
+ * The requested subdomain string.
+ * @param $patterns
+ * An array of patterns  and aliase data that match the given subdomain string.
+ * @return
+ * The best match, as an $alias array.
+ */
+function domain_alias_best_match($subdomain, $patterns) {
+  $alias = array();
+  $test = -1;
+  $request = explode('.', $subdomain);
+  foreach ($patterns as $pattern) {
+    $match = explode('.', $pattern['pattern']);
+    $count = count(array_intersect($match, $request));
+    if ($count > $test) {
+      $test = $count;
+      $alias = $pattern;
+    }
+  }
+  return $alias;
+}
+
+/**
  * Replace placeholders * and ? with SQL placeholders % and _
  *
  * @param $subdomain
@@ -194,7 +233,7 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
  * String with replaced values.
  */
 function _domain_alias_placeholders_to_sql($subdomain, $reverse = FALSE) {
-  $placeholders = array('*' => '%%', '?' => '_');
+  $placeholders = array('*' => '%', '?' => '_');
   if ($reverse) {
     return str_replace($placeholders, array_keys($placeholders), $subdomain);
   }
@@ -383,8 +422,9 @@ function theme_domain_alias_block($domains) {
 function _domain_alias_link($alias, $domain, $request, $active = 0) {
   // Search for wildcards.
   $wildcard = substr_count($alias['pattern'], '*');
+  $character = substr_count($alias['pattern'], '?');
   $text = $alias['pattern'];
-  if ($wildcard || $character) {
+  if ($wildcard) {
     $bits = array_reverse(explode('.', $text));
     foreach ($bits as $key => $bit) {
       if ($bit == '*' && isset($request[$key])) {
@@ -392,6 +432,12 @@ function _domain_alias_link($alias, $domain, $request, $active = 0) {
       }
     }
     $text = implode('.', array_reverse($bits));
+  }
+  if ($character) {
+    $request = strrev(implode('.', array_reverse($request)));
+    $char = strpos(strrev($text), '?');
+    $replace = substr($request, $char, 1);
+    $text = str_replace('?', $replace, $text);
   }
   $wildcard = substr_count($text, '*');
   $output = $alias['pattern'];

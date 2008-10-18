@@ -243,21 +243,22 @@ web site and to all affiliates.  If you wish to alter this behavior, see
 sections 2.4 through 2.6.
 
 ----
-2.1 Patches to Drupal Core
+2.1 Patch to Drupal Core
 
-The following patches are optional.  They affect advanced behavior of the
+The following patch is optional.  They affect advanced behavior of the
 Domain Access module.
 
-Patches are distributed in the 'patches' folder of the download.
+The patch is distributed in the 'patches' folder of the download.
 
-To apply these patches, place them in your root Drupal folder.
+To apply the patch, copy the file to your root Drupal folder.
 Then follow the instructions at: http://drupal.org/patch/apply
 
 ----
 2.1.1 multiple_node_access.patch
 
 You should apply this patch only if you use Domain Access along with
-another Node Access module, such as Organic Groups (OG).
+another Node Access module, such as Organic Groups (OG), and
+have need of advanced access controls.
 
 The multiple_node_access.patch allows Drupal to run more than one
 node access control scheme in parallel.  Instead of using OR logic to
@@ -997,7 +998,7 @@ displayed as checkboxes under the heading "Domain access options":
     Select which affiliates can access this content.
 
 If you select 'Send to all affiliates,' the node will be viewable on all domains
-for your site.  If you do not select this option, you must select at least one
+for your site.  Even if you select this option, you must select at least one
 domain for the node.
 
 If you do not select at least one option, the module will automatically

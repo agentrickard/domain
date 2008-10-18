@@ -167,6 +167,13 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
     form_error($form[$type][$id]['pattern'], t('%name is already defined. You must use unique values.', array('%name' => $alias)));
     return;
   }
+  // 2) Check that the alias only has one wildcard.
+  $count = substr_count($alias, '*') + substr_count($alias, '?');
+  if ($count > 1) {
+    form_error($form[$type][$id]['pattern'], t('You may only have one wildcard character in each alias.'));
+    return;
+  }
+  
   // 2) Check that the alias doesn't contain any invalid characters.
   $check = preg_match('/^[a-z0-9\.\+\-\*\?]*$/', $alias);
   if ($check == 0) {
@@ -184,8 +191,12 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   }
   // 4) Check that the alias or a pattern matching the same domain name does not exist.
   $_pattern = _domain_alias_placeholders_to_sql($alias);
-  $_domain_id = isset($form_state['values']['domain_id']) ? $form_state['values']['domain_id'] : NULL;
-  $_alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = '%s'", $_pattern, $alias));
+  if (isset($form_state['values']['domain_id']) && $_pattern != $form_state['values']['domain_id']) {
+    $_alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = '%s' OR pattern  = '%s'", $_pattern, $form_state['values']['domain_id']));
+  }
+  else {
+    $_alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = '%s'", $_pattern));
+  }
   if (!empty($_alias)) {
     form_error($form[$type][$id]['pattern'], 
       t('%name matches <a href="!url" title="Edit aliases for domain !id">alias #!aid</a> (%existing). You must use unique values. ',
@@ -209,6 +220,7 @@ function domain_alias_form_submit($form, &$form_state) {
   // The new alias fields are always present.
   foreach ($form_state['values']['domain_alias_new'] as $id => $alias) {
     if (!empty($alias['pattern'])) {
+      $alias['pattern'] = _domain_alias_placeholders_to_sql($alias['pattern']);
       db_query("INSERT INTO {domain_alias} (domain_id, pattern, redirect) VALUES ('%d', '%s', '%d')", $form_state['values']['domain_id'], $alias['pattern'], intval($alias['redirect']));
     }
   }
@@ -279,6 +291,6 @@ function domain_alias_help_text() {
     <p>You may specify a pattern for your domains by using <strong>*</strong> (asterisk) to match any number of random 
     characters and <strong>?</strong> (question mark) to match exactly one random character.  
     For example: <em>*.example.com</em> would match any HTTP request made to a subdomain of <em>example.com</em>
-    to the domain record for <em>example.com</em>.');
+    to the domain record for <em>example.com</em>. NOTE: <em>Only one wildcard is allowed per alias.</em></p>');
   return $output;
 }

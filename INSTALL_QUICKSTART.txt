@@ -56,9 +56,8 @@ include './sites/all/modules/domain/settings.inc';
 
 7. Go to Admin > Build > Domain and configure the module.
 
-8. Note that as of 6.x.2.0, two domains are created for you on installation.
-    The first is a placeholder for your default domain. The second is a 
-    sample domain record. See INSTALL.txt for details.
+8. Note that as of 6.x.2.0, the primary domain is created for you on 
+    installation.
 
 9. Now you are ready to explore the options available to you.
 

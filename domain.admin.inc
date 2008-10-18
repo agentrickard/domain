@@ -1019,7 +1019,7 @@ function domain_roles_form($form_state) {
       1 => t('Add default roles to the user account'),
     ),
     '#title' => t('Role settings behavior'),
-    '#description' => t('Adding role settings to the user account will permanently save them for each user on account registration or account updates. Otherwise, role-based settings can be added or removed at will.'),
+    '#description' => t('Adding role settings to the user account will permanently save them for each user on account updates. Otherwise, role-based settings can be added or removed at will.'),
     '#default_value' => variable_get('domain_add_roles', 0),
   );
 

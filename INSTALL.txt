@@ -152,18 +152,12 @@ other Drupal module.
 ----
 3.1   After Installation
 
-Note that as of 6.x.2.0, two domains are created for you on installation.
-The first is a placeholder for your default domain. The second is a 
-sample domain record.
+Note that as of 6.x.2.0, the primary domain is created for you on 
+installation.
 
-The first domain will use the HTTP_HOST value of the request made
+The primary domain will use the SERVER_NAME value of the request made
 when installing the module. This value may be edited by going to
 Admin > Build > Domains and editing the Primary Domain value.
-
-The second domain will be given the value test.example.com, where
-example.com is the Primary Domain value. This domain is set to be
-'inactive' initially. You will need to edit this domain record in order to
-use it.
 
 After you install the module, you should visit Admin > Users > Permissions
 and set the module permissions; normally you will give your site 
