@@ -164,6 +164,8 @@ example.com to the domain record for example.com.
 Using wildcards is a good way to reduce the number of aliases that you need to
 maintain.
 
+NOTE: Only one wildcard is allowed per alias.
+
 ----
 3.4   Redirecting Aliases
 
