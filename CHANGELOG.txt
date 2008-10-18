@@ -5,6 +5,8 @@
 -- Creates the primary domain on install.
 -- Fixed domain alias matching issue.
 -- Fixes ? handling in domain alias block.
+-- #300454 by ariflukito. Introduces hook_domainpath() to allow for URL rewrites
+    across domains.
 
 14-OCT-2008
 

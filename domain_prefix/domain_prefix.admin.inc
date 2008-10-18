@@ -9,24 +9,6 @@
  */
 
 /**
- * Check for existing table prefixing.
- */
-function domain_prefix_get_prefix() {
-  global $db_prefix;
-  // Check for existing table prefixing.
-  $prefix = NULL;
-  if (!empty($db_prefix)) {
-    if (is_array($db_prefix)) {
-      $prefix = $db_prefix['default'];
-    }
-    else {
-      $prefix = $db_prefix;
-    }
-  }
-  return $prefix;
-}
-
-/**
  * Get the tables with the active prefix
  *
  * @param $prefix
@@ -360,18 +342,6 @@ function domain_prefix_form($form_state, $domain, $arguments = array()) {
 }
 
 /**
- * Does a table exist -- we use this to bypass Drupal's default table prefixing check.
- *
- * @param $prefix
- *   The table prefix used with this domain. Optional.
- * @param $table
- *   The name of the table being acted upon.
- */
-function domain_prefix_table_exists($prefix, $table) {
-  return db_table_exists(db_escape_table($prefix . $table));
-}
-
-/**
  * FormsAPI for domain_prefix_form.
  */
 function domain_prefix_form_submit($form, &$form_state) {
@@ -556,14 +526,3 @@ function domain_prefix_drop_records($domain_id) {
   }
   db_query("DELETE FROM {domain_prefix} WHERE domain_id = %d", $domain_id);
 }
-
-/**
- * Uniform prefix string
- *
- * @param $domain_id
- *  The domain_id taken from {domain}.
- */
-function domain_prefix_string($domain_id) {
-  return 'domain_'. $domain_id .'_';
-}
-

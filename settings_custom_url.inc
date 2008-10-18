@@ -23,7 +23,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
   }
 
   // Set static variables for the node lookups, to remove redundant queries.
-  static $domain_site, $domain, $nodepaths;
+  static $domain_site, $domain, $nodepaths, $path_rewrite;
 
   // This routine only needs to be run from certain urls or if we want to
   // force all links to go to a single domain for SEO.
@@ -98,5 +98,13 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
         $options['base_url'] = rtrim($root['path'], '/');
       }
     }
+  }
+  // We may have to implement hook_domainpath().
+  if (!isset($path_rewrite)) {
+    $path_rewrite = count(_domain_path_modules());
+  }
+  // Allow path changes, if needed.
+  if ($path_rewrite > 0) {
+    $path = domain_path($domain[$nid]['domain_id'], $original_path, isset($options['language']) ? $options['language']->language : '');
   }
 }

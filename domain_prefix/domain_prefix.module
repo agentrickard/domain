@@ -49,6 +49,18 @@ function domain_prefix_domain_bootstrap_full($domain) {
 }
 
 /**
+ * Implements hook_init().
+ *
+ * Check for prefixes of the url_alias table, and if present add hook_domainprefix().
+ */
+function domain_prefix_init() {
+  $count = db_result(db_query("SELECT COUNT(*) FROM {domain_prefix} WHERE status > 1 AND tablename = 'url_alias'"));
+  if (!empty($count)) {
+    include 'domain_prefix.path.inc';
+  }
+}
+
+/**
  * Implements hook_menu()
  */
 function domain_prefix_menu() {
@@ -116,6 +128,46 @@ function domain_prefix_disable() {
 }
 
 /**
+ * Uniform prefix string
+ *
+ * @param $domain_id
+ *  The domain_id taken from {domain}.
+ */
+function domain_prefix_string($domain_id) {
+  return 'domain_'. $domain_id .'_';
+}
+
+/**
+ * Check for existing table prefixing.
+ */
+function domain_prefix_get_prefix() {
+  global $db_prefix;
+  // Check for existing table prefixing.
+  $prefix = NULL;
+  if (!empty($db_prefix)) {
+    if (is_array($db_prefix)) {
+      $prefix = $db_prefix['default'];
+    }
+    else {
+      $prefix = $db_prefix;
+    }
+  }
+  return $prefix;
+}
+
+/**
+ * Does a table exist -- we use this to bypass Drupal's default table prefixing check.
+ *
+ * @param $prefix
+ *   The table prefix used with this domain. Optional.
+ * @param $table
+ *   The name of the table being acted upon.
+ */
+function domain_prefix_table_exists($prefix, $table) {
+  return db_table_exists(db_escape_table($prefix . $table));
+}
+
+/**
  * Implements hook_domainlinks()
  *
  * @param $domain
@@ -154,4 +206,3 @@ function domain_prefix_domainupdate($op, $domain, $form_state = array()) {
       break;
   }
 }
-

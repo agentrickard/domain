@@ -579,3 +579,26 @@ function hook_domain_bootstrap_full($domain) {
   // Our test module sets the default language to Spanish.
   $conf['language'] = 'es';
 }
+
+/**
+ * Allows modules to alter path when rewriting URLs.
+ *
+ * This hook will fire for all paths and may be resource-intensive.
+ * Look at Domain Prefix for best practices implementation. In Domain
+ * Prefix, we only include this function if we know it is necessary.
+ *
+ * @see domain_prefix_init()
+ *
+ * @param $domain_id
+ *  The domain_id taken from {domain}.
+ * @param $path
+ *  The internal drupal path to the node.
+ * @param $path_language
+ *  Language code to look up the path in.
+ *
+ * @ingroup domain_hooks
+ */
+function hook_domainpath($domain_id, &$path, $path_language = '') {
+  // Give a normal path alias
+  $path = drupal_get_path_alias($path);
+}

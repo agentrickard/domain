@@ -638,7 +638,6 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
         }
       }
     }
-   # print_r($domains[$uid]);
   }
   return $domains[$uid];
 }
@@ -712,7 +711,21 @@ function domain_get_path($domain) {
  * The absolute url to the current page on the requested domain.
  */
 function domain_get_uri($domain) {
-  $path = $domain['scheme'] .'://'. $domain['subdomain'] . request_uri();
+  $request_uri = request_uri();
+
+  $modules = _domain_path_modules();
+  if (!empty($modules)) {
+    // If needed, let modules modify the path alias.
+    $string = substr($request_uri, strlen(base_path()));
+    $path = drupal_get_normal_path($string);
+    $alias = domain_path($domain['domain_id'], $path);
+    if ($string == $alias) {
+      $alias = drupal_get_path_alias($path);
+    }
+    $request_uri = base_path() . $alias;
+  }
+
+  $path = $domain['scheme'] .'://'. $domain['subdomain'] . $request_uri;
   return $path;
 }
 
@@ -1606,4 +1619,39 @@ function domain_simpletest() {
   $dir = drupal_get_path('module', $module_name) .'/tests';
   $tests = file_scan_directory($dir, '\.test$');
   return array_keys($tests);
+}
+
+/**
+ * Helper function for passing hook_domainpath() by reference.
+ *
+ * @param $domain_id
+ * The domain_id taken from {domain}.
+ * @param $path
+ * The internal drupal path to the node.
+ * @param $path_language
+ * Optional language code to look up the path in.
+ * @return
+ * The $path, modified by reference by hook_domainpath() implementations.
+ */
+function domain_path($domain_id, $path, $path_language = '') {
+  $modules = _domain_path_modules();
+  if (!empty($modules)) {
+    foreach ($modules as $module) {
+      // Cannot use module_invoke_all() since these are passed by reference.
+      $function = $module .'_domainpath';
+      $function($domain_id, $path, $path_language);
+    }
+  }
+  return $path;
+}
+
+/**
+ * Helper function for domain_path() checks.
+ */
+function _domain_path_modules() {
+  static $modules;
+  if (!isset($modules)) {
+    $modules = module_implements('domainpath');
+  }
+  return $modules;
 }
