@@ -105,6 +105,6 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
   }
   // Allow path changes, if needed.
   if ($path_rewrite > 0) {
-    $path = domain_path($domain[$nid]['domain_id'], $original_path, isset($options['language']) ? $options['language']->language : '');
+    $path = domain_path($_domain['domain_id'], $original_path, isset($options['language']) ? $options['language']->language : '');
   }
 }

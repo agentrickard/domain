@@ -716,12 +716,8 @@ function domain_get_uri($domain) {
   $modules = _domain_path_modules();
   if (!empty($modules)) {
     // If needed, let modules modify the path alias.
-    $string = substr($request_uri, strlen(base_path()));
-    $path = drupal_get_normal_path($string);
+    $path = $_GET['q'];
     $alias = domain_path($domain['domain_id'], $path);
-    if ($string == $alias) {
-      $alias = drupal_get_path_alias($path);
-    }
     $request_uri = base_path() . $alias;
   }
 

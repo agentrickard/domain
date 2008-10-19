@@ -5,7 +5,7 @@
  * @file
  * Implements hook_domainpath().
  * This is a resource-intensive function, so we only include it
- * if the {url_alias} table is present.
+ * if an alias of the {url_alias} table is present.
  */
 
 /**

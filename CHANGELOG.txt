@@ -1,5 +1,10 @@
 // $Id$
 
+19-OCT-2008
+
+-- Fixes logic error for hook_domainpath() implementation in custom_url_rewrite.
+-- Simplifies the domain_get_uri() function.
+
 18-OCT-2008
 
 -- Creates the primary domain on install.
