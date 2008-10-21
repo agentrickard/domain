@@ -20,7 +20,7 @@ function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
   $path_language = (!empty($path_language)) ? $path_language : $language->language;
 
   // The default domain does not use a prefix.
-  if ($domain_id == 0) {
+  if ($domain_id == 0 && !isset($status[0])) {
     $status[0] = db_table_exists('url_alias');
     $tablename[0] = 'url_alias';
   }

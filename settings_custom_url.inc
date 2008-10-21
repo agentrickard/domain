@@ -98,13 +98,13 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
         $options['base_url'] = rtrim($root['path'], '/');
       }
     }
-  }
-  // We may have to implement hook_domainpath().
-  if (!isset($path_rewrite)) {
-    $path_rewrite = count(_domain_path_modules());
-  }
-  // Allow path changes, if needed.
-  if ($path_rewrite > 0) {
-    $path = domain_path($_domain['domain_id'], $original_path, isset($options['language']) ? $options['language']->language : '');
+    // We may have to implement hook_domainpath().
+    if (!isset($path_rewrite)) {
+      $path_rewrite = count(_domain_path_modules());
+    }
+    // Allow path changes, if needed.
+    if ($path_rewrite > 0) {
+      $path = domain_path($domain[$nid]['domain_id'], $original_path, isset($options['language']) ? $options['language']->language : '');
+    }
   }
 }

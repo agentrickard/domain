@@ -3,6 +3,7 @@
 21-OCT-2008
 
 -- #324008 patch by ariflukito. Fixed inconsistent use of domain_get_user_domains().
+-- #300454 patch by ariflukito. Optimizes and corrects hook_domainpath().
 
 19-OCT-2008
 
