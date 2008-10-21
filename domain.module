@@ -853,7 +853,7 @@ function domain_node_grants($account, $op) {
   }
   else {
     // The $account may not have domain information loaded, so get it.
-    $domains = domain_get_user_domains($account->uid);
+    $domains = domain_get_user_domains($account);
     $perm = 'delete domain nodes';
     if ($op == 'update') {
       $perm = 'edit domain nodes';

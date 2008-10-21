@@ -1,9 +1,13 @@
 // $Id$
 
+21-OCT-2008
+
+-- #324008 patch by ariflukito. Fixed inconsistent use of domain_get_user_domains().
+
 19-OCT-2008
 
 -- Fixes logic error for hook_domainpath() implementation in custom_url_rewrite.
--- Simplifies the domain_get_uri() function.
+-- Simplifies the domain_get_uri() function changes.
 
 18-OCT-2008
 

@@ -165,7 +165,7 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
       $alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE pattern = '%s'", $subdomain));
       // If that fails, find the closest pattern(s).
       if (empty($alias)) {
-        $result = db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE '%s' LIKE (pattern)", $subdomain);
+        $result = db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE '%s' LIKE pattern", $subdomain);
         // If we returned more than one match, we have to find the most appropriate one.
         $patterns = array();
         while ($alias = db_fetch_array($result)) {

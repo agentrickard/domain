@@ -103,7 +103,7 @@ function domain_content_check($domain, $all = FALSE) {
   if (!$rule) {
     return FALSE;
   }
-  $domains = domain_get_user_domains($user->uid);
+  $domains = domain_get_user_domains($user);
   $check = FALSE;
   $editor = FALSE;
   // Can this user see the default site?
