@@ -3,6 +3,7 @@
 22-OCT-2008
 
 -- #324008 by ariflukito. hook_user() does not fire before hook_form_alter().
+-- #300454 by ariflukito. More optimization for hook_domainpath().
 
 21-OCT-2008
 

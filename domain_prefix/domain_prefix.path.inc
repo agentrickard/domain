@@ -13,9 +13,13 @@
  */
 function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
   global $language, $_domain;
-
   // $map[$domain_id] keys are Drupal paths and the values are the corresponding aliases
   static $map = array(), $count = array(), $status = array(), $tablename = array();
+
+  // If the alias is for the current domain, do nothing.
+  if ($domain_id == $_domain['domain_id']) {
+    return;
+  }
 
   $path_language = (!empty($path_language)) ? $path_language : $language->language;
 
