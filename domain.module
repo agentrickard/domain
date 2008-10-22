@@ -1130,6 +1130,7 @@ function domain_form_alter($form_id, &$form) {
           case 3:
             // If the user has no available domains, then they cannot post.
             if (empty($user_options)) {
+              $form = array();
               return drupal_access_denied();
             }          
             $form['domain'] = array(
