@@ -1,5 +1,9 @@
 // $Id$
 
+22-OCT-2008
+
+-- #324008 by ariflukito. hook_user() does not fire before hook_form_alter().
+
 21-OCT-2008
 
 -- #324008 patch by ariflukito. Fixed inconsistent use of domain_get_user_domains().

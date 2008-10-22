@@ -56,6 +56,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
         }
       }
     }
+    $target_domain_id = $_domain['domain_id'];
     // This path has matched a node id, so it may need to be rewritten.
     if ($nid) {
       $root = domain_lookup(variable_get('domain_default_source', 0));
@@ -88,6 +89,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
           if (isset($source)) {
             $seo = FALSE;
           }
+          $target_domain_id = $domain[$nid]['domain_id'];
         }
       }
       // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
@@ -96,6 +98,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
         $options['absolute'] = TRUE;
         // In this case, the $base_url cannot have a trailing slash
         $options['base_url'] = rtrim($root['path'], '/');
+        $target_domain_id = $root['domain_id'];
       }
     }
     // We may have to implement hook_domainpath().
@@ -103,8 +106,8 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
       $path_rewrite = count(_domain_path_modules());
     }
     // Allow path changes, if needed.
-    if ($path_rewrite > 0) {
-      $path = domain_path($domain[$nid]['domain_id'], $original_path, isset($options['language']) ? $options['language']->language : '');
+    if ($path_rewrite > 0 && $path != '') {
+      $path = domain_path($target_domain_id, $original_path, isset($options['language']) ? $options['language']->language : '');
     }
   }
 }

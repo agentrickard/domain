@@ -714,7 +714,7 @@ function domain_get_uri($domain) {
   $request_uri = request_uri();
 
   $modules = _domain_path_modules();
-  if (!empty($modules)) {
+  if (!empty($modules) && !drupal_is_front_page()) {
     // If needed, let modules modify the path alias.
     $path = $_GET['q'];
     $alias = domain_path($domain['domain_id'], $path);
@@ -1126,19 +1126,23 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     // If the user has limited permissions, show that form or obey the settings.
     else {
       if (user_access('view domain publishing')) {
+        // hook_user() has not run, so get the domain data for this user.
+        $user->domain_user = domain_get_user_domains($user);
         $action = variable_get('domain_options', 0);
         $user_domains = array();
         $default_options = array();
-        foreach ($user->domain_user as $key => $value) {
-          if (abs($value) > 0) {
-            $user_domains[] = $value;
-          }
-        }
-        $first_domain = current($user_domains);
         $user_options = array();
-        foreach ($options as $key => $value) {
-          if (in_array($key, $user_domains)) {
-            $user_options[$key] = $value;
+        if (!empty($user->domain_user)) {
+          foreach ($user->domain_user as $key => $value) {
+            if (abs($value) > 0) {
+              $user_domains[] = $value;
+            }
+          }
+          $first_domain = current($user_domains);
+          foreach ($options as $key => $value) {
+            if (in_array($key, $user_domains)) {
+              $user_options[$key] = $value;
+            }
           }
         }
         // Raw data checks for published nodes.
