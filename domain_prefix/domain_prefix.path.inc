@@ -18,6 +18,7 @@ function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
 
   // If the alias is for the current domain, do nothing.
   if ($domain_id == $_domain['domain_id']) {
+    $path = drupal_get_path_alias($path);
     return;
   }
 
