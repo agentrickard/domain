@@ -128,6 +128,32 @@ function domain_conf_system(&$form, &$form_state, $form_id) {
     '#default_value' => variable_get('admin_theme', '0'),
   );
 
+  // Menu settings: primary and secondary links.
+  $form['menu'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Menu settings'),
+    '#collapsible' => TRUE,
+    '#weight' => -6
+  );
+
+  $menus = menu_get_menus();
+  $menus[0] = t('Do not use for this site');
+  $form['menu']['menu_primary_links_source'] = array(
+    '#type' => 'select',
+    '#title' => t('Primary links menu'),
+    '#default_value' => isset($settings['menu_primary_links_source']) ? $settings['menu_primary_links_source'] : variable_get('menu_primary_links_source', 'primary-links'),
+    '#options' => $menus,
+    '#description' => t('Select the primary links for this site.')
+  );
+
+  $form['menu']['menu_secondary_links_source'] = array(
+    '#type' => 'select',
+    '#title' => t('Secondary links menu'),
+    '#default_value' => isset($settings['menu_secondary_links_source']) ? $settings['menu_secondary_links_source'] : variable_get('menu_secondary_links_source', 'secondary-links'),
+    '#options' => $menus,
+    '#description' => t('Select the secondary links for this site.')
+  );
+
   // Date settings: set the default timezone
   $form['date'] = array(
     '#type' => 'fieldset',
