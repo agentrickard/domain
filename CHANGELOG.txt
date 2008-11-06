@@ -2,7 +2,11 @@
 
 06-NOV-2008
 
--- #273415 by junphine, bforchammer.  Adds porimary and secondary links handling to Domain Conf.
+-- #324008 by ariflukito. Adds domain user information to domain_boot().
+-- Fixes logic error in domain_alias_bootstrap_lookup().
+-- #273415 by junphine, bforchammer.  Adds primary and secondary links handling to Domain Conf.
+-- #319876 patch by nonsie.  Adds Views 2 handlers to Domain Views.
+-- Creates rc5.
 
 22-OCT-2008
 

@@ -26,6 +26,14 @@ define('DOMAIN_INSTALL_RULE', TRUE);
 define('DOMAIN_SITE_GRANT', TRUE);
 
 /**
+ * Adds the domain user data to the $user object.
+ */
+function domain_boot() {
+  global $user;
+  $user->domain_user = domain_get_user_domains($user);
+}
+
+/**
  * Implementation of hook_init().
  *
  * Inititalizes a global $_domain variable if necessary (usually that's done in

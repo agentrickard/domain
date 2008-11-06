@@ -40,7 +40,7 @@ function domain_views_views_data() {
     ),
     // Information for accepting a domain_id as a filter
     'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'handler' => 'domain_views_handler_filter_domain_domain_id',
     ),
     // Information for sorting on a domain_id.
     'sort' => array(
@@ -108,7 +108,7 @@ function domain_views_views_data() {
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
-  );  
+  );
 
   // Define the {domain_access} table.
   $data['domain_access']['table']['group'] = t('Domain');
@@ -150,7 +150,7 @@ function domain_views_views_data() {
     ),
     // Information for accepting a domain_id as a filter
     'filter' => array(
-      'handler' => 'views_handler_filter_numeric',
+      'handler' => 'domain_views_handler_filter_domain_access_gid',
     ),
     // Information for sorting on a domain_id.
     'sort' => array(
@@ -173,21 +173,52 @@ function domain_views_views_data() {
       'handler' => 'views_handler_sort',
     ),
   );
+   // Define available on current domain field
+  $data['domain_access']['current_all'] = array(
+    'title' => t('Available on current domain'),
+    'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates'),
+    'field' => array(
+      'handler' => 'views_handler_field_boolean',
+      'click sortable' => TRUE,
+    ),
+    'filter' => array(
+      'field' => 'gid',
+      'handler' => 'domain_views_handler_filter_domain_access_current_all',
+      'label' => t('Available on current domain'),
+    ),
+  );
   return $data;
 }
 
 /**
  * Implementation of hook_views_handlers() to register all of the basic handlers
  * views uses.
-
-function domain_views_views_handlers() {
-  $handlers = array();
-  $handlers['handlers'] = array(
-    // field handlers
-    'views_handler_argument_domain_id' => array(
-      'parent' => 'views_handler_argument_numeric',
-    ),
-  );
-  return $handklers;
-}
  */
+function domain_views_views_handlers() {
+  $handlers = array(
+    'info' => array(
+    'path' => drupal_get_path('module', 'domain_views') .'/includes',
+    ),
+    'handlers' => array(
+    // filter handlers
+    'domain_views_handler_filter_domain_access_current_all' => array(
+        'parent' => 'views_handler_filter_boolean_operator',
+    ),
+    'domain_views_handler_filter_domain_access_gid' => array(
+      'parent' => 'views_handler_filter_in_operator',
+    ),
+    'domain_views_handler_filter_domain_domain_id' => array(
+      'parent' => 'views_handler_filter_in_operator',
+    ),
+  ),
+  );
+  return $handlers;
+}
+
+/**
+ * Implementation of hook_views_query_substitutions ()
+ */
+function domain_views_query_substitutions($view) {
+  return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);
+}
+
