@@ -1,5 +1,9 @@
 // $Id$
 
+20-NOV-2008
+
+-- #300825 by rtbox, fp, awolfey, bribiz and rohnjeynolds.  db_result() error in domain_enable.
+
 10-OCT-2008
 
 -- #319542 by batigolix. Updates install instructions.

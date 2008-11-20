@@ -924,17 +924,17 @@ function domain_enable() {
     $edit = variable_get('domain_editors', DOMAIN_EDITOR_RULE);
     $site = DOMAIN_SITE_GRANT;
     $nids = db_query("SELECT nid FROM {node}");
-    while ($nid = db_result($nids)) {
+    while ($nid = db_fetch_object($nids)) {
       if (!empty($site)) {
-        db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_site');
+        db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid->nid, 0, 'domain_site');
       }
       if (!empty($rule)) {
         // By design, all nodes are assigned to the master domain.
-        db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_id');
+        db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid->nid, 0, 'domain_id');
         // Editor rules only apply is nodes are assigned to a domain.
         if (!empty($edit)) {
           variable_set('domain_editors', TRUE);
-          db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_editor');
+          db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid->nid, 0, 'domain_editor');
         }
       }
     }
