@@ -22,6 +22,10 @@
 function domain_theme_init() {
   // Assign the theme selected, based on the active domain.
   global $_domain, $custom_theme;
+  // If the theme has already been set (such as an admin theme), ignore.
+  if (!empty($custom_theme)) {
+    return;
+  }
   $default_theme = variable_get('theme_default', 'garland');
   $theme = domain_theme_lookup($_domain['domain_id']);
   // The above returns -1 on failure.

@@ -1,5 +1,9 @@
 // $Id$
 
+25-NOV-2008
+
+-- #324373 by jastern and Crell. Domain Theme wipes away custom admin themes.
+
 06-NOV-2008
 
 -- #324008 by ariflukito. Adds domain user information to domain_boot().
