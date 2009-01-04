@@ -100,11 +100,18 @@ function domain_conf_disable() {
  * Implements hook_domainlinks()
  */
 function domain_conf_domainlinks($domain) {
-  $links[] = array(
-    'title' => t('settings'),
-    'path' => 'admin/build/domain/conf/'. $domain['domain_id']
-  );
-  return $links;
+  static $extra;
+  if (!isset($extra)) {
+    $extra = domain_conf_api();
+  }
+  if ($domain['domain_id'] > 0 || !empty($extra)) {
+    $links[] = array(
+      'title' => t('settings'),
+      'path' => 'admin/build/domain/conf/'. $domain['domain_id']
+    );
+    return $links;
+  }
+  return FALSE;
 }
 
 /**

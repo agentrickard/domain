@@ -29,11 +29,11 @@ function domain_view() {
   // Get header elements from other modules
   $extra = module_invoke_all('domainview', 'header');
   $header = array_merge($header, $extra);
-  $header[] = array('data' => t('Actions'));
+  $header[] = array('data' => t('Actions'), 'colspan' => 6);
 
   // Cannot use domain_domains() here because we need to sort the output.
   $domains = array();
-
+  $actions = array();
   // Get any select sql from other modules.
   $select = module_invoke_all('domainview', 'select');
   $select_sql = '';
@@ -59,28 +59,36 @@ function domain_view() {
     $domain = domain_api($domain);
     $link = l($domain['subdomain'], domain_get_uri($domain), array('absolute' => TRUE));
     if ($domain['domain_id'] == 0) {
-      $actions = l(t('Default settings'), 'admin/build/domain/settings');
       // Grab any extra elements defined by other modules.  If so, allow configuration.
+      $extra = array();
       if (module_exists('domain_conf')) {
-        $extra = array();
         $extra = domain_conf_api();
-        if (!empty($extra)) {
-          $actions .= ' | '. l(t('settings'), 'admin/build/domain/conf/0');
-        }
+      }
+      if (!empty($extra)) {
+        $actions[] = l(t('settings'), 'admin/build/domain/conf/0');
+      }
+      else {
+        $actions[] = array('data' => t('primary'), 'colspan' =>2);
       }
     }
     else {
-      $actions = l(t('edit'), 'admin/build/domain/edit/'. $domain['domain_id']);
+      $actions = array();
+      $actions[] = l(t('edit'), 'admin/build/domain/edit/'. $domain['domain_id']);
+      $actions[] = l(t('delete'), 'admin/build/domain/delete/'. $domain['domain_id']);
+    }
       // Add advanced settings from other modules.
       $items = array();
       $items = module_invoke_all('domainlinks', $domain);
       if (!empty($items)) {
         foreach ($items as $item) {
-          $actions .= ' | '. l($item['title'], $item['path']);
+          if (!empty($item)) {
+            $actions[] = l($item['title'], $item['path']);
+          }
+          else {
+            $actions[] = '<br />';
+          }
         }
       }
-      $actions .= ' | '. l(t('delete'), 'admin/build/domain/delete/'. $domain['domain_id']);
-    }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
     $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<b>'. $link .'</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
@@ -89,8 +97,7 @@ function domain_view() {
       $row[] = module_invoke($module, 'domainview', 'data', $domain);
     }
     // Add the actions.
-    $row[] = $actions;
-    $rows[] = $row;
+    $rows[] = array_merge($row, $actions);
   }
   if (!empty($rows)) {
     $output .= theme_table($header, $rows);

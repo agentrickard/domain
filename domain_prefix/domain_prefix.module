@@ -174,13 +174,14 @@ function domain_prefix_table_exists($prefix, $table) {
  *  The currently active $domain array, provided by domain_lookup().
  */
 function domain_prefix_domainlinks($domain) {
-  if (user_access('administer table prefixing')) {
+  if (user_access('administer table prefixing') && $domain['domain_id'] > 0) {
     $links[] = array(
       'title' => t('tables'),
       'path' => 'admin/build/domain/prefix/'. $domain['domain_id']
     );
     return $links;
   }
+  return FALSE;
 }
 
 /**

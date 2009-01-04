@@ -101,11 +101,14 @@ function domain_theme_lookup($domain_id = NULL, $theme = NULL, $clear = FALSE) {
  * Implements hook_domainlinks()
  */
 function domain_theme_domainlinks($domain) {
-  $links[] = array(
-    'title' => t('theme'),
-    'path' => 'admin/build/domain/theme/'. $domain['domain_id']
-  );
-  return $links;
+  if ($domain['domain_id'] > 0) {
+    $links[] = array(
+      'title' => t('theme'),
+      'path' => 'admin/build/domain/theme/'. $domain['domain_id']
+    );
+    return $links;
+  }
+  return FALSE;
 }
 
 /**

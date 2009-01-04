@@ -151,16 +151,20 @@ function hook_domainupdate($op, $domain, $form_state = array()) {
  *    - path -- the link path (a Drupal-formatted path)
  *  The data returned by this function will be passed through the l() function.
  *
+ *  If you do not provide a link for a specific domain, return FALSE.
+ *
  * @ingroup domain_hooks
  */
 function hook_domainlinks($domain) {
-  if (user_access('my permission')) {
+  // These actions do not apply to the primary domain.
+  if (user_access('my permission') && $domain['domain_id'] > 0) {
     $links[] = array(
       'title' => t('settings'),
       'path' => 'admin/build/domain/myaction/'. $domain['domain_id']
     );
     return $links;
   }
+  return FALSE;
 }
 
 /**

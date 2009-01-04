@@ -341,6 +341,17 @@ function domain_alias_domainview($op, $domain = array()) {
 }
 
 /**
+ * Implements hook_domainlinks()
+ */
+function domain_alias_domainlinks($domain) {
+  $links[] = array(
+    'title' => t('aliases'),
+    'path' => 'admin/build/domain/aliases/'. $domain['domain_id']
+  );
+  return $links;
+}
+
+/**
  * Implements hook_domainnav().
  *
  * Ensure that active domains are correctly marked as active.
