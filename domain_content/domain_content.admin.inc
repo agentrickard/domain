@@ -125,7 +125,6 @@ function domain_content_form($form_state) {
 
   $result = pager_query(db_rewrite_sql('SELECT n.*, u.name, u.uid FROM {node} n '. $filter['join'] .' INNER JOIN {users} u ON n.uid = u.uid '. $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
 
-  $destination = drupal_get_destination();
   $check = array();
 
   // Some existing permissions alter the node access rules.
@@ -185,7 +184,7 @@ function domain_content_form($form_state) {
     }
     $form['domains'][$node->nid] =  array('#value' => theme('item_list', $items));
     if (!empty($check[$node->nid])) {
-      $form['operations'][$node->nid] = array('#value' => l(t('edit'), 'node/'. $node->nid .'/edit', array(), $destination));
+      $form['operations'][$node->nid] = array('#value' => l(t('edit'), 'node/'. $node->nid .'/edit', array('query' => drupal_get_destination())));
       $nodes[$node->nid] = '';
     }
   }

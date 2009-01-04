@@ -6,6 +6,7 @@
 -- #273415 by aaront.  The default primary links block does not respect domain settings.
     Creates new blocks to handle primary and secondary links.
 -- #350350 by aufumy. Clarifies installation instructions for settings.php.
+-- #336218 by ariflukito. Fixes error in l() function for Domain Content.
 
 25-NOV-2008
 
