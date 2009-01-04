@@ -1292,7 +1292,7 @@ function domain_grant_all($reset= FALSE) {
       $regexp = '/^('. preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/', '/(^|\|)\\\\<front\\\\>($|\|)/'), array('|', '.*', '\1'. preg_quote(variable_get('site_frontpage', 'node'), '/') .'\2'), preg_quote($pages, '/')) .')$/';
       // Compare with the internal and path alias (if any).
       $page_match = preg_match($regexp, $_GET['q']);
-      if (!$page_match) {
+      if (!$page_match && function_exists('drupal_get_path_alias')) {
         $path = drupal_get_path_alias($_GET['q']);
         if ($path != $_GET['q']) {
           $page_match = preg_match($regexp, $path);

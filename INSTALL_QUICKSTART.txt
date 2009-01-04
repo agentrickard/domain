@@ -33,6 +33,10 @@ include './sites/all/modules/domain/settings.inc';
     NOTE: You may need to alter the file path above based on your
     site configuration.  See INSTALL.txt for further help.
 
+    IMPORTANT: You must add these lines to settings.php after the
+    $db_url. Normally, you should add these lines to the end of the
+    settings.php file.
+
 4. Go to Admin > Build > Modules.  Therre you will see the Domain
     module group.
 

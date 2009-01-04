@@ -17,6 +17,7 @@ CONTENTS
 2.  Installation
 2.1   Dependencies
 2.2   Configuration Options
+2.3   Menu Blocks
 3.  Batch Updates
 4.  Developer Notes
 4.1   Extending Options with hook_domainconf()
@@ -84,6 +85,9 @@ settings are:
   - Footer message
   - Default front page
   - Anonymous user
+  - Administrative theme
+  - Primary links menu
+  - Secondary links menu
   - Default time zone
   - Site status
   - Site off-line message
@@ -91,6 +95,22 @@ settings are:
 On page load, these values are dynamically loaded to replace your site's
 defaults. If you do not adjust these settings, defaults will be used for all
 affiliates.
+
+----
+2.3  Menu Blocks
+
+This section only applies if you set separate Primary or Secondary links
+for your domains.
+
+Drupal's default blocks for Primary and Secondary links do not respect
+the variables set by Domain Configuration. To work around this limitation,
+we instead create two new blocks, named:
+
+  -- Domain primary links
+  -- Domain secondary links
+
+These blocks respond to domain-specific settings and may be used instead
+of (or in addition to) the default Primary and Secondary links blocks.
 
 ----
 3.  Batch Updates

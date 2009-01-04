@@ -352,3 +352,35 @@ function domain_conf_api($all = FALSE) {
   }
   return $options;
 }
+
+/**
+ * Implements hook_block().
+ *
+ * The primary links and secondary links blocks do not respect our settings,
+ * so we replace it with the following blocks.
+ */
+function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
+  if ($op == 'list') {
+    $blocks = array();
+    $blocks['domain-primary-links']['info'] = t('Domain primary links');
+    $blocks['domain-secondary-links']['info'] = t('Domain secondary links');
+    // Menu blocks can't be cached because each menu item can have
+    // a custom access callback. menu.inc manages its own caching.
+    $blocks['domain-primary-links']['cache'] = BLOCK_NO_CACHE;
+    $blocks['domain-secondary-links']['cache'] = BLOCK_NO_CACHE;
+    return $blocks;
+  }
+  else if ($op == 'view') {
+    $menus = menu_get_menus();
+    $string = str_replace('domain-', '', $delta);
+    $source = 'menu_'. str_replace('-', '_', $string) .'_source';
+    $delta = variable_get($source, $string);
+    // Some domains can disable primary and secondary links.
+    if (empty($delta)) {
+      return;
+    }
+    $data['subject'] = check_plain($menus[$string]);
+    $data['content'] = menu_tree($delta);
+    return $data;
+  }
+}

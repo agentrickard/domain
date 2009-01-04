@@ -260,6 +260,10 @@ how your site is being requested.
 If you do not add settings.inc to your settings.php file, Domain Access will
 fail to load and report an error message to site administrators.
 
+IMPORTANT: You must add these lines to settings.php after the $db_url
+has been set; otherwise, Drupal will fail to load. Normally, you should add
+these lines to the end of the settings.php file.
+
 ----
 5.4.1  Installation
 
