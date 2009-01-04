@@ -12,6 +12,7 @@
 -- Changes Domain Content to use the sitename instead of the URL in menus.
 -- Cleans up the Domain List screen.
 -- Changes hook_domainlinks() to return FALSE if no link is written.
+-- Adds default menu per node setting to Domain Conf.
 
 25-NOV-2008
 

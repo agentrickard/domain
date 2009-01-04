@@ -86,6 +86,7 @@ settings are:
   - Default front page
   - Anonymous user
   - Administrative theme
+  - Default menu for content
   - Primary links menu
   - Secondary links menu
   - Default time zone

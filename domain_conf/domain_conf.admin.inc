@@ -137,6 +137,15 @@ function domain_conf_system(&$form, &$form_state, $form_id) {
   );
 
   $menus = menu_get_menus();
+
+  $form['menu']['menu_default_node_menu'] = array(
+    '#type' => 'select',
+    '#title' => t('Default menu for content'),
+    '#default_value' => isset($settings['menu_default_node_menu']) ? $settings['menu_default_node_menu'] : variable_get('menu_default_node_menu', 'primary-links'),
+    '#options' => $menus,
+    '#description' => t('Choose the menu to be the default in the menu options in the content authoring form.'),
+  );
+
   $menus[0] = t('Do not use for this site');
   $form['menu']['menu_primary_links_source'] = array(
     '#type' => 'select',
