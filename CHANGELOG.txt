@@ -7,6 +7,9 @@
     Creates new blocks to handle primary and secondary links.
 -- #350350 by aufumy. Clarifies installation instructions for settings.php.
 -- #336218 by ariflukito. Fixes error in l() function for Domain Content.
+-- #336221 by ariflukito. Fixes url encoding issue with Domain Content.
+-- Forces a menu rebuild whenever domains are updated or created.
+-- Changes Domain Content to use the sitename instead of the URL in menus.
 
 25-NOV-2008
 

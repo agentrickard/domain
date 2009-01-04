@@ -1434,10 +1434,11 @@ function domain_domainupdate($op, $domain, $form_state = array()) {
         // Remove domain-specific entries from the {node_access} table and clear the cache.
         db_query("DELETE FROM {node_access} WHERE realm = '%s' AND gid = %d", 'domain_id', $domain['domain_id']);
         db_query("DELETE FROM {domain_access} WHERE realm = '%s' AND gid = %d", 'domain_id', $domain['domain_id']);
-        cache_clear_all();
       }
       break;
   }
+  // In all cases, we need to force a menu rebuild, which also clears the cache.
+  menu_rebuild();
 }
 
 /**

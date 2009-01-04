@@ -41,8 +41,8 @@ function domain_content_menu() {
   // Generate the list of active domains as menu items
   $domains = domain_domains();
   foreach ($domains as $domain) {
-    $items['admin/domain/content/'. filter_xss_admin($domain['subdomain'])] = array(
-      'title' => filter_xss_admin($domain['subdomain']) .' content',
+    $items['admin/domain/content/'. $domain['domain_id']] = array(
+      'title' => filter_xss_admin($domain['sitename']) .' content',
       'page callback' => 'domain_content_view',
       'page arguments' => array($domain['domain_id'], FALSE),
       'access callback' => 'domain_content_check',
