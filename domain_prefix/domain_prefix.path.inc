@@ -32,7 +32,7 @@ function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
 
   // Check to see if table prefixing has been done for the {url_alias} table.
   if (!isset($status[$domain_id])) {
-    $prefix = domain_prefix_string($domain_id) . domain_prefix_get_prefix();
+    $prefix = domain_prefix_string($domain_id);
     $status[$domain_id] = domain_prefix_table_exists($prefix, 'url_alias');
     $tablename[$domain_id] = $prefix .'url_alias';
   }
