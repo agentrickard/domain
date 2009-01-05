@@ -782,6 +782,7 @@ have installed the hook_url_alter() patch.
   -- comment/reply/%n
   -- node/add/book/parent/%n
   -- book/export/html/%n
+  -- node/%n/outline
 
 Where %n is a placeholder for the node id.
 

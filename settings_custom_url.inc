@@ -40,7 +40,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
 
     // Advanced pattern matching, we find the node id based on token %n in the path string.
     if (!isset($nodepaths)) {
-      $pathdata = variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n\r\nnode\%n\outline");
+      $pathdata = variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n\r\nnode/%n/outline");
       $path_match = preg_replace('/(\r\n?|\n)/', '|', $pathdata);
       $nodepaths = explode("|", $path_match);
     }
