@@ -4,6 +4,7 @@
 
 -- #354422 by ariflukito. Fixes incorrect slashes in node link patterns.
 -- #300454 by ariflukito. Fixes table name error in path prefix handling.
+-- #336218 by ariflukito. Fixes return path on batch content deletes.
 
 04-JAN-2009
 
