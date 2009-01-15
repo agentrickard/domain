@@ -499,7 +499,9 @@ function domain_prefix_disallow() {
   return array(
     'domain',
     'domain_access',
+    'domain_alias',
     'domain_conf',
+    'domain_editor',
     'domain_prefix',
     'domain_source',
     'domain_theme',

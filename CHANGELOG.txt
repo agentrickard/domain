@@ -1,5 +1,9 @@
 // $Id$
 
+15-JAN-2009
+
+-- #359277. Disallow prefixing of the new tables.
+
 05-JAN-2009
 
 -- #354422 by ariflukito. Fixes incorrect slashes in node link patterns.
