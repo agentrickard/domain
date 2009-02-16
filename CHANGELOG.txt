@@ -1,5 +1,9 @@
 // $Id$
 
+16-FEB-2009
+
+-- #316072 by JaceRider. Finish implementing domain_content_extra_fields.
+
 15-JAN-2009
 
 -- #359277. Disallow prefixing of the new tables.

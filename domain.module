@@ -1105,13 +1105,16 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
         $options[$key] = $data['sitename'];
       }
     }
+    // This lets CCK adjust the weight of our element. @see domain_content_extra_fields().
+    $weight = module_exists('content') ? content_extra_field_weight($form['type']['#value'], 'domain') : 1;
     // If the user is a site admin, show the form, otherwise pass it silently.
     if (user_access('set domain access')) {
       $form['domain'] = array(
         '#type' => 'fieldset',
         '#title' => t('Domain access options'),
         '#collapsible' => TRUE,
-        '#collapsed' => FALSE
+        '#collapsed' => FALSE,
+        '#weight' => $weight,
       );
       $form['domain']['domain_site'] = array(
         '#type' => 'checkbox',
@@ -1195,7 +1198,8 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
               '#type' => 'fieldset',
               '#title' => t('Affiliate publishing options'),
               '#collapsible' => TRUE,
-              '#collapsed' => FALSE
+              '#collapsed' => FALSE,
+              '#weight' => $weight,
             );
             // We must preserve publishing options that the user cannot access, but only for
             // existing nodes.
