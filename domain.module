@@ -65,6 +65,7 @@ function domain_init() {
   // End of the error handling routine.
 
   // Strip the www. off the domain, if required by the module settings.
+  $www_replaced = FALSE;
   if (variable_get('domain_www', 0) && strpos($_domain['subdomain'], 'www.') !== FALSE) {
     $_domain['subdomain'] = str_replace('www.', '', $_domain['subdomain']);
     $www_replaced = TRUE;
@@ -614,6 +615,10 @@ function _domain_rurl_sort($a, $b) {
  */
 function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
   static $domains = array();
+  if (empty($account)) {
+    // This may happen when creating a new user.
+    return array();
+  }
   $uid = (int) $account->uid;
   if (!isset($domains[$uid]) || $reset) {
     $domains[$uid] = array();
@@ -927,7 +932,7 @@ function domain_node_access_records($node) {
 
   // If set, grant access to the core site, otherwise
   // The grant must be explicitly given to a domain.
-  if ($node->domain_site) {
+  if (!empty($node->domain_site)) {
     $grants[] = array(
       'realm' => 'domain_site',
       'gid' => 0,

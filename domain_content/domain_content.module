@@ -35,7 +35,7 @@ function domain_content_menu() {
     'page arguments' => array(NULL, TRUE),
     'access callback' => 'domain_content_menu_check',
     'file' => 'domain_content.admin.inc',
-    'description' => 'View content assigned to all affiliate sites.'. $extra,
+    'description' => 'View content assigned to all affiliate sites.',
     'weight' => -10
   );
   // Generate the list of active domains as menu items
