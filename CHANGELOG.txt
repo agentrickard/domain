@@ -4,6 +4,7 @@
 
 -- #378258 by svdoord. Remove {domain_editor} entries when deleting domains.
 -- #356614 by blueyed and Pasquale. Cleans up E_NOTICE errors.
+-- #368594 bty skizzo. Adds domain batch editing forms for new menu settings.
 
 16-FEB-2009
 

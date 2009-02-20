@@ -281,6 +281,51 @@ function domain_conf_domainbatch() {
     '#data_type' => 'string',
     '#weight' => -8,
   );
+  // Change the menus
+  $menus = menu_get_menus();
+  $batch['menu_default_node_menu'] = array(
+    '#form' => array(
+      '#title' => t('Default menu for content'),
+      '#type' => 'select',
+      '#options' => $menus,
+      '#description' => t('Choose the menu to be the default in the menu options in the content authoring form.'),
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('menu_default_node_menu', 0),
+    '#variable' => 'menu_default_node_menu',
+    '#meta_description' => t('Set the default menu options for the content authoring form in all domains.'),
+    '#data_type' => 'string',
+    '#weight' => -6,
+  );
+  $menus[0] = t('Do not use for this site');
+  $batch['menu_primary_links_source'] = array(
+    '#form' => array(
+      '#title' => t('Primary links menu'),
+      '#type' => 'select',
+      '#options' => $menus,
+      '#description' => t('Select the primary links for this site.'),
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('menu_primary_links_source', 0),
+    '#variable' => 'menu_primary_links_source',
+    '#meta_description' => t('Set the primary links menu in all domains.'),
+    '#data_type' => 'string',
+    '#weight' => -6,
+  );
+  $batch['menu_secondary_links_source'] = array(
+    '#form' => array(
+      '#title' => t('Secondary links menu'),
+      '#type' => 'select',
+      '#options' => $menus,
+      '#description' => t('Select the secondary links for this site.'),
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('menu_secondary_links_source', 0),
+    '#variable' => 'menu_secondary_links_source',
+    '#meta_description' => t('Set the secondary links menu in all domains.'),
+    '#data_type' => 'string',
+    '#weight' => -6,
+  );
   // Change the timezone.
   $zones = _system_zonelist();
   $batch['date_default_timezone'] = array(
@@ -295,7 +340,7 @@ function domain_conf_domainbatch() {
     '#variable' => 'date_default_timezone',
     '#meta_description' => t('Set the default timezone for all domains.'),
     '#data_type' => 'string',
-    '#weight' => -8,
+    '#weight' => -4,
   );
   // Toggle the site offline status.
   $batch['site_offline'] = array(
@@ -310,7 +355,7 @@ function domain_conf_domainbatch() {
     '#variable' => 'site_offline',
     '#meta_description' => t('Set the online / offline status for all domains.'),
     '#data_type' => 'integer',
-    '#weight' => -8,
+    '#weight' => -4,
   );
   // Change the site offline message.
   $batch['site_offline_message'] = array(
@@ -326,7 +371,7 @@ function domain_conf_domainbatch() {
     '#variable' => 'site_offline_message',
     '#meta_description' => t('Set the site offline message for all domains.'),
     '#data_type' => 'string',
-    '#weight' => -8,
+    '#weight' => -4,
   );
   return $batch;
 }
