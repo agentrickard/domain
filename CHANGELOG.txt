@@ -6,6 +6,8 @@
 -- #356614 by blueyed and Pasquale. Cleans up E_NOTICE errors.
 -- #368594 bty skizzo. Adds domain batch editing forms for new menu settings.
 -- #365654 by _natron. Adds unique class identifiers to Domain Nav output.
+-- #375828 by grawat. Adds documentation warning about custom_url_rewrite_outbound().
+-- Creates rc6.
 
 16-FEB-2009
 

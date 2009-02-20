@@ -23,7 +23,19 @@ INSTALLATION INSTRUCTIONS
 
       'sites/all/modules'
 
-3. Add the following four lines of code to your settings.php file:
+3. Check for existing custom_url_rewrite_outbound().
+
+    custom_url_rewrite_outbound() is a special function that you
+    can add to settings.php to alter how Drupal writes links to content.
+    
+    If your site already uses this function -- it is not in core -- then
+    you will receive a PHP fatal error. This is because Domain Access
+    uses a version of this function as well.
+    
+    If you encounter this conflict, you need to merge the logic of the
+    two functions into a single function.
+
+4. Add the following four lines of code to your settings.php file:
 
 /**
  * Add the domain module setup routine.
@@ -37,12 +49,12 @@ include './sites/all/modules/domain/settings.inc';
     $db_url. Normally, you should add these lines to the end of the
     settings.php file.
 
-4. Go to Admin > Build > Modules.  Therre you will see the Domain
+5. Go to Admin > Build > Modules.  Therre you will see the Domain
     module group.
 
     Only enable the Domain Acccess module.
 
-5. Configure permissions for the module, normally you will give your
+6. Configure permissions for the module, normally you will give your
     site administrators the following permissions:
 
     -- 'administer domains'
@@ -56,14 +68,14 @@ include './sites/all/modules/domain/settings.inc';
 
     For more information see README.txt.
 
-6.  Read the main README.txt file for the Domain Access module.
+7.  Read the main README.txt file for the Domain Access module.
 
-7. Go to Admin > Build > Domain and configure the module.
+8. Go to Admin > Build > Domain and configure the module.
 
-8. Note that as of 6.x.2.0, the primary domain is created for you on 
+9. Note that as of 6.x.2.0, the primary domain is created for you on 
     installation.
 
-9. Now you are ready to explore the options available to you.
+10. Now you are ready to explore the options available to you.
 
     The Domain Access suite contains a number of optional helper
     modules.  You do not need to use any of these modules, but

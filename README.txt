@@ -765,18 +765,14 @@ Note that this does not affect node access permissions set by other modules.
 ----
 4.5   Node Link Patterns
 
-When using this module, there are times when hook_url_alter() will need
-to rewrite a node link.
-
-Note that these settings are not available if the hook_url_alter() patch
-is not applied.
+When using this module, there are times when Domain Access will need to 
+rewrite a node link using custom_url_rewrite_outbound().
 
 Since Drupal is an extensible system, we cannot account for all possible
 links to specific nodes.  Node Link Patterns are designed to allow you to
 extend the module as you add new contributed modules.
 
-By default, the following core link paths will be rewritten as needed if you
-have installed the hook_url_alter() patch.
+By default, the following core link paths will be rewritten as needed.
 
   -- node/%n
   -- comment/reply/%n
