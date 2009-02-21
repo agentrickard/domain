@@ -173,13 +173,33 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
     form_error($form[$type][$id]['pattern'], t('You may only have one wildcard character in each alias.'));
     return;
   }
-
-  // 2) Check that the alias doesn't contain any invalid characters.
-  $check = preg_match('/^[a-z0-9\.\+\-\*\?]*$/', $alias);
+  // 3) Only one colon allowed, and it must be followed by numbers only.
+  $count = substr_count($alias, ':');
+  if ($count > 1) {
+    form_error($form[$type][$id]['pattern'], t('You may only have one colon ":" character in each alias.'));
+    return;
+  }
+  else if ($count == 1) {
+    $int = substr($alias, strpos($alias, ':') + 1);
+    if (!is_numeric($int)) {
+      form_error($form[$type][$id]['pattern'], t('A colon may only be followed by an integer indicating the proper port.'));
+      return;
+    }
+  }
+  // 4) Check that the alias doesn't contain any invalid characters.
+  $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $alias);
   if ($check == 0) {
     form_error($form[$type][$id]['pattern'], t('%name contains invalid characters. ', array('%name' => $alias)));
   }
-  // 3) Check that the alias doesn't match another alias defined for this domain.
+  // 5) Check that the alias is not a direct match for a registered domain.
+  $check = preg_match('/[a-z0-9\.\+\-:]*$/', $alias);
+  if ($check == 1) {
+    $test = db_result(db_query("SELECT COUNT(*) FROM {domain} WHERE subdomain = '%s'", $alias));
+    if ($test > 0) {
+      form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record. ', array('%name' => $alias)));
+    }
+  }
+  // 6) Check that the alias doesn't match another alias defined for this domain.
   $replace = array('.' => '\.', '+' => '\+', '-' => '\-', '*' => '[a-z0-9\.\+\-]*', '?' => '[a-z0-9\.\+\-]?');
   $_pattern = str_replace(array_keys($replace), $replace, $alias);
   foreach ($aliases as $_alias) {
@@ -189,7 +209,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
       break;
     }
   }
-  // 4) Check that the alias or a pattern matching the same domain name does not exist.
+  // 7) Check that the alias or a pattern matching the same domain name does not exist.
   $_pattern = _domain_alias_placeholders_to_sql($alias);
   if (isset($form_state['values']['domain_id']) && $_pattern != $form_state['values']['domain_id']) {
     $_alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = '%s' OR pattern  = '%s'", $_pattern, $form_state['values']['domain_id']));
