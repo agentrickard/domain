@@ -161,7 +161,7 @@ function domain_content_domainupdate($op, $domain, $form_state = array()) {
  * The multiple delete form issues a redirect in its submit function.
  * So we must supply the proper path as a form element.
  *
- * @see http://drupal.org/node/336218
+ * @link http://drupal.org/node/336218
  */
 function domain_content_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'node_multiple_delete_confirm') {

@@ -34,7 +34,7 @@
  * @return
  * An array containing at least a valid domain_id. Other values are:
  * -- 'active_alias_id' => the currently active alias.
- * -- 'redirect' => a bollean flag telling the module to redirect to the 
+ * -- 'redirect' => a boolean flag telling the module to redirect to the
  * registered domain name if accessed from an alias.
  */
 function domain_alias_domain_bootstrap_lookup($domain) {
@@ -415,7 +415,7 @@ function theme_domain_alias_block($domains) {
   $output .= theme('item_list', $items);
   if ($msg) {
     $output .= t('<em>* Inactive domain.</em>');
-  }  
+  }
   return $output;
 }
 

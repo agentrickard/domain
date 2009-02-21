@@ -63,7 +63,7 @@ function domain_bootstrap() {
 }
 
 /**
- * Calls individuell bootstrap phases.
+ * Calls individual bootstrap phases.
  *
  * @param $phase
  * The domain bootstrap phase to call.
@@ -142,7 +142,7 @@ function _domain_bootstrap_modules($reset = FALSE) {
 
 /**
  * Tries to load all domain bootstrap modules.
- * @see _domain_bootstrap_modules().
+ * @see _domain_bootstrap_modules()
  */
 function _domain_bootstrap_modules_load() {
   $modules = _domain_bootstrap_modules();
@@ -194,7 +194,7 @@ function _domain_bootstrap_invoke_all() {
       $result = call_user_func_array($function, $args);
       if (isset($result) && is_array($result)) {
         $return = array_merge_recursive($return, $result);
-      } 
+      }
       else if (isset($result)) {
         $return[] = $result;
       }

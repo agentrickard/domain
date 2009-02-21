@@ -235,7 +235,7 @@ function theme_domain_nav_default($options) {
 function theme_domain_nav_ul($options) {
   foreach ($options as $key => $value) {
     (isset($value['active'])) ? $active = 'active' : $active =  '';
-    $class = "domain-id-".$value['domain_id'] . " " . $active;
+    $class = "domain-id-".$value['domain_id'] ." ". $active;
     $items[] = l($value['sitename'], $value['path'], array('attributes' => array('class' => $class)));
   }
   return theme('item_list', $items);
@@ -252,7 +252,7 @@ function theme_domain_nav_menus($options) {
     (isset($value['active'])) ? $active = 'active' : $active =  '';
     $items[] = array(
       'data' => l($value['sitename'], $value['path']),
-      'class' => "domain-id-".$value['domain_id'] . " " . $active,
+      'class' => "domain-id-".$value['domain_id'] ." ". $active,
     );
   }
   return theme('item_list', $items, NULL, 'ul', array('class' => 'tabs primary'));

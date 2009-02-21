@@ -113,7 +113,7 @@ function hook_domainload(&$domain) {
  * @param $domain
  * The domain record taken from {domain}, as an array.
  * @param $form_state
- *  The form values processed by the form.  Note that these are not editable since 
+ *  The form values processed by the form.  Note that these are not editable since
  *  module_invoke_all() cannot pass by reference.  We set $form_state to an array
  *  by default in case this hook gets called by a non-form function.
  *

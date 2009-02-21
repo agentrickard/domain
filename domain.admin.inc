@@ -68,7 +68,7 @@ function domain_view() {
         $actions[] = l(t('settings'), 'admin/build/domain/conf/0');
       }
       else {
-        $actions[] = array('data' => t('primary'), 'colspan' =>2);
+        $actions[] = array('data' => t('primary'), 'colspan' => 2);
       }
     }
     else {
@@ -197,7 +197,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#options' => array(0 => t('Do not show debugging output'), 1 => t('Show debugging output on node view')),
     '#description' => t('If set, users with the <em>set domain access</em> permission will be able to view the node access rules for each node. See the README for more details.')
   );
-  
+
   $options = array(
     'id' => t('Creation order, oldest > newest'),
     'rid' => t('Creation order, newest > oldest'),
@@ -322,7 +322,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
       the Drupal path of the link, using the <em>%n</em> placeholder to represent the node id.
       Enter one path per line.  See the README for more details.')
   );
- 
+
   // Allow submodules to add elements to the form.
   $modules = module_implements('domainform');
   if (!empty($modules)) {
@@ -1015,7 +1015,7 @@ function domain_batch_data_type($type) {
  *
  * These settigns are added to the $user object.
  *
- * @see domain_get_user_domains().
+ * @see domain_get_user_domains()
  */
 function domain_roles_form($form_state) {
   $form = array();
@@ -1066,7 +1066,7 @@ function domain_roles_form($form_state) {
 }
 
 /**
- * FormsAPI 
+ * FormsAPI
  */
 function theme_domain_roles_form($form) {
   $output = '';

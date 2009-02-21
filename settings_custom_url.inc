@@ -16,7 +16,7 @@
  */
 function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
   global $_domain;
-  
+
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.
   if (!isset($_domain['domain_id'])) {
     return;

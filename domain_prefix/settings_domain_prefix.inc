@@ -7,9 +7,8 @@
  *
  * Loads the table prefixes for the current domain.
  *
- * Deprecated in 6.x.2. 
+ * Deprecated in 6.x.2.
  * Left here to prevent load errors during upgrade.
- * 
+ *
  * @ingroup domain_prefix
  */
-

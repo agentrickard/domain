@@ -80,9 +80,9 @@ function domain_alias_form($form_state, $domain, $arguments = array()) {
   );
   $form['domain_new_help'] = array(
     '#type' => 'markup',
-    '#value' => t('To create a new alias, enter the matching pattern. Check the <em>redirect</em> box if you would like requests made to the alias to redirect to the registered domain. 
+    '#value' => t('To create a new alias, enter the matching pattern. Check the <em>redirect</em> box if you would like requests made to the alias to redirect to the registered domain.
       <em>You may enter up to five (5) aliases at a time.</em>'),
-  );  
+  );
   $form['domain_alias_new'] = array(
     '#tree' => TRUE,
   );
@@ -173,7 +173,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
     form_error($form[$type][$id]['pattern'], t('You may only have one wildcard character in each alias.'));
     return;
   }
-  
+
   // 2) Check that the alias doesn't contain any invalid characters.
   $check = preg_match('/^[a-z0-9\.\+\-\*\?]*$/', $alias);
   if ($check == 0) {
@@ -198,13 +198,13 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
     $_alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = '%s'", $_pattern));
   }
   if (!empty($_alias)) {
-    form_error($form[$type][$id]['pattern'], 
+    form_error($form[$type][$id]['pattern'],
       t('%name matches <a href="!url" title="Edit aliases for domain !id">alias #!aid</a> (%existing). You must use unique values. ',
         array(
-          '%name' => $alias, 
+          '%name' => $alias,
           '%existing' => _domain_alias_placeholders_from_sql($_alias['pattern']),
           '!url' => url('admin/build/domain/alias/'. $_alias['domain_id']),
-          '!id' => $_alias['domain_id'], 
+          '!id' => $_alias['domain_id'],
           '!aid' => $_alias['alias_id']
         )
       )
@@ -286,10 +286,10 @@ function theme_domain_alias_form($form) {
  * Help text for the form.
  */
 function domain_alias_help_text() {
-  $output = t('<p>A domain alias is used to register multiple valid domain names to a single record within Domain Access. 
+  $output = t('<p>A domain alias is used to register multiple valid domain names to a single record within Domain Access.
     You may enter as many unique aliases per domain as you wish. </p>
-    <p>You may specify a pattern for your domains by using <strong>*</strong> (asterisk) to match any number of random 
-    characters and <strong>?</strong> (question mark) to match exactly one random character.  
+    <p>You may specify a pattern for your domains by using <strong>*</strong> (asterisk) to match any number of random
+    characters and <strong>?</strong> (question mark) to match exactly one random character.
     For example: <em>*.example.com</em> would match any HTTP request made to a subdomain of <em>example.com</em>
     to the domain record for <em>example.com</em>. NOTE: <em>Only one wildcard is allowed per alias.</em></p>');
   return $output;
