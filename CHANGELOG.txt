@@ -5,6 +5,7 @@
 -- Makes for better use of Domain Access Advanced, by changing the query
     login for Domain Content admin screens to use {domain_access} instead of
     {node_access}.
+--  #367963 by svdoord. Adds domain_conf_variable_set() helper function.
 
 20-FEB-2009
 

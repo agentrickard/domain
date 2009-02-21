@@ -436,3 +436,39 @@ function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
     return $data;
   }
 }
+
+/**
+ * Change the variable setting for a domain.
+ * This function is called by external modules that wish
+ * to alter Domain Conf settings.
+ * 
+ * @link http://drupal.org/node/367963
+ *
+ * @param $domain_id
+ * The unique domain ID that is being edited.
+ * @param $variable
+ * The name of the variable you wish to set.
+ * @param $value
+ * The value of the variable to set. You may leave this
+ * value blank in order to unset the custom variable.
+ */
+function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
+  global $conf, $_domain;
+  // Get the current settings for this domain, if any.
+  $settings = unserialize(db_result(db_queryd("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  // Settings found, update them.
+  if (!empty($settings)) {
+    $settings[$variable] = $value;
+    db_query("UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d", serialize($settings), $domain_id);
+  }
+  else if (domain_lookup($domain_id) != -1) {
+    $settings = array($variable => $value);
+    db_query("INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)", $domain_id, serialize($settings));
+  }
+  // Clear the cache.
+  cache_clear_all('variables', 'cache');
+  // If we are on the active domain, set the active variable.
+  if ($domain_id == $_domain['domain_id']) {
+    $conf[$variable] = $value;
+  }
+}

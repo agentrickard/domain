@@ -21,8 +21,9 @@ CONTENTS
 3.  Batch Updates
 4.  Developer Notes
 4.1   Extending Options with hook_domainconf()
-4.2   Using domain_conf.inc
-4.3   Database Schema
+4.2   Setting Variables for Domains
+4.3   Using domain_conf.inc
+4.4   Database Schema
 
 ----
 1.  Introduction
@@ -154,7 +155,17 @@ Please see the full documentation in the API.
 http://therickards.com/api/function/hook_domainconf/Domain
 
 ----
-4.2   Using domain_conf.inc
+4.2   Setting Variables for Domains
+
+If you need to change the value of a domain-specific setting from another
+module, you can now use the function domain_conf_variable_set().
+
+  domain_conf_variable_set($domain_id, $variable, $value = NULL)
+
+Complete documentation of this function is in API.php.
+
+----
+4.3   Using domain_conf.inc
 
 The normal method for using hook_domainconf() is to have the hook implemented
 in other modules.
@@ -205,7 +216,7 @@ domain_conf.inc file is not included in the module package.
 See http://drupal.org/node/236877 for additional background.
 
 ----
-4.3   Database Schema
+4.4   Database Schema
 
 Installing the module creates a {domain_conf} table that contains:
 
