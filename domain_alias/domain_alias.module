@@ -382,6 +382,7 @@ function theme_domain_alias_block($domains) {
   $items = array();
   $msg = FALSE;
   $i = 0;
+  $active = NULL;
   foreach ($domains as $domain) {
     if ($domain['valid']) {
       $title = $domain['sitename'];

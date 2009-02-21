@@ -91,6 +91,7 @@ settings are:
   - Primary links menu
   - Secondary links menu
   - Default time zone
+  - Default language
   - Site status
   - Site off-line message
 

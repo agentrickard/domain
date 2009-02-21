@@ -729,9 +729,9 @@ function domain_get_uri($domain) {
   $modules = _domain_path_modules();
   if (!empty($modules) && !drupal_is_front_page()) {
     // If needed, let modules modify the path alias.
-    $path = $_GET['q'];
-    $alias = domain_path($domain['domain_id'], $path);
-    $request_uri = base_path() . $alias;
+    $alias = domain_path($domain['domain_id'], $_GET['q']);
+    // Run the result through url() for proper language and path handling.
+    $request_uri = url($alias);
   }
 
   $path = $domain['scheme'] .'://'. $domain['subdomain'] . $request_uri;

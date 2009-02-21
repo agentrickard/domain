@@ -24,6 +24,13 @@ function domain_conf_domain_bootstrap_full($domain) {
     $settings = unserialize($data['settings']);
     // Overwrite the $conf variables.
     foreach ($settings as $key => $value) {
+      // Language handling is a special case.
+      if ($key == 'language_default') {
+        $temp = db_fetch_object(db_query("SELECT * FROM {languages} WHERE language = '%s'", $value));
+        if (!empty($temp)) {
+          $value = $temp;
+        }
+      }
       $conf[$key] = $value;
     }
   }
@@ -140,7 +147,9 @@ function domain_conf_domainwarnings() {
     'system_admin_theme_settings',
     'system_date_time_settings',
     'system_site_information_settings',
-    'system_site_maintenance_settings'
+    'system_site_maintenance_settings',
+    'locale_languages_overview_form',
+    'menu_configure',
   );
 }
 
@@ -162,7 +171,7 @@ function domain_conf_domainbatch() {
     '#variable' => 'domain_conf',
     '#meta_description' => t('Delete custom settings for domains as supplied by Domain Configuration.'),
     '#table' => 'domain_conf',
-    '#weight' => -2,
+    '#weight' => 0,
   );
   // Change the email address.
   $batch['site_mail'] = array(
@@ -342,6 +351,24 @@ function domain_conf_domainbatch() {
     '#data_type' => 'string',
     '#weight' => -4,
   );
+  // Change the default language.
+  $languages = domain_conf_language_options();
+  $default = language_default();
+  $batch['language_default'] = array(
+    '#form' => array(
+      '#title' => t('Default language'),
+      '#type' => 'select',
+      '#options' => $languages,
+      '#description' => t('The default language to use for this domain. <em>Note: This setting only works with path-based language switching.</em>'),
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => $default->language,
+    '#override_default' => TRUE,
+    '#variable' => '', // deliberately empty, since this is an array and cannot be set.
+    '#meta_description' => t('Set the default language for all domains.'),
+    '#data_type' => 'string',
+    '#weight' => -3,
+  );
   // Toggle the site offline status.
   $batch['site_offline'] = array(
     '#form' => array(
@@ -355,7 +382,7 @@ function domain_conf_domainbatch() {
     '#variable' => 'site_offline',
     '#meta_description' => t('Set the online / offline status for all domains.'),
     '#data_type' => 'integer',
-    '#weight' => -4,
+    '#weight' => -2,
   );
   // Change the site offline message.
   $batch['site_offline_message'] = array(
@@ -371,7 +398,7 @@ function domain_conf_domainbatch() {
     '#variable' => 'site_offline_message',
     '#meta_description' => t('Set the site offline message for all domains.'),
     '#data_type' => 'string',
-    '#weight' => -4,
+    '#weight' => -2,
   );
   return $batch;
 }
@@ -471,4 +498,20 @@ function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
   if ($domain_id == $_domain['domain_id']) {
     $conf[$variable] = $value;
   }
+}
+
+/**
+ * Get the language options for use in forms.
+ */
+function domain_conf_language_options() {
+  $languages = language_list('language', TRUE);
+  $options = array();
+  foreach ($languages as $key => $lang) {
+    $extra = '';
+    if ($lang->native != $lang->name) {
+      $extra = ' ('. $lang->name .')';
+    }
+    $options[$key] = $lang->native . $extra;
+  }
+  return $options;
 }

@@ -178,6 +178,26 @@ function domain_conf_system(&$form, &$form_state, $form_id) {
     '#options' => $zones,
     '#description' => t('Select the default site time zone.')
   );
+
+  // Language settings, if needed.
+  if (module_exists('locale') && variable_get('language_count', 1) > 1) {
+    $form['language'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Language settings'),
+      '#collapsible' => TRUE,
+      '#weight' => 0,
+    );
+    $options = domain_conf_language_options();
+    $default = language_default();
+    $form['language']['language_default'] = array(
+      '#type' => 'radios',
+      '#title' => t('Default language'),
+      '#options' => $options,
+      '#default_value' => $default->language,
+      '#description' => t('The default language to use for this domain. <em>Note: This setting only works with path-based language switching.</em>'),
+    );
+  }
+
   // Offline notices.
   $form['offline'] = array(
     '#type' => 'fieldset',

@@ -411,6 +411,8 @@ function hook_domainconf() {
  *
  * - '#meta_description' [required] Used to describe your action to end users.
  *
+ *  - '#override_default' [optional] A boolean value used to tell whether to use variable_get() to retrieve the current value.
+ *  Use this when complex variables do not allow a normal usage.
  * - '#domain_action' [required] Indicates what submit action will be invoked for this setting.  Allowed values are:
  * --- 'domain' == writes the value to the {domain} table.  Normally, contributed modules will not use this option.
  * --- 'domain_conf' == writes the value to the {domain_conf} table.  Use in connection with hook_domainconf().

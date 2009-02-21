@@ -5,7 +5,11 @@
 -- Makes for better use of Domain Access Advanced, by changing the query
     login for Domain Content admin screens to use {domain_access} instead of
     {node_access}.
---  #367963 by svdoord. Adds domain_conf_variable_set() helper function.
+-- #367963 by svdoord. Adds domain_conf_variable_set() helper function.
+-- #26607. Allows each domain to specify a default language.
+-- Cleans up some more E_ALL notices.
+-- Fixes a logic error in domain_get_uri() that discarded language prefixes.
+-- Adds a small API change to hook_domainbatch().
 
 20-FEB-2009
 

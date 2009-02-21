@@ -834,7 +834,13 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
     }
     if ($batch['#domain_action'] == 'domain_conf') {
       // Set the default value to the main settings.
-      $default[$domain['domain_id']] = variable_get($action, $batch['#system_default']);
+      // In rare cases, variable_get() returns unusable data, so we override it.
+      if (empty($batch['#override_default'])) {
+        $default[$domain['domain_id']] = variable_get($action, $batch['#system_default']);
+      }
+      else {
+        $default[$domain['domain_id']] = $batch['#system_default'];
+      }
       // Check for domain-specific settings.
       $result = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
       $settings = unserialize($result);
@@ -874,6 +880,7 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
   $form['handler'] = array('#type' => 'value', '#value' => $batch['#domain_action']);
   $form['batch_item'] = array('#type' => 'value', '#value' => $action);
   $form['submit'] = array('#type' => 'submit', '#value' => t('Update domain settings'));
+
   return $form;
 }
 
