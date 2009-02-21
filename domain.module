@@ -831,6 +831,7 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  */
 function domain_node_grants($account, $op) {
   global $_domain;
+  $grants = array();
 
   // Do we need to use complex rules?
   $rules = variable_get('domain_access_rules', FALSE);
