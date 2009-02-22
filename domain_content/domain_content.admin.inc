@@ -100,26 +100,26 @@ function domain_content_form($form_state) {
   $filter = node_build_filter_query();
 
   // Bypass the superuser permissions by forcing an AND on {domain_access}.
-  $filter['join'] .= " INNER JOIN {domain_access} da ON da.nid = n.nid ";
+  $filter['join'] .= " INNER JOIN {domain_access} dac ON dac.nid = n.nid ";
   $arg = arg(3);
 
   if ($arg != 'all') {
     // In this case, we must check the domain_id grant.
     // We use intval() here for security, since we are not filtering the query parameter otherwise.
     if (empty($filter['where'])) {
-      $filter['where'] = " WHERE da.realm = 'domain_id' AND da.gid = ". intval($_domain['domain_id']) ." ";
+      $filter['where'] = " WHERE dac.realm = 'domain_id' AND dac.gid = ". intval($_domain['domain_id']) ." ";
     }
     else {
-      $filter['where'] .= " AND da.realm = 'domain_id' AND da.gid = ". intval($_domain['domain_id']) ." ";
+      $filter['where'] .= " AND dac.realm = 'domain_id' AND dac.gid = ". intval($_domain['domain_id']) ." ";
     }
   }
   else {
     // Or check the domain_site grant.
     if (empty($filter['where'])) {
-      $filter['where'] = " WHERE da.realm = 'domain_site' AND da.gid = 0 ";
+      $filter['where'] = " WHERE dac.realm = 'domain_site' AND dac.gid = 0 ";
     }
     else {
-      $filter['where'] .= " AND da.realm = 'domain_site' AND da.gid = 0 ";
+      $filter['where'] .= " AND dac.realm = 'domain_site' AND dac.gid = 0 ";
     }
   }
 
