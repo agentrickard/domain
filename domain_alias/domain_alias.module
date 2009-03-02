@@ -346,7 +346,7 @@ function domain_alias_domainview($op, $domain = array()) {
 function domain_alias_domainlinks($domain) {
   $links[] = array(
     'title' => t('aliases'),
-    'path' => 'admin/build/domain/aliases/'. $domain['domain_id']
+    'path' => 'admin/build/domain/alias/'. $domain['domain_id']
   );
   return $links;
 }

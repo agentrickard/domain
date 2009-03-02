@@ -1,5 +1,9 @@
 // $Id$
 
+02-MAR-2009
+
+-- #388636 by nirvanajyothi. domain_alias_domainlikns() returns bad path.
+
 21-FEB-2009
 
 -- Makes for better use of Domain Access Advanced, by changing the query
