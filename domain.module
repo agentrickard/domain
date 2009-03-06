@@ -324,7 +324,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
         }
         $options[-1] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
         while ($data = db_fetch_array($result)) {
-          $options[$data['domain_id']] = $data['sitename'];
+          $options[$data['domain_id']] = check_plain($data['sitename']);
         }
         // Replace the zero record to -1.
         unset($options[0]);
@@ -1108,7 +1108,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
       // The domain must be valid.
       if ($data['valid'] || user_access('administer domains')) {
-        $options[$key] = $data['sitename'];
+        $options[$key] = check_plain($data['sitename']);
       }
     }
     // This lets CCK adjust the weight of our element using domain_content_extra_fields().

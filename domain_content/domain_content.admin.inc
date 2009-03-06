@@ -196,7 +196,7 @@ function domain_content_form($form_state) {
       ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
       // The domain must be valid.
       if ($data['valid'] || user_access('administer domains')) {
-        $options[$key] = $data['sitename'];
+        $options[$key] = check_plain($data['sitename']);
       }
     }
     // If the user is a site admin, show the form, otherwise pass it silently.
