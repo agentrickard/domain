@@ -5,6 +5,7 @@
 -- #361018 patch by blackdog. Token support for domains.
 -- #393448. Moves Content editing forms settings to hook_perm().
     See UPGRADE.txt for details on the changes.
+-- Reomves {node_access} queries from custom_url_rewrite_outbound().
 
 02-MAR-2009
 

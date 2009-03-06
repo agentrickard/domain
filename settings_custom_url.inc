@@ -63,7 +63,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
       // Remove redundancy from the domain_site check.
       if (!isset($domain_site[$nid])) {
         // If this check works, we don't need to rewrite the path unless SEO rules demand it.
-        $domain_site[$nid] = db_result(db_query("SELECT grant_view FROM {node_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
+        $domain_site[$nid] = db_result(db_query("SELECT COUNT(nid) FROM {domain_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
       }
       if (!$domain_site[$nid] || $use_source) {
         // Remove rendundancy from the domain_id check.
@@ -76,7 +76,7 @@ function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
           }
           else {
             // Load the domain data for this node -- but only take the first match.
-            $id = db_result(db_query_range("SELECT gid FROM {node_access} WHERE nid = %d AND realm = '%s' AND grant_view = 1 ORDER BY gid", $nid, 'domain_id', 0, 1));
+            $id = db_result(db_query_range("SELECT gid FROM {domain_access} WHERE nid = %d AND realm = '%s' ORDER BY gid", $nid, 'domain_id', 0, 1));
             $domain[$nid] = domain_lookup($id);
           }
         }
