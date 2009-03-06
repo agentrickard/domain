@@ -38,9 +38,8 @@ CONTENTS
 4.1.3   Domain URL Scheme
 4.2   Domain Module Behaviors
 4.2.1   New Content Settings
-4.2.2   Content Editing Forms
-4.2.3   Debugging Status
-4.2.4   Sort Domain Lists
+4.2.2   Debugging Status
+4.2.3   Sort Domain Lists
 4.3   Advanced Settings
 4.3.1   Search Settings
 4.3.2   Search Engine Optimization
@@ -394,13 +393,58 @@ The Domain Access module has the following permissions:
   If the user does not have this permission, the book page will only be shown
   to users who are on http://one.example.com.
 
-  - 'view domain publishing'
-  This permission provides a limited set of options for users to create and
-  edit content on your site.  Users who have this permission will have their
-  node editing forms processed according to the "Content Editing Form"
-  settings described in section 4.2.2.
+  - 'publish from default domain'
+  - 'publish from assigned domain'
+  - 'publish to any assigned domain'
+  This group of permission provides a limited set of options for users to create
+  and edit content on your site.  Users who have this permission will have their
+  node editing forms processed according to the following rules:
 
-  This feature was added in response to http://drupal.org/node/188275.
+  -- 'publish from default domain'
+  Before being presented the editing form, users will be taken to the root
+  domain.  If the node is not visible on the root domain, the user may not be
+  able to edit the node.
+
+  -- 'publish from assigned domain'
+  Before being presented the editing form, users will be taken to the
+  first domain assigned to their user account.  This function is most useful
+  when you users are only allowed to enter content from a single domain.
+
+  Note that for users who have more than one assigned domain, this option
+  will take them to the first match and the user will not be allowed to
+  change the domain affiliation.
+
+  The advantage of this option is the user cannot modify the URL of a 
+  content edit form to match the URL of other domains, forcing all of her 
+  posts to be made to a single domain. Users trying to enter content 
+  from another domain will always be transferred to their assigned domain.
+  
+  In effect, a user assigned to 'one.example.com' will only be able to post
+  to that domain, even if she clicks Create Content from two.example.com.
+
+  -- 'publish to any assigned domain'
+  The node editing form is shown normally, and the user is presented a
+  list of checkboxes.  These options represent the affiliate domains that
+  the user is allowed to publish content to, according to the domains
+  assigned to their user account.
+
+  Note that if this option is selected, users will also be shown a list of 
+  affiliates to which the node is  assigned.  This list shows only the 
+  affiliates that the user cannot edit.
+
+  Warning: If this option is selected and the user has no domain publishing
+  options, the user will not be allowed to post or edit!
+
+  NOTE: Users who are assgined _none_ of these permissions and cannot 
+  'set domain access' will have the default form values passed as hidden fields. 
+  This is the default option.  It will assign all content to the domain from which 
+  the form is entered.
+
+Note also that the user is not given the ability to promote content to
+'all affiliates'.  Users who need this ability should be given the 'set domain
+access' permission instead.
+
+§This feature was added in response to http://drupal.org/node/188275.
 
 ----
 3.2 Normal Usage
@@ -519,60 +563,7 @@ If this value is set to 'Show on all sites,' then all new content will be
 assigned to all sites _in addition to_ the active domain.
 
 ----
-4.2.2   Content Editing Forms
-
-Defines how to present the forms for node creation and editing to users
-who do not have permission to 'set domain access' but need some control
-over where their content is published.
-
-Users with the 'view domain publishing' permission will be subject to the
-rules defined below.
-
-  -- Pass the default form values as hidden fields
-  The default option.  It will assign all content to the root domain and to
-  the domain from which the form is entered.
-
-  -- Take user to the default domain
-  Before being presented the editing form, users will be taken to the root
-  domain.  If the node is not visible on the root domain, the user may not be
-  able to edit the node.
-
-  -- Take user to their assigned domain
-  Before being presented the editing form, users will be taken to the
-  first domain assigned to their user account.  This function is most useful
-  when you users are only allowed to enter content from a single domain.
-
-  Note that for users who have more than one assigned domain, this option
-  will take them to the first match and the user will not be allowed to
-  change the domain affiliation.
-
-  The advantage of this option is the user cannot modify the URL of a 
-  content edit form to match the URL of other domains, forcing all of her 
-  posts to be made to a single domain. Users trying to enter content 
-  from another domain will always be transferred to their assigned domain.
-  
-  In effect, a user assigned to 'one.example.com' will only be able to post
-  to that domain, even if she clicks Create Content from two.example.com.
-
-  -- Show user their publishing options
-  The node editing form is shown normally, and the user is presented a
-  list of checkboxes.  These options represent the affilaite domains that
-  the user is allowed to publish content to, according to the domains
-  assigned to their user account.
-
-  Note that if this option is selected, users with the 'view domain publishing'
-  permission will also be shown a list of affilates to which the node is
-  assigned.  This list shows only the affiliates that the user cannot edit.
-
-  Warning: If this option is selected and the user has no domain publishing
-  options, the user will not be allowed to post or edit!
-
-Note also that the user is not given the ability to promote content to
-'all affiliates'.  Users who need this ability should be given the 'set domain
-access' permission instead.
-
-----
-4.2.3   Debugging Status
+4.2.2   Debugging Status
 
 If enabled, this will append node access information to the bottom of each
 node.  This data is only viewable by uses with the 'set domain access'
@@ -580,7 +571,7 @@ privilege.  It is provided for debugging, since 'adminiseter nodes' will make
 all nodes viewable to some users.
 
 ----
-4.2.4   Sort Domain Lists
+4.2.3   Sort Domain Lists
 
 Both the Domain Switcher block and the Domain Nav module provide an
 end-user visible list of domains.  The domain sorting settings control how

@@ -82,6 +82,12 @@ After running the update script, when you return to the administration pages
 you will be prompted to rebuild the node access table. Click on the link or go
 to Admin > Content > Post settings and click the 'Rebuild Permissions button.
 
+STEP 6: Reset permissions for domain module
+
+The old 'Content Editing Forms' setting has been replaced by role-based
+permissions.  Please see section 3.1 of README.txt and reset your 
+site permissions accordingly.
+
 ----
 3. Error Notices
 
@@ -102,6 +108,8 @@ Below are some notes about the changes to the new version.
 
 -- Pre-load functions are now handled automatically.
 -- Domain Alias has been added.
+-- The old setting for 'Content editing forms' has been made a permission,
+    so these functions can now be set per user role.
 -- The Primary Domain is now stored in both the {variables} and 
     {domain} tables. Doing so allows full integration with Views and
     simplifies some of the core code. However, it will also force the module

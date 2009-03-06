@@ -176,19 +176,6 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
   );
 
-  $form['domain_behavior']['domain_options'] = array(
-    '#type' => 'radios',
-    '#title' => t('Content editing forms'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_options', 0),
-    '#options' => array(
-      0 => t('Pass the default form values as hidden fields'),
-      1 => t('Take user to the default domain'),
-      2 => t('Take user to their assigned domain'),
-      3 => t('Show user their publishing options')),
-    '#description' => t('Controls the behavior of forms for users with the <em>view domain publishing</em> permission when creating or editing content. See the README for more details.')
-  );
-
   $form['domain_behavior']['domain_debug'] = array(
     '#type' => 'radios',
     '#title' => t('Debugging status'),

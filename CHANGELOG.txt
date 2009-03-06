@@ -2,7 +2,9 @@
 
 06-MAR-2009
 
--- #36101 patch by blackdog. Token support for domains.
+-- #361018 patch by blackdog. Token support for domains.
+-- #393448. Moves Content editing forms settings to hook_perm().
+    See UPGRADE.txt for details on the changes.
 
 02-MAR-2009
 

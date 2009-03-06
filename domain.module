@@ -191,7 +191,16 @@ function domain_menu() {
  * Implements hook_perm()
  */
 function domain_perm() {
-  $perms = array('administer domains', 'assign domain editors', 'delete domain nodes', 'edit domain nodes', 'set domain access', 'view domain publishing');
+  $perms = array(
+    'administer domains',
+    'assign domain editors',
+    'delete domain nodes',
+    'edit domain nodes',
+    'set domain access',
+    'publish to any assigned domains',
+    'publish from assigned domain',
+    'publish from default domain',
+  );
   return $perms;
 }
 
@@ -1142,10 +1151,10 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     }
     // If the user has limited permissions, show that form or obey the settings.
     else {
-      if (user_access('view domain publishing')) {
+      $action = domain_form_perm();
+      if (!empty($action)) {
         // hook_user() has not run, so get the domain data for this user.
         $user->domain_user = domain_get_user_domains($user);
-        $action = variable_get('domain_options', 0);
         $user_domains = array();
         $default_options = array();
         $user_options = array();
@@ -1268,6 +1277,28 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       }
     }
   }
+}
+
+/**
+ * Check a user's permissions for displaying the Domain form on nodes.
+ *
+ * This sets the hierarchy of user form permissions for those without 'set domain access'.
+ * Note that the most permissive permission wins.
+ */
+function domain_form_perm() {
+  $perms = array(
+    'publish from default domain' => 1,
+    'publish from assigned domain' => 2,
+    'publish to any assigned domains' => 3,
+  );
+  // By default, we will hide the form by returning NULL.
+  $action = NULL;
+  foreach ($perms as $perm => $value) {
+    if (user_access($perm)) {
+      $action = $value;
+    }
+  }
+  return $action;
 }
 
 /**
