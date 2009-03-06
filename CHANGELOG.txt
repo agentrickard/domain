@@ -1,5 +1,9 @@
 // $Id$
 
+06-MAR-2009
+
+-- #36101 patch by blackdog. Token support for domains.
+
 02-MAR-2009
 
 -- #388636 by nirvanajyothi. domain_alias_domainlikns() returns bad path.

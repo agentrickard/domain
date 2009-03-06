@@ -1576,6 +1576,41 @@ function domain_warning_check($form_id) {
 }
 
 /**
+ * Helper function for passing hook_domainpath() by reference.
+ *
+ * @param $domain_id
+ * The domain_id taken from {domain}.
+ * @param $path
+ * The internal drupal path to the node.
+ * @param $path_language
+ * Optional language code to look up the path in.
+ * @return
+ * The $path, modified by reference by hook_domainpath() implementations.
+ */
+function domain_path($domain_id, $path, $path_language = '') {
+  $modules = _domain_path_modules();
+  if (!empty($modules)) {
+    foreach ($modules as $module) {
+      // Cannot use module_invoke_all() since these are passed by reference.
+      $function = $module .'_domainpath';
+      $function($domain_id, $path, $path_language);
+    }
+  }
+  return $path;
+}
+
+/**
+ * Helper function for domain_path() checks.
+ */
+function _domain_path_modules() {
+  static $modules;
+  if (!isset($modules)) {
+    $modules = module_implements('domainpath');
+  }
+  return $modules;
+}
+
+/**
  * Implements hook_domainignore().
  */
 function domain_domainignore() {
@@ -1632,6 +1667,72 @@ function domain_content_extra_fields($type_name = NULL) {
 }
 
 /**
+ * Implements hook_token_list().
+ */
+function domain_token_list($type = 'all') {
+  // Current domain tokens.
+  $tokens['domain']['domain-id'] = t('The current domain ID.');
+  $tokens['domain']['domain-name'] = t('The current domain name, lowercased and with only alphanumeric characters.');
+  $tokens['domain']['domain-name-raw'] = t('The current domain name. WARNING - raw user input. NOT path safe.');
+  $tokens['domain']['domain-url'] = t('The current domain\'s URL, lowercased and with only alphanumeric characters.');
+  $tokens['domain']['domain-url-raw'] = t('The current domain\'s URL. WARNING - raw user input. NOT path safe.');
+  // Default domain tokens.
+  $tokens['domain']['domain-default-id'] = t('The default domain ID.');
+  $tokens['domain']['domain-default-name'] = t('The default domain name, lowercased and with only alphanumeric characters.');
+  $tokens['domain']['domain-default-name-raw'] = t('The default domain name. WARNING - raw user input. NOT path safe.');
+  $tokens['domain']['domain-default-url'] = t('The default domain\'s URL, lowercased and with only alphanumeric characters.');
+  $tokens['domain']['domain-default-url-raw'] = t('The default domain\'s URL. WARNING - raw user input. NOT path safe.');
+
+  return $tokens;
+}
+
+/**
+ * Implements hook_token_values().
+ */
+function domain_token_values($type, $object = NULL, $options = array()) {
+  global $_domain;
+  if ($type != 'global') {
+    return;
+  }
+
+  $default_domain = domain_default(FALSE);
+
+  // Current domain tokens.
+  $tokens['domain-id'] = $_domain['domain_id'];
+  $tokens['domain-name'] = domain_url_encode($_domain['sitename']);
+  $tokens['domain-name-raw'] = check_plain($_domain['sitename']);
+  $tokens['domain-url'] = domain_url_encode($_domain['subdomain']);
+  $tokens['domain-url-raw'] = check_plain($_domain['subdomain']);
+  // Default domain
+  $tokens['domain-default-id'] = $default_domain['domain_id'];
+  $tokens['domain-default-name'] = domain_url_encode($default_domain['sitename']);
+  $tokens['domain-default-name-raw'] = check_plain($default_domain['sitename']);
+  $tokens['domain-default-url'] = domain_url_encode($default_domain['subdomain']);
+  $tokens['domain-default-url-raw'] = check_plain($default_domain['subdomain']);
+
+  return $tokens;
+}
+
+/**
+ * Simple function to clean strings for use in for example paths.
+ */
+function domain_url_encode($string) {
+  $string = drupal_strtolower($string);
+
+  // Remove slashes.
+  $string = str_replace('/', '', $string);
+
+  // Reduce to the subset of ASCII96 letters and numbers - from Pathauto.
+  $pattern = '/[^a-zA-Z0-9\/]+/ ';
+  $string = preg_replace($pattern, '', $string);
+
+  // Remove white space - from Pathauto.
+  $string = preg_replace('/\s+/', '', $string);
+
+  return $string;
+}
+
+/**
  * Implements hook_simpletest()
  */
 function domain_simpletest() {
@@ -1639,39 +1740,4 @@ function domain_simpletest() {
   $dir = drupal_get_path('module', $module_name) .'/tests';
   $tests = file_scan_directory($dir, '\.test$');
   return array_keys($tests);
-}
-
-/**
- * Helper function for passing hook_domainpath() by reference.
- *
- * @param $domain_id
- * The domain_id taken from {domain}.
- * @param $path
- * The internal drupal path to the node.
- * @param $path_language
- * Optional language code to look up the path in.
- * @return
- * The $path, modified by reference by hook_domainpath() implementations.
- */
-function domain_path($domain_id, $path, $path_language = '') {
-  $modules = _domain_path_modules();
-  if (!empty($modules)) {
-    foreach ($modules as $module) {
-      // Cannot use module_invoke_all() since these are passed by reference.
-      $function = $module .'_domainpath';
-      $function($domain_id, $path, $path_language);
-    }
-  }
-  return $path;
-}
-
-/**
- * Helper function for domain_path() checks.
- */
-function _domain_path_modules() {
-  static $modules;
-  if (!isset($modules)) {
-    $modules = module_implements('domainpath');
-  }
-  return $modules;
 }
