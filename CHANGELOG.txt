@@ -3,6 +3,7 @@
 23-MAR-2009
 
 -- #407756 by nonsie. Fixes some documentation errors.
+-- Fixes wildcard matching issue with Domain Alias.
 
 06-MAR-2009
 

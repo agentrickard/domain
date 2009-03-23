@@ -38,8 +38,9 @@
  * registered domain name if accessed from an alias.
  */
 function domain_alias_domain_bootstrap_lookup($domain) {
-  // If the domain_id is 0, then we did not find an exact match, and must do an advanced check.
-  if ($domain['domain_id'] > 0) {
+  // If we had an exact match, then $domain['sitename'] is populated.
+  // Otherwise, we must do an advanced check.
+  if (isset($domain['sitename'])) {
     return;
   }
   $alias = domain_alias_lookup($domain['subdomain']);
