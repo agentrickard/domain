@@ -255,6 +255,17 @@ Then follow the instructions at: http://drupal.org/patch/apply
 ----
 2.1.1 multiple_node_access.patch
 
+NOTE: The multiple node access patch has been deprecated.
+This patch was rejected for Drupal core for version 7. The new database
+layer makes it unnecessary. 
+
+If you wish to use Domain Access with another node access
+module, try using the Domain Advanced module.
+
+http://drupal.org/project/domain_advanced
+
+Original documentation is below:
+
 You should apply this patch only if you use Domain Access along with
 another Node Access module, such as Organic Groups (OG), and
 have need of advanced access controls.
@@ -268,8 +279,6 @@ WARNING: This patch uses subselect statements and requires pgSQL or
 MySQL 4.1 or higher.
 
 Developers: see http://drupal.org/node/191375 for more information.
-
-This patch is being submitted to Drupal core for version 7.
 
 ----
 2.2 Server Configuration

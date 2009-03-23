@@ -115,7 +115,7 @@ Below are some notes about the changes to the new version.
     simplifies some of the core code. However, it will also force the module
     to skip a domain_id in the database. This change will not cause any
     issues, but there will be a skipped domain_id for all sites.
--- Fresh installs of Domain Access will never have a domain_id of 2.
+-- Fresh installs of Domain Access will never have a domain_id of 1.
 -- The 'domain editor' grant has been deprecated.
--- The new function domain_user_ger_user_domains($uid) can be used
+-- The new function domain_user_get_user_domains($uid) can be used
     to find which domains as user is assigned to.
