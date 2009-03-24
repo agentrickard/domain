@@ -193,7 +193,7 @@ function domain_conf_system(&$form, &$form_state, $form_id) {
       '#type' => 'radios',
       '#title' => t('Default language'),
       '#options' => $options,
-      '#default_value' => $default->language,
+      '#default_value' => isset($settings['language_default']) ? $settings['language_default'] : $default->language,
       '#description' => t('The default language to use for this domain. <em>Note: This setting only works with path-based language switching.</em>'),
     );
   }

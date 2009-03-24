@@ -1,5 +1,9 @@
 // $Id$
 
+24-MAR-2009
+
+-- #266071 patch by nonsie. (Comment 43) fixes two minor errors in i18n forms.
+
 23-MAR-2009
 
 -- #407756 by nonsie. Fixes some documentation errors.

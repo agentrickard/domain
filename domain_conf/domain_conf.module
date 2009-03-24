@@ -468,7 +468,7 @@ function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
  * Change the variable setting for a domain.
  * This function is called by external modules that wish
  * to alter Domain Conf settings.
- * 
+ *
  * @link http://drupal.org/node/367963
  *
  * @param $domain_id
@@ -482,7 +482,7 @@ function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
 function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
   global $conf, $_domain;
   // Get the current settings for this domain, if any.
-  $settings = unserialize(db_result(db_queryd("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  $settings = unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
   // Settings found, update them.
   if (!empty($settings)) {
     $settings[$variable] = $value;

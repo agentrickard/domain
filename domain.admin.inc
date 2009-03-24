@@ -648,7 +648,7 @@ function domain_advanced_form($form_state, $node_types) {
     '#title' => t('Domain node types'),
     '#collapsible' => TRUE
   );
-  $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.  <br /><em>NOTE: These settings only apply if the "New content settings" option is set to "Only show on selected sites."</em></p>'));
+  $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.</p>'));
   foreach ($node_types as $key => $value) {
     $form['domain_node']['domain_node_'. $key] = array(
       '#type' => 'checkbox',
