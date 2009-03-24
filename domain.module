@@ -922,9 +922,19 @@ function domain_node_grants($account, $op) {
  * if no options are selected, the node is assigned to the main site.
  */
 function domain_node_access_records($node) {
+  global $_domain;
   // Define the $grants array.
   $grants = array();
-
+  // Check to see if the node domains were set properly.
+  // If not, we are dealing with an automated node process, which
+  // means we have to add the logic from hook_form_alter() here.
+  if (!isset($node->domain_site)) {
+    // We came from a separate source, so let's set the proper defaults.
+    $node->domain_site = variable_get('domain_node_'. $node->type, variable_get('domain_behavior', DOMAIN_INSTALL_RULE));
+    // And the currently active domain.
+    $node->domains = array($_domain['domain_id'] => $_domain['domain_id']);
+  }
+  
   // If the form is hidden, we are passed the 'domains_raw' variable.
   // We need to append unique values from this variable to the existing
   // stored values.  See the logic for 'view domain publshing' in domain_form_alter().

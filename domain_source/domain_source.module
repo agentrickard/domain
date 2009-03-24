@@ -32,7 +32,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
       }
     }
     // In the case of users with limited permissions, option 3 is the "show options" value.
-    else if (user_access('view domain publishing') && variable_get('domain_options', 0) == 3) {
+    else if (user_access('publish to any assigned domain')) {
       global $user;
       // Get the user's allowed domains.
       foreach ($domains as $domain) {
@@ -77,7 +77,6 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
     global $_domain;
     $options = array();
     $domains = domain_domains();
-    $show = FALSE;
     if (user_access('set domain access')) {
       foreach ($domains as $domain) {
         $options[$domain['domain_id']] = $domain['sitename'];
@@ -101,6 +100,10 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
 function domain_source_nodeapi(&$node, $op, $a3, $a4) {
   switch ($op) {
     case 'validate':
+      // If not set, we ignore.
+      if (!isset($node->domain_source)) {
+        return;
+      }
       // Cast the key from zero to -1 to match the data coming from the input.
       ($node->domain_source == 0) ? $key = -1 : $key = $node->domain_source;
       if ($node->domain_site && $key == -1) {
@@ -115,6 +118,11 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       break;
     case 'insert':
     case 'update':
+      global $_domain;
+      // If not set, we came from a drupal_execute() or other external call, so use the current domain.
+      if (!isset($node->domain_source)) {
+        $node->domain_source = $_domain['domain_id'];
+      }
       db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);
       db_query("INSERT INTO {domain_source} (nid, domain_id) VALUES (%d, %d)", $node->nid, $node->domain_source);
       break;

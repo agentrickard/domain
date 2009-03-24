@@ -90,7 +90,7 @@ Access module:
   domain.  With Domain Source, it also allows users to assign that content to
   any domain as the "source" domain.
 
-  -- 'view domain publishing'
+  -- 'publish to any assigned domain'
   This permission lets affiliate editors select publishing options for the
   domains on which they are editors.  If these users are allowed to select
   the affiliate domains for their content, they will also be allowed to assign
@@ -105,15 +105,8 @@ domain.
 ----
 3.2 Content Editing Forms
 
-Users with the 'view domain publishing' permission will only be able to select
-a "source" domain only if the "Content editing forms" setting on Admin > Build
-> Domains is set to:
-
-  -- Show user their publishing options
-  The node editing form is shown normally, and the user is presented a
-  list of checkboxes.  These options represent the affilaite domains that
-  the user is allowed to publish content to, according to the domains
-  assigned to their user account.
+Only users with the 'set domain access' or  'publish to any assigned domain' 
+permission will be able to select a "source" domain.
 
 Otherwise, domain assignments will be done automatically, based on the currently
 active domain.

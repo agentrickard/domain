@@ -3,6 +3,7 @@
 24-MAR-2009
 
 -- #266071 patch by nonsie. (Comment 43) fixes two minor errors in i18n forms.
+-- #252877 patch to react when non-altered form values are saved.
 
 23-MAR-2009
 
