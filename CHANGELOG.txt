@@ -4,6 +4,8 @@
 
 -- #412156. Introduces domain_set_domain() so that necessary changes can be made
     without switching domains.
+-- Updates the UPGRADE.txt instructions.
+-- Finishes $412156.
 
 24-MAR-2009
 

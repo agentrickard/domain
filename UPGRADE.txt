@@ -13,7 +13,7 @@ CONTENTS
 2. How to Upgrade
 3. Error Notices
 4. Change Summary
-
+5. Upgrading From Drupal 5
 
 ----
 1. Who Needs to Upgrade?
@@ -28,8 +28,15 @@ In previous versions, Domain Access asked you to make several
 changes to your site's settings.php file.  The 6.x.2.0 version
 has made this process easier.
 
-To upgrade, follow the steps below.
+NOTE: You must leave the Domain Access module and its child
+modules turned on during the upgrade process.
 
+When you first update the source code, you may see some
+Drupal error messages printed on screen. These are normal and
+will disappear after the upgrade is complete.
+
+
+To upgrade, follow the steps below.
 
 STEP  1:  Update the module source code
 
@@ -119,3 +126,16 @@ Below are some notes about the changes to the new version.
 -- The 'domain editor' grant has been deprecated.
 -- The new function domain_user_get_user_domains($uid) can be used
     to find which domains as user is assigned to.
+
+----
+5. Upgrading from Drupal 5
+
+The upgrade process should work fine when upgrading from Drupal 5.
+
+Best practice is to disable contributed modules when upgrading Drupal.
+Be sure you disable (but do not uninstall) the Domain Access module
+before upgrading Drupal.
+
+When you have upgraded Drupal core, you may upgrade Domain Access.
+Be sure to turn the Domain Access module (and its children) back on
+before running any Domain Access updates.
