@@ -436,7 +436,7 @@ function domain_cron() {
     $domains = domain_domains();
     // Run the hook for each active domain.
     foreach ($domains as $domain) {
-      domain_set_domain($domain['domain_id']);
+      domain_set_domain($domain['domain_id'], TRUE);
       foreach ($modules as $module) {
         module_invoke($module, 'domaincron', $domain);
       }
@@ -688,15 +688,19 @@ function domain_api($domain, $reset = FALSE) {
  *
  * @param $domain_id
  *   The domain id of the domain to load.
+ * @param $bootstrap
+ *   Boolean flag that indicates whether to run domain bootstrap load.
  * @return
  *   No return value. The global $_domain value is altered, and domain-specific
  *   data functions are loaded.
  */
-function domain_set_domain($domain_id) {
+function domain_set_domain($domain_id, $bootstrap = FALSE) {
   global $_domain;
   $_domain = domain_load($domain_id);
   // Now re-run the bootstrap.
-  _domain_bootstrap_invoke_all('full', $_domain);
+  if ($bootstrap) {
+    _domain_bootstrap_invoke_all('full', $_domain);
+  }
 }
 
 /**

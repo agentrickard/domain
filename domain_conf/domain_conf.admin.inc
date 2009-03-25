@@ -27,8 +27,6 @@ function domain_conf_page($domain) {
 
   $output = theme_domain_conf_reset($domain);
   if ($domain['domain_id'] > 0) {
-    // Ensure we are on the proper domain.
-    domain_goto($domain);
     drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
     return $output . drupal_get_form('system_site_information_settings');
   }
