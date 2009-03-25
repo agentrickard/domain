@@ -449,6 +449,9 @@ function hook_domainconf() {
  * --- (-6) items used by Domain Theme.
  * --- (-2) items reserved for batch delete actions.
  *
+ * - '#group' [optional] Used to place elements into fieldsets for the main domain configuration page. If not set, any
+ *    new element will be added to the 'Site configuration' fieldset.
+ *
  * @ingroup domain_hooks
  */
 function hook_domainbatch() {
@@ -469,6 +472,7 @@ function hook_domainbatch() {
     '#validate' => 'domain_mysetting_validate',
     '#data_type' => 'string',
     '#weight' => 0,
+    '#group' => t('My settings'),
   );
   return $batch;
 }

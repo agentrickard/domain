@@ -28,11 +28,81 @@ function domain_conf_page($domain) {
   $output = theme_domain_conf_reset($domain);
   if ($domain['domain_id'] > 0) {
     drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
-    return $output . drupal_get_form('system_site_information_settings');
+    return $output . drupal_get_form('domain_conf_form', $domain);
   }
   else if ($domain['domain_id'] == 0) {
     return $output . drupal_get_form('domain_conf_default', $domain);
   }
+}
+
+/**
+ * Custom form to generate domain-specific site settings.
+ *
+ * The items on this form are taken from hook_domainbatch() and hook_domainconf().
+ * See the API for more information.
+ *
+ * @param $domain
+ *   The domain currently being updated.
+ */
+function domain_conf_form($form_state, $domain) {
+  $form = array();
+  $batch = module_invoke_all('domainbatch');
+  $settings = array();
+  $data = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+  if (!empty($data)) {
+    $settings = unserialize($data);
+  }
+  $default_group = t('Site configuration');
+  foreach ($batch as $key => $action) {
+    if ($action['#domain_action'] != 'domain_conf') {
+      continue;
+    }
+    if ($action['#form']['#type'] == 'select') {
+      $action['#form']['#options'] = array_merge(array(NULL => t('Use primary domain settings')), $action['#form']['#options']);
+    }
+    $group = isset($action['#group']) ? $action['#group'] : $default_group;
+    if (!isset($form[$group])) {
+      $form[$group] = array(
+        '#type' => 'fieldset',
+        '#title' => $group,
+        '#collapsible' => TRUE,
+      );
+    }
+    $form[$group][$key] = $action['#form'];
+    $form[$group][$key]['#default_value'] = isset($settings[$key]) ? $settings[$key] : $action['#system_default'];
+    // Change the path for the frontpage.
+    if ($key == 'site_frontpage') {
+      global $base_url;
+      $prefix = $base_url .'/';
+      $_path = parse_url($prefix);
+      $str = $_path['host'];
+      $fix = preg_replace("/$str/", $domain['subdomain'], $prefix, 1);
+      $form[$default_group]['site_frontpage']['#field_prefix'] = $fix;
+    }
+  }
+  $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+  // Site name must be edited at the domain creation screen.
+  $form[$default_group]['site_name'] = array(
+    '#disabled' => TRUE,
+    '#title' => t('Site name'),
+    '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/'. $domain['domain_id']))),
+    '#type' => 'textfield',
+    '#default_value' => $domain['sitename'],
+    '#weight' => -100,
+  );
+
+  // Grab any extra elements defined by other modules.
+  $extra = domain_conf_api(TRUE);
+  // Merge the $extra and $form arrays.
+  $form = array_merge($form, $extra);
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save domain settings'),
+    '#weight' => 10
+  );
+
+  return $form;
 }
 
 /**
@@ -74,189 +144,16 @@ function domain_conf_default($domain) {
 }
 
 /**
- * The bulk of our hook_form_alter implementation.
- */
-function domain_conf_system(&$form, &$form_state, $form_id) {
-  // We use the system_site_information_settings form as a base, and add the elements we need
-  // from other forms.  The default values are altered based on stored settings.
-  $domain_id = arg(4);
-  $domain = domain_lookup($domain_id);
-  $data = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
-  if (!empty($data)) {
-    $settings = unserialize($data);
-  }
-  else {
-    $settings = array();
-  }
-  $unset = array('buttons', '#submit');
-  foreach ($unset as $key) {
-    unset($form[$key]);
-  }
-  $form['main'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Domain information'),
-    '#collapsible' => TRUE,
-    '#weight' => -10
-  );
-  // Put the defaults in the fieldset
-  $fields = array('site_name', 'site_mail', 'site_slogan', 'site_mission', 'site_footer', 'site_frontpage', 'anonymous');
-  foreach ($fields as $field) {
-    $form['main'][$field] = $form[$field];
-    unset($form[$field]);
-  }
-
-  // Change the path for the frontpage.
-  $prefix = $form['main']['site_frontpage']['#field_prefix'];
-  $_path = parse_url($prefix);
-  $str = $_path['host'];
-  $fix = preg_replace("/$str/", $domain['subdomain'], $prefix, 1);
-  $form['main']['site_frontpage']['#field_prefix'] = $fix;
-
-  // Admin theme settings
-  $themes = list_themes();
-  ksort($themes);
-  $options[] = t('Use domain default theme');
-  foreach ($themes as $key => $value) {
-    $options[$key] = $key;
-  }
-  $form['main']['admin_theme'] = array(
-    '#type' => 'select',
-    '#title' => t('Administrative theme'),
-    '#options' => $options,
-    '#default_value' => variable_get('admin_theme', '0'),
-  );
-
-  // Menu settings: primary and secondary links.
-  $form['menu'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Menu settings'),
-    '#collapsible' => TRUE,
-    '#weight' => -6
-  );
-
-  $menus = menu_get_menus();
-
-  $form['menu']['menu_default_node_menu'] = array(
-    '#type' => 'select',
-    '#title' => t('Default menu for content'),
-    '#default_value' => isset($settings['menu_default_node_menu']) ? $settings['menu_default_node_menu'] : variable_get('menu_default_node_menu', 'primary-links'),
-    '#options' => $menus,
-    '#description' => t('Choose the menu to be the default in the menu options in the content authoring form.'),
-  );
-
-  $menus[0] = t('Do not use for this site');
-  $form['menu']['menu_primary_links_source'] = array(
-    '#type' => 'select',
-    '#title' => t('Primary links menu'),
-    '#default_value' => isset($settings['menu_primary_links_source']) ? $settings['menu_primary_links_source'] : variable_get('menu_primary_links_source', 'primary-links'),
-    '#options' => $menus,
-    '#description' => t('Select the primary links for this site.')
-  );
-
-  $form['menu']['menu_secondary_links_source'] = array(
-    '#type' => 'select',
-    '#title' => t('Secondary links menu'),
-    '#default_value' => isset($settings['menu_secondary_links_source']) ? $settings['menu_secondary_links_source'] : variable_get('menu_secondary_links_source', 'secondary-links'),
-    '#options' => $menus,
-    '#description' => t('Select the secondary links for this site.')
-  );
-
-  // Date settings: set the default timezone
-  $form['date'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Timezone settings'),
-    '#collapsible' => TRUE,
-    '#weight' => -5
-  );
-  $zones = _system_zonelist();
-  $form['date']['date_default_timezone'] = array(
-    '#type' => 'select',
-    '#title' => t('Default time zone'),
-    '#default_value' => isset($settings['date_default_timezone']) ? $settings['date_default_timezone'] : variable_get('date_default_timezone', 0),
-    '#options' => $zones,
-    '#description' => t('Select the default site time zone.')
-  );
-
-  // Language settings, if needed.
-  if (module_exists('locale') && variable_get('language_count', 1) > 1) {
-    $form['language'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Language settings'),
-      '#collapsible' => TRUE,
-      '#weight' => 0,
-    );
-    $options = domain_conf_language_options();
-    $default = language_default();
-    $form['language']['language_default'] = array(
-      '#type' => 'radios',
-      '#title' => t('Default language'),
-      '#options' => $options,
-      '#default_value' => isset($settings['language_default']) ? $settings['language_default'] : $default->language,
-      '#description' => t('The default language to use for this domain. <em>Note: This setting only works with path-based language switching.</em>'),
-    );
-  }
-
-  // Offline notices.
-  $form['offline'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Maintenance settings'),
-    '#collapsible' => TRUE,
-    '#weight' => 5
-  );
-  $form['offline']['site_offline'] = array(
-    '#type' => 'radios',
-    '#title' => t('Site status'),
-    '#default_value' => isset($settings['site_offline']) ? $settings['site_offline'] : variable_get('site_offline', 0),
-    '#options' => array(t('Online'), t('Off-line')),
-    '#description' => t('When set to "Online", all visitors will be able to browse your site normally. When set to "Off-line", only users with the "administer site configuration" permission will be able to access your site to perform maintenance; all other visitors will see the site off-line message configured below. Authorized users can log in during "Off-line" mode directly via the <a href="@user-login">user login</a> page.', array('@user-login' => url('user'))),
-  );
-
-  $form['offline']['site_offline_message'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Site off-line message'),
-    '#default_value' => isset($settings['site_offline_message']) ? $settings['site_offline_message'] : variable_get('site_offline_message', t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => $domain['sitename']))),
-    '#description' => t('Message to show visitors when the site is in off-line mode.')
-  );
-
-  // Site name must be edited at the domain creation screen.
-  $form['main']['site_name']['#disabled'] = TRUE;
-  $form['main']['site_name']['#description'] = t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/'. $domain['domain_id'])));
-
-  // Reset the provided form defaults, if needed
-  $form['main']['site_name']['#value'] = $domain['sitename'];
-  $form['main']['site_mail']['#default_value'] = isset($settings['site_mail']) ? $settings['site_mail'] : variable_get('site_mail', ini_get('sendmail_from'));
-  $form['main']['site_slogan']['#default_value'] = isset($settings['site_slogan']) ? $settings['site_slogan'] : variable_get('site_slogan', '');
-  $form['main']['site_mission']['#default_value'] = isset($settings['site_mission']) ? $settings['site_mission'] : variable_get('site_mission', '');
-  $form['main']['site_footer']['#default_value'] = isset($settings['site_footer']) ? $settings['site_footer'] : variable_get('site_footer', '');
-  $form['main']['site_frontpage']['#default_value'] = isset($settings['site_frontpage']) ? $settings['site_frontpage'] : variable_get('site_frontpage', 'node');
-  $form['main']['anonymous']['#default_value'] = isset($settings['anonymous']) ? $settings['anonymous'] : variable_get('anonymous', t('Guest'));
-
-  // Domain information, for saving.
-  $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-
-  // Grab any extra elements defined by other modules.
-  $extra = domain_conf_api(TRUE);
-  // Merge the $extra and $form arrays.
-  $form = array_merge($form, $extra);
-
-  // Submit functions
-  $form['#submit'][] = 'domain_conf_form_submit';
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save domain settings'),
-    '#weight' => 10
-  );
-}
-
-/**
  * FormsAPI for domain_conf_form().
  */
 function domain_conf_form_submit($form, &$form_state) {
   // Throw away what we don't need.
-  $settings = $form_state['values'];
-  $unset = array('form_token', 'form_id', 'form_build_id', 'op', 'submit');
-  foreach ($unset as $key) {
-    unset($settings[$key]);
+  $ignore = array('form_token', 'form_id', 'form_build_id', 'op', 'submit', 'domain_id');
+  foreach ($form_state['values'] as $key => $value) {
+    if (in_array($key, $ignore) || empty($value)) {
+      continue;
+    }
+    $settings[$key] = $value;
   }
   // INSERT or UPDATE?
   $check = 0;

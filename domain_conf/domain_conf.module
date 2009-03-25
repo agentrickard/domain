@@ -125,23 +125,6 @@ function domain_conf_domainlinks($domain) {
 }
 
 /**
- * Implements hook_form_alter()
- *
- * Since this function is only loaded at the path admin/build/domain/conf, we
- * don't have to worry about hook_form_alter() being called when not wanted.
- */
-function domain_conf_form_alter(&$form, &$form_state, $form_id) {
-  // TODO: Replace with hook_domainbatch()?
-  // Check to be certain that we are on the right form page.
-  $module = arg(2);
-  $action = arg(3);
-  // If we are making the form, load our alterations.
-  if ($form_id == 'system_site_information_settings' && $module == 'domain' && $action == 'conf') {
-    domain_conf_system($form, $form_state, $form_id);
-  }
-}
-
-/**
  * Implements hook_domainwarnings()
  */
 function domain_conf_domainwarnings() {
@@ -191,6 +174,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the email address for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#group' => t('Site configuration'),
   );
   // Change the site slogan.
   $batch['site_slogan'] = array(
@@ -207,6 +191,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site slogan for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#group' => t('Site configuration'),
   );
   // Change the site slogan.
   $batch['site_mission'] = array(
@@ -223,6 +208,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site mission for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#group' => t('Site configuration'),
   );
   // Change the site footer.
   $batch['site_footer'] = array(
@@ -239,6 +225,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site footer for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#group' => t('Site configuration'),
   );
   // Change the site frontpage.
   $batch['site_frontpage'] = array(
@@ -255,6 +242,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site frontpage for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#group' => t('Site configuration'),
   );
   // Change the anonymous user name.
   $batch['anonymous'] = array(
@@ -271,6 +259,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the anonymous user label for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#group' => t('Site configuration'),
   );
   // Change the administrative theme.
   $themes = list_themes();
@@ -292,6 +281,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the administrative theme for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#group' => t('Administrative theme'),
   );
   // Change the menus
   $menus = menu_get_menus();
@@ -308,6 +298,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the default menu options for the content authoring form in all domains.'),
     '#data_type' => 'string',
     '#weight' => -6,
+    '#group' => t('Menu settings'),
   );
   $menus[0] = t('Do not use for this site');
   $batch['menu_primary_links_source'] = array(
@@ -323,6 +314,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the primary links menu in all domains.'),
     '#data_type' => 'string',
     '#weight' => -6,
+    '#group' => t('Menu settings'),
   );
   $batch['menu_secondary_links_source'] = array(
     '#form' => array(
@@ -337,6 +329,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the secondary links menu in all domains.'),
     '#data_type' => 'string',
     '#weight' => -6,
+    '#group' => t('Menu settings'),
   );
   // Change the timezone.
   $zones = _system_zonelist();
@@ -353,6 +346,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the default timezone for all domains.'),
     '#data_type' => 'string',
     '#weight' => -4,
+    '#group' => t('Timezone settings'),
   );
   // Change the default language.
   $languages = domain_conf_language_options();
@@ -371,6 +365,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the default language for all domains.'),
     '#data_type' => 'string',
     '#weight' => -3,
+    '#group' => t('Language settings'),
   );
   // Toggle the site offline status.
   $batch['site_offline'] = array(
@@ -386,6 +381,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the online / offline status for all domains.'),
     '#data_type' => 'integer',
     '#weight' => -2,
+    '#group' => t('Site status'),
   );
   // Change the site offline message.
   $batch['site_offline_message'] = array(
@@ -397,11 +393,12 @@ function domain_conf_domainbatch() {
       '#description' => t('Message to show visitors when this domain is in off-line mode.'),
     ),
     '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('site_offline_message', ''),
+    '#system_default' => t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => variable_get('site_name', 'Drupal'))),
     '#variable' => 'site_offline_message',
     '#meta_description' => t('Set the site offline message for all domains.'),
     '#data_type' => 'string',
     '#weight' => -2,
+    '#group' => t('Site status'),
   );
   return $batch;
 }
