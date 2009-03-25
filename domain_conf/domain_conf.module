@@ -29,8 +29,11 @@ function domain_conf_domain_bootstrap_full($domain) {
         $temp = db_fetch_object(db_query("SELECT * FROM {languages} WHERE language = '%s'", $value));
         if (!empty($temp)) {
           $value = $temp;
+          global $language;
+          $language = $temp;
         }
       }
+      // We store the language variable here as well, for forms.
       $conf[$key] = $value;
     }
   }
