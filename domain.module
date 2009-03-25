@@ -436,16 +436,7 @@ function domain_cron() {
     $domains = domain_domains();
     // Run the hook for each active domain.
     foreach ($domains as $domain) {
-      // Set the domain-specific variables
-      if (function_exists('_domain_conf_load')) {
-        _domain_conf_load($domain);
-      }
-      // Set the global table prefix
-      if (function_exists('_domain_prefix_load')) {
-        _domain_prefix_load($domain);
-      }
-      // Set the global to the current $domain.
-      $_domain = $domain;
+      domain_set_domain($domain['domain_id']);
       foreach ($modules as $module) {
         module_invoke($module, 'domaincron', $domain);
       }
