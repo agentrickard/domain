@@ -44,10 +44,10 @@ function domain_content_page() {
  */
 function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   global $_domain;
-  // For users with limited privileges, we have to be on the same server
-  // as the content we are looking up.  Will return -1 if it fails.
-  $domain = domain_lookup($domain_id);
-  domain_goto($domain);
+  // Load the active domain, which is not necessarily the current domain.
+  if (!is_null($domain_id) && $domain_id != $_domain['domain_id']) {
+    domain_set_domain($domain_id);
+  }
   $output = '';
   // Override the $_domain global so we can see the appropriate content
   if (!is_null($domain_id)) {

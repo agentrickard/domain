@@ -690,6 +690,25 @@ function domain_api($domain, $reset = FALSE) {
 }
 
 /**
+ * Set the active domain to something other than the HTTP request.
+ *
+ * This function is used in cases where you wish to similuate the loading
+ * of a domain while on another domain.
+ *
+ * @param $domain_id
+ *   The domain id of the domain to load.
+ * @return
+ *   No return value. The global $_domain value is altered, and domain-specific
+ *   data functions are loaded.
+ */
+function domain_set_domain($domain_id) {
+  global $_domain;
+  $_domain = domain_load($domain_id);
+  // Now re-run the bootstrap.
+  _domain_bootstrap_invoke_all('full', $_domain);
+}
+
+/**
  * Implements hook_domainload()
  *
  * Adds the home page 'path' and 'site_grant' boolean.

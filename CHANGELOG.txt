@@ -1,5 +1,10 @@
 // $Id$
 
+25-MAR-2009
+
+-- #412156. Introduces domain_set_domain() so that necessary changes can be made
+    without switching domains.
+
 24-MAR-2009
 
 -- #266071 patch by nonsie. (Comment 43) fixes two minor errors in i18n forms.
