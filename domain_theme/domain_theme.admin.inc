@@ -15,9 +15,15 @@
  *  The $domain object created by domain_lookup().
  */
 function domain_theme_page($domain) {
+  global $custom_theme;
   if (isset($domain['domain_id'])) {
-    // Ensure we are on the proper domain.
-    domain_goto($domain);
+    // Set the custom theme, for display.
+    $custom_theme = variable_get('theme_default', 'garland');
+    $theme = domain_theme_lookup($domain['domain_id']);
+    // The above returns -1 on failure.
+    if ($theme != -1) {
+      $custom_theme = $theme['theme'];
+    }
 
     // Load the system form file.
     include_once drupal_get_path('module', 'system') .'/system.admin.inc';
@@ -36,9 +42,13 @@ function domain_theme_page($domain) {
  */
 function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'system_themes_form') {
-    global $_domain;
+    $domain_id = arg(4);
+    $domain = domain_load($domain_id);
+    if ($domain == -1) {
+      return drupal_access_denied();
+    }
     // Get the current $theme for this domain, if available.
-    $theme = domain_theme_lookup($_domain['domain_id']);
+    $theme = domain_theme_lookup($domain['domain_id']);
     if ($theme['theme']) {
       $form['theme_default']['#default_value'] = $theme['theme'];
     }
@@ -71,7 +81,7 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
     // Which domain are we editing?
     $form['domain_id'] = array(
       '#type' => 'value',
-      '#value' => $_domain['domain_id'],
+      '#value' => $domain['domain_id'],
     );
     // Our submit handlers.
     $form['#submit'][] = 'domain_theme_submit';
