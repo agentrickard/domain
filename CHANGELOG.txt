@@ -7,6 +7,7 @@
 -- Updates the UPGRADE.txt instructions.
 -- Finishes $412156.
 -- #405148. Removes hook_form_alter from Domain Conf.
+-- #413950. Adds domain_conf_variable_get().
 
 24-MAR-2009
 

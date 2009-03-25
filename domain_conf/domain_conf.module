@@ -501,6 +501,37 @@ function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
 }
 
 /**
+ * Load a variable specific to a domain.
+ *
+ * @param $domain_id
+ * The unique domain ID that is being edited.
+ * @param $variable
+ * The name of the variable you wish to get.
+ * @param $all
+ * A boolean flag indicating whether to return the entire variable array.
+ * @param $reset
+ * A boolean flag to reset the static variable array for the domain. Useful
+ * if you are changing variables during a page request.
+ * @return
+ * The value of the variable for that domain, or NULL if not set, 
+ * or an array of variables, in the case of $all.
+ */
+function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $reset = FALSE) {
+  static $settings;
+  if (!isset($settings[$domain_id]) || $reset) {
+    // Get the current settings for this domain, if any.
+    $settings[$domain_id] = unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  }
+  if ($all) {
+    return $settings[$domain_id];
+  }
+  if (isset($settings[$domain_id][$variable])) {
+    return $settings[$domain_id][$variable];
+  }
+  return NULL;
+}
+
+/**
  * Get the language options for use in forms.
  */
 function domain_conf_language_options() {
