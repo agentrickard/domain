@@ -459,7 +459,7 @@ function domain_edit($domain) {
     return t('Invalid page requested.');
   }
   // This action should be performed from the primary domain.
-  domain_goto(domain_default());
+  domain_check_primary();
   return drupal_get_form('domain_edit_form', $domain);
 }
 
@@ -574,7 +574,7 @@ function domain_delete($domain) {
     return t('Invalid page requested.');
   }
   // This action should be performed from the primary domain.
-  domain_goto(domain_default());
+  domain_check_primary();
   return drupal_get_form('domain_delete_form', $domain);
 
 }
@@ -583,16 +583,16 @@ function domain_delete($domain) {
  * FormsAPI
  *
  * @param $form_state
- * The current form state, passed by FormsAPI.
+ *    The current form state, passed by FormsAPI.
  * @param $domain
- * An array containing the record from the {domain} table.
+ *    An array containing the record from the {domain} table.
  * @param $arguments
- *  An array of additional hidden key/value pairs to pass to the form.
- *  Used by child modules to control behaviors.
- *  Currently supported arguments are:
- *    'user_submitted' => TRUE
- *    Indicates that a form should not process administrative messages and paths
- *    upon form submit.  Used by the Domain User module.
+ *    An array of additional hidden key/value pairs to pass to the form.
+ *    Used by child modules to control behaviors.
+ *    Currently supported arguments are:
+ *      'user_submitted' => TRUE
+ *      Indicates that a form should not process administrative messages and paths
+ *      upon form submit.  Used by the Domain User module.
  */
 function domain_delete_form($form_state, $domain, $argumants = array()) {
   $form = array();
@@ -716,8 +716,8 @@ function domain_batch($action = NULL) {
     return t('There are no domains configured for this site.');
   }
 
-  // This action must be performed from the root domain.
-  domain_goto(domain_default());
+  // This action should be performed from the primary domain.
+  domain_check_primary();
 
   $batch = module_invoke_all('domainbatch');
   // We must have some actions, otherwise, no point.

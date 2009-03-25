@@ -704,6 +704,28 @@ function domain_set_domain($domain_id, $bootstrap = FALSE) {
 }
 
 /**
+ * Check to see if a redirect to the primary domain is needed.
+ *
+ * If TRUE, issue a redirect and print a message.
+ *
+ * @param $msg
+ *   The message to print. Optional. If passed, this string must be translated and safe.
+ */
+function domain_check_primary($msg = 'default') {
+  global $_domain;
+  $default = domain_default();
+  if ($_domain['domain_id'] != $default['domain_id']) {
+    if ($msg == 'default') {
+      drupal_set_message(t('You have been redirected: This page must be accessed from the primary domain.'));
+    }
+    else if (!empty($msg)) {
+      drupal_set_message($msg);
+    }
+    domain_goto($default);
+  }
+}
+
+/**
  * Implements hook_domainload()
  *
  * Adds the home page 'path' and 'site_grant' boolean.

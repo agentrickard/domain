@@ -53,9 +53,10 @@ function _domain_prefix_sort($a, $b) {
  * FormsAPI for generating the configuration form
  */
 function domain_prefix_configure_form() {
-  // We must be on the root domain!
+  // We must use the settings from the root domain.
   $default = domain_default();
-  domain_goto($default);
+  domain_set_domain($default['domain_id'], TRUE);
+
   // Get the tables for the root installation.
   $tables = domain_prefix_get_tables();
 
@@ -212,12 +213,14 @@ function theme_domain_prefix_configure_form($form) {
  *  Used by child modules to control behaviors.
  */
 function domain_prefix_form($form_state, $domain, $arguments = array()) {
-  // We must be on the root domain!
-  domain_goto(domain_default());
   // If an invalid request was made, reject it.
   if ($domain == -1) {
     return drupal_access_denied();
   }
+  // We must use the settings from the root domain.
+  $default = domain_default();
+  domain_set_domain($default['domain_id'], TRUE);
+
   drupal_set_title(t('Table prefixing for !domain', array('!domain' => $domain['sitename'])));
   // Remove the disallowed tables.
   $disallow = domain_prefix_disallow();
