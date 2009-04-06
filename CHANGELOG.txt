@@ -1,5 +1,10 @@
 // $Id$
 
+
+06-APR-2009
+
+-- #418452 patch by nonsie. Implements domainupdate in Domain Conf.
+
 20-NOV-2008
 
 -- #300825 by rtbox, fp, awolfey, bribiz and rohnjeynolds.  db_result() error in domain_enable.

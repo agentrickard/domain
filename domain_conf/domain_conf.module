@@ -574,3 +574,13 @@ function domain_conf_api($all = FALSE) {
   }
   return $options;
 }
+
+/**
+* Implements hook_domainupdate().
+*/
+function domain_conf_domainupdate($op, $domain, $edit = array()) {
+  if ($op == 'delete') {
+    db_query("DELETE FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']);
+    cache_clear_all('variables', 'cache');
+  }
+}
