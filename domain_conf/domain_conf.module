@@ -404,6 +404,16 @@ function domain_conf_domainbatch() {
 }
 
 /**
+* Implements hook_domainupdate().
+*/
+function domain_conf_domainupdate($op, $domain, $form_state = array()) {
+  if ($op == 'delete') {
+    db_query("DELETE FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']);
+    cache_clear_all('variables', 'cache');
+  }
+}
+
+/**
  * Retrieves elements from hook_domainconf() and formats them
  * as needed.
  *
@@ -513,7 +523,7 @@ function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
  * A boolean flag to reset the static variable array for the domain. Useful
  * if you are changing variables during a page request.
  * @return
- * The value of the variable for that domain, or NULL if not set, 
+ * The value of the variable for that domain, or NULL if not set,
  * or an array of variables, in the case of $all.
  */
 function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $reset = FALSE) {
