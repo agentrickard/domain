@@ -367,6 +367,10 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
       break;
     case 'insert':
     case 'update':
+      // If our field element is missing, do nothing.
+      if (!isset($edit['domain_user'])) {
+        return;
+      }
       // Clear and reset the {domain_editor} table.
       db_query("DELETE FROM {domain_editor} WHERE uid = %d", $account->uid);
       if (empty($edit['domain_user'])) {

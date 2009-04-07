@@ -1,5 +1,9 @@
 // $Id$
 
+07-APR-2009
+
+-- #412078 patch by jolos. Fixes accidental deletion of user domains.
+
 06-APR-2009
 
 -- #418452 patch by nonsie. Implements domainupdate in Domain Conf.
