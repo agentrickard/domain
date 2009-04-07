@@ -320,6 +320,13 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
     case 'validate':
       return array('domain_user' => $edit['domain_user']);
       break;
+    case 'insert':
+    case 'update':
+      // If our field element is missing, do nothing.
+      if (!isset($edit['domain_user'])) {
+        return;
+      }
+      break;
     case 'view':
       if (user_access('assign domain editors') && !empty($account->domain_user)) {
         $output = '<ul>';

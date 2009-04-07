@@ -248,6 +248,10 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       break;
     case 'insert':
     case 'update':
+      // If we did not come from our expected form, do nothing.
+      if (!isset($edit['domain_create_user'])) {
+        return;
+      }
       if (!empty($edit['domain_create_user']) && user_access('create personal domain', $account)) {
         $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
         $name = domain_user_strip_chars($account->name);
