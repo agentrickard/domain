@@ -257,11 +257,12 @@ function domain_prefix_form($form_state, $domain, $arguments = array()) {
   else {
     $table_options = array();
     $settings = array();
-    foreach ($tables as $table) {
-      $table_options[$table['tablename']] = $table;
-      $settings[$table['tablename']] = $table['status'];
+    foreach ($tables as $name => $table) {
+      if (array_key_exists($name, $default)) {
+        $table_options[$table['tablename']] = $table;
+        $settings[$table['tablename']] = $table['status'];
+      }
     }
-    $table_options = array_merge($default, $table_options);
   }
 
   // Sort them by module

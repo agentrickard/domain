@@ -3,6 +3,7 @@
 07-APR-2009
 
 -- #412078 patch by jolos. Fixes accidental deletion of user domains.
+-- #424830 by Tim Jones Toronto. Remove dead tables from Domain Prefix form.
 
 06-APR-2009
 
