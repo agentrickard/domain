@@ -22,10 +22,7 @@ function domain_conf_page($domain) {
     return t('Invalid page requested.');
   }
 
-  // Load the system form file.
-  include_once drupal_get_path('module', 'system') .'/system.admin.inc';
-
-  $output = theme_domain_conf_reset($domain);
+  $output = theme('domain_conf_reset', $domain);
   if ($domain['domain_id'] > 0) {
     drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
     return $output . drupal_get_form('domain_conf_form', $domain);
