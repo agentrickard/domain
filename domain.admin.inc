@@ -542,7 +542,7 @@ function domain_delete_form($form_state, $domain, $arguments = array()) {
     'admin/build/domain/view',
     NULL,
     t('Delete domain record'),
-    'Cancel',
+    t('Cancel')
   );
 }
 
