@@ -158,7 +158,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       // TODO: Maybe we should set a message here.
       if ($domain == -1 && domain_lookup(NULL, $name .'.'. $root) == -1) {
         $create_domain = variable_get('domain_user', 0);
-        if (user_access('create personal domain')) {
+        if (user_access('create personal domain', $account)) {
           if ($create_domain == 1 && !empty($root)) {
             $form['domain_user_domain']['domain_create_user'] = array(
               '#type' => 'value',
@@ -200,12 +200,12 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
         $domain = domain_user_lookup($account->uid);
         if ($domain == -1) {
           // Set arguments to be passed to the form
-          $arguments = array('user_submitted' => TRUE);
+          $arguments = array('user_submitted' => TRUE, 'ignore_domain_status_check' => TRUE);
           // Include the form file.
           include_once drupal_get_path('module', 'domain') .'/domain.admin.inc';
           // Set the scheme as needed.
           $form_state['values']['domain_scheme'] = variable_get('domain_user_scheme', 'http');
-          drupal_execute('domain_create_form', $form_state, $arguments);
+          drupal_execute('domain_form', $form_state, array(), $arguments);
           $domain = domain_lookup(NULL, $form_state['values']['subdomain'], TRUE);
           if ($domain['domain_id']) {
             db_query("INSERT INTO {domain_user} (domain_id, uid) VALUES (%d, %d)", $domain['domain_id'], $account->uid);
@@ -230,7 +230,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
         }
       }
       if (isset($edit['domain_create_user']) && !user_access('create personal domain', $account)) {
-        drupal_set_message(t('Your personal URL could not be created.'));
+        drupal_set_message(t('Your personal URL could not be created. 2'));
       }
       // Throw away what we do not need.
       $edit['domain_create_user'] = NULL;

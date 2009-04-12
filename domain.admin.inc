@@ -125,6 +125,10 @@ function domain_configure() {
  * FormsAPI for configuring the domain module.
  */
 function domain_configure_form($form_state, $user_submitted = FALSE) {
+  $root = variable_get('domain_root', '');
+  if (empty($root)) {
+    domain_set_primary_domain();
+  }
   $form = array();
   $form['domain'] = array(
     '#type' => 'fieldset',
@@ -323,144 +327,63 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
   return system_settings_form($form);
 }
 
+/**
+ * Validate the primary domain string.
+ */
 function domain_configure_form_validate($form, &$form_state) {
-  $subdomain = strtolower(urlencode($form_state['values']['domain_root']));
-  if (empty($subdomain)) {
-    form_set_error('domain_root', t('Please enter a primary domain.'));
+  if ($form_state['values']['op'] == $form_state['values']['reset']) {
+    $subdomain = strtolower(rtrim($_SERVER['SERVER_NAME']));
   }
-  // TODO: Make this a proper regex for validation.
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id <> 0", $subdomain));
-  if ($check) {
-    form_set_error('domain_root', t('The domain value must be unique.'));
+  else {
+    $subdomain = $form_state['values']['domain_root'];
   }
-  $check2 = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id <> 0", $form_state['values']['domain_sitename']));
-  if ($check2) {
-    form_set_error('domain_sitename', t('The site name value must be unique.'));
+  $domain_changed = (bool) strcmp($form_state['values']['domain_root'], $form['domain']['domain_root']['#default_value']);
+  if ($domain_changed) {
+    $error_list = domain_validate($subdomain);
+    foreach ($error_list as $error) {
+      form_set_error('domain_root', $error);
+    }
   }
 }
 
+/**
+ * Save any changes to the primary domain record.
+ */
 function domain_configure_form_submit($form, &$form_state) {
-  $subdomain = strtolower(urlencode($form_state['values']['domain_root']));
+  if ($form_state['values']['op'] == $form_state['values']['reset']) {
+    domain_set_primary_domain();
+    return;
+  }
+  $subdomain = $form_state['values']['domain_root'];
   db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme']);
   if (!db_affected_rows()) {
     db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme'], 1);
     // MySQL won't let us insert row 0 into an autoincrement table.
     db_query("UPDATE {domain} SET domain_id = 0 WHERE subdomain = '%s'", $form_state['values']['domain_root']);
   }
+  // Allow other modules to respond to changes.
+  module_invoke_all('domainupdate', 'update', domain_default(TRUE));
 }
 
 /**
- * Create a new domain record
- */
-function domain_create() {
-  return drupal_get_form('domain_create_form');
-}
-
-/**
- * FormsAPI for creating domain records.
+ * Return an array of values suitable for both create and update sql statements
  *
- * @param $arguments
- *  An array of additional hidden key/value pairs to pass to the form.
- *  Used by child modules to control behaviors.
- *  Currently supported arguments are:
- *    'user_submitted' => TRUE
- *    Indicates that a form should not process administrative messages and paths
- *    upon form submit.  Used by the Domain User module.
- */
-function domain_create_form($form_state, $arguments = array()) {
-  $form = array();
-  // The $arguments arrray allows other modules to pass values to change the bahavior
-  // of submit and validate functions.
-  if (!empty($arguments)) {
-    $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
-  }
-  $form['domain'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('New domain record'),
-    '#collapsible' => TRUE
-  );
-  $form['domain']['subdomain'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Domain'),
-    '#size' => 40,
-    '#maxlength' => 80,
-    '#required' => TRUE,
-    '#description' => t('The allowed domain, using the full <em>path.example.com</em> format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
-  );
-  $form['domain']['sitename'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Site name'),
-    '#size' => 40,
-    '#maxlength' => 80,
-    '#required' => TRUE,
-    '#description' => t('The human-readable name of this domain.')
-  );
-  $form['domain']['scheme'] = array(
-    '#type' => 'radios',
-    '#title' => t('Domain URL scheme'),
-    '#required' => TRUE,
-    '#options' => array('http' => 'http://', 'https' => 'https://'),
-    '#default_value' => 'http',
-    '#description' => t('The URL scheme for accessing this domain.')
-  );
-  $form['domain']['valid'] = array(
-    '#type' => 'radios',
-    '#title' => t('Domain status'),
-    '#required' => TRUE,
-    '#options' => array(1 => t('Active'), 0 => t('Inactive')),
-    '#default_value' => 1,
-    '#description' => t('Must be set to "Active" for users to navigate to this domain.')
-  );
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Create domain record'));
-  return $form;
-}
-
-/**
- * FormsAPI for domain_create_form()
- */
-function domain_create_form_validate($form, &$form_state) {
-  // TODO: Make this a proper regex?
-  $subdomain = strtolower(urlencode($form_state['values']['subdomain']));
-  $check = 0;
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
-  if ($check > 0) {
-    form_set_error('subdomain', t('The domain value must be unique.'));
-  }
-  $check = 0;
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s'", $form_state['values']['sitename']));
-  if ($check > 0) {
-    form_set_error('sitename', t('The site name value must be unique.'));
-  }
-}
-
-/**
- * FormsAPI for domain_create_form()
- */
-function domain_create_form_submit($form, &$form_state) {
-  db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_state['values']['subdomain'], $form_state['values']['sitename'], $form_state['values']['scheme'], $form_state['values']['valid']);
-  // Let other modules act.
-  $domain = domain_lookup(NULL, $form_state['values']['subdomain']);
-  module_invoke_all('domainupdate', 'create', $domain, $form_state);
-  // The user_submitted flag is needed for Domain User.
-  if (!isset($form_state['values']['domain_arguments']['user_submitted'])) {
-    drupal_set_message(t('Domain record created.'));
-    $form_state['redirect'] = 'admin/build/domain/view';
-  }
-}
-
-/**
- * Edit an existing domain record
+ * The last element on this array is ignored by the create sql because it has
+ * one fewer placeholder argument as it doesnt require a WHERE clause.
  *
- * @param $domain
- *  The $domain object created by domain_lookup().
+ * @param $form_state
+ *   From state from the submit_hook
+ * @return array
+ *   Array of domain values for insert and update sql operations
  */
-function domain_edit($domain) {
-  if ($domain == -1) {
-    return t('Invalid page requested.');
-  }
-  // This action should be performed from the primary domain.
-  domain_check_primary();
-  return drupal_get_form('domain_edit_form', $domain);
+function domain_values_from_form_state($form_state) {
+  return array(
+    'subdomain' => $form_state['values']['subdomain'],
+    'sitename'  => $form_state['values']['sitename'],
+    'scheme'    => $form_state['values']['scheme'],
+    'valid'     => $form_state['values']['valid'],
+    'domain_id' => $form_state['values']['domain_id'],
+  );
 }
 
 /**
@@ -478,9 +401,13 @@ function domain_edit($domain) {
  *    Indicates that a form should not process administrative messages and paths
  *    upon form submit.  Used by the Domain User module.
  */
-function domain_edit_form($form_state, $domain, $arguments = array()) {
-  if (empty($_POST)) {
-    domain_check_response($domain);
+function domain_form($form_state, $domain = array(), $arguments = array()) {
+  // This action should be performed from the primary domain unless overridden.
+  if (!isset($arguments['ignore_domain_status_check'])) {
+    domain_check_primary();
+    if (empty($_POST) && !empty($domain)) {
+      domain_check_response($domain);
+    }
   }
   $form = array();
   // The $arguments arrray allows other modules to pass values to change the bahavior
@@ -490,7 +417,7 @@ function domain_edit_form($form_state, $domain, $arguments = array()) {
   }
   $form['domain'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Edit domain record'),
+    '#title' => t('Domain record'),
     '#collapsible' => TRUE
   );
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
@@ -501,7 +428,7 @@ function domain_edit_form($form_state, $domain, $arguments = array()) {
     '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => $domain['subdomain'],
-    '#description' => t('The allowed domain, using the full <em>path.example.com</em> format.  Can only contain lower-case alphanumeric characters.  Leave off the http:// and the trailing slash.')
+    '#description' => t('The allowed domain, using the full <em>path.example.com</em> format.  Can only contain lower-case alphanumeric characters, dashes and a colon (if using alternative ports).  Leave off the http:// and the trailing slash and do not include any paths.')
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
@@ -517,7 +444,7 @@ function domain_edit_form($form_state, $domain, $arguments = array()) {
     '#title' => t('Domain URL scheme'),
     '#required' => TRUE,
     '#options' => array('http' => 'http://', 'https' => 'https://'),
-    '#default_value' => $domain['scheme'],
+    '#default_value' => !empty($domain['scheme']) ? $domain['scheme'] : 'http',
     '#description' => t('The URL scheme for accessing this domain.')
   );
   $form['domain']['valid'] = array(
@@ -525,62 +452,65 @@ function domain_edit_form($form_state, $domain, $arguments = array()) {
     '#title' => t('Domain status'),
     '#required' => TRUE,
     '#options' => array(1 => t('Active'), 0 => t('Inactive')),
-    '#default_value' => $domain['valid'],
+    '#default_value' => !empty($domain['valid']) ? $domain['valid'] : 1,
     '#description' => t('Must be set to "Active" for users to navigate to this domain.')
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
+  $form['#validate'][] = 'domain_form_validate';
+  $form['#redirect'] = array('admin/build/domain/view');
   return $form;
 }
 
 /**
- * FormsAPI for domain_edit_form()
+ * Implementation of domain_form validate hook.
  */
-function domain_edit_form_validate($form, &$form_state) {
-  // TODO: Make this a proper regex
-  $subdomain = strtolower(urlencode($form_state['values']['subdomain']));
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id <> %d", $subdomain, $form_state['values']['domain_id']));
-  if ($check) {
-    form_set_error('subdomain', t('The domain value must be unique.'));
-  }
-  $check2 = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id <> %d", $form_state['values']['sitename'], $form_state['values']['domain_id']));
-  if ($check2) {
-    form_set_error('sitename', t('The site name value must be unique.'));
+function domain_form_validate($form, &$form_state) {
+  $subdomain = $form_state['values']['subdomain'];
+  $domain_changed = (bool) strcmp($form_state['values']['subdomain'], $form['domain']['subdomain']['#default_value']);
+  if ($domain_changed) {
+    $error_list = domain_validate($subdomain);
+    foreach ($error_list as $error) {
+      form_set_error('subdomain', $error);
+    }
   }
 }
 
 /**
- * FormsAPI for domain_edit_form()
+ * Implementation of domain_form submit hook.
  */
-function domain_edit_form_submit($form, &$form_state) {
-  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = %d WHERE domain_id = %d", $form_state['values']['subdomain'], $form_state['values']['sitename'], $form_state['values']['scheme'], $form_state['values']['valid'], $form_state['values']['domain_id']);
+function domain_form_submit($form, &$form_state) {
+  // Populate sql values used in both queries.
+  $values = domain_values_from_form_state($form_state);
+
+  // Update or create a new domain depending on presence of domain_id.
+  if ($values['domain_id']) {
+    $sql = "UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = %d WHERE domain_id = %d";
+    $action = 'update';
+    $message = t('Domain record updated.');
+  }
+  else {
+    $sql = "INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)";
+    $action = 'create';
+    $message = t('Domain record created.');
+  }
+
+  // Update the record.
+  db_query($sql, $values);
+
   // Let other modules act.
-  $domain = domain_lookup($form_state['values']['domain_id']);
-  module_invoke_all('domainupdate', 'update', $domain, $form_state);
-  // The user_submitted flag is needed for Domain User.
+  $domain = domain_lookup(NULL, $values['subdomain']);
+  module_invoke_all('domainupdate', $action, $domain, $form_state);
+
+  // Hide the message for the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
-    drupal_set_message(t('Domain record updated.'));
-    $form_state['redirect'] = 'admin/build/domain/view';
+    drupal_set_message($message);
   }
+
+  return $domain;
 }
 
 /**
- * Delete a domain record.
- *
- * @param $domain
- * An array containing the record from the {domain} table.
- */
-function domain_delete($domain) {
-  if ($domain == -1) {
-    return t('Invalid page requested.');
-  }
-  // This action should be performed from the primary domain.
-  domain_check_primary();
-  return drupal_get_form('domain_delete_form', $domain);
-
-}
-
-/**
- * FormsAPI
+ * Implementation of domain_delete_form.
  *
  * @param $form_state
  *    The current form state, passed by FormsAPI.
@@ -594,7 +524,10 @@ function domain_delete($domain) {
  *      Indicates that a form should not process administrative messages and paths
  *      upon form submit.  Used by the Domain User module.
  */
-function domain_delete_form($form_state, $domain, $argumants = array()) {
+function domain_delete_form($form_state, $domain, $arguments = array()) {
+  // This action should be performed from the primary domain.
+  domain_check_primary();
+
   $form = array();
   // The $arguments arrray allows other modules to pass values to change the bahavior
   // of submit and validate functions.
@@ -602,22 +535,29 @@ function domain_delete_form($form_state, $domain, $argumants = array()) {
     $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
   }
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $form['domain'] = array('#value' => t('<p>Are you sure you wish to delete the domain record for <b>%domain</b>?</p>', array('%domain' => $domain['subdomain'])));
-  $form['cancel'] = array('#value' => '<p>'. l(t('Cancel action'), 'admin/build/domain') .'<br />');
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Delete domain record'), '#suffix' => '<p>');
-  return $form;
+
+  return confirm_form(
+    $form,
+    t('Are you sure you wish to delete the domain record for <strong>%domain</strong>?', array('%domain' => $domain['subdomain'])),
+    'admin/build/domain/view',
+    NULL,
+    t('Delete domain record'),
+    'Cancel',
+  );
 }
 
 /**
- * FormsAPI for domain_delete_form()
+ * Implementation of domain_delete_form submit hook.
  */
 function domain_delete_form_submit($form, &$form_state) {
   // Run the lookup before we delete the row!
   $domain = domain_lookup($form_state['values']['domain_id']);
   db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_state['values']['domain_id']);
+
   // Let other modules act.
   module_invoke_all('domainupdate', 'delete', $domain, $form_state);
-  // The user_submitted flag is needed for Domain User.
+
+  // Hide the message from the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message(t('Domain record deleted.'));
     $form_state['redirect'] = 'admin/build/domain/view';
@@ -625,23 +565,14 @@ function domain_delete_form_submit($form, &$form_state) {
 }
 
 /**
- * Advanced node-type settings
- */
-function domain_advanced() {
-  $node_types = node_get_types('names');
-  return drupal_get_form('domain_advanced_form', $node_types);
-}
-
-/**
- * FormsAPI
+ * Implementation of domain_advanced_form.
  *
  * @param $form_state
  * The current form state, passed by FormsAPI.
- * @param $node_types
- *  A list of active node types taken from node_get_types().
  */
-function domain_advanced_form($form_state, $node_types) {
+function domain_advanced_form($form_state) {
   $form = array();
+  $node_types = node_get_types('names');
   $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
   $form['domain_node'] = array(
     '#type' => 'fieldset',

@@ -99,23 +99,23 @@ function domain_menu() {
   $items['admin/build/domain'] = array(
     'title' => 'Domains',
     'access arguments' => array('administer domains'),
-    'page callback' => 'domain_configure',
+    'page callback' => 'domain_view',
     'file' => 'domain.admin.inc',
-    'description' => 'Settings for the Domain Access module.'
-  );
-  $items['admin/build/domain/settings'] = array(
-    'title' => 'Settings',
-    'access arguments' => array('administer domains'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'page callback' => 'domain_configure',
-    'file' => 'domain.admin.inc',
-    'weight' => -10
+    'description' => 'Settings for the Domain Access module.',
   );
   $items['admin/build/domain/view'] = array(
     'title' => 'Domain list',
     'access arguments' => array('administer domains'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
     'page callback' => 'domain_view',
+    'file' => 'domain.admin.inc',
+    'weight' => -10
+  );
+  $items['admin/build/domain/settings'] = array(
+    'title' => 'Settings',
+    'access arguments' => array('administer domains'),
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'domain_configure',
     'file' => 'domain.admin.inc',
     'weight' => -8
   );
@@ -123,7 +123,8 @@ function domain_menu() {
     'title' => 'Create domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
-    'page callback' => 'domain_create',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_form'),
     'file' => 'domain.admin.inc',
     'weight' => -7
     );
@@ -131,7 +132,8 @@ function domain_menu() {
     'title' => 'Node settings',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
-    'page callback' => 'domain_advanced',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_advanced_form'),
     'file' => 'domain.admin.inc',
     'weight' => -6
   );
@@ -172,16 +174,16 @@ function domain_menu() {
     'title' => 'Edit domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,
-    'page callback' => 'domain_edit',
-    'page arguments' => array(4),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_form', 4),
     'file' => 'domain.admin.inc',
   );
   $items['admin/build/domain/delete/%domain'] = array(
     'title' => 'Delete domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,
-    'page callback' => 'domain_delete',
-    'page arguments' => array(4),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_delete_form', 4),
     'file' => 'domain.admin.inc',
   );
   return $items;
@@ -457,12 +459,18 @@ function domain_cron() {
  * valid records.
  *
  * @param $domain_id
- * The id request for a specific domain.
+ *   The id request for a specific domain.
  * @return
- * The $domain array from domain_domainload() or -1 on failure.
+ *   $domain array on success or FALSE on failure.
  */
 function domain_load($domain_id = NULL) {
-  return domain_lookup($domain_id);
+  $domain = domain_lookup($domain_id);
+  if ($domain == -1) {
+    return FALSE;
+  }
+  else {
+    return $domain;
+  }
 }
 
 /**
@@ -539,6 +547,32 @@ function domain_default($reset = FALSE) {
 }
 
 /**
+ * Set the primary domain properly, if necessary.
+ */
+function domain_set_primary_domain() {
+  $root = strtolower(rtrim($_SERVER['SERVER_NAME']));
+  $site = variable_get('site_name', 'Drupal');
+  $scheme = 'http';
+  if (!empty($_SERVER['HTTPS'])) {
+    $scheme = 'https';
+  }
+  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $root, $site, $scheme);
+  if (!db_affected_rows()) {
+    db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, $site, $scheme, 1);
+    // MySQL won't let us insert row 0 into an autoincrement table.
+    // Similar to the {users} table, this leaves us with no row 1.
+    db_query("UPDATE {domain} SET domain_id = domain_id - 1");
+  }
+  // Set the default domain variables.
+  variable_set('domain_root', $root);
+  variable_set('domain_scheme', $scheme);
+  variable_set('domain_sitename', $site);
+
+  // Allow other modules to respond to changes.
+  module_invoke_all('domainupdate', 'update', domain_default(TRUE));
+}
+
+/**
  * Return all active domains (including the default) as an array.
  *
  * @param $reset
@@ -602,6 +636,82 @@ function _domain_rname_sort($a, $b) {
  */
 function _domain_rurl_sort($a, $b) {
   return strcmp($a['subdomain'], $b['subdomain']);
+}
+
+/**
+ * Validates a domain string.
+ * @param string $subdomain
+ *   The string to check for domain validity
+ * @return array
+ *   List of error messages or empty array.
+ */
+function domain_validate($subdomain) {
+  $error_list = array();
+  // Validate the domains format generically for now.
+  $error = domain_valid_domain($subdomain);
+  if (!empty($error)) {
+    $error_list[] = $error;
+  }
+  // Make sure domain is unique
+  if (!domain_unique_domain($subdomain)) {
+    $error_list[] = t('The domain value must be unique.');
+  }
+  return $error_list;
+}
+
+/**
+ * Validate the domain against all correctable errors.
+ *
+ * Note that we decided not to check for valid TLDs here.
+ *
+ * @param $subdomain
+ *   Domain string to check.
+ * @return string
+ *   Empty if valid, error message on invalid.
+ */
+function domain_valid_domain($subdomain) {
+  $error_list = array();
+  // Check for one colon only.
+  if (substr_count($subdomain, ':') > 1) {
+    $error_list[] = t('Only one colon (:) is allowed.');
+  }
+  // If a colon, make sure it is only followed by numbers.
+  else if (substr_count($subdomain, ':') == 1) {
+    $parts = explode(':', $subdomain);
+    $port = (int) $parts[1];
+    if (empty($port) || $port != (float) $parts[1]) {
+      $error_list[] = t('The port protocol must be an integer.');
+    }
+  }
+  // The domain cannot begin or end with a period.
+  if (substr($subdomain, 0, 1) == '.') {
+    $error_list[] = t('The domain must not begin with a dot (.)');
+  }
+  // The domain cannot begin or end with a period.
+  if (substr($subdomain, -1) == '.') {
+    $error_list[] = t('The domain must not end with a dot (.)');
+  }
+  // Check for valid characters
+  $pattern = '/^[a-z0-9\.\+\-\*\?:]*$/i';
+  if (!preg_match($pattern, $subdomain)) {
+    $error_list[] = t('Only alphanumeric characters, dashes, and a colon are allowed.');
+  }
+  if (!empty($error_list)) {
+    return t('The domain string is invalid:') . theme('item_list', $error_list);
+  }
+}
+
+/**
+ * Validate the domain against existing domains.
+ *
+ * @param $subdomain
+ *   Domain string to check
+ * @return bool
+ *   TRUE if unique; FALSE if duplicate.
+ */
+function domain_unique_domain($subdomain) {
+  $count = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
+  return !(bool) $count;
 }
 
 /**
@@ -974,7 +1084,7 @@ function domain_node_access_records($node) {
     // And the currently active domain.
     $node->domains = array($_domain['domain_id'] => $_domain['domain_id']);
   }
-  
+
   // If the form is hidden, we are passed the 'domains_raw' variable.
   // We need to append unique values from this variable to the existing
   // stored values.  See the logic for 'view domain publshing' in domain_form_alter().

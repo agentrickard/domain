@@ -1,5 +1,9 @@
 // $Id$
 
+12-APR-2009
+
+-- #427258 patch by michaelfavia. Clean up cruft in domain administration.
+
 07-APR-2009
 
 -- #412078 patch by jolos. Fixes accidental deletion of user domains.
