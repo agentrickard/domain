@@ -11,7 +11,23 @@
  */
 function domain_install() {
   drupal_install_schema('domain');
-  domain_set_primary_domain();
+  $root = strtolower(rtrim($_SERVER['SERVER_NAME']));
+  $site = variable_get('site_name', 'Drupal');
+  $scheme = 'http';
+  if (!empty($_SERVER['HTTPS'])) {
+    $scheme = 'https';
+  }
+  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $root, $site, $scheme);
+  if (!db_affected_rows()) {
+    db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, $site, $scheme, 1);
+    // MySQL won't let us insert row 0 into an autoincrement table.
+    // Similar to the {users} table, this leaves us with no row 1.
+    db_query("UPDATE {domain} SET domain_id = domain_id - 1");
+  }
+  // Set the default domain variables.
+  variable_set('domain_root', $root);
+  variable_set('domain_scheme', $scheme);
+  variable_set('domain_sitename', $site);
 }
 
 /**
