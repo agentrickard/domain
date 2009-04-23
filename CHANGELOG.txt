@@ -3,6 +3,7 @@
 23-APR-2009
 
 -- #427258 Fixes incorrect call to domain_set_primary_domain().
+-- #319876 patch by nonsie. Better views argument handling.
 
 12-APR-2009
 

@@ -4,6 +4,8 @@
 /**
  * @file
  * Interface between domain_views.module and views.module.
+ *
+ * @ingroup domain_views
  */
 
 /**

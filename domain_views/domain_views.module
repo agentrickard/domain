@@ -24,6 +24,39 @@
  * Implements hook_views_api().
  */
 function domain_views_views_api() {
-
   return array('api' => 2.0);
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function domain_views_theme() {
+  return array(
+   'domain_views_view_multiple_field' => array(
+      'arguments' => array('items' => NULL, 'field' => NULL, 'data' => NULL),
+    ),
+  );
+}
+
+/**
+ * Theme multiple field output.
+ *
+ * Note that we only use $items in the default, but other themes might
+ * wish to leverage the extra data.
+ *
+ * @param $items
+ *   An array of output strings, as defined by the view field definition.
+ * @param $field
+ *   A string representing the name of the field being displayed.
+ * @param $values
+ *   An object containing the prepared views data, before it was altered by our handler.
+ * @return
+ *   Themed HTML output.
+ */
+function theme_domain_views_view_multiple_field($items, $field, $values) {
+  $output = '';
+  foreach ($items as $item) {
+    $output .= '<div class="field-item">'. $item .'</div>';
+  }
+  return $output;
 }

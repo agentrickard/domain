@@ -16,11 +16,11 @@
 function domain_views_views_data() {
   $data = array();
   // Define the {domain} table.
-  $data['domain']['table']['group'] = t('Domain');
+  $data['domain']['table']['group'] = t('Domains');
   // We can use this as a base table for Views.
   $data['domain']['table']['base'] = array(
     'field' => 'domain_id',
-    'title' => t('Domain'),
+    'title' => t('Domains'),
     'help' => t('Domain Access uses domains to divide and display content on a group of related sites.'),
   );
   // Define the joins.
@@ -48,7 +48,7 @@ function domain_views_views_data() {
     ),
   );
   $data['domain']['subdomain'] = array(
-    'title' => t('Domain'),
+    'title' => t('Subdomain'),
     'help' => t('The URL string that identifies a domain.'),
     'field' => array(
       'click sortable' => TRUE,
@@ -66,6 +66,7 @@ function domain_views_views_data() {
     'title' => t('Site name'),
     'help' => t('The display string that identifies a domain.'),
     'field' => array(
+      'handler' => 'domain_views_handler_field_domain_sitename',
       'click sortable' => TRUE,
     ),
     // Information for accepting a domain_id as a filter
@@ -111,7 +112,7 @@ function domain_views_views_data() {
   );
 
   // Define the {domain_access} table.
-  $data['domain_access']['table']['group'] = t('Domain');
+  $data['domain_access']['table']['group'] = t('Domain Access');
   // Define the joins.
   $data['domain_access']['table']['join']['node'] = array(
     'left_field' => 'nid',
@@ -143,8 +144,8 @@ function domain_views_views_data() {
   );
   // Define the fields.
   $data['domain_access']['gid'] = array(
-    'title' => t('Group ID'),
-    'help' => t('The group id of the record.'),
+    'title' => t('Domain ID'),
+    'help' => t('The domain id of the record.'),
     'field' => array(
       'click sortable' => TRUE,
     ),
@@ -155,6 +156,10 @@ function domain_views_views_data() {
     // Information for sorting on a domain_id.
     'sort' => array(
       'handler' => 'views_handler_sort',
+    ),
+    // Information accepting domain_id as an argument
+    'argument' => array(
+      'handler' => 'domain_views_handler_argument_domain_access_gid',
     ),
   );
   // Define the fields.
@@ -187,12 +192,59 @@ function domain_views_views_data() {
       'label' => t('Available on current domain'),
     ),
   );
+  // Define the {domain_editor} table.
+  $data['domain_editor']['table']['group'] = t('Domain Editor');
+  // Define the joins.
+  $data['domain_editor']['table']['join']['users'] = array(
+    'left_field' => 'uid',
+    'field' => 'uid',
+  );
+  // Define the fields.
+  $data['domain_editor']['uid'] = array(
+    'title' => t('User ID'),
+    'help' => t('The user\'s id.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    // Information for accepting a domain_id as a filter
+    'filter' => array(
+      'handler' => 'views_handler_filter_numeric',
+    ),
+    // Information for sorting on a domain_id.
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+  // Define the fields.
+  $data['domain_editor']['domain_id'] = array(
+    'title' => t('Domain ID'),
+    'help' => t('The domain id of the editor record.'),
+    'field' => array(
+      'click sortable' => TRUE,
+    ),
+    // Information for accepting a domain_id as a filter
+    'filter' => array(
+      'handler' => 'domain_views_handler_filter_domain_domain_id',
+    ),
+    // Information for sorting on a domain_id.
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+    'relationship' => array(
+      'title' => t('Domain editors'),
+      'help' => t("Bring in information about the domain this user is assigned to."),
+      'base' => 'domain',
+      'field' => 'domain_id',
+      'handler' => 'views_handler_relationship',
+      'label' => t('Domain editors'),
+    ),
+  );
   return $data;
 }
 
 /**
- * Implementation of hook_views_handlers() to register all of the basic handlers
- * views uses.
+ * Implementation of hook_views_handlers() to register all of the
+ * basic handlers views uses.
  */
 function domain_views_views_handlers() {
   $handlers = array(
@@ -210,6 +262,14 @@ function domain_views_views_handlers() {
     'domain_views_handler_filter_domain_domain_id' => array(
       'parent' => 'views_handler_filter_in_operator',
     ),
+    // argument handlers
+    'domain_views_handler_argument_domain_access_gid' => array(
+      'parent' => 'views_handler_argument',
+    ),
+    // field handlers
+    'domain_views_handler_field_domain_sitename' => array(
+      'parent' => 'views_handler_field',
+    ),
   ),
   );
   return $handlers;
@@ -221,4 +281,3 @@ function domain_views_views_handlers() {
 function domain_views_query_substitutions($view) {
   return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);
 }
-
