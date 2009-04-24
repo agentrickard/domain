@@ -40,6 +40,9 @@ define('DOMAIN_BOOTSTRAP_FULL', 2);
  */
 function domain_bootstrap() {
   global $_domain;
+  if (!isset($_domain)) {
+    $_domain = array();
+  }
   $phases = array(DOMAIN_BOOTSTRAP_INIT, DOMAIN_BOOTSTRAP_NAME_RESOLVE, DOMAIN_BOOTSTRAP_FULL);
   foreach ($phases as $phase) {
     // We return NULL if the domain module is not enabled.  This prevents
