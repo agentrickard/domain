@@ -302,7 +302,7 @@ function domain_alias_domainload(&$domain) {
  *
  * When a {domain} entry is deleted also delete all related {domain_alias} entries.
  */
-function domain_alias_domainupdate($op, $domain = array(), &$form_state = array()) {
+function domain_alias_domainupdate($op, $domain = array(), $form_state = array()) {
   switch ($op) {
     case 'delete':
       db_query("DELETE FROM {domain_alias} WHERE domain_id = '%d'", $domain['domain_id']);
