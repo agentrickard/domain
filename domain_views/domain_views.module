@@ -60,3 +60,70 @@ function theme_domain_views_view_multiple_field($items, $field, $values) {
   }
   return $output;
 }
+
+/**
+ * Access callback for use with domain_views_plugin_access.
+ *
+ * @param $domains
+ *  An array of domain ids that may access this view.
+ * @return
+ *  Boolean TRUE or FALSE.
+ */
+function domain_views_access($domains) {
+  global $user, $_domain;
+  $grants = domain_views_get_grants();
+  foreach ($grants['domain_id'] as $grant) {
+    if ($grant == 0) {
+      $grant = -1;
+    }
+    if (in_array($grant, $domains)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/**
+ * Helper function to return the node grants for this user.
+ *
+ * @param $account
+ *  The account object of the user requesting the View.
+ * @return $grants
+ *  An array indicating which domains the user may access.
+ */
+function domain_views_get_grants($account = NULL)  {
+  global $user, $_domain;
+  static $grants;
+  if (empty($account)) {
+    $account = $user;
+  }
+  if (isset($grants[$account->uid])) {
+    return $grants[$account->uid];
+  }
+  $grants = domain_node_grants($account, 'view');
+  // Domain All gets in the way of normal grants.
+  if (!empty($grants['domain_all'])) {
+    $grants['domain_id'] = array($_domain['domain_id']);
+    _domain_views_alter_grants($grants);
+  }
+  $grants[$account->uid] = $grants;
+  return $grants[$account->uid];
+}
+
+/**
+ * Helper function to middor hook_domaingrants().
+ * This should be replaced by a drupal_alter().
+ */
+function _domain_views_alter_grants(&$grants) {
+  static $_modules;
+  if (!isset($_modules)) {
+    $_modules = module_implements('domaingrants');
+  }
+  if (!empty($_modules)) {
+    foreach ($_modules as $module) {
+      // Cannot use module_invoke_all() since these are passed by reference.
+      $function = $module .'_domaingrants';
+      $function($grants, $account, $op);
+    }
+  }
+}

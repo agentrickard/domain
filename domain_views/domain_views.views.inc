@@ -276,8 +276,27 @@ function domain_views_views_handlers() {
 }
 
 /**
+ * Implement hook_views_plugins().
+ */
+function domain_views_views_plugins() {
+  $path = drupal_get_path('module', 'domain_views') .'/includes';
+  return array(
+    'access' => array(
+      'domain' => array(
+        'title' => t('Domain'),
+        'help' => t('Will be available only on selected domains.'),
+        'handler' => 'domain_views_plugin_access',
+        'uses options' => TRUE,
+        'path' => $path,
+      ),
+    ),
+  );
+}
+
+/**
  * Implementation of hook_views_query_substitutions ()
  */
 function domain_views_query_substitutions($view) {
   return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);
 }
+

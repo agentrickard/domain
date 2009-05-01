@@ -3,6 +3,7 @@
 01-MAY-2009
 
 -- #450344 patch by Dave Cohen. Prevent collisions when using custom_url_rewrite_outound().
+-- #448850. Restrict Views by domain.
 
 24-APR-2009
 
