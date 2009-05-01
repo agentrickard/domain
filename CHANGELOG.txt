@@ -1,5 +1,9 @@
 // $Id$
 
+01-MAY-2009
+
+-- #450344 patch by Dave Cohen. Prevent collisions when using custom_url_rewrite_outound().
+
 24-APR-2009
 
 -- #443346 by kenorb. Must initialize the $_domain array on first use.
