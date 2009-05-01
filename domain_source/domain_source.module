@@ -201,3 +201,12 @@ function domain_source_domainupdate($op, $domain, $form_state = array()) {
     db_query("DELETE FROM {domain_source} WHERE domain_id = %d", $domain['domain_id']);
   }
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function domain_source_views_api() {
+  if (module_exists('domain_views')) {
+    return array('api' => 2.0);
+  }
+}

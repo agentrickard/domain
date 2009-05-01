@@ -4,6 +4,7 @@
 
 -- #450344 patch by Dave Cohen. Prevent collisions when using custom_url_rewrite_outound().
 -- #448850. Restrict Views by domain.
+-- #319876. Views handlers for Domain Source.
 
 24-APR-2009
 

@@ -37,6 +37,7 @@ function domain_views_views_data() {
     'help' => t('The unique id key for the active domain.'),
     'field' => array(
       'click sortable' => TRUE,
+      'handler' => 'domain_views_handler_field_domain_id',
     ),
     // Information for accepting a domain_id as a filter
     'filter' => array(
@@ -148,6 +149,7 @@ function domain_views_views_data() {
     'help' => t('The domain id of the record.'),
     'field' => array(
       'click sortable' => TRUE,
+      'handler' => 'domain_views_handler_field_domain_id',
     ),
     // Information for accepting a domain_id as a filter
     'filter' => array(
@@ -221,6 +223,7 @@ function domain_views_views_data() {
     'help' => t('The domain id of the editor record.'),
     'field' => array(
       'click sortable' => TRUE,
+      'handler' => 'domain_views_handler_field_domain_id',
     ),
     // Information for accepting a domain_id as a filter
     'filter' => array(
@@ -267,6 +270,9 @@ function domain_views_views_handlers() {
       'parent' => 'views_handler_argument',
     ),
     // field handlers
+    'domain_views_handler_field_domain_id' => array(
+      'parent' => 'views_handler_field',
+    ),
     'domain_views_handler_field_domain_sitename' => array(
       'parent' => 'views_handler_field',
     ),
