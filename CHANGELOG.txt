@@ -1,5 +1,9 @@
 // $Id$
 
+13-MAY-2009
+
+-- #461114 by chawl. Patch #450344 forgot to pass $options by reference.
+
 01-MAY-2009
 
 -- #450344 patch by Dave Cohen. Prevent collisions when using custom_url_rewrite_outound().
