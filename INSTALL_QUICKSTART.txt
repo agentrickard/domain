@@ -23,19 +23,7 @@ INSTALLATION INSTRUCTIONS
 
       'sites/all/modules'
 
-3. Check for existing custom_url_rewrite_outbound().
-
-    custom_url_rewrite_outbound() is a special function that you
-    can add to settings.php to alter how Drupal writes links to content.
-    
-    If your site already uses this function -- it is not in core -- then
-    you will receive a PHP fatal error. This is because Domain Access
-    uses a version of this function as well.
-    
-    If you encounter this conflict, you need to merge the logic of the
-    two functions into a single function.
-
-4. Add the following four lines of code to your settings.php file:
+3. Add the following four lines of code to your settings.php file:
 
 /**
  * Add the domain module setup routine.
@@ -48,6 +36,38 @@ include './sites/all/modules/domain/settings.inc';
     IMPORTANT: You must add these lines to settings.php after the
     $db_url. Normally, you should add these lines to the end of the
     settings.php file.
+
+4. Check for existing custom_url_rewrite_outbound().
+
+    custom_url_rewrite_outbound() is a special function that you
+    can add to settings.php to alter how Drupal writes links to content.
+
+    If your site already uses this function -- it is not in core -- then
+    you will need to modify its use to accommodate Domain Access
+    because the module has its own version.
+
+    Domain Access loads its version of this function automatically if
+    it does not already exist. If it does exist, you need to decide which
+    version should run first, and then add something like the following
+    code to settings.php _below_ the lines from step 3:
+
+/**
+ * Both Drupal for Facebook and domain module use the
+ * custom_url_rewrite feature.  We have to define our own functions
+ * which call the others in the proper order.
+ */
+function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
+  // Call fb module first
+  if (function_exists('fb_settings_url_rewrite_outbound')) {
+    fb_settings_url_rewrite_outbound($path, $options, $original_path);
+  }
+  if (function_exists('domain_url_rewrite_outbound')) {
+    domain_url_rewrite_outbound($path, $options, $original_path);
+  }
+}
+
+    NOTE: Domain Access does not use custom_url_rewrite_inbound().
+
 
 5. Go to Admin > Build > Modules.  Therre you will see the Domain
     module group.

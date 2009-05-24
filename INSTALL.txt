@@ -101,9 +101,9 @@ server.  For more information, see:
 After you have enabled multiple DNS entries to resolve to your Drupal
 installation, you may activate the module and configure its settings.
 
-NOTE: No matter how many domains resolve to the same IP, you only need one instance
-of Drupal's settings.php file.  The sites folder should be named 'default' or
-named for your primary domain.
+NOTE: No matter how many domains resolve to the same IP, you only need one
+instance of Drupal's settings.php file.  The sites folder should be named
+'default' or named for your primary domain.
 
 ----
 2.3 Setting DOMAIN_INSTALL_RULE
@@ -277,15 +277,15 @@ include './sites/all/modules/domain/settings.inc';
 ----
 4.4.3 Option 2
 
-If you are having difficulty determining the correct path, copy the following files
-into your settings folder.
+If you are having difficulty determining the correct path, copy the following
+files into your settings folder.
 
   domain > domain.bootstrap.inc
   domain > settings.inc
   domain > settings_custom_url.inc
 
-The files should be in the same directory as your active settings.php file.  Then
-add the following lines:
+The files should be in the same directory as your active settings.php file.
+Then add the following lines:
 
 ====
 /**
@@ -320,16 +320,44 @@ into your settings.php file.
 ----
 4.5 custom_url_rewrite_outbound()
 
-Domain Access implements this function inside its settings.inc file.
-Domain Access has not been tested with other uses of 
-custom_url_rewrite_outbound().
+custom_url_rewrite_outbound() is a special function that you can add
+to settings.php to alter how Drupal writes links to content.
 
-If your site currently implements this function, you will need to make custom
-edits to your current file.  Either move the function from domain/settings.inc
-into your current function, or vice versa.
+Domain Access implements this function inside its settings.inc file.
+
+If your site already uses this function -- it is not in core -- then you will
+need to modify its use to accommodate Domain Access because the 
+module has its own version.
+
+Domain Access loads its version of this function automatically if
+it does not already exist. If it does exist, you need to decide which
+version should run first, and then add something like the following
+code to settings.php _below_ the lines from step 4.4:
+
+====
+/**
+ * Both Drupal for Facebook and domain module use the
+ * custom_url_rewrite feature.  We have to define our own functions
+ * which call the others in the proper order.
+ */
+function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
+  // Call fb module first
+  if (function_exists('fb_settings_url_rewrite_outbound')) {
+    fb_settings_url_rewrite_outbound($path, $options, $original_path);
+  }
+  if (function_exists('domain_url_rewrite_outbound')) {
+    domain_url_rewrite_outbound($path, $options, $original_path);
+  }
+}
+====
+
+You may need to experiment with the order in which you call these functions.
+
+NOTE: Domain Access does not use custom_url_rewrite_inbound().
 
 For more information, see
   http://api.drupal.org/api/function/custom_url_rewrite_outbound/6
+  http://drupal.org/node/450344
 
 ----
 5.  Additional Module Installation

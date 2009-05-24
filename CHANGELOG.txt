@@ -1,5 +1,9 @@
 // $Id$
 
+24-MAY-2009
+
+-- #450998. Updates documentation of custom_url_rewrite_outbound().
+
 13-MAY-2009
 
 -- #461114 by chawl. Patch #450344 forgot to pass $options by reference.
