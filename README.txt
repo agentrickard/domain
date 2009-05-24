@@ -462,11 +462,6 @@ Under a normal Drupal site, a single administrator (or a handful of equally
 trusted administrators) typically have the 'administer nodes' permission and
 individual 'edit TYPE nodes' permissions.
 
-If your site follows this method, you will not need to enable the advanced
-editing controls provided by Domain Access.  Under the module settings, leave
-the setting 'Domain-based editing controls' as 'Do not use access control for
-editors'.  In this case, the 'edit domain nodes' permission becomes irrelevant.
-
 The only choices for permissions would be who gets to administer the module
 settings and who gets to assign nodes to specific domains.  Generally, only
 users who you trust to 'administer site configuration' should be given the
