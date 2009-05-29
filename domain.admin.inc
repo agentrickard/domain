@@ -562,6 +562,9 @@ function domain_delete_form_submit($form, &$form_state) {
     drupal_set_message(t('Domain record deleted.'));
     $form_state['redirect'] = 'admin/build/domain/view';
   }
+
+  // Notify that node access needs to be rebuilt.
+  node_access_needs_rebuild(TRUE);
 }
 
 /**
