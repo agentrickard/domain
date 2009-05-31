@@ -4,7 +4,7 @@
 
 /**
  * @file
- * Includde file for settings.php to provide advanced
+ * Include file for settings.php to provide advanced
  * functionality for rewriting links as needed.
  *
  * @ingroup domain
@@ -12,9 +12,17 @@
 
 /**
  * Implement custom_url_rewrite_outbound().
+ */
+if (!function_exists('custom_url_rewrite_outbound')) {
+  function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$base_url, $original_path) {
+    domain_url_rewrite_outbound($path, $query, $fragment, $absolute, $base_url, $original_path);
+  }
+}
+
+/**
  * Forces absolute paths for domains when needed.
  */
-function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$base_url, $original_path) {
+function domain_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$base_url, $original_path) {
   global $_domain;
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.
   if (isset($_domain['domain_id'])) {
