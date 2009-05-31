@@ -17,7 +17,7 @@
  */
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_theme_menu($may_cache) {
   $items = array();
@@ -159,7 +159,7 @@ function domain_theme_lookup($domain_id = NULL, $theme = NULL, $clear = FALSE) {
 }
 
 /**
- * Implements hook_domainlinks()
+ * Implement hook_domainlinks()
  */
 function domain_theme_domainlinks($domain) {
   $links[] = array(
@@ -170,7 +170,7 @@ function domain_theme_domainlinks($domain) {
 }
 
 /**
- * Implements hook_domainform()
+ * Implement hook_domainform()
  */
 function domain_theme_domainform(&$form) {
   // Set the module weight for Domain Theme,
@@ -197,7 +197,7 @@ function domain_theme_domainform(&$form) {
 }
 
 /**
- * Implements hook_domainbatch()
+ * Implement hook_domainbatch()
  */
 function domain_theme_domainbatch() {
   $batch = array();
@@ -266,7 +266,7 @@ function domain_theme_batch($form_values) {
 }
 
 /**
- * Implements hook_domainwarnings()
+ * Implement hook_domainwarnings()
  */
 function domain_theme_domainwarnings() {
   return array(

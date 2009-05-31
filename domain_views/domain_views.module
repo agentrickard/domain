@@ -16,7 +16,7 @@
  * @in
 
 /**
- * Implementation of hook_views_tables().
+ * Implement hook_views_tables().
  * Provide a filter that restricts a view to only show nodes from a specific domain (by domain_id).
  * Relevant for authenticated users who have superuser permissions and can therefore see all nodes.
  */
@@ -76,7 +76,7 @@ function domain_views_tables() {
 }
 
 /**
- * Implementation of hook_views_arguments().
+ * Implement hook_views_arguments().
  * Provide a filter that restricts a view to only show nodes from a specific domain (by domain_id).
  * If you pass "current" as the argument, it filters according to the domain the page is being viewed from.
  */

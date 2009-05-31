@@ -19,7 +19,7 @@
  */
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_content_menu($may_cache) {
   $items = array();
@@ -400,7 +400,7 @@ function domain_content_update_nodes($form_id, $form_values) {
 }
 
 /**
- * Implements hook_node_operations()
+ * Implement hook_node_operations()
  */
 function domain_content_node_operations() {
   // Only privileged users can perform this operation.
@@ -426,7 +426,7 @@ function domain_content_node_operations_access($nodes) {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  */
 function domain_content_domainupdate($op, $domain = array(), $edit = array()) {
   // We rebuild the menu, since the domain records have changed.

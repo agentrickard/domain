@@ -7,7 +7,7 @@
  */
 
 /**
- * Implements hook_install()
+ * Implement hook_install()
  *
  * @ingroup drupal
  */
@@ -38,7 +38,7 @@ function domain_prefix_install() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implement hook_uninstall()
  */
 function domain_prefix_uninstall() {
   // We must drop all the created tables.

@@ -17,7 +17,7 @@
  */
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_conf_menu($may_cache) {
   $items = array();
@@ -114,7 +114,7 @@ function domain_conf_default($domain) {
 }
 
 /**
- * Implements hook_domainlinks()
+ * Implement hook_domainlinks()
  */
 function domain_conf_domainlinks($domain) {
   $links[] = array(
@@ -125,7 +125,7 @@ function domain_conf_domainlinks($domain) {
 }
 
 /**
- * Implements hook_form_alter()
+ * Implement hook_form_alter()
  *
  * Since this function is only loaded at the path admin/build/domain/conf, we
  * don't have to worry about hook_form_alter() being called when not wanted.
@@ -279,7 +279,7 @@ function domain_conf_form_submit($form_id, $form_values) {
 }
 
 /**
- * Implements hook_domainwarnings()
+ * Implement hook_domainwarnings()
  */
 function domain_conf_domainwarnings() {
   // These are the forms for variables set by Domain Conf.
@@ -292,7 +292,7 @@ function domain_conf_domainwarnings() {
 }
 
 /**
- * Implements hook_domaininstall()
+ * Implement hook_domaininstall()
  */
 function domain_conf_domaininstall() {
   // If Domain Conf is being used, check to see that it is installed correctly.
@@ -361,7 +361,7 @@ function theme_domain_conf_reset($domain) {
 }
 
 /**
- * Implements hook_domainbatch()
+ * Implement hook_domainbatch()
  */
 function domain_conf_domainbatch() {
   $batch = array();
@@ -576,7 +576,7 @@ function domain_conf_api($all = FALSE) {
 }
 
 /**
-* Implements hook_domainupdate().
+* Implement hook_domainupdate().
 */
 function domain_conf_domainupdate($op, $domain, $edit = array()) {
   if ($op == 'delete') {

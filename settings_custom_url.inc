@@ -11,7 +11,7 @@
  */
 
 /**
- * Implements custom_url_rewrite_outbound().
+ * Implement custom_url_rewrite_outbound().
  * Forces absolute paths for domains when needed.
  */
 function custom_url_rewrite_outbound(&$path, &$query, &$fragment, &$absolute, &$base_url, $original_path) {

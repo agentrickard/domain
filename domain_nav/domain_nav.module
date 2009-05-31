@@ -21,7 +21,7 @@
 define('DOMAIN_NAV_MENU', TRUE);
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_nav_menu($may_cache) {
   global $base_url;
@@ -64,7 +64,7 @@ function domain_nav_menu($may_cache) {
 }
 
 /**
- * Implements hook_block()
+ * Implement hook_block()
  */
 function domain_nav_block($op='list', $delta = 0, $edit = array()) {
   switch ($op) {
@@ -224,7 +224,7 @@ function theme_domain_nav_menus($options) {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  */
 function domain_nav_domainupdate($op, $domain = array(), $edit = array()) {
   // Only execute if the menu is turned on.

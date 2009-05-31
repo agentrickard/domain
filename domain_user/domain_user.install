@@ -7,7 +7,7 @@
 */
 
 /**
- * Implements hook_install()
+ * Implement hook_install()
  *
  * @ingroup drupal
  */
@@ -34,7 +34,7 @@ function domain_user_install() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implement hook_uninstall()
  */
 function domain_user_uninstall() {
   // Drop the storage table.

@@ -16,7 +16,7 @@
 
 
 /**
- * Implements hook_form_alter()
+ * Implement hook_form_alter()
  */
 function domain_source_form_alter($form_id, &$form) {
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
@@ -97,7 +97,7 @@ function domain_source_form_alter($form_id, &$form) {
 }
 
 /**
- * Implements hook_nodeapi()
+ * Implement hook_nodeapi()
  */
 function domain_source_nodeapi(&$node, $op, $a3, $a4) {
   switch ($op) {
@@ -185,7 +185,7 @@ function domain_source_validate($form_id, $form_values) {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  *
  * When deleting domain records, we remove all traces from the {domain_source} table.
  */

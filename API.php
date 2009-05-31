@@ -288,11 +288,11 @@ function hook_domainview($op, $domain = array()) {
  *  be passed by reference.
  *  Normally, you should include your form elements inside a new fieldset.
  * @return
- *  No rerturn value.  The $form is modified by reference, as needed.
+ *  No return value.  The $form is modified by reference, as needed.
  */
 function hook_domainform(&$form) {
   // Add the form element to the main screen.
-  $form['domain_myfmodule'] = array(
+  $form['domain_mymodule'] = array(
     '#type' => 'fieldset',
     '#title' => t('Mymodule settings'),
     '#collapsible' => TRUE,

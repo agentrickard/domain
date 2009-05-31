@@ -32,7 +32,7 @@ define('DOMAIN_EDITOR_RULE', FALSE);
 define('DOMAIN_SITE_GRANT', TRUE);
 
 /**
- * Implements hook_init()
+ * Implement hook_init()
  *
  * Inititalizes a global $_domain variable and set it based on the
  * third-level domain used to access the page.
@@ -81,7 +81,7 @@ function domain_init() {
 }
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_menu($may_cache) {
   $items = array();
@@ -183,7 +183,7 @@ function domain_menu($may_cache) {
 }
 
 /**
- * Implements hook_perm()
+ * Implement hook_perm()
  */
 function domain_perm() {
   $perms = array('administer domains', 'assign domain editors', 'edit domain nodes', 'set domain access', 'view domain publishing');
@@ -191,7 +191,7 @@ function domain_perm() {
 }
 
 /**
- * Implements hook_block()
+ * Implement hook_block()
  *
  * A nifty little domain-switcher block, useful during debugging.
  */
@@ -267,7 +267,7 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 /**
- * Implements hook_user()
+ * Implement hook_user()
  *
  * Attached domain_id records to all registering users.  These
  * are used to determine which 'domain_editor' group that users
@@ -354,7 +354,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
 }
 
 /**
- * Implements hook_cron()
+ * Implement hook_cron()
  *
  * This function invokes hook_domaincron() and allows
  * Domain Access modules to run functions for all active affiliates.
@@ -564,7 +564,7 @@ function domain_api($domain) {
 }
 
 /**
- * Implements hook_domainload()
+ * Implement hook_domainload()
  *
  * Adds the home page 'path' and 'site_grant' boolean.
  */
@@ -623,7 +623,7 @@ function domain_goto($domain) {
 }
 
 /**
- * Implements hook_nodeapi().
+ * Implement hook_nodeapi().
  *
  * This function is used to provide debugging information and to prep values from
  * the {domain_access} table when editing nodes.  Since not all users can see the
@@ -711,7 +711,7 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 }
 
 /**
- * Implements hook_node_grants.
+ * Implement hook_node_grants.
  *
  * Informs the node access system what permissions the user has.  By design
  * all users are in the realm defined by the currently active domain_id.
@@ -790,7 +790,7 @@ function domain_node_grants($account, $op) {
 }
 
 /**
- * Implements hook_node_access_records()
+ * Implement hook_node_access_records()
  *
  * Set permissions for a node to be written to the database.  By design
  * if no options are selected, the node is assigned to the main site.
@@ -974,7 +974,7 @@ function domain_enabling($set = NULL) {
 }
 
 /**
- * Implements hook_disable()
+ * Implement hook_disable()
  */
 function domain_disable() {
   domain_disabling(TRUE);
@@ -1000,7 +1000,7 @@ function domain_disabling($set = NULL) {
 }
 
 /**
- * Implements hook_form_alter()
+ * Implement hook_form_alter()
  *
  * This function is crucial, as it appends our node access elements to the node edit form.
  * For users without the "set domain access" permission, this happens silently.
@@ -1257,7 +1257,7 @@ function domain_grant_all($reset= FALSE) {
 }
 
 /**
- * Implements hook_domaininstall()
+ * Implement hook_domaininstall()
  */
 function domain_domaininstall() {
   // Check to see if the hook_url_alter() patch is installed.
@@ -1267,7 +1267,7 @@ function domain_domaininstall() {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  */
 function domain_domainupdate($op, $domain = array(), $edit = array()) {
   switch ($op) {
@@ -1285,7 +1285,7 @@ function domain_domainupdate($op, $domain = array(), $edit = array()) {
 }
 
 /**
- * Implements hook_domainbatch()
+ * Implement hook_domainbatch()
  */
 function domain_domainbatch() {
   // Change all the domain names at once.
@@ -1384,7 +1384,7 @@ function domain_batch_validate($form_values) {
 }
 
 /**
- * Implements hook_simpletest()
+ * Implement hook_simpletest()
  */
 function domain_simpletest() {
   $module_name = 'domain';
@@ -1419,7 +1419,7 @@ function domain_warning_check($form_id) {
 }
 
 /**
- * Implements hook_node_access_explain for devel.module
+ * Implement hook_node_access_explain for devel.module
  */
 function domain_node_access_explain($row) {
   global $_domain;

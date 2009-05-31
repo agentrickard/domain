@@ -7,7 +7,7 @@
  */
 
 /**
- * Implements hook_install()
+ * Implement hook_install()
  *
  * @ingroup drupal
  */
@@ -34,7 +34,7 @@ function domain_theme_install() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implement hook_uninstall()
  */
 function domain_theme_uninstall() {
   db_query("DROP TABLE {domain_theme}");

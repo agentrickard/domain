@@ -26,7 +26,7 @@ define(DOMAIN_PREFIX_DROP, 8);
 define(DOMAIN_PREFIX_UPDATE, 16);
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_prefix_menu($may_cache) {
   $items = array();
@@ -61,7 +61,7 @@ function domain_prefix_menu($may_cache) {
 }
 
 /**
- * Implements hook_perm
+ * Implement hook_perm
  */
 function domain_prefix_perm() {
   return array('administer table prefixing');
@@ -234,7 +234,7 @@ function domain_prefix_configure_form() {
 }
 
 /**
- * Implements hook_domainlinks()
+ * Implement hook_domainlinks()
  *
  * @param $domain
  *  The currently active $domain array, provided by domain_lookup().
@@ -723,7 +723,7 @@ function domain_prefix_disallow() {
 }
 
 /**
- * Implements hook_domainupdate().
+ * Implement hook_domainupdate().
  */
 function domain_prefix_domainupdate($op, $domain = array(), $edit = array()) {
   switch ($op) {
@@ -776,7 +776,7 @@ function domain_prefix_string($domain_id) {
 
 
 /**
- * Implements hook_domaininstall()
+ * Implement hook_domaininstall()
  */
 function domain_prefix_domaininstall() {
   // If Domain Prefix is being used, check to see that it is installed correctly.

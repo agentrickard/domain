@@ -9,7 +9,7 @@
  */
 
 /**
- * Implements hook_form_alter()
+ * Implement hook_form_alter()
  */
 function domain_theme_form_alter($form_id, &$form) {
   if ($form_id == 'system_themes') {
