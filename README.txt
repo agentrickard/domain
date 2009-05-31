@@ -262,7 +262,7 @@ layer makes it unnecessary.
 If you wish to use Domain Access with another node access
 module, try using the Domain Advanced module.
 
-http://drupal.org/project/domain_advanced
+http://drupal.org/project/domain_adv
 
 Original documentation is below:
 
