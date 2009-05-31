@@ -2,11 +2,11 @@
 
 31-MAY-2009
 
-  -- Doxygen cleanup. Upgrades node access patch to Drupal 6.12.
+-- Doxygen cleanup. Upgrades node access patch to Drupal 6.12.
 
 29-MAY-2009
 
-  -- #474460 by Pasqualle. Deleting a domain requires rebuilding node access.
+-- #474460 by Pasqualle. Deleting a domain requires rebuilding node access.
 
 24-MAY-2009
 
