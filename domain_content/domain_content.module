@@ -19,7 +19,7 @@
  */
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_content_menu() {
   $items = array();
@@ -56,7 +56,7 @@ function domain_content_menu() {
 }
 
 /**
- * Implements hook_theme().
+ * Implement hook_theme().
  */
 function domain_content_theme() {
   $themes = array(
@@ -121,7 +121,7 @@ function domain_content_check($domain, $all = FALSE) {
 }
 
 /**
- * Implements hook_node_operations()
+ * Implement hook_node_operations()
  */
 function domain_content_node_operations() {
   // Only privileged users can perform this operation.
@@ -147,7 +147,7 @@ function domain_content_node_operations_access($nodes) {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  */
 function domain_content_domainupdate($op, $domain, $form_state = array()) {
   // We rebuild the menu, since the domain records have changed.

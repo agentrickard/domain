@@ -3,13 +3,13 @@
 
 /**
  * @file
- * Implements hook_domainpath().
+ * Implement hook_domainpath().
  * This is a resource-intensive function, so we only include it
  * if an alias of the {url_alias} table is present.
  */
 
 /**
- * Implements hook_domainpath().
+ * Implement hook_domainpath().
  */
 function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
   global $language, $_domain;

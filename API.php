@@ -20,6 +20,8 @@
  * This hook allows Domain Access modules to overwrite default behaviors.
  * See http://api.drupal.org/api/function/hook_node_grants/6 for more detail.
  *
+ * Note: In Drupal 7, this is a core feature.
+ *
  * @see domain_strict_domaingrants()
  *
  * @param &$grants
@@ -45,6 +47,8 @@ function hook_domaingrants(&$grants, $account, $op) {
  *
  * This hook allows Domain Access modules to overwrite the default bahaviors.
  * See http://api.drupal.org/api/function/hook_node_access_records/6 for more detail.
+ *
+ * Note: In Drupal 7, this is a core feature.
  *
  * @param &$grants
  *  The existing default $grants, passed by reference.
@@ -290,11 +294,11 @@ function hook_domainview($op, $domain = array()) {
  *  be passed by reference.
  *  Normally, you should include your form elements inside a new fieldset.
  * @return
- *  No rerturn value.  The $form is modified by reference, as needed.
+ *  No return value.  The $form is modified by reference, as needed.
  */
 function hook_domainform(&$form) {
   // Add the form element to the main screen.
-  $form['domain_myfmodule'] = array(
+  $form['domain_mymodule'] = array(
     '#type' => 'fieldset',
     '#title' => t('Mymodule settings'),
     '#collapsible' => TRUE,

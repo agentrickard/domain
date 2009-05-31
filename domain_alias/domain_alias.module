@@ -20,7 +20,7 @@
  */
 
 /**
- * Implements hook_domain_bootstrap_lookup().
+ * Implement hook_domain_bootstrap_lookup().
  *
  * Tries to match the given domain name against patterns in the {domain_alias}
  * table and, if successful, updates information in given parameter $domain.
@@ -53,7 +53,7 @@ function domain_alias_domain_bootstrap_lookup($domain) {
 }
 
 /**
- * Implements hook_init().
+ * Implement hook_init().
  *
  * If redirection is enabled for the active domain alias then we redirect to the
  * main domain.
@@ -69,7 +69,7 @@ function domain_alias_init() {
 }
 
 /**
- * Implements hook_menu().
+ * Implement hook_menu().
  */
 function domain_alias_menu() {
   $items = array();
@@ -85,7 +85,7 @@ function domain_alias_menu() {
 }
 
 /**
- * Implements hook_theme().
+ * Implement hook_theme().
  */
 function domain_alias_theme() {
   return array(
@@ -100,7 +100,7 @@ function domain_alias_theme() {
 }
 
 /**
- * Implements hook_enable().
+ * Implement hook_enable().
  *
  * Register domain_alias with domain bootstrap so we can use domain_bootstrap hooks.
  */
@@ -109,14 +109,14 @@ function domain_alias_enable() {
 }
 
 /**
- * Implements hook_disable().
+ * Implement hook_disable().
  */
 function domain_alias_disable() {
   domain_bootstrap_unregister('domain_alias');
 }
 
 /**
- * Implements hook_block().
+ * Implement hook_block().
  */
 function domain_alias_block($op = 'list', $delta = 0, $edit = array()) {
   $blocks = array();
@@ -285,7 +285,7 @@ function domain_alias_list($domain_id, $reset = FALSE) {
 }
 
 /**
- * Implements hook_domainload()
+ * Implement hook_domainload()
  *
  * Adds a list of all aliases for the current domain.
  */
@@ -298,7 +298,7 @@ function domain_alias_domainload(&$domain) {
 }
 
 /**
- * Implements hook_domainupdate().
+ * Implement hook_domainupdate().
  *
  * When a {domain} entry is deleted also delete all related {domain_alias} entries.
  */
@@ -311,7 +311,7 @@ function domain_alias_domainupdate($op, $domain = array(), $form_state = array()
 }
 
 /**
- * Implements hook_domainview().
+ * Implement hook_domainview().
  */
 function domain_alias_domainview($op, $domain = array()) {
   switch ($op) {
@@ -342,7 +342,7 @@ function domain_alias_domainview($op, $domain = array()) {
 }
 
 /**
- * Implements hook_domainlinks()
+ * Implement hook_domainlinks()
  */
 function domain_alias_domainlinks($domain) {
   $links[] = array(
@@ -353,7 +353,7 @@ function domain_alias_domainlinks($domain) {
 }
 
 /**
- * Implements hook_domainnav().
+ * Implement hook_domainnav().
  *
  * Ensure that active domains are correctly marked as active.
  */

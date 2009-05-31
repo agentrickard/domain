@@ -11,7 +11,7 @@
  */
 
 /**
- * Implements custom_url_rewrite_outbound().
+ * Implement custom_url_rewrite_outbound().
  */
 if (!function_exists('custom_url_rewrite_outbound')) {
   function custom_url_rewrite_outbound(&$path, &$options, $original_path) {

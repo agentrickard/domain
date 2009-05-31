@@ -7,14 +7,14 @@
  */
 
 /**
- * Implements hook_install()
+ * Implement hook_install()
  */
 function domain_source_install() {
   drupal_install_schema('domain_source');
 }
 
 /**
- * Implements hook_schema()
+ * Implement hook_schema()
  */
 function domain_source_schema() {
   $schema['domain_source'] = array(
@@ -27,7 +27,7 @@ function domain_source_schema() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implement hook_uninstall()
  */
 function domain_source_uninstall() {
   drupal_uninstall_schema('domain_source');

@@ -7,14 +7,14 @@
  */
 
 /**
- * Implements hook_install()
+ * Implement hook_install()
  */
 function domain_conf_install() {
   drupal_install_schema('domain_conf');
 }
 
 /**
- * Implements hook_schema()
+ * Implement hook_schema()
  */
 function domain_conf_schema() {
   $schema['domain_conf'] = array(
@@ -27,7 +27,7 @@ function domain_conf_schema() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implement hook_uninstall()
  */
 function domain_conf_uninstall() {
   drupal_uninstall_schema('domain_conf');

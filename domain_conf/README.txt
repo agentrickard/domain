@@ -188,7 +188,7 @@ file:
 ====
 <?php
 /**
- * Implements hook_domainconf() to add the user picture.
+ * Implement hook_domainconf() to add the user picture.
  */
 function user_domainconf() {
   $form['pictures'] = array(

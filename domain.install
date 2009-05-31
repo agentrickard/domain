@@ -7,7 +7,7 @@
  */
 
 /**
- * Implements hook_install()
+ * Implement hook_install()
  */
 function domain_install() {
   drupal_install_schema('domain');
@@ -31,7 +31,7 @@ function domain_install() {
 }
 
 /**
- * Implements hook_schema()
+ * Implement hook_schema()
  */
 function domain_schema() {
   $schema['domain'] = array(
@@ -64,7 +64,7 @@ function domain_schema() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implement hook_uninstall()
  */
 function domain_uninstall() {
   drupal_uninstall_schema('domain');

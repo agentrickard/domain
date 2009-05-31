@@ -40,7 +40,7 @@ function domain_conf_domain_bootstrap_full($domain) {
 }
 
 /**
- * Implements hook_init()
+ * Implement hook_init()
  */
 function domain_conf_init() {
   // Allow sites to add implementations of hook_domainconf() without hacking.
@@ -54,7 +54,7 @@ function domain_conf_init() {
 }
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_conf_menu() {
   $items = array();
@@ -78,7 +78,7 @@ function domain_conf_menu() {
 }
 
 /**
- * Implements hook_theme()
+ * Implement hook_theme()
  */
 function domain_conf_theme() {
   $themes = array(
@@ -90,7 +90,7 @@ function domain_conf_theme() {
 }
 
 /**
- * Implementation of hook_enable().
+ * Implement hook_enable().
  *
  * Register the domain_conf with the domain module so it's loaded during domain
  * bootstrap and can implement domain_bootstrap hooks.
@@ -100,14 +100,14 @@ function domain_conf_enable() {
 }
 
 /**
- * Implementation of hook_disable().
+ * Implement hook_disable().
  */
 function domain_conf_disable() {
   domain_bootstrap_unregister('domain_conf');
 }
 
 /**
- * Implements hook_domainlinks()
+ * Implement hook_domainlinks()
  */
 function domain_conf_domainlinks($domain) {
   static $extra;
@@ -125,7 +125,7 @@ function domain_conf_domainlinks($domain) {
 }
 
 /**
- * Implements hook_domainwarnings()
+ * Implement hook_domainwarnings()
  */
 function domain_conf_domainwarnings() {
   // These are the forms for variables set by Domain Conf.
@@ -140,7 +140,7 @@ function domain_conf_domainwarnings() {
 }
 
 /**
- * Implements hook_domainbatch()
+ * Implement hook_domainbatch()
  */
 function domain_conf_domainbatch() {
   $batch = array();
@@ -404,7 +404,7 @@ function domain_conf_domainbatch() {
 }
 
 /**
-* Implements hook_domainupdate().
+* Implement hook_domainupdate().
 */
 function domain_conf_domainupdate($op, $domain, $form_state = array()) {
   if ($op == 'delete') {
@@ -443,7 +443,7 @@ function domain_conf_api($all = FALSE) {
 }
 
 /**
- * Implements hook_block().
+ * Implement hook_block().
  *
  * The primary links and secondary links blocks do not respect our settings,
  * so we replace it with the following blocks.

@@ -49,7 +49,7 @@ function domain_prefix_domain_bootstrap_full($domain) {
 }
 
 /**
- * Implements hook_init().
+ * Implement hook_init().
  *
  * Check for prefixes of the url_alias table, and if present add hook_domainprefix().
  */
@@ -61,7 +61,7 @@ function domain_prefix_init() {
 }
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_prefix_menu() {
   $items = array();
@@ -92,14 +92,14 @@ function domain_prefix_menu() {
 }
 
 /**
- * Implements hook_perm
+ * Implement hook_perm
  */
 function domain_prefix_perm() {
   return array('administer table prefixing');
 }
 
 /**
- * Implements hook_theme()
+ * Implement hook_theme()
  */
 function domain_prefix_theme() {
   $themes = array(
@@ -111,7 +111,7 @@ function domain_prefix_theme() {
 }
 
 /**
- * Implementation of hook_enable().
+ * Implement hook_enable().
  *
  * Register the domain_prefix with the domain module so it's loaded during domain
  * bootstrap and can implement domain_bootstrap hooks.
@@ -121,7 +121,7 @@ function domain_prefix_enable() {
 }
 
 /**
- * Implementation of hook_disable().
+ * Implement hook_disable().
  */
 function domain_prefix_disable() {
   domain_bootstrap_unregister('domain_prefix');
@@ -168,7 +168,7 @@ function domain_prefix_table_exists($prefix, $table) {
 }
 
 /**
- * Implements hook_domainlinks()
+ * Implement hook_domainlinks()
  *
  * @param $domain
  *  The currently active $domain array, provided by domain_lookup().
@@ -185,7 +185,7 @@ function domain_prefix_domainlinks($domain) {
 }
 
 /**
- * Implements hook_domainupdate().
+ * Implement hook_domainupdate().
  */
 function domain_prefix_domainupdate($op, $domain, $form_state = array()) {
   // Include the extra functions.

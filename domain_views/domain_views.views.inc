@@ -11,7 +11,7 @@
  */
 
 /**
- * Implements hook_views_data().
+ * Implement hook_views_data().
  */
 function domain_views_views_data() {
   $data = array();
@@ -246,7 +246,7 @@ function domain_views_views_data() {
 }
 
 /**
- * Implementation of hook_views_handlers() to register all of the
+ * Implement hook_views_handlers() to register all of the
  * basic handlers views uses.
  */
 function domain_views_views_handlers() {
@@ -300,7 +300,7 @@ function domain_views_views_plugins() {
 }
 
 /**
- * Implementation of hook_views_query_substitutions ()
+ * Implement hook_views_query_substitutions ()
  */
 function domain_views_query_substitutions($view) {
   return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);

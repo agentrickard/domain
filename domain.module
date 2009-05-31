@@ -34,7 +34,7 @@ function domain_boot() {
 }
 
 /**
- * Implementation of hook_init().
+ * Implement hook_init().
  *
  * Inititalizes a global $_domain variable if necessary (usually that's done in
  * domain_bootstrap.inc) and loads information on current domain.
@@ -91,7 +91,7 @@ function domain_init() {
 }
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_menu() {
   $items = array();
@@ -190,7 +190,7 @@ function domain_menu() {
 }
 
 /**
- * Implements hook_perm()
+ * Implement hook_perm()
  */
 function domain_perm() {
   $perms = array(
@@ -207,7 +207,7 @@ function domain_perm() {
 }
 
 /**
- * Implements hook_theme()
+ * Implement hook_theme()
  */
 function domain_theme() {
   $themes = array(
@@ -228,7 +228,7 @@ function domain_theme() {
 }
 
 /**
- * Implements hook_block()
+ * Implement hook_block()
  *
  * A nifty little domain-switcher block, useful during debugging.
  */
@@ -301,7 +301,7 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
 }
 
 /**
- * Implements hook_user()
+ * Implement hook_user()
  *
  * Attached domain_id records to all registering users.  These
  * are used to determine which 'domain_editor' group that users
@@ -426,7 +426,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
 }
 
 /**
- * Implements hook_cron()
+ * Implement hook_cron()
  *
  * This function invokes hook_domaincron() and allows
  * Domain Access modules to run functions for all active affiliates.
@@ -840,7 +840,7 @@ function domain_check_primary($msg = 'default') {
 }
 
 /**
- * Implements hook_domainload()
+ * Implement hook_domainload()
  *
  * Adds the home page 'path' and 'site_grant' boolean.
  */
@@ -916,7 +916,7 @@ function domain_goto($domain) {
 }
 
 /**
- * Implements hook_nodeapi().
+ * Implement hook_nodeapi().
  *
  * This function is used to provide debugging information and to prep values from
  * the {domain_access} table when editing nodes.  Since not all users can see the
@@ -983,7 +983,7 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 }
 
 /**
- * Implements hook_node_grants.
+ * Implement hook_node_grants.
  *
  * Informs the node access system what permissions the user has.  By design
  * all users are in the realm defined by the currently active domain_id.
@@ -1066,7 +1066,7 @@ function domain_node_grants($account, $op) {
 }
 
 /**
- * Implements hook_node_access_records()
+ * Implement hook_node_access_records()
  *
  * Set permissions for a node to be written to the database.  By design
  * if no options are selected, the node is assigned to the main site.
@@ -1220,7 +1220,7 @@ function domain_enable() {
 }
 
 /**
- * Implements hook_form_alter()
+ * Implement hook_form_alter()
  *
  * This function is crucial, as it appends our node access elements to the node edit form.
  * For users without the "set domain access" permission, this happens silently.
@@ -1618,7 +1618,7 @@ function domain_lookup_simple($name, $reset = FALSE) {
 }
 
 /**
- * Implements hook_domaininstall()
+ * Implement hook_domaininstall()
  */
 function domain_domaininstall() {
   // Set the proper variables for our bootstrap load, as a precaution.
@@ -1626,7 +1626,7 @@ function domain_domaininstall() {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  */
 function domain_domainupdate($op, $domain, $form_state = array()) {
   switch ($op) {
@@ -1644,7 +1644,7 @@ function domain_domainupdate($op, $domain, $form_state = array()) {
 }
 
 /**
- * Implements hook_domainbatch()
+ * Implement hook_domainbatch()
  */
 function domain_domainbatch() {
   // Change all the domain names at once.
@@ -1802,7 +1802,7 @@ function _domain_path_modules() {
 }
 
 /**
- * Implements hook_domainignore().
+ * Implement hook_domainignore().
  */
 function domain_domainignore() {
   // In Drupal 6, the update script behaves differently than D5, so we ignore it.
@@ -1810,7 +1810,7 @@ function domain_domainignore() {
 }
 
 /**
- * Implements hook_node_access_explain for devel.module
+ * Implement hook_node_access_explain for devel.module
  */
 function domain_node_access_explain($row) {
   global $_domain;
@@ -1841,7 +1841,7 @@ function domain_node_access_explain($row) {
 }
 
 /**
- * Implements hook_content_extra_fields()
+ * Implement hook_content_extra_fields()
  *
  * CCK hook to allow sorting of the domain settings field.
  */
@@ -1858,7 +1858,7 @@ function domain_content_extra_fields($type_name = NULL) {
 }
 
 /**
- * Implements hook_token_list().
+ * Implement hook_token_list().
  */
 function domain_token_list($type = 'all') {
   // Current domain tokens.
@@ -1878,7 +1878,7 @@ function domain_token_list($type = 'all') {
 }
 
 /**
- * Implements hook_token_values().
+ * Implement hook_token_values().
  */
 function domain_token_values($type, $object = NULL, $options = array()) {
   global $_domain;
@@ -1924,7 +1924,7 @@ function domain_url_encode($string) {
 }
 
 /**
- * Implements hook_simpletest()
+ * Implement hook_simpletest()
  */
 function domain_simpletest() {
   $module_name = 'domain';

@@ -38,7 +38,7 @@ function domain_theme_page($domain) {
 }
 
 /**
- * Implements hook_form_alter()
+ * Implement hook_form_alter()
  */
 function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == 'system_themes_form') {

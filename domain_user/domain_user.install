@@ -7,14 +7,14 @@
  */
 
 /**
- * Implements hook_install()
+ * Implement hook_install()
  */
 function domain_user_install() {
   drupal_install_schema('domain_user');
 }
 
 /**
- * Implements hook_schema()
+ * Implement hook_schema()
  */
 function domain_user_schema() {
   $schema['domain_user'] = array(
@@ -29,7 +29,7 @@ function domain_user_schema() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implement hook_uninstall()
  */
 function domain_user_uninstall() {
   // Drop the storage table.

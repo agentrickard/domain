@@ -21,7 +21,7 @@
 define('DOMAIN_NAV_MENU', TRUE);
 
 /**
- * Implements hook_init()
+ * Implement hook_init()
  */
 function domain_nav_init() {
   // In the Garland header, we have to force the block to appear correctly.
@@ -29,7 +29,7 @@ function domain_nav_init() {
 }
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_nav_menu() {
   $items = array();
@@ -78,7 +78,7 @@ function domain_nav_check($access = FALSE) {
 }
 
 /**
- * Implements hook_theme()
+ * Implement hook_theme()
  */
 function domain_nav_theme() {
   $themes = array(
@@ -96,7 +96,7 @@ function domain_nav_theme() {
 }
 
 /**
- * Implements hook_block()
+ * Implement hook_block()
  */
 function domain_nav_block($op='list', $delta = 0, $edit = array()) {
   $block = array();
@@ -259,7 +259,7 @@ function theme_domain_nav_menus($options) {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  */
 function domain_nav_domainupdate($op, $domain, $form_state = array()) {
   // Only execute if the menu is turned on.

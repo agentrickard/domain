@@ -462,7 +462,7 @@ function domain_form($form_state, $domain = array(), $arguments = array()) {
 }
 
 /**
- * Implementation of domain_form validate hook.
+ * Implement domain_form validate hook.
  */
 function domain_form_validate($form, &$form_state) {
   $subdomain = $form_state['values']['subdomain'];
@@ -476,7 +476,7 @@ function domain_form_validate($form, &$form_state) {
 }
 
 /**
- * Implementation of domain_form submit hook.
+ * Implement domain_form submit hook.
  */
 function domain_form_submit($form, &$form_state) {
   // Populate sql values used in both queries.
@@ -510,7 +510,7 @@ function domain_form_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of domain_delete_form.
+ * Implement domain_delete_form.
  *
  * @param $form_state
  *    The current form state, passed by FormsAPI.
@@ -547,7 +547,7 @@ function domain_delete_form($form_state, $domain, $arguments = array()) {
 }
 
 /**
- * Implementation of domain_delete_form submit hook.
+ * Implement domain_delete_form submit hook.
  */
 function domain_delete_form_submit($form, &$form_state) {
   // Run the lookup before we delete the row!
@@ -568,7 +568,7 @@ function domain_delete_form_submit($form, &$form_state) {
 }
 
 /**
- * Implementation of domain_advanced_form.
+ * Implement domain_advanced_form.
  *
  * @param $form_state
  * The current form state, passed by FormsAPI.

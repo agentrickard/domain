@@ -17,7 +17,7 @@
  */
 
 /**
- * Implements hook_init()
+ * Implement hook_init()
  */
 function domain_theme_init() {
   // Assign the theme selected, based on the active domain.
@@ -34,7 +34,7 @@ function domain_theme_init() {
 }
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_theme_menu() {
   $items = array();
@@ -59,7 +59,7 @@ function domain_theme_menu() {
 }
 
 /**
- * Implements hook_theme()
+ * Implement hook_theme()
  */
 function domain_theme_theme() {
   $themes = array(
@@ -97,7 +97,7 @@ function domain_theme_lookup($domain_id = NULL, $theme = NULL, $clear = FALSE) {
 }
 
 /**
- * Implements hook_domainlinks()
+ * Implement hook_domainlinks()
  */
 function domain_theme_domainlinks($domain) {
   if ($domain['domain_id'] > 0) {
@@ -111,7 +111,7 @@ function domain_theme_domainlinks($domain) {
 }
 
 /**
- * Implements hook_domainform()
+ * Implement hook_domainform()
  */
 function domain_theme_domainform(&$form) {
   // Set the module weight for Domain Theme,
@@ -138,7 +138,7 @@ function domain_theme_domainform(&$form) {
 }
 
 /**
- * Implements hook_domainbatch()
+ * Implement hook_domainbatch()
  */
 function domain_theme_domainbatch() {
   $batch = array();
@@ -207,7 +207,7 @@ function domain_theme_batch($values) {
 }
 
 /**
- * Implements hook_domainwarnings()
+ * Implement hook_domainwarnings()
  */
 function domain_theme_domainwarnings() {
   return array(

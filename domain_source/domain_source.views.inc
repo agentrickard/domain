@@ -8,7 +8,7 @@
  */
 
 /**
- * Implements hook_views_data().
+ * Implement hook_views_data().
  */
 function domain_source_views_data() {
   // Define the {domain_access} table.

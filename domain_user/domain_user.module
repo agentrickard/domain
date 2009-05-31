@@ -15,7 +15,7 @@
  */
 
 /**
- * Implements hook_init()
+ * Implement hook_init()
  *
  * We have to do this because we cannot redirect on login.
  */
@@ -28,7 +28,7 @@ function domain_user_init() {
 }
 
 /**
- * Implements hook_menu()
+ * Implement hook_menu()
  */
 function domain_user_menu() {
   $items = array();
@@ -44,7 +44,7 @@ function domain_user_menu() {
 }
 
 /**
- * Implements hook_perm()
+ * Implement hook_perm()
  */
 function domain_user_perm() {
   return array('create personal domain');
@@ -86,7 +86,7 @@ function domain_user_rules($generate = TRUE) {
 }
 
 /**
- * Implements hook_enable()
+ * Implement hook_enable()
  *
  * When the module is enabled, create the rules for existing domains.
  */
@@ -95,7 +95,7 @@ function domain_user_enable() {
 }
 
 /**
- * Implements hook_disable()
+ * Implement hook_disable()
  *
  * Deletes our user access masks.
  */
@@ -109,7 +109,7 @@ function domain_user_disable() {
 }
 
 /**
- * Implements hook_domainload()
+ * Implement hook_domainload()
  */
 function domain_user_domainload(&$domain) {
   // Zero is the default domain, and we don't want to invalidate it.
@@ -124,7 +124,7 @@ function domain_user_domainload(&$domain) {
 }
 
 /**
- * Implements hook_user()
+ * Implement hook_user()
  */
 function domain_user_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
@@ -284,7 +284,7 @@ function domain_user_strip_chars($name) {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implement hook_domainupdate()
  */
 function domain_user_domainupdate($op, $domain, $form_state = array()) {
   $root = variable_get('domain_user_root', variable_get('domain_root', ''));
@@ -342,7 +342,7 @@ function domain_user_lookup($uid = NULL, $name = NULL, $domain_id = NULL, $clear
 }
 
 /**
- * Implements hook_domainview()
+ * Implement hook_domainview()
  */
 function domain_user_domainview($op, $domain = array()) {
   switch ($op) {

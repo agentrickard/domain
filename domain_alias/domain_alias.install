@@ -3,13 +3,13 @@
 
 /**
  * @file
- * Implementations of module installation related hooks.
+ * Provide hostname alias registration for domain records.
  *
  * @ingroup domain_alias
  */
 
 /**
- * Implementation of hook_schema().
+ * Implement hook_schema().
  */
 function domain_alias_schema() {
   $schema['domain_alias'] = array('description' => 'Domain aliases and patterns for domain entries in {domain}.',
@@ -46,14 +46,14 @@ function domain_alias_schema() {
 }
 
 /**
- * Implementation of hook_install().
+ * Implement hook_install().
  */
 function domain_alias_install() {
   drupal_install_schema('domain_alias');
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implement hook_uninstall().
  */
 function domain_alias_uninstall() {
   drupal_uninstall_schema('domain_alias');
