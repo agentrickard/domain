@@ -22,6 +22,7 @@ CONTENTS
 4.  Drupal Upgrades
 5.  Developer Notes
 5.1   Database Schema
+5.2   Known Issues
 
 ----
 1.  Introduction
@@ -219,3 +220,13 @@ Installing the module creates a {domain_prefix} table that contains:
   Indicates the source of data copied for this domain.  This value is
   the domain_id of the source domain.
 
+
+----
+5.2 Known Issues
+
+If you are running MySQL in STRICT mode, then you may run into
+an error if you try to COPY the {users} table. This occurs because
+MySQL STRICT does not allow autoincrement columns to be inserted
+with a value of zero (0).
+
+See http://drupal.org/node/445386 for information.
