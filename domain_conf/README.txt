@@ -125,6 +125,10 @@ All of the current settings are available in batch mode.
 You may also choose to remove domain-specific configurations.  This feature
 is useful if you wish to roll back custom changes.
 
+NOTE: If you make batch changes from a domain other than the primary
+domain, the default variable value may be taken from the active domain.
+Be sure to check the values in this form before saving.
+
 ----
 4.  Developer Notes
 

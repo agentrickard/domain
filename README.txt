@@ -884,6 +884,8 @@ Additional batch actions are made available for the Domain Configuration
 module.  Other modules may implement hook_domainbatch() to provide
 additional batch actions.
 
+It may be necessary to enter the batch form from the primary domain.
+
 ----
 4.10  Assigning Users to Domains
 

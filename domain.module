@@ -1755,7 +1755,7 @@ function domain_warning_check($form_id) {
     // Add the list of forms
     $forms = array();
     $forms = module_invoke_all('domainwarnings');
-    if (arg(2) != 'domain' && in_array($form_id, $forms)) {
+    if ($form_id = 'domain_batch_form' || (arg(2) != 'domain' && in_array($form_id, $forms))) {
       $default = domain_default();
       if ($_domain['domain_id'] != $default['domain_id']) {
         $_path = domain_get_uri($default);

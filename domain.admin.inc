@@ -650,9 +650,6 @@ function domain_batch($action = NULL) {
     return t('There are no domains configured for this site.');
   }
 
-  // This action should be performed from the primary domain.
-  domain_check_primary();
-
   $batch = module_invoke_all('domainbatch');
   // We must have some actions, otherwise, no point.
   if (empty($batch)) {

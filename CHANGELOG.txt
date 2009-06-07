@@ -3,6 +3,7 @@
 7-JUN-2009
 
 -- #303406 by junphine and celloandy. Adds theme-specific settings to Domain Theme.
+-- #405148. Adds warning to the batch editing form.
 
 31-MAY-2009
 
