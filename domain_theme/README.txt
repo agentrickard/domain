@@ -37,7 +37,7 @@ You may also set domain-specific settings for each theme.
 ----
 1.1 Upgrading
 
-If you used Domain Theme prior to 6.x.1.0rc7, you will need to run the
+If you used Domain Theme prior to 6.x.2.0rc7, you will need to run the
 Drupal upgrade script.
 
 ----
@@ -99,7 +99,7 @@ link.
 ----
 3.3 Domain-Specific Theme Settings
 
-New in versions 6.x.1.0rc7 and higher, you may configure custom theme settings
+New in versions 6.x.2.0rc7 and higher, you may configure custom theme settings
 per domain. This can be very useful in swapping out logo files per domain, or
 changed the color of Garland for each domain.
 

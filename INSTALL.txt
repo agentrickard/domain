@@ -40,8 +40,14 @@ CONTENTS
 The Domain Access module is a Node Access module.  It is designed to
 restrict access to content.
 
-Failure to install or uninstall this module according to instructions may
-cause errors in your site.
+WARNINGS: 
+ - Failure to install or uninstall this module according to instructions
+   may cause errors in your site.
+ - Node Access rules never apply to user 1 (the site admin) or to users
+   with the 'administer nodes' permission. As such, these users will always
+   be able to see all content on your site(s). To verify that Domain Access
+   is working correctly, you will need to turn on its debug mode or view the
+   site as a user without this permission.
 
 ----
 2.  Installation
@@ -50,12 +56,30 @@ This module requires some advanced understanding of Drupal and of
 how DNS servers behave.  If you simply untar the download and
 activate the module, it may not work correctly.
 
+Domain Access works by reading the inbound HTTP_HOST request
+and serving content appropriate to the requested domain. For this to
+work properly, all domains for your site must be routed to the same
+Drupal installation on your webserver.
+
+Domain Access was not designed to run on shared hosts, and you may need
+assistance from your provider to make it work correctly.
+
+For more background on DNS and virtual host configuration, please try the
+following documentation:
+
+For a general overview:
+  - http://en.wikipedia.org/wiki/Virtual_hosting
+
+In-depth documentation with many examples for specific situations:
+  - http://httpd.apache.org/docs/2.0/vhosts/
+  - http://httpd.apache.org/docs/2.0/vhosts/examples.html
+
 When you enable the module, it will create a {domain} table in your Drupal
 database.
 
-All existing nodes on your site will be assigned to the default domain for your
-web site and to all affiliates.  If you wish to alter this behavior, see sections
-2.4 through 2.6 of README.txt
+On installation, all existing nodes on your site will be assigned to the default
+(primary) domain for your web site as well as  to all subdomains.
+In order to change this behavior, see sections 2.3 and 2.4 below.
 
 ----
 2.1  Before Installing
@@ -75,35 +99,72 @@ after you have installed Drupal.
 2.2   Server Configuration
 
 For the module to work correctly, the DNS record of your server must accept
-multiple DNS entries pointing at a single IP address that hosts your Drupal
-installation.
+multiple DNS entries [most servers do]. Your new virtual host(s) must then
+be correctly configured for your server.  In general, this involves small
+additions to the hosts file and the httpd.conf file.
 
-The two basic methods for doing this are either to:
+In order for the Apache server to find your virtual host(s), it absolutely
+needs two pieces of information: the ServerName (hostname & port the server
+uses to identify itself) and an IP address. 
 
-  - Setup WildCard DNS, so that *.example.com resolves to your Drupal site.
-  - Setup VirtualHosts so that one.example.com, two.example.com, etc. all
-    resolve to your Drupal site.
+The two basic methods for doing this are to either:
 
-For example, on my local testing machine, I have VirtualHosts to the following
-sites setup in httpd.conf (and my hosts file, to allow the .test TLD):
+  - Set up WildCard DNS, so that *.example.com resolves to your Drupal site.
+    (The asterisk indicates any and all names carrying the < example.com >
+    suffix) 
+  - Set up each VirtualHost specifically, so that one.example.com,
+    two.example.com, (and so on) all resolve to your Drupal site.
+
+For example, on a local testing machine, VirtualHosts in my hosts file could be
+configured in the following way:
 
   - ken.test => 127.0.0.1
-  - one.ken.test => 127.0.0.1
   - two.ken.test => 127.0.0.1
-  - three.ken.test => 127.0.0.1
+  - foo.test => 127.0.0.1
 
-It is beyond the scope of this document to explain how to configure your DNS
-server.  For more information, see:
+With their port and document root defined (WildCard set up) in the httpd.conf f
+file:
 
-  - http://en.wikipedia.org/wiki/Wildcard_DNS_record
-  - http://en.wikipedia.org/wiki/Virtual_hosting
+<VirtualHost *:80>
+DocumentRoot /path/to/drupal/install
+ServerName ken.test
+ServerAlias *.ken.test foo.test
+</VirtualHost>
 
-After you have enabled multiple DNS entries to resolve to your Drupal
-installation, you may activate the module and configure its settings.
+In this case any subdomain (*.ken.test) and another domain foo.test resolve to
+the same location. When configuring DNS for Domain Access, the document root is
+the same for all the VirtualHosts. The documentRoot directive sets the directory
+from which httpd will serve files. For DA, there is one Drupal installation and
+it is this installation built on a single database that is serving the files. 
 
-NOTE: No matter how many domains resolve to the same IP, you only need one
-instance of Drupal's settings.php file.  The sites folder should be named
-'default' or named for your primary domain.
+This becomes even clearer when the VirtualHosts are set up specifically,
+each with its own VirtualHost block in the httpd.conf file, for example:
+
+<VirtualHost 127.0.0.1:80>
+DocumentRoot /path/to/drupal/install
+ServerName ken.test
+</VirtualHost>
+
+<VirtualHost 127.0.0.1:80>
+DocumentRoot /path/to/drupal/install
+ServerName two.ken.test
+</VirtualHost>
+
+<VirtualHost 127.0.0.1:80>
+DocumentRoot /path/to/drupal/install
+ServerName foo.test
+</VirtualHost>
+
+This example gives a general idea of what is involved, but it is beyond the 
+scope of this document to explain how to configure your specific DNS server
+situation, which may involve considerable research, trial & error or a call for
+help. Shared server situations can be particularly complicated and you should
+contact their administration for help with configuration if their online help
+files do not make things clear enough.
+
+After you have enabled multiple DNS entries to resolve to your single, 
+default Drupal installation, you may activate the module and configure its
+settings at Admin > Build > Domains.
 
 ----
 2.3 Setting DOMAIN_INSTALL_RULE
