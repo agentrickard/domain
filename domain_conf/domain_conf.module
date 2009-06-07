@@ -17,6 +17,18 @@
  * Implementats hook_domain_bootstrap_full().
  */
 function domain_conf_domain_bootstrap_full($domain) {
+  static $check;
+  // If running domain_set_domain(), we have issues with the variables
+  // from the primary domain, which need to be loaded from cache.
+  // @link http://drupal.org/node/412156
+  if ($check) {
+    global $_domain;
+    if ($domain['domain_id'] == 0 && $check != $_domain['domain_id']) {
+      _domain_conf_load_primary(TRUE);
+    }
+  }
+  // Flag that we have already loaded.
+  $check = $domain['domain_id'];
   $data = array();
   $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
   if (!empty($data)) {
@@ -527,10 +539,18 @@ function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
  * or an array of variables, in the case of $all.
  */
 function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $reset = FALSE) {
-  static $settings;
+  global $_domain;
+  static $settings, $base;
+  if (empty($base)) {
+    $base = _domain_conf_load_primary(FALSE);
+  }
   if (!isset($settings[$domain_id]) || $reset) {
     // Get the current settings for this domain, if any.
-    $settings[$domain_id] = unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+    $data = unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+    if (empty($data)) {
+      $data = array();
+    }
+    $settings[$domain_id] = array_merge($base, $data);
   }
   if ($all) {
     return $settings[$domain_id];
@@ -555,4 +575,48 @@ function domain_conf_language_options() {
     $options[$key] = check_plain($lang->native . $extra);
   }
   return $options;
+}
+
+/**
+ * Load the variables from the primary domain.
+ *
+ * We run this special handler when not able to trust variable_get()
+ * during domain switching.
+ *
+ * @see domain_set_domain()
+ *
+ * @param $unset
+ *   If TRUE, this will reset the global $conf array.
+ * @return
+ *   If set to TRUE, no return, just modify the global $conf array.
+ *   Otherwise, return the settings data for the primary domain.
+ */
+function _domain_conf_load_primary($unset = FALSE) {
+  global $db_prefix;
+  static $settings;
+
+  if (empty($settings)) {
+    $cache = 'cache';
+    // Account for table prefixing.
+    if (empty($db_prefix)) {
+      $cache_table = $cache;
+    }
+    else if (is_string($db_prefix)) {
+      $cache_table = $db_prefix . $cache;
+    }
+    else {
+      $cache_table = $db_prefix['default'] . $cache;
+    }
+    $cache_table = db_escape_table($cache_table);
+    // Load the query.
+    $data = db_result(db_query("SELECT data FROM $cache_table WHERE cid = 'variables'"));
+    $settings = unserialize($data);
+  }
+  // Do we reset the global or just return data?
+  if ($unset) {
+    global $conf;
+    $conf = $settings;
+    return;
+  }
+  return $settings;
 }

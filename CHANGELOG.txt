@@ -4,6 +4,7 @@
 
 -- #303406 by junphine and celloandy. Adds theme-specific settings to Domain Theme.
 -- #405148. Adds warning to the batch editing form.
+-- #412156. Improves variable switching across domains.
 
 31-MAY-2009
 
