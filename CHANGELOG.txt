@@ -1,12 +1,13 @@
 // $Id$
 
-7-JUN-2009
+07-JUN-2009
 
 -- #303406 by junphine and celloandy. Adds theme-specific settings to Domain Theme.
 -- #405148. Adds warning to the batch editing form.
 -- #412156. Improves variable switching across domains.
 -- #415336 by vic_d. Adds additional DNS configuration tips.
 -- Documents Domain Prefix issue #445386.
+-- Creates the 6.x.2.0rc7 release.
 
 31-MAY-2009
 
