@@ -1,5 +1,9 @@
 // $Id$
 
+7-JUN-2009
+
+-- #303406 by junphine and celloandy. Adds theme-specific settings to Domain Theme.
+
 31-MAY-2009
 
 -- Doxygen cleanup. Upgrades node access patch to Drupal 6.12.

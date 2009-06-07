@@ -22,14 +22,47 @@
 function domain_theme_init() {
   // Assign the theme selected, based on the active domain.
   global $_domain, $custom_theme;
-  // If the theme has already been set (such as an admin theme), ignore.
-  if (!empty($custom_theme)) {
-    return;
+  // If the theme has already been set (such as an admin theme), only load settings.
+  if (empty($custom_theme)) {
+    $theme = domain_theme_lookup($_domain['domain_id']);
   }
-  $theme = domain_theme_lookup($_domain['domain_id']);
+  else {
+    $theme = domain_theme_lookup($_domain['domain_id'], $custom_theme);
+  }
   // The above returns -1 on failure.
   if ($theme != -1) {
-    $custom_theme = $theme['theme'];
+    // Set our domain-specific theme.
+    if (empty($custom_theme)) {
+      $custom_theme = $theme['theme'];
+    }
+    domain_theme_set_variables($theme);
+  }
+}
+
+function domain_theme_set_variables($theme) {
+  global $conf;
+  if (!empty($theme['settings'])) {
+    $settings = unserialize($theme['settings']);
+    $conf['theme_'. $theme['theme'] .'_settings'] = $settings;
+    // Account for color module.
+    $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
+    // In some cases, where the domain uses the default color palette
+    // and the primary theme does not, we may only have the palette 
+    // stored, in which case, we have to load that data and ignore the rest.
+    $palette_var = 'color_'. $theme['theme'] .'_palette';
+    if (!isset($settings[$palette_var])) {
+      if (isset($settings['palette'])) {
+        $conf[$palette_var] = $settings['palette'];
+      }
+    }
+    else {
+      foreach ($vars as $variable) {
+        $name = 'color_'. $theme['theme'] .'_'. $variable;
+        if (isset($settings[$name])) {
+          $conf[$name] = $settings[$name];
+        }
+      }
+    }
   }
 }
 
@@ -55,6 +88,14 @@ function domain_theme_menu() {
     'page arguments' => array(4),
     'file' => 'domain_theme.admin.inc',
   );
+  $items['admin/build/domain/theme/%/%domain/theme-settings'] = array(
+    'title' => 'Configure domain theme settings',
+    'type' => MENU_CALLBACK,
+    'access arguments' => array('administer domains'),
+    'page callback' => 'domain_theme_settings',
+    'page arguments' => array(4, 5),
+    'file' => 'domain_theme.admin.inc',
+  );
   return $items;
 }
 
@@ -74,21 +115,22 @@ function domain_theme_theme() {
  * Get domain theme information
  *
  * @param $domain_id
- *  The domain_id taken from {domain}. Optional.
+ *  The domain_id taken from {domain}.
  * @param $theme
  *  The string representation of a {domain_theme} entry. Optional.
- * @param $clear
+ *  If this value is NULL, the default theme for this domain will be returned.
+ * @param $reset
  *  A boolean flag to clear the static variable if necessary. Not used.  Here for consistency.
  * @return
  *  An array containing the requested row from the {domain_theme} table.
  *  Returns -1 on failure.
  */
-function domain_theme_lookup($domain_id = NULL, $theme = NULL, $clear = FALSE) {
-  if (!is_null($domain_id)) {
-    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE domain_id = %d", $domain_id));
+function domain_theme_lookup($domain_id, $theme = NULL, $reset = FALSE) {
+  if (!is_null($theme)) {
+    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings, status FROM {domain_theme} WHERE domain_id = %d AND theme= '%s'", $domain_id, $theme));
   }
-  else if (!is_null($theme)) {
-    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings FROM {domain_theme} WHERE theme= '%s'", $theme));
+  else {
+    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings, status FROM {domain_theme} WHERE domain_id = %d AND status = 1", $domain_id));
   }
   if (empty($return)) {
     $return = -1;
@@ -215,3 +257,16 @@ function domain_theme_domainwarnings() {
     'system_theme_settings',
   );
 }
+
+/**
+ * Return the unique string path element used by color.module.
+ *
+ * @param $path
+ *  A path to a color module file, such as 'default/files/garland-00123451/style.css'.
+ * @ return
+ *  A string indicating the color module's filepath.
+ */
+function domain_theme_get_color_path($path) {
+  return current(array_slice(array_reverse(explode('/', $path)), 1, 1));
+}
+
