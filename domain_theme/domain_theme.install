@@ -42,10 +42,10 @@ function domain_theme_uninstall() {
  */
 function domain_theme_update_6200() {
   $ret = array();
-  db_drop_primary_key(&$ret, 'domain_theme');
-  db_add_primary_key(&$ret, 'domain_theme', array('domain_id', 'theme'));
-  db_add_field(&$ret, 'domain_theme', 'status', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
-  db_add_field(&$ret, 'domain_theme', 'filepath', array('type' => 'varchar', 'length' => '255', 'not null' => FALSE));
+  db_drop_primary_key($ret, 'domain_theme');
+  db_add_primary_key($ret, 'domain_theme', array('domain_id', 'theme'));
+  db_add_field($ret, 'domain_theme', 'status', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
+  db_add_field($ret, 'domain_theme', 'filepath', array('type' => 'varchar', 'length' => '255', 'not null' => FALSE));
   $ret[] = update_sql("UPDATE {domain_theme} SET status = 1");
   return $ret;
 }

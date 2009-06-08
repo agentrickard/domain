@@ -1,5 +1,9 @@
 // $Id$
 
+08-JUN-22009
+
+-- #484864 by dlivingstone. E_ALL notice in domain_theme update hook.
+
 07-JUN-2009
 
 -- #303406 by junphine and celloandy. Adds theme-specific settings to Domain Theme.
