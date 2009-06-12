@@ -130,8 +130,6 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
     return drupal_access_denied();
   }
 
-  $color_info = color_get_info($theme);
-
   drupal_set_title(t('!site : %theme settings', array('!site' => $domain['sitename'], '%theme' => $theme)));
   // Which domain are we editing?
   $form['domain_id'] = array(
@@ -151,7 +149,12 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
     }
   }
   ksort($form['#submit']);
+
   // Check for the presence of color.module.
+  $color_info = NULL;
+  if (module_exists('color')) {
+    $color_info = color_get_info($theme);
+  }
   if (empty($color_info)) {
     return;
   }

@@ -1,6 +1,10 @@
 // $Id$
 
-08-JUN-22009
+12-JUN-2009
+
+-- #303406 by orangecoat-ciallella. Account for absence of Color module in Domain Theme.
+
+08-JUN-2009
 
 -- #484864 by dlivingstone. E_ALL notice in domain_theme update hook.
 -- #484968 by sn0rcha. Dumb typo in domain_warning_check().
