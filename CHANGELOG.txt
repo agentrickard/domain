@@ -3,6 +3,7 @@
 13-JUN-2009
 
 -- #490878. Make the batch action list easier to read.
+-- #486038 by mrgoltra. Domain Conf throws away 0 values.
 
 12-JUN-2009
 
