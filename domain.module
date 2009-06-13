@@ -1281,10 +1281,11 @@ function domain_domainupdate($op, $domain = array(), $edit = array()) {
         db_query("DELETE FROM {node_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);
         db_query("DELETE FROM {domain_access} WHERE realm = 'domain_id' AND gid = %d", $domain['domain_id']);
         db_query("DELETE FROM {domain_access} WHERE realm = 'domain_editor' AND gid = %d", $domain['domain_id']);
-        cache_clear_all();
       }
       break;
   }
+  // In all cases, we need to force a menu rebuild, which also clears the cache.
+  menu_rebuild();
 }
 
 /**

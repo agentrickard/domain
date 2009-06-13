@@ -3,6 +3,8 @@
 13-JUN-2009
 
 -- #487842 by jmunning. Account for empty user domains.
+-- #336221 by ariflukito./ Backport of Domain Content menu changes.
+    Requires menu rebuild after upgrade.
 
 07-JUN-2009
 

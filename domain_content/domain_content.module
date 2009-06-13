@@ -57,7 +57,7 @@ function domain_content_menu($may_cache) {
     foreach ($domains as $domain) {
       $check = domain_content_check($domain, $all);
       $items[] = array(
-        'path' => 'admin/domain/content/'. filter_xss_admin($domain['subdomain']),
+        'path' => 'admin/domain/content/'. $domain['domain_id'],
         'title' => t('@domain content', array('@domain' => $domain['sitename'])),
         'description' => t('View content assigned to !domain', array('!domain' => $domain['subdomain'])),
         'callback' => 'domain_content_view',
