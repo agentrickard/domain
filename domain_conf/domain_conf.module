@@ -169,7 +169,7 @@ function domain_conf_domainbatch() {
     '#variable' => 'domain_conf',
     '#meta_description' => t('Delete custom settings for domains as supplied by Domain Configuration.'),
     '#table' => 'domain_conf',
-    '#weight' => 0,
+    '#weight' => -10,
   );
   // Change the email address.
   $batch['site_mail'] = array(
@@ -412,6 +412,10 @@ function domain_conf_domainbatch() {
     '#weight' => -2,
     '#group' => t('Site status'),
   );
+  foreach ($batch as $key => $value) {
+    $batch[$key]['#module'] = t('Domain Configuration');
+  }
+
   return $batch;
 }
 

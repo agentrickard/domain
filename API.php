@@ -455,6 +455,7 @@ function hook_domainconf() {
  *
  * - '#group' [optional] Used to place elements into fieldsets for the main domain configuration page. If not set, any
  *    new element will be added to the 'Site configuration' fieldset.
+ * - '#module' [optional] Used to group like elements together on the batch action list.
  *
  * @ingroup domain_hooks
  */
@@ -477,6 +478,7 @@ function hook_domainbatch() {
     '#data_type' => 'string',
     '#weight' => 0,
     '#group' => t('My settings'),
+    '#module' => t('Domain Access'),
   );
   return $batch;
 }

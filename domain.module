@@ -1711,6 +1711,9 @@ function domain_domainbatch() {
     '#data_type' => 'integer',
     '#weight' => -10,
   );
+  foreach ($batch as $key => $value) {
+    $batch[$key]['#module'] = t('Domain Access');
+  }
   return $batch;
 }
 

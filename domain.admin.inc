@@ -694,8 +694,18 @@ function domain_batch($action = NULL) {
 function domain_batch_list($batch) {
   $header = array(t('Action'), t('Description'));
   $rows = array();
-  uasort($batch, 'domain_batch_sort');
   foreach ($batch as $key => $value) {
+    if (!isset($value['#module'])) {
+      $value['#module'] = t('Other');
+    }
+  }
+  uasort($batch, 'domain_batch_sort');
+  $group = '';
+  foreach ($batch as $key => $value) {
+    if ($group != $value['#module']) {
+      $rows[] = array(array('data' => '<strong>'. t('%module options', array('%module' => $value['#module'])) .'</strong>', 'colspan' => 2));
+      $group = $value['#module'];
+    }
     $rows[] = array(l($value['#form']['#title'], 'admin/build/domain/batch/'. $key), $value['#meta_description']);
   }
   $output = '<p>'. t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') .'</p>';
@@ -707,6 +717,9 @@ function domain_batch_list($batch) {
  * Sorting function for domain batch options.
  */
 function domain_batch_sort($a, $b) {
+  if ($a['#module'] != $b['#module']) {
+    return strcmp($a['#module'], $b['#module']);
+  }
   if ($a['#weight'] == $b['#weight']) {
     return strcmp($a['#form']['#title'], $b['#form']['#title']);
   }

@@ -1,5 +1,9 @@
 // $Id$
 
+13-JUN-2009
+
+-- #490878. Make the batch action list easier to read.
+
 12-JUN-2009
 
 -- #303406 by orangecoat-ciallella. Account for absence of Color module in Domain Theme.
