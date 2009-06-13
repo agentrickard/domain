@@ -1090,6 +1090,9 @@ function domain_form_alter($form_id, &$form) {
         $action = variable_get('domain_options', 0);
         $user_domains = array();
         $default_options = array();
+        if (!isset($user->domain_user)) {
+          $user->domain_user = array();
+        }
         foreach ($user->domain_user as $key => $value) {
           if (abs($value) > 0) {
             $user_domains[] = $value;
