@@ -1,5 +1,9 @@
 // $Id$
 
+07-JUN-2009
+
+-- Creates 5.x.10 release.
+
 31-MAY-2009
 
 -- Doxygen cleanup. Upgrades patches to Drupal 5.18.
