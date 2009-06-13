@@ -453,7 +453,7 @@ Note also that the user is not given the ability to promote content to
 'all affiliates'.  Users who need this ability should be given the 'set domain
 access' permission instead.
 
-§This feature was added in response to http://drupal.org/node/188275.
+This feature was added in response to http://drupal.org/node/188275.
 
 ----
 3.2 Normal Usage
