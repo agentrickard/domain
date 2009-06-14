@@ -1,5 +1,9 @@
 // $Id$
 
+14-JUN-2009
+
+-- Created 5.x.11 release.
+
 13-JUN-2009
 
 -- #487842 by jmunning. Account for empty user domains.
