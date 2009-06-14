@@ -16,6 +16,7 @@ CONTENTS
 2.  Installation
 3.  Arguments
 4.  Filters
+5.  Access Plugin
 
 ----
 1. Introduction
@@ -76,7 +77,8 @@ and you enable the "Domain Access" argument type:
     all nodes of type car that are assigned to domain4.
 
     -- If the argument value is not set in your View, it will display the
-    default view which can be "page not found", a summary view or any of the other defaults.
+    default view which can be "page not found", a summary view or any of the
+    other defaults.
 
 You can get the view to filter by the current domain by default by pasting the
 following code in "Argument Handling Code" text box . This will cause the view
@@ -108,4 +110,14 @@ setting provided by the Domain Access module.
 When using Views filters, you must select at least one criteria for the filter
 to be applied.
 
-The filters available to Domain Access include all active domains plus currently active domain.
+The filters available to Domain Access include all active domains plus currently
+active domain.
+
+----
+5. Access Plugin
+
+Domain Views offers an access plugin to all Views that allow you to select
+on which domains a View may be accessed.
+
+This setting is valuable for cases where certain Views are not appropriate
+on all domains.

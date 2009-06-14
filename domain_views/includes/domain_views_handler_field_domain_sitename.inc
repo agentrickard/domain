@@ -19,7 +19,6 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
   function construct() {
     parent::construct();
     $this->additional_fields['domain_id'] = 'domain_id';
-    $this->additional_fields['nid'] = array('table' => 'node', 'field' => 'nid');
   }
 
   function option_definition() {

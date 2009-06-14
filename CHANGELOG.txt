@@ -4,6 +4,7 @@
 
 -- #490846. Batch management of user assignment to domains.
 -- #486370. Local module needs special handling.
+-- #485762 by BWPanda. Views error in loading NID for domains.
 
 13-JUN-2009
 
