@@ -17,6 +17,7 @@ CONTENTS
 2.2   Server Configuration
 2.3   Setting DOMAIN_INSTALL_RULE
 2.4   Setting DOMAIN_SITE_GRANT
+2.5   Setting DOMAIN_ASSIGN_USERS
 3.   Installing the Module
 3.1   After Installation
 4.  Configuring settings.php
@@ -200,6 +201,29 @@ On install, setting this value to TRUE will assign all current content to
 be viewable on all domains.
 
 Normally, you will not need to edit this value.
+
+----
+2.5 Setting DOMAIN_ASSIGN_USERS
+
+At the top of the domain.module file, you will find this line:
+
+  define('DOMAIN_ASSIGN_USERS', TRUE);
+
+After you install the Domain Access module, all new users who
+register will automatically be assign to the domain from which
+their account was created. This value is used to determine
+advanced editing access and can be used by modules such as
+Domain Strict.
+
+On install, setting this value to TRUE will assign all current users
+to be members of the default domain. Set the value to FALSE
+and the module will not assign users to any domains.
+
+Normally, you will not need to edit this value.
+
+After installation and configuration, users with the appropriate
+permissions may batch assign users to domains from
+Administer > User Management > Users.
 
 ----
 3.   Installing the Module

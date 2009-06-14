@@ -20,10 +20,16 @@
 define('DOMAIN_INSTALL_RULE', TRUE);
 
 /**
- * Defines whether to show affiliated content on all domains..
+ * Defines whether to show affiliated content on all domains.
  * You may alter this variable before installing the module. See README.txt.
  */
 define('DOMAIN_SITE_GRANT', TRUE);
+
+/**
+ * Defines whether to assign users to the default domain on install.
+ * You may alter this variable before installing the module. See README.txt.
+ */
+define('DOMAIN_ASSIGN_USERS', TRUE);
 
 /**
  * Adds the domain user data to the $user object.
@@ -211,6 +217,10 @@ function domain_perm() {
  */
 function domain_theme() {
   $themes = array(
+    'domain_admin_users_form' => array(
+      'arguments' => array('form' => array()),
+      'file' => 'domain.admin.inc',
+    ),
     'domain_batch_form' => array(
       'arguments' => array('form' => array()),
       'file' => 'domain.admin.inc',
@@ -426,6 +436,112 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
 }
 
 /**
+ * Implement hook_user_operations().
+ */
+function domain_user_operations() {
+  if (!user_access('assign domain editors')) {
+    return;
+  }
+  return array(
+    'domain' => array(
+      'label' => t('Assign users to domains'),
+      'callback' => 'domain_user_operation_assign',
+    ),
+  );
+}
+
+/**
+ * Implement hook_form_alter().
+ */
+function domain_form_user_admin_account_alter(&$form, $form_state) {
+  if (!user_access('assign domain editors')) {
+    return;
+  }
+  $options = array();
+  foreach (domain_domains() as $data) {
+    // Cannot pass zero in checkboxes.
+    ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
+    // The domain must be valid.
+    if ($data['valid'] || user_access('administer domains')) {
+      $options[$key] = check_plain($data['sitename']);
+    }
+  }
+  $form['domain'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Affiliate editor options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#prefix' => '<div class="description">'. t('If you select <em>Assign users to domains</em> above, you should confirm the <em>Affiliate editor options</em> settings below.') .'</div>',
+    '#weight' => -1,
+  );
+  $form['domain']['domains'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Assign to'),
+    '#options' => $options,
+    '#required' => FALSE,
+    '#description' => t('Select which affiliates these users should belong to. <em>Note: this will erase any current assignment for the selsected users.</em>'),
+    '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
+  );
+  // Add our domain elements.
+  foreach (array_keys($form['name']) as $uid) {
+    $form['user_domains'][$uid][0] = array('#value' => theme('item_list', _domain_user_list($uid)));
+  }
+  $form['#theme'] = 'domain_admin_users_form';
+  $form['#submit'][] = 'domain_update_users';
+}
+
+/**
+ * Helper function to get the names of all domains for a user.
+ *
+ * @param $uid
+ *   The user id.
+ * @return
+ * An array of domain names.
+ */
+function _domain_user_list($uid) {
+  $temp_account = new stdClass;
+  $temp_account->uid = $uid;
+  $list = domain_get_user_domains($temp_account, FALSE);
+  $domains = array();
+  foreach ($list as $domain_id) {
+    if ($domain_id == -1) {
+      $domain_id = 0;
+    }
+    $domains[] = check_plain(db_result(db_query("SELECT sitename FROM {domain} WHERE domain_id = %d ORDER BY domain_id ASC", $domain_id)));
+  }
+  return $domains;
+}
+
+/**
+ * Callback for domain_content_node_operations().
+ *
+ * This callback is required, but we actually do our action inside
+ * of domain_update_users().
+ */
+function domain_user_operation_assign($accounts) {
+}
+
+/**
+ * FormsAPI to handle the batch update of users.
+ */
+function domain_update_users($form, &$form_state) {
+  $values = $form_state['values'];
+  if ($values['operation'] != 'domain') {
+    return;
+  }
+  foreach ($values['accounts'] as $uid) {
+    db_query("DELETE FROM {domain_editor} WHERE uid = %d", $uid);
+    foreach (array_filter($values['domains']) as $domain_id) {
+      // Cannot use 0 as a checkbox.
+      if ($domain_id == -1) {
+        $domain_id = 0;
+      }
+      db_query("INSERT INTO {domain_editor} (uid, domain_id) VALUES (%d, %d)", $uid, $domain_id);
+    }
+  }
+}
+
+ /**
  * Implement hook_cron()
  *
  * This function invokes hook_domaincron() and allows
@@ -1195,15 +1311,16 @@ function domain_set_default_grant() {
 
 /**
  * Upon enabling this module, store the default view grant
- * in the {node_access} table.
+ * in the {node_access} table. Then it assigns all users to
+ * the primary domain.
  */
 function domain_enable() {
   // Set the default 'domain_all' grant for special pages.
   domain_set_default_grant();
   // Thanks to the new way that batch processing of node grants is handled, we have to
   // manually define our records if none are present.
-  $count = db_result(db_query("SELECT COUNT(*) FROM {domain_access}"));
-  if ($count == 0) {
+  $count = (bool) db_result(db_query("SELECT COUNT(*) FROM {domain_access}"));
+  if (empty($count)) {
     $rule = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
     $site = DOMAIN_SITE_GRANT;
     $nids = db_query("SELECT nid FROM {node}");
@@ -1215,6 +1332,17 @@ function domain_enable() {
         // By design, all nodes are assigned to the master domain.
         db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_id');
       }
+    }
+  }
+  // Add users to the {domain_editor} table, but skip user 0.
+  if (!DOMAIN_ASSIGN_USERS) {
+    return;
+  }
+  $result = db_query("SELECT uid FROM {users} WHERE uid > 0");
+  while ($data = db_fetch_object($result)) {
+    $check = (bool) db_result(db_query("SELECT COUNT(*) FROM {domain_editor} WHERE uid = %d", $data->uid));
+    if (empty($check)) {
+      db_query("INSERT INTO {domain_editor} VALUES (%d, %d)", $data->uid, 0);
     }
   }
 }

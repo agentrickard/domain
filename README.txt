@@ -56,6 +56,7 @@ CONTENTS
 4.8.2   Domain Node Types
 4.9   Batch Updating
 4.10  Assigning Users to Domains
+4.11 Batch Assignment of Users to Domains
 5.  Blocks
 5.1   Block -- Domain Switcher
 5.2   Block -- Domain Access Information
@@ -929,6 +930,28 @@ from which they enter the registration form.
 Settings for the 'new user' are permanently saved to the user account.
 
 See http://drupal.org/node/313629 for some background about this feature.
+
+----
+4.11 Batch Assignment of Users to Domains
+
+In 6.x.2 and higher, users with the 'administer users' and 'assign domain
+editors' permissions may use the User administration page to batch assign
+users to domains.
+
+This feature is useful if you need to convert a group of editorial users to
+become domain editors.
+
+To use this feature, navigate to Administer > User management > Users.
+Look for the 'Assign users to domains' option in the 'Update options' select
+form. Choose this operation and then use the 'Affiliate editor options'
+fieldset to select the domains you wish to assgin users to.
+
+Select the desired users and hit the Update button.
+
+Note that this form also shows you a list of domains that a user is
+currently assigned to.
+
+If these elements do not appear, you do not have the proper permissions.
 
 ----
 5.  Blocks

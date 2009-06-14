@@ -1,5 +1,9 @@
 // $Id$
 
+14-JUN-2009
+
+-- #490846. Batch management of user assignment to domains.
+
 13-JUN-2009
 
 -- #490878. Make the batch action list easier to read.
