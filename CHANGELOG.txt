@@ -3,6 +3,7 @@
 14-JUN-2009
 
 -- #490846. Batch management of user assignment to domains.
+-- #486370. Local module needs special handling.
 
 13-JUN-2009
 

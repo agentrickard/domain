@@ -49,6 +49,7 @@ function domain_conf_form($form_state, $domain) {
   if (!empty($data)) {
     $settings = unserialize($data);
   }
+
   $default_group = t('Site configuration');
   foreach ($batch as $key => $action) {
     if ($action['#domain_action'] != 'domain_conf') {
@@ -87,6 +88,12 @@ function domain_conf_form($form_state, $domain) {
     '#default_value' => $domain['sitename'],
     '#weight' => -100,
   );
+
+  // Locale module is a little tricky, so handle it properly.
+  $str = t('Language settings');
+  if (isset($form[$str]['language_default']) && !isset($settings['language_default'])) {
+    $form[$str]['language_default']['#default_value'] = NULL;
+  }
 
   // Grab any extra elements defined by other modules.
   $extra = domain_conf_api(TRUE);

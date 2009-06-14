@@ -37,16 +37,18 @@ function domain_conf_domain_bootstrap_full($domain) {
     // Overwrite the $conf variables.
     foreach ($settings as $key => $value) {
       // Language handling is a special case.
-      if ($key == 'language_default') {
+      $language = (bool) db_result(db_query("SELECT status FROM {system} WHERE name = 'locale' AND type = 'module'"));
+      if ($key == 'language_default' && $language) {
         $temp = db_fetch_object(db_query("SELECT * FROM {languages} WHERE language = '%s'", $value));
         if (!empty($temp)) {
           $value = $temp;
-          global $language;
-          $language = $temp;
+          $GLOBALS['language'] = $temp;
+          $conf[$key] = $value;
         }
       }
-      // We store the language variable here as well, for forms.
-      $conf[$key] = $value;
+      else {
+        $conf[$key] = $value;
+      }
     }
   }
 }
@@ -361,24 +363,26 @@ function domain_conf_domainbatch() {
     '#group' => t('Timezone settings'),
   );
   // Change the default language.
-  $languages = domain_conf_language_options();
-  $default = language_default();
-  $batch['language_default'] = array(
-    '#form' => array(
-      '#title' => t('Default language'),
-      '#type' => 'select',
-      '#options' => $languages,
-      '#description' => t('The default language to use for this domain. <em>Note: This setting only works with path-based language switching.</em>'),
-    ),
-    '#domain_action' => 'domain_conf',
-    '#system_default' => $default->language,
-    '#override_default' => TRUE,
-    '#variable' => '', // deliberately empty, since this is an array and cannot be set.
-    '#meta_description' => t('Set the default language for all domains.'),
-    '#data_type' => 'string',
-    '#weight' => -3,
-    '#group' => t('Language settings'),
-  );
+  if (module_exists('locale')) {
+    $languages = domain_conf_language_options();
+    $default = language_default();
+    $batch['language_default'] = array(
+      '#form' => array(
+        '#title' => t('Default language'),
+        '#type' => 'select',
+        '#options' => $languages,
+        '#description' => t('The default language to use for this domain. <em>Note: This setting only works with path-based language switching.</em>'),
+      ),
+      '#domain_action' => 'domain_conf',
+      '#system_default' => $default->language,
+      '#override_default' => TRUE,
+      '#variable' => '', // deliberately empty, since this is an array and cannot be set.
+      '#meta_description' => t('Set the default language for all domains.'),
+      '#data_type' => 'string',
+      '#weight' => -3,
+      '#group' => t('Language settings'),
+    );
+  }
   // Toggle the site offline status.
   $batch['site_offline'] = array(
     '#form' => array(
