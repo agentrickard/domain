@@ -26,6 +26,7 @@ CONTENTS
 2.3   Creating Domain Records
 2.4   Setting DOMAIN_INSTALL_RULE
 2.5   Setting DOMAIN_SITE_GRANT
+2.6   Setting DOMAIN_ASSIGN_USERS
 3.  Permissons
 3.1   Module Permissions
 3.2   Normal Usage
@@ -76,8 +77,11 @@ CONTENTS
 ----
 1.  Introduction
 
+Before using the module, you should read the installation instructions found
+in INSTALL_QUICKSTART.txt.
+
 The Domain Access module group is designed to run an affiliated network of sites
-from a single Drupal installation.  The module thus allows you to share users,
+from a single Drupal installation.  The module allows you to share users,
 content, and configurations across a group of sites such as:
 
   - example.com
@@ -105,7 +109,7 @@ typical Drupal privilege to 'administer nodes.'
 For more information about Domain Access privileges, see section 3.
 
 For more information about node_access(), see
-http://api.drupal.org/api/group/node_access/5
+http://api.drupal.org/api/group/node_access/6
 
 ----
 1.1 Use-Case
@@ -230,17 +234,21 @@ README.txt file.
 WARNING: The Domain Access module assumes that you have already installed
 and configured your Drupal site.  Please do so before continuing.
 
+Installing the module requires that you share a single copy of settings.php
+for all domains that will be registered with Domain Access.
+
+You must also add code to that settings.php file in order to load the domain
+handling code. See INSTALL_QUICKSTART.txt for instructions.
+
 For detailed instructions, see INSTALL.txt.
 
-To install the module, simply untar the download and put it in your site's
-modules directory.  After reading this document, enable the module normally.
+After you have completed the steps outlined by the installer, you may enable
+the module normally. When you enable the module, it will create a {domain} table
+in your Drupal database.
 
-When you enable the module, it will create a {domain} table in your Drupal
-database.
-
-All existing nodes on your site will be assigned to the default domain for your
-web site and to all affiliates.  If you wish to alter this behavior, see
-sections 2.4 through 2.6.
+All existing nodes and users on your site will be assigned to the default domain
+for your web site. Existing content will be set to be visible on all new
+domains.  If you wish to alter this behavior, see sections 2.4 through 2.6.
 
 ----
 2.1 Patch to Drupal Core
@@ -361,6 +369,29 @@ be viewable on all domains.
 Normally, you will not need to edit this value.
 
 ----
+2.6   Setting DOMAIN_ASSIGN_USERS
+
+At the top of the domain.module file, you will find this line:
+
+  define('DOMAIN_ASSIGN_USERS', TRUE);
+
+After you install the Domain Access module, all new users who
+register will automatically be assign to the domain from which
+their account was created. This value is used to determine
+advanced editing access and can be used by modules such as
+Domain Strict.
+
+On install, setting this value to TRUE will assign all current users
+to be members of the default domain. Set the value to FALSE
+and the module will not assign users to any domains.
+
+Normally, you will not need to edit this value.
+
+After installation and configuration, users with the appropriate
+permissions may batch assign users to domains from
+Administer > User Management > Users.
+
+----
 3.  Permissions
 
 After enabling the module, go to Access Control to configure the module's
@@ -447,8 +478,8 @@ The Domain Access module has the following permissions:
 
   NOTE: Users who are assgined _none_ of these permissions and cannot 
   'set domain access' will have the default form values passed as hidden fields. 
-  This is the default option.  It will assign all content to the domain from which 
-  the form is entered.
+  This is the default option.  It will assign all content to the domain from
+  which the form is entered.
 
 Note also that the user is not given the ability to promote content to
 'all affiliates'.  Users who need this ability should be given the 'set domain
@@ -478,13 +509,14 @@ TYPE nodes' permissions provided by Drupal's core Node module.
 These permissons grant the ability for a user to edit and delete all nodes of a 
 given type.
 
-In the Domain Access model, these permissions are not used in favor of the provided
-'edit domain nodes' and 'delete domain nodes' permissions.  These permissions 
-allow editors only to edit (and delete) nodes that belong to their domain.
+In the Domain Access model, these permissions are not used in favor of the
+provided 'edit domain nodes' and 'delete domain nodes' permissions.  These 
+permissions  allow editors only to edit (and delete) nodes that belong to their
+domain.
 
-To enable this feature, you should grant the 'edit domain nodes' and (optionally)
-the 'delete domain nodes' permission to some roles. Then assign individual
-users accounts to specific domains to assign them as Domain Editors.
+To enable this feature, you should grant the 'edit domain nodes' and
+(optionally) the 'delete domain nodes' permission to some roles. Then assign
+individual users accounts to specific domains to assign them as Domain Editors.
 
 NOTE: Users with the 'delete domain nodes' permission must also be given
 the 'edit domain nodes' permission in order to delete content.
@@ -566,6 +598,9 @@ Defines the default behavior for content added to your site.  By design, the
 module automatically assigns all content to the currently active domain.
 If this value is set to 'Show on all sites,' then all new content will be
 assigned to all sites _in addition to_ the active domain.
+
+If you set this value to 'Only show on selected sites,' you must configure
+the Node type settings described in section 4.8.2.
 
 ----
 4.2.2   Debugging Status
@@ -896,8 +931,9 @@ assign users to domains basd on the user's site roles.
 Click on the 'User defaults' tab to see the settings available.
 
 By design, these settings are always added to a user's domains when a page
-is requested. That is, if you assign all 'authenticated users' to your first domain,
-one.example.com, then all authenticated users will be assigned to that domain.
+is requested. That is, if you assign all 'authenticated users' to your first
+domain, one.example.com, then all authenticated users will be assigned to that
+domain.
 
 This setting is most useful under the following conditions:
 

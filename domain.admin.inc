@@ -177,7 +177,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#required' => TRUE,
     '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
     '#options' => array(1 => t('Show on all affiliate sites'), 2 => t('Only show on selected sites')),
-    '#description' => t('If set, this value will automatically assign new content to all sites. <a href="!url">Node-type specific settings</a> are also available.', array('!url' => url('admin/build/domain/advanced')))
+    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.<br />If set to <em>Only show on selected sites</em>, you must configure the <a href="!url">Node-type specific settings</a>.', array('!url' => url('admin/build/domain/advanced')))
   );
 
   $form['domain_behavior']['domain_debug'] = array(

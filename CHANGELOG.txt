@@ -1,5 +1,9 @@
 // $Id$
 
+19-JUN-2009
+
+-- #477290 by DrupalFan. Clarifies some documentation.
+
 14-JUN-2009
 
 -- #490846. Batch management of user assignment to domains.
