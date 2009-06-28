@@ -6,6 +6,7 @@
 -- Adds domain_get_primary_table($table) escaping function.
 -- #486370 by jaxpax. Fixes error with local module handling.
 -- #504529. Adds domain_get_domain() as suggested by wildkatana.
+-- #501116 by nonsie. Fixes errors when menu module is disabled.
 
 19-JUN-2009
 
