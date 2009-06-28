@@ -413,7 +413,7 @@ function domain_prefix_form_submit($form, &$form_state) {
             // TODO: Make this a nice update function with a progress bar.
             $data = db_create_table_sql($newtable, $table_schema);
             db_query($data[0]);
-            db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
+            domain_prefix_insert_data($table_schema, $newtable, $sourcetable);
             if ($msg) {
               drupal_set_message(t('!string table copied.', array('!string' => $newtable)));
             }
@@ -426,7 +426,7 @@ function domain_prefix_form_submit($form, &$form_state) {
         else if ($value == DOMAIN_PREFIX_UPDATE) {
           if ($exists > 0) {
             db_query("TRUNCATE TABLE {%s}", $newtable);
-            db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
+            domain_prefix_insert_data($table_schema, $newtable, $sourcetable);
             if ($msg) {
               drupal_set_message(t('!string table updated from source.', array('!string' => $newtable)));
             }
@@ -457,6 +457,46 @@ function domain_prefix_form_submit($form, &$form_state) {
         $form_state['values'][$key] = $value;
       }
     }
+  }
+}
+
+/**
+ * Insert data from one table into another.
+ *
+ * We need a function here to prevent accidental errors when
+ * copying or updating serial fields that have a 0 element, like {users}.
+ *
+ * @param $schema
+ *   The table definition provided by hook_schema.
+ * @param $newtable
+ *   The name of the table being created or updated.
+ * @param $sourcetable
+ *   The name of the source data table.
+ */
+function domain_prefix_insert_data($schema, $newtable, $sourcetable) {
+  $zero_row = FALSE;
+  // Check the source table for serial fields that include a zero row.
+  foreach ($schema['fields'] as $field => $info) {
+    if ($info['type'] == 'serial') {
+      $zero_row = db_fetch_array(db_query("SELECT * FROM {%s} WHERE %s = 0", $sourcetable, $field));
+    }
+    break;
+  }
+
+  // If no zero row, then we are done.
+  if (empty($zero_row)) {
+    // Insert the records.
+    db_query("INSERT INTO {%s} SELECT * FROM {%s}", $newtable, $sourcetable);
+    return;
+  }
+  // Run the query, but treat row zero with care.
+  db_query("INSERT INTO {%s} SELECT * FROM {%s} WHERE %s > 0", $newtable, $sourcetable, $field);
+  db_query("INSERT INTO {%s} SELECT * FROM {%s} WHERE %s = 0", $newtable, $sourcetable, $field);
+  $id = db_last_insert_id($newtable, $field);
+  db_query("UPDATE {%s} SET %s = 0 WHERE %s = %d", $newtable, $field, $field, $id);
+  // On MySQL at least, we can safely modify the autoincrement sequence.
+  if ($GLOBALS['db_type'] == 'mysqli') {
+    db_query("ALTER TABLE %s AUTO_INCREMENT = %d", $newtable, $id);
   }
 }
 

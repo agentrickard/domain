@@ -7,6 +7,8 @@
 -- #486370 by jaxpax. Fixes error with local module handling.
 -- #504529. Adds domain_get_domain() as suggested by wildkatana.
 -- #501116 by nonsie. Fixes errors when menu module is disabled.
+-- #445386 by mindgame. Domain Prefix fails on {users} and other tables that
+    autoincrement and have a zero row.
 
 19-JUN-2009
 
