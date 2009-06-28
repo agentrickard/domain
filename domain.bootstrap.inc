@@ -81,7 +81,8 @@ function _domain_bootstrap($phase) {
       // Make sure database is loaded
       _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
       // If the module has been disabled, stop loading.
-      $check = db_result(db_query("SELECT status FROM {system} WHERE name = 'domain' AND type = 'module'"));
+      $table = domain_get_primary_table('system');
+      $check = db_result(db_query("SELECT status FROM $table WHERE name = 'domain' AND type = 'module'"));
       if (empty($check)) {
         return NULL;
       }
@@ -164,7 +165,8 @@ function _domain_bootstrap_modules_load() {
 function _domain_bootstrap_modules_get() {
   global $conf;
   $key = 'domain_bootstrap_modules';
-  $conf[$key] = unserialize(db_result(db_query("SELECT value FROM {variable} WHERE name = '%s'", $key)));
+  $table = domain_get_primary_table('variable');
+  $conf[$key] = unserialize(db_result(db_query("SELECT value FROM $table WHERE name = '%s'", $key)));
   return $conf[$key];
 }
 
@@ -205,3 +207,34 @@ function _domain_bootstrap_invoke_all() {
   }
   return $return;
 }
+
+/**
+ * Escape the names of the default tables for variable lookups.
+ *
+ * There are a few cases where we must directly query data from the
+ * primary site's database. Due to table prefixing and Domain Prefix, we
+ * must ensure that we are querying the correct table.
+ *
+ * When using this function, you should insert the $table result directly
+ * into your query string, or use token replacement '%s' syntax. Do not
+ * enclose the table name in brackets {}, as that defeats the purpose of
+ * this function.
+ *
+ * @see _domain_conf_load_primary()
+ *
+ * @param $table
+ *   The name of the base table to lookup.
+ * @return
+ *   A query-safe table name pointing to the primary domain.
+ */
+function domain_get_primary_table($table) {
+  global $db_prefix;
+  if (is_string($db_prefix)) {
+    $table = $db_prefix . $table;
+  }
+  else if (is_array($db_prefix)) {
+    $table = $db_prefix['default'] . $table;
+  }
+  return db_escape_table($table);
+}
+

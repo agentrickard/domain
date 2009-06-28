@@ -600,25 +600,26 @@ function domain_conf_language_options() {
  *   Otherwise, return the settings data for the primary domain.
  */
 function _domain_conf_load_primary($unset = FALSE) {
-  global $db_prefix;
   static $settings;
 
-  if (empty($settings)) {
-    $cache = 'cache';
+  if (!isset($settings)) {
     // Account for table prefixing.
-    if (empty($db_prefix)) {
-      $cache_table = $cache;
-    }
-    else if (is_string($db_prefix)) {
-      $cache_table = $db_prefix . $cache;
-    }
-    else {
-      $cache_table = $db_prefix['default'] . $cache;
-    }
-    $cache_table = db_escape_table($cache_table);
+    $cache_table = domain_get_primary_table('cache');
     // Load the query.
     $data = db_result(db_query("SELECT data FROM $cache_table WHERE cid = 'variables'"));
-    $settings = unserialize($data);
+    if (!empty($data)) {
+      $settings = unserialize($data);
+    }
+    // If the cache has been cleared, this data will be empty.
+    // In this case, grab the data directly from the base {variable} table.
+    else {
+      $variable_table = domain_get_primary_table('variable');
+      $result = db_query("SELECT name, value FROM $variable_table");
+      while ($vars = db_fetch_array($result)) {
+        $data[$vars['name']] = unserialize($vars['value']);
+      }
+      $settings = $data;
+    }
   }
   // Do we reset the global or just return data?
   if ($unset) {

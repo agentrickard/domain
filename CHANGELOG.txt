@@ -1,5 +1,10 @@
 // $Id$
 
+28-JUN-2009
+
+-- #469856 by BWPanda and nonsie. Corrects errors with domain_conf_variable_get().
+-- Adds domain_get_primary_table($table) escaping function.
+
 19-JUN-2009
 
 -- #477290 by DrupalFan. Clarifies some documentation.
