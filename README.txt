@@ -786,7 +786,7 @@ module.
 4.3.8   Redirect Notification
 
 If issuing a redirect from an invalid domain, print a message to the screen
-telling the use that they following an outdated link. This is useful for cases
+telling the user that he following an outdated link. This is useful for cases
 where you have migrated a site or its content onto Domain Access.
 
 By default this behavior is turned on. It will not appear if Wildcard
