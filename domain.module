@@ -934,6 +934,19 @@ function domain_set_domain($domain_id, $bootstrap = FALSE) {
 }
 
 /**
+ * Return the currently active domain.
+ *
+ * This value is stored in a global, but having a function
+ * will let us replace that with a static function in D7.
+ *
+ * @return
+ *   An array of data defining the currently active domain.
+ */
+function domain_get_domain() {
+  return $GLOBALS['_domain'];
+}
+
+/**
  * Check to see if a redirect to the primary domain is needed.
  *
  * If TRUE, issue a redirect and print a message.
