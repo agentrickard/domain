@@ -277,6 +277,7 @@ function domain_configure_form($user_submitted = FALSE) {
       This feature requires the hook_url_alter() patch.')
   );
 
+
   $options = array('-1' => t('Do not change domain'));
   foreach (domain_domains() as $data) {
     // The domain must be valid.
@@ -298,6 +299,20 @@ function domain_configure_form($user_submitted = FALSE) {
     '#default_value' => variable_get('domain_www', 0),
     '#options' => array(0 => t('Process all host requests normally'), 1 => t('Treat www.*.example.com as an alias of *.example.com')),
     '#description' => t('If set, calls to www.* will be treated as if the www. did not exist.')
+  );
+
+  $form['domain_advanced']['domain_redirect_wildcards'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable wildcard domain redirection'),
+    '#default_value' => variable_get('domain_redirect_wildcards', TRUE),
+    '#description' => t('When using Domain Access with wildcard DNS, an invalid domain (e.g. a misspelling) results in an alias of the default domain rather than a redirect. In general you will want to issue a redirect, to avoid spiders indexing wrong domains, or people making bookmarks to non-existant domains. However, in some cases you do not want this redirect to take place. For example when testing or developing on test.example.com, or your localhost.'),
+  );
+
+  $form['domain_advanced']['domain_redirect_alert'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Notify user of wildcard redirection'),
+    '#default_value' => variable_get('domain_redirect_alert', TRUE),
+    '#description' => t('If redirecting invalid domains to the primary domain, print a message to the user, telling them to update any page bookmarks.'),
   );
 
   $form['domain_all'] = array(

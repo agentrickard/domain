@@ -56,10 +56,13 @@ function domain_init() {
   // If return is -1, then the DNS didn't match anything, so use defaults.
   if ($_domain == -1) {
     $_domain = domain_default();
-    // If the request was not for the primary domain, send the user there.  See http://drupal.org/node/293453.
-    if (!empty($_domain['subdomain']) && $_subdomain != $_domain['subdomain']) {
+    // If the request was not for the primary domain, send the user there.
+    // See http://drupal.org/node/293453 and http://drupal.org/node/321071.
+    if (variable_get('domain_redirect_wildcards', TRUE) && !empty($_domain['subdomain']) && $_subdomain != $_domain['subdomain']) {
       $request = domain_get_uri($_domain);
-      drupal_set_message(t('You have followed an incorrect link to this website.  Please update your links and bookmarks to <a href="!url">!url</a>.', array('!url' => $request)));
+      if (variable_get('domain_redirect_alert', TRUE)) {
+        drupal_set_message(t('You have followed an incorrect link to this website.  Please update your links and bookmarks to <a href="!url">!url</a>.', array('!url' => $request)));
+      }
       drupal_goto($request);
     }
   }

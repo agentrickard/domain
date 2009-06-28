@@ -1,5 +1,9 @@
 // $Id$
 
+28-JUN-2009
+
+-- #321071 patch by Bèr Kessels. Makes wildcard redirection configurable.
+
 14-JUN-2009
 
 -- Created 5.x.11 release.

@@ -51,6 +51,8 @@ CONTENTS
 4.3.4   Default Source Domain
 4.3.5   WWW Prefix Handling
 4.3.6   Node Access Settings
+4.3.7   Wildcard Redirection
+4.3.8   Redirect Notification
 4.4   Special Page Requests
 4.4.1   Cron Handling
 4.5   Node Link Patterns
@@ -735,7 +737,6 @@ required IF:
   -- You want to strictly enforce access permissions by requiring
   both Domain Access and your other module to grant permission.
 
-
 By design, the node access system in Drupal 5 is a permissive system.
 That is, if you are using multiple node access modules, the permissions
 are checked using an OR syntax.
@@ -761,6 +762,38 @@ For more information, see http://drupal.org/node/191375.
 
 Enabling this feature requires the multiple_node_access patch discussed
 in 2.1.1.
+
+----
+4.3.7   Wildcard Redirection
+
+When using Domain Access with wildcard DNS, an invalid domain (e.g. a
+misspelling) results in an alias of the default domain rather than a redirect.
+In general you will want to issue a redirect, to avoid spiders indexing wrong
+domains, or people making bookmarks to non-existant domains. However, in some
+cases you do not want this redirect to take place. For example when testing or
+developing on test.example.com, or your localhost.
+
+Check the box if you wish to redirect invalid domain requests to the default
+domain. Note that an "invalid" request is a domain that is recognized by your
+web server (like foo.example.com) but not registered with Domain Access.
+
+By default this behavior is turned on.
+
+NOTE: This behavior is deprecated in Drupal 6 in favor of the Domain alias
+module.
+
+----
+4.3.8   Redirect Notification
+
+If issuing a redirect from an invalid domain, print a message to the screen
+telling the use that they following an outdated link. This is useful for cases
+where you have migrated a site or its content onto Domain Access.
+
+By default this behavior is turned on. It will not appear if Wildcard
+Redirection is not enabled.
+
+NOTE: This behavior is deprecated in Drupal 6 in favor of the Domain alias
+module.
 
 ----
 4.4   Special Page Requests
