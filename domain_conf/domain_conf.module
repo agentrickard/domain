@@ -37,13 +37,17 @@ function domain_conf_domain_bootstrap_full($domain) {
     // Overwrite the $conf variables.
     foreach ($settings as $key => $value) {
       // Language handling is a special case.
-      $language = (bool) db_result(db_query("SELECT status FROM {system} WHERE name = 'locale' AND type = 'module'"));
-      if ($key == 'language_default' && $language) {
-        $temp = db_fetch_object(db_query("SELECT * FROM {languages} WHERE language = '%s'", $value));
-        if (!empty($temp)) {
-          $value = $temp;
-          $GLOBALS['language'] = $temp;
-          $conf[$key] = $value;
+      if ($key == 'language_default') {
+        $table = domain_get_primary_table('system');
+        $language = (bool) db_result(db_query("SELECT status FROM $table WHERE name = 'locale' AND type = 'module'"));      
+        if ($language) {
+          $table = domain_get_primary_table('languages');
+          $temp = db_fetch_object(db_query("SELECT * FROM $table WHERE language = '%s'", $value));
+          if (!empty($temp)) {
+            $value = $temp;
+            $GLOBALS['language'] = $temp;
+            $conf[$key] = $value;
+          }
         }
       }
       else {

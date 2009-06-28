@@ -4,6 +4,7 @@
 
 -- #469856 by BWPanda and nonsie. Corrects errors with domain_conf_variable_get().
 -- Adds domain_get_primary_table($table) escaping function.
+-- #486370 by jaxpax. Fixes error with local module handling.
 
 19-JUN-2009
 
