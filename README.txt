@@ -872,8 +872,15 @@ Both the Domain and the Site name are required to be unique values.
 After you create a record, you may edit or delete it as you see fit.
 
 NOTE: As a result of module installation, you will never have a Domain with
-the domain_id of 2 if you did not use Domain Access prior to 6.x.2.0. This
+the domain_id of 1 if you did not use Domain Access prior to 6.x.2.0. This
 is by design and will not affect the module.
+
+NOTE: When editing a domain record, Domain Access runs an http request
+to see if the domain is responding properly. This test checks for the presence
+of the module's the file '200.png' inside the module's 'test' directory.
+If a 200 "found" reply is not returned, you will see an message warning you
+that your DNS may not be configured properly.  This message is intended
+to help you debug your DNS configuration and may be safely ignored.
 
 ----
 4.8 Node Settings

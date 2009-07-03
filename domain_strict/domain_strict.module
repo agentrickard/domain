@@ -29,7 +29,7 @@ function domain_strict_domaingrants(&$grants, $account, $op) {
     return;
   }
   // Erase the default domain_id grants.
-  unset($grants['domain_id']);
+  $grants['domain_id'] = array();
   // Get the user-assigned domains.
   $domains = domain_get_user_domains($account);
   if (!empty($domains)) {

@@ -3,6 +3,7 @@
 03-JUL-2009
 
 -- #509170 by anrikun. Bad variable handling breaks domain views access settings.
+-- #509356. Cleans up some error handling and Domain Strict usage. Adds test png.
 
 28-JUN-2009
 

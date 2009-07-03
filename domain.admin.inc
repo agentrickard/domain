@@ -625,7 +625,7 @@ function domain_advanced_form($form_state) {
  * An array containing the record from the {domain} table
  */
 function domain_check_response($domain) {
-  $url = domain_get_path($domain);
+  $url = domain_get_path($domain) . drupal_get_path('module', 'domain') .'/tests/200.png';
   $response = drupal_http_request($url);
   if ($response->code != 200) {
     drupal_set_message(t('%server is not responding and may not be configured correctly at the server level.
