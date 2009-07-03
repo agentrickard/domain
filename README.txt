@@ -877,7 +877,8 @@ is by design and will not affect the module.
 
 NOTE: When editing a domain record, Domain Access runs an http request
 to see if the domain is responding properly. This test checks for the presence
-of the module's the file '200.png' inside the module's 'test' directory.
+of the file '200.png' inside the module's 'test' directory.
+
 If a 200 "found" reply is not returned, you will see an message warning you
 that your DNS may not be configured properly.  This message is intended
 to help you debug your DNS configuration and may be safely ignored.
