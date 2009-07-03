@@ -1,5 +1,9 @@
 // $Id$
 
+03-JUL-2009
+
+-- #509170 by anrikun. Bad variable handling breaks domain views access settings.
+
 28-JUN-2009
 
 -- #469856 by BWPanda and nonsie. Corrects errors with domain_conf_variable_get().

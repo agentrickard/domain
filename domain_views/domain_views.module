@@ -100,18 +100,18 @@ function domain_views_get_grants($account = NULL)  {
   if (isset($grants[$account->uid])) {
     return $grants[$account->uid];
   }
-  $grants = domain_node_grants($account, 'view');
+  $user_grants = domain_node_grants($account, 'view');
   // Domain All gets in the way of normal grants.
-  if (!empty($grants['domain_all'])) {
-    $grants['domain_id'] = array($_domain['domain_id']);
-    _domain_views_alter_grants($grants);
+  if (!empty($user_grants['domain_all'])) {
+    $user_grants['domain_id'] = array($_domain['domain_id']);
+    _domain_views_alter_grants($user_grants);
   }
-  $grants[$account->uid] = $grants;
+  $grants[$account->uid] = $user_grants;
   return $grants[$account->uid];
 }
 
 /**
- * Helper function to middor hook_domaingrants().
+ * Helper function to hook_domaingrants().
  * This should be replaced by a drupal_alter().
  */
 function _domain_views_alter_grants(&$grants) {
