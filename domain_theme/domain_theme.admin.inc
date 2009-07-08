@@ -326,7 +326,7 @@ function domain_theme_settings_submit($form, &$form_state) {
   // If no record exists, we behave differently.
   $check = db_result(db_query("SELECT COUNT(*) FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme));
   if ($values['op'] == $values['reset'] && $check > 0) {
-    db_queryd("UPDATE {domain_theme} SET settings = NULL, filepath = NULL WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
+    db_query("UPDATE {domain_theme} SET settings = NULL, filepath = NULL WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
     drupal_set_message(t('The configuration options have been reset to their default values.'));
   }
   else {
