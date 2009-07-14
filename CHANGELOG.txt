@@ -1,5 +1,9 @@
 // $Id$
 
+14-JUL-2009
+
+-- #496936 by Skirr. Patch by nonsie. Fixed current domain Views filter.
+
 03-JUL-2009
 
 -- #509170 by anrikun. Bad variable handling breaks domain views access settings.
