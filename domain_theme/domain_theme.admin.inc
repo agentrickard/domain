@@ -264,7 +264,7 @@ function domain_theme_settings($theme, $domain) {
   // Write uploads to the proper directory?
   if ($domain['domain_id'] > 0) {
     global $conf;
-    $conf['file_directory_path'] .= '/domain-'. $domain['domain_id'];
+    $conf['file_directory_path'] = file_directory_path() .'/domain-'. $domain['domain_id'];
   }
 
   // If there are settings, we have to load ours.

@@ -31,7 +31,7 @@ by allowing site and affilaite editors to select a primary "source" domain for
 all content.
 
 When links are written to content from another domain using the SEO strict
-rules, cross-domain sesarching or the "Special Page Requests" rules, the links
+rules, cross-domain searching or the "Special Page Requests" rules, the links
 will go to the "source" domain specified for the node.
 
 ----
