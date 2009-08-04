@@ -1019,7 +1019,7 @@ function domain_roles_form($form_state) {
 
   $form['domain_roles'] = array(
     '#tree' => TRUE,
-    '#value' => '<p>'. t('You may set optional default domains for each site user role. These settings will be added to each user when determining the permissions the user has to view and edit content on your site. These settings are expressly needed if you allow <em?anonymouse users</em> to post content on your site.') .'</p>',
+    '#value' => '<p>'. t('You may set optional default domains for each site user role. These settings will be added to each user when determining the permissions the user has to view and edit content on your site. These settings are expressly needed if you allow <em>anonymous users</em> to post content on your site.') .'</p>',
   );
   $domains = array();
   foreach (domain_domains() as $key => $value) {
