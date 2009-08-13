@@ -457,12 +457,17 @@ function domain_conf_domainupdate($op, $domain, $form_state = array()) {
  * @return
  * An array of form elements according to the FormsAPI or an empty array.
  */
-function domain_conf_api($all = FALSE) {
+function domain_conf_api($all = FALSE, $settings = array()) {
   global $_domain;
   $options = array();
   $extra = module_invoke_all('domainconf', $_domain);
   if (!empty($extra)) {
     foreach ($extra as $key => $value) {
+      foreach (element_children($value) as $element) {
+        if (isset($value[$element]['#default_value']) && isset($settings[$element])) {
+          $value[$element]['#default_value'] = $settings[$element];
+        }
+      }
       if ($value['#domain_setting'] == TRUE || $all == TRUE) {
         // Discard the #domain_setting flag; it is not needed.
         unset($value['#domain_setting']);

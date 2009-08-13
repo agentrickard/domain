@@ -1,5 +1,9 @@
 // $Id$
 
+13-AUG-2009
+
+-- #547309 by yt2s. Fixes default value for domain_conf.inc values.
+
 23-JUL-2009
 
 -- #527426 patch by Alkkaaran, skizzo. Fixes file paths for domain theme.
