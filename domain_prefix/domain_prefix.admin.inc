@@ -20,7 +20,7 @@ function domain_prefix_get_tables($prefix = NULL) {
     $prefix = domain_prefix_get_prefix();
   }
 
-  // Get the database chema information.
+  // Get the database schema information.
   $schema = drupal_get_schema();
   ksort($schema);
 
@@ -221,7 +221,7 @@ function domain_prefix_form($form_state, $domain, $arguments = array()) {
   $default = domain_default();
   domain_set_domain($default['domain_id'], TRUE);
 
-  drupal_set_title(t('Table prefixing for !domain', array('!domain' => $domain['sitename'])));
+  drupal_set_title(t('Table prefixing for !domain', array('!domain' => check_plain($domain['sitename']))));
   // Remove the disallowed tables.
   $disallow = domain_prefix_disallow();
 
@@ -257,15 +257,22 @@ function domain_prefix_form($form_state, $domain, $arguments = array()) {
   else {
     $table_options = array();
     $settings = array();
+    // Process the existing tables.
     foreach ($tables as $name => $table) {
       if (array_key_exists($name, $default)) {
         $table_options[$table['tablename']] = $table;
         $settings[$table['tablename']] = $table['status'];
       }
     }
+    // Check to see if new tables have been added.
+    foreach ($default as $name => $table) {
+      if (!array_key_exists($name, $table_options)) {
+        $table_options[$name] = $table;
+      }
+    }
   }
 
-  // Sort them by module
+  // Sort the options by module.
   uasort($table_options, '_domain_prefix_sort');
   // All tables are prefixed as 'domain_#_'
   $prefix = domain_prefix_string($domain['domain_id']);

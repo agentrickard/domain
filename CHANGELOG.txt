@@ -1,5 +1,10 @@
 // $Id$
 
+17-AUG-2009
+
+-- #234430 patch by gsbc, mr2400, Terence Westaphal, et. al. Fixes table
+    previxing for newly added tables.
+
 13-AUG-2009
 
 -- #547309 by yt2s. Fixes default value for domain_conf.inc values.
