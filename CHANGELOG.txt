@@ -6,6 +6,7 @@
     previxing for newly added tables.
 -- #227751 patch by blackdog. Removes unusable items from node settings.
     Requires running update.php.
+-- #548140 by carvelhar. Fixes bug in Domain Content node saves.
 
 13-AUG-2009
 

@@ -313,7 +313,7 @@ function domain_content_update_nodes($form, &$form_state) {
         }
         if (!empty($domains)) {
           foreach ($domains as $id) {
-            db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, $id, 'domain_id', 1, 0, 0);
+            db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, $id, 'domain_id', 1, 1, 1);
             db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, $id, 'domain_id');
           }
         }
