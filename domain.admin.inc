@@ -600,11 +600,9 @@ function domain_advanced_form($form_state) {
   $form['domain_form']['intro'] = array('#value' => t('<p>When editors view domain-access restricted nodes, which form elements should be exposed?</p>'));
   $options = array(
     'log' => t('Log messages'),
-    'author' => t('Authoring information'),
     'options' => t('Publishing options'),
     'comment_settings' => t('Comment settings'),
     'path' => t('Path aliasing'),
-    'menu' => t('Menu settings'),
     'attachments' => t('File attachments')
   );
   ksort($options);
@@ -612,7 +610,7 @@ function domain_advanced_form($form_state) {
     '#type' => 'checkboxes',
     '#default_value' => variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path')),
     '#options' => $options,
-    '#description' => t('Some elements may not be editable for all users due to permission restrictions, specifically <em>authoring</a> and menu</em> settings.'),
+    '#description' => t('Some elements may not be editable for all users due to permission restrictions.'),
   );
   return system_settings_form($form);
 }

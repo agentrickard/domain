@@ -4,6 +4,8 @@
 
 -- #234430 patch by gsbc, mr2400, Terence Westaphal, et. al. Fixes table
     previxing for newly added tables.
+-- #227751 patch by blackdog. Removes unusable items from node settings.
+    Requires running update.php.
 
 13-AUG-2009
 

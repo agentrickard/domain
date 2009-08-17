@@ -160,3 +160,20 @@ function domain_update_6201() {
   db_query("DELETE FROM {domain_editor} WHERE NOT EXISTS (SELECT domain_id FROM {domain} WHERE {domain}.domain_id={domain_editor}.domain_id)");
   return $ret;
 }
+
+/**
+ * Updates to 6.x.2.
+ * 
+ * Removes the authoring and menu settings for the node form.
+ * 
+ */
+function domain_update_6202() {
+  $options = variable_get('domain_form_elements', array());
+  if (isset($options['author'])) {
+    unset($options['author']);
+  }
+  if (isset($options['menu'])) {
+    unset($options['menu']);
+  }
+  variable_set('domain_form_elements', $options);
+}
