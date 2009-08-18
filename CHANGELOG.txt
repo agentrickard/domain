@@ -1,5 +1,9 @@
 // $Id$
 
+18-AUG-2009
+
+-- Adds minor drush documentation.
+
 17-AUG-2009
 
 -- #234430 patch by gsbc, mr2400, Terence Westaphal, et. al. Fixes table
