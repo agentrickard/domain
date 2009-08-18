@@ -1,5 +1,9 @@
 // $Id$
 
+18-AUG-2009
+
+-- Adds minor drush documentation.
+
 28-JUN-2009
 
 -- #321071 patch by Bèr Kessels. Makes wildcard redirection configurable.

@@ -76,7 +76,7 @@ CONTENTS
 7.2   The $_domain Global
 7.3   Database Schema
 7.4   API
-8.  To Do
+7.5   drush and Domain Access
 
 
 
@@ -1268,3 +1268,15 @@ included in the download as API.php and can be viewed online at:
 The most important developer functions are the internal module hooks:
 
   http://therickards.com/api/group/hooks/Domain
+
+----
+7.5 drush and Domain Access
+
+Using drush, treat a Domain Access site like a multi-site install.  If you do not supply
+a URI flag, drush gets confused and will error out.
+
+Enter drush commands in the format:
+
+  >> drush --uri=www.example.com NORMAL COMMAND
+
+Generally, use the primary domain as the --uri flag.
