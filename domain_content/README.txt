@@ -68,6 +68,12 @@ The module uses the existing permissions from the Domain Access module.
 When the module is installed, a new top-level Administration menu is created.
 This menu is titled 'Affiliated Content'.
 
+If your site has fewer domains than set in the Domain List Size setting
+of the main module, then each affilite will be given its own menu entry.
+The default size of this variable is 25.
+
+See http://drupal.org/node/367752 for the rationale.
+
 ----
 3.1 Access Control
 

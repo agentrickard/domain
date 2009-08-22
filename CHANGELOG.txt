@@ -3,6 +3,7 @@
 22-AUG-2009
 
 -- #551532 by jseltzer. Switches to function_exists for the domain source check.
+-- #367752 by gildedgod, blackdog, nonsie. Fixes menu issues with lots of domains.
 
 18-AUG-2009
 

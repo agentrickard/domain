@@ -29,6 +29,67 @@ function domain_content_page() {
 }
 
 /**
+ * List the available domains for this user.
+ *
+ * See http://drupal.org/node/367752 for a discussion of the
+ * need for this function.
+ */
+function domain_content_list() {
+  global $user;
+  if (user_access('administer nodes') || user_access('review content for all domains')) {
+    // Return all domains.
+    $query = "SELECT domain_id, subdomain, sitename, scheme FROM {domain} d";
+  }
+  else {
+    if (empty($user->domain_user)) {
+      return drupal_access_denied();
+    }
+    // Cast the -1 as 0.
+    if (isset($user->domain_user[-1])) {
+      unset($user->domain_user[-1]);
+      $user->domain_user[0] = 0;
+    }
+    $query = "SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE domain_id IN (". db_placeholders($user->domain_user, 'int') .")";
+  }
+  // Table information
+  $header = array(
+    array('data' => t('Id'), 'field' => 'domain_id'),
+    array('data' => t('Site content'), 'field' => 'sitename'),
+    array('data' => t('Content count')),
+    array('data' => t('Site'), 'field' => 'subdomain'),
+  );
+  $query .= tablesort_sql($header);
+  $result = pager_query($query, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0, NULL, $user->domain_user);
+  $rows = array();
+  while ($domain = db_fetch_array($result)) {
+    $path = trim(domain_get_path($domain), '/');
+    $rows[] = array(
+      $domain['domain_id'],
+      l(t('!sitename content', array('!sitename' => $domain['sitename'])), 'admin/domain/content/'. $domain['domain_id']),
+      (int) db_result(db_query("SELECT COUNT(*) FROM {domain_access} WHERE gid = %d AND realm = 'domain_id'", $domain['domain_id'])),
+      l(t('view site'), $path),
+    );
+  }
+
+  $all = array(
+    '-',
+    l(t('Content assigned to all affiliates'), 'admin/domain/content/all'),
+    (int) db_result(db_query("SELECT COUNT(*) FROM {domain_access} WHERE gid = 0 AND realm = 'domain_site'")),
+    '',
+  );
+  array_unshift($rows, $all);
+  if (!empty($rows)) {
+    $output = '<p>'. t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate.') .'</p>';
+    $output .= theme_table($header, $rows);
+    $output .= theme('pager', NULL, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0);
+    return $output;
+  }
+  else {
+    return t('You do not have editing access to any domains. Please contact your site administrator.');
+  }
+}
+
+/**
  * Content administration for a specific domain.
  * This callback puts the user on the current domain and then
  * fetches the appropirate content for batch editing.
@@ -44,10 +105,12 @@ function domain_content_page() {
  */
 function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   global $_domain;
+
   // Load the active domain, which is not necessarily the current domain.
   if (!is_null($domain_id) && $domain_id != $_domain['domain_id']) {
     domain_set_domain($domain_id);
   }
+
   $output = '';
   // Override the $_domain global so we can see the appropriate content
   if (!is_null($domain_id)) {
@@ -58,6 +121,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
     $_domain['site_grant'] = TRUE;
     drupal_set_title(t('Content for all affiliate sites'));
   }
+
   // KILLSWITCH CASE: returns an error
   else {
     drupal_set_message(t('Invalid request'), 'error');

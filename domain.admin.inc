@@ -50,7 +50,7 @@ function domain_view() {
   }
 
   $sql = 'SELECT d.*'. $select_sql .' FROM {domain} d'. $join_sql . tablesort_sql($header);
-  $result = pager_query($sql, 24);
+  $result = pager_query($sql, variable_get('domain_list_size', DOMAIN_LIST_SIZE));
   while ($data = db_fetch_array($result)) {
     $domains[] = $data;
   }
@@ -101,7 +101,7 @@ function domain_view() {
   }
   if (!empty($rows)) {
     $output .= theme_table($header, $rows);
-    $output .= theme('pager', NULL, 24, 0);
+    $output .= theme('pager', NULL, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0);
     return $output;
   }
   else {
@@ -204,6 +204,14 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#default_value' => variable_get('domain_sort', 'id'),
     '#options' => $options,
     '#description' => t('Controls the display of domain lists to end users.')
+  );
+  $form['domain_behavior']['domain_list_size'] = array(
+    '#type' => 'select',
+    '#title' => t('Domain list size'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_list_size', DOMAIN_LIST_SIZE),
+    '#options' => drupal_map_assoc(array(5, 10, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, 1000)),
+    '#description' => t('Sets a break point for the size of domain lists shown to users. After this point, user interfaces will use tables, pagination, and select lists to prevent too many domains from appearing in a list. <em>Note: setting this value higher than 200 may cause memory and display issues for your site.</em>')
   );
 
   $form['domain_advanced'] = array(

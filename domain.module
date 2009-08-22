@@ -32,6 +32,11 @@ define('DOMAIN_SITE_GRANT', TRUE);
 define('DOMAIN_ASSIGN_USERS', TRUE);
 
 /**
+ * Sets a default value at which to start paginating Domain lists.
+ */
+define('DOMAIN_LIST_SIZE', 25);
+
+/**
  * Adds the domain user data to the $user object.
  */
 function domain_boot() {
