@@ -1,5 +1,9 @@
 // $Id$
 
+22-AUG-2009
+
+-- #551532 by jseltzer. Switches to function_exists for the domain source check.
+
 18-AUG-2009
 
 -- Adds minor drush documentation.
