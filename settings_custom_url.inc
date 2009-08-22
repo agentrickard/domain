@@ -11,18 +11,27 @@
  */
 
 /**
- * Implement custom_url_rewrite_outbound().
+ * Implement custom_url_rewrite_outbound() if the url_alter.module is not enabled.
  */
 if (!function_exists('custom_url_rewrite_outbound')) {
   function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
-    domain_url_rewrite_outbound($path, $options, $original_path);
+    domain_url_alter_outbound($path, $options, $original_path);
   }
 }
 
 /**
- * Forces absolute paths for domains when needed.
+ * Legacy wrapper for users of 6.x.2, rc8.
  */
 function domain_url_rewrite_outbound(&$path, &$options, $original_path) {
+  domain_url_alter_outbound($path, $options, $original_path);
+}
+
+/**
+ * Implementation of hook_url_alter_outbound().
+ *
+ * Forces absolute paths for domains when needed.
+ */
+function domain_url_alter_outbound(&$path, &$options, $original_path) {
   global $_domain;
 
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.

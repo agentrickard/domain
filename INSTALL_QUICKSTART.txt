@@ -46,30 +46,19 @@ include './sites/all/modules/domain/settings.inc';
     you will need to modify its use to accommodate Domain Access
     because the module has its own version.
 
-    Domain Access loads its version of this function automatically if
-    it does not already exist. If it does exist, you need to decide which
-    version should run first, and then add something like the following
-    code to settings.php _below_ the lines from step 3:
+    Domain Access implements this function within the context of the
+    URL Alter module, http://drupal.org/project/url_alter, which is a
+    functional backport of changes implemented in Drupal 7.
 
-/**
- * Both Drupal for Facebook and domain module use the
- * custom_url_rewrite feature.  We have to define our own functions
- * which call the others in the proper order.
- */
-function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
-  // Call fb module first
-  if (function_exists('fb_settings_url_rewrite_outbound')) {
-    fb_settings_url_rewrite_outbound($path, $options, $original_path);
-  }
-  if (function_exists('domain_url_rewrite_outbound')) {
-    domain_url_rewrite_outbound($path, $options, $original_path);
-  }
-}
+    If your site uses custom code to implement custom_url_rewrite_outbound(),
+    consider upgrading to the URL Alter module for full compatibility.
+
+    You may also call the function domain_url_rewrite_outbound() directly in
+    your custom code.
 
     NOTE: Domain Access does not use custom_url_rewrite_inbound().
 
-
-5. Go to Admin > Build > Modules.  Therre you will see the Domain
+5. Go to Admin > Build > Modules.  There you will see the Domain
     module group.
 
     Only enable the Domain Acccess module.

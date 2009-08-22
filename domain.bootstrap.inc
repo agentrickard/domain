@@ -59,10 +59,6 @@ function domain_bootstrap() {
       break;
     }
   }
-  if (!isset($_domain['error'])) {
-    // All the load phases worked, so load custom_url_rewrite_outbound().
-    include 'settings_custom_url.inc';
-  }
 }
 
 /**
@@ -89,8 +85,8 @@ function _domain_bootstrap($phase) {
 
       // Load bootstrap modules registered by Domain Access.
       _domain_bootstrap_modules_load();
-      // if essential core module file has not been loaded, bootstrap fails.
 
+      // If essential core module file has not been loaded, bootstrap fails.
       if (!function_exists('domain_load')) {
         return FALSE;
       }

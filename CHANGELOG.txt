@@ -4,6 +4,7 @@
 
 -- #551532 by jseltzer. Switches to function_exists for the domain source check.
 -- #367752 by gildedgod, blackdog, nonsie. Fixes menu issues with lots of domains.
+-- #529026 by Dave Reid. Integrates with URL Alter module for custom_url_rewrite_*.
 
 18-AUG-2009
 
@@ -11,8 +12,8 @@
 
 17-AUG-2009
 
--- #234430 patch by gsbc, mr2400, Terence Westaphal, et. al. Fixes table
-    previxing for newly added tables.
+-- #234340 patch by gsbc, mr2400, Terence Westaphal, et. al. Fixes table
+    prefixing for newly added tables.
 -- #227751 patch by blackdog. Removes unusable items from node settings.
     Requires running update.php.
 -- #548140 by carvelhar. Fixes bug in Domain Content node saves.
