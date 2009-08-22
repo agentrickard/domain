@@ -39,7 +39,7 @@ function domain_url_rewrite_outbound(&$path, &$options, $original_path) {
   $check = domain_grant_all();
   $seo = variable_get('domain_seo', 0);
   // If using Domain Source, we force links to a specific domain.
-  $use_source = module_exists('domain_source');
+  $use_source = function_exists('domain_source_domainupdate');
 
   if ($check || $seo || $use_source) {
     // Check to see if this is a node or comment link and set $nid accordingly.
