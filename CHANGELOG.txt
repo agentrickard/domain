@@ -6,6 +6,8 @@
 -- #367752 by gildedgod, blackdog, nonsie. Fixes menu issues with lots of domains.
 -- #529026 by Dave Reid. Integrates with URL Alter module for custom_url_rewrite_*.
 -- #539422 fixes potential logic error in domain_node_records().
+-- #397116 by CorpX and nonsie. Fixes relationships for Views.
+-- #369928 by drupalok, ayalon. Filter for users of a domain.
 
 18-AUG-2009
 

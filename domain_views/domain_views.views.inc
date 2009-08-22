@@ -23,13 +23,11 @@ function domain_views_views_data() {
     'title' => t('Domains'),
     'help' => t('Domain Access uses domains to divide and display content on a group of related sites.'),
   );
-  // Define the joins.
+  //Define the joins.
   $data['domain']['table']['join']['node'] = array(
     'left_table' => 'domain_access',
     'left_field' => 'gid',
     'field' => 'domain_id',
-    'type' => 'INNER',
-    'extra' => "domain_access.realm = 'domain_id'",
   );
   // Define the fields.
   $data['domain']['domain_id'] = array(
@@ -118,6 +116,16 @@ function domain_views_views_data() {
   $data['domain_access']['table']['join']['node'] = array(
     'left_field' => 'nid',
     'field' => 'nid',
+    'extra' => array(
+      array('field' => 'realm', 'value' => 'domain_id', 'numeric' => FALSE),
+    ),
+  );
+  $data['domain_access']['table']['join']['domain'] = array(
+    'left_field' => 'domain_id',
+    'field' => 'gid',
+    'extra' => array(
+      array('field' => 'realm', 'value' => 'domain_id', 'numeric' => FALSE),
+    ),
   );
   // Define the fields.
   $data['domain_access']['nid'] = array(
@@ -201,6 +209,10 @@ function domain_views_views_data() {
     'left_field' => 'uid',
     'field' => 'uid',
   );
+  $data['domain_editor']['table']['join']['node'] = array(
+    'left_field' => 'uid',
+    'field' => 'uid',
+  );
   // Define the fields.
   $data['domain_editor']['uid'] = array(
     'title' => t('User ID'),
@@ -208,11 +220,12 @@ function domain_views_views_data() {
     'field' => array(
       'click sortable' => TRUE,
     ),
-    // Information for accepting a domain_id as a filter
     'filter' => array(
       'handler' => 'views_handler_filter_numeric',
     ),
-    // Information for sorting on a domain_id.
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),
     'sort' => array(
       'handler' => 'views_handler_sort',
     ),
@@ -220,7 +233,7 @@ function domain_views_views_data() {
   // Define the fields.
   $data['domain_editor']['domain_id'] = array(
     'title' => t('Domain ID'),
-    'help' => t('The domain id of the editor record.'),
+    'help' => t('The domain(s) an editor is assigned to.'),
     'field' => array(
       'click sortable' => TRUE,
       'handler' => 'domain_views_handler_field_domain_id',
@@ -228,6 +241,10 @@ function domain_views_views_data() {
     // Information for accepting a domain_id as a filter
     'filter' => array(
       'handler' => 'domain_views_handler_filter_domain_domain_id',
+    ),
+    // Information for accepting a domain_id as a filter
+    'argument' => array(
+      'handler' => 'domain_views_handler_argument_domain_access_gid',
     ),
     // Information for sorting on a domain_id.
     'sort' => array(
@@ -251,32 +268,32 @@ function domain_views_views_data() {
  */
 function domain_views_views_handlers() {
   $handlers = array(
-    'info' => array(
-    'path' => drupal_get_path('module', 'domain_views') .'/includes',
+     'info' => array(
+      'path' => drupal_get_path('module', 'domain_views') .'/includes',
     ),
     'handlers' => array(
-    // filter handlers
-    'domain_views_handler_filter_domain_access_current_all' => array(
-        'parent' => 'views_handler_filter_boolean_operator',
+      // filter handlers
+      'domain_views_handler_filter_domain_access_current_all' => array(
+          'parent' => 'views_handler_filter_boolean_operator',
+      ),
+      'domain_views_handler_filter_domain_access_gid' => array(
+        'parent' => 'views_handler_filter_in_operator',
+      ),
+      'domain_views_handler_filter_domain_domain_id' => array(
+        'parent' => 'views_handler_filter_in_operator',
+      ),
+      // argument handlers
+      'domain_views_handler_argument_domain_access_gid' => array(
+        'parent' => 'views_handler_argument',
+      ),
+      // field handlers
+      'domain_views_handler_field_domain_id' => array(
+        'parent' => 'views_handler_field',
+      ),
+      'domain_views_handler_field_domain_sitename' => array(
+        'parent' => 'views_handler_field',
+      ),
     ),
-    'domain_views_handler_filter_domain_access_gid' => array(
-      'parent' => 'views_handler_filter_in_operator',
-    ),
-    'domain_views_handler_filter_domain_domain_id' => array(
-      'parent' => 'views_handler_filter_in_operator',
-    ),
-    // argument handlers
-    'domain_views_handler_argument_domain_access_gid' => array(
-      'parent' => 'views_handler_argument',
-    ),
-    // field handlers
-    'domain_views_handler_field_domain_id' => array(
-      'parent' => 'views_handler_field',
-    ),
-    'domain_views_handler_field_domain_sitename' => array(
-      'parent' => 'views_handler_field',
-    ),
-  ),
   );
   return $handlers;
 }
