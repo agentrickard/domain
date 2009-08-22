@@ -5,6 +5,7 @@
 -- #551532 by jseltzer. Switches to function_exists for the domain source check.
 -- #367752 by gildedgod, blackdog, nonsie. Fixes menu issues with lots of domains.
 -- #529026 by Dave Reid. Integrates with URL Alter module for custom_url_rewrite_*.
+-- #539422 fixes potential logic error in domain_node_records().
 
 18-AUG-2009
 

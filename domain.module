@@ -1271,7 +1271,7 @@ function domain_node_access_records($node) {
   // this prevents null values in the form.
   // If we are enabling the module for the first time, we set the
   // default domain of all existing nodes to the root domain.
-  if (empty($grants)) {
+  else {
     $grants[] = array(
     'realm' => 'domain_id',
     'gid' => 0,
