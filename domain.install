@@ -168,6 +168,7 @@ function domain_update_6201() {
  * 
  */
 function domain_update_6202() {
+  $ret = array();
   $options = variable_get('domain_form_elements', array());
   if (isset($options['author'])) {
     unset($options['author']);
@@ -176,4 +177,5 @@ function domain_update_6202() {
     unset($options['menu']);
   }
   variable_set('domain_form_elements', $options);
+  return $ret;
 }

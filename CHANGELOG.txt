@@ -1,5 +1,13 @@
 // $Id$
 
+24-AUG-2009
+
+-- #557702 by TCRobbert. Missing retrun in update 6202.
+
+23-AUG-2009
+
+-- Releases 6.x.2.0-rc9.
+
 22-AUG-2009
 
 -- #551532 by jseltzer. Switches to function_exists for the domain source check.
