@@ -1,5 +1,9 @@
 // $Id$
 
+08-SEP-2009
+
+-- #572124 by nonsie. Fixes status inactive default value.
+
 24-AUG-2009
 
 -- #557702 by TCRobbert. Missing retrun in update 6202.

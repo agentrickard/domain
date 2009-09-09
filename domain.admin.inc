@@ -460,7 +460,7 @@ function domain_form($form_state, $domain = array(), $arguments = array()) {
     '#title' => t('Domain status'),
     '#required' => TRUE,
     '#options' => array(1 => t('Active'), 0 => t('Inactive')),
-    '#default_value' => !empty($domain['valid']) ? $domain['valid'] : 1,
+    '#default_value' => isset($domain['valid']) ? $domain['valid'] : 1,
     '#description' => t('Must be set to "Active" for users to navigate to this domain.')
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
