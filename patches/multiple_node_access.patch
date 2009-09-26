@@ -24,9 +24,9 @@ diff -u -p -r1.947.2.15 node.module
 +      if (!empty($grants_sql)) {
 +        $grants_sql .= ' AND';
        }
-+      $sql = "SELECT COUNT(*) FROM {node_access} WHERE (nid = 0 OR nid = %d) $grants_sql grant_$op >= 1";
-+      $result = db_query($sql, $node->nid);
-+      return (db_result($result));
++      $sql = "SELECT 1 FROM {node_access} WHERE (nid = 0 OR nid = %d) $grants_sql grant_$op >= 1";
++      $result = db_query_range($sql, $node->nid, 0, 1);
++      return (bool) db_result($result);
      }
 -
 -    $grants_sql = '';
@@ -34,9 +34,9 @@ diff -u -p -r1.947.2.15 node.module
 -      $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
 -    }
 -
--    $sql = "SELECT COUNT(*) FROM {node_access} WHERE (nid = 0 OR nid = %d) $grants_sql AND grant_$op >= 1";
--    $result = db_query($sql, $node->nid);
--    return (db_result($result));
+-    $sql = "SELECT 1 FROM {node_access} WHERE (nid = 0 OR nid = %d) $grants_sql AND grant_$op >= 1";
+-    $result = db_query_range($sql, $node->nid, 0, 1);
+-    return (bool) db_result($result);
    }
  
    // Let authors view their own nodes.

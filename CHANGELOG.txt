@@ -1,5 +1,9 @@
 // $Id$
 
+26-SEP-2009
+
+-- #579696 patch by bl444137. Updates multiple_node_access.patch for 6.14.
+
 08-SEP-2009
 
 -- #572124 by nonsie. Fixes status inactive default value.
