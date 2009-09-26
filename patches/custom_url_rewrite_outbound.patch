@@ -7,7 +7,7 @@ retrieving revision 1.611.2.24
 diff -u -p -r1.611.2.24 common.inc
 --- includes/common.inc	13 May 2009 17:10:36 -0000	1.611.2.24
 +++ includes/common.inc	31 May 2009 18:19:47 -0000
-@@ -1307,7 +1307,17 @@ function url($path = NULL, $query = NULL
+@@ -1320,7 +1320,17 @@ function url($path = NULL, $query = NULL
      $clean_url = (bool)variable_get('clean_url', '0');
    }
  

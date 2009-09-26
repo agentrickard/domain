@@ -1,5 +1,9 @@
 // $Id$
 
+26-SEP-2009
+
+-- Updates the custom_url_rewrite_outbound.patch for Drupal 5.20.
+
 22-AUG-2009
 
 -- #551532 by jseltzer. Switches to function_exists for the domain source check.
