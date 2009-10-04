@@ -2021,6 +2021,8 @@ function domain_token_list($type = 'all') {
   $tokens['domain']['domain-name-raw'] = t('The current domain name. WARNING - raw user input. NOT path safe.');
   $tokens['domain']['domain-url'] = t('The current domain\'s URL, lowercased and with only alphanumeric characters.');
   $tokens['domain']['domain-url-raw'] = t('The current domain\'s URL. WARNING - raw user input. NOT path safe.');
+  $tokens['domain']['domain-subdomain'] = t('The current subdomain, lowercased and with only alphanumeric characters. Only works with *.example.com formats');
+  $tokens['domain']['domain-subdomain-raw'] = t('The current subdomain. Only works with *.example.com formats. WARNING - raw user input. NOT path safe.');
   // Default domain tokens.
   $tokens['domain']['domain-default-id'] = t('The default domain ID.');
   $tokens['domain']['domain-default-name'] = t('The default domain name, lowercased and with only alphanumeric characters.');
@@ -2041,6 +2043,13 @@ function domain_token_values($type, $object = NULL, $options = array()) {
   }
 
   $default_domain = domain_default(FALSE);
+  $subdomain_elements = explode('.', $_domain['subdomain']);
+  if (count($subdomain_elements) > 2) {
+    $subdomain = $subdomain_elements[0];
+  }
+  else {
+    $subdomain = 'www';
+  }
 
   // Current domain tokens.
   $tokens['domain-id'] = $_domain['domain_id'];
@@ -2048,6 +2057,9 @@ function domain_token_values($type, $object = NULL, $options = array()) {
   $tokens['domain-name-raw'] = check_plain($_domain['sitename']);
   $tokens['domain-url'] = domain_url_encode($_domain['subdomain']);
   $tokens['domain-url-raw'] = check_plain($_domain['subdomain']);
+  $tokens['domain-subdomain'] = domain_url_encode($subdomain);
+  $tokens['domain-subdomain-raw'] = check_plain($subdomain);
+
   // Default domain
   $tokens['domain-default-id'] = $default_domain['domain_id'];
   $tokens['domain-default-name'] = domain_url_encode($default_domain['sitename']);

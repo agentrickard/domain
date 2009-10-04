@@ -3,6 +3,7 @@
 04-OCT-2009
 
 -- #595802 by LaurentB. Removes Shared Sign On from documentation.
+-- #578648 patch by nirbhasa. Adds subdomain tokens.
 
 26-SEP-2009
 
