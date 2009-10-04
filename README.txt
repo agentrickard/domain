@@ -208,9 +208,6 @@ While example.com and one.example.com can share a login cookie, the
 other two domains cannot read that cookie.  This is an internet standard,
 not a bug.
 
-The single sign-on module is a good solution to this limitation:
-  http://drupal.org/project/singlesignon
-
 Note: See the INSTALL.txt for instructions regarding Drupal's default
 cookie handling.
 

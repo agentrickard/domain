@@ -1,5 +1,9 @@
 // $Id$
 
+04-OCT-2009
+
+-- #595802 by LaurentB. Removes Shared Sign On from documentation.
+
 26-SEP-2009
 
 -- Updates the custom_url_rewrite_outbound.patch for Drupal 5.20.
