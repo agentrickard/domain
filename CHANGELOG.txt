@@ -1,5 +1,9 @@
 // $Id$
 
+04-OCT-2009
+
+-- #595802 by LaurentB. Removes Shared Sign On from documentation.
+
 26-SEP-2009
 
 -- #579696 patch by bl444137. Updates multiple_node_access.patch for 6.14.
