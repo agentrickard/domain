@@ -1,5 +1,9 @@
 // $Id$
 
+05-OCT-2009
+
+-- #584428 patch by voxpelli. Adds default domain argument handler to Domain Views.
+
 04-OCT-2009
 
 -- #595802 by LaurentB. Removes Shared Sign On from documentation.

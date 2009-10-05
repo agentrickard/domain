@@ -313,6 +313,14 @@ function domain_views_views_plugins() {
         'path' => $path,
       ),
     ),
+    'argument default' => array(
+      'current_domain' => array(
+        'title' => t("Current domain"),
+        'handler' => 'domain_views_plugin_argument_default_current',
+        'path' => $path,
+        'parent' => 'fixed', // so that the parent class is included
+      ),
+    ),
   );
 }
 
