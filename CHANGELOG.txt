@@ -1,5 +1,10 @@
 // $Id$
 
+08-OCT-2009
+
+-- #597654 by matteoraggi. Fixes theme batch update errors.
+-- #558600 by uufsm. Auto-sets theme to default on batch edits.
+
 05-OCT-2009
 
 -- #584428 patch by voxpelli. Adds default domain argument handler to Domain Views.

@@ -23,6 +23,7 @@ function domain_theme_page($domain) {
     // The above returns -1 on failure.
     if ($theme != -1) {
       $custom_theme = $theme['theme'];
+      drupal_set_message(t('You are viewing the active theme for %domain.', array('%domain' => $domain['sitename'])));
     }
 
     // Load the system form file.
@@ -260,7 +261,7 @@ function domain_theme_settings($theme, $domain) {
   include_once(drupal_get_path('module', 'system') .'/system.admin.inc');
 
   $theme = db_fetch_array(db_query("SELECT theme, settings FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain['domain_id'], $theme));
-
+  drupal_set_message(t('You are viewing the %theme settings for %domain.', array('%theme' => $theme['theme'], '%domain' => $domain['sitename'])));
   // Write uploads to the proper directory?
   if ($domain['domain_id'] > 0) {
     global $conf;
@@ -284,9 +285,10 @@ function domain_theme_settings_submit($form, &$form_state) {
   $values = $form_state['values'];
   $filepath = NULL;
   $reset = FALSE;
+  $form_state['redirect'] = 'admin/build/domain/theme/'. $values['domain_id'];
+  $domain = domain_lookup($values['domain_id']);
   if ($values['op'] == $values['reset']) {
     db_query("DELETE FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $values['domain_id'], $values['theme']);
-    $domain = domain_lookup($values['domain_id']);
     drupal_set_message(t('The %theme settings for %domain have been reset.', array('%theme' => $values['theme'], '%domain' => $domain['sitename'])));
     $reset = TRUE;
   }
@@ -340,5 +342,11 @@ function domain_theme_settings_submit($form, &$form_state) {
       db_query("INSERT INTO {domain_theme} (domain_id, theme, settings, status, filepath) VALUES (%d, '%s', %b, 0, '%s')", $domain_id, $theme, $settings, $filepath);
     }
     drupal_set_message(t('The configuration options have been saved.'));
+  }
+  // If nothing is active, then we make this one active.
+  $active = db_result(db_query("SELECT COUNT(*) FROM {domain_theme} WHERE domain_id = %d AND status = 1", $domain_id));
+  if (empty($active)) {
+    db_query("UPDATE {domain_theme} SET status = 1 WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
+    drupal_set_message(t('%theme has been set as the default theme for %domain', array('%theme' => $theme, '%domain' => $domain['sitename'])));
   }
 }

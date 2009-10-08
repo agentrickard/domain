@@ -238,12 +238,14 @@ function domain_theme_domainbatch() {
 function domain_theme_batch($values) {
   foreach ($values['domain_batch'] as $key => $value) {
     if ($key > 0) {
-      $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE domain_id = %d", $key));
+      // Clear out the old theme.
+      db_query("UPDATE {domain_theme} SET status = 0 WHERE domain_id = %d", $key);
+      $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE theme = '%s' AND domain_id = %d", $value, $key));
       if (isset($data['theme'])) {
-        db_query("UPDATE {domain_theme} SET theme = '%s' WHERE domain_id = %d", $value, $key);
+        db_query("UPDATE {domain_theme} SET status = 1 WHERE theme = '%s' AND domain_id = %d", $value, $key);
       }
       else {
-        db_query("INSERT INTO {domain_theme} (domain_id, theme) VALUES (%d, '%s')", $key, $value);
+        db_query("INSERT INTO {domain_theme} (domain_id, theme, status) VALUES (%d, '%s', 1)", $key, $value);
       }
     }
     else {

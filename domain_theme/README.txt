@@ -96,6 +96,9 @@ theme selection form, with the following notes:
 You may configure domain-specific theme settings by clicking on the 'configure'
 link.
 
+NOTE: When viewing this configuration page, the theme's domain-specific
+settings will be displayed and the page's theme will change.
+
 ----
 3.3 Domain-Specific Theme Settings
 
@@ -108,6 +111,12 @@ configure page. You will be presented with the standard Drupal theme
 configuration form.
 
 On page load, your domain-specific theme settings will be loaded automatically.
+
+If you configure a theme's settings without having selected a default theme for
+the domain, that theme will be made the default.
+
+NOTE: When viewing this configuration page, the theme's domain-specific
+settings will be displayed and the page's theme will change.
 
 ----
 3.4 Color Module Notes
@@ -129,6 +138,9 @@ Domain Theme allows you to make batch changes to settings for all domains.
 You may also choose to remove domain-specific theme selections. Note that
 the batch editing form only allows you to change the active theme for a domain.
 You cannot use the batch edit screen to modify theme settings per-domain.
+
+Using the batch screen sets the active theme for all domains to the selected
+value(s).
 
 This feature is useful if you wish to roll back custom changes.
 
