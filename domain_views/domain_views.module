@@ -77,17 +77,22 @@ function domain_views_access($domains, $strict = TRUE, $member = FALSE) {
   global $_domain, $user;
   $account = $user;
   $check = FALSE;
+  // Apply membership rules?
+  if ($member) {
+    $grants['domain_id'] = domain_get_user_domains($account);
+    if (isset($grants['domain_id'][-1])) {
+      $grants['domain_id'][0] = 0;
+      unset($grants['domain_id'][-1]);
+    }
+    $check = TRUE;
+  }
+  // Apply strict rules? These are harsher than membership and get applied last.
   if ($strict) {
     $grants = domain_views_get_grants();
     $check = TRUE;
   }
-  // Apply membership rules?
-  if ($member) {
-    $grants['domain_id'] = domain_get_user_domains($account);
-    $check = TRUE;
-  }
   // If no grants, stop.
-  if ($check && empty($grants['domain_id'])) {
+  if ($check && (empty($grants['domain_id']) || !in_array($_domain['domain_id'], $grants['domain_id']))) {
     return FALSE;
   }
   // None of the above, just match the current domain.
@@ -99,7 +104,7 @@ function domain_views_access($domains, $strict = TRUE, $member = FALSE) {
     if ($grant == 0) {
       $grant = -1;
     }
-    if (in_array($grant, $domains) && $grant == $_domain['domain_id']) {
+    if (in_array($grant, $domains)) {
       return TRUE;
     }
   }

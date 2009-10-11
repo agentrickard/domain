@@ -121,9 +121,11 @@ on which domains a View may be accessed. There are three settings to consider.
 
   -- The domain(s) on which the content should be available.
   -- Whether the user can access content on the active domain. This setting
-      mirrors the behavior of the Domain Strict module.
+      mirrors the behavior of the Domain Strict module in that it gathers the
+      data from hook_node_grants() before appying access rules.
   -- Whether the user is assigned to the active domain. This setting can be
-      used to provide members-only or editors-only Views.
+      used to provide members-only or editors-only Views. This setting is more
+      liberal than the strict setting, and they two may be used at the same time.
 
 This access setting is valuable for cases where certain Views are not appropriate
 on all domains.

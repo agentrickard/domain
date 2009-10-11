@@ -12,6 +12,8 @@
  */
 class domain_views_plugin_access extends views_plugin_access {
   function access($account) {
+  dsm($this->options['domains']);
+  dsm($this);
     return domain_views_access(array_filter($this->options['domains']), $this->options['domain_strict'], $this->options['domain_member']);
   }
 
@@ -25,7 +27,7 @@ class domain_views_plugin_access extends views_plugin_access {
 
   function option_defaults(&$options) {
     $options['domains'] = array(-1);
-    $options['domain_strict'] = TRUE;
+    $options['domain_strict'] = FALSE;
     $options['domain_member'] = FALSE;
   }
 
