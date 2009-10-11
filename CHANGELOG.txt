@@ -8,6 +8,7 @@
 -- #550684 by TCRobbert. Added cache settings to Domain Conf.
 -- #601516. Fixes permission inconsistency.
 -- #548140 by carvalhar. Fixes errors in validation for Domain Source.
+-- #579552 by skizzo and seattleturtle. Tries to avoid PHP errors for missing globals.
 
 08-OCT-2009
 

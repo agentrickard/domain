@@ -55,7 +55,9 @@ function domain_boot() {
  */
 function domain_init() {
   global $_domain, $conf;
-
+  if (!is_array($_domain)) {
+    $_domain = array();
+  }
   // Error handling in case the module is not installed correctly.
   if (empty($_domain)) {
     $_domain['error'] = '-1';
@@ -1022,6 +1024,9 @@ function domain_domainload(&$domain) {
  */
 function domain_get_path($domain) {
   global $base_url;
+  if (empty($base_url)) {
+    return check_url($domain['scheme'] .'://'. $domain['subdomain']);
+  }
   $_url = parse_url($base_url);
   // PHP 5 does not return an empty path element.
   if (!isset($_url['path'])) {
@@ -1031,7 +1036,7 @@ function domain_get_path($domain) {
   if (substr($_url['path'], -1) != '/') {
     $_url['path'] .= '/';
   }
-  $path = $domain['scheme'] .'://'. $domain['subdomain'] . $_url['path'];
+  $path = check_url($domain['scheme'] .'://'. $domain['subdomain'] . $_url['path']);
   return $path;
 }
 
@@ -1054,7 +1059,7 @@ function domain_get_uri($domain) {
     $request_uri = url($alias);
   }
 
-  $path = $domain['scheme'] .'://'. $domain['subdomain'] . $request_uri;
+  $path = check_url($domain['scheme'] .'://'. $domain['subdomain'] . $request_uri);
   return $path;
 }
 
@@ -1421,7 +1426,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     // We cannot reset this if it has already been set by another module.
     // See http://drupal.org/node/306551
     if (empty($action['host'])) {
-      $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
+      $form['#action'] =  check_url($_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query']);
     }
   }
 
