@@ -390,6 +390,8 @@ function domain_content_update_nodes($form, &$form_state) {
       }
     }
   }
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**

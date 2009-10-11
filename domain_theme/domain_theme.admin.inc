@@ -190,6 +190,8 @@ function domain_theme_submit($form, &$form_state) {
   }
   // Return to the correct page.
   $form_state['redirect'] = 'admin/build/domain/theme/'. $domain_id;
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**
@@ -228,6 +230,8 @@ function domain_theme_reset_form_submit($form, &$form_state) {
   db_query("DELETE FROM {domain_theme} WHERE domain_id = %d", $form_state['values']['domain_id']);
   drupal_set_message(t('Domain theme settings have been reset.'));
   $form_state['redirect'] = 'admin/build/domain/theme/'. $form_state['values']['domain_id'];
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**
@@ -349,4 +353,6 @@ function domain_theme_settings_submit($form, &$form_state) {
     db_query("UPDATE {domain_theme} SET status = 1 WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
     drupal_set_message(t('%theme has been set as the default theme for %domain', array('%theme' => $theme, '%domain' => $domain['sitename'])));
   }
+  // Clear the cache.
+  cache_clear_all();
 }

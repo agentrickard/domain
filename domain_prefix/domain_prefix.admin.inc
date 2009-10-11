@@ -465,6 +465,8 @@ function domain_prefix_form_submit($form, &$form_state) {
       }
     }
   }
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**

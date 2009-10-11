@@ -3,6 +3,7 @@
 11-OCT-2009
 
 -- #576444 by jeremyr and nonsie. Makes the selection of domains configrable as checkboxes or select list.
+-- #576116 by guusbosman. Clear the cache when adjusting settings like themes, site slogan, et. al.
 
 08-OCT-2009
 

@@ -256,6 +256,8 @@ function domain_alias_form_submit($form, &$form_state) {
     }
   }
   drupal_set_message(t('Domain aliases updated successfully.'));
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**

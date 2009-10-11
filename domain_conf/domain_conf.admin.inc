@@ -171,6 +171,8 @@ function domain_conf_form_submit($form, &$form_state) {
     db_query($sql, $form_state['values']['domain_id'], serialize($settings));
   }
   drupal_set_message(t('Domain options saved successfully.'));
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**
@@ -211,6 +213,8 @@ function domain_conf_reset_form_submit($form, &$form_state) {
   db_query("DELETE FROM {domain_conf} WHERE domain_id = %d", $form_state['values']['domain_id']);
   drupal_set_message(t('Domain configuration settings have been reset.'));
   $form_state['redirect'] = 'admin/build/domain/conf/'. $form_state['values']['domain_id'];
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**
