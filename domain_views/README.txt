@@ -117,7 +117,13 @@ active domain.
 5. Access Plugin
 
 Domain Views offers an access plugin to all Views that allow you to select
-on which domains a View may be accessed.
+on which domains a View may be accessed. There are three settings to consider.
 
-This setting is valuable for cases where certain Views are not appropriate
+  -- The domain(s) on which the content should be available.
+  -- Whether the user can access content on the active domain. This setting
+      mirrors the behavior of the Domain Strict module.
+  -- Whether the user is assigned to the active domain. This setting can be
+      used to provide members-only or editors-only Views.
+
+This access setting is valuable for cases where certain Views are not appropriate
 on all domains.

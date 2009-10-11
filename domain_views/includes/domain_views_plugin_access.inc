@@ -12,20 +12,11 @@
  */
 class domain_views_plugin_access extends views_plugin_access {
   function access($account) {
-    $grants = domain_views_get_grants($account);
-    foreach ($grants['domain_id'] as $grant) {
-      if ($grant == 0) {
-        $grant = -1;
-      }
-      if (in_array($grant, array_filter($this->options['domains']))) {
-        return TRUE;
-      }
-    }
-    return FALSE;
+    return domain_views_access(array_filter($this->options['domains']), $this->options['domain_strict'], $this->options['domain_member']);
   }
 
   function get_access_callback() {
-    return array('domain_views_access', array(array_filter($this->options['domains'])));
+    return array('domain_views_access', array(array_filter($this->options['domains']), $this->options['domain_strict'], $this->options['domain_member']));
   }
 
   function summary_title() {
@@ -34,6 +25,8 @@ class domain_views_plugin_access extends views_plugin_access {
 
   function option_defaults(&$options) {
     $options['domains'] = array(-1);
+    $options['domain_strict'] = TRUE;
+    $options['domain_member'] = FALSE;
   }
 
   function options_form(&$form, &$form_state) {
@@ -63,5 +56,17 @@ class domain_views_plugin_access extends views_plugin_access {
       $form['domains']['#multiple'] = TRUE;
       $form['domains']['#size'] = count($options) > 10 ? 10 : count($options);
     }
+    $form['domain_strict'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Use strict access control'),
+      '#default_value' => $this->options['domain_strict'],
+      '#description' => t('If checked, the user must be able to access the domain being viewed.'),
+    );
+    $form['domain_member'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Require domain membership'),
+      '#default_value' => $this->options['domain_member'],
+      '#description' => t('If checked, the user must be a member of the domain being viewed.'),
+    );
   }
 }

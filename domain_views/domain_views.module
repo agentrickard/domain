@@ -66,17 +66,40 @@ function theme_domain_views_view_multiple_field($items, $field, $values) {
  *
  * @param $domains
  *  An array of domain ids that may access this view.
+ * @param $strict
+ *  Boolean value indicating if strict rules should be applied.
+ * @param $member
+ *  Boolean value indicating if membership rules should be applied.
  * @return
  *  Boolean TRUE or FALSE.
  */
-function domain_views_access($domains) {
-  global $user, $_domain;
-  $grants = domain_views_get_grants();
+function domain_views_access($domains, $strict = TRUE, $member = FALSE) {
+  global $_domain, $user;
+  $account = $user;
+  $check = FALSE;
+  if ($strict) {
+    $grants = domain_views_get_grants();
+    $check = TRUE;
+  }
+  // Apply membership rules?
+  if ($member) {
+    $grants['domain_id'] = domain_get_user_domains($account);
+    $check = TRUE;
+  }
+  // If no grants, stop.
+  if ($check && empty($grants['domain_id'])) {
+    return FALSE;
+  }
+  // None of the above, just match the current domain.
+  else if (!$check) {
+    $grants['domain_id'] = array($_domain['domain_id']);
+  }
+  // Otherwise, convert and check.
   foreach ($grants['domain_id'] as $grant) {
     if ($grant == 0) {
       $grant = -1;
     }
-    if (in_array($grant, $domains)) {
+    if (in_array($grant, $domains) && $grant == $_domain['domain_id']) {
       return TRUE;
     }
   }
