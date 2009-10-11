@@ -1,5 +1,9 @@
 // $Id$
 
+11-OCT-2009
+
+-- #576444 by jeremyr and nonsie. Makes the selection of domains configrable as checkboxes or select list.
+
 08-OCT-2009
 
 -- #597654 by matteoraggi. Fixes theme batch update errors.
@@ -24,7 +28,7 @@
 
 24-AUG-2009
 
--- #557702 by TCRobbert. Missing retrun in update 6202.
+-- #557702 by TCRobbert. Missing return in update 6202.
 
 23-AUG-2009
 

@@ -213,6 +213,14 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#options' => drupal_map_assoc(array(5, 10, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750, 1000)),
     '#description' => t('Sets a break point for the size of domain lists shown to users. After this point, user interfaces will use tables, pagination, and select lists to prevent too many domains from appearing in a list. <em>Note: setting this value higher than 200 may cause memory and display issues for your site.</em>')
   );
+  $form['domain_behavior']['domain_select_format'] = array(
+    '#type' => 'select',
+    '#title' => t('Domain selection format'),
+    '#required' => TRUE,
+    '#default_value' => domain_select_format(),
+    '#options' => array(t('Checkboxes'), t('Select list')),
+    '#description' => t('Determines the display format of form elements that display domain lists.')
+  );
 
   $form['domain_advanced'] = array(
     '#type' => 'fieldset',

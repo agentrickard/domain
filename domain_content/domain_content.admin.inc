@@ -255,12 +255,14 @@ function domain_content_form($form_state) {
   // Privileged users can make global changes to Domain Access permissions.
   if (user_access('set domain access')) {
     $options = array();
+    $format = domain_select_format();
     foreach (domain_domains() as $data) {
       // Cannot pass zero in checkboxes.
       ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
       // The domain must be valid.
       if ($data['valid'] || user_access('administer domains')) {
-        $options[$key] = check_plain($data['sitename']);
+        // Filter checkboxes but not select lists.
+        $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
       }
     }
     // If the user is a site admin, show the form, otherwise pass it silently.
@@ -282,13 +284,17 @@ function domain_content_form($form_state) {
         '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
       );
       $form['domain']['domains'] = array(
-        '#type' => 'checkboxes',
+        '#type' => empty($format) ? 'checkboxes' : 'select',
         '#title' => t('Publish to'),
         '#options' => $options,
         '#required' => FALSE,
         '#description' => t('Select which affiliates can access this content.'),
         '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
       );
+      if ($format) {
+        $form['domain']['domains']['#multiple'] = TRUE;
+        $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
+      }
     }
   }
   // Users must have passed at least one access check to have batch options.

@@ -39,24 +39,29 @@ class domain_views_plugin_access extends views_plugin_access {
   function options_form(&$form, &$form_state) {
     $domains = domain_domains();
     $options = array();
+    $format = domain_select_format();
     foreach ($domains as $domain) {
       // Checkboxes cannot handles zeros.
       if ($domain['domain_id'] == 0) {
         $domain['domain_id'] = -1;
       }
-      $options[$domain['domain_id']] = check_plain($domain['sitename']);
-    }
-    $type = 'checkboxes';
-    if (count($options) > 20) {
-      $type = 'select';
+      // The domain must be valid.
+      if ($domain['valid'] || user_access('administer domains')) {
+        // Filter checkboxes but not select lists.
+        $options[$domain['domain_id']] = empty($format) ? check_plain($domain['sitename']) : $domain['sitename'];
+      }
     }
     $form['domains'] = array(
-      '#type' => $type,
+      '#type' => empty($format) ? 'checkboxes' : 'select',
       '#multiple' => TRUE,
       '#options' => $options,
       '#title' => t('Domains'),
       '#default_value' => $this->options['domains'],
       '#description' => t('Only users with the selected permission flag will be able to access this display. Note that users with "access all views" can see any view, regardless of other permissions.'),
     );
+    if ($format) {
+      $form['domains']['#multiple'] = TRUE;
+      $form['domains']['#size'] = count($options) > 10 ? 10 : count($options);
+    }
   }
 }

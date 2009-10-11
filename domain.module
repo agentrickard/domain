@@ -358,6 +358,7 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
         }
         // Replace the zero record to -1.
         unset($options[0]);
+        $format = domain_select_format();
         if (user_access('assign domain editors')) {
           $form['domain_user'] = array(
             '#type' => 'fieldset',
@@ -367,12 +368,16 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
             '#weight' => 1
           );
           $form['domain_user']['domain_user'] = array(
-            '#type' => 'checkboxes',
+            '#type' => empty($format) ? 'checkboxes' : 'select',
             '#options' => $options,
             '#title' => t('Domain access settings'),
             '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain nodes" permission.'),
             '#default_value' => $default
           );
+          if ($format) {
+            $form['domain_user']['domain_user']['#multiple'] = TRUE;
+            $form['domain_user']['domain_user']['#size'] = count($options) > 10 ? 10 : count($options);
+          }
         }
         else {
           $form['domain_user'] = array(
@@ -467,12 +472,14 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     return;
   }
   $options = array();
+  $format = domain_select_format();
   foreach (domain_domains() as $data) {
     // Cannot pass zero in checkboxes.
     ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
     // The domain must be valid.
     if ($data['valid'] || user_access('administer domains')) {
-      $options[$key] = check_plain($data['sitename']);
+      // Filter checkbox output but not select list.
+      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
   $form['domain'] = array(
@@ -484,13 +491,17 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     '#weight' => -1,
   );
   $form['domain']['domains'] = array(
-    '#type' => 'checkboxes',
+    '#type' => empty($format) ? 'checkboxes' : 'select',
     '#title' => t('Assign to'),
     '#options' => $options,
     '#required' => FALSE,
     '#description' => t('Select which affiliates these users should belong to. <em>Note: this will erase any current assignment for the selsected users.</em>'),
     '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
   );
+  if ($format) {
+    $form['domain']['domains']['#multiple'] = TRUE;
+    $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
+  }
   // Add our domain elements.
   foreach (array_keys($form['name']) as $uid) {
     $form['user_domains'][$uid][0] = array('#value' => theme('item_list', _domain_user_list($uid)));
@@ -761,6 +772,18 @@ function _domain_rname_sort($a, $b) {
  */
 function _domain_rurl_sort($a, $b) {
   return strcmp($a['subdomain'], $b['subdomain']);
+}
+
+/**
+ * Determine the default format for domain list forms.
+ */
+function domain_select_format() {
+  $domains = domain_domains();
+  $format = 0;
+  if (count($domains) > variable_get('domain_list_size', DOMAIN_LIST_SIZE)) {
+    $format = 1;
+  }
+  return variable_get('domain_select_format', $format);
 }
 
 /**
@@ -1422,12 +1445,15 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     }
 
     $options = array();
+    // Get the display format of the form element.
+    $format = domain_select_format();
     foreach (domain_domains() as $data) {
       // Cannot pass zero in checkboxes.
       ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
       // The domain must be valid.
       if ($data['valid'] || user_access('administer domains')) {
-        $options[$key] = check_plain($data['sitename']);
+        // Checkboxes must be filtered, select listts should not.
+        $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
       }
     }
     // This lets CCK adjust the weight of our element using domain_content_extra_fields().
@@ -1451,13 +1477,17 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
         '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );
       $form['domain']['domains'] = array(
-        '#type' => 'checkboxes',
+        '#type' => empty($format) ? 'checkboxes' : 'select',
         '#title' => t('Publish to'),
         '#options' => $options,
         '#required' => TRUE,
         '#description' => t('Select which affiliates can access this content.'),
         '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domains : $default,
       );
+      if ($format) {
+        $form['domain']['domains']['#multiple'] = TRUE;
+        $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
+      }
     }
     // If the user has limited permissions, show that form or obey the settings.
     else {
@@ -1538,14 +1568,17 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             (empty($raw)) ? $required = TRUE : $required = FALSE;
 
             $form['domain']['domains'] = array(
-             '#type' => 'checkboxes',
+              '#type' => empty($format) ? 'checkboxes' : 'select',
               '#title' => t('Publish to'),
               '#options' => $user_options,
               '#required' => $required,
               '#description' => t('Select which affiliates can access this content.'),
               '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domains : $default_options,
             );
-
+            if ($format) {
+              $form['domain']['domains']['#multiple'] = TRUE;
+              $form['domain']['domains']['#size'] = count($user_options) > 10 ? 10 : count($user_options);
+            }
             // Show the options that cannot be changed.
             $list = array();
             if ($form['#node']->domain_site) {

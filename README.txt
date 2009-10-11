@@ -41,6 +41,7 @@ CONTENTS
 4.2.1   New Content Settings
 4.2.2   Debugging Status
 4.2.3   Sort Domain Lists
+4.2.4   Domain Selection Format
 4.3   Advanced Settings
 4.3.1   Search Settings
 4.3.2   Search Engine Optimization
@@ -463,9 +464,9 @@ The Domain Access module has the following permissions:
 
   -- 'publish to any assigned domain'
   The node editing form is shown normally, and the user is presented a
-  list of checkboxes.  These options represent the affiliate domains that
-  the user is allowed to publish content to, according to the domains
-  assigned to their user account.
+  list of checkboxes or a multiple select list.  These options represent the
+  affiliate domains that the user is allowed to publish content to, according
+  to the domains assigned to their user account.
 
   Note that if this option is selected, users will also be shown a list of 
   affiliates to which the node is  assigned.  This list shows only the 
@@ -614,6 +615,17 @@ all nodes viewable to some users.
 Both the Domain Switcher block and the Domain Nav module provide an
 end-user visible list of domains.  The domain sorting settings control how
 these lists are generated and presented to the user.
+
+----
+4.2.4   Domain Selection Format
+
+Controls the form element display when choosing a list of domains. By
+default, Domain Access shows checkboxes, but if your site has a large
+number of domains, checkboxes hinder usability. You may use this setting
+to force domain lists to be displayed as multiple select lists instead.
+
+By default, if you have more than 25 domains, a select list will be used
+for your forms, but you may use this setting to alter that behavior.
 
 ----
 4.3   Advanced Settings
@@ -1043,7 +1055,8 @@ is assigned to that domain or to all domains.
 
 Users who have the 'set domain access' permission can assign any node to any or
 all registered sites.  During node editing, a series of options will be
-displayed as checkboxes under the heading "Domain access options":
+displayed as checkboxes or a multiple select list under the heading
+"Domain access options":
 
   Publishing options:
     []  Send to all affiliates
