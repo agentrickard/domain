@@ -9,6 +9,7 @@
 -- #601516. Fixes permission inconsistency.
 -- #548140 by carvalhar. Fixes errors in validation for Domain Source.
 -- #579552 by skizzo and seattleturtle. Tries to avoid PHP errors for missing globals.
+-- #601614 with salvis. Adds devel_node_access_acknowledge() for the domain_all grant.
 
 08-OCT-2009
 

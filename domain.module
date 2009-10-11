@@ -2033,6 +2033,15 @@ function domain_node_access_explain($row) {
 }
 
 /**
+* Implement hook_node_access_acknowlegde for devel.module
+*/
+function domain_node_access_acknowledge($grant) {
+  if ($grant['realm'] == 'domain_all') {
+    return TRUE;
+  }
+}
+
+/**
  * Implement hook_content_extra_fields()
  *
  * CCK hook to allow sorting of the domain settings field.
