@@ -1,5 +1,9 @@
 // $Id$
 
+11-OCT-2009
+
+-- #579552 by skizzo and seattleturtle. Tries to avoid PHP errors for missing globals.
+
 04-OCT-2009
 
 -- #595802 by LaurentB. Removes Shared Sign On from documentation.
