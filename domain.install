@@ -179,3 +179,19 @@ function domain_update_6202() {
   variable_set('domain_form_elements', $options);
   return $ret;
 }
+
+/**
+ * Fixes permission naming error in rc9 and lower.
+ */
+function domain_update_6203() {
+  $ret = array();
+  $result = db_query("SELECT * FROM {permission}");
+  while ($permission = db_fetch_object($result)) {
+    if (strpos($permission->perm, 'publish to any assigned domains') > 0) {
+      $pid = (int) $permission->pid;
+      $string = db_escape_string(str_replace('publish to any assigned domains', 'publish to any assigned domain', $permission->perm));
+      $ret[] = update_sql("UPDATE {permission} SET perm = '$string' WHERE pid = $pid");
+    }
+  }
+  return $ret;
+}
