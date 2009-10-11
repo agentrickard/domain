@@ -79,7 +79,7 @@ For each registered domain, you have the option of saving settings that will
 replace the system settings for your root site.  The currently available
 settings are:
 
-  - Name [of site]
+  - Name of site
   - E-mail address
   - Slogan
   - Mission
@@ -87,11 +87,14 @@ settings are:
   - Default front page
   - Anonymous user
   - Administrative theme
-  - Default menu for content
-  - Primary links menu
-  - Secondary links menu
+  - Default menu for content (if Menu module is used)
+  - Primary links menu (if Menu module is used)
+  - Secondary links menu (if Menu module is used)
   - Default time zone
-  - Default language
+  - Default language (if Locale module is used)
+  - Caching mode
+  - Minimum cache lifetime
+  - Page compression
   - Site status
   - Site off-line message
 

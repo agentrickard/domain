@@ -318,6 +318,56 @@ function domain_conf_domainbatch() {
     '#weight' => -6,
     '#group' => t('Timezone settings'),
   );
+  // Change the caching mode.
+  $batch['cache'] = array(
+    '#form' => array(
+      '#type' => 'radios',
+      '#title' => t('Caching mode'),
+      '#options' => array(CACHE_DISABLED => t('Disabled'), CACHE_NORMAL => t('Normal (recommended for production sites, no side effects)')),
+      '#description' => t('Enabling the page cache will offer a significant performance boost. Drupal can store and send compressed cached pages requested by <em>anonymous</em> users. By caching a web page, Drupal does not have to construct the page each time it is viewed.') .'<em> '. t('Aggressive mode caching is not supported when using Domain Access.') .'</em>',
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('cache', CACHE_DISABLED),
+    '#variable' => 'cache',
+    '#meta_description' => t('Set the page cache options for all domains.'),
+    '#data_type' => 'integer',
+    '#weight' => -5,
+    '#group' => t('Performance'),
+  );
+  // Change the cache lifetime.
+  $period = drupal_map_assoc(array(0, 60, 180, 300, 600, 900, 1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400), 'format_interval');
+  $period[0] = '<'. t('none') .'>';
+  $batch['cache_lifetime'] = array(
+    '#form' => array(
+      '#type' => 'select',
+      '#title' => t('Minimum cache lifetime'),
+      '#options' => $period,
+      '#description' => t('On high-traffic sites, it may be necessary to enforce a minimum cache lifetime. The minimum cache lifetime is the minimum amount of time that will elapse before the cache is emptied and recreated, and is applied to both page and block caches. A larger minimum cache lifetime offers better performance, but users will not see new content for a longer period of time.')
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('cache_lifetime', 0),
+    '#variable' => 'cache',
+    '#meta_description' => t('Set the minimum cache lifetime for all domains.'),
+    '#data_type' => 'integer',
+    '#weight' => -5,
+    '#group' => t('Performance'),
+  );
+  // Change the page compression settings.
+  $batch['page_compression'] = array(
+    '#form' => array(
+      '#type' => 'radios',
+      '#title' => t('Page compression'),
+      '#options' => array(t('Disabled'), t('Enabled')),
+      '#description' => t("By default, Drupal compresses the pages it caches in order to save bandwidth and improve download times. This option should be disabled when using a webserver that performs compression."),
+    ),
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('page_compression', TRUE),
+    '#variable' => 'cache',
+    '#meta_description' => t('Set the page compression status for all domains.'),
+    '#data_type' => 'integer',
+    '#weight' => -5,
+    '#group' => t('Performance'),
+  );
   // Toggle the site offline status.
   $batch['site_offline'] = array(
     '#form' => array(
