@@ -43,7 +43,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
       // Is this node assigned to a source that the user can control?
       $source = $form['#node']->domain_source;
       if (isset($source)) {
-        if ($user->domain_user[$domain['domain_id']] == $source) {
+        if (isset($user->domain_user[$source]) && $user->domain_user[$source] == $source) {
           $show = TRUE;
         }
         else {
@@ -106,13 +106,20 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       }
       // Cast the key from zero to -1 to match the data coming from the input.
       ($node->domain_source == 0) ? $key = -1 : $key = $node->domain_source;
+      // Check the domain and domains_raw variables to set up the allowed source list.
+      $allowed = array();
+      if (!empty($node->domains)) {
+        $allowed = $node->domains;
+      }
+      if (!empty($node->domains_raw)) {
+        $allowed = array_merge($node->domains, $node->domains_raw);
+      }
       if ($node->domain_site && $key == -1) {
         // This case is acceptable, so we let it pass.
         // I find this code easier to read than a compound IF statement.
       }
       // Here we account for both the 'domains_raw' and 'domains' options.
-      // If selected, these clauses will not be zero.
-      else if ((!empty($node->domains) && !$node->domains[$key]) || (!empty($node->domains_raw) && !in_array($key, $node->domains_raw))) {
+      else if (!in_array($key, $allowed)) {
         form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
       }
       break;
