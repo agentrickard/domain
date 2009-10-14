@@ -78,7 +78,7 @@ require_once './sites/all/modules/domain/domain_prefix/settings_domain_prefix.in
 
 STEP  4:  Register the module updates
 
-After your have editing settings.php, log in to your Primary Domain as user 1
+After you have edited settings.php, log in to your Primary Domain as user 1
 and run the Drupal update script.
 
 The update must be run from your primary domain.
@@ -87,13 +87,15 @@ STEP 5:  Rebuild node access permissions
 
 After running the update script, when you return to the administration pages
 you will be prompted to rebuild the node access table. Click on the link or go
-to Admin > Content > Post settings and click the 'Rebuild Permissions button.
+to Admin > Content > Post settings and click the 'Rebuild Permissions' button.
 
 STEP 6: Reset permissions for domain module
 
 The old 'Content Editing Forms' setting has been replaced by role-based
 permissions.  Please see section 3.1 of README.txt and reset your 
-site permissions accordingly.
+site permissions accordingly. The upgrade does not split permissions for you.
+
+There are also new permissions documented in README.txt.
 
 ----
 3. Error Notices
@@ -103,9 +105,9 @@ on the top of the page -- this message is shown only to users with the
 'administer domains' permission.  The error is also written to your site's
 error logs, if any.
 
-If you encourter this error, please check that you have installed or upgraded
+If you encounter this error, please check that you have installed or upgraded
 the module correctly.  If the problem persists, please file a support request
-at http://drupal.org/project/domain
+at http://drupal.org/project/domain.
 
 
 ----
@@ -124,7 +126,7 @@ Below are some notes about the changes to the new version.
     issues, but there will be a skipped domain_id for all sites.
 -- Fresh installs of Domain Access will never have a domain_id of 1.
 -- The 'domain editor' grant has been deprecated.
--- The new function domain_user_get_user_domains($uid) can be used
+-- The new function domain_get_user_domains($uid) can be used
     to find which domains as user is assigned to.
 
 ----
