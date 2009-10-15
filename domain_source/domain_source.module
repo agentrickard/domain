@@ -60,7 +60,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
         '#type' => 'select',
         '#title' => t('Source domain'),
         '#options' => $options,
-        '#default_value' => ($form['#node']->domain_source) ? $form['#node']->domain_source : $_domain['domain_id'],
+        '#default_value' => isset($form['#node']->domain_source) ? $form['#node']->domain_source : $_domain['domain_id'],
         '#description' => t('This affiliate will be used to write links to this content from other affiliates, as needed.')
       );
     }
