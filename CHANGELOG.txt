@@ -1,5 +1,9 @@
 // $Id$
 
+15-OCT-2009
+
+-- #604770 patch by seattleturtle. Correctly check isset for domain source value.
+
 11-OCT-2009
 
 -- #579552 by skizzo and seattleturtle. Tries to avoid PHP errors for missing globals.
