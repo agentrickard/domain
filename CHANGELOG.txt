@@ -6,7 +6,7 @@
 
 11-OCT-2009
 
--- #576444 by jeremyr and nonsie. Makes the selection of domains configrable as checkboxes or select list.
+-- #576444 by jeremyr and nonsie. Makes the selection of domains configurable as checkboxes or select list.
 -- #576116 by guusbosman. Clear the cache when adjusting settings like themes, site slogan, et. al.
 -- #560156 by skizzo. Improves the Views domain access plugin by adding strict and membership options.
 -- #550684 by TCRobbert. Added cache settings to Domain Conf.
