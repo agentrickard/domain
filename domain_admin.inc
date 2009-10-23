@@ -277,7 +277,6 @@ function domain_configure_form($user_submitted = FALSE) {
       This feature requires the hook_url_alter() patch.')
   );
 
-
   $options = array('-1' => t('Do not change domain'));
   foreach (domain_domains() as $data) {
     // The domain must be valid.

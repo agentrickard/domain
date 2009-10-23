@@ -1019,7 +1019,7 @@ function domain_form_alter($form_id, &$form) {
   }
   // Set a message if we are on an admin page.
   domain_warning_check($form_id);
-  
+
   // If SEO is turned on, then form actions need to be absolute paths
   // to the currently active domain.  See http://drupal.org/node/196217.
   $seo = variable_get('domain_seo', 0);
@@ -1034,6 +1034,11 @@ function domain_form_alter($form_id, &$form) {
     if (empty($action['host'])) {
       $form['#action'] =  check_url($_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query']);
     }
+  }
+
+  // Save our settings for the default domain.
+  if ($form_id = 'system_site_information_settings' && arg(2) != 'domain') {
+    $form['#submit']['domain_form_sitename_submit'] = array();
   }
 
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
@@ -1218,6 +1223,15 @@ function domain_form_alter($form_id, &$form) {
     }
   }
 }
+
+/**
+ * Update the default domain's sitename.
+ */
+function domain_form_sitename_submit($form, &$form_state) {
+  variable_set('domain_sitename', $form_state['values']['site_name']);
+  drupal_set_message(t('Primary domain settings updated.'));
+}
+
 
 /**
  * Activate the hidden grant for searches.

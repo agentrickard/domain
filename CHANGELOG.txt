@@ -1,5 +1,9 @@
 // $Id$
 
+23-OCT-2009
+
+-- #609600 by seddonym. Must track changes to the default site_name variable.
+
 15-OCT-2009
 
 -- #604770 patch by seattleturtle. Correctly check isset for domain source value.
