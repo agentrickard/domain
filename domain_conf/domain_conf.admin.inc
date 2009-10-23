@@ -56,7 +56,7 @@ function domain_conf_form($form_state, $domain) {
       continue;
     }
     if ($action['#form']['#type'] == 'select') {
-      $action['#form']['#options'] = array_merge(array(NULL => t('Use primary domain settings')), $action['#form']['#options']);
+      $action['#form']['#options'] = array(NULL => t('Use primary domain settings')) + $action['#form']['#options'];
     }
     $group = isset($action['#group']) ? $action['#group'] : $default_group;
     if (!isset($form[$group])) {

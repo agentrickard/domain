@@ -1,5 +1,9 @@
 // $Id$
 
+23-OCT-2009
+
+-- #612808 patch by voxpelli. Cannot use array_merge() with Domain Conf defaults.
+
 15-OCT-2009
 
 -- #604770 patch by seattleturtle. Correctly check isset for domain source value.
