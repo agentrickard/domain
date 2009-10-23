@@ -1628,6 +1628,19 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Update the default domain's sitename.
+ */
+function domain_form_system_site_information_settings_alter(&$form, &$form_state) {
+  $form['#submit'][] = 'domain_form_sitename_submit';
+}
+
+function domain_form_sitename_submit($form, &$form_state) {
+  db_query("UPDATE {domain} SET sitename = '%s' WHERE domain_id = 0", $form_state['values']['site_name']);
+  variable_set('domain_sitename', $form_state['values']['site_name']);
+  drupal_set_message(t('Primary domain settings updated.'));
+}
+
+/**
  * Check a user's permissions for displaying the Domain form on nodes.
  *
  * This sets the hierarchy of user form permissions for those without 'set domain access'.

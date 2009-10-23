@@ -3,6 +3,8 @@
 23-OCT-2009
 
 -- #612808 patch by voxpelli. Cannot use array_merge() with Domain Conf defaults.
+-- #609600 by seddonym. Must track changes to the default site_name variable.
+
 
 15-OCT-2009
 
