@@ -95,7 +95,7 @@ function domain_init() {
   }
 
   // For Domain User, we check the validity of accounts, so the 'valid' flag must be TRUE.
-  if (!$_domain['valid'] && !user_access('access inactive domains')) {
+  if (empty($_domain['valid'])) {
     domain_invalid_domain_requested();
   }
 
@@ -1814,6 +1814,11 @@ function domain_request_name() {
  */
 function domain_invalid_domain_requested() {
   global $_domain, $user;
+
+  // Some users are allowed to view inactive domains.
+  if (user_access('access inactive domains')) {
+    return;
+  }
 
   // Check to see if this is a node page. These are redirected to a visible page, if possible.
   $item = menu_get_item();
