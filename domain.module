@@ -1459,9 +1459,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
   if ($form['#id'] == 'node-form' && !isset($form['#node']->cck_dummy_node_form)) {
     global $_domain, $user;
-    
-    // Include a submit hook so we can redirect?
-    $form['#submit'][] = 'domain_node_form_submit';
+
     // By default, the requesting domain is assigned.
     $default = array($_domain['domain_id']);
     // How is core content handled for this site?
