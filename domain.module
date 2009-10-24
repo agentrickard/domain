@@ -58,6 +58,7 @@ function domain_init() {
   if (!is_array($_domain)) {
     $_domain = array();
   }
+
   // Error handling in case the module is not installed correctly.
   if (empty($_domain)) {
     $_domain['error'] = '-1';
@@ -94,11 +95,10 @@ function domain_init() {
   }
 
   // For Domain User, we check the validity of accounts, so the 'valid' flag must be TRUE.
-  // If this check fails, we send users to the default site homepage.
-  if (!$_domain['valid'] && !user_access('administer domains')) {
-    $_domain = domain_default();
-    drupal_goto($_domain['path']);
+  if (!$_domain['valid'] && !user_access('access inactive domains')) {
+    domain_invalid_domain_requested();
   }
+
   // Set the site name to the domain-specific name.
   $conf['site_name'] = $_domain['sitename'];
 
@@ -211,6 +211,7 @@ function domain_menu() {
  */
 function domain_perm() {
   $perms = array(
+    'access inactive domains',
     'administer domains',
     'assign domain editors',
     'delete domain nodes',
@@ -281,7 +282,7 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
             else {
               $title = $domain['sitename'] .' *';
               $allow = FALSE;
-              if (user_access('administer domains')) {
+              if (user_access('access inactive domains')) {
                 $msg = TRUE;
                 $allow = TRUE;
               }
@@ -479,7 +480,7 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     // Cannot pass zero in checkboxes.
     ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
     // The domain must be valid.
-    if ($data['valid'] || user_access('administer domains')) {
+    if ($data['valid'] || user_access('access inactive domains')) {
       // Filter checkbox output but not select list.
       $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
@@ -1097,25 +1098,20 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         return;
       }
       // Append the domain grants to the node for editing.
-      $node->domains = array();
-      $node->domain_site = FALSE;
-      $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = %d AND (realm = '%s' OR realm = '%s')", $node->nid, 'domain_id', 'domain_site');
-      while ($data = db_fetch_object($result)) {
-        // Transform the 0 to -1, since {domain_access} is unsigned.
-        ($data->gid == 0) ? $gid = -1 : $gid = $data->gid;
-        if ($data->realm == 'domain_id') {
-          $node->domains[$gid] = $gid;
-          if ($gid > 0) {
-            $domain = domain_lookup($gid);
-            $node->subdomains[] = $domain['sitename'];
-          }
-          else {
-            $node->subdomains[] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
-          }
+      $domains = domain_get_node_domains($node->nid);
+      $node->domains = $domains['domain_id'];
+      $node->domain_site = $domains['domain_site'];
+      $node->subdomains = array();
+      if ($node->domain_site) {
+        $node->subdomains[] = t('All affiliates');
+      }
+      foreach ($node->domains as $gid) {
+        if ($gid > 0) {
+          $domain = domain_lookup($gid);
+          $node->subdomains[] = $domain['sitename'];
         }
-        else if ($data->realm == 'domain_site') {
-          $node->domain_site = TRUE;
-          $node->subdomains[] = t('All affiliates');
+        else {
+          $node->subdomains[] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
         }
       }
       break;
@@ -1146,6 +1142,36 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       db_query("DELETE FROM {domain_access} WHERE nid = %d", $node->nid);
       break;
   }
+}
+
+/**
+ * Get the domains for a node.
+ *
+ * @param $nid
+ *   The node id.
+ * @return
+ *   An array, consisting of two parts. 'domain_id' is an array of active domain ids. 'domain_site'
+ *   is a TRUE/FALSE boolean indicating affiliate status.
+ */
+function domain_get_node_domains($nid) {
+  static $lookup = array();
+  if (isset($lookup[$nid])) {
+    return $lookup[$nid];
+  }
+  $domains = array('domain_id' => array(), 'domain_site' => FALSE);
+  $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = %d AND (realm = '%s' OR realm = '%s')", $nid, 'domain_id', 'domain_site');
+  while ($data = db_fetch_object($result)) {
+    // Transform the 0 to -1, since {domain_access} is unsigned.
+    ($data->gid == 0) ? $gid = -1 : $gid = $data->gid;
+    if ($data->realm == 'domain_id') {
+      $domains['domain_id'][$gid] = $gid;
+    }
+    else if ($data->realm == 'domain_site') {
+       $domains['domain_site'] = TRUE;
+    }
+  }
+  $lookup[$nid] = $domains;
+  return $lookup[$nid];
 }
 
 /**
@@ -1768,6 +1794,70 @@ function domain_request_name() {
   // We lower case this, since EXAMPLE.com == example.com.
   return strtolower(rtrim($_SERVER['HTTP_HOST']));
 }
+
+/**
+ * Redirect a request to an invalid domain.
+ *
+ * We were sent here from domain_init() because the user cannot
+ * view the requested domain.
+ *
+ * Take the user to the best valid match, which is usually the primary
+ * domain. In the case of nodes, try to find another match.
+ *
+ * @return
+ *   No return. This function issues a drupal_goto();
+ */
+function domain_invalid_domain_requested() {
+  global $_domain, $user;
+
+  // Check to see if this is a node page. These are redirected to a visible page, if possible.
+  $item = menu_get_item();
+  $nid = NULL;
+  if ($item['path'] == 'node/%') {
+    $node = node_load(arg(1));
+  }
+  if (empty($node->nid)) {
+    $path = $item['href'];
+    if (drupal_is_front_page($item['href'])) {
+      $path = '';
+    }
+    $default = domain_default();
+    // Log the access attempt.
+    watchdog('domain', 'Invalid domain requested by %user on %domain; redirected to %default.', array('%user' => $user->name, '%domain' => $_domain['sitename'], '%default' => $default['sitename']), WATCHDOG_WARNING);
+    drupal_goto($default['path'] . drupal_get_path_alias($path));
+  }
+  // Try to find the proper redirect for a node.
+  $path = "node/$node->nid";
+  if (isset($node->domain_source)) {
+    $domain = domain_lookup($node->domain_source);
+    if ($domain['valid']) {
+      $redirect = $domain;
+    }
+    else if (!empty($node->domains)) {
+      foreach ($node->domains as $domain_id) {
+        if ($domain_id == -1) {
+          $domain_id = 0;
+        }
+        $domain = domain_lookup($domain_id);
+        if ($domain['valid']) {
+          $redirect = $domain;
+          break;
+        }
+      }
+    }
+  }
+  // If we found no node matches, just go to the home page.
+  $extra = ' '. t('node page.');
+  if (empty($redirect)) {
+    $redirect = domain_default();
+    $path = '';
+    $extra = '.';
+  }
+  // Log the access attempt.
+  watchdog('domain', 'Invalid domain requested by %user on %domain, redirected to %redirect', array('%user' => $user->name, '%domain' => $_domain['sitename'], '%redirect' => $redirect['sitename'] . $extra), WATCHDOG_WARNING);
+  drupal_goto($redirect['path'] . drupal_get_path_alias($path));
+}
+
 
 /**
  * Determines a domain_id matching given $_name.

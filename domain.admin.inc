@@ -145,7 +145,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#default_value' => variable_get('domain_root', ''),
     '#description' => t('The primary domain for your site.  Typically <em>example.com</em> or <em>www.example.com</em>.  Do not use http or slashes.
       <br />This domain will be used as the default URL for your site.
-      <br />If an invalid domain is requested, users will be sent to the primary domain.')
+      <br />If an invalid domain is requested, users will be sent next available domain or to the primary domain.')
   );
   $form['domain']['domain_sitename'] = array(
     '#type' => 'textfield',
@@ -229,6 +229,15 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#collapsed' => TRUE
   );
 
+  $form['domain_advanced']['domain_www'] = array(
+    '#type' => 'radios',
+    '#title' => t('WWW prefix handling'),
+    '#default_value' => variable_get('domain_www', 0),
+    '#options' => array(0 => t('Process all host requests normally'), 1 => t('Treat www.*.example.com as an alias of *.example.com')),
+    '#description' => t('If set, calls to www.* will be treated as if the www. did not exist.
+    <em>Users will be taken from www.example.com to example.com, so your domains must be registered without the www. prefix.</em>')
+  );
+
   // Check to see if the node_access patch is enabled.  If it is, then
   // we need to know if more than one node_access module is running.
   $modules = count(module_implements('node_grants'));
@@ -265,15 +274,6 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
       option reduces the chance that search engines will recognize duplicate content.')
   );
 
-  $form['domain_advanced']['domain_www'] = array(
-    '#type' => 'radios',
-    '#title' => t('WWW prefix handling'),
-    '#default_value' => variable_get('domain_www', 0),
-    '#options' => array(0 => t('Process all host requests normally'), 1 => t('Treat www.*.example.com as an alias of *.example.com')),
-    '#description' => t('If set, calls to www.* will be treated as if the www. did not exist.
-    <em>Users will be taken from www.example.com to example.com, so your domains must be registered without the www. prefix.</em>')
-  );
-
   $options = array('-1' => t('Do not change domain'));
   foreach (domain_domains() as $data) {
     // The domain must be valid.
@@ -287,7 +287,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#title' => t('Default source domain'),
     '#options' => $options,
     '#default_value' => variable_get('domain_default_source', 0),
-    '#description' => t('When rewriting urls, nodes assigned to all affiliates will be sent to this domain.'),
+    '#description' => t('When rewriting urls, nodes assigned to all affiliates will be sent to this domain. <em>NOTE: This option only fires if you enable SEO rewrites or use the Domain Source module.</em>'),
   );
 
   $form['domain_all'] = array(

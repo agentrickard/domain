@@ -71,10 +71,17 @@ function domain_nav_menu() {
  *
  * @param $access
  * The status set by our menu checks, which is always TRUE.  It defaults to
- * FALSE ehr because that is a good habit.
+ * FALSE here because that is a good habit.
  */
-function domain_nav_check($access = FALSE) {
+ function domain_nav_check($access = FALSE) {
   return $access;
+ }
+
+/**
+  * Implement hook_perm().
+  */
+function domain_nav_perm() {
+  return array('access domain navigation');
 }
 
 /**
@@ -157,6 +164,9 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
  */
 function domain_nav_render($paths = NULL, $style = NULL) {
   global $_domain;
+  if (!user_access('access domain navigation')) {
+    return;
+  }
   // Get the options and set the variables.
   if (empty($paths)) {
     $paths = variable_get('domain_nav_block', 0);
@@ -172,7 +182,7 @@ function domain_nav_render($paths = NULL, $style = NULL) {
     $allow = TRUE;
     // If the domain is not valid, we disable it by default.
     if (!$value['valid']) {
-      if (user_access('administer domains')) {
+      if (user_access('access inactive domains')) {
         $value['sitename'] .= ' *';
       }
       else {

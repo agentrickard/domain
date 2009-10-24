@@ -195,3 +195,22 @@ function domain_update_6203() {
   }
   return $ret;
 }
+
+/**
+ * Adds the new 'access inactive domains' permission.
+ */
+function domain_update_6204() {
+  $ret = array();
+  $result = db_query("SELECT * FROM {permission}");
+  while ($permission = db_fetch_object($result)) {
+    if (strpos($permission->perm, 'administer domains') > 0) {
+      $pid = (int) $permission->pid;
+      $string = db_escape_string($permission->perm .', access inactive domains');
+      if (module_exists('domain_nav')) {
+        $string .= ', access domain navigation';
+      }
+      $ret[] = update_sql("UPDATE {permission} SET perm = '$string' WHERE pid = $pid");
+    }
+  }
+  return $ret;
+}

@@ -1,10 +1,23 @@
 // $Id$
 
+24-OCT-2009
+
+-- #529026 by davereid. Updates the URL Alter integration to match Drupal 7.
+-- #540684 by Bartezz. Allows Domain Source to set the active domain as source.
+-- #561282 by kotu, nonsie, nirbhasa, Bartezz. Removes the auto-filtering of domains
+    by id when using Views.
+-- #564070 by BWPanda. Limits Domain Source to only active domains.
+-- #564070 by BWPanda. Better redirects from invalid domains.
+-- Introduces domain_get_node_domains() and domain_source_lookup().
+-- Now logs requests to invalid domains.
+-- Introduces the _access inactive domains_ permission.
+-- Introduces the _access domain navigation_ permission.
+-- Requires running update.php to add new permissions.
+
 23-OCT-2009
 
 -- #612808 patch by voxpelli. Cannot use array_merge() with Domain Conf defaults.
 -- #609600 by seddonym. Must track changes to the default site_name variable.
-
 
 15-OCT-2009
 

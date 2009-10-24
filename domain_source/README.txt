@@ -111,6 +111,8 @@ permission will be able to select a "source" domain.
 Otherwise, domain assignments will be done automatically, based on the currently
 active domain.
 
+NOTE: Inactive domains may not be selected as a source domain.
+
 ----
 3.3 Integration with Domain Content
 

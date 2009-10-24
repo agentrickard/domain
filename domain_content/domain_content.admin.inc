@@ -260,7 +260,7 @@ function domain_content_form($form_state) {
       // Cannot pass zero in checkboxes.
       ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
       // The domain must be valid.
-      if ($data['valid'] || user_access('administer domains')) {
+      if ($data['valid'] || user_access('access inactive domains')) {
         // Filter checkboxes but not select lists.
         $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
       }

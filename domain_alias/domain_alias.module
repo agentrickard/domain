@@ -392,7 +392,7 @@ function theme_domain_alias_block($domains) {
     else {
       $title = $domain['sitename'] .' *';
       $allow = FALSE;
-      if (user_access('administer domains')) {
+      if (user_access('access inactive domains')) {
         $msg = TRUE;
         $allow = TRUE;
       }

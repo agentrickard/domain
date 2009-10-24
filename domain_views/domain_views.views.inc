@@ -116,9 +116,6 @@ function domain_views_views_data() {
   $data['domain_access']['table']['join']['node'] = array(
     'left_field' => 'nid',
     'field' => 'nid',
-    'extra' => array(
-      array('field' => 'realm', 'value' => 'domain_id', 'numeric' => FALSE),
-    ),
   );
   $data['domain_access']['table']['join']['domain'] = array(
     'left_field' => 'domain_id',

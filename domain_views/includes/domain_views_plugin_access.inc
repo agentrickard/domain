@@ -12,8 +12,6 @@
  */
 class domain_views_plugin_access extends views_plugin_access {
   function access($account) {
-  dsm($this->options['domains']);
-  dsm($this);
     return domain_views_access(array_filter($this->options['domains']), $this->options['domain_strict'], $this->options['domain_member']);
   }
 
@@ -41,7 +39,7 @@ class domain_views_plugin_access extends views_plugin_access {
         $domain['domain_id'] = -1;
       }
       // The domain must be valid.
-      if ($domain['valid'] || user_access('administer domains')) {
+      if ($domain['valid'] || user_access('access inactive domains')) {
         // Filter checkboxes but not select lists.
         $options[$domain['domain_id']] = empty($format) ? check_plain($domain['sitename']) : $domain['sitename'];
       }

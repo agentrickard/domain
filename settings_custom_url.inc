@@ -15,7 +15,7 @@
  */
 if (!function_exists('custom_url_rewrite_outbound')) {
   function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
-    domain_url_alter_outbound($path, $options, $original_path);
+    domain_url_outbound_alter($path, $options, $original_path);
   }
 }
 
@@ -23,15 +23,15 @@ if (!function_exists('custom_url_rewrite_outbound')) {
  * Legacy wrapper for users of 6.x.2, rc8.
  */
 function domain_url_rewrite_outbound(&$path, &$options, $original_path) {
-  domain_url_alter_outbound($path, $options, $original_path);
+  domain_url_outbound_alter($path, $options, $original_path);
 }
 
 /**
- * Implementation of hook_url_alter_outbound().
+ * Implement hook_url_outbound_alter().
  *
  * Forces absolute paths for domains when needed.
  */
-function domain_url_alter_outbound(&$path, &$options, $original_path) {
+function domain_url_outbound_alter(&$path, &$options, $original_path) {
   global $_domain;
 
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.
@@ -48,7 +48,7 @@ function domain_url_alter_outbound(&$path, &$options, $original_path) {
   $check = domain_grant_all();
   $seo = variable_get('domain_seo', 0);
   // If using Domain Source, we force links to a specific domain.
-  $use_source = function_exists('domain_source_domainupdate');
+  $use_source = function_exists('domain_source_lookup');
 
   if ($check || $seo || $use_source) {
     // Check to see if this is a node or comment link and set $nid accordingly.
@@ -88,8 +88,7 @@ function domain_url_alter_outbound(&$path, &$options, $original_path) {
           // The Domain Source module is optional, and allows nodes to be assigned to specific domains for the
           // purpose of this check.
           if ($use_source) {
-            $source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $nid));
-            $domain[$nid] = domain_lookup($source);
+            $domain[$nid] = domain_source_lookup($nid);
           }
           else {
             // Load the domain data for this node -- but only take the first match.
@@ -103,7 +102,7 @@ function domain_url_alter_outbound(&$path, &$options, $original_path) {
           // In this case, the $base_url cannot have a trailing slash
           $options['base_url'] = rtrim($domain[$nid]['path'], '/');
           // Domain Source trumps the seo rules below.
-          if (isset($source)) {
+          if ($use_source) {
             $seo = FALSE;
           }
           $target_domain_id = $domain[$nid]['domain_id'];

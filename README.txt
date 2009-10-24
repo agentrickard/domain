@@ -673,6 +673,9 @@ This setting allows you to control the domain to use when rewriting links that
 are sent to 'all affiliates.'  Simply select the domain that you wish to use as
 the primary domain for URL rewrites.
 
+NOTE: This option only fires if you enable SEO rewrites or use the provided
+Domain Source module.
+
 By default this value is your primary domain.
 
 ----
