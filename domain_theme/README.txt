@@ -92,7 +92,7 @@ theme for use by that domain.  This form works just like the default system
 theme selection form, with the following notes:
 
   -- You cannot enable themes from this screen. Themes must be enabled globally.
-  
+
 You may configure domain-specific theme settings by clicking on the 'configure'
 link.
 

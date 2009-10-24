@@ -189,7 +189,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   // 4) Check that the alias doesn't contain any invalid characters.
   $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $alias);
   if ($check == 0) {
-    form_error($form[$type][$id]['pattern'], t('%name contains invalid characters. ', array('%name' => $alias)));
+    form_error($form[$type][$id]['pattern'], t('%name contains invalid characters.', array('%name' => $alias)));
   }
   // 5) Check that the alias is not a direct match for a registered domain.
   $check = preg_match('/[a-z0-9\.\+\-:]*$/', $alias);
@@ -205,7 +205,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   foreach ($aliases as $_alias) {
     $_alias_pattern = str_replace(array_keys($replace), $replace, $_alias);
     if (preg_match('@'. $_pattern .'@i', $_alias) || preg_match('@'. $_alias_pattern .'@i', $alias)) {
-      form_error($form[$type][$id]['pattern'], t('%name matches %existing. You must use unique values. ', array('%name' => $alias, '%existing' => $_alias)));
+      form_error($form[$type][$id]['pattern'], t('%name matches %existing. You must use unique values.', array('%name' => $alias, '%existing' => $_alias)));
       break;
     }
   }

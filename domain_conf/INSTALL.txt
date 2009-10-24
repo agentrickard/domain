@@ -25,7 +25,7 @@ In particular, these variables need to be available during variable_init().
 ----
 2.  Installation
 
-As of 6.x.2, this module is now loaded directly from settings.php when you 
+As of 6.x.2, this module is now loaded directly from settings.php when you
 install the Domain module correctly.
 
 ----

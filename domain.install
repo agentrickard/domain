@@ -163,9 +163,9 @@ function domain_update_6201() {
 
 /**
  * Updates to 6.x.2.
- * 
+ *
  * Removes the authoring and menu settings for the node form.
- * 
+ *
  */
 function domain_update_6202() {
   $ret = array();

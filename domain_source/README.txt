@@ -105,7 +105,7 @@ domain.
 ----
 3.2 Content Editing Forms
 
-Only users with the 'set domain access' or  'publish to any assigned domain' 
+Only users with the 'set domain access' or  'publish to any assigned domain'
 permission will be able to select a "source" domain.
 
 Otherwise, domain assignments will be done automatically, based on the currently

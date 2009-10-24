@@ -7,7 +7,7 @@ diff -u -p -r1.947.2.15 node.module
 --- modules/node/node.module	16 Feb 2009 14:39:40 -0000	1.947.2.15
 +++ modules/node/node.module	31 May 2009 18:10:32 -0000
 @@ -2032,22 +2032,19 @@ function node_access($op, $node, $accoun
- 
+
    // If the module did not override the access rights, use those set in the
    // node_access table.
 -  if ($op != 'create' && $node->nid && $node->status) {
@@ -38,12 +38,12 @@ diff -u -p -r1.947.2.15 node.module
 -    $result = db_query_range($sql, $node->nid, 0, 1);
 -    return (bool) db_result($result);
    }
- 
+
    // Let authors view their own nodes.
 @@ -2097,17 +2094,7 @@ function _node_access_where_sql($op = 'v
      return;
    }
- 
+
 -  $grants = array();
 -  foreach (node_access_grants($op, $account) as $realm => $gids) {
 -    foreach ($gids as $gid) {
@@ -56,12 +56,12 @@ diff -u -p -r1.947.2.15 node.module
 -    $grants_sql = 'AND ('. implode(' OR ', $grants) .')';
 -  }
 +  $grants_sql = node_access_grants_sql($op, $node_access_alias, $account);
- 
+
    $sql = "$node_access_alias.grant_$op >= 1 $grants_sql";
    return $sql;
 @@ -2145,18 +2132,7 @@ function node_access_view_all_nodes() {
    static $access;
- 
+
    if (!isset($access)) {
 -    $grants = array();
 -    foreach (node_access_grants('view') as $realm => $gids) {
@@ -82,7 +82,7 @@ diff -u -p -r1.947.2.15 node.module
 @@ -2165,6 +2141,92 @@ function node_access_view_all_nodes() {
    return $access;
  }
- 
+
 + /**
 +  * Check the logic of node grants and prepare the SQL statement.
 +  *
@@ -108,10 +108,10 @@ diff -u -p -r1.947.2.15 node.module
 +   $grants = array();
 +   $alias = '';
 +   $grants_sql = '';
-+ 
++
 +   // First, acquire all the grants as an array of rules.
 +   $rules = node_access_grants($op, $account);
-+ 
++
 +   // Prepare the table alias, if needed.
 +   if (!empty($node_access_alias)) {
 +     $alias = $node_access_alias .'.';

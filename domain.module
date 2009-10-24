@@ -1167,7 +1167,7 @@ function domain_get_node_domains($nid) {
       $domains['domain_id'][$gid] = $gid;
     }
     else if ($data->realm == 'domain_site') {
-       $domains['domain_site'] = TRUE;
+      $domains['domain_site'] = TRUE;
     }
   }
   $lookup[$nid] = $domains;
@@ -2121,7 +2121,7 @@ function domain_node_access_explain($row) {
   global $_domain;
   $active = $_domain['subdomain'];
   $domain = domain_lookup($row->gid);
-  $return = t('Domain Access -- ');
+  $return = t('Domain Access') .' -- ';
   switch ($row->realm) {
     case 'domain_all':
       if (domain_grant_all() == TRUE) {
@@ -2146,8 +2146,8 @@ function domain_node_access_explain($row) {
 }
 
 /**
-* Implement hook_node_access_acknowlegde for devel.module
-*/
+ * Implement hook_node_access_acknowlegde for devel.module
+ */
 function domain_node_access_acknowledge($grant) {
   if ($grant['realm'] == 'domain_all') {
     return TRUE;

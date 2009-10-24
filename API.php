@@ -629,16 +629,16 @@ function hook_domainpath($domain_id, &$path, $path_language = '') {
  * Use this function if you need to reset a domain-specific variable
  * from your own code. It is especially useful in conjunction with
  * hook_domainupdate().
- * 
+ *
  * @link http://drupal.org/node/367963
  *
  * @param $domain_id
- * The unique domain ID that is being edited.
+ *  The unique domain ID that is being edited.
  * @param $variable
- * The name of the variable you wish to set.
+ *  The name of the variable you wish to set.
  * @param $value
- * The value of the variable to set. You may leave this
- * value blank in order to unset the custom variable.
+ *  The value of the variable to set. You may leave this
+ *  value blank in order to unset the custom variable.
  */
 function mymodule_form_submit($form_state) {
   // When we save these changes, replicate them across all domains.

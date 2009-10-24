@@ -39,7 +39,7 @@ function domain_conf_domain_bootstrap_full($domain) {
       // Language handling is a special case.
       if ($key == 'language_default') {
         $table = domain_get_primary_table('system');
-        $language = (bool) db_result(db_query("SELECT status FROM $table WHERE name = 'locale' AND type = 'module'"));      
+        $language = (bool) db_result(db_query("SELECT status FROM $table WHERE name = 'locale' AND type = 'module'"));
         if ($language) {
           $table = domain_get_primary_table('languages');
           $temp = db_fetch_object(db_query("SELECT * FROM $table WHERE language = '%s'", $value));
@@ -486,8 +486,8 @@ function domain_conf_domainbatch() {
 }
 
 /**
-* Implement hook_domainupdate().
-*/
+ * Implement hook_domainupdate().
+ */
 function domain_conf_domainupdate($op, $domain, $form_state = array()) {
   if ($op == 'delete') {
     db_query("DELETE FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']);

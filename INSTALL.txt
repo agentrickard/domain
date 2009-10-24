@@ -41,7 +41,7 @@ CONTENTS
 The Domain Access module is a Node Access module.  It is designed to
 restrict access to content.
 
-WARNINGS: 
+WARNINGS:
  - Failure to install or uninstall this module according to instructions
    may cause errors in your site.
  - Node Access rules never apply to user 1 (the site admin) or to users
@@ -106,13 +106,13 @@ additions to the hosts file and the httpd.conf file.
 
 In order for the Apache server to find your virtual host(s), it absolutely
 needs two pieces of information: the ServerName (hostname & port the server
-uses to identify itself) and an IP address. 
+uses to identify itself) and an IP address.
 
 The two basic methods for doing this are to either:
 
   - Set up WildCard DNS, so that *.example.com resolves to your Drupal site.
     (The asterisk indicates any and all names carrying the < example.com >
-    suffix) 
+    suffix)
   - Set up each VirtualHost specifically, so that one.example.com,
     two.example.com, (and so on) all resolve to your Drupal site.
 
@@ -136,7 +136,7 @@ In this case any subdomain (*.ken.test) and another domain foo.test resolve to
 the same location. When configuring DNS for Domain Access, the document root is
 the same for all the VirtualHosts. The documentRoot directive sets the directory
 from which httpd will serve files. For DA, there is one Drupal installation and
-it is this installation built on a single database that is serving the files. 
+it is this installation built on a single database that is serving the files.
 
 This becomes even clearer when the VirtualHosts are set up specifically,
 each with its own VirtualHost block in the httpd.conf file, for example:
@@ -156,14 +156,14 @@ DocumentRoot /path/to/drupal/install
 ServerName foo.test
 </VirtualHost>
 
-This example gives a general idea of what is involved, but it is beyond the 
+This example gives a general idea of what is involved, but it is beyond the
 scope of this document to explain how to configure your specific DNS server
 situation, which may involve considerable research, trial & error or a call for
 help. Shared server situations can be particularly complicated and you should
 contact their administration for help with configuration if their online help
 files do not make things clear enough.
 
-After you have enabled multiple DNS entries to resolve to your single, 
+After you have enabled multiple DNS entries to resolve to your single,
 default Drupal installation, you may activate the module and configure its
 settings at Admin > Build > Domains.
 
@@ -235,7 +235,7 @@ other Drupal module.
 ----
 3.1   After Installation
 
-Note that as of 6.x.2.0, the primary domain is created for you on 
+Note that as of 6.x.2.0, the primary domain is created for you on
 installation.
 
 The primary domain will use the SERVER_NAME value of the request made
@@ -243,7 +243,7 @@ when installing the module. This value may be edited by going to
 Admin > Build > Domains and editing the Primary Domain value.
 
 After you install the module, you should visit Admin > Users > Permissions
-and set the module permissions; normally you will give your site 
+and set the module permissions; normally you will give your site
 administrators the following permissions:
 
     -- 'administer domains'
@@ -312,7 +312,7 @@ log back in for the new cookie to take effect.
 
 For Domain Access to work, you must add some code to your settings.php
 file. This code will load the Domain Access bootstrap routines that determine
-how your site is being requested. 
+how your site is being requested.
 
 If you do not add settings.inc to your settings.php file, Domain Access will
 fail to load and report an error message to site administrators.
@@ -385,7 +385,7 @@ include 'settings.inc';
 After editing your settings.php file, go to Admin > Build > Domains.  You may
 see a warning at the top of the page:
 
-  "Domain access failed to load during phase: -1. Please check your settings.php 
+  "Domain access failed to load during phase: -1. Please check your settings.php
   file and site configuration."
 
 This message means that your PHP server cannot find the include file.  You

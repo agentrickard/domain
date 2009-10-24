@@ -47,7 +47,7 @@ function domain_theme_set_variables($theme) {
     // Account for color module.
     $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
     // In some cases, where the domain uses the default color palette
-    // and the primary theme does not, we may only have the palette 
+    // and the primary theme does not, we may only have the palette
     // stored, in which case, we have to load that data and ignore the rest.
     $palette_var = 'color_'. $theme['theme'] .'_palette';
     if (!isset($settings[$palette_var])) {

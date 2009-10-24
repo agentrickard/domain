@@ -265,7 +265,7 @@ Then follow the instructions at: http://drupal.org/patch/apply
 
 NOTE: The multiple node access patch has been deprecated.
 This patch was rejected for Drupal core for version 7. The new database
-layer makes it unnecessary. 
+layer makes it unnecessary.
 
 If you wish to use Domain Access with another node access
 module, try using the Domain Advanced module.
@@ -454,11 +454,11 @@ The Domain Access module has the following permissions:
   will take them to the first match and the user will not be allowed to
   change the domain affiliation.
 
-  The advantage of this option is the user cannot modify the URL of a 
-  content edit form to match the URL of other domains, forcing all of her 
-  posts to be made to a single domain. Users trying to enter content 
+  The advantage of this option is the user cannot modify the URL of a
+  content edit form to match the URL of other domains, forcing all of her
+  posts to be made to a single domain. Users trying to enter content
   from another domain will always be transferred to their assigned domain.
-  
+
   In effect, a user assigned to 'one.example.com' will only be able to post
   to that domain, even if she clicks Create Content from two.example.com.
 
@@ -468,15 +468,15 @@ The Domain Access module has the following permissions:
   affiliate domains that the user is allowed to publish content to, according
   to the domains assigned to their user account.
 
-  Note that if this option is selected, users will also be shown a list of 
-  affiliates to which the node is  assigned.  This list shows only the 
+  Note that if this option is selected, users will also be shown a list of
+  affiliates to which the node is  assigned.  This list shows only the
   affiliates that the user cannot edit.
 
   Warning: If this option is selected and the user has no domain publishing
   options, the user will not be allowed to post or edit!
 
-  NOTE: Users who are assgined _none_ of these permissions and cannot 
-  'set domain access' will have the default form values passed as hidden fields. 
+  NOTE: Users who are assgined _none_ of these permissions and cannot
+  'set domain access' will have the default form values passed as hidden fields.
   This is the default option.  It will assign all content to the domain from
   which the form is entered.
 
@@ -504,12 +504,12 @@ to any user you trust to use the UI properly.
 
 In the event that you wish to segregate which content certain editors can
 control, you should not use the normal 'edit any TYPE nodes' and 'delete any
-TYPE nodes' permissions provided by Drupal's core Node module.  
-These permissons grant the ability for a user to edit and delete all nodes of a 
+TYPE nodes' permissions provided by Drupal's core Node module.
+These permissons grant the ability for a user to edit and delete all nodes of a
 given type.
 
 In the Domain Access model, these permissions are not used in favor of the
-provided 'edit domain nodes' and 'delete domain nodes' permissions.  These 
+provided 'edit domain nodes' and 'delete domain nodes' permissions.  These
 permissions  allow editors only to edit (and delete) nodes that belong to their
 domain.
 
@@ -533,7 +533,7 @@ Due to the way node_access() works, the following limitations should be noted.
     unavoidable.  It is best to preview your site as an anonymous or
     authenticated user who does not have special permissions.
 
-  - Users who have the 'edit any TYPE nodes' permission will be able to edit 
+  - Users who have the 'edit any TYPE nodes' permission will be able to edit
     nodes that do not belong to their domain.
 
 These limitations are due to the permissive nature of node_access().  If any
@@ -809,7 +809,7 @@ Note that this does not affect node access permissions set by other modules.
 ----
 4.5   Node Link Patterns
 
-When using this module, there are times when Domain Access will need to 
+When using this module, there are times when Domain Access will need to
 rewrite a node link using custom_url_rewrite_outbound().
 
 Since Drupal is an extensible system, we cannot account for all possible
@@ -856,7 +856,7 @@ process is especially important for sites using Wildcard DNS, as it prevents
 non-registered sites from resolving.
 
 Note that as of 6.x.2.0, two domains are created for you on installation.
-The first is a placeholder for your default domain. The second is a 
+The first is a placeholder for your default domain. The second is a
 sample domain record.
 
 The first domain will use the HTTP_HOST value of the request made
@@ -961,7 +961,7 @@ This setting is most useful under the following conditions:
   -- If you let anonymous users post content on your site. In this case, you
   should assign at least one domain to the anonymous user role, so that
   the module will assign anonymous posts to the appropirate domain(s).
-  
+
   -- If you use Domain Strict, you can use this setting to assign default
   access to specific roles.
 
@@ -972,7 +972,7 @@ Note that there are two options for how this setting behaves:
   {domain_editor} table. Use this setting if you want to change options for
   each role quickly, as these are global settings, so taking away a domain
   will instantly apply to all users.
-  
+
   -- Add default roles to the user account
   Use this setting if you want to automatically register users to specific
   domains or to save changes to a batch of users. When this setting is
@@ -1195,7 +1195,7 @@ required, but each adds functionality to the core module.
   this module to treat multiple domains as though they were identical.
 
   - Domain Configuration -- Allows you to change select system variables for
-  each domain, such as offline status, footer message and default home 
+  each domain, such as offline status, footer message and default home
   page.
 
   - Domain Content -- Provides a content administration page for each domain,
@@ -1248,7 +1248,7 @@ Some uses for this global variable might include:
   - Theme switching based on domain.
 
 The 'error' element is new in 6.x.2 and is used to signal installation problems.
-Normally the 'error' element should not be set. See the API documentation of 
+Normally the 'error' element should not be set. See the API documentation of
 hook_domain_bootstrap_ful() for details.
 
 ----
@@ -1297,7 +1297,7 @@ delete content on specific domains.  Its structure is:
   - uid
   Integer, unsigned NOT NULL default '0,
   A foreign key to the {users} table.
-  
+
   - domain_id
   Integer, unsigned NOT NULL default '0'
   A foreign key to the {domain} table.

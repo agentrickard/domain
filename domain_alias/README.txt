@@ -30,7 +30,7 @@ CONTENTS
 ----
 1.  Introduction
 
-The Domain Access: Domain Alias module, is an optional extension of the 
+The Domain Access: Domain Alias module, is an optional extension of the
 Domain Access module.  Domain Alias provides advanced options
 for configuring domain request handling by your site.
 
@@ -140,7 +140,7 @@ will show the current aliases, with a link to 'edit aliases.'
 Clicking on this link will show the Edit domain aliases page; this time, the top
 section of the form will show your current registered aliases.
 
-To modify an alias, simply change the pattern text or toggle the redirect 
+To modify an alias, simply change the pattern text or toggle the redirect
 option.
 
 To delete an alias, check the 'Delete' box on the right side of the form.
@@ -156,7 +156,7 @@ You may also use wildcard characters for advanced pattern matching.
 
 You may specify a pattern for your domains by using * (asterisk) to match any
 number of random characters and ? (question mark) to match exactly one random
-character. 
+character.
 
 For example: *.example.com would match any HTTP request made to a subdomain of
 example.com to the domain record for example.com.
@@ -214,7 +214,7 @@ Your site has the following domains and aliases:
   -- *.example.com
 -- foo.one.example.com
   -- foo.*.example.com
-  
+
 If you send a request to 'bar.example.com' the domain switcher will write
 the following links:
 
@@ -249,10 +249,10 @@ For information on the development of Domain Alias, see:
 
 Installing the module creates a {domain_conf} table that contains:
 
-  - alias_id 
+  - alias_id
   Integer, unique
   The lookup key for the record.
-  
+
   - domain_id
   Integer
   The matching key for this record, foreign key to the {domain} table.
@@ -260,7 +260,7 @@ Installing the module creates a {domain_conf} table that contains:
   - pattern
   Varchar (255)
   The alias pattern to match against inbound requests.
-  
+
   - redirect
   Integer (tiny)
   A boolean flag indicating that requests made to this alias should be
