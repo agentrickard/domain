@@ -55,19 +55,27 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
     }
     // In the case of users with limited permissions, option 3 is the "show options" value.
     else if (user_access('publish to any assigned domain') && !empty($account->domain_user)) {
+      $show = FALSE;
       // Get the user's allowed domains.
       foreach ($domains as $domain) {
         $key = $domain['domain_id'];
         if ($domain['domain_id'] == 0) {
           $key = -1;
         }
-        if ($domain['valid'] && $user->domain_user[$domain['domain_id']] != 0 && $domain['domain_id'] == $user->domain_user[$domain['domain_id']]) {
+        if ($domain['valid'] && $user->domain_user[$key] != 0) {
           $options[$key] = $domain['sitename'];
         }
       }
       // Is this node assigned to a source that the user can control?
-      $source = $form['#node']->domain_source;
-      if (isset($source) && isset($account->domain_user[$source])) {
+      if (isset($form['#node']->domain_source)) {
+        // Transform the 0 to -1 for lookups.
+        $source = ($form['#node']->domain_source == 0) ? -1 : $form['#node']->domain_source;
+      }
+      else {
+        $source = NULL;
+        $show = TRUE;
+      }
+      if (!is_null($source) && isset($account->domain_user[$source])) {
         if ($account->domain_user[$source] == $source) {
           $show = TRUE;
         }
@@ -186,12 +194,12 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
           $extra = ' ';
           $use_active = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
           if (empty($use_active)) {
-            $extra .= t('determined automatically');
+            $extra .= t('(determined automatically)');
           }
           else if ($use_active == DOMAIN_SOURCE_USE_ACTIVE) {
-            $extra .= t('using active domain');
+            $extra .= t('(using active domain)');
           }
-          $node->content['domain_source'] = array('#value' => '<p>'. t('<b>Source domain</b>: %source', array('%source' => $source['sitename'] . $extra)) .'</b></p>', '#weight' => 25);
+          $node->content['domain_source'] = array('#value' => '<p>'. t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . $extra .'</p>', '#weight' => 25);
         }
       }
       break;

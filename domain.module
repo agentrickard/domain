@@ -1459,6 +1459,9 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
   if ($form['#id'] == 'node-form' && !isset($form['#node']->cck_dummy_node_form)) {
     global $_domain, $user;
+    
+    // Include a submit hook so we can redirect?
+    $form['#submit'][] = 'domain_node_form_submit';
     // By default, the requesting domain is assigned.
     $default = array($_domain['domain_id']);
     // How is core content handled for this site?
@@ -1641,6 +1644,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
         '#value' => $raw,
       );
     }
+
     // THIS SECTION BREAKS CCK if we don't check for cck_dummy_node_form!  See http://drupal.org/node/186624
     // and note the !$form['#node']->cck_dummy_node_form in the IF check at the top of the function.
     // Some editors cannot administer nodes, so we have to add these form elements.
@@ -1660,6 +1664,9 @@ function domain_form_system_site_information_settings_alter(&$form, &$form_state
   $form['#submit'][] = 'domain_form_sitename_submit';
 }
 
+/**
+ * FormsAPI submit handler to track site name changes.
+ */
 function domain_form_sitename_submit($form, &$form_state) {
   db_query("UPDATE {domain} SET sitename = '%s' WHERE domain_id = 0", $form_state['values']['site_name']);
   variable_set('domain_sitename', $form_state['values']['site_name']);
