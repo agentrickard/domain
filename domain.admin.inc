@@ -262,7 +262,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#title' => t('Search settings'),
     '#default_value' => variable_get('domain_search', 0),
     '#options' => array(0 => t('Search content for the current domain only'), 1 => t('Search all domains from any URL')),
-    '#description' => t('Options for content searching.  This feature requires custom_url_rewrite_outbound() to be installed.')
+    '#description' => t('Options for content searching.')
   );
 
   $form['domain_advanced']['domain_seo'] = array(
