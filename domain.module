@@ -1567,7 +1567,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
           case 2:
             $domain = domain_lookup($first_domain);
             // If the domain is invalid, go to the primary domain.
-            if ($domain == -1 || (empty($domain['valid']) && !user_access('access inactive domains')) {
+            if ($domain == -1 || (empty($domain['valid']) && !user_access('access inactive domains'))) {
               domain_goto(domain_default());
             }
             else if ($domain['domain_id'] != $_domain['domain_id']) {
