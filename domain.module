@@ -1483,7 +1483,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       // Cannot pass zero in checkboxes.
       ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
       // The domain must be valid.
-      if ($data['valid'] || user_access('administer domains')) {
+      if ($data['valid'] || user_access('access inactive domains')) {
         // Checkboxes must be filtered, select listts should not.
         $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
       }
@@ -1567,7 +1567,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
           case 2:
             $domain = domain_lookup($first_domain);
             // If the domain is invalid, go to the primary domain.
-            if ($domain == -1 || $domain['valid'] == 0) {
+            if ($domain == -1 || (empty($domain['valid']) && !user_access('access inactive domains')) {
               domain_goto(domain_default());
             }
             else if ($domain['domain_id'] != $_domain['domain_id']) {

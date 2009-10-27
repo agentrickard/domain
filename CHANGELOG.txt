@@ -1,5 +1,9 @@
 // $Id$
 
+27-OCT-2009
+
+-- #564070 follow-up by nonsie. Catches missed conversion to new permission.
+
 24-OCT-2009
 
 -- #529026 by davereid. Updates the URL Alter integration to match Drupal 7.
