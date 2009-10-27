@@ -77,7 +77,7 @@ include './sites/all/modules/domain/settings.inc';
 
     For more information see README.txt.
 
-7.  Read the main README.txt file for the Domain Access module.
+7. Read the main README.txt file for the Domain Access module.
 
 8. Go to Admin > Build > Domain and configure the module.
 

@@ -111,7 +111,25 @@ permission will be able to select a "source" domain.
 Otherwise, domain assignments will be done automatically, based on the currently
 active domain.
 
+Users may select any assigned domain as the source for the content. They may
+also choose to use the 'Use current domain' option. if that option is selected,
+the links to the content will not be rewritten unless the current domain denies
+access to the content.
+
 NOTE: Inactive domains may not be selected as a source domain.
+
+When viewing content in debug mode, the module will show you the source
+domain for the content and the means used to determine that domain.
+Posible options are:
+
+  -- Domain sitename
+  Indicates the content is expressly assigned to a source domain.
+  -- Domain sitename 'determined automatically'
+  Indicates that no source domain is set, and the module is using default
+  behavior to determine the proper source domain.
+  -- Domain sitename 'using current domain'
+  Indicates the content link should not be rewritten, unless necessary, and to
+  view it on the current domain.
 
 ----
 3.3 Integration with Domain Content

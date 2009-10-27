@@ -3,6 +3,7 @@
 27-OCT-2009
 
 -- #564070 follow-up by nonsie. Catches missed conversion to new permission.
+-- Documentation updates.
 
 24-OCT-2009
 

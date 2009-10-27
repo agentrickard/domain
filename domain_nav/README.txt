@@ -14,6 +14,7 @@ CONTENTS
 1.  Introduction
 2.  Installation
 2.1   Dependencies
+2.2   Permissions
 3.  Configuration Options
 3.1   Link Paths
 3.2   Link Theme
@@ -45,6 +46,20 @@ The Domain Navigation module does not add any database tables.
 2.1 Dependencies
 
 Domain Navigation requires the Domain Access module be installed and active.
+
+----
+2.2 Permissions
+
+As of 6.x.2.0, Domain Navigation has one permission:
+
+  - 'access domain navigation'
+  This permission allows users to view the Domain Navigation block.
+  
+The module also uses the following inherited permission:
+
+  - 'access inactive domains'
+  If the user has this permission, inactive domains are shown and marked with
+  an asterisk (*).
 
 ----
 3.  Configuration Options

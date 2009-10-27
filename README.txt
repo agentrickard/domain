@@ -14,11 +14,12 @@ CONTENTS
 1.  Introduction
 1.1   Use-Case
 1.2   Examples
-1.3   Using Multiple Node Access Modules
-1.4   Known Issues
-1.4.1   Logging In To Multiple Domains
-1.4.2   Cron Handling
-1.4.3   Updating Your Site
+1.3   Editing Content
+1.4   Using Multiple Node Access Modules
+1.5   Known Issues
+1.5.1   Logging In To Multiple Domains
+1.5.2   Cron Handling
+1.5.3   Updating Your Site
 2.  Installation
 2.1   Patches to Drupal Core
 2.1.1   multiple_node_access.patch
@@ -37,22 +38,22 @@ CONTENTS
 4.1.1   Primary Domain Name
 4.1.2   Site Name
 4.1.3   Domain URL Scheme
-4.2   Domain Module Behaviors
-4.2.1   New Content Settings
-4.2.2   Debugging Status
-4.2.3   Sort Domain Lists
-4.2.4   Domain Selection Format
-4.3   Advanced Settings
-4.3.1   Search Settings
-4.3.2   Search Engine Optimization
-4.3.3   Default Source Domain
-4.3.4   WWW Prefix Handling
-4.3.5   Node Access Settings
-4.4   Special Page Requests
-4.4.1   Cron Handling
-4.5   Node Link Patterns
-4.6   The Domain List
-4.7   Creating Domain Records
+4.2   Creating Domain Records
+4.3   Domain Module Behaviors
+4.3.1   New Content Settings
+4.3.2   Debugging Status
+4.3.3   Sort Domain Lists
+4.3.4   Domain Selection Format
+4.4   Advanced Settings
+4.4.1   Search Settings
+4.4.2   Search Engine Optimization
+4.4.3   Default Source Domain
+4.4.4   WWW Prefix Handling
+4.4.5   Node Access Settings
+4.5   Special Page Requests
+4.5.1   Cron Handling
+4.6   Node Link Patterns
+4.7   The Domain List
 4.8   Node Settings
 4.8.1   Domain Node Editing
 4.8.2   Domain Node Types
@@ -74,6 +75,7 @@ CONTENTS
 7.3   Database Schema
 7.4   API
 7.5   drush and Domain Access
+7.6   Domain Tokens
 
 
 ----
@@ -134,10 +136,43 @@ editors have no control over which domains their content is published to.
 ----
 1.2 Examples
 
-For the original example of the module in use, see http://skirt.com/
+For the original example of the module in use, see http://skirt.com/.
 
 ----
-1.3   Using Multiple Node Access Modules
+1.3 Editing Content
+
+When using this module, users with proper permissions will see the following
+form elements when editing site content:
+
+  -- Domain Access --
+  
+  [ ] Send to all affiliates
+  Select if this content can be shown to all affiliates. This setting will
+  override the options below, but you must still select a domain that "owns" 
+  this content.
+  
+  Publish to *
+  [ ] example.com
+  [ ] one.example.com
+  [ ] two.example.com
+  [ ] myexample.com
+  Select which affiliates can access this content.
+
+The 'Send to all affliates' option is optional and indicates that the content
+may be viewed on any of your domains.
+
+The 'Publish to' field is required -- even if you select 'Send to all 
+affiliates'. This field is used to provide access control when 'Send to all 
+affiliates' is not enabled. It is also used to determine links to the content 
+and to control editorial access. You may select multiple affiliates.
+
+Users without permission to view these options will have their content assigned
+to the current domain
+
+For more information, including advanced options, see section 3. Permissions.
+
+----
+1.4   Using Multiple Node Access Modules
 
 Node Access is a complex issue in Drupal.  Typically, sites will only use
 one node access module at a time.  In some cases, you may require
@@ -171,14 +206,14 @@ For background, see:
   -- http://drupal.org/node/234087
 
 ----
-1.4   Known Issues
+1.5   Known Issues
 
 There are some issues that occur when Domain Access is used outside
 of its original use case.  These are probably fixable, but may not work
 as you expect.  You should pay careful attention to your site behavior.
 
 ----
-1.4.1   Logging In To Multiple Domains
+1.5.1   Logging In To Multiple Domains
 
 The Domain Access module allows the creation of domains with different
 hosts.  However, security standards dictate that cookies can only be
@@ -200,7 +235,7 @@ Note: See the INSTALL.txt for instructions regarding Drupal's default
 cookie handling.
 
 ----
-1.4.2   Cron Handling
+1.5.2   Cron Handling
 
 When Drupal's cron function runs, it operates on the domain from which
 the cron.php script is invoked.  That is, if you setup cron to run from:
@@ -219,7 +254,10 @@ If you encounter any cron-related issues, please report them at:
 http://drupal.org/project/issues/domain
 
 ----
-1.4.3   Updating Your Site
+1.5.3   Updating Your Site
+
+If prefixing database tables, it is possible that Drupal's update.php script
+may not update all mdoule tables correctly.
 
 This issue only occurs if you use the Domain Prefix module.  It is possible
 that database updates will not be applied to prefixed tables.
@@ -405,6 +443,11 @@ The Domain Access module has the following permissions:
   This permission allows users to create and manage domain records
   and settings.
 
+  - 'access inactive domains'
+  This permission allows users to navigate to domains which are marked
+  as inactive. Users with this permission may also assign content to an
+  inactive domain.
+
   'assign domain editors'
   This permission allows users to assign themselves and other users as
   affiliate editors.  For those users to act as editors, their role(s) must also
@@ -586,12 +629,77 @@ Allows the site to use 'http' or 'https' as the URL scheme.  Default is
 'http'.  All links and redirects to root site will use the selected scheme.
 
 ----
-4.2   Domain Module Behaviors
+4.2 Creating domain records
+
+As noted above, this screen does not register DNS records with Apache.
+
+Use this screen to register new allowed domains with your site.  This
+process is especially important for sites using Wildcard DNS, as it prevents
+non-registered sites from resolving.
+
+Note that as of 6.x.2.0, two domains are created for you on installation.
+The first is a placeholder for your default domain. The second is a
+sample domain record.
+
+The first domain will use the HTTP_HOST value of the request made
+when installing the module. This value may be edited by going to
+Admin > Build > Domains and editing the Primary Domain value.
+
+The second domain will be given the value test.example.com, where
+example.com is the Primary Domain value. This domain is set to be
+'inactive' initially. You will need to edit this domain record in order to
+use it.
+
+When you create a new domain record, simply fill in the form:
+
+  - Domain
+  This is the full path.example.com, without http:// or a trailing slash.
+
+  - Site name
+  This is the name of the site that will be shown when users access this site.
+
+  -- Domain URL scheme
+  Allows the domain to use 'http' or 'https' as the URL scheme.  Default is
+  'http'.  All links and redirects to the domain will use the selected scheme.
+
+  -- Domain status
+  By default, all domains are Active and anyone can navigate to them. Setting
+  a domain to Inactive restricts access to users with the 'access inactive
+  domains' permission. This feature is useful for staging content and testing
+  new domain configurations.
+  
+  NOTE: Users who try to access an inactive domain will have the attempt
+  reported in the site logs. When this occurs, the module will try to redirect
+  the user to the appropriate content on an active domain. If no match is
+  found, the user is send to the default home page.
+
+Both the Domain and the Site name are required to be unique values.
+
+After you create a record, you may edit or delete it as you see fit.
+
+NOTE: As a result of module installation, you will never have a Domain with
+the domain_id of 1 if you did not use Domain Access prior to 6.x.2.0. This
+is by design and will not affect the module.
+
+NOTE: When editing a domain record, Domain Access runs an http request
+to see if the domain is responding properly. This test checks for the presence
+of the file '200.png' inside the module's 'test' directory.
+
+If a 200 "found" reply is not returned, you will see an message warning you
+that your DNS may not be configured properly.  This message is intended
+to help you debug your DNS configuration and may be safely ignored.
+
+NOTE: Users who attempt to access an unregistered domain will be
+redirected to the primary domain automatically.
+
+
+----
+4.3   Domain Module Behaviors
 
 These options affect the basic options for how the module behaves.
 
 ----
-4.2.1   New Content Settings
+4.3.1   New Content Settings
 
 Defines the default behavior for content added to your site.  By design, the
 module automatically assigns all content to the currently active domain.
@@ -602,7 +710,7 @@ If you set this value to 'Only show on selected sites,' you must configure
 the Node type settings described in section 4.8.2.
 
 ----
-4.2.2   Debugging Status
+4.3.2   Debugging Status
 
 If enabled, this will append node access information to the bottom of each
 node.  This data is only viewable by uses with the 'set domain access'
@@ -610,14 +718,14 @@ privilege.  It is provided for debugging, since 'adminiseter nodes' will make
 all nodes viewable to some users.
 
 ----
-4.2.3   Sort Domain Lists
+4.3.3   Sort Domain Lists
 
 Both the Domain Switcher block and the Domain Nav module provide an
 end-user visible list of domains.  The domain sorting settings control how
 these lists are generated and presented to the user.
 
 ----
-4.2.4   Domain Selection Format
+4.3.4   Domain Selection Format
 
 Controls the form element display when choosing a list of domains. By
 default, Domain Access shows checkboxes, but if your site has a large
@@ -628,7 +736,7 @@ By default, if you have more than 25 domains, a select list will be used
 for your forms, but you may use this setting to alter that behavior.
 
 ----
-4.3   Advanced Settings
+4.4   Advanced Settings
 
 These settings control advanced features for the module.  Some of these
 features require patches to Drupal core.  Please read the documentation
@@ -640,14 +748,14 @@ have not been applied.
 By default, these features are all disabled.
 
 ----
-4.3.1   Search Settings
+4.4.1   Search Settings
 
 Allows the admin to decide if content searches should be run across all
 affiliates or just the currently active domain.  By design, Drupal will only
 find matches for the current domain.
 
 ----
-4.3.2   Search Engine Optimization
+4.4.2   Search Engine Optimization
 
 There is a risk with these modules that your site could be penalized by search
 engines such as Google for having duplicate content.  This setting controls the
@@ -656,7 +764,7 @@ behavior of URLs written for nodes on your affiliated sites.
     - If SEO settings are turned on, all node links are rewritten as absolute
       URLs.
     - If assigned to 'all affiliates' the node link goes to the 'default source
-      domain' defined in 4.3.4.  Normally. this is your primary domain.
+      domain' defined in 4.4.3.  Normally. this is your primary domain.
     - If assigned to a single affiliate, the node link goes to that affiliate.
     - If assigned to multiple affiliates, the node link goes to the first
       matching domain.
@@ -667,7 +775,7 @@ The optional Domain Source module (included in the download) allows you to
 assign the link to specific domains.
 
 ----
-4.3.3   Default Source Domain
+4.4.3   Default Source Domain
 
 This setting allows you to control the domain to use when rewriting links that
 are sent to 'all affiliates.'  Simply select the domain that you wish to use as
@@ -679,7 +787,7 @@ Domain Source module.
 By default this value is your primary domain.
 
 ----
-4.3.4   WWW Prefix Handling
+4.4.4   WWW Prefix Handling
 
 This setting controls how requests to www.example.com are treated with
 respect to example.com.  The default behavior is to process all host names
@@ -696,7 +804,7 @@ had requested one.example.com.
 This feature was requested by Rick and Matt at DZone.com
 
 ----
-4.3.5  Node Access Settings
+4.4.5  Node Access Settings
 
 This setting controls how you want Domain Access to interact with other
 node access modules.
@@ -737,7 +845,7 @@ Enabling this feature requires the multiple_node_access patch discussed
 in 2.1.1.
 
 ----
-4.4   Special Page Requests
+4.5   Special Page Requests
 
 For this feature to work, you must follow the instructions in INSTALL.txt
 regarding custom_url_rewrite_outbound().  If you have not followed the
@@ -781,13 +889,13 @@ Default and custom Views are often good candidates here as well.
 
 By default, 'user/*/track' is in this list.
 
-The logic for how these links are written is documented in 4.3.3 Search Engine
+The logic for how these links are written is documented in 4.4.2 Search Engine
 Optimization.
 
 Note that the 'search' path is handled separately and need not be added here.
 
 ----
-4.4.1  Cron Handling
+4.5.1  Cron Handling
 
 When Drupal's cron function runs, it runs on a specific domain.  This forces
 Domain Access to invoke its access control rules, which may not be desired.
@@ -807,7 +915,7 @@ for nodes when cron runs.
 Note that this does not affect node access permissions set by other modules.
 
 ----
-4.5   Node Link Patterns
+4.6   Node Link Patterns
 
 When using this module, there are times when Domain Access will need to
 rewrite a node link using custom_url_rewrite_outbound().
@@ -839,62 +947,12 @@ This is an advanced, but necessary feature.  Please report any core node path
 omissions at http://drupal.org/project/issues/domain.
 
 ----
-4.6 Domain List
+4.7 Domain List
 
 This screen shows all active domains registered for use with the site.
 
 Record zero (0) is hardcoded to refer to the "root" site defined as your
 Primary domain name.
-
-----
-4.7 Create domain record
-
-As noted above, this screen does not register DNS records with Apache.
-
-Use this screen to register new allowed domains with your site.  This
-process is especially important for sites using Wildcard DNS, as it prevents
-non-registered sites from resolving.
-
-Note that as of 6.x.2.0, two domains are created for you on installation.
-The first is a placeholder for your default domain. The second is a
-sample domain record.
-
-The first domain will use the HTTP_HOST value of the request made
-when installing the module. This value may be edited by going to
-Admin > Build > Domains and editing the Primary Domain value.
-
-The second domain will be given the value test.example.com, where
-example.com is the Primary Domain value. This domain is set to be
-'inactive' initially. You will need to edit this domain record in order to
-use it.
-
-When you create a new domain record, simply fill in the form:
-
-  - Domain
-  This is the full path.example.com, without http:// or a trailing slash.
-
-  - Site name
-  This is the name of the site that will be shown when users access this site.
-
-  -- Domain URL scheme
-  Allows the domain to use 'http' or 'https' as the URL scheme.  Default is
-  'http'.  All links and redirects to the domain will use the selected scheme.
-
-Both the Domain and the Site name are required to be unique values.
-
-After you create a record, you may edit or delete it as you see fit.
-
-NOTE: As a result of module installation, you will never have a Domain with
-the domain_id of 1 if you did not use Domain Access prior to 6.x.2.0. This
-is by design and will not affect the module.
-
-NOTE: When editing a domain record, Domain Access runs an http request
-to see if the domain is responding properly. This test checks for the presence
-of the file '200.png' inside the module's 'test' directory.
-
-If a 200 "found" reply is not returned, you will see an message warning you
-that your DNS may not be configured properly.  This message is intended
-to help you debug your DNS configuration and may be safely ignored.
 
 ----
 4.8 Node Settings
@@ -1324,3 +1382,35 @@ Enter drush commands in the format:
   >> drush --uri=www.example.com NORMAL COMMAND
 
 Generally, use the primary domain as the --uri flag.
+
+----
+7.6   Domain Tokens
+
+The module provides the following replacement tokens.
+
+  'domain-id'
+    The current domain ID.
+  'domain-name'
+    The current domain name, lowercased and with only alphanumeric characters.
+  'domain-name-raw'
+    The current domain name. WARNING - raw user input. NOT path safe.
+  'domain-url'
+    The current domain\'s URL, lowercased and with only alphanumeric characters.
+  'domain-url-raw'
+    The current domain\'s URL. WARNING - raw user input. NOT path safe.
+  'domain-subdomain'
+    The current subdomain, lowercased and with only alphanumeric characters.
+    Only works with *.example.com formats
+  'domain-subdomain-raw'
+    The current subdomain. Only works with *.example.com formats. WARNING - raw
+    user input. NOT path safe.
+  'domain-default-id'
+    The default domain ID.
+  'domain-default-name'
+    The default domain name, lowercased and with only alphanumeric characters.
+  'domain-default-name-raw'
+    The default domain name. WARNING - raw user input. NOT path safe.
+  'domain-default-url'
+    The default domain\'s URL, lowercased and with only alphanumeric characters.
+  'domain-default-url-raw'
+    The default domain\'s URL. WARNING - raw user input. NOT path safe.
