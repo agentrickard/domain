@@ -176,17 +176,6 @@ function domain_content_node_operations_access($nodes) {
 }
 
 /**
- * Implement hook_domainupdate()
- */
-function domain_content_domainupdate($op, $domain, $form_state = array()) {
-  // We rebuild the menu, since the domain records have changed.
-  // Clear the page cache, so that changed menus are reflected for anonymous users.
-  cache_clear_all('*', 'cache_page', TRUE);
-  // Also clear the menu cache.
-  cache_clear_all('*', 'cache_menu', TRUE);
-}
-
-/**
  * The multiple delete form issues a redirect in its submit function.
  * So we must supply the proper path as a form element.
  *

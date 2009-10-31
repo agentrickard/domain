@@ -5,6 +5,7 @@
 -- #227947 by NeuZeitgeist et. al. Ensure that edited nodes redirect to a valid domain.
 -- #615294. Adds a setting to force Domain Access rules on users who can _administer nodes_.
 -- Documentation cleanup.
+-- Removes redundant code in domain_content_domainupdate().
 
 27-OCT-2009
 
