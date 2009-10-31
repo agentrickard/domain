@@ -142,3 +142,22 @@ function domain_update_3() {
   }
   return $ret;
 }
+
+/**
+ * Updates to 5.x.12.
+ * 
+ * Removes the authoring and menu settings for the node form.
+ * 
+ */
+function domain_update_5012() {
+  $ret = array();
+  $options = variable_get('domain_form_elements', array());
+  if (isset($options['author'])) {
+    unset($options['author']);
+  }
+  if (isset($options['menu'])) {
+    unset($options['menu']);
+  }
+  variable_set('domain_form_elements', $options);
+  return $ret;
+}

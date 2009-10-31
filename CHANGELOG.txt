@@ -6,6 +6,8 @@
 -- Documentation cleanup.
 -- #576116 by guusbosman. Clear the cache when adjusting settings like themes, site slogan, et. al.
 -- Removes redundant code in domain_content_domainupdate().
+-- #227751 patch by blackdog. Removes unusable items from node settings.
+    Requires running update.php.
 
 23-OCT-2009
 
