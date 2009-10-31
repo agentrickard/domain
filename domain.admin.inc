@@ -189,6 +189,15 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#description' => t('If set, users with the <em>set domain access</em> permission will be able to view the node access rules for each node. See the README for more details.')
   );
 
+  $form['domain_behavior']['domain_force_admin'] = array(
+    '#type' => 'radios',
+    '#title' => t('Enforce rules on administrators'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_force_admin', 0),
+    '#options' => array(0 => t('Do not enforce'), 1 => t('Restrict node views for administrators')),
+    '#description' => t('If set, users with the <em>administer nodes</em> permission and user 1 <em>will view the site with Domain Access restrictions enforced</em>. See the README for more details.')
+  );
+
   $options = array(
     'id' => t('Creation order, oldest > newest'),
     'rid' => t('Creation order, newest > oldest'),

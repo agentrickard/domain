@@ -48,7 +48,10 @@ WARNINGS:
    with the 'administer nodes' permission. As such, these users will always
    be able to see all content on your site(s). To verify that Domain Access
    is working correctly, you will need to turn on its debug mode or view the
-   site as a user without this permission.
+   site as a user without this permission. You may also enable the 'Enforce
+   rules on adminstrators' setting, which will apply Domain Access
+   restrcitions to all users. (See section 4.3.3 of README.txt for more
+   details on this feature.)
 
 ----
 2.  Installation

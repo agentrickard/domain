@@ -2310,3 +2310,23 @@ function domain_simpletest() {
   $tests = file_scan_directory($dir, '\.test$');
   return array_keys($tests);
 }
+
+/**
+ * Implement hook_db_rewrite_sql().
+ *
+ * If enabled, force admins to use Domain Access rules.
+ */
+function domain_db_rewrite_sql($query, $primary_table, $primary_field, $args) {
+  global $_domain;
+  $admin_force = variable_get('domain_force_admin', FALSE);
+  // In any of the following cases, do not enforce any rules.
+  if (!$admin_force || empty($query) || $primary_field != 'nid' || !user_access('administer nodes') || domain_grant_all()) {
+    return;
+  }
+  $domain_id = (int) $_domain['domain_id'];
+  $return = array(
+    'join' => "INNER JOIN {domain_access} da_admin ON $primary_table.nid = da_admin.nid",
+    'where' => "(da_admin.gid = 0 AND da_admin.realm = 'domain_site') OR (da_admin.gid = $domain_id AND da_admin.realm = 'domain_id')",
+  );
+  return $return;
+}

@@ -42,8 +42,9 @@ CONTENTS
 4.3   Domain Module Behaviors
 4.3.1   New Content Settings
 4.3.2   Debugging Status
-4.3.3   Sort Domain Lists
-4.3.4   Domain Selection Format
+4.3.3   Enforce Rules on Adminstrators
+4.3.4   Sort Domain Lists
+4.3.5   Domain Selection Format
 4.4   Advanced Settings
 4.4.1   Search Settings
 4.4.2   Search Engine Optimization
@@ -572,9 +573,9 @@ Due to the way node_access() works, the following limitations should be noted.
     by any editor who belongs to one of the domains.
 
   - Users who look at the sites and have the 'administer nodes' permission
-    can always see all content on all sites, which can be confusing.  This is
-    unavoidable.  It is best to preview your site as an anonymous or
-    authenticated user who does not have special permissions.
+    can always see all content on all sites, which can be confusing.  To
+    enforce Domain Access rules on these users, you may enable the
+    'Enforce rules on administrators' setting described in 4.3.3. 
 
   - Users who have the 'edit any TYPE nodes' permission will be able to edit
     nodes that do not belong to their domain.
@@ -718,14 +719,32 @@ privilege.  It is provided for debugging, since 'adminiseter nodes' will make
 all nodes viewable to some users.
 
 ----
-4.3.3   Sort Domain Lists
+4.3.3   Enforce Rules on Administrators
+
+When using Node Access modules, user 1 (the super-admin) and users with
+the 'administer nodes' permission are not subject to node access rules. This
+is a design feature of Drupal, and it can lead to confusion when viewing your
+site as an administrator.
+
+To help with this confusion, the 'Enfore rules on adminstrators' setting can
+be enabled. This setting forces Domain Access rules to be applied _even to
+users who can administer nodes_.
+
+The default setting is OFF, but if you regularly login as user 1 or a user with
+the 'administer nodes' permission, you may want to enable this feature.
+
+NOTE: This feature _only_ applies Domain Access rules. if you are using
+multiple node access modules, not all rules will be applied.
+
+----
+4.3.4   Sort Domain Lists
 
 Both the Domain Switcher block and the Domain Nav module provide an
 end-user visible list of domains.  The domain sorting settings control how
 these lists are generated and presented to the user.
 
 ----
-4.3.4   Domain Selection Format
+4.3.5   Domain Selection Format
 
 Controls the form element display when choosing a list of domains. By
 default, Domain Access shows checkboxes, but if your site has a large
