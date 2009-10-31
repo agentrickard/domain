@@ -14,12 +14,11 @@ CONTENTS
 1.  Introduction
 1.1   Use-Case
 1.2   Examples
-1.3   Sponsors
-1.4   Using Multiple Node Access Modules
-1.5   Known Issues
-1.5.1   Logging In To Multiple Domains
-1.5.2   Cron Handling
-1.5.3   Updating Your Site
+1.3   Using Multiple Node Access Modules
+1.4   Known Issues
+1.4.1   Logging In To Multiple Domains
+1.4.2   Cron Handling
+1.4.3   Updating Your Site
 2.  Installation
 2.1   Patches to Drupal Core
 2.1.1   multiple_node_access.patch
@@ -43,7 +42,8 @@ CONTENTS
 4.2.1   New Content Settings
 4.2.2   Content Editing Forms
 4.2.3   Debugging Status
-4.2.4   Sort Domain Lists
+4.2.4   Enforce Rules on Adminstrators
+4.2.5   Sort Domain Lists
 4.3   Advanced Settings
 4.3.1   Domain-based Editing Controls
 4.3.2   Search Settings
@@ -83,14 +83,20 @@ CONTENTS
 ----
 1.  Introduction
 
+Before using the module, you should read the installation instructions found
+in INSTALL_QUICKSTART.txt.
+
 The Domain Access module group is designed to run an affiliated network of sites
-from a single Drupal installation.  The module thus allows you to share users,
+from a single Drupal installation.  The module allows you to share users,
 content, and configurations across a group of sites such as:
 
   - example.com
   - one.example.com
   - two.example.com
   - my.example.com
+  - thisexample.com
+  - anothersite.com
+  - example.com:3000 <-- non-standard ports are treated as unique domains.
 
 By default, these sites share all tables in your Drupal installation.
 
@@ -135,13 +141,7 @@ editors have no control over which domains their content is published to.
 For the original example of the module in use, see http://skirt.com/
 
 ----
-1.3 Sponsors
-
-Domain Access is sponsored by Morris DigitalWorks.
-  http://morrisdigitalworks.com
-
-----
-1.4   Using Multiple Node Access Modules
+1.3   Using Multiple Node Access Modules
 
 Node Access is a complex issue in Drupal.  Typically, sites will only use
 one node access module at a time.  In some cases, you may require
@@ -174,14 +174,14 @@ For background, see:
   -- http://drupal.org/node/201156
 
 ----
-1.5   Known Issues
+1.4   Known Issues
 
 There are some issues that occur when Domain Access is used outside
 of its original use case.  These are probably fixable, but may not work
 as you expect.  You should pay careful attention to your site behavior.
 
 ----
-1.5.1   Logging In To Multiple Domains
+1.4.1   Logging In To Multiple Domains
 
 The Domain Access module allows the creation of domains with different
 hosts.  However, security standards dictate that cookies can only be
@@ -212,7 +212,7 @@ Note: See the INSTALL.txt for instructions regarding Drupal's default
 cookie handling.
 
 ----
-1.5.2   Cron Handling
+1.4.2   Cron Handling
 
 When Drupal's cron function runs, it operates on the domain from which
 the cron.php script is invoked.  That is, if you setup cron to run from:
@@ -231,7 +231,7 @@ If you encounter any cron-related issues, please report them at:
 http://drupal.org/project/issues/domain
 
 ----
-1.5.3   Updating Your Site
+1.4.3   Updating Your Site
 
 This issue only occurs if you use the Domain Prefix module.  It is possible
 that database updates will not be applied to prefixed tables.
@@ -245,17 +245,21 @@ README.txt file.
 WARNING: The Domain Access module assumes that you have already installed
 and configured your Drupal site.  Please do so before continuing.
 
+Installing the module requires that you share a single copy of settings.php
+for all domains that will be registered with Domain Access.
+
+You must also add code to that settings.php file in order to load the domain
+handling code. See INSTALL_QUICKSTART.txt for instructions.
+
 For detailed instructions, see INSTALL.txt.
 
-To install the module, simply untar the download and put it in your site's
-modules directory.  After reading this document, enable the module normally.
+After you have completed the steps outlined by the installer, you may enable
+the module normally. When you enable the module, it will create a {domain} table
+in your Drupal database.
 
-When you enable the module, it will create a {domain} table in your Drupal
-database.
-
-All existing nodes on your site will be assigned to the default domain for your
-web site and to all affiliates.  If you wish to alter this behavior, see
-sections 2.4 through 2.6.
+All existing nodes and users on your site will be assigned to the default domain
+for your web site. Existing content will be set to be visible on all new
+domains.  If you wish to alter this behavior, see sections 2.4 through 2.6.
 
 ----
 2.1 Patches to Drupal Core
@@ -272,7 +276,8 @@ Then follow the instructions at: http://drupal.org/patch/apply
 2.1.1 multiple_node_access.patch
 
 You should apply this patch only if you use Domain Access along with
-another Node Access module, such as Organic Groups (OG).
+another Node Access module, such as Organic Groups (OG), and
+have need of advanced access controls.
 
 The multiple_node_access.patch allows Drupal to run more than one
 node access control scheme in parallel.  Instead of using OR logic to
@@ -452,7 +457,7 @@ The Domain Access module has the following permissions:
   node editing forms processed according to the "Content Editing Form"
   settings described in section 4.2.2.
 
-  This feature was added in response to http://drupal.org/node/188275.
+This feature was added in response to http://drupal.org/node/188275.
 
 ----
 3.2 Normal Usage
@@ -497,9 +502,9 @@ Due to the way node_access() works, the following limitations should be noted.
     by any editor who belongs to one of the domains.
 
   - Users who look at the sites and have the 'administer nodes' permission
-    can always see all content on all sites, which can be confusing.  This is
-    unavoidable.  It is best to preview your site as an anonymous or
-    authenticated user who does not have special permissions.
+    can always see all content on all sites, which can be confusing.  To
+    enforce Domain Access rules on these users, you may enable the
+    'Enforce rules on administrators' setting described in 4.2.4. 
 
   - Users who have the 'edit TYPE nodes' permission will be able to edit nodes
     that do not belong to their domain.
@@ -516,7 +521,7 @@ The settings for Domain Access are listed under Site Building.  The path is
 ----
 4.1   Default Domain Settings
 
-These elements define the 'root' domain for your site.  In the event that a
+These elements define the 'primary' domain for your site.  In the event that a
 user tries to access an invalid domain, this domain will be used.
 
 ----
@@ -628,7 +633,25 @@ privilege.  It is provided for debugging, since 'adminiseter nodes' will make
 all nodes viewable to some users.
 
 ----
-4.2.4   Sort Domain Lists
+4.2.4   Enforce Rules on Administrators
+
+When using Node Access modules, user 1 (the super-admin) and users with
+the 'administer nodes' permission are not subject to node access rules. This
+is a design feature of Drupal, and it can lead to confusion when viewing your
+site as an administrator.
+
+To help with this confusion, the 'Enfore rules on adminstrators' setting can
+be enabled. This setting forces Domain Access rules to be applied _even to
+users who can administer nodes_.
+
+The default setting is OFF, but if you regularly login as user 1 or a user with
+the 'administer nodes' permission, you may want to enable this feature.
+
+NOTE: This feature _only_ applies Domain Access rules. if you are using
+multiple node access modules, not all rules will be applied.
+
+----
+4.2.5   Sort Domain Lists
 
 Both the Domain Switcher block and the Domain Nav module provide an
 end-user visible list of domains.  The domain sorting settings control how
@@ -865,18 +888,18 @@ Note that this does not affect node access permissions set by other modules.
 ----
 4.5   Node Link Patterns
 
-When using this module, there are times when hook_url_alter() will need
-to rewrite a node link.
+When using this module, there are times when Domain Access will need to
+rewrite a node link using custom_url_rewrite_outbound().
 
-Note that these settings are not available if the hook_url_alter() patch
-is not applied.
+Note that these settings are not available if the custom_url_rewrite_outbound
+patch is not applied.
 
 Since Drupal is an extensible system, we cannot account for all possible
 links to specific nodes.  Node Link Patterns are designed to allow you to
 extend the module as you add new contributed modules.
 
 By default, the following core link paths will be rewritten as needed if you
-have installed the hook_url_alter() patch.
+have installed the custom_url_rewrite_outbound patch.
 
   -- node/%n
   -- comment/reply/%n
@@ -925,6 +948,11 @@ When you create a new domain record, simply fill in the two fields:
   -- Domain URL scheme
   Allows the domain to use 'http' or 'https' as the URL scheme.  Default is
   'http'.  All links and redirects to the domain will use the selected scheme.
+
+  -- Domain status
+  By default, all domains are Active and anyone can navigate to them. Setting
+  a domain to Inactive restricts access to users with the 'administer domains'
+  permission.
 
 Both the Domain and the Site name are required to be unique values.
 

@@ -1,5 +1,10 @@
 // $Id$
 
+31-OCT-2009
+
+-- #615294. Adds a setting to force Domain Access rules on users who can _administer nodes_.
+-- Documentation cleanup.
+
 23-OCT-2009
 
 -- #609600 by seddonym. Must track changes to the default site_name variable.
