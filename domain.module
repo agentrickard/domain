@@ -95,26 +95,26 @@ function domain_menu($may_cache) {
       'path' => 'admin/build/domain',
       'access' => $admin,
       'callback' => 'domain_admin',
-      'callback arguments' => array('configure'),
-      'description' => t('Settings for the Domain Access module.')
-    );
-    $items[] = array(
-      'title' => t('Settings'),
-      'path' => 'admin/build/domain/settings',
-      'access' => $admin,
-      'type' => MENU_DEFAULT_LOCAL_TASK,
-      'callback' => 'domain_admin',
-      'callback arguments' => array('configure'),
-      'weight' => -10
+      'callback arguments' => array('view'),
+      'description' => t('Settings for the Domain Access module.'),
     );
     $items[] = array(
       'title' => t('Domain list'),
       'path' => 'admin/build/domain/view',
       'access' => $admin,
-      'type' => MENU_LOCAL_TASK,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
       'callback' => 'domain_admin',
       'callback arguments' => array('view'),
-      'weight' => -8
+      'weight' => -10,
+    );
+    $items[] = array(
+      'title' => t('Settings'),
+      'path' => 'admin/build/domain/settings',
+      'access' => $admin,
+      'type' => MENU_LOCAL_TASK,
+      'callback' => 'domain_admin',
+      'callback arguments' => array('configure'),
+      'weight' => -8,
     );
     $items[] = array(
       'title' => t('Create domain record'),
@@ -123,7 +123,7 @@ function domain_menu($may_cache) {
       'type' => MENU_LOCAL_TASK,
       'callback' => 'domain_admin',
       'callback arguments' => array('create'),
-      'weight' => -4
+      'weight' => -4,
     );
     $items[] = array(
       'title' => t('Node settings'),
@@ -132,7 +132,7 @@ function domain_menu($may_cache) {
       'type' => MENU_LOCAL_TASK,
       'callback' => 'domain_admin',
       'callback arguments' => array('advanced'),
-      'weight' => -2
+      'weight' => -2,
     );
     // Register the batch actions as menu callbacks
     $batch = module_invoke_all('domainbatch');
@@ -144,7 +144,7 @@ function domain_menu($may_cache) {
         'type' => MENU_LOCAL_TASK,
         'callback' => 'domain_admin',
         'callback arguments' => array('batch'),
-        'weight' => 0
+        'weight' => 0,
       );
       // Get the submenu items
       foreach ($batch as $key => $value) {
@@ -155,7 +155,7 @@ function domain_menu($may_cache) {
           'type' => MENU_CALLBACK,
           'callback' => 'domain_admin',
           'callback arguments' => array('batch', $key),
-          'weight' => $value['#weight']
+          'weight' => $value['#weight'],
         );
       }
     }
@@ -167,7 +167,7 @@ function domain_menu($may_cache) {
       'access' => $admin,
       'type' => MENU_CALLBACK,
       'callback' => 'domain_admin',
-      'callback arguments' => array('edit', arg(4))
+      'callback arguments' => array('edit', arg(4)),
     );
     $items[] = array(
       'title' => t('Delete domain record'),
@@ -175,7 +175,7 @@ function domain_menu($may_cache) {
       'access' => $admin,
       'type' => MENU_CALLBACK,
       'callback' => 'domain_admin',
-      'callback arguments' => array('delete', arg(4))
+      'callback arguments' => array('delete', arg(4)),
     );
     // Make sure that our default grant is set at all times.
     if (arg(0) == 'admin') {
