@@ -111,6 +111,8 @@ function domain_theme_reset_form($domain) {
  */
 function domain_theme_reset_form_submit($form_id, $form_values) {
   db_query("DELETE FROM {domain_theme} WHERE domain_id = %d", $form_values['domain_id']);
+  // Clear the cache.
+  cache_clear_all();
   drupal_set_message(t('Domain theme settings have been reset.'));
 }
 

@@ -397,6 +397,8 @@ function domain_content_update_nodes($form_id, $form_values) {
       }
     }
   }
+  // Clear the cache.
+  cache_clear_all();
 }
 
 /**
@@ -423,17 +425,6 @@ function domain_content_node_operations() {
  * of domain_content_update_nodes().
  */
 function domain_content_node_operations_access($nodes) {
-}
-
-/**
- * Implement hook_domainupdate()
- */
-function domain_content_domainupdate($op, $domain = array(), $edit = array()) {
-  // We rebuild the menu, since the domain records have changed.
-  // Clear the page cache, so that changed menus are reflected for anonymous users.
-  cache_clear_all('*', 'cache_page', TRUE);
-  // Also clear the menu cache.
-  cache_clear_all('*', 'cache_menu', TRUE);
 }
 
 /**

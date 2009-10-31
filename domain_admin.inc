@@ -1009,6 +1009,8 @@ function domain_batch_form_submit($form_id, $form_values) {
       }
       break;
   }
+  // Clear the cache.
+  cache_clear_all();
   drupal_set_message(t('Settings have been updated successfully.'));
 }
 

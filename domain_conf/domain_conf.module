@@ -275,6 +275,8 @@ function domain_conf_form_submit($form_id, $form_values) {
     $sql = "INSERT INTO {domain_conf} VALUES (%d, %b)";
     db_query($sql, $form_values['domain_id'], serialize($settings));
   }
+  // Clear the cache.
+  cache_clear_all();
   drupal_set_message(t('Domain options saved successfully.'));
 }
 

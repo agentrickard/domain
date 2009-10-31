@@ -74,4 +74,6 @@ function domain_theme_submit($form_id, $form_values) {
   else {
     db_query("UPDATE {domain_theme} SET theme = '%s', settings = %b WHERE domain_id = %d", $theme, $settings, $id);
   }
+  // Clear the cache.
+  cache_clear_all();
 }

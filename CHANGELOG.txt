@@ -4,6 +4,8 @@
 
 -- #615294. Adds a setting to force Domain Access rules on users who can _administer nodes_.
 -- Documentation cleanup.
+-- #576116 by guusbosman. Clear the cache when adjusting settings like themes, site slogan, et. al.
+-- Removes redundant code in domain_content_domainupdate().
 
 23-OCT-2009
 
