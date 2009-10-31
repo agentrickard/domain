@@ -123,10 +123,11 @@ For example, on a local testing machine, VirtualHosts in my hosts file could be
 configured in the following way:
 
   - ken.test => 127.0.0.1
+  - one.ken.test => 127.0.0.1
   - two.ken.test => 127.0.0.1
   - foo.test => 127.0.0.1
 
-With their port and document root defined (WildCard set up) in the httpd.conf f
+With their port and document root defined (WildCard set up) in the httpd.conf
 file:
 
 <VirtualHost *:80>
