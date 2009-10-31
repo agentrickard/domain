@@ -55,6 +55,7 @@ function domain_boot() {
  */
 function domain_init() {
   global $_domain, $conf;
+
   if (!is_array($_domain)) {
     $_domain = array();
   }
@@ -78,6 +79,9 @@ function domain_init() {
   }
   // End of the error handling routine.
 
+  // If coming from a node save, make sure we are on an accessible domain.
+  domain_node_save_redirect();
+
   // Strip the www. off the domain, if required by the module settings.
   $www_replaced = FALSE;
   if (variable_get('domain_www', 0) && strpos($_domain['subdomain'], 'www.') !== FALSE) {
@@ -85,7 +89,7 @@ function domain_init() {
     $www_replaced = TRUE;
   }
 
-  // add information from domain_lookup but keep existing values (domain_id and subdomain)
+  // Add information from domain_lookup but keep existing values (domain_id and subdomain)
   $domain = domain_lookup($_domain['domain_id']);
   $_domain = array_merge($domain, $_domain);
 
@@ -1141,6 +1145,10 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       // Remove records from the {domain_access} table.
       db_query("DELETE FROM {domain_access} WHERE nid = %d", $node->nid);
       break;
+    case 'insert':
+    case 'update':
+      $_SESSION['domain_nid'] = $node->nid;
+      break;
   }
 }
 
@@ -1868,6 +1876,50 @@ function domain_invalid_domain_requested() {
   drupal_goto($redirect['path'] . drupal_get_path_alias($path));
 }
 
+/**
+ * On a node save, make sure the editor is returned
+ * to a domain that can view the node.
+ *
+ * The node id is saved in the $_SESSION during hook_nodeapi().
+ * We must do this because node_form_submit() overrides the
+ * form's redirect values.
+ *
+ * @return
+ *   No return value. Issue a drupal_goto() if needed.
+ */
+function domain_node_save_redirect() {
+  // If no session token, nothing to do.
+  if (!isset($_SESSION['domain_nid'])) {
+    return;
+  }
+  $nid = $_SESSION['domain_nid'];
+  // Unset the token now so as not to repeat this step.
+  unset($_SESSION['domain_nid']);
+  // Domain Source tells us where to go.
+  if (function_exists('domain_source_lookup')) {
+    $source = domain_source_lookup($nid);
+  }
+  // Otherwise, make an educated guess.
+  // TODO: Merge these lookup functions and make an alter hook.
+  else {
+    $domains = domain_get_node_domains($nid);
+    // If set to all affilaites, we don't care.
+    if (!empty($domains['domain_site'])) {
+      return;
+    }
+    $domain_id = current($domains['domain_id']);
+    if ($domain_id == -1) {
+      $source = domain_default();
+    }
+    else {
+      $source = domain_lookup($domain_id);
+    }
+  }  
+  // If issuing a redirect, make sure it is valid and to a visible domain.
+  if ($source['domain_id'] != -1 && $source['domain_id'] != $_domain['domain_id'] && ($source['valid'] || user_access('access inactive domains'))) {
+    drupal_goto($source['path'] . drupal_get_path_alias("node/$nid"));
+  }
+}
 
 /**
  * Determines a domain_id matching given $_name.
