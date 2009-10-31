@@ -9,6 +9,7 @@
 -- #227751 patch by blackdog. Removes unusable items from node settings.
     Requires running update.php.
 -- #427854 backport. Makes the domain list the default local task.
+-- Creates the 5.x.12 release.
 
 23-OCT-2009
 
