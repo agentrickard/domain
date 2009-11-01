@@ -39,19 +39,22 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
       '#description' => t('This will override any other link you have set.'),
       '#type' => 'checkbox',
       '#default_value' => !empty($this->options['link_to_default_domain']),
-      );
+    );
     $form['link_to_original_domain'] = array(
       '#title' => t('Link this field to the domain it originates from'),
       '#description' => t('This will override any other link you have set.'),
       '#type' => 'checkbox',
       '#default_value' => !empty($this->options['link_to_original_domain']),
     );
-    $form['list_all_domains'] = array(
-      '#title' => t('List all domains this node is published to'),
-      '#description' => t('This will override the default setting to show only one domain.'),
-      '#type' => 'checkbox',
-      '#default_value' => !empty($this->options['list_all_domains']),
-    );
+    // Only list the node links if this is a node view.
+    if ($this->view->base_table == 'node') {
+      $form['list_all_domains'] = array(
+        '#title' => t('List all domains this node is published to'),
+        '#description' => t('This will override the default setting to show only one domain.'),
+        '#type' => 'checkbox',
+        '#default_value' => !empty($this->options['list_all_domains']),
+      );
+    }
   }
 
 
@@ -62,8 +65,8 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
       return parent::pre_render($values);
     }
     $options = $this->options;
-    // Only alter output if requested
-    if (!empty($options['list_all_domains'])) {
+    // Only alter output if requested.
+    if ($this->view->base_table == 'node' && !empty($options['list_all_domains'])) {
       // Build a list of nids
       $nids = array();
       foreach ($values as $value) {
@@ -88,43 +91,65 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
    * Data should be made XSS safe prior to calling this function.
    */
   function render_link($data, $values) {
+    // Determine the node path, if any.
+    $nid = NULL;
+    if (isset($values->{$this->aliases['nid']})) {
+      $nid = $values->{$this->aliases['nid']};
+    }
+    else if (isset($values->nid)) {
+      $nid = $values->nid;
+    }
+    $node_path = '';
+    if (!empty($nid)) {
+      $node_path = drupal_get_path_alias('node/'. $nid);
+    }
+    // Determine the link path.
     if (!empty($this->options['link_to_default_domain']) && $data !== NULL && $data !== '') {
       $this->options['alter']['make_link'] = TRUE;
-      $domain = domain_lookup(0);
-      $node_path = drupal_get_path_alias('node/'. $values->{$this->aliases['nid']});
-      $this->options['alter']['path'] = $domain['scheme'] .'://'. $domain['subdomain'] .'/'. $node_path;
+      $domain = domain_default();
+      $this->options['alter']['path'] = $domain['path'] . $node_path;
     }
     if (!empty($this->options['link_to_original_domain']) && $data !== NULL && $data !== '') {
       $this->options['alter']['make_link'] = TRUE;
       $domain_id = $values->{$this->aliases['domain_id']};
       $domain = domain_lookup($domain_id);
-      $this->aliases['nid'] = 'nid';
-      $node_path = drupal_get_path_alias('node/'. $values->{$this->aliases['nid']});
-      $this->options['alter']['path'] = $domain['scheme'] .'://'. $domain['subdomain'] .'/'. $node_path;
+      $this->options['alter']['path'] = $domain['path'] . $node_path;
     }
     return $data;
   }
 
   function render($values) {
     // Special case handling when returning multiple sitenames per record.
-    // This only happens when list all domains is selected in options
+    // This only happens when list all domains is selected in options.
+
+    // Determine the node path, if any.
+    $nid = NULL;
+    if (isset($values->{$this->aliases['nid']})) {
+      $nid = $values->{$this->aliases['nid']};
+    }
+    else if (isset($values->nid)) {
+      $nid = $values->nid;
+    }
+    $node_path = '';
+    if (!empty($nid)) {
+      $node_path = drupal_get_path_alias('node/'. $nid);
+    }
+    $link_options = array('absolute' => TRUE);
+    // Now write the links.
     if (is_array($this->field_values[$values->nid])) {
       $field = $this->content_field;
       $options = $this->options;
       $items = array();
-      foreach ($this->field_values[$values->nid] as $key => $item) {
+      foreach ($this->field_values[$values->nid] as $domain_id => $item) {
         if (!empty($item)) {
           $link = $item;
           if (!empty($options['link_to_original_domain'])) {
-            $domain_id = $key;
             $domain = domain_lookup($domain_id);
-            $node_path = drupal_get_path_alias('node/'. $values->{$this->aliases['nid']});
-            $link = l($item, $domain['scheme'] .'://'. $domain['subdomain'] .'/'. $node_path);
+            $link = l($item, $domain['path'] . $node_path, $link_options);
           }
           if (!empty($options['link_to_default_domain'])) {
-            $domain = domain_lookup(0);
-            $node_path = drupal_get_path_alias('node/'. $values->{$this->aliases['nid']});
-            $link = l($item, $domain['scheme'] .'://'. $domain['subdomain'] .'/'. $node_path);
+            $domain = domain_default();
+            $link = l($item, $domain['path'] . $node_path, $link_options);
           }
           $items[] = $link;
         }
@@ -132,7 +157,7 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
       if (count($items) > 1) {
         return theme('domain_views_view_multiple_field', $items, $field, $values);
       }
-      elseif (count($items) == 1) {
+      else if (count($items) == 1) {
         return $items[0];
       }
       else {

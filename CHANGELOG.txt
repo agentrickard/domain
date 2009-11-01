@@ -10,6 +10,7 @@
   And also the new lookup functions for finding the best links:
   -- domain_get_node_match($nid)
   -- domain_get_path_match($path)
+-- #581372 by voxpelli. Cleans up the domain_sitename Views handler.
 
 31-OCT-2009
 
