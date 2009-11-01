@@ -1,5 +1,15 @@
 // $Id$
 
+01-NOV-2009 (2)
+
+-- Branches DRUPAL-6--2 to move new work to HEAD.
+-- Removes the following modules.
+  -- Domain Prefix
+  -- Domain Theme
+  -- Domain User
+  -- Domain Views
+-- Removes the patches directory.
+
 01-NOV-2009
 
 -- #617312 by Dr. DOT. Fixes Domain User handling on add user page. Other
