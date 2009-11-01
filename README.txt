@@ -986,6 +986,14 @@ additional batch actions.
 
 It may be necessary to enter the batch form from the primary domain.
 
+For some settings, you may see an 'Update value for all domains' section
+of the form. You may use this value to reset all domains to the same
+setting. This option is not available for settings that must be unique
+per domain, such as the domain string.
+
+For global settings to apply, you must check the 'Apply to all domains'
+box before submitting the form.
+
 ----
 4.10  Assigning Users to Domains
 

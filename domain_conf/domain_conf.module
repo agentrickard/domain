@@ -192,6 +192,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the email address for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
   // Change the site slogan.
@@ -209,6 +210,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site slogan for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
   // Change the site slogan.
@@ -226,6 +228,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site mission for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
   // Change the site footer.
@@ -243,6 +246,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site footer for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
   // Change the site frontpage.
@@ -260,6 +264,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site frontpage for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
   // Change the anonymous user name.
@@ -277,6 +282,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the anonymous user label for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
   // Change the administrative theme.
@@ -299,6 +305,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the administrative theme for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
+    '#update_all' => TRUE,
     '#group' => t('Administrative theme'),
   );
   // Change the timezone.
@@ -316,6 +323,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the default timezone for all domains.'),
     '#data_type' => 'string',
     '#weight' => -6,
+    '#update_all' => TRUE,
     '#group' => t('Timezone settings'),
   );
   // Change the caching mode.
@@ -332,6 +340,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the page cache options for all domains.'),
     '#data_type' => 'integer',
     '#weight' => -5,
+    '#update_all' => TRUE,
     '#group' => t('Performance'),
   );
   // Change the cache lifetime.
@@ -346,10 +355,11 @@ function domain_conf_domainbatch() {
     ),
     '#domain_action' => 'domain_conf',
     '#system_default' => variable_get('cache_lifetime', 0),
-    '#variable' => 'cache',
+    '#variable' => 'cache_lifetime',
     '#meta_description' => t('Set the minimum cache lifetime for all domains.'),
     '#data_type' => 'integer',
     '#weight' => -5,
+    '#update_all' => TRUE,
     '#group' => t('Performance'),
   );
   // Change the page compression settings.
@@ -362,10 +372,11 @@ function domain_conf_domainbatch() {
     ),
     '#domain_action' => 'domain_conf',
     '#system_default' => variable_get('page_compression', TRUE),
-    '#variable' => 'cache',
+    '#variable' => 'page_compression',
     '#meta_description' => t('Set the page compression status for all domains.'),
     '#data_type' => 'integer',
     '#weight' => -5,
+    '#update_all' => TRUE,
     '#group' => t('Performance'),
   );
   // Toggle the site offline status.
@@ -382,6 +393,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the online / offline status for all domains.'),
     '#data_type' => 'integer',
     '#weight' => -4,
+    '#update_all' => TRUE,
     '#group' => t('Site status'),
   );
   // Change the site offline message.
@@ -399,6 +411,7 @@ function domain_conf_domainbatch() {
     '#meta_description' => t('Set the site offline message for all domains.'),
     '#data_type' => 'string',
     '#weight' => -2,
+    '#update_all' => TRUE,
     '#group' => t('Site status'),
   );
   // Change the default language.
@@ -419,6 +432,7 @@ function domain_conf_domainbatch() {
       '#meta_description' => t('Set the default language for all domains.'),
       '#data_type' => 'string',
       '#weight' => 6,
+      '#update_all' => TRUE,
       '#group' => t('Language settings'),
       '#module' => t('Language'),
     );
@@ -439,6 +453,7 @@ function domain_conf_domainbatch() {
       '#meta_description' => t('Set the default menu options for the content authoring form in all domains.'),
       '#data_type' => 'string',
       '#weight' => 0,
+      '#update_all' => TRUE,
       '#group' => t('Menu settings'),
       '#module' => t('Menu'),
     );
@@ -456,6 +471,7 @@ function domain_conf_domainbatch() {
       '#meta_description' => t('Set the primary links menu in all domains.'),
       '#data_type' => 'string',
       '#weight' => 2,
+      '#update_all' => TRUE,
       '#group' => t('Menu settings'),
       '#module' => t('Menu'),
     );
@@ -472,6 +488,7 @@ function domain_conf_domainbatch() {
       '#meta_description' => t('Set the secondary links menu in all domains.'),
       '#data_type' => 'string',
       '#weight' => 4,
+      '#update_all' => TRUE,
       '#group' => t('Menu settings'),
       '#module' => t('Menu'),
     );

@@ -2054,6 +2054,7 @@ function domain_domainbatch() {
     '#variable' => 'domain_root',
     '#validate' => 'domain_batch_validate',
     '#data_type' => 'string',
+    '#update_all' => FALSE,
     '#weight' => -10,
   );
   //Change all the sitenames at once.
@@ -2071,6 +2072,7 @@ function domain_domainbatch() {
     '#variable' => 'domain_sitename',
     '#validate' => 'domain_batch_validate',
     '#data_type' => 'string',
+    '#update_all' => TRUE,
     '#weight' => -10,
   );
   // Change all the schemes at once.
@@ -2086,6 +2088,7 @@ function domain_domainbatch() {
     '#system_default' => variable_get('domain_scheme', 'http://'),
     '#variable' => 'domain_scheme',
     '#data_type' => 'string',
+    '#update_all' => TRUE,
     '#weight' => -10,
   );
   // Change all the valid flags at once.
@@ -2100,6 +2103,7 @@ function domain_domainbatch() {
     '#meta_description' => t('Edit all domain status flags.'),
     '#system_default' => 1,
     '#data_type' => 'integer',
+    '#update_all' => TRUE,
     '#weight' => -10,
   );
   foreach ($batch as $key => $value) {

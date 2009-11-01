@@ -219,7 +219,8 @@ function domain_theme_domainbatch() {
     '#system_default' => variable_get('theme_default', 'garland'),
     '#variable' => 'theme_default',
     '#meta_description' => t('Change the themes for all domains.'),
-    '#data_type' => 'integer',
+    '#data_type' => 'string',
+    '#update_all' => TRUE,
     '#weight' => -9,
   );
   foreach ($batch as $key => $value) {

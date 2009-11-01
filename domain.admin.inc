@@ -775,6 +775,25 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
     '#type' => 'markup',
     '#value' => theme('domain_batch_title', $batch)
   );
+
+  // For some values, allow every record to be updated.
+  if (!empty($batch['#update_all'])) {
+    $form['domain_batch_all'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Update value for all domains'),
+      '#weight' => -10,
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#description' => t('By entering a value below and checking the <strong>Apply to all domains</strong> option, you can set the desired value for all domains.'),
+    );
+    $form['domain_batch_all']['batch_all_setting'] = $batch['#form'];
+    $form['domain_batch_all']['batch_all_setting']['#default_value'] = $batch['#system_default'];
+    $form['domain_batch_all']['batch_override'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Apply to all domains'),
+    );
+    $form['domain_batch_all']['submit'] = array('#type' => 'submit', '#value' => t('Update all domain settings'));
+  }
   $form['domain_batch'] = array(
     '#tree' => TRUE,
     '#title' => $batch['#form']['#title'],
@@ -888,6 +907,9 @@ function theme_domain_admin_users_form($form) {
 function theme_domain_batch_form($form) {
   $output = '';
   $output = drupal_render($form['message']);
+  if (isset($form['domain_batch_all'])) {
+    $output .= drupal_render($form['domain_batch_all']);
+  }
   $header = array(t('Id'), t('Domain'), t('Setting'));
   $rows = array();
   foreach (element_children($form['domain_batch']) as $key) {
@@ -932,6 +954,13 @@ function domain_batch_form_validate($form, &$form_state) {
  * FormsAPI for saving batch form actions.
  */
 function domain_batch_form_submit($form, &$form_state) {
+  if (!empty($form_state['values']['batch_override'])) {
+    foreach ($form_state['values']['domain_batch'] AS $domain_id => $value) {
+      $options_all[$domain_id] = $form_state['values']['batch_all_setting'];
+    }
+    $form_state['values']['domain_batch'] = $options_all;
+  }
+
   $item = $form_state['values']['batch_item'];
   switch ($form_state['values']['handler']) {
     case 'domain':

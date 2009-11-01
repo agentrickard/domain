@@ -11,6 +11,8 @@
   -- domain_get_node_match($nid)
   -- domain_get_path_match($path)
 -- #581372 by voxpelli. Cleans up the domain_sitename Views handler.
+-- #372887 patch by nonsie and blackdog. Super-awesome set values for all domains in domain batch.
+-- Creates the 6.x.2.0 stable release.
 
 31-OCT-2009
 
