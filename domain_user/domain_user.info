@@ -1,6 +1,0 @@
-;  $Id$
-name = Domain User
-description = Creates unique subdomains for registered users.
-package = Domain Access
-dependencies[] = domain
-core = 6.x
