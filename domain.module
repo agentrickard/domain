@@ -309,10 +309,8 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
             if (!empty($this_node->subdomains)) {
               $output .= theme('item_list', $this_node->subdomains, t('Assigned domains'));
             }
-            if (isset($this_node->domain_source)) {
-              $this_domain = domain_lookup($this_node->domain_source);
-              $output .= theme('item_list', array($this_domain['sitename']), t('Source domain'));
-            }
+            $this_domain = domain_get_node_match($this_node->nid);
+            $output .= theme('item_list', array($this_domain['sitename']), t('Source domain'));
             if (empty($output)) {
               $output = t('This node is not assigned to a domain.');
             }
@@ -1153,6 +1151,45 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
 }
 
 /**
+ * Get the best matching domain for a node link.
+ *
+ * @param $nid
+ *   The node id.
+ * @return
+ *   The domain array for the best matching domain for links to this node.
+ */
+function domain_get_node_match($nid) {
+  static $domain = array();
+  if (isset($domain[$nid])) {
+    return $domain[$nid];
+  }
+  // Load the domain data for this node -- but only take the first match.
+  $id = db_result(db_query_range("SELECT gid FROM {domain_access} WHERE nid = %d AND realm = '%s' ORDER BY gid", $nid, 'domain_id', 0, 1));
+  $source = domain_lookup($id);
+  drupal_alter('domain_source', $source, $nid);
+  $domain[$nid] = $source;
+  return $source;
+}
+
+/**
+ * Allow the lookup of path rewrites.
+ *
+ * Note that unlinke domain_get_node_match(), this function assumes
+ * that all links will be written to the current domain.
+ *
+ * @param $path
+ *   The link path.
+ * @return
+ *   The domain array for the best matching domain for links to this node.
+ */
+function domain_get_path_match($path) {
+  global $_domain;
+  $source = $_domain;
+  drupal_alter('domain_source_path', $source, $path);
+  return $source;
+}
+
+/**
  * Get the domains for a node.
  *
  * @param $nid
@@ -1846,24 +1883,24 @@ function domain_invalid_domain_requested() {
   }
   // Try to find the proper redirect for a node.
   $path = "node/$node->nid";
-  if (isset($node->domain_source)) {
-    $domain = domain_lookup($node->domain_source);
-    if ($domain['valid']) {
-      $redirect = $domain;
-    }
-    else if (!empty($node->domains)) {
-      foreach ($node->domains as $domain_id) {
-        if ($domain_id == -1) {
-          $domain_id = 0;
-        }
-        $domain = domain_lookup($domain_id);
-        if ($domain['valid']) {
-          $redirect = $domain;
-          break;
-        }
+
+  $domain = domain_get_node_match($node->nid);
+  if ($domain['valid']) {
+    $redirect = $domain;
+  }
+  else if (!empty($node->domains)) {
+    foreach ($node->domains as $domain_id) {
+      if ($domain_id == -1) {
+        $domain_id = 0;
+      }
+      $domain = domain_lookup($domain_id);
+      if ($domain['valid']) {
+        $redirect = $domain;
+        break;
       }
     }
   }
+
   // If we found no node matches, just go to the home page.
   $extra = ' '. t('node page.');
   if (empty($redirect)) {

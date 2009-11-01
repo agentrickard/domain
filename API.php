@@ -334,6 +334,46 @@ function hook_domainwarnings() {
 }
 
 /**
+ * Allows modules to specify the target link for a node.
+ *
+ * @param &$source
+ *   The domain array from domain_get_node_match(), passed by reference.
+ * @param $nid
+ *   The node id.
+ * @return
+ *   No return value; modify $source by reference.
+ */
+function hook_domain_source_alter(&$source, $nid) {
+  // Taken from the Domain Source module
+  $source = domain_source_lookup($nid);
+}
+
+/**
+ * Allows modules to specify the target link for a Drupal path.
+ *
+ * Note: This hook is not meant to be used for node paths, which
+ * are handled by hook_domain_source_alter(). This hook is split
+ * from hook_domain_source_alter() for better performance.
+ *
+ * Currently, no modules in the package implement this hook.
+ *
+ * @param &$source
+ *   The domain array from domain_get_node_match(), passed by reference.
+ * @param $nid
+ *   The identifier of the obect being rewritten. For nodes, this is the node id.
+ *   In other instances, we may pass a $path string or other variable.
+ * @return
+ *   No return value; modify $source by reference.
+ */
+function hook_domain_source_path_alter(&$source, $path) {
+  // Always make admin links go to the primary domain.
+  $base = arg(0, $path);
+  if ($base == 'admin') {
+    $source = domain_default();
+  }
+}
+
+/**
  * Allows modules to add additional form elements for saving as domain-specific
  * settings.
  *

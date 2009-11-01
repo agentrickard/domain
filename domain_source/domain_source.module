@@ -180,7 +180,7 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       break;
     case 'load':
       if ($node->nid) {
-        $source = domain_source_lookup($node, $node->domains, $node->domain_site);
+        $source = domain_source_lookup($node->nid, $node->domains, $node->domain_site);
         $node->domain_source = $source['domain_id'];
       }
       break;
@@ -190,7 +190,7 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
       // calls that are neither a teaser nor a page view.
       if ($a3 !== FALSE || $a4 !== FALSE) {
         if (variable_get('domain_debug', 0) && user_access('set domain access') && isset($node->domain_source)) {
-          $source = domain_lookup($node->domain_source);
+          $source = domain_get_node_match($node->nid);
           $extra = ' ';
           $use_active = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
           if (empty($use_active)) {
@@ -218,7 +218,9 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
  */
 function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
   global $_domain;
+
   $source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $nid));
+
   if (empty($source)) {
     $source = variable_get('domain_default_source', 0);
   }
@@ -241,6 +243,20 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
   }
   $domain_id = ($source == -1) ? 0 : $source;
   return domain_lookup($domain_id);
+}
+
+/**
+ * Implement hook_domain_source_node_alter().
+ *
+ * @param &$source
+ *   The domain array from domain_get_node_match(), passed by reference.
+ * @param $nid
+ *   The node id.
+ * @return
+ *   No return value; modify $source by reference.
+ */
+function domain_source_domain_source_alter(&$source, $nid) {
+  $source = domain_source_lookup($nid);
 }
 
 /**
