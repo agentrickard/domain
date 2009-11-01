@@ -47,7 +47,7 @@ function domain_user_menu() {
  * Implement hook_perm()
  */
 function domain_user_perm() {
-  return array('create personal domain');
+  return array('create personal domain', 'create user domains');
 }
 
 /**
@@ -146,6 +146,10 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       if (isset($account->uid)) {
         $domain = domain_user_lookup($account->uid);
       }
+      else {
+        $account->uid = 0;
+        $account->roles = array(0 => t('anonymous user'));
+      }
       // New users throw E_ALL errors.
       $name = t('username');
       if (isset($account->name)) {
@@ -158,7 +162,11 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       // TODO: Maybe we should set a message here.
       if ($domain == -1 && domain_lookup(NULL, $name .'.'. $root) == -1) {
         $create_domain = variable_get('domain_user', 0);
-        if (user_access('create personal domain', $account)) {
+        if (user_access('create personal domain', $account) || user_access('create user domains')) {
+          // For the add user page, we force the checkbox.
+          if (empty($account->uid) && arg(0) == 'admin' && $create_domain == 1) {
+            $create_domain = 2;
+          }
           if ($create_domain == 1 && !empty($root)) {
             $form['domain_user_domain']['domain_create_user'] = array(
               '#type' => 'value',
@@ -189,7 +197,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
       if (!isset($edit['domain_create_user'])) {
         return;
       }
-      if (!empty($edit['domain_create_user']) && user_access('create personal domain', $account)) {
+      if (!empty($edit['domain_create_user']) && (user_access('create personal domain', $account) || !user_access('create user domains'))) {
         $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
         $name = domain_user_strip_chars($account->name);
         $form_state['values']['sitename'] = $account->name;
@@ -209,6 +217,11 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           $domain = domain_lookup(NULL, $form_state['values']['subdomain'], TRUE);
           if ($domain['domain_id']) {
             db_query("INSERT INTO {domain_user} (domain_id, uid) VALUES (%d, %d)", $domain['domain_id'], $account->uid);
+            // If this user has never registered before, or settings require it, remove other domain editing permissions.
+            if (empty($account->login) || !variable_get('domain_user_assign', 0)) {
+              db_query("DELETE FROM {domain_editor} WHERE uid = %d", $account->uid);
+            }
+            db_query("INSERT INTO {domain_editor} (domain_id, uid) VALUES (%d, %d)", $domain['domain_id'], $account->uid);
             $edit['domains'][] = $domain['domain_id'];
             drupal_set_message(t('Your personal URL is <a href="!url">!url</a>.', array('!url' => url($domain['path']))));
           }
@@ -229,8 +242,8 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           }
         }
       }
-      if (isset($edit['domain_create_user']) && !user_access('create personal domain', $account)) {
-        drupal_set_message(t('Your personal URL could not be created. 2'));
+      if (isset($edit['domain_create_user']) && !user_access('create personal domain', $account) && !user_access('create user domains')) {
+        drupal_set_message(t('Your personal URL could not be created.'));
       }
       // Throw away what we do not need.
       $edit['domain_create_user'] = NULL;
@@ -300,6 +313,14 @@ function domain_user_domainupdate($op, $domain, $form_state = array()) {
     case 'delete':
       // Delete from {domain_user}
       db_query("DELETE FROM {domain_user} WHERE domain_id = %d", $domain['domain_id']);
+      // Move from user domain to default domain for {domain_editor}
+      $check = db_result(db_query("SELECT COUNT(uid) FROM {domain_editor} WHERE uid = %d AND domain_id = 0", $domain['uid']));
+      if (empty($check)) {
+        db_query("INSERT INTO {domain_editor} (domain_id, uid) VALUES (0, %d)", $domain['uid'], $domain['domain_id']);
+      }
+      else {
+        db_query("DELETE FROM {domain_editor} WHERE uid = %d AND domain_id = %d", $domain['uid'], $domain['domain_id']);
+      }
       // Delete from the access rules.
       $user_root = variable_get('domain_user_root', variable_get('domain_root', ''));
       $mask = str_replace('.'. $user_root, '', $domain['subdomain']);

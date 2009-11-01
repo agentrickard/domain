@@ -46,6 +46,13 @@ function domain_user_configure_form() {
     '#default_value' => variable_get('domain_user_login', 1),
     '#description' => t('The domain users should go to when they login to the site.')
   );
+  $form['domain_user_assign'] = array(
+    '#type' => 'radios',
+    '#title' => t('Assign user domains'),
+    '#options' => array(0 => t('Only assign to user domain'), 1 => t('Assign to both user domain and active domain')),
+    '#default_value' => variable_get('domain_user_assign', 0),
+    '#description' => t('Indicates which domains should the user be assigned to when new user accounts are created.')
+  );
   if (module_exists('domain_prefix')) {
     $form['domain_user_prefixing'] = array(
       '#type' => 'radios',

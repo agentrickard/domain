@@ -22,9 +22,10 @@ CONTENTS
 4.2   Root Domain Name
 4.3   User Domain URL Scheme
 4.4   User Login Behavior
-4.5   Domain Table Prefixing *
-4.6   Reserved Usernames
-4.7   Domain Settings Page
+4.5   Assigned User Domains
+4.6   Domain Table Prefixing *
+4.7   Reserved Usernames
+4.8   Domain Settings Page
 5.  Developer Notes
 5.1   hook_user() Implementation
 5.2   Domain API Hooks
@@ -102,6 +103,12 @@ the Domain User settings page.
 Domain User adds one permission to your Access Control page:
 
   -- 'create personal domain'
+  Allows users to create a personal domain when registering or
+  updating their accounts.
+
+  -- 'create user domains'
+  Allows a site administrator to create user domains on behalf
+  of some other user.
 
 Only roles that have this permission can create personal subdomains.
 
@@ -200,7 +207,19 @@ Because of how Drupal login works, this feature uses a session variable to
 trigger the redirect.
 
 ----
-4.5   Domain Table Prefixing *
+4.5   Assigned User Domains
+
+Controls which domains a user is assigned to for editing purposes. The options
+are:
+
+  -- Assign only to the user domain [default]
+  -- Assign to both user domain and active domain
+
+NOTE: If a user domain is deleted, the user will be assigned to the primary
+domain.
+
+----
+4.6   Domain Table Prefixing *
 
 This setting is only available if you have the Domain Prefix module turned on.
 Since Domain Prefix is a powerful module that creates extra database tables,
@@ -215,7 +234,7 @@ Note that "obey the settings" may not create tables when the domain is created,
 since Domain Prefix has its own behavior settings.
 
 ----
-4.6   Reserved Usernames
+4.7   Reserved Usernames
 
 At the bottom of the Domain User settings page is a list of all reserved
 usernames.  This list is derived from the administrator-created list of domains.
@@ -223,7 +242,7 @@ usernames.  This list is derived from the administrator-created list of domains.
 Users should not be able to register or login with any username listed here.
 
 ----
-4.7   Domain List Page
+4.8   Domain List Page
 
 Note that on the main Domain list page at Admin > Build > Domains > Domain
 list, a new column is added to the domain table.  This column shows the username
