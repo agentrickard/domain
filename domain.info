@@ -2,4 +2,10 @@
 name = Domain Access
 description = A domain-based access control system
 package = Domain Access
-core = 6.x
+core = 7.x
+files[] = domain.admin.inc
+files[] = domain.install
+files[] = domain.bootstrap.inc
+files[] = domain.module
+files[] = settings_custom_url.inc
+files[] = settings.inc

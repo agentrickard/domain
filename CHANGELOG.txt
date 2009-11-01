@@ -1,5 +1,10 @@
 // $Id$
 
+01-NOV-2009 (3)
+
+-- Removes old settings files.
+-- Updates module .info files for D7.
+
 01-NOV-2009 (2)
 
 -- Branches DRUPAL-6--2 to move new work to HEAD.

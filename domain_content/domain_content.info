@@ -3,4 +3,6 @@ name = Domain Content
 description = Provides a content batch editing screen for each active domain.
 package = Domain Access
 dependencies[] = domain
-core = 6.x
+core = 7.x
+files[] = domain_content.admin.inc
+files[] = domain_content.module
