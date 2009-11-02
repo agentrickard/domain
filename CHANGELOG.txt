@@ -3,6 +3,8 @@
 02-NOV-2009
 
 -- #621480. check_url() breaks page caching.
+-- Fixes sitename reset D6 error.
+-- Creates the 5.x.13 release.
 
 31-OCT-2009
 

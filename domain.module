@@ -1227,8 +1227,8 @@ function domain_form_alter($form_id, &$form) {
 /**
  * Update the default domain's sitename.
  */
-function domain_form_sitename_submit($form, &$form_state) {
-  variable_set('domain_sitename', $form_state['values']['site_name']);
+function domain_form_sitename_submit($form_id, $form_values) {
+  variable_set('domain_sitename', $form_values['site_name']);
   drupal_set_message(t('Primary domain settings updated.'));
 }
 
