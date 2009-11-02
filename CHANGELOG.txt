@@ -1,5 +1,9 @@
 // $Id$
 
+02-NOV-2009
+
+-- #620596 by RoboPhred and lara.s. Error in Domain Source validation.
+
 01-NOV-2009
 
 -- #617312 by Dr. DOT. Fixes Domain User handling on add user page. Other

@@ -147,7 +147,7 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
         $allowed = $node->domains;
       }
       if (!empty($node->domains_raw)) {
-        $allowed = array_merge($node->domains, $node->domains_raw);
+        $allowed = array_merge($allowed, $node->domains_raw);
       }
       if ($node->domain_site && $key == -1) {
         // This case is acceptable, so we let it pass.
