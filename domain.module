@@ -587,7 +587,7 @@ function domain_domainload(&$domain) {
 function domain_get_path($domain) {
   global $base_url;
   if (empty($base_url)) {
-    return check_url($domain['scheme'] .'://'. $domain['subdomain']);
+    return $domain['scheme'] .'://'. $domain['subdomain'];
   }
   $_url = parse_url($base_url);
   // PHP 5 does not return an empty path element.
@@ -598,7 +598,7 @@ function domain_get_path($domain) {
   if (substr($_url['path'], -1) != '/') {
     $_url['path'] .= '/';
   }
-  $path = check_url($domain['scheme'] .'://'. $domain['subdomain'] . $_url['path']);
+  $path = $domain['scheme'] .'://'. $domain['subdomain'] . $_url['path'];
   return $path;
 }
 
@@ -606,7 +606,7 @@ function domain_get_path($domain) {
  * Determine an absolute path to the current page
  */
 function domain_get_uri($domain) {
-  $path = check_url($domain['scheme'] .'://'. $domain['subdomain'] . request_uri());
+  $path = $domain['scheme'] .'://'. $domain['subdomain'] . request_uri();
   return $path;
 }
 
@@ -1495,4 +1495,80 @@ function domain_node_access_explain($row) {
       break;
   }
   return $return;
+}
+
+/**
+ * Validates a domain string.
+ * @param string $subdomain
+ *   The string to check for domain validity
+ * @return array
+ *   List of error messages or empty array.
+ */
+function domain_validate($subdomain) {
+  $error_list = array();
+  // Validate the domains format generically for now.
+  $error = domain_valid_domain($subdomain);
+  if (!empty($error)) {
+    $error_list[] = $error;
+  }
+  // Make sure domain is unique
+  if (!domain_unique_domain($subdomain)) {
+    $error_list[] = t('The domain value must be unique.');
+  }
+  return $error_list;
+}
+
+/**
+ * Validate the domain against all correctable errors.
+ *
+ * Note that we decided not to check for valid TLDs here.
+ *
+ * @param $subdomain
+ *   Domain string to check.
+ * @return string
+ *   Empty if valid, error message on invalid.
+ */
+function domain_valid_domain($subdomain) {
+  $error_list = array();
+  // Check for one colon only.
+  if (substr_count($subdomain, ':') > 1) {
+    $error_list[] = t('Only one colon (:) is allowed.');
+  }
+  // If a colon, make sure it is only followed by numbers.
+  else if (substr_count($subdomain, ':') == 1) {
+    $parts = explode(':', $subdomain);
+    $port = (int) $parts[1];
+    if (strcmp($port, $parts[1])) {
+      $error_list[] = t('The port protocol must be an integer.');
+    }
+  }
+  // The domain cannot begin or end with a period.
+  if (substr($subdomain, 0, 1) == '.') {
+    $error_list[] = t('The domain must not begin with a dot (.)');
+  }
+  // The domain cannot begin or end with a period.
+  if (substr($subdomain, -1) == '.') {
+    $error_list[] = t('The domain must not end with a dot (.)');
+  }
+  // Check for valid characters
+  $pattern = '/^[a-z0-9\.\-:]*$/i';
+  if (!preg_match($pattern, $subdomain)) {
+    $error_list[] = t('Only alphanumeric characters, dashes, and a colon are allowed.');
+  }
+  if (!empty($error_list)) {
+    return t('The domain string is invalid:') . theme('item_list', $error_list);
+  }
+}
+
+/**
+ * Validate the domain against existing domains.
+ *
+ * @param $subdomain
+ *   Domain string to check
+ * @return bool
+ *   TRUE if unique; FALSE if duplicate.
+ */
+function domain_unique_domain($subdomain) {
+  $count = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
+  return !(bool) $count;
 }

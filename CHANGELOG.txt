@@ -1,5 +1,9 @@
 // $Id$
 
+02-NOV-2009
+
+-- #621480. check_url() breaks page caching.
+
 31-OCT-2009
 
 -- #615294. Adds a setting to force Domain Access rules on users who can _administer nodes_.

@@ -476,15 +476,10 @@ function domain_create_form($arguments = array()) {
  */
 function domain_create_form_validate($form_id, $form_values) {
   // TODO: Make this a proper regex?
-  $subdomain = strtolower(urlencode($form_values['subdomain']));
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
-  if ($check) {
-    form_set_error('subdomain', t('The subdomain value must be unique.'));
-  }
-  $check = NULL;
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s'", $form_values['sitename']));
-  if ($check) {
-    form_set_error('sitename', t('The site name value must be unique.'));
+  $subdomain = strtolower($form_values['subdomain']);
+  $error_list = domain_validate($subdomain);
+  foreach ($error_list as $error) {
+    form_set_error('subdomain', $error);
   }
 }
 
@@ -587,16 +582,15 @@ function domain_edit_form($domain, $arguments = array()) {
 /**
  * FormsAPI for domain_edit_form()
  */
-function domain_edit_form_validate($form_id, $form_values) {
+function domain_edit_form_validate($form_id, $form_values, $form) {
   // TODO: Make this a proper regex
-  $subdomain = strtolower(urlencode($form_values['subdomain']));
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id <> %d", $subdomain, $form_values['domain_id']));
-  if ($check) {
-    form_set_error('subdomain', t('The subdomain value must be unique.'));
-  }
-  $check2 = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id <> %d", $form_values['sitename'], $form_values['domain_id']));
-  if ($check2) {
-    form_set_error('sitename', t('The site name value must be unique.'));
+  $subdomain = strtolower($form_values['subdomain']);
+  $domain_changed = (bool) strcmp($form_values['subdomain'], $form['domain']['subdomain']['#default_value']);
+  if ($domain_changed) {
+    $error_list = domain_validate($subdomain);
+    foreach ($error_list as $error) {
+      form_set_error('subdomain', $error);
+    }
   }
 }
 
