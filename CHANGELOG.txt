@@ -1,5 +1,9 @@
 // $Id$
 
+02-NOV-2009
+
+-- #620596 by RoboPhred and lara.s. Error in Domain Source validation.
+
 01-NOV-2009 (3)
 
 -- Removes old settings files.
