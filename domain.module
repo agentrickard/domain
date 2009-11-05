@@ -1037,7 +1037,7 @@ function domain_form_alter($form_id, &$form) {
   }
 
   // Save our settings for the default domain.
-  if ($form_id = 'system_site_information_settings' && arg(2) != 'domain') {
+  if ($form_id == 'system_site_information_settings' && arg(2) != 'domain') {
     $form['#submit']['domain_form_sitename_submit'] = array();
   }
 

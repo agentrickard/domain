@@ -1,5 +1,9 @@
 // $Id$
 
+05-NOV-2009
+
+-- #623486. Accidental use of = instead of ==.
+
 02-NOV-2009
 
 -- #621480. check_url() breaks page caching.
