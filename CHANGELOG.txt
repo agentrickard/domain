@@ -1,5 +1,9 @@
 // $Id$
 
+16-NOV-2009
+
+-- #624296. Enforce node access limits on search for admins.
+
 02-NOV-2009
 
 -- #620596 by RoboPhred and lara.s. Error in Domain Source validation.
