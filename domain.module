@@ -1452,7 +1452,7 @@ function domain_db_rewrite_sql($query, $primary_table, $primary_field, $args) {
   global $_domain;
   $admin_force = variable_get('domain_force_admin', FALSE);
   // In any of the following cases, do not enforce any rules.
-  if (!$admin_force || empty($query) || $primary_field != 'nid' || !user_access('administer nodes') || domain_grant_all()) {
+  if (!$admin_force || $primary_field != 'nid' || !user_access('administer nodes') || domain_grant_all()) {
     return;
   }
   $domain_id = (int) $_domain['domain_id'];
