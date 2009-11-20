@@ -1,5 +1,10 @@
 // $Id$
 
+20-NOV-2009
+
+-- #620596. Fixes domain source handling for some users.
+-- Creates the 5.x.14 release.
+
 05-NOV-2009
 
 -- #623486. Accidental use of = instead of ==.
