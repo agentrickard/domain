@@ -1497,7 +1497,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     // We cannot reset this if it has already been set by another module.
     // See http://drupal.org/node/306551
     if (empty($action['host'])) {
-      $form['#action'] =  check_url($_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query']);
+      $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
     }
   }
 
