@@ -1,5 +1,9 @@
 // $Id$
 
+30-NOV-2009
+
+-- #638816 patch by hades666evil. Removes redundant check_url() call.
+
 16-NOV-2009
 
 -- #624296. Enforce node access limits on search for admins.
