@@ -1145,7 +1145,8 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       break;
     case 'insert':
     case 'update':
-      $_SESSION['domain_nid'] = $node->nid;
+      global $_domain;
+      $_SESSION['domain_save_id'] = $_domain['domain_id'];
       break;
   }
 }
@@ -1921,40 +1922,25 @@ function domain_invalid_domain_requested() {
  * We must do this because node_form_submit() overrides the
  * form's redirect values.
  *
+ * For extra checking, we also store the source domain_id and
+ * try to redirect to that domain if we acidentally moved. However,
+ * the node must be visible on that domain.
+ *
  * @return
  *   No return value. Issue a drupal_goto() if needed.
  */
 function domain_node_save_redirect() {
+  global $_domain;
   // If no session token, nothing to do.
-  if (!isset($_SESSION['domain_nid'])) {
+  if (!isset($_SESSION['domain_save_id'])) {
     return;
   }
-  $nid = $_SESSION['domain_nid'];
+  $domain_id = $_SESSION['domain_save_id'];
   // Unset the token now so as not to repeat this step.
-  unset($_SESSION['domain_nid']);
-  // Domain Source tells us where to go.
-  if (function_exists('domain_source_lookup')) {
-    $source = domain_source_lookup($nid);
-  }
-  // Otherwise, make an educated guess.
-  // TODO: Merge these lookup functions and make an alter hook.
-  else {
-    $domains = domain_get_node_domains($nid);
-    // If set to all affilaites, we don't care.
-    if (!empty($domains['domain_site'])) {
-      return;
-    }
-    $domain_id = current($domains['domain_id']);
-    if ($domain_id == -1) {
-      $source = domain_default();
-    }
-    else {
-      $source = domain_lookup($domain_id);
-    }
-  }  
-  // If issuing a redirect, make sure it is valid and to a visible domain.
+  unset($_SESSION['domain_save_id']);
+  $source = domain_lookup($domain_id);
   if ($source['domain_id'] != -1 && $source['domain_id'] != $_domain['domain_id'] && ($source['valid'] || user_access('access inactive domains'))) {
-    drupal_goto($source['path'] . drupal_get_path_alias("node/$nid"));
+    domain_goto($source);
   }
 }
 

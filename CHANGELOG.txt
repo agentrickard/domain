@@ -1,5 +1,11 @@
 // $Id$
 
+08-DEC-2009
+
+-- #624360 by TCRobbert, netw3rker, Netbuddy, djmystic82, guysung.
+    On node save, stay on the domain from which the form was submitted.
+-- Creates the 6.x.2.1 release.
+
 30-NOV-2009
 
 -- #638816 patch by hades666evil. Removes redundant check_url() call.
