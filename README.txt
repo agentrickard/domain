@@ -214,7 +214,7 @@ In this case, Domain Access will check the access settings for that domain.
 This behavior has been known to cause issues with other contributed modules.
 As a solution, we normally disable Domain Access rules when cron runs.
 
-For more information, see section 4.4.1 Cron Handling.
+For more information, see section 4.5.1 Cron Handling.
 
 If you encounter any cron-related issues, please report them at:
 
