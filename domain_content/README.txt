@@ -58,9 +58,9 @@ editors' option under Advanced Settings on the Domains configuration page:
 ----
 2.1 Permissions
 
-The Domain Content module does not add any new Access Control permissions.
-
-The module uses the existing permissions from the Domain Access module.
+The Domain Content adds 'review content for all domains' permission to Access
+Control permissions and uses the existing permissions from the Domain Access
+module.
 
 ----
 3.  Menu Items
@@ -77,11 +77,12 @@ See http://drupal.org/node/367752 for the rationale.
 ----
 3.1 Access Control
 
-The Access Control permissions for the module are set by the root Domain Access
-module. The relevant permissions are:
+The relevant permissions to Domain Content are:
 
   - 'edit domain nodes'
   - 'set domain access'
+  - 'review content for all domains'
+  - 'administer nodes'
 
 Users with the 'edit domain nodes' permission can view content for domains where
 they are assigned editors.  Users with the 'set domain access' permission can
@@ -91,8 +92,8 @@ to one or more affiliates.
 Users with the core 'administer nodes' permission may view and edit content on any
 affiliate.
 
-Either the 'administer nodes' or the 'edit domain nodes' permission is required to
-access the 'Affiliate content' screen.
+Either the 'administer nodes', 'edit domain nodes' or the 'review content for all
+domains' permission is required to access the 'Affiliated content' screen.
 
 ----
 3.2 Affiliated Content
