@@ -273,9 +273,14 @@ considered carefully.
 The $base_url setting is normally not set.  With Domain Access, you
 cannot set this value manually.
 
-Since mutliple domains are involved, Drupal needs to be allowed to
+Since multiple domains are involved, Drupal needs to be allowed to
 set this value.  (For the technical, this happens in the conf_init()
 function).
+
+If you need to install Drupal in a subdirectory and wish to hide that
+subdirectory from site visitors, you may set $base_url dynamically.
+
+See the instructions at http://drupal.org/node/633726.
 
 ----
 4.2   $db_prefix
