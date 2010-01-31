@@ -3,6 +3,7 @@
 31-JAN-2010
 
 -- #685872 by biged. Prevent race condition in bootstrap.
+-- #698568 patch by nonsie. Updated Domain Content docs.
 
 08-DEC-2009
 
