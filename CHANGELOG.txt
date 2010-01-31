@@ -5,6 +5,7 @@
 -- #685872 by biged. Prevent race condition in bootstrap.
 -- #698568 patch by nonsie. Updated Domain Content docs.
 -- #633726 patch by BWPanda. How to dynamically set $base_url.
+-- Add system_performance_settings to domain_conf_domainwarnings().
 
 08-DEC-2009
 
