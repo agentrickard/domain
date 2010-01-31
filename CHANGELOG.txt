@@ -1,5 +1,9 @@
 // $Id$
 
+31-JAN-2010
+
+-- #685872 by biged. Prevent race condition in bootstrap.
+
 08-DEC-2009
 
 -- #624360 by TCRobbert, netw3rker, Netbuddy, djmystic82, guysung.

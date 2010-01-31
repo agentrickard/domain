@@ -162,7 +162,13 @@ function _domain_bootstrap_modules_get() {
   global $conf;
   $key = 'domain_bootstrap_modules';
   $table = domain_get_primary_table('variable');
-  $conf[$key] = unserialize(db_result(db_query("SELECT value FROM $table WHERE name = '%s'", $key)));
+  $result = db_result(db_query("SELECT value FROM $table WHERE name = '%s'", $key));
+  if (!empty($result)) {
+    $conf[$key] = unserialize($result);
+  }
+  else {
+    $conf[$key] = array('domain');
+  }
   return $conf[$key];
 }
 
