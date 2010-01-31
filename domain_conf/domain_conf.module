@@ -150,6 +150,7 @@ function domain_conf_domainwarnings() {
   return array(
     'system_admin_theme_settings',
     'system_date_time_settings',
+    'system_performance_settings',
     'system_site_information_settings',
     'system_site_maintenance_settings',
     'locale_languages_overview_form',
