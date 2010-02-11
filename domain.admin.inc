@@ -427,11 +427,18 @@ function domain_values_from_form_state($form_state) {
  *    upon form submit.  Used by the Domain User module.
  */
 function domain_form($form_state, $domain = array(), $arguments = array()) {
+  global $_domain;
   // This action should be performed from the primary domain unless overridden.
   if (!isset($arguments['ignore_domain_status_check'])) {
     domain_check_primary();
     if (empty($_POST) && !empty($domain)) {
       domain_check_response($domain);
+    }
+  }
+  // Ensure indexes are set.
+  foreach ($_domain as $key => $value) {
+    if (!isset($domain[$key])) {
+      $domain[$key] = NULL;
     }
   }
   $form = array();
