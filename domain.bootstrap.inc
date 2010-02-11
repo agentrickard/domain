@@ -75,7 +75,7 @@ function _domain_bootstrap($phase) {
   switch ($phase) {
     case DOMAIN_BOOTSTRAP_INIT:
       // Make sure database is loaded
-      _drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
       // If the module has been disabled, stop loading.
       $table = domain_get_primary_table('system');
       $check = db_result(db_query("SELECT status FROM $table WHERE name = 'domain' AND type = 'module'"));

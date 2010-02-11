@@ -1,5 +1,10 @@
 // $Id$
 
+11-FEB-2010
+
+-- Patch #710978 by Dave Reid. Fixes SimpleTest conflixt.
+-- Cleans up some PHP strict index warnings.
+
 31-JAN-2010
 
 -- #685872 by biged. Prevent race condition in bootstrap.
