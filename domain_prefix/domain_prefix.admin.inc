@@ -337,7 +337,7 @@ function domain_prefix_form($form_state, $domain, $arguments = array()) {
         '#type' => 'select',
         '#title' => '',
         '#options' => $sources,
-        '#default_value' => $source_defaults['_source_'. $table],
+        '#default_value' => isset($source_defaults['_source_'. $table]) ? $source_defaults['_source_'. $table] : DOMAIN_PREFIX_IGNORE,
       );
     }
   }
