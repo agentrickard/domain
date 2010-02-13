@@ -259,10 +259,15 @@ function domain_theme_batch($values) {
  * Implement hook_domainwarnings()
  */
 function domain_theme_domainwarnings() {
-  return array(
+  $forms =  array(
     'system_themes_form',
     'system_theme_settings',
   );
+  $return = array();
+  foreach ($forms as $form) {
+    $return[$form] =  'admin/build/domain/theme/%domain_id';
+  }
+  return $return;
 }
 
 /**
