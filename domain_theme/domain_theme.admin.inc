@@ -309,7 +309,7 @@ function domain_theme_settings_submit($form, &$form_state) {
   if (isset($values['domain_color_defaults'])) {
     foreach ($values['domain_color_defaults'] as $key => $value) {
       if (!empty($value)) {
-        variable_set($key, unserialize($value));
+        variable_set($key, domain_unserialize($value));
       }
       else {
         variable_del($key);

@@ -1,5 +1,9 @@
 // $Id$
 
+13-FEB-2010
+
+-- #686146 by AlexisWilke and davidwhthomas. Fixes unserialize on pgSQL.
+
 11-FEB-2010
 
 -- Patch #710978 by Dave Reid. Fixes SimpleTest conflixt.

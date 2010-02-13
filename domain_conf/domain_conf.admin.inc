@@ -47,7 +47,7 @@ function domain_conf_form($form_state, $domain) {
   $settings = array();
   $data = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
   if (!empty($data)) {
-    $settings = unserialize($data);
+    $settings = domain_unserialize($data);
   }
 
   $default_group = t('Site configuration');

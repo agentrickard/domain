@@ -240,3 +240,25 @@ function domain_get_primary_table($table) {
   return db_escape_table($table);
 }
 
+/**
+ * Unserialize an object stored in {domain_*} tables.
+ *
+ * PostGRES has issues with bytea fields, and while this is
+ * handled cleanly in cache_get(), we have our own functions
+ * for retrieving similar data objects. So we must be sure to
+ * unserialize these safely.
+ *
+ * @param $object
+ *   The serialized object.
+ * @return $data
+ *   Properly unserialized data or an empty string if the $object
+ *   contained no data.
+ *
+ * @see http://drupal.org/node/686146
+ */
+function domain_unserialize($object) {
+  if (empty($object)) {
+    return;
+  }
+  return unserialize(db_decode_blob($object));
+}

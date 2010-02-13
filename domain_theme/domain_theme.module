@@ -42,7 +42,7 @@ function domain_theme_init() {
 function domain_theme_set_variables($theme) {
   global $conf;
   if (!empty($theme['settings'])) {
-    $settings = unserialize($theme['settings']);
+    $settings = domain_unserialize($theme['settings']);
     $conf['theme_'. $theme['theme'] .'_settings'] = $settings;
     // Account for color module.
     $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
