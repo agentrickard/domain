@@ -81,7 +81,7 @@ function domain_theme_form_system_themes_form_alter(&$form, &$form_state) {
       $form['status']['#disabled'] = TRUE;
     }
 
-    if ($form[$key] && $form[$key]['operations']) {
+    if (isset($form[$key]) && isset($form[$key]['operations'])) {
       $form[$key]['operations']= array(
         '#value' => l(t('configure'), 'admin/build/domain/theme/'. $key .'/'. $domain['domain_id'] .'/theme-settings'),
       );
