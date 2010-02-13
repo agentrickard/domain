@@ -29,7 +29,7 @@ function domain_view() {
   // Get header elements from other modules
   $extra = module_invoke_all('domainview', 'header');
   $header = array_merge($header, $extra);
-  $header[] = array('data' => t('Actions'), 'colspan' => 6);
+  $header[] = array('data' => t('Actions'));
 
   // Cannot use domain_domains() here because we need to sort the output.
   $domains = array();
@@ -67,9 +67,6 @@ function domain_view() {
       if (!empty($extra)) {
         $actions[] = l(t('settings'), 'admin/build/domain/conf/0');
       }
-      else {
-        $actions[] = array('data' => t('primary'), 'colspan' => 2);
-      }
     }
     else {
       $actions = array();
@@ -84,9 +81,6 @@ function domain_view() {
           if (!empty($item)) {
             $actions[] = l($item['title'], $item['path']);
           }
-          else {
-            $actions[] = '<br />';
-          }
         }
       }
     // Set the valid flag.
@@ -97,7 +91,8 @@ function domain_view() {
       $row[] = module_invoke($module, 'domainview', 'data', $domain);
     }
     // Add the actions.
-    $rows[] = array_merge($row, $actions);
+    $row[] = theme('item_list', $actions);
+    $rows[] = $row;
   }
   if (!empty($rows)) {
     $output .= theme_table($header, $rows);

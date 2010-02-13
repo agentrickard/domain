@@ -327,16 +327,16 @@ function domain_alias_domainview($op, $domain = array()) {
       foreach ($aliases as $alias) {
         if (strpos($alias['pattern'], '*') === FALSE) {
           $link = str_replace($domain['subdomain'], $domain['aliases'][$alias['alias_id']]['pattern'], domain_get_uri($domain));
-          $pieces[] = ' - '. l($alias['pattern'], $link, array('absolute' => TRUE));
+          $pieces[] = l($alias['pattern'], $link, array('absolute' => TRUE));
         }
         else {
-          $pieces[] = ' - '. $alias['pattern'];
+          $pieces[] = $alias['pattern'];
         }
       }
       $linktext = empty($pieces) ? 'add alias' : 'edit aliases';
       $action[] = l($linktext, 'admin/build/domain/alias/'. $domain['domain_id']);
       $pieces = array_merge($action, $pieces);
-      return implode('<br /> ', $pieces);
+      return theme('item_list', $pieces);
       break;
   }
 }
