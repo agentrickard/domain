@@ -93,6 +93,9 @@ function domain_init() {
   $domain = domain_lookup($_domain['domain_id']);
   $_domain = array_merge($domain, $_domain);
 
+  // Set the initial domain record, for later reference. See http://drupal.org/node/706490.
+  domain_initial_domain($_domain);
+
   // If we have replaced 'www.' in the url, redirect to the clean domain.
   if ($www_replaced) {
     drupal_goto(domain_get_uri($_domain));
@@ -1145,8 +1148,9 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       break;
     case 'insert':
     case 'update':
-      global $_domain;
-      $_SESSION['domain_save_id'] = $_domain['domain_id'];
+      // We cannot use the global domain here, since it can be modified.
+      $domain = domain_initial_domain();
+      $_SESSION['domain_save_id'] = $domain['domain_id'];
       break;
   }
 }
@@ -1487,7 +1491,8 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   // to the currently active domain.  See http://drupal.org/node/196217.
   $seo = variable_get('domain_seo', 0);
   if ($seo) {
-    global $_domain;
+    // We cannot use the global domain here, since it can be modified.
+    $domain = domain_initial_domain();
     $action = parse_url($form['#action']);
     if (isset($action['query'])) {
       $action['path'] .= '?';
@@ -1498,7 +1503,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     // We cannot reset this if it has already been set by another module.
     // See http://drupal.org/node/306551
     if (empty($action['host'])) {
-      $form['#action'] =  $_domain['scheme'] .'://'. $_domain['subdomain'] . $action['path'] . $action['query'];
+      $form['#action'] =  $domain['scheme'] .'://'. $domain['subdomain'] . $action['path'] . $action['query'];
     }
   }
 

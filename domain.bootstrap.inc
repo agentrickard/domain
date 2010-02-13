@@ -262,3 +262,14 @@ function domain_unserialize($object) {
   }
   return unserialize(db_decode_blob($object));
 }
+
+/**
+ * Store the initially loaded domain, for later use.
+ */
+function domain_initial_domain($domain = array()) {
+  static $initial;
+  if (!isset($initial) && !empty($domain)) {
+    $initial = $domain;
+  }
+  return $initial;
+}
