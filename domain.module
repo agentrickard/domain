@@ -1152,6 +1152,37 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
       $domain = domain_initial_domain();
       $_SESSION['domain_save_id'] = $domain['domain_id'];
       break;
+    case 'presave':
+      if ($node->devel_generate) {
+        // Build $domains array based on domains checked in the generate form
+        // and shuffle for randomization
+        $checked = array_filter($node->devel_generate['domains']);
+        shuffle($checked);
+        $domains = array_combine(array_values($checked), array_values($checked));
+        // Add the domains and supporting data to the node
+        if (!empty($domains)) {
+          // Remove some domains from the shuffled array (if more than one domain
+          // is chosen) for randomization (-1 guarantees at least one domain).
+          if (count($domains) > 1) {
+            $howmany = rand(0, count($domains) - 1);
+            for ($i=0; $i < $howmany; $i++) {
+              array_pop($domains);
+            }
+          }
+          // Add the domains to the node and grab the first domain as the source.
+          // The source is random because the array has been shuffled.
+          $node->domains = $domains;
+          $node->domain_source = current($domains);
+          // domain_site is set to TRUE or FALSE based on "all", "never" or "random flag"
+          $node->domain_site = $node->devel_generate['domain_site'] == 'all' ? 1 : ($node->devel_generate['domain_site'] == 'random' ? rand(0, 1) == 1 : 0);
+          // Set subdomains according to the domains in $domains
+          $node->domains = array();
+          foreach ($domains as $id) {
+            $node->domains[$id] = $id;
+          }
+        }
+      }
+    break;
   }
 }
 
@@ -1354,6 +1385,7 @@ function domain_node_access_records($node) {
       'priority' => 0,         // If this value is > 0, then other grants will not be recorded
     );
   }
+
   // Set the domain-specific grants.
   if (!empty($node->domains)) {
     foreach ($node->domains as $key => $value) {
@@ -1400,6 +1432,7 @@ function domain_node_access_records($node) {
   }
   // Store our records in the {domain_access} table.
   _domain_store_grants($node->nid, $grants);
+
   return $grants;
 }
 
@@ -1535,7 +1568,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
       // The domain must be valid.
       if ($data['valid'] || user_access('access inactive domains')) {
-        // Checkboxes must be filtered, select listts should not.
+        // Checkboxes must be filtered, select lists should not.
         $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
       }
     }
@@ -1743,6 +1776,52 @@ function domain_form_perm() {
   }
   return $action;
 }
+
+/**
+ * Add settings to devel generate module.
+ */
+function domain_form_devel_generate_content_form_alter(&$form, &$form_state) {
+  $form['submit']['#weight'] = 10;
+  $form['domain'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Domain Access Options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#weight' => 9,
+  );
+  $form['domain']['domain_site'] = array(
+    '#type' => 'select',
+    '#title' => t('Send to all affiliates'),
+    '#options' => array(
+      'none' => t('Never'),
+      'all' => t('Always'),
+      'random' => t('Randomly decide'),
+    ),
+    '#description'  => t('If you choose "always" or "randomly" you must select at least one domain below.'),
+  );
+  // Get the display format of the form element.
+  $format = domain_select_format();
+  foreach (domain_domains() as $data) {
+    // Cannot pass zero in checkboxes.
+    ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
+    // The domain must be valid.
+    if ($data['valid'] || user_access('access inactive domains')) {
+      // Checkboxes must be filtered, select lists should not.
+      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
+    }
+  }
+  $form['domain']['domains'] = array(
+    '#type' => empty($format) ? 'checkboxes' : 'select',
+    '#title' => t('Publish to'),
+    '#options' => $options,
+    '#description' => t('Generated content will be accessible on any or all of the domains checked above.'),
+  );
+  if ($format) {
+    $form['domain']['domains']['#multiple'] = TRUE;
+    $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
+  }
+}
+
 
 /**
  * Activate the hidden grant for searches.
