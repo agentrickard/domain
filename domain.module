@@ -2218,17 +2218,32 @@ function domain_batch_validate($values) {
 function domain_warning_check($form_id) {
   static $_warning;
   // If $_POST is set, we are submitting the form and should not set a message.
-  if (!$_POST && empty($_warning)) {
+  if (empty($_POST) && empty($_warning)) {
     global $_domain;
     // Add the list of forms
     $forms = array();
     $forms = module_invoke_all('domainwarnings');
-    if ($form_id == 'domain_batch_form' || (arg(2) != 'domain' && in_array($form_id, $forms))) {
+    if ($form_id == 'domain_batch_form' || (arg(2) != 'domain' && in_array($form_id, array_keys($forms)))) {
       $default = domain_default();
-      if ($_domain['domain_id'] != $default['domain_id']) {
-        $_path = domain_get_uri($default);
-        drupal_set_message(t('You are viewing #this. This form may need to be entered from <a href="!url">!domain</a>', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'])));
+      if ($_domain['domain_id'] == $default['domain_id']) {
+        return;
       }
+      $link_text = '';
+      $link = $forms[$form_id];
+      if (!empty($link)) {
+        $elements = array();
+        foreach ($_domain as $key => $value) {
+          if (!is_array($value)) {
+            $elements[$key] = $value;
+          }
+        }
+        $replace = explode('|', '%'. implode('|%', array_keys($elements)));
+        $values = explode('|', implode('|', $elements));
+        $link = str_replace($replace, $values, $link);
+        $link_text = t('You may submit changes to the current domain at <a href="!url">%link</a>.', array('!url' => url($link), '%link' => $link));
+      }
+      $_path = domain_get_uri($default);
+      drupal_set_message(t('This form submits changes to your primary domain and <a href="!url">may need to be entered from !domain</a>. !link', array('#this' => $_domain['subdomain'], '!url' => $_path, '!domain' => $default['subdomain'], '!link' => $link_text)), 'warning', FALSE);
     }
     $_warning = TRUE;
   }

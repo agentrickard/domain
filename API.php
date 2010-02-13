@@ -319,18 +319,29 @@ function hook_domainform(&$form) {
  *  may have values that vary on each domain.
  *
  * @return
- *  An array of form_id values representing forms that require warnings.
+ *   An associative array where the keys form_id values representing forms 
+ *   that require warnings. The value should return a link for where the
+ *   form may be set for the current domain. If no link exists, you should
+ *   pass NULL as the value.
+ *
+ *   These values are subject to token replacement, using the syntax
+ *   %value, where %NAME may be any element of the $_domain array.
  *
  * @ingroup domain_hooks
  */
 function hook_domainwarnings() {
   // These are the forms for variables set by Domain Conf.
-  return array(
+  $forms = array(
     'system_admin_theme_settings',
     'system_date_time_settings',
     'system_site_information_settings',
     'system_site_maintenance_settings'
   );
+  $return = array();
+  foreach ($forms as $key) {
+    $return[$key] = 'admin/build/domain/path/%domain_id';
+  }
+  return $return;
 }
 
 /**

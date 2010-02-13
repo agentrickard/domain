@@ -6,6 +6,7 @@
 -- #706490 by ibis. Fixes accidental redirects when using domain_set_domain().
 -- Patch #632220 by bleen18 and nonsie. Support Devel Generate.
 -- #652000 by vividgates. Let domain list table display cleanly.
+-- #692772 by croryx and nonsie. Stronger warnings on forms.
 
 11-FEB-2010
 

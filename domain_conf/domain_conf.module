@@ -147,7 +147,7 @@ function domain_conf_domainlinks($domain) {
  */
 function domain_conf_domainwarnings() {
   // These are the forms for variables set by Domain Conf.
-  return array(
+  $forms = array(
     'system_admin_theme_settings',
     'system_date_time_settings',
     'system_performance_settings',
@@ -156,6 +156,11 @@ function domain_conf_domainwarnings() {
     'locale_languages_overview_form',
     'menu_configure',
   );
+  $return = array();
+  foreach ($forms as $form) {
+    $return[$form] = 'admin/build/domain/conf/%domain_id';
+  }
+  return $return;
 }
 
 /**
