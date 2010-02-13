@@ -1379,9 +1379,9 @@ function domain_node_access_records($node) {
     $grants[] = array(
       'realm' => 'domain_site',
       'gid' => 0,
-      'grant_view' => TRUE,
-      'grant_update' => FALSE,
-      'grant_delete' => FALSE,
+      'grant_view' => 1,
+      'grant_update' => 0,
+      'grant_delete' => 0,
       'priority' => 0,         // If this value is > 0, then other grants will not be recorded
     );
   }
@@ -1395,9 +1395,9 @@ function domain_node_access_records($node) {
         $grants[] = array(
           'realm' => 'domain_id',
           'gid' => $key,
-          'grant_view' => TRUE,
-          'grant_update' => TRUE,
-          'grant_delete' => TRUE,
+          'grant_view' => 1,
+          'grant_update' => 1,
+          'grant_delete' => 1,
           'priority' => 0,
         );
       }
@@ -1411,9 +1411,9 @@ function domain_node_access_records($node) {
     $grants[] = array(
     'realm' => 'domain_id',
     'gid' => 0,
-    'grant_view' => TRUE,
-    'grant_update' => TRUE,
-    'grant_delete' => TRUE,
+    'grant_view' => 1,
+    'grant_update' => 1,
+    'grant_delete' => 1,
     'priority' => 0,
     );
   }

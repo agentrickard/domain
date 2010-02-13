@@ -7,10 +7,11 @@
 -- Patch #632220 by bleen18 and nonsie. Support Devel Generate.
 -- #652000 by vividgates. Let domain list table display cleanly.
 -- #692772 by croryx and nonsie. Stronger warnings on forms.
+-- DBTNG does not allow boolean returns for hook_node_access_records(). Must use integer.
 
 11-FEB-2010
 
--- Patch #710978 by Dave Reid. Fixes SimpleTest conflixt.
+-- Patch #710978 by Dave Reid. Fixes SimpleTest conflict.
 -- Cleans up some PHP strict index warnings.
 
 31-JAN-2010
