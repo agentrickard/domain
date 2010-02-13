@@ -33,7 +33,7 @@ function domain_conf_domain_bootstrap_full($domain) {
   $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
   if (!empty($data)) {
     global $conf;
-    $settings = unserialize($data['settings']);
+    $settings = domain_unserialize($data['settings']);
     // Overwrite the $conf variables.
     foreach ($settings as $key => $value) {
       // Language handling is a special case.
@@ -597,7 +597,7 @@ function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
 function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
   global $conf, $_domain;
   // Get the current settings for this domain, if any.
-  $settings = unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  $settings = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
   // Settings found, update them.
   if (!empty($settings)) {
     $settings[$variable] = $value;
@@ -639,7 +639,7 @@ function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $res
   }
   if (!isset($settings[$domain_id]) || $reset) {
     // Get the current settings for this domain, if any.
-    $data = unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+    $data = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
     if (empty($data)) {
       $data = array();
     }
@@ -693,7 +693,7 @@ function _domain_conf_load_primary($unset = FALSE) {
     // Load the query.
     $data = db_result(db_query("SELECT data FROM $cache_table WHERE cid = 'variables'"));
     if (!empty($data)) {
-      $settings = unserialize($data);
+      $settings = domain_unserialize($data);
     }
     // If the cache has been cleared, this data will be empty.
     // In this case, grab the data directly from the base {variable} table.
@@ -701,7 +701,7 @@ function _domain_conf_load_primary($unset = FALSE) {
       $variable_table = domain_get_primary_table('variable');
       $result = db_query("SELECT name, value FROM $variable_table");
       while ($vars = db_fetch_array($result)) {
-        $data[$vars['name']] = unserialize($vars['value']);
+        $data[$vars['name']] = domain_unserialize($vars['value']);
       }
       $settings = $data;
     }

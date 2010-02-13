@@ -823,7 +823,7 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
       }
       // Check for domain-specific settings.
       $result = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
-      $settings = unserialize($result);
+      $settings = domain_unserialize($result);
       if (isset($settings[$action])) {
         $default[$domain['domain_id']] = $settings[$action];
       }
@@ -986,7 +986,7 @@ function domain_batch_form_submit($form, &$form_state) {
         if ($key > 0 || empty($form_state['values']['variable'])) {
           $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $key));
           if (isset($data['settings'])) {
-            $settings = unserialize($data['settings']);
+            $settings = domain_unserialize($data['settings']);
             $settings[$item] = $value;
             db_query("UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d", serialize($settings), $key);
           }
