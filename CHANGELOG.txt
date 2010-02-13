@@ -4,6 +4,7 @@
 
 -- #686146 by AlexisWilke and davidwhthomas. Fixes unserialize on pgSQL.
 -- #706490 by ibis. Fixes accidental redirects when using domain_set_domain().
+-- Patch #632220 by bleen18 and nonsie. Support Devel Generate.
 
 11-FEB-2010
 
