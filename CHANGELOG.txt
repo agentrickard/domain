@@ -3,6 +3,7 @@
 18-FEB-2010
 
 -- Patch #698566 by nonsie. Fixes some bad code logic in Domain Content.
+-- Requires update.php / menu rebuild.
 
 13-FEB-2010
 
