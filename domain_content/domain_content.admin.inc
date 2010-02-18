@@ -160,7 +160,7 @@ function domain_content_admin() {
  *  A form array according to the FormsAPI.
  */
 function domain_content_form($form_state) {
-  global $user, $_domain;
+  global $_domain;
   $filter = node_build_filter_query();
 
   // Bypass the superuser permissions by forcing an AND on {domain_access}.
@@ -187,42 +187,22 @@ function domain_content_form($form_state) {
     }
   }
 
-  $result = pager_query(db_rewrite_sql('SELECT n.*, u.name, u.uid FROM {node} n '. $filter['join'] .' INNER JOIN {users} u ON n.uid = u.uid '. $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
+  $result = pager_query(db_rewrite_sql('SELECT nid FROM {node} n '. $filter['join'] . $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
 
-  $check = array();
+  $nodes = array();
 
-  // Some existing permissions alter the node access rules.
-  $message = FALSE;
-  $set = 0;
-  $all = FALSE;
-  if (user_access('administer nodes') || user_access('set domain access')) {
-    $all = TRUE;
-    $message = TRUE;
-  }
   // Loop through the nodes to build the form
-  while ($node = db_fetch_object($result)) {
-    // Can the user edit all nodes of this type?
-    if (user_access('edit '. $node->type .' nodes')) {
-      $message = TRUE;
-    }
-    // Flag a message if user has extra permissions
-    if ($message) {
-      $check[$node->nid] = TRUE;
-    }
+  while ($nid = db_fetch_object($result)) {
+    $node = node_load($nid->nid);
+
     $form['title'][$node->nid] = array('#value' => l($node->title, 'node/'. $node->nid) .' '. theme('mark', node_mark($node->nid, $node->changed)));
     $form['name'][$node->nid] =  array('#value' => check_plain(node_get_types('name', $node)));
     $form['username'][$node->nid] = array('#value' => theme('username', $node));
     $form['status'][$node->nid] =  array('#value' =>  ($node->status ? t('published') : t('not published')));
-    // This routine controls if the editor can see the 'edit' link.
-    // Load the domain_access rules directly from domain_nodeapi().
-    domain_nodeapi($node, 'load');
 
     $node_domains = array();
-
     if (!empty($node->domains)) {
       foreach ($node->domains as $domain) {
-        // Can the user edit this node.  We use += here since this is an array loop.
-        $check[$node->nid] += domain_content_check($domain, $all);
         // The root domain is stored as -1, but cast as zero in the global variable.
         $key = ($domain == -1) ? 0 : $domain;
         // Convert the domain ids to data so we can print them.
@@ -247,7 +227,7 @@ function domain_content_form($form_state) {
       }
     }
     $form['domains'][$node->nid] =  array('#value' => theme('item_list', $items));
-    if (!empty($check[$node->nid])) {
+    if (node_access('update', $node)) {
       $form['operations'][$node->nid] = array('#value' => l(t('edit'), 'node/'. $node->nid .'/edit', array('query' => drupal_get_destination())));
       $nodes[$node->nid] = '';
     }
@@ -265,40 +245,37 @@ function domain_content_form($form_state) {
         $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
       }
     }
-    // If the user is a site admin, show the form, otherwise pass it silently.
-    if (user_access('set domain access')) {
-      $form['domain'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Affiliate publishing options'),
-        '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
-        '#prefix' => '<div class="description">'. t('If you select <em>Change affiliate publishing options</em> above, you should confirm the <em>Affiliate publishing options</em> settings below.') .'</div>'
-      );
-      $form['domain']['domain_site'] = array(
-        '#type' => 'checkbox',
-        '#prefix' => t('<p><b>Publishing options:</b>'),
-        '#suffix' => '</p>',
-        '#title' => t('Send to all affiliates'),
-        '#required' => FALSE,
-        '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
-        '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
-      );
-      $form['domain']['domains'] = array(
-        '#type' => empty($format) ? 'checkboxes' : 'select',
-        '#title' => t('Publish to'),
-        '#options' => $options,
-        '#required' => FALSE,
-        '#description' => t('Select which affiliates can access this content.'),
-        '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
-      );
-      if ($format) {
-        $form['domain']['domains']['#multiple'] = TRUE;
-        $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
-      }
+    $form['domain'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Affiliate publishing options'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#prefix' => '<div class="description">'. t('If you select <em>Change affiliate publishing options</em> above, you should confirm the <em>Affiliate publishing options</em> settings below.') .'</div>'
+    );
+    $form['domain']['domain_site'] = array(
+      '#type' => 'checkbox',
+      '#prefix' => t('<p><b>Publishing options:</b>'),
+      '#suffix' => '</p>',
+      '#title' => t('Send to all affiliates'),
+      '#required' => FALSE,
+      '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
+      '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
+    );
+    $form['domain']['domains'] = array(
+      '#type' => empty($format) ? 'checkboxes' : 'select',
+      '#title' => t('Publish to'),
+      '#options' => $options,
+      '#required' => FALSE,
+      '#description' => t('Select which affiliates can access this content.'),
+      '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
+    );
+    if ($format) {
+      $form['domain']['domains']['#multiple'] = TRUE;
+      $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
     }
   }
   // Users must have passed at least one access check to have batch options.
-  if (!empty($check)) {
+  if ((user_access('administer nodes') || user_access('set domain access')) && !empty($nodes)) {
     $form['options'] = array('#type' => 'fieldset',
       '#title' => t('Update options'),
       '#prefix' => '<div class="container-inline">',
@@ -312,14 +289,14 @@ function domain_content_form($form_state) {
     $form['options']['operation'] = array('#type' => 'select', '#options' => $options,  '#default_value' => 'approve');
     $form['options']['submit'] = array('#type' => 'submit', '#value' => t('Update'));
     $form['nodes'] = array('#type' => 'checkboxes', '#options' => $nodes);
+    // Filter the available operations based on user permissions.
+    domain_content_filter_operations($form['options']['operation']['#options']);
   }
   $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
   $form['#theme'] = 'domain_content_admin_nodes';
   $form['#validate'][] = 'node_admin_nodes_validate';
   $form['#submit'][] = 'node_admin_nodes_submit';
   $form['#submit'][] = 'domain_content_update_nodes';
-  // Filter the available operations based on user permissions.
-  domain_content_filter_operations($form['options']['operation']['#options']);
   return $form;
 }
 
