@@ -1,5 +1,9 @@
 // $Id$
 
+21-FEB-2010
+
+-- Adds Domain Settings and cleans up Domain Conf a bit.
+
 18-FEB-2010
 
 -- Patch #698566 by nonsie. Fixes some bad code logic in Domain Content.
