@@ -13,9 +13,9 @@
  * The domain conf page callback router.
  *
  * @param $domain
- *  The $domain object created by domain_lookup().
+ *   The $domain object created by domain_lookup().
  * @return
- * The appropriate form or an error message.
+ *   The appropriate form or an error message.
  */
 function domain_conf_page($domain) {
   if ($domain == -1) {
@@ -113,9 +113,9 @@ function domain_conf_form($form_state, $domain) {
  * Special configuration options for the main domain.
  *
  * @param $domain
- * The $domain object for the default domain.
+ *   The $domain object for the default domain.
  * @return
- * A $form array according to the FormsAPI, if unique configuration is possible.
+ *   A $form array according to the FormsAPI, if unique configuration is possible.
  */
 
 function domain_conf_default($domain) {
@@ -179,9 +179,9 @@ function domain_conf_form_submit($form, &$form_state) {
  * Resets configuration settings by removing the domain row from {domain_conf}.
  *
  * @param $domain
- *  The $domain object created by domain_lookup().
+ *   The $domain object created by domain_lookup().
  * @return
- * A confirmation form.
+ *   A confirmation form.
  */
 
 function domain_conf_reset($domain) {
@@ -195,9 +195,9 @@ function domain_conf_reset($domain) {
  * FormsAPI for resetting a domain configuration.
  *
  * @param $domain
- * The $domain object for the selected domain.
+ *   The $domain object for the selected domain.
  * @return
- * Themed HTML form.
+ *   Themed HTML form.
  */
 
 function domain_conf_reset_form($form_state, $domain) {
@@ -221,9 +221,9 @@ function domain_conf_reset_form_submit($form, &$form_state) {
  * Theme a message at the top of domain configuration pages.
  *
  * @param $domain
- * The $domain object for the selected domain.
+ *   The $domain object for the selected domain.
  * @return
- * Themed HTML messages.
+ *   Themed HTML messages.
  */
 function theme_domain_conf_reset($domain) {
   $output = '';

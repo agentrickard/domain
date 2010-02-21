@@ -110,7 +110,7 @@ function domain_conf_theme() {
 /**
  * Implement hook_enable().
  *
- * Register the domain_conf with the domain module so it's loaded during domain
+ * Register domain_conf with the domain module so it's loaded during domain
  * bootstrap and can implement domain_bootstrap hooks.
  */
 function domain_conf_enable() {
@@ -523,12 +523,11 @@ function domain_conf_domainupdate($op, $domain, $form_state = array()) {
  * as needed.
  *
  * @param $all
- * Should the function return all hook implementations or just those marked
- * with the domain_settings flag.  Defaults to FALSE.  Used to determine if
- * we are loading configuration options specific to the Domain Access module.
- *
+ *   Should the function return all hook implementations or just those marked
+ *   with the domain_settings flag.  Defaults to FALSE.  Used to determine if
+ *   we are loading configuration options specific to the Domain Access module.
  * @return
- * An array of form elements according to the FormsAPI or an empty array.
+ *   An array of form elements according to the FormsAPI or an empty array.
  */
 function domain_conf_api($all = FALSE, $settings = array()) {
   global $_domain;
@@ -589,29 +588,23 @@ function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
  * This function is called by external modules that wish
  * to alter Domain Conf settings.
  *
+ * Note that this function saves the value to the database
+ * and changes the active $conf array.
+ *
  * @link http://drupal.org/node/367963
+ * @see domain_conf_variable_save()
  *
  * @param $domain_id
- * The unique domain ID that is being edited.
+ *   The unique domain ID that is being edited.
  * @param $variable
- * The name of the variable you wish to set.
+ *   The name of the variable you wish to set.
  * @param $value
- * The value of the variable to set. You may leave this
- * value blank in order to unset the custom variable.
+ *   The value of the variable to set. You may leave this
+ *   value blank in order to unset the custom variable.
  */
 function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
   global $conf, $_domain;
-  // Get the current settings for this domain, if any.
-  $settings = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
-  // Settings found, update them.
-  if (!empty($settings)) {
-    $settings[$variable] = $value;
-    db_query("UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d", serialize($settings), $domain_id);
-  }
-  else if (domain_lookup($domain_id) != -1) {
-    $settings = array($variable => $value);
-    db_query("INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)", $domain_id, serialize($settings));
-  }
+  domain_conf_variable_save($domain_id, $variable, $value = NULL)
   // Clear the cache.
   cache_clear_all('variables', 'cache');
   // If we are on the active domain, set the active variable.
@@ -624,17 +617,17 @@ function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
  * Load a variable specific to a domain.
  *
  * @param $domain_id
- * The unique domain ID that is being edited.
+ *   The unique domain ID that is being edited.
  * @param $variable
- * The name of the variable you wish to get.
+ *   The name of the variable you wish to get.
  * @param $all
- * A boolean flag indicating whether to return the entire variable array.
+ *   A boolean flag indicating whether to return the entire variable array.
  * @param $reset
- * A boolean flag to reset the static variable array for the domain. Useful
- * if you are changing variables during a page request.
+ *   A boolean flag to reset the static variable array for the domain. Useful
+ *   if you are changing variables during a page request.
  * @return
- * The value of the variable for that domain, or NULL if not set,
- * or an array of variables, in the case of $all.
+ *   The value of the variable for that domain, or NULL if not set,
+ *   or an array of variables, in the case of $all.
  */
 function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $reset = FALSE) {
   global $_domain;
@@ -718,4 +711,50 @@ function _domain_conf_load_primary($unset = FALSE) {
     return;
   }
   return $settings;
+}
+
+/**
+ * Delete a setting from {domain_conf}.
+ *
+ * @param $domain_id
+ *   The unique domain ID that is being edited.
+ * @param $variable
+ *   The name of the variable you wish to delete.
+ */
+function domain_conf_variable_delete($domain_id, $variable) {
+  // Get the current settings for this domain, if any.
+  $settings = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  // Settings found, remove them.
+  if (!empty($settings)) {
+    unset($settings[$variable]);
+    db_query("UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d", serialize($settings), $domain_id);
+  }
+}
+
+/**
+ * Store a single variable in {domain_conf}.
+ *
+ * @link http://drupal.org/node/367963
+ * @see domain_conf_variable_set()
+ *
+ * @param $domain_id
+ *   The unique domain ID that is being edited.
+ * @param $variable
+ *   The name of the variable you wish to set.
+ * @param $value
+ *   The value of the variable to set. You may leave this
+ *   value blank in order to unset the custom variable.
+ */
+function domain_conf_variable_save($domain_id, $variable, $value = NULL) {
+  // Get the current settings for this domain, if any.
+  $settings = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  // Settings found, update them.
+  if (!empty($settings)) {
+    $settings[$variable] = $value;
+    db_query("UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d", serialize($settings), $domain_id);
+  }
+  else if (domain_lookup($domain_id) != -1) {
+    $settings = array($variable => $value);
+    db_query("INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)", $domain_id, serialize($settings));
+  }
 }
