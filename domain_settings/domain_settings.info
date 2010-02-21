@@ -1,7 +1,0 @@
-;  $Id$
-name = Domain Settings
-description = Expanded site configuration options for Domain Access.
-package = Domain Access
-dependencies[] = domain
-dependencies[] = domain_conf
-core = 6.x
