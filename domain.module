@@ -2054,7 +2054,7 @@ function domain_lookup_simple($name, $reset = FALSE) {
   static $cache = array();
 
   if (empty($name)) {
-    return 0;
+    return array();
   }
 
   if ($reset || !isset($cache[$name])) {

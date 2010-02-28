@@ -3,6 +3,7 @@
 28-FEB-2010
 
 -- #726460 by TimAlsop. Adds hook_domain_nav_options_alter().
+-- #723858 by fizk. Ensure $_domain is always an array, even on fail.
 
 21-FEB-2010
 
