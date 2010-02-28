@@ -1,5 +1,9 @@
 // $Id$
 
+28-FEB-2010
+
+-- #726460 by TimAlsop. Adds hook_domain_nav_options_alter().
+
 21-FEB-2010
 
 -- Adds Domain Settings and cleans up Domain Conf a bit.

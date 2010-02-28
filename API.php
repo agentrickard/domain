@@ -707,3 +707,37 @@ function mymodule_form_submit($form_state) {
     domain_conf_variable_set($domain['domain_id'], 'my_variable', $value);
   }
 }
+
+/**
+ * Allow modules to alter access to Domain Navigation items.
+ *
+ * This drupal_alter hook exposes the $options array before
+ * Domain Nav passes its links to the theme layer. You can use it
+ * to introduce additional access controls on those links.
+ *
+ * Note that "inactive" domains are already filtered before this
+ * hook is called, so you would have to explcitly add them again.
+ *
+ * @see drupal_alter()
+ * @see theme_domain_nav_default()
+ *
+ * @param &$options
+ *   The link options, passed by reference, to the theme.
+ * @return
+ *   No return value. Modify $options by reference.
+ */
+function domain_nav_domain_nav_options_alter(&$options) {
+  // Remove domains that the user is not a member of.
+  global $user;
+  if (empty($user->domain_user)) {
+    $options = array();
+  }
+  else {
+    foreach ($options as $key => $value) {
+      $check = ($key == 0) ? -1 : $key; // Account for -1.
+      if (!in_array($check, $user->domain_user)) {
+        unset($options[$key]);
+      }
+    }
+  }
+}

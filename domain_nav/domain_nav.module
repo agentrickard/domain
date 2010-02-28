@@ -122,15 +122,16 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
         '#default_value' => variable_get('domain_nav_block', 0),
         '#options' => array(0 => t('Link to site home page'), 1 => t('Link to active url')),
       );
+      $options = array(
+        'default' => t('JavaScript select list'),
+        'menus' => t('Menu-style tab links'),
+        'ul' => t('Unordered list of links'),
+      );
       $form['domain_nav_theme'] = array(
         '#type' => 'radios',
         '#title' => t('Link theme'),
         '#default_value' => variable_get('domain_nav_theme', 'default'),
-        '#options' => array(
-          'default' => t('JavaScript select list'),
-          'menus' => t('Menu-style tab links'),
-          'ul' => t('Unordered list of links'),
-        ),
+        '#options' => $options,
       );
       return $form;
       break;
@@ -203,6 +204,7 @@ function domain_nav_render($paths = NULL, $style = NULL) {
     }
   }
   $theme = 'domain_nav_'. $style;
+  drupal_alter('domain_nav_options', $options);
   $content = theme($theme, $options);
   return $content;
 }
