@@ -4,6 +4,7 @@
 
 -- #726460 by TimAlsop. Adds hook_domain_nav_options_alter().
 -- #723858 by fizk. Ensure $_domain is always an array, even on fail.
+-- #721352 by fizk. Check correct node values for form_alter.
 
 21-FEB-2010
 

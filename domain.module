@@ -1590,7 +1590,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
         '#title' => t('Send to all affiliates'),
         '#required' => FALSE,
         '#description' => t('Select if this content can be shown to all affiliates. This setting will override the options below, but you must still select a domain that "owns" this content.'),
-        '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
+        '#default_value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );
       $form['domain']['domains'] = array(
         '#type' => empty($format) ? 'checkboxes' : 'select',
@@ -1598,7 +1598,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
         '#options' => $options,
         '#required' => TRUE,
         '#description' => t('Select which affiliates can access this content.'),
-        '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domains : $default,
+        '#default_value' => (isset($form['#node']->domains)) ? $form['#node']->domains : $default,
       );
       if ($format) {
         $form['domain']['domains']['#multiple'] = TRUE;
@@ -1689,7 +1689,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
               '#options' => $user_options,
               '#required' => $required,
               '#description' => t('Select which affiliates can access this content.'),
-              '#default_value' => (isset($form['#node']->nid)) ? $form['#node']->domains : $default_options,
+              '#default_value' => (isset($form['#node']->domains)) ? $form['#node']->domains : $default_options,
             );
             if ($format) {
               $form['domain']['domains']['#multiple'] = TRUE;
@@ -1718,7 +1718,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       // These form elements are hidden from non-privileged users, by design.
       $form['domain_site'] = array(
         '#type' => 'value',
-        '#value' => (isset($form['#node']->nid)) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
+        '#value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : variable_get('domain_node_'. $form['#node']->type, $behavior),
       );
       // Domains that have been assigned and cannot be changed.
       $form['domains_raw'] = array(
