@@ -1920,14 +1920,25 @@ function domain_resolve_host($name = '') {
 }
 
 /**
- * Determines current fully qualified domain name.
+ * Determines current, fully qualified domain name.
+ *
+ * Relies on $_SERVER['HTTP_HOST'] being set. Note
+ * that this value has already been security checked by
+ * Drupal core. Otherwise, we never get this far.
+ *
+ * @see conf_init()
  *
  * @return
  * The current (host) domain name as a String.
  */
 function domain_request_name() {
-  // We lower case this, since EXAMPLE.com == example.com.
-  return strtolower(rtrim($_SERVER['HTTP_HOST']));
+  if (isset($_SERVER['HTTP_HOST'])) { 
+    // We lower case this, since EXAMPLE.com == example.com.
+    return strtolower(rtrim($_SERVER['HTTP_HOST']));
+  }
+  else {
+    return '';
+  }
 }
 
 /**
