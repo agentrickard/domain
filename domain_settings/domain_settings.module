@@ -25,6 +25,8 @@ function domain_settings_perm() {
  */
 function domain_settings_form_alter(&$form, $form_state, $form_id) {
   global $_domain;
+
+  // Remove settings that cannot be used reliably.
   $disallow = domain_settings_disallow();
   if (!user_access('access domain settings form') || in_array($form_id, $disallow) || !isset($form['#submit']) || !in_array('system_settings_form_submit', $form['#submit'])) {
     return;
@@ -160,19 +162,15 @@ function domain_settings_disallow() {
       $match = preg_replace('/(\r\n?|\n)/', '|', $list);
       $items = explode("|", $match);
     }
-    $forms = array_merge(array('domain_configure_form'), $items);
+    // These forms are known to be problematic, so omit them.
+    $default = array(
+      'domain_configure_form',
+      'system_file_system_settings', // Changing file paths is dangerous.
+      'system_performance_settings', // JS and CSS aggregation is not supported.
+    );
+    $forms = array_merge($default, $items);
   }
+
   return $forms;
 }
 
-/**
- * Temporary, chasing HEAD.
- */
-if (!function_exists('domain_unserialize')) {
-  function domain_unserialize($object) {
-    if (empty($object)) {
-      return;
-    }
-    return unserialize(db_decode_blob($object));
-  }
-}
