@@ -174,3 +174,20 @@ function domain_settings_disallow() {
   return $forms;
 }
 
+/**
+ * Implement hook_domain_warnings_alter().
+ */
+function domain_settings_domain_warnings_alter(&$forms) {
+  // Forms which Domain Settings handles and are set as warnings.
+  $core_forms = array(
+    'system_admin_theme_settings',
+    'system_site_information_settings',
+    'system_site_maintenance_settings',
+    'menu_configure',
+  );
+  foreach ($core_forms as $form_id) {
+    if (isset($forms[$form_id])) {
+      unset($forms[$form_id]);
+    }
+  }
+}

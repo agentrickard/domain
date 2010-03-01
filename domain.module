@@ -2234,13 +2234,14 @@ function domain_warning_check($form_id) {
     // Add the list of forms
     $forms = array();
     $forms = module_invoke_all('domainwarnings');
+    drupal_alter('domain_warnings', $forms);
     if ($form_id == 'domain_batch_form' || (arg(2) != 'domain' && in_array($form_id, array_keys($forms)))) {
       $default = domain_default();
       if ($_domain['domain_id'] == $default['domain_id']) {
         return;
       }
       $link_text = '';
-      $link = $forms[$form_id];
+      $link = isset($forms[$form_id]) ? $forms[$form_id] : NULL;
       if (!empty($link)) {
         $elements = array();
         foreach ($_domain as $key => $value) {
