@@ -2234,6 +2234,7 @@ function domain_warning_check($form_id) {
     // Add the list of forms
     $forms = array();
     $forms = module_invoke_all('domainwarnings');
+    drupal_alter('domain_warnings', $forms);
     // Catch the API change.
     foreach ($forms as $key => $value) {
       if (is_numeric($key)) {
@@ -2247,7 +2248,7 @@ function domain_warning_check($form_id) {
         return;
       }
       $link_text = '';
-      $link = $forms[$form_id];
+      $link = isset($forms[$form_id]) ? $forms[$form_id] : NULL;
       if (!empty($link)) {
         $elements = array();
         foreach ($_domain as $key => $value) {

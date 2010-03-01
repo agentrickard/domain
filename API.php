@@ -741,3 +741,27 @@ function domain_nav_domain_nav_options_alter(&$options) {
     }
   }
 }
+
+/**
+ * Allows modules to remove form_ids from the list set
+ * by hook_domainwarnings().
+ *
+ * Required by Domain Settings, whose code is shown below.
+ *
+ * @param &$forms
+ *   An array of form_ids, passed by reference.
+ */
+function hook_domain_warnings_alter(&$forms) {
+  // Forms which Domain Settings handles and are set as warnings.
+  $core_forms = array(
+    'system_admin_theme_settings',
+    'system_site_information_settings',
+    'system_site_maintenance_settings',
+    'menu_configure',
+  );
+  foreach ($core_forms as $form_id) {
+    if (isset($forms[$form_id])) {
+      unset($forms[$form_id]);
+    }
+  }
+}

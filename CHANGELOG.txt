@@ -7,6 +7,7 @@
 -- #721352 by fizk. Check correct node values for form_alter.
 -- #723262. Handle missing $_SERVER[HTTP_HOST] gracefully.
 -- Cleans up some Domain Settings elements.
+-- #721148. Adds hook_domain_warnings_alter().
 
 21-FEB-2010
 
