@@ -8,6 +8,7 @@
 -- #723262. Handle missing $_SERVER[HTTP_HOST] gracefully.
 -- Cleans up some Domain Settings elements.
 -- #721148. Adds hook_domain_warnings_alter().
+-- Adds basic Drush support.
 
 21-FEB-2010
 
