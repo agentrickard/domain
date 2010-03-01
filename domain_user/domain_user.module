@@ -304,7 +304,7 @@ function domain_user_domainupdate($op, $domain, $form_state = array()) {
   switch ($op) {
     case 'update':
       // If these are different, then we must delete a row from {access}.
-      if ($domain['subdomain'] != $form_state['values']['subdomain']) {
+      if (isset($form_state['values']['subdomain']) && $domain['subdomain'] != $form_state['values']['subdomain']) {
         $mask = str_replace('.'. $root, '', $domain['subdomain']);
         db_query("DELETE FROM {access} WHERE mask = '%s'", $mask);
       }
