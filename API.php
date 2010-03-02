@@ -726,7 +726,7 @@ function mymodule_form_submit($form_state) {
  * @return
  *   No return value. Modify $options by reference.
  */
-function domain_nav_domain_nav_options_alter(&$options) {
+function hook_domain_nav_options_alter(&$options) {
   // Remove domains that the user is not a member of.
   global $user;
   if (empty($user->domain_user)) {
@@ -762,6 +762,26 @@ function hook_domain_warnings_alter(&$forms) {
   foreach ($core_forms as $form_id) {
     if (isset($forms[$form_id])) {
       unset($forms[$form_id]);
+    }
+  }
+}
+
+/**
+ * Notify other modules that Domain Settings has saved a variable set.
+ *
+ * @param $domain_id
+ *   The domain the variable is being saved for. This is not always
+ *   the current domain.
+ * @param $values
+ *   The variable values being changed, an array in the format $name => $value.
+ *  @return
+ *   No return required.
+ */
+function hook_domain_settings($domain_id, $values) {
+  // Sync domain 2 with the primary domain in all cases.
+  if ($domain_id == 2) {
+    foreach($values as $name => $value) {
+      variable_set($name, $value);
     }
   }
 }

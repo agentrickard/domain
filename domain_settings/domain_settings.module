@@ -3,8 +3,16 @@
 // $Id$
 
 /**
+ * @defgroup domain_settings Domain Settings : expanded site configuration options for Domain Access
+ *
+ * Makes standard system settings forms domain-sensitive.
+ */
+
+/**
  * @file
  * Allows domain-specific use of Drupal system settings forms.
+ *
+ * @ingroup domain_settings
  */
 
 /**
