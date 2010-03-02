@@ -1,5 +1,9 @@
 // $Id$
 
+02-MAR-2010
+
+-- #730566. fixes API documentation omissions.
+
 28-FEB-2010
 
 -- #726460 by TimAlsop. Adds hook_domain_nav_options_alter().
