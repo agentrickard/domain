@@ -1,5 +1,9 @@
 // $Id$
 
+04-MAR-2010
+
+-- #732494 by antiorario, GiorgosK. Fixed db_rewrite_sql() error in Domain Content.
+
 02-MAR-2010
 
 -- #730566. fixes API documentation omissions.
