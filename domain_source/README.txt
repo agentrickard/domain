@@ -120,7 +120,7 @@ NOTE: Inactive domains may not be selected as a source domain.
 
 When viewing content in debug mode, the module will show you the source
 domain for the content and the means used to determine that domain.
-Posible options are:
+Possible options are:
 
   -- Domain sitename
   Indicates the content is expressly assigned to a source domain.
