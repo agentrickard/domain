@@ -21,6 +21,7 @@ CONTENTS
 3.2   Domain-Specific Themes
 3.3   Domain-Specific Theme Settings
 3.4   Color Module Notes
+3.5   Conflicts With Other Modules
 4.  Batch Updates
 5.  Developer Notes
 5.1   Database Schema
@@ -129,6 +130,20 @@ Color module is a difficult case, and this module works as expected in Garland
 and Minelli (both core Drupal themes). You may experience issues with custom
 themes, or with modules that dynamically add additional CSS files to the Color
 module.
+
+----
+3.5   Conflicts With Other Modules
+
+Due to how Drupal handles theme switching, you may experience a conflict if
+more than one module tries to alter the site theme. To work around this issue,
+Domain Theme provides a settings that allows you to adjust the module's
+execution order.
+
+The form is found at the bottom of the settings page for Domain Access,
+under the 'Theme settings' header.
+
+You may need to experiment with various weights before finding the correct
+setting for your site. Lower weights execute first. Zero is the default weight.
 
 ----
 4.  Batch Updates

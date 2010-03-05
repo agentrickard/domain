@@ -2,7 +2,8 @@
 
 05-MAR-2010
 
--- #579696 bu Jerome F. Updates multiple node access patch to 6.16.
+-- #579696 by Jerome F. Updates multiple node access patch to 6.16.
+-- #731802 by tjmoyer. Document Domain Theme weight settings. 
 
 04-MAR-2010
 
