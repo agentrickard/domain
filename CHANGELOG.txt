@@ -1,5 +1,9 @@
 // $Id$
 
+05-MAR-2010
+
+-- #579696 bu Jerome F. Updates multiple node access patch to 6.16.
+
 04-MAR-2010
 
 -- #732494 by antiorario, GiorgosK. Fixed db_rewrite_sql() error in Domain Content.
