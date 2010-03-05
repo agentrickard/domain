@@ -1,5 +1,10 @@
 // $Id$
 
+
+05-MAR-2010
+
+-- #730736 by pbeakley. Bad use of empty() in Domain Source.
+
 04-MAR-2010
 
 -- #732494 by antiorario, GiorgosK. Fixed db_rewrite_sql() error in Domain Content.
