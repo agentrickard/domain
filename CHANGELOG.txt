@@ -3,7 +3,8 @@
 05-MAR-2010
 
 -- #579696 by Jerome F. Updates multiple node access patch to 6.16.
--- #731802 by tjmoyer. Document Domain Theme weight settings. 
+-- #731802 by tjmoyer. Document Domain Theme weight settings.
+-- #730736 by pbeakley. Bad use of empty() in Domain Source.
 
 04-MAR-2010
 
