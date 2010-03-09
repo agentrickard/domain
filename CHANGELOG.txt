@@ -1,5 +1,9 @@
 // $Id$
 
+09-MAR-2010
+
+-- #736314 by hefox. Clear up help text in Domain Views access plugin.
+
 05-MAR-2010
 
 -- #579696 by Jerome F. Updates multiple node access patch to 6.16.

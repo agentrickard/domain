@@ -50,7 +50,7 @@ class domain_views_plugin_access extends views_plugin_access {
       '#options' => $options,
       '#title' => t('Domains'),
       '#default_value' => $this->options['domains'],
-      '#description' => t('Only users with the selected permission flag will be able to access this display. Note that users with "access all views" can see any view, regardless of other permissions.'),
+      '#description' => t('This display will only be available on the selected domains. Note that users with "access all views" can see any view, regardless of other permissions.'),
     );
     if ($format) {
       $form['domains']['#multiple'] = TRUE;
