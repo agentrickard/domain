@@ -580,8 +580,6 @@ function domain_cron() {
   // Check to see if this function is needed at all.
   $modules = module_implements('domaincron');
   if (!empty($modules)) {
-    // Store the current $_domain global.
-    $_temp = $_domain;
     // Get the domain list.
     $domains = domain_domains();
     // Run the hook for each active domain.
@@ -591,8 +589,8 @@ function domain_cron() {
         module_invoke($module, 'domaincron', $domain);
       }
     }
-    // Set the $_domain global back.
-    $_domain = $_temp;
+    // Reset the active domain.
+    domain_reset_domain(TRUE);
   }
 }
 
@@ -970,6 +968,32 @@ function domain_set_domain($domain_id, $bootstrap = FALSE) {
   // Now re-run the bootstrap.
   if ($bootstrap) {
     _domain_bootstrap_invoke_all('full', $_domain);
+  }
+}
+
+/**
+ * Reset the active domain to its initial version.
+ *
+ * If $bootstrap is set to TRUE, this function will re-bootstrap
+ * Domain Access to restore variables and other settings that
+ * may have changed during request execution.
+ *
+ * If domain_set_domain() invoked TRUE, then this matching
+ * function should as well. Otherwise, pass FALSE or empty.
+ *
+ * @see domain_initial_domain()
+ * @see domain_set_domain()
+ *
+ * @param $bootstrap
+ *   Boolean flag that indicates whether to run domain bootstrap load.
+ * @return
+ *   No return value. The global $_domain value is altered, and domain-specific
+ *   data functions are loaded.
+ */
+function domain_reset_domain($bootstrap = FALSE) {
+  $domain = domain_initial_domain();
+  if (!empty($domain)) {
+    domain_set_domain($domain['domain_id'], $bootstrap);
   }
 }
 
