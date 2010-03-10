@@ -264,21 +264,21 @@ function domain_theme_settings($theme, $domain) {
   // Load the system form file.
   include_once(drupal_get_path('module', 'system') .'/system.admin.inc');
 
-  $theme = db_fetch_array(db_query("SELECT theme, settings FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain['domain_id'], $theme));
-  drupal_set_message(t('You are viewing the %theme settings for %domain.', array('%theme' => $theme['theme'], '%domain' => $domain['sitename'])));
-  // Write uploads to the proper directory?
+  $settings = db_fetch_array(db_query("SELECT theme, settings FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain['domain_id'], $theme));
+  drupal_set_message(t('You are viewing the %theme settings for %domain.', array('%theme' => $theme, '%domain' => $domain['sitename'])));
+  // Write uploads to the proper directory.
   if ($domain['domain_id'] > 0) {
     global $conf;
     $conf['file_directory_path'] = file_directory_path() .'/domain-'. $domain['domain_id'];
   }
 
   // If there are settings, we have to load ours.
-  if (!empty($theme)) {
-    domain_theme_set_variables($theme);
-    return drupal_get_form('system_theme_settings', $theme['theme']);
+  if (!empty($settings)) {
+    domain_theme_set_variables($settings);
+    return drupal_get_form('system_theme_settings', $settings['theme']);
   }
   else {
-    return drupal_get_form('system_theme_settings');
+    return drupal_get_form('system_theme_settings', $theme);
   }
 }
 

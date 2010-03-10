@@ -1,5 +1,9 @@
 // $Id$
 
+10-MAR-2010
+
+-- Patch #700854 by hefox and eme. Load default theme settings.
+
 09-MAR-2010
 
 -- #736314 by hefox. Clear up help text in Domain Views access plugin.
