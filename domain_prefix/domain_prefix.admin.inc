@@ -137,6 +137,8 @@ function domain_prefix_configure_form() {
     '#type' => 'submit',
     '#value' => t('Restore defaults'),
   );
+  // Reset the active domain.
+  domain_reset_domain(TRUE);
   return $form;
 }
 
@@ -349,6 +351,8 @@ function domain_prefix_form($form_state, $domain, $arguments = array()) {
     '#type' => 'submit',
     '#value' => $submit
   );
+  // Reset the active domain.
+  domain_reset_domain(TRUE);
   return $form;
 }
 

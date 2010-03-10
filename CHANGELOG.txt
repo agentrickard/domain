@@ -3,6 +3,8 @@
 10-MAR-2010
 
 -- Patch #700854 by hefox and eme. Load default theme settings.
+-- #733722 by hefox and pbeakley. Add domain_reset_domain() and use it where needed.
+-- Rolls the 6.x.2.3 release.
 
 09-MAR-2010
 
