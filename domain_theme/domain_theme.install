@@ -1,0 +1,51 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install file for the Domain Theme module
+ */
+
+/**
+ * Implement hook_install()
+ */
+function domain_theme_install() {
+  drupal_install_schema('domain_theme');
+}
+
+/**
+ * Implement hook_schema()
+ */
+function domain_theme_schema() {
+  $schema['domain_theme'] = array(
+    'fields' => array(
+      'domain_id' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'theme' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
+      'settings' => array('type' => 'blob', 'not null' => FALSE),
+      'status' => array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0),
+      'filepath' => array('type' => 'varchar', 'length' => '255', 'not null' => FALSE)),
+    'primary key' => array('domain_id', 'theme'),
+  );
+  return $schema;
+}
+
+/**
+ * Implement hook_uninstall()
+ */
+function domain_theme_uninstall() {
+  drupal_uninstall_schema('domain_theme');
+  variable_del('domain_theme_weight');
+}
+
+/**
+ * Update the table structure
+ */
+function domain_theme_update_6200() {
+  $ret = array();
+  db_drop_primary_key($ret, 'domain_theme');
+  db_add_primary_key($ret, 'domain_theme', array('domain_id', 'theme'));
+  db_add_field($ret, 'domain_theme', 'status', array('type' => 'int', 'size' => 'tiny', 'not null' => TRUE, 'default' => 0));
+  db_add_field($ret, 'domain_theme', 'filepath', array('type' => 'varchar', 'length' => '255', 'not null' => FALSE));
+  $ret[] = update_sql("UPDATE {domain_theme} SET status = 1");
+  return $ret;
+}
