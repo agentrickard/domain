@@ -2210,7 +2210,10 @@ function domain_lookup_simple($name, $reset = FALSE) {
 
   if ($reset || !isset($cache[$name])) {
     // Lookup the given domain name against our allowed hosts record.
-    $domain = db_fetch_array(db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = '%s'", $name));
+    $domain = db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = :subdomain", 
+      array(':subdomain' => $name),
+      array('fetch' => PDO::FETCH_ASSOC)
+    );
     if (!is_array($domain)) {
       $domain = array();
     }

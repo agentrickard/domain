@@ -2,6 +2,7 @@
 
 16-MAR-2010
 -- Domain Access now correctly installs and uninstalls in Drupal 7.
+-- Makes domain bootstrap correctly when included in settings.php.
 
 10-MAR-2010
 

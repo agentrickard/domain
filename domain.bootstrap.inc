@@ -75,10 +75,10 @@ function _domain_bootstrap($phase) {
   switch ($phase) {
     case DOMAIN_BOOTSTRAP_INIT:
       // Make sure database is loaded
-      drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE);
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE, FALSE);
       // If the module has been disabled, stop loading.
       $table = domain_get_primary_table('system');
-      $check = db_result(db_query("SELECT status FROM $table WHERE name = 'domain' AND type = 'module'"));
+      $check = (bool) db_query("SELECT status FROM $table WHERE name = 'domain' AND type = 'module'")->fetchField();
       if (empty($check)) {
         return NULL;
       }
@@ -162,9 +162,9 @@ function _domain_bootstrap_modules_get() {
   global $conf;
   $key = 'domain_bootstrap_modules';
   $table = domain_get_primary_table('variable');
-  $result = db_result(db_query("SELECT value FROM $table WHERE name = '%s'", $key));
+  $result = db_query("SELECT value FROM $table WHERE name = :name", array(':name' => $key))->fetchField();
   if (!empty($result)) {
-    $conf[$key] = unserialize($result);
+    $conf[$key] = domain_unserialize($result);
   }
   else {
     $conf[$key] = array('domain');
