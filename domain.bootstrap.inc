@@ -260,7 +260,7 @@ function domain_unserialize($object) {
   if (empty($object)) {
     return;
   }
-  return unserialize(db_decode_blob($object));
+  return unserialize(pg_unescape_bytea($object));
 }
 
 /**

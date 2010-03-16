@@ -119,94 +119,102 @@ function domain_init() {
 function domain_menu() {
   $items = array();
   $admin = user_access('administer domains');
-  $items['admin/build/domain'] = array(
+  $items['admin/config/domain'] = array(
     'title' => 'Domains',
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_view',
     'file' => 'domain.admin.inc',
     'description' => 'Settings for the Domain Access module.',
   );
-  $items['admin/build/domain/view'] = array(
+  $items['admin/config/domain/view'] = array(
     'title' => 'Domain list',
     'access arguments' => array('administer domains'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
     'page callback' => 'domain_view',
     'file' => 'domain.admin.inc',
+    'description' => 'View list of registered domains.',
     'weight' => -10
   );
-  $items['admin/build/domain/settings'] = array(
+  $items['admin/config/domain/settings'] = array(
     'title' => 'Settings',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'domain_configure',
     'file' => 'domain.admin.inc',
+    'description' => 'Configure Domain Access settings.',
     'weight' => -8
   );
-  $items['admin/build/domain/create'] = array(
+  $items['admin/config/domain/create'] = array(
     'title' => 'Create domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_form'),
     'file' => 'domain.admin.inc',
+    'description' => 'Create new domain record.',
     'weight' => -7
     );
-  $items['admin/build/domain/advanced'] = array(
+  $items['admin/config/domain/advanced'] = array(
     'title' => 'Node settings',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_advanced_form'),
     'file' => 'domain.admin.inc',
+    'description' => 'Configure content creation settings for domains.',
     'weight' => -6
   );
   // Register the batch actions as menu callbacks
   $batch = module_invoke_all('domainbatch');
   if (!empty($batch)) {
-    $items['admin/build/domain/batch'] = array(
+    $items['admin/config/domain/batch'] = array(
       'title' => 'Batch updating',
       'access arguments' => array('administer domains'),
       'type' => MENU_LOCAL_TASK,
       'page callback' => 'domain_batch',
       'file' => 'domain.admin.inc',
+      'description' => 'Batch update domain settings.',
       'weight' => -5
     );
     // Get the submenu items
     foreach ($batch as $key => $value) {
-      $items['admin/build/domain/batch/' . $key] = array(
+      $items['admin/config/domain/batch/' . $key] = array(
         'title' => $value['#form']['#title'],
         'access arguments' => array('administer domains'),
         'type' => MENU_CALLBACK,
         'page callback' => 'domain_batch',
         'page arguments' => array($key),
         'file' => 'domain.admin.inc',
+        'description' => isset($value['#description']) ? $value['#description'] : '',
         'weight' => $value['#weight']
       );
     }
   }
-  $items['admin/build/domain/roles'] = array(
+  $items['admin/config/domain/roles'] = array(
     'title' => 'User defaults',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_roles_form'),
     'file' => 'domain.admin.inc',
+    'description' => 'Default domain settings for users.',
     'weight' => -4
   );
-  $items['admin/build/domain/edit/%domain'] = array(
+  $items['admin/config/domain/edit/%domain'] = array(
     'title' => 'Edit domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_form', 4),
+    'description' => 'Edit domain record.',
     'file' => 'domain.admin.inc',
   );
-  $items['admin/build/domain/delete/%domain'] = array(
+  $items['admin/config/domain/delete/%domain'] = array(
     'title' => 'Delete domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_delete_form', 4),
+    'description' => 'Delete domain record.',
     'file' => 'domain.admin.inc',
   );
   return $items;
