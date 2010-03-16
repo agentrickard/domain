@@ -130,6 +130,7 @@ function domain_menu() {
     'title' => 'Domain list',
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_view',
+    'type' => MENU_LOCAL_TASK,
     'file' => 'domain.admin.inc',
     'description' => 'View list of registered domains.',
     'weight' => -10
@@ -669,19 +670,13 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   // Run the lookup, if needed.
   if (!isset($domains[$key]) || $reset) {
     if ($subdomain) {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE subdomain = :subdomain", 
-        array(':subdomain' => $subdomain),
-        array('fetch' => PDO::FETCH_ASSOC)
-      );
+      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchAssoc();
     }
     elseif ($domain_id == 0) {
       $domain = domain_default();
     }
     else {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE domain_id = :domain_id", 
-        array(':domain_id' => $domain_id),
-        array('fetch' => PDO::FETCH_ASSOC)
-      );
+      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchAssoc();
     }
     // Did we get a valid result?
     if (isset($domain['domain_id'])) {
@@ -760,8 +755,8 @@ function domain_domains($reset = FALSE) {
   if (empty($domains) || $reset) {
     $domains = array();
     // Query the db for active domain records.
-    $result = db_query("SELECT domain_id FROM {domain}");
-    while ($data = db_fetch_array($result)) {
+    $result = db_query("SELECT domain_id FROM {domain}", array(), array('fetch' => PDO::FETCH_ASSOC));
+    foreach ($result as $data) {
       $domain = domain_lookup($data['domain_id'], NULL, TRUE);
       $domains[$domain['domain_id']] = $domain;
     }
@@ -897,7 +892,7 @@ function domain_valid_domain($subdomain) {
  *   TRUE if unique; FALSE if duplicate.
  */
 function domain_unique_domain($subdomain) {
-  $count = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
+  $count = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchField();
   return !(bool) $count;
 }
 
@@ -1162,15 +1157,45 @@ function domain_node_load($nodes, $types) {
       $nodes[$node->nid]->subdomains[] = t('All affiliates');
     }
     foreach ($nodes[$node->nid]->domains as $gid) {
-      if ($gid > 0) {
-        $domain = domain_lookup($gid);
-        $nodes[$node->nid]->subdomains[] = $domain['sitename'];
-      }
-      else {
-        $nodes[$node->nid]->subdomains[] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
-      }
+      ($gid == -1) ? $key = 0 : $key = $gid;
+      $domain = domain_lookup($key);
+      $nodes[$node->nid]->subdomains[] = check_plain($domain['sitename']);
     }
   }
+}
+
+/**
+ * Implements hook_node_view()
+ *
+ * Display debugging information for a node.
+ */
+function domain_node_view($node, $view_mode) {
+  if (empty($node->nid) || !in_array($view_mode, array('full', 'teaser'))) {
+    return;
+  }
+  $output = '';
+  if (variable_get('domain_debug', 0) && user_access('set domain access')) {
+    if (!empty($node->subdomains)) {
+      $output = theme('item_list', array('items' => $node->subdomains, 'title' => t('Assigned domains')));
+      $node->content['subdomains'] = array('#markup' => $output, '#weight' => 20);
+    }
+    if (!empty($node->editors)) {
+      $output = theme('item_list', array('items' => $node->editors, 'title' => t('Editors')));
+      $node->content['editors'] = array('#markup' => $output, '#weight' => 21);
+    }
+    if (empty($output)) {
+      $node->content['domain'] = array('#markup' => t('This node is not assigned to a domain.'), '#weight' => 22);
+    }
+  }
+}
+
+/**
+ * Implements hook_node_delete()
+ */
+function domain_node_delete($node) {
+  db_delete('domain_access')
+    ->condition('nid', $node->nid)
+    ->execute();
 }
 
 /**
@@ -1351,7 +1376,7 @@ function domain_get_node_domains($nid) {
  * all users are in the realm defined by the currently active domain_id.
  */
 function domain_node_grants($account, $op) {
-  global $_domain;
+  $_domain = domain_get_domain();
   $grants = array();
 
   // Do we need to use complex rules?
@@ -1360,7 +1385,7 @@ function domain_node_grants($account, $op) {
   // By design, all users can see content sent to all affiliates,
   // but the $_domain['site_grant'] can be set to FALSE.
   if ($op == 'view') {
-    if ($_domain['site_grant']) {
+    if (!empty($_domain['site_grant'])) {
       $grants['domain_site'][] = 0;
       if ($rules) {
         $grants['domain_site']['group'] = 'domain';
@@ -1412,18 +1437,7 @@ function domain_node_grants($account, $op) {
       }
     }
   }
-  // Let Domain Access module extensions act to override the defaults.
-  static $_modules;
-  if (!isset($_modules)) {
-    $_modules = module_implements('domaingrants');
-  }
-  if (!empty($_modules)) {
-    foreach ($_modules as $module) {
-      // Cannot use module_invoke_all() since these are passed by reference.
-      $function = $module . '_domaingrants';
-      $function($grants, $account, $op);
-    }
-  }
+  dsm($grants);
   return $grants;
 }
 
@@ -2218,10 +2232,7 @@ function domain_lookup_simple($name, $reset = FALSE) {
 
   if ($reset || !isset($cache[$name])) {
     // Lookup the given domain name against our allowed hosts record.
-    $domain = db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = :subdomain", 
-      array(':subdomain' => $name),
-      array('fetch' => PDO::FETCH_ASSOC)
-    );
+    $domain = db_query("SELECT domain_id, subdomain, sitename FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $name))->fetchAssoc();
     if (!is_array($domain)) {
       $domain = array();
     }

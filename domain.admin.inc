@@ -119,12 +119,13 @@ function domain_configure() {
 /**
  * FormsAPI for configuring the domain module.
  */
-function domain_configure_form($form_state, $user_submitted = FALSE) {
+function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
   $root = variable_get('domain_root', '');
   if (empty($root)) {
     domain_set_primary_domain();
   }
   $form = array();
+  /*
   $form['domain'] = array(
     '#type' => 'fieldset',
     '#title' => t('Default domain settings'),
@@ -158,12 +159,12 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     '#options' => array('http' => 'http://', 'https' => 'https://'),
     '#default_value' => variable_get('domain_scheme', 'http'),
     '#description' => t('The URL scheme for accessing the primary domain.')
-  );
+  ); */
   $form['domain_behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Domain module behaviors'),
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE
+    '#collapsed' => FALSE,
   );
 
   $form['domain_behavior']['domain_behavior'] = array(
@@ -343,7 +344,7 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
     }
   }
   // Add our additional submit handlers.
-  $form['#submit'] = array('domain_configure_form_submit');
+  #$form['#submit'] = array('domain_configure_form_submit');
   return system_settings_form($form);
 }
 
@@ -351,12 +352,10 @@ function domain_configure_form($form_state, $user_submitted = FALSE) {
  * Validate the primary domain string.
  */
 function domain_configure_form_validate($form, &$form_state) {
-  if ($form_state['values']['op'] == $form_state['values']['reset']) {
-    $subdomain = strtolower(rtrim($_SERVER['SERVER_NAME']));
+  if (!isset($form_state['values']['domain_root'])) {
+    return;
   }
-  else {
-    $subdomain = $form_state['values']['domain_root'];
-  }
+  $subdomain = $form_state['values']['domain_root'];
   $domain_changed = (bool) strcmp($form_state['values']['domain_root'], $form['domain']['domain_root']['#default_value']);
   if ($domain_changed) {
     $error_list = domain_validate($subdomain);
@@ -370,8 +369,7 @@ function domain_configure_form_validate($form, &$form_state) {
  * Save any changes to the primary domain record.
  */
 function domain_configure_form_submit($form, &$form_state) {
-  if ($form_state['values']['op'] == $form_state['values']['reset']) {
-    domain_set_primary_domain();
+  if (!isset($form_state['values']['domain_root'])) {
     return;
   }
   $subdomain = $form_state['values']['domain_root'];
@@ -409,20 +407,22 @@ function domain_values_from_form_state($form_state) {
 /**
  * FormsAPI for editing a domain record
  *
+ * @param $form
+ *   The current form, passed by FormsAPI.
  * @param $form_state
- * The current form state, passed by FormsAPI.
+ *   The current form state, passed by FormsAPI.
  * @param $domain
- * An array containing the record from the {domain} table.
+ *   An array containing the record from the {domain} table.
  * @param $arguments
- *  An array of additional hidden key/value pairs to pass to the form.
- *  Used by child modules to control behaviors.
- *  Currently supported arguments are:
- *    'user_submitted' => TRUE
- *    Indicates that a form should not process administrative messages and paths
- *    upon form submit.  Used by the Domain User module.
+ *   An array of additional hidden key/value pairs to pass to the form.
+ *   Used by child modules to control behaviors.
+ *   Currently supported arguments are:
+ *     'user_submitted' => TRUE
+ *     Indicates that a form should not process administrative messages and paths
+ *     upon form submit.  Used by the Domain User module.
  */
-function domain_form($form_state, $domain = array(), $arguments = array()) {
-  global $_domain;
+function domain_form($form, $form_state, $domain = array(), $arguments = array()) {
+  $_domain = domain_get_domain();
   // This action should be performed from the primary domain unless overridden.
   if (!isset($arguments['ignore_domain_status_check'])) {
     domain_check_primary();
@@ -510,19 +510,16 @@ function domain_form_submit($form, &$form_state) {
   $values = domain_values_from_form_state($form_state);
 
   // Update or create a new domain depending on presence of domain_id.
-  if ($values['domain_id']) {
-    $sql = "UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = %d WHERE domain_id = %d";
+  if (!is_null($values['domain_id'])) {
+    drupal_write_record('domain', $values, 'domain_id');
     $action = 'update';
     $message = t('Domain record updated.');
   }
   else {
-    $sql = "INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)";
+    drupal_write_record('domain', $values);
     $action = 'create';
     $message = t('Domain record created.');
   }
-
-  // Update the record.
-  db_query($sql, $values);
 
   // Let other modules act.
   $domain = domain_lookup(NULL, $values['subdomain']);

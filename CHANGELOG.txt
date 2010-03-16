@@ -3,6 +3,7 @@
 16-MAR-2010
 -- Domain Access now correctly installs and uninstalls in Drupal 7.
 -- Makes domain bootstrap correctly when included in settings.php.
+-- Deprecates hook_domaingrants() and hook_domainrecords().
 -- See commit log for other commits.
 
 10-MAR-2010
