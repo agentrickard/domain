@@ -11,22 +11,6 @@
  */
 
 /**
- * Implement custom_url_rewrite_outbound() if the url_alter.module is not enabled.
- */
-if (!function_exists('custom_url_rewrite_outbound')) {
-  function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
-    domain_url_outbound_alter($path, $options, $original_path);
-  }
-}
-
-/**
- * Legacy wrapper for users of 6.x.2, rc8.
- */
-function domain_url_rewrite_outbound(&$path, &$options, $original_path) {
-  domain_url_outbound_alter($path, $options, $original_path);
-}
-
-/**
  * Implement hook_url_outbound_alter().
  *
  * Forces absolute paths for domains when needed.

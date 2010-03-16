@@ -28,7 +28,7 @@ INSTALLATION INSTRUCTIONS
 /**
  * Add the domain module setup routine.
  */
-include './sites/all/modules/domain/settings.inc';
+include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
 
     NOTE: You may need to alter the file path above based on your
     site configuration.  See INSTALL.txt for further help.
@@ -37,33 +37,12 @@ include './sites/all/modules/domain/settings.inc';
     $db_url. Normally, you should add these lines to the end of the
     settings.php file.
 
-4. Check for existing custom_url_rewrite_outbound().
-
-    custom_url_rewrite_outbound() is a special function that you
-    can add to settings.php to alter how Drupal writes links to content.
-
-    If your site already uses this function -- it is not in core -- then
-    you will need to modify its use to accommodate Domain Access
-    because the module has its own version.
-
-    Domain Access implements this function within the context of the
-    URL Alter module, http://drupal.org/project/url_alter, which is a
-    functional backport of changes implemented in Drupal 7.
-
-    If your site uses custom code to implement custom_url_rewrite_outbound(),
-    consider upgrading to the URL Alter module for full compatibility.
-
-    You may also call the function domain_url_rewrite_outbound() directly in
-    your custom code.
-
-    NOTE: Domain Access does not use custom_url_rewrite_inbound().
-
-5. Go to Admin > Build > Modules.  There you will see the Domain
+4. Go to Admin > Build > Modules.  There you will see the Domain
     module group.
 
     Only enable the Domain Acccess module.
 
-6. Configure permissions for the module, normally you will give your
+5. Configure permissions for the module, normally you will give your
     site administrators the following permissions:
 
     -- 'administer domains'
@@ -77,14 +56,14 @@ include './sites/all/modules/domain/settings.inc';
 
     For more information see README.txt.
 
-7. Read the main README.txt file for the Domain Access module.
+6. Read the main README.txt file for the Domain Access module.
 
-8. Go to Admin > Build > Domain and configure the module.
+7. Go to Admin > Build > Domain and configure the module.
 
-9. Note that as of 6.x.2.0, the primary domain is created for you on
+8. Note that as of 6.x.2.0, the primary domain is created for you on
     installation.
 
-10. Now you are ready to explore the options available to you.
+9. Now you are ready to explore the options available to you.
 
     The Domain Access suite contains a number of optional helper
     modules.  You do not need to use any of these modules, but

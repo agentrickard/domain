@@ -1,5 +1,8 @@
 // $Id$
 
+16-MAR-2010
+-- Domain Access now correctly installs and uninstalls in Drupal 7.
+
 10-MAR-2010
 
 -- #733722 by hefox and pbeakley. Add domain_reset_domain() and use it where needed.

@@ -355,7 +355,7 @@ Add the following lines to the end of your settings.php file:
 /**
  * Add the domain module setup routine.
  */
-include './path/to/modules/domain/settings.inc';
+include DRUPAL_ROOT . '/path/to/modules/domain/settings.inc';
 ====
 
 In this case, change 'path/to/modules' with the directory where your modules are
@@ -365,7 +365,7 @@ stored.  Typically this will be 'sites/all/modules', which makes the lines:
 /**
  * Add the domain module setup routine.
  */
-include './sites/all/modules/domain/settings.inc';
+include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
 ====
 
 ----
@@ -412,29 +412,6 @@ You may also copy the entire function custom_url_rewrite_outbound() directly
 into your settings.php file.
 
 ----
-4.5 custom_url_rewrite_outbound()
-
-custom_url_rewrite_outbound() is a special function that you can add
-to settings.php to alter how Drupal writes links to content.
-
-Domain Access implements this function within the context of the
-URL Alter module, http://drupal.org/project/url_alter, which is a
-functional backport of changes implemented in Drupal 7.
-
-If your site uses custom code to implement custom_url_rewrite_outbound(),
-consider upgrading to the URL Alter module for full compatibility.
-
-You may also call the function domain_url_rewrite_outbound() directly in
-your custom code.
-
-NOTE: Domain Access does not use custom_url_rewrite_inbound().
-
-For more information, see
-  http://api.drupal.org/api/function/custom_url_rewrite_outbound/6
-  http://drupal.org/node/450344
-  http://drupal.org/node/529026
-
-----
 5.  Additional Module Installation
 
 The Domain Access module includes several sub-modules.  Two of these
@@ -466,7 +443,4 @@ access rules associated with this module.
 
 You may then uninstall the module normally.
 
-You should also revert the patches that you applied and remove
-any extra code from your settings.php file.
-
-To revert a patch, see http://drupal.org/patch/reverse
+You should also remove any extra code from your settings.php file.
