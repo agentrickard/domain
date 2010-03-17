@@ -1312,7 +1312,9 @@ function domain_get_node_match($nid) {
     return $domain[$nid];
   }
   // Load the domain data for this node -- but only take the first match.
-  $id = db_result(db_query_range("SELECT gid FROM {domain_access} WHERE nid = %d AND realm = '%s' ORDER BY gid", $nid, 'domain_id', 0, 1));
+  $id = db_query("SELECT gid FROM {domain_access} WHERE nid = :nid AND realm = :realm ORDER BY gid", array(':nid' => $nid, ':realm' => 'domain_id'))->fetchField();
+
+  // Now find the proper source domain.
   $source = domain_lookup($id);
   drupal_alter('domain_source', $source, $nid);
   $domain[$nid] = $source;

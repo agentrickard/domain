@@ -84,7 +84,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
       // Remove redundancy from the domain_site check.
       if (!isset($domain_site[$nid])) {
         // If this check works, we don't need to rewrite the path unless SEO rules demand it.
-        $domain_site[$nid] = db_result(db_query("SELECT COUNT(nid) FROM {domain_access} WHERE nid = %d AND gid = 0 AND realm = '%s'", $nid, 'domain_site'));
+        $domain_site[$nid] = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE nid = :nid AND gid = 0 AND realm = :realm", array(':nid' => $nid, ':realm' => 'domain_site'))->fetchField();
       }
       if (!$domain_site[$nid] || $use_source) {
         // Remove rendundancy from the domain_id check.
