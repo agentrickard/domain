@@ -52,7 +52,7 @@ function domain_bootstrap() {
       $_domain['error'] = -1;
       break;
     }
-    else if ($error === FALSE) {
+    elseif ($error === FALSE) {
       // watchdog() is not available here, and there may be other logging.
       // So we have to write an error message global variable and pick them up in settings,inc.
       $_domain['error'] = $phase;
@@ -196,13 +196,13 @@ function _domain_bootstrap_invoke_all() {
   unset($args[0]);
   $return = array();
   foreach (_domain_bootstrap_modules() as $module) {
-    $function = $module .'_domain_bootstrap_'. $hook;
+    $function = $module . '_domain_bootstrap_' . $hook;
     if (function_exists($function)) {
       $result = call_user_func_array($function, $args);
       if (isset($result) && is_array($result)) {
         $return = array_merge_recursive($return, $result);
       }
-      else if (isset($result)) {
+      elseif (isset($result)) {
         $return[] = $result;
       }
     }
@@ -234,7 +234,7 @@ function domain_get_primary_table($table) {
   if (is_string($db_prefix)) {
     $table = $db_prefix . $table;
   }
-  else if (is_array($db_prefix)) {
+  elseif (is_array($db_prefix)) {
     $table = $db_prefix['default'] . $table;
   }
   return db_escape_table($table);

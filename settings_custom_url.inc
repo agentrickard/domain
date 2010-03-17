@@ -105,7 +105,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
       }
       // If strict SEO rules are enabled, we set "all affiliate" links to the root domain.
       // Only needed if we are not on the default source domain.
-      else if ($root != -1 && $seo && $_domain['domain_id'] != $root['domain_id']) {
+      elseif ($root != -1 && $seo && $_domain['domain_id'] != $root['domain_id']) {
         $options['absolute'] = TRUE;
         // In this case, the $base_url cannot have a trailing slash
         $options['base_url'] = rtrim($root['path'], '/');
@@ -113,7 +113,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
       }
     }
     // Hook for non-node paths.
-    else if (!empty($path_alter)) {
+    elseif (!empty($path_alter)) {
       // Must use md5 here, to prevent array keys from breaking.
       $name = md5($path);
       if (!isset($path_lookup[$name])) {

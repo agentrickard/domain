@@ -38,7 +38,7 @@ function domain_view() {
   $select = module_invoke_all('domainview', 'select');
   $select_sql = '';
   if (!empty($select)) {
-    $select_sql = ', '. implode(', ', $select);
+    $select_sql = ', ' . implode(', ', $select);
     $select_sql = rtrim($select_sql, ',');
   }
 
@@ -46,10 +46,10 @@ function domain_view() {
   $join = module_invoke_all('domainview', 'join');
   $join_sql = '';
   if (!empty($join)) {
-    $join_sql = ' '. implode(' ', $join);
+    $join_sql = ' ' . implode(' ', $join);
   }
 
-  $sql = 'SELECT d.*'. $select_sql .' FROM {domain} d'. $join_sql . tablesort_sql($header);
+  $sql = 'SELECT d.*' . $select_sql . ' FROM {domain} d' . $join_sql . tablesort_sql($header);
   $result = pager_query($sql, variable_get('domain_list_size', DOMAIN_LIST_SIZE));
   while ($data = db_fetch_array($result)) {
     $domains[] = $data;
@@ -70,8 +70,8 @@ function domain_view() {
     }
     else {
       $actions = array();
-      $actions[] = l(t('edit'), 'admin/build/domain/edit/'. $domain['domain_id']);
-      $actions[] = l(t('delete'), 'admin/build/domain/delete/'. $domain['domain_id']);
+      $actions[] = l(t('edit'), 'admin/build/domain/edit/' . $domain['domain_id']);
+      $actions[] = l(t('delete'), 'admin/build/domain/delete/' . $domain['domain_id']);
     }
       // Add advanced settings from other modules.
       $items = array();
@@ -85,7 +85,7 @@ function domain_view() {
       }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
-    $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<b>'. $link .'</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
+    $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<b>' . $link . '</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
     // Let other modules add data.
     foreach (module_implements('domainview') as $module) {
       $row[] = module_invoke($module, 'domainview', 'data', $domain);
@@ -125,7 +125,7 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     domain_set_primary_domain();
   }
   $form = array();
-  /*
+
   $form['domain'] = array(
     '#type' => 'fieldset',
     '#title' => t('Default domain settings'),
@@ -159,12 +159,12 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     '#options' => array('http' => 'http://', 'https' => 'https://'),
     '#default_value' => variable_get('domain_scheme', 'http'),
     '#description' => t('The URL scheme for accessing the primary domain.')
-  ); */
+  );
   $form['domain_behavior'] = array(
     '#type' => 'fieldset',
     '#title' => t('Domain module behaviors'),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => TRUE,
   );
 
   $form['domain_behavior']['domain_behavior'] = array(
@@ -339,12 +339,12 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
   $modules = module_implements('domainform');
   if (!empty($modules)) {
     foreach ($modules as $module) {
-      $func = $module .'_domainform';
+      $func = $module . '_domainform';
       $func($form);
     }
   }
   // Add our additional submit handlers.
-  #$form['#submit'] = array('domain_configure_form_submit');
+  $form['#submit'] = array('domain_configure_form_submit');
   return system_settings_form($form);
 }
 
@@ -373,12 +373,15 @@ function domain_configure_form_submit($form, &$form_state) {
     return;
   }
   $subdomain = $form_state['values']['domain_root'];
-  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme']);
-  if (!db_affected_rows()) {
-    db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme'], 1);
-    // MySQL won't let us insert row 0 into an autoincrement table.
-    db_query("UPDATE {domain} SET domain_id = 0 WHERE subdomain = '%s'", $form_state['values']['domain_root']);
-  }
+  db_update('domain')
+    ->condition('domain_id', 0)
+    ->fields(array(
+      'subdomain' => $subdomain,
+      'sitename' => $form_state['values']['domain_sitename'],
+      'scheme' => $form_state['values']['domain_scheme'],
+      'valid' => 1,
+    ))
+    ->execute();
   // Allow other modules to respond to changes.
   module_invoke_all('domainupdate', 'update', domain_default(TRUE));
 }
@@ -599,7 +602,7 @@ function domain_delete_form_submit($form, &$form_state) {
  */
 function domain_advanced_form($form_state) {
   $form = array();
-  $node_types = node_get_types('names');
+  $node_types = node_type_get_names();
   $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
   $form['domain_node'] = array(
     '#type' => 'fieldset',
@@ -608,10 +611,10 @@ function domain_advanced_form($form_state) {
   );
   $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.</p>'));
   foreach ($node_types as $key => $value) {
-    $form['domain_node']['domain_node_'. $key] = array(
+    $form['domain_node']['domain_node_' . $key] = array(
       '#type' => 'checkbox',
       '#title' => check_plain($value),
-      '#default_value' => variable_get('domain_node_'. $key, $default),
+      '#default_value' => variable_get('domain_node_' . $key, $default),
     );
   }
   // Some editors will not have full node editing permissions.  This allows us
@@ -647,7 +650,7 @@ function domain_advanced_form($form_state) {
  * An array containing the record from the {domain} table
  */
 function domain_check_response($domain) {
-  $url = domain_get_path($domain) . drupal_get_path('module', 'domain') .'/tests/200.png';
+  $url = domain_get_path($domain) . drupal_get_path('module', 'domain') . '/tests/200.png';
   $response = drupal_http_request($url);
   if ($response->code != 200) {
     drupal_set_message(t('%server is not responding and may not be configured correctly at the server level.
@@ -725,13 +728,13 @@ function domain_batch_list($batch) {
   $group = '';
   foreach ($batch as $key => $value) {
     if ($group != $value['#module']) {
-      $rows[] = array(array('data' => '<strong>'. t('%module options', array('%module' => $value['#module'])) .'</strong>', 'colspan' => 2));
+      $rows[] = array(array('data' => '<strong>' . t('%module options', array('%module' => $value['#module'])) . '</strong>', 'colspan' => 2));
       $group = $value['#module'];
     }
-    $rows[] = array(l($value['#form']['#title'], 'admin/build/domain/batch/'. $key), $value['#meta_description']);
+    $rows[] = array(l($value['#form']['#title'], 'admin/build/domain/batch/' . $key), $value['#meta_description']);
   }
-  $output = '<p>'. t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') .'</p>';
-  $output .= '<p><em>'. t('Note that you will only be shown domains on which each action may be performed.  If the module is not yet configured, some actions may be empty.') .'</em></p>';
+  $output = '<p>' . t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') . '</p>';
+  $output .= '<p><em>' . t('Note that you will only be shown domains on which each action may be performed.  If the module is not yet configured, some actions may be empty.') . '</em></p>';
   return $output . theme('table', $header, $rows);
 }
 
@@ -820,7 +823,7 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
         $default[$domain['domain_id']] = $settings[$action];
       }
     }
-    else if ($batch['#domain_action'] == 'custom' && isset($batch['#lookup'])) {
+    elseif ($batch['#domain_action'] == 'custom' && isset($batch['#lookup'])) {
       $default[$domain['domain_id']] = $batch['#system_default'];
       $func = $batch['#lookup'];
       $setting = $func($domain);
@@ -839,14 +842,14 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
   $api_keys = array('variable', 'table', 'data_type');
   // These are optional elements, only passed if present.
   foreach ($api_keys as $key) {
-    if (isset($batch['#'. $key])) {
-      $form[$key] = array('#type' => 'value', '#value' => $batch['#'. $key]);
+    if (isset($batch['#' . $key])) {
+      $form[$key] = array('#type' => 'value', '#value' => $batch['#' . $key]);
     }
   }
   // Custom submit and validate handlers.
   foreach (array('submit', 'validate') as $key) {
-    if (isset($batch['#'. $key])) {
-      $form[$key .'_handler'] = array('#type' => 'value', '#value' => $batch['#'. $key]);
+    if (isset($batch['#' . $key])) {
+      $form[$key . '_handler'] = array('#type' => 'value', '#value' => $batch['#' . $key]);
     }
   }
   $form['handler'] = array('#type' => 'value', '#value' => $batch['#domain_action']);
@@ -932,9 +935,9 @@ function theme_domain_batch_form($form) {
  */
 function theme_domain_batch_title($batch) {
   $output = '';
-  $output = '<p>'. $batch['#meta_description'] .'</p>';
+  $output = '<p>' . $batch['#meta_description'] . '</p>';
   if (!empty($batch['#required'])) {
-    $output .= '<p><em>'. t('All values are required.') .'</em></p>';
+    $output .= '<p><em>' . t('All values are required.') . '</em></p>';
   }
   return $output;
 }
@@ -965,7 +968,7 @@ function domain_batch_form_submit($form, &$form_state) {
     case 'domain':
       foreach ($form_state['values']['domain_batch'] as $key => $value) {
         // Note that $type in the query below is a sanitzed value passed from domain_batch_data_type().
-        db_query("UPDATE {domain} SET %s = ". domain_batch_data_type($form_state['values']['data_type']) ." WHERE domain_id = %d", $item, $value, $key);
+        db_query("UPDATE {domain} SET %s = " . domain_batch_data_type($form_state['values']['data_type']) . " WHERE domain_id = %d", $item, $value, $key);
         // Update the variable for the root domain
         if (!empty($form_state['values']['variable']) && $key == 0) {
           variable_set($form_state['values']['variable'], $value);
@@ -987,7 +990,7 @@ function domain_batch_form_submit($form, &$form_state) {
             db_query("INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)", $key, serialize($settings));
           }
         }
-        else if (!empty($form_state['values']['variable'])) {
+        elseif (!empty($form_state['values']['variable'])) {
           variable_set($form_state['values']['variable'], $value);
         }
       }
@@ -1070,7 +1073,7 @@ function domain_roles_form($form_state) {
 
   $form['domain_roles'] = array(
     '#tree' => TRUE,
-    '#value' => '<p>'. t('You may set optional default domains for each site user role. These settings will be added to each user when determining the permissions the user has to view and edit content on your site. These settings are expressly needed if you allow <em>anonymous users</em> to post content on your site.') .'</p>',
+    '#value' => '<p>' . t('You may set optional default domains for each site user role. These settings will be added to each user when determining the permissions the user has to view and edit content on your site. These settings are expressly needed if you allow <em>anonymous users</em> to post content on your site.') . '</p>',
   );
   $domains = array();
   foreach (domain_domains() as $key => $value) {

@@ -1912,7 +1912,12 @@ function domain_form_system_site_information_settings_alter(&$form, &$form_state
  * FormsAPI submit handler to track site name changes.
  */
 function domain_form_sitename_submit($form, &$form_state) {
-  db_query("UPDATE {domain} SET sitename = '%s' WHERE domain_id = 0", $form_state['values']['site_name']);
+  db_update('domain')
+    ->condition('domain_id', 0)
+    ->fields(array(
+      'sitename' => $form_state['values']['site_name'],
+    ))
+    ->execute();
   variable_set('domain_sitename', $form_state['values']['site_name']);
   drupal_set_message(t('Primary domain settings updated.'));
 }
