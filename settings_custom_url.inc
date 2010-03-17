@@ -16,7 +16,7 @@
  * Forces absolute paths for domains when needed.
  */
 function domain_url_outbound_alter(&$path, &$options, $original_path) {
-  global $_domain;
+  $_domain = domain_get_domain();
 
   // If the domain_id is not set, then the Domain module is not active, and we cannot run this function.
   if (!isset($_domain['domain_id'])) {
