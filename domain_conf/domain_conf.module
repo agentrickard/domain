@@ -604,7 +604,7 @@ function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
  */
 function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
   global $conf, $_domain;
-  domain_conf_variable_save($domain_id, $variable, $value = NULL);
+  domain_conf_variable_save($domain_id, $variable);
   // Clear the cache.
   cache_clear_all('variables', 'cache');
   // If we are on the active domain, set the active variable.
