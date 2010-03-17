@@ -3,5 +3,5 @@ name = Domain Navigation
 description = Navigation block and menu options for Domain Access
 package = Domain Access
 dependencies[] = domain
-core = 7.x
+core = 6.x
 files[] = domain_nav.module
