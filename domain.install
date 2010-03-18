@@ -16,7 +16,6 @@ function domain_install() {
   if (!empty($_SERVER['HTTPS'])) {
     $scheme = 'https';
   }
-  #db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $root, $site, $scheme);
   db_insert('domain')
     ->fields(array(
         'subdomain' => $root,
@@ -37,16 +36,17 @@ function domain_install() {
   variable_set('domain_scheme', $scheme);
   variable_set('domain_sitename', $site);
   // Tag the default domain.
+  // In a later update function, we will remove the 0 record
+  // and change this value.
   variable_set('domain_default', 0);
 }
 
 /**
  * Implement hook_schema()
- *
- * @TODO: add foreign key tracking.
  */
 function domain_schema() {
   $schema['domain'] = array(
+    'description' => 'The base table for domain records',
     'fields' => array(
       'domain_id' => array('type' => 'serial', 'not null' => TRUE),
       'subdomain' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
@@ -55,22 +55,33 @@ function domain_schema() {
       'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1')),
     'primary key' => array('domain_id'),
     'indexes' => array(
-      'subdomain' => array('subdomain')),
+      'subdomain' => array('subdomain')
+    ),
   );
   $schema['domain_access'] = array(
+    'description' => 'Stores domain information for each node',
     'fields' => array(
       'nid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
       'gid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
       'realm' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '')),
     'primary key' => array('nid', 'gid', 'realm'),
     'indexes' => array(
-      'nid' => array('nid')),
+      'nid' => array('nid')
+    ),
+    'foreign_keys' => array(
+      'nid' => array('node' => 'nid'),
+    ),
   );
   $schema['domain_editor'] = array(
+    'description' => 'Stores domain information for each user',
     'fields' => array(
       'uid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
       'domain_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
     'primary key' => array('uid', 'domain_id'),
+    'foreign_keys' => array(
+      'uid' => array('user' => 'uid'),
+      'domain_id' => array('domain' => 'domain_id'),
+    ),
   );
   return $schema;
 }
