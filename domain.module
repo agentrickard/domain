@@ -2268,15 +2268,21 @@ function domain_domaininstall() {
 
 /**
  * Implement hook_domainupdate()
+ *
+ * @TODO: reassign orphans?
  */
 function domain_domainupdate($op, $domain, $form_state = array()) {
   switch ($op) {
     case 'delete':
       if ($domain != -1) {
-        // Remove domain-specific entries from the {node_access} table and clear the cache.
-        db_query("DELETE FROM {node_access} WHERE realm = '%s' AND gid = %d", 'domain_id', $domain['domain_id']);
-        db_query("DELETE FROM {domain_access} WHERE realm = '%s' AND gid = %d", 'domain_id', $domain['domain_id']);
-        db_query("DELETE FROM {domain_editor} WHERE domain_id = %d", $domain['domain_id']);
+        // Remove domain-specific entries from tables and clear the cache.
+        db_delete('domain_access')
+          ->condition('gid', $domain['domain_id'])
+          ->condition('realm', 'domain_id')
+          ->execute();
+        db_delete('domain_editor')
+          ->condition('domain_id', $domain['domain_id'])
+          ->execute();
       }
       break;
   }

@@ -560,7 +560,7 @@ function domain_form_submit($form, &$form_state) {
  *      Indicates that a form should not process administrative messages and paths
  *      upon form submit.  Used by the Domain User module.
  */
-function domain_delete_form($form_state, $domain, $arguments = array()) {
+function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
   // This action should be performed from the primary domain.
   domain_check_primary();
 
@@ -575,7 +575,7 @@ function domain_delete_form($form_state, $domain, $arguments = array()) {
   return confirm_form(
     $form,
     t('Are you sure you wish to delete the domain record for <strong>%domain</strong>?', array('%domain' => $domain['subdomain'])),
-    'admin/build/domain/view',
+    'admin/config/domain/view',
     NULL,
     t('Delete domain record'),
     t('Cancel')
@@ -588,7 +588,9 @@ function domain_delete_form($form_state, $domain, $arguments = array()) {
 function domain_delete_form_submit($form, &$form_state) {
   // Run the lookup before we delete the row!
   $domain = domain_lookup($form_state['values']['domain_id']);
-  db_query("DELETE FROM {domain} WHERE domain_id = %d", $form_state['values']['domain_id']);
+  db_delete('domain')
+    ->condition('domain_id', $form_state['values']['domain_id'])
+    ->execute();
 
   // Let other modules act.
   module_invoke_all('domainupdate', 'delete', $domain, $form_state);
@@ -596,7 +598,7 @@ function domain_delete_form_submit($form, &$form_state) {
   // Hide the message from the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message(t('Domain record deleted.'));
-    $form_state['redirect'] = 'admin/build/domain/view';
+    $form_state['redirect'] = 'admin/config/domain/view';
   }
 
   // Notify that node access needs to be rebuilt.
