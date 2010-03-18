@@ -588,11 +588,6 @@ function hook_domain_bootstrap() {
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
  *
- * In order for this hook to work your module needs to be registered with
- * domain_bootstrap_register() during hook_enable();
- *
- * Modules must also use domain_bootsrap_unregister('mymodule') during hook_disable().
- *
  * @param $domain
  *   An array containing current domain (host) name (used during bootstrap) and
  *   the results of lookup against {domain} table.
@@ -616,11 +611,6 @@ function hook_domain_bootstrap_lookup($domain) {
  *
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
- *
- * In order for this hook to work your module needs to be registered with
- * domain_bootstrap_register() during hook_enable();
- *
- * Modules must also use domain_bootsrap_unregister('mymodule') during hook_disable().
  *
  * @param $domain
  *   An array containing current domain and domain_id and any other values

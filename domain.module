@@ -37,14 +37,6 @@ define('DOMAIN_ASSIGN_USERS', TRUE);
 define('DOMAIN_LIST_SIZE', 25);
 
 /**
- * Adds the domain user data to the $user object.
- */
-function domain_boot() {
-#  global $user;
-#  $user->domain_user = domain_get_user_domains($user);
-}
-
-/**
  * Implement hook_init().
  *
  * Inititalizes a global $_domain variable if necessary (usually that's done in
@@ -500,6 +492,7 @@ function domain_user_operations() {
   );
 }
  */
+
 /**
  * Implement hook_form_alter().
  */
@@ -552,7 +545,7 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
  * @param $uid
  *   The user id.
  * @return
- * An array of domain names.
+ *   An array of domain names.
  */
 function _domain_user_list($uid) {
   $temp_account = new stdClass;
@@ -604,7 +597,6 @@ function domain_update_users($form, &$form_state) {
  * Domain Access modules to run functions for all active affiliates.
  */
 function domain_cron() {
-  global $_domain;
   // Check to see if this function is needed at all.
   $modules = module_implements('domaincron');
   if (!empty($modules)) {
@@ -650,14 +642,14 @@ function domain_load($domain_id = NULL) {
  * or add to the $domain array.
  *
  * @param $domain_id
- *  The domain_id taken from {domain}. Optional.
+ *   The domain_id taken from {domain}. Optional.
  * @param $subdomain
- *  The string representation of a {domain} entry. Optional.
+ *   The string representation of a {domain} entry. Optional.
  * @param $reset
- *  A boolean flag to clear the static variable if necessary.
+ *   A boolean flag to clear the static variable if necessary.
  * @return
- *  An array containing the requested row from the {domain} table, plus the
- *  elements added by hook_domainload().  Returns -1 on failure.
+ *   An array containing the requested row from the {domain} table, plus the
+ *   elements added by hook_domainload().  Returns -1 on failure.
  */
 function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   static $domains;
@@ -699,7 +691,7 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
  * it has not been configured.
  *
  * @param $reset
- * A boolean flag indicating whether to reset the static array or not.
+ *   A boolean flag indicating whether to reset the static array or not.
  */
 function domain_default($reset = FALSE) {
   static $default;
@@ -746,9 +738,9 @@ function domain_set_primary_domain() {
  * Return all active domains (including the default) as an array.
  *
  * @param $reset
- * A boolean flag indicating whether to reset the static array or not.
+ *   A boolean flag indicating whether to reset the static array or not.
  * @return
- * An array of all active domains, with the domain_id as the key.
+ *   An array of all active domains, with the domain_id as the key.
  */
 function domain_domains($reset = FALSE) {
   static $domains;
@@ -900,14 +892,14 @@ function domain_unique_domain($subdomain) {
  * Get the domains a user is assigned to.
  *
  * @param $account
- * The user account object.
+ *   The user account object.
  * @param $add_roles
- * A boolean flag indicating whether to add the default role settings to the user's domains.
+ *   A boolean flag indicating whether to add the default role settings to the user's domains.
  * @param $reset
- * A boolean flag indicating whether to reset the static array or not.
+ *   A boolean flag indicating whether to reset the static array or not.
  * @return
- * An array of domains to which the user is assigned, in the format array($domain_id => $domain_id).
- * Note that the default domain is -1 here, due to checkbox behavior.
+ *   An array of domains to which the user is assigned, in the format array($domain_id => $domain_id).
+ *   Note that the default domain is -1 here, due to checkbox behavior.
  */
 function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
   static $domains = array();
@@ -918,8 +910,8 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
   $uid = (int) $account->uid;
   if (!isset($domains[$uid]) || $reset) {
     $domains[$uid] = array();
-    $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = %d", $uid);
-    while ($data = db_fetch_object($result)) {
+    $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = :uid", array(':uid' => $uid));
+    foreach ($result as $data) {
       if ($data->domain_id == 0) {
         $domains[$uid]['-1'] = -1;
       }
@@ -955,11 +947,11 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
  * Helper function for passing hook_domainload() by reference.
  *
  * @param $domain
- * The domain array defined by domain_lookup().
+ *   The domain array defined by domain_lookup().
  * @param $reset
- *  A boolean flag to clear the static variable if necessary.
+ *    A boolean flag to clear the static variable if necessary.
  * @return
- * The $domain array, modified by reference by hook_domainload() implementations.
+ *   The $domain array, modified by reference by hook_domainload() implementations.
  */
 function domain_api($domain, $reset = FALSE) {
   static $_modules;
@@ -1076,9 +1068,9 @@ function domain_domainload(&$domain) {
  * Determine an absolute path for a domain
  *
  * @param $domain
- *  The currently active $domain array, provided by domain_lookup().
+ *   The currently active $domain array, provided by domain_lookup().
  * @return
- * The base url of the requested domain.
+ *   The base url of the requested domain.
  */
 function domain_get_path($domain) {
   global $base_url;
@@ -1128,7 +1120,7 @@ function domain_get_uri($domain) {
  * domain.
  *
  * @param $domain
- *  The currently active $domain array, provided by domain_lookup().
+ *   The currently active $domain array, provided by domain_lookup().
  */
 function domain_goto($domain) {
   global $_domain;
@@ -1439,7 +1431,6 @@ function domain_node_grants($account, $op) {
       }
     }
   }
-  dsm($grants);
   return $grants;
 }
 
@@ -1998,7 +1989,7 @@ function domain_form_devel_generate_content_form_alter(&$form, &$form_state) {
  * @param $reset
  *   A boolean flag indicating whether to reset the static variable or not.
  * @return
- *  TRUE or FALSE, depending on whether the grants should be executed for this page.
+ *   TRUE or FALSE, depending on whether the grants should be executed for this page.
  */
 function domain_grant_all($reset= FALSE) {
   static $grant;
@@ -2040,6 +2031,21 @@ function domain_grant_all($reset= FALSE) {
 }
 
 /**
+ * Implements hook_modules_enabled().
+ */
+function domain_modules_enabled() {
+  domain_bootstrap_register();
+}
+
+/**
+ * Implements hook_modules_disabled().
+ */
+function domain_modules_disabled() {
+  domain_bootstrap_register();
+}
+
+
+/**
  * Register the modules needed to load during bootstrap.
  * Stores results in the 'domain_bootstrap_modules' variable.
  */
@@ -2048,26 +2054,6 @@ function domain_bootstrap_register() {
   $lookup = module_implements('domain_bootstrap_lookup');
   $full = module_implements('domain_bootstrap_full');
   $modules = array_merge($lookup, $full);
-  variable_set('domain_bootstrap_modules', $modules);
-}
-
-/**
- * Removes a module so it is not loaded during domain_bootstrap.
- *
- * This function should be called from within hook_disable() implementations.
- *
- * @param $name
- * The name of the module that is un-registered.
- */
-function domain_bootstrap_unregister($name) {
-  $modules = variable_get('domain_bootstrap_modules', array());
-  if (is_array($modules)) {
-    foreach ($modules as $k => $v) {
-      if ($v == $name) {
-        unset($modules[$k]);
-      }
-    }
-  }
   variable_set('domain_bootstrap_modules', $modules);
 }
 

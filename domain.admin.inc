@@ -54,6 +54,7 @@ function domain_view() {
     // Let submodules overwrite the defaults, if they wish.
     $domain = domain_api($domain);
     $link = l($domain['subdomain'], domain_get_uri($domain), array('absolute' => TRUE));
+    $actions = array();
     if ($domain['domain_id'] == 0) {
       // Grab any extra elements defined by other modules.  If so, allow configuration.
       $extra = array();
@@ -65,20 +66,19 @@ function domain_view() {
       }
     }
     else {
-      $actions = array();
       $actions[] = l(t('edit'), 'admin/config/domain/edit/' . $domain['domain_id']);
       $actions[] = l(t('delete'), 'admin/config/domain/delete/' . $domain['domain_id']);
     }
-      // Add advanced settings from other modules.
-      $items = array();
-      $items = module_invoke_all('domainlinks', $domain);
-      if (!empty($items)) {
-        foreach ($items as $item) {
-          if (!empty($item)) {
-            $actions[] = l($item['title'], $item['path']);
-          }
+    // Add advanced settings from other modules.
+    $items = array();
+    $items = module_invoke_all('domainlinks', $domain);
+    if (!empty($items)) {
+      foreach ($items as $item) {
+        if (!empty($item)) {
+          $actions[] = l($item['title'], $item['path']);
         }
       }
+    }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
     $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<strong>' . $link . '</strong>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
@@ -248,7 +248,7 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
   // we need to know if more than one node_access module is running.
   $modules = count(module_implements('node_grants'));
 
-  if (!function_exists('node_access_grants_sql') ||  $modules < 2) {
+  if (!function_exists('domain_node_access_grants_sql') ||  $modules < 2) {
     $disabled = TRUE;
     variable_set('domain_access_rules', 0);
   }
@@ -421,9 +421,9 @@ function domain_values_from_form_state($form_state) {
  *   An array of additional hidden key/value pairs to pass to the form.
  *   Used by child modules to control behaviors.
  *   Currently supported arguments are:
- *     'user_submitted' => TRUE
- *     Indicates that a form should not process administrative messages and paths
- *     upon form submit.  Used by the Domain User module.
+ *    'user_submitted' => TRUE
+ *    Indicates that a form should not process administrative messages and paths
+ *    upon form submit.  Used by the Domain User module.
  */
 function domain_form($form, $form_state, $domain = array(), $arguments = array()) {
   $_domain = domain_get_domain();
@@ -538,19 +538,19 @@ function domain_form_submit($form, &$form_state) {
 }
 
 /**
- * Implement domain_delete_form.
+ * A delete confirmation form.
  *
  * @param $form_state
- *    The current form state, passed by FormsAPI.
+ *   The current form state, passed by FormsAPI.
  * @param $domain
- *    An array containing the record from the {domain} table.
+ *   An array containing the record from the {domain} table.
  * @param $arguments
- *    An array of additional hidden key/value pairs to pass to the form.
- *    Used by child modules to control behaviors.
- *    Currently supported arguments are:
- *      'user_submitted' => TRUE
- *      Indicates that a form should not process administrative messages and paths
- *      upon form submit.  Used by the Domain User module.
+ *   An array of additional hidden key/value pairs to pass to the form.
+ *   Used by child modules to control behaviors.
+ *   Currently supported arguments are:
+ *     'user_submitted' => TRUE
+ *     Indicates that a form should not process administrative messages and paths
+ *     upon form submit.  Used by the Domain User module.
  */
 function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
   // This action should be performed from the primary domain.
@@ -600,10 +600,12 @@ function domain_delete_form_submit($form, &$form_state) {
 /**
  * Implement domain_advanced_form.
  *
+ * @param $form
+ *   The current form, passed by FormsAPI.
  * @param $form_state
- * The current form state, passed by FormsAPI.
+ *   The current form state, passed by FormsAPI.
  */
-function domain_advanced_form($form_state) {
+function domain_advanced_form($form, $form_state) {
   $form = array();
   $node_types = node_type_get_names();
   $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
@@ -656,7 +658,7 @@ function domain_check_response($domain) {
   $url = domain_get_path($domain) . drupal_get_path('module', 'domain') . '/tests/200.png';
   $response = drupal_http_request($url);
   if ($response->code != 200) {
-    drupal_set_message(t('%server is not responding and may not be configured correctly at the server level.
+    drupal_set_message(t('%server is not responding as expected and may not be configured correctly at the server level.
       Server code !code was returned.',
     array('%server' => $url, '!code' => $response->code)), 'warning');
   }
@@ -666,10 +668,10 @@ function domain_check_response($domain) {
  * Allows for the batch update of certain elements.
  *
  * @param $action
- * The name of the action to perform; corresponds to the keys of the $batch array
- * returned by hook_domainbatch().
+ *   The name of the action to perform; corresponds to the keys of the $batch array
+ *   returned by hook_domainbatch().
  * @return
- * The appropriate form, or a list of actions, or an error.
+ *   The appropriate form, or a list of actions, or an error.
  */
 function domain_batch($action = NULL) {
   // We must have the module configured correctly.
@@ -715,9 +717,9 @@ function domain_batch($action = NULL) {
  * Lists available batch updates for the domain module.
  *
  * @param $batch
- * An array of batch actions, as defined by hook_domainbatch().
+ *   An array of batch actions, as defined by hook_domainbatch().
  * @return
- * A themed table of links and descriptions for batch actions.
+ *   A themed table of links and descriptions for batch actions.
  */
 function domain_batch_list($batch) {
   $header = array(t('Action'), t('Description'));
@@ -760,18 +762,18 @@ function domain_batch_sort($a, $b) {
  * Generate the form data for a batch update.
  *
  * @param $form_state
- * The current form state, passed by FormsAPI.
+ *   The current form state, passed by FormsAPI.
  * @param $action
- * The name of the action to perform; corresponds to the keys of the $batch array
- * returned by hook_domainbatch().
+ *   The name of the action to perform; corresponds to the keys of the $batch array
+ *   returned by hook_domainbatch().
  * @param $batch
- * The batch data for this $action, as defined by hook_domainbatch().
+ *   The batch data for this $action, as defined by hook_domainbatch().
  * @param $domains
- * The current settings for each domain.
+ *   The current settings for each domain.
  * @return
- * A themed table of links and descriptions for batch actions.
+ *   A themed table of links and descriptions for batch actions.
  */
-function domain_batch_form($form_state, $action, $batch, $domains) {
+function domain_batch_form($form, $form_state, $action, $batch, $domains) {
   $default = array();
   drupal_set_title($batch['#form']['#title']);
 
@@ -863,7 +865,7 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
 }
 
 /**
- * FormsAPI
+ * FormsAPI theming.
  */
 function theme_domain_admin_users_form($form) {
   // Overview table:
@@ -905,9 +907,11 @@ function theme_domain_admin_users_form($form) {
 
   $output .= drupal_render($form);
 
-  return $output;}
+  return $output;
+}
+
 /**
- * FormsAPI
+ * FormsAPI theming.
  */
 function theme_domain_batch_form($form) {
   $output = '';
@@ -934,7 +938,7 @@ function theme_domain_batch_form($form) {
  * Theme function for displaying batch editing.
  *
  * @param $batch
- * the batch function to be performed.
+ *   The batch function to be performed.
  */
 function theme_domain_batch_title($batch) {
   $output = '';
@@ -1027,9 +1031,9 @@ function domain_batch_form_submit($form, &$form_state) {
  * Converts a data type indicator into a sql-safe string.
  *
  * @param $type
- * The data type defined in hook_domainbatch().
+ *   The data type defined in hook_domainbatch().
  * @return
- * A sql-safe string ('%s', %d, %f, %b) for use with db_query().
+ *   A sql-safe string ('%s', %d, %f, %b) for use with db_query().
  */
 function domain_batch_data_type($type) {
   $return = "'%s'";
@@ -1052,11 +1056,11 @@ function domain_batch_data_type($type) {
 /**
  * FormsAPI to set default domain membership for each role.
  *
- * These settigns are added to the $user object.
+ * These settings are added to the $user object.
  *
  * @see domain_get_user_domains()
  */
-function domain_roles_form($form_state) {
+function domain_roles_form($form, $form_state) {
   $form = array();
   $form['domain_add_roles'] = array(
     '#type' => 'radios',
@@ -1105,7 +1109,7 @@ function domain_roles_form($form_state) {
 }
 
 /**
- * FormsAPI
+ * FormsAPI theming.
  */
 function theme_domain_roles_form($form) {
   $output = '';
