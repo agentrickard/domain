@@ -12,9 +12,6 @@
  * systems like the variable or database/prefix system - before they are used by
  * any other modules.
  *
- * Note that all functions in this file are _private, by design.  You should never
- * call these functions directly.  Public functions are declared in domain.module.
- *
  * @ingroup domain
  */
 
@@ -65,10 +62,9 @@ function domain_bootstrap() {
  * Calls individual bootstrap phases.
  *
  * @param $phase
- * The domain bootstrap phase to call.
- *
+ *   The domain bootstrap phase to call.
  * @return
- * Returns TRUE if the bootstrap phase was successful and FALSE otherwise.
+ *   Returns TRUE if the bootstrap phase was successful and FALSE otherwise.
  */
 function _domain_bootstrap($phase) {
   global $_domain;
@@ -109,6 +105,7 @@ function _domain_bootstrap($phase) {
       _domain_bootstrap_invoke_all('full', $_domain);
       break;
   }
+
   return TRUE;
 }
 
@@ -119,11 +116,10 @@ function _domain_bootstrap($phase) {
  * should usually be first one as well.
  *
  * @param $reset
- * If set to TRUE the cached list of modules is updated with the value from the
- * {variable} table again. Default value is FALSE. Optional.
- *
+ *   If set to TRUE the cached list of modules is updated with the value from the
+ *   {variable} table again. Default value is FALSE. Optional.
  * @return
- * An array of module names.
+ *   An array of module names.
  */
 function _domain_bootstrap_modules($reset = FALSE) {
   static $modules = NULL;
@@ -156,7 +152,7 @@ function _domain_bootstrap_modules_load() {
  * {variable} table. This function does not use Drupal's variable system.
  *
  * @return
- * An array containing module names.
+ *   An array containing module names.
  */
 function _domain_bootstrap_modules_get() {
   global $conf;
@@ -182,11 +178,6 @@ function _domain_bootstrap_modules_get() {
  *
  * This function is basically a copy of module_invoke_all() adjusted to our
  * needs.
- *
- * @param $hook
- * The name of the bootstrap hook to invoke.
- *
- * ... Arguments to pass to the hook.
  *
  * @link http://api.drupal.org/api/function/module_invoke_all/6
  */
@@ -265,6 +256,13 @@ function domain_unserialize($object) {
 
 /**
  * Store the initially loaded domain, for later use.
+ *
+ * @param $domain
+ *   The domain global value. This should only be called once.
+ * @return $initial
+ *   A copy of the initial $_domain global value.
+ *
+ * @see domain_init()
  */
 function domain_initial_domain($domain = array()) {
   static $initial;
