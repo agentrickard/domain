@@ -17,8 +17,8 @@
  */
 function domain_view() {
   global $_domain;
-  $output = t('<p>The following domains have been created for your site.  The currently active domain <b>is shown in boldface</b>.  You
-                    may click on a domain to change the currently active domain.  Your default domain has an ID of zero (0).</p>');
+  $output = t('<p>The following domains have been created for your site.  The currently active domain <strong>is shown in boldface</strong>.  You
+                    may click on a domain to change the currently active domain.  Your default domain has an ID of %id.</p>', array('%id' => variable_get('domain_default', 0)));
   $header = array(
     array('data' => t('Id'), 'field' => 'd.domain_id'),
     array('data' => t('Domain'), 'field' => 'd.subdomain'),
@@ -48,11 +48,17 @@ function domain_view() {
   if (!empty($join)) {
     $join_sql = ' ' . implode(' ', $join);
   }
+  // Set up the base query.
+  $query = db_select('domain', 'd')
+    ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
+  $query = $query
+   ->extend('TableSort')
+   ->orderByHeader($header);
+  $query = $query->extend('PagerDefault')->limit(variable_get('domain_list_size', DOMAIN_LIST_SIZE));
 
-  $sql = 'SELECT d.*' . $select_sql . ' FROM {domain} d' . $join_sql . tablesort_sql($header);
-  $result = pager_query($sql, variable_get('domain_list_size', DOMAIN_LIST_SIZE));
-  while ($data = db_fetch_array($result)) {
-    $domains[] = $data;
+  $result = $query->execute();
+  foreach ($result as $data) {
+    $domains[] = (array) $data;
   }
   foreach ($domains as $domain) {
     // Let submodules overwrite the defaults, if they wish.
@@ -65,13 +71,13 @@ function domain_view() {
         $extra = domain_conf_api();
       }
       if (!empty($extra)) {
-        $actions[] = l(t('settings'), 'admin/build/domain/conf/0');
+        $actions[] = l(t('settings'), 'admin/config/domain/conf/0');
       }
     }
     else {
       $actions = array();
-      $actions[] = l(t('edit'), 'admin/build/domain/edit/' . $domain['domain_id']);
-      $actions[] = l(t('delete'), 'admin/build/domain/delete/' . $domain['domain_id']);
+      $actions[] = l(t('edit'), 'admin/config/domain/edit/' . $domain['domain_id']);
+      $actions[] = l(t('delete'), 'admin/config/domain/delete/' . $domain['domain_id']);
     }
       // Add advanced settings from other modules.
       $items = array();
@@ -85,18 +91,21 @@ function domain_view() {
       }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
-    $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<b>' . $link . '</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
+    $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<strong>' . $link . '</strong>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
     // Let other modules add data.
     foreach (module_implements('domainview') as $module) {
       $row[] = module_invoke($module, 'domainview', 'data', $domain);
     }
     // Add the actions.
-    $row[] = theme('item_list', $actions);
+    $list = array('items' => $actions);
+    $row[] = theme('item_list', $list);
     $rows[] = $row;
   }
   if (!empty($rows)) {
-    $output .= theme_table($header, $rows);
-    $output .= theme('pager', NULL, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0);
+    $table = array('header' => $header, 'rows' => $rows);
+    $output .= theme('table', $table);
+    $pager = array();
+    $output .= theme('pager', $pager);
     return $output;
   }
   else {

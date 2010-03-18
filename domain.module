@@ -2646,6 +2646,8 @@ function domain_query_node_access_alter(QueryAlterableInterface $query) {
         ->condition("{$access_alias}.realm", 'domain_id')
       );
       $query->condition($or);
+      // Node module will not have run, so add the distinct.
+      $query->distinct();
     }
   }
 }
