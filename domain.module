@@ -1310,14 +1310,14 @@ function domain_node_grants($account, $op) {
     // In special cases, we grant the ability to view all nodes.  That is,
     // we simply get out of the way of other node_access rules.
     // We do this with the universal 'domain_all' grant.
-    if ($op == 'view' && domain_grant_all()) {
+    if (domain_grant_all()) {
       // If no other node access modules are present, return our grant.
       // Otherwise, we just step out of the way.
       if ($rules) {
-        return array();
+        $grants = array();
       }
       else {
-        return array('domain_all' => array(0));
+        $grants = array('domain_all' => array(0));
       }
     }
   }
