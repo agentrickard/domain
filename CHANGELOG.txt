@@ -2,6 +2,7 @@
 
 18-MAR-2010
 -- Patch #744522 by hefox. Pass domain_all to the alter hook.
+-- Changes hook_domainview() to match DBTNG.
 
 17-MAR-2010
 -- Patch #745028 by Docc. Fixes dumb error in domain_conf_variable_set().

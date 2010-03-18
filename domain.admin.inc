@@ -34,28 +34,18 @@ function domain_view() {
   // Cannot use domain_domains() here because we need to sort the output.
   $domains = array();
   $actions = array();
-  // Get any select sql from other modules.
-  $select = module_invoke_all('domainview', 'select');
-  $select_sql = '';
-  if (!empty($select)) {
-    $select_sql = ', ' . implode(', ', $select);
-    $select_sql = rtrim($select_sql, ',');
-  }
 
-  // Get any tablesort sql from other modules.
-  $join = module_invoke_all('domainview', 'join');
-  $join_sql = '';
-  if (!empty($join)) {
-    $join_sql = ' ' . implode(' ', $join);
-  }
   // Set up the base query.
   $query = db_select('domain', 'd')
     ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
+  // Get any tablesort sql from other modules.
+  module_invoke_all('domainview', 'query', array(), $query);
+  // Add the tablesort.
   $query = $query
    ->extend('TableSort')
    ->orderByHeader($header);
   $query = $query->extend('PagerDefault')->limit(variable_get('domain_list_size', DOMAIN_LIST_SIZE));
-
+  // Get the domains.
   $result = $query->execute();
   foreach ($result as $data) {
     $domains[] = (array) $data;
@@ -93,8 +83,10 @@ function domain_view() {
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
     $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<strong>' . $link . '</strong>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
     // Let other modules add data.
+    $data = array();
     foreach (module_implements('domainview') as $module) {
-      $row[] = module_invoke($module, 'domainview', 'data', $domain);
+      $add = module_invoke($module, 'domainview', 'data', $domain);
+      $row = array_merge($row, $add);
     }
     // Add the actions.
     $list = array('items' => $actions);
