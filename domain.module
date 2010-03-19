@@ -252,22 +252,22 @@ function domain_permission() {
 /**
  * Implement hook_theme()
  */
-function domain_theme() {
+function domain_theme($existing, $type, $theme, $path) {
   $themes = array(
     'domain_admin_users_form' => array(
-      'arguments' => array('form' => array()),
+      'variables' => array('form' => array()),
       'file' => 'domain.admin.inc',
     ),
     'domain_batch_form' => array(
-      'arguments' => array('form' => array()),
+      'variables' => array('form' => array()),
       'file' => 'domain.admin.inc',
     ),
     'domain_batch_title' => array(
-      'arguments' => array('batch' => array()),
+      'variables' => array('batch' => array()),
       'file' => 'domain.admin.inc',
     ),
     'domain_roles_form' => array(
-      'arguments' => array('form' => array()),
+      'variables' => array('form' => array()),
       'file' => 'domain.admin.inc',
     ),
   );
@@ -346,12 +346,198 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
 }
 */
 /**
- * Implement hook_user()
+ * Implements hook_user_load()
  *
  * Attached domain_id records to all registering users.  These
  * are used to determine which 'domain_editor' group that users
  * with the 'edit domain nodes' and 'delete domain nodes' permissions are in.
- *
+ */
+function domain_user_load($users) {
+  foreach ($users as $uid => $account) {
+    $users[$uid]->domain_user = domain_get_user_domains($account);
+  }
+}
+
+/**
+ * Implements hook_user_insert() 
+ */
+function domain_user_insert(&$edit, $account, $category) {
+  domain_user_save(&$edit, $account, $category);
+}
+
+/**
+ * Implements hook_user_update() 
+ */
+function domain_user_update(&$edit, $account, $category) {
+  domain_user_save(&$edit, $account, $category);
+}
+
+/**
+ * Helper function called by both hook_user_insert() and hook_user_update().
+ */
+function domain_user_save(&$edit, $account, $category) {
+  // If our field element is missing, do nothing.
+  if (!isset($edit['domain_user'])) {
+    return;
+  }
+  // Clear and reset the {domain_editor} table.
+  db_delete('domain_editor')
+    ->condition('uid', $account->uid)
+    ->execute();
+  // Store the new domains.
+  $values = array();
+  foreach ($edit['domain_user'] as $domain_id => $status) {
+    if ($status != 0) {
+      // Convert the -1 checkboxes to a zero.
+      if ($domain_id == -1) {
+        $domain_id = 0;
+      }
+      $values[] = array('uid' => $account->uid, 'domain_id' => $domain_id);
+    }
+  }
+  if (!empty($values)) {
+    $query = db_insert('domain_editor')->fields(array('uid', 'domain_id'));
+    foreach ($values as $record) {
+      $query->values($record);
+    }
+    $query->execute();
+  }
+  // Clear the $edit field.
+  $edit['domain_user'] = NULL;
+}
+
+/**
+ * Implements hook_user_cancel().
+ */
+function domain_user_cancel($edit, $account, $method) {
+  // Because of hook_user_cancel_methods_alter(), we cannot predict
+  // what method might be called here. So we assume the account has
+  // been deactivated or deleted, and that domain assignments will
+  // be repopulated when the account is re-instated.
+  db_delete('domain_editor')
+    ->condition('uid', $account->uid)
+    ->execute();
+}
+
+/**
+ * Implements hook_user_view().
+ */
+function domain_user_view($account, $view_mode) {
+  // Only show on full view.
+  if ($view_mode != 'full') {
+    return;
+  }
+  // Only show trusted users.
+  // TODO: Make this a new permission.
+  if (!user_access('assign domain editors')) {
+    return;
+  }
+  $output = '';
+  $account->content['domain'] = array(
+    '#type' => 'user_profile_category',
+    '#weight' => 10,
+    '#title' => t('Domain status'),
+  );
+  if (empty($account->domain_user)) {
+    $output = t('This user is not assigned to a domain.');
+  }
+  else {
+    $items = array();
+    foreach (array_filter($account->domain_user) as $id) {
+      ($id == -1) ? $key = 0 : $key = $id;
+      $domain = domain_lookup($key);
+      $items[] = check_plain($domain['sitename']);
+    }
+    $output = theme('item_list', array('items' => $items));
+  }
+  $account->content['domain']['domain_settings'] = array(
+    '#type' => 'user_profile_item',
+    '#title' => t('Assigned domains'),
+    '#markup' => $output,
+  );
+}
+
+/**
+ * Implement hook_form_FORM_ID_alter().
+ */
+function domain_form_user_profile_form_alter(&$form, &$form_state) {
+  domain_form_user_form_alter(&$form, &$form_state);
+}
+
+/**
+ * Implement hook_form_FORM_ID_alter().
+ */
+function domain_form_user_register_form_alter(&$form, &$form_state) {
+  domain_form_user_form_alter(&$form, &$form_state);
+}
+
+/**
+ * Helper function for the two user forms we care about.
+ */
+function domain_form_user_form_alter(&$form, &$form_state) {
+  // Only act on our forms.
+  if (is_null($form['#user_category']) || !in_array($form['#user_category'], array('account', 'register'))) {
+    return;
+  }
+
+  $_domain = domain_get_domain();
+
+  // Get the domains for this user, but ignore roles unless told to use them.
+  $add_roles = variable_get('domain_add_roles', 0);
+  // In the register case, we take the 'new user' settings.
+  if ($form['#user_category'] == 'register') {
+    $add_roles = TRUE;
+  }
+  $account = $form['#user'];
+  $account->domain_user = domain_get_user_domains($account, $add_roles, TRUE);
+  // By default, the requesting domain is assigned.
+  if (empty($account->domain_user)) {
+    ($_domain['domain_id'] == 0) ? $default  = array(-1) : $default = array($_domain['domain_id'] => $_domain['domain_id']);
+  }
+  else {
+    $default = $account->domain_user;
+  }
+  if (user_access('assign domain editors')) {
+    // Set the form options.
+    $domains = domain_domains();
+    $options = array();
+    foreach ($domains as $domain) {
+      // Handle 0 and -1
+      if ($domain['domain_id'] == variable_get('default_domain', 0)) {
+       $domain['domain_id'] = -1;
+      }
+      $options[$domain['domain_id']] = check_plain($domain['sitename']);
+    }
+    $format = domain_select_format();
+
+    $form['domain_user'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Domain access'),
+      '#collapsible' => TRUE,
+      '#collapsed' => FALSE,
+      '#weight' => 1
+    );
+    $form['domain_user']['domain_user'] = array(
+      '#type' => empty($format) ? 'checkboxes' : 'select',
+      '#options' => $options,
+      '#title' => t('Domain access settings'),
+      '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain nodes" permission.'),
+      '#default_value' => $default
+    );
+    if ($format) {
+      $form['domain_user']['domain_user']['#multiple'] = TRUE;
+      $form['domain_user']['domain_user']['#size'] = count($options) > 10 ? 10 : count($options);
+    }
+  }
+  else {
+    $form['domain_user'] = array(
+      '#type' => 'value',
+      '#value' => $default
+    );
+  }
+}
+
+/* 
  * TODO: update
  *
 function domain_user($op, &$edit, &$account, $category = NULL) {
@@ -496,7 +682,7 @@ function domain_user_operations() {
 /**
  * Implement hook_form_alter().
  */
-function domain_form_user_admin_account_alter(&$form, $form_state) {
+function domain_form_user_admin1_account_alter(&$form, $form_state) {
   if (!user_access('assign domain editors')) {
     return;
   }
