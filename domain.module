@@ -407,13 +407,9 @@ function domain_user_save(&$edit, $account, $category) {
 }
 
 /**
- * Implements hook_user_cancel().
+ * Implements hook_user_delete().
  */
-function domain_user_cancel($edit, $account, $method) {
-  // Because of hook_user_cancel_methods_alter(), we cannot predict
-  // what method might be called here. So we assume the account has
-  // been deactivated or deleted, and that domain assignments will
-  // be repopulated when the account is re-instated.
+function domain_user_delete($account) {
   db_delete('domain_editor')
     ->condition('uid', $account->uid)
     ->execute();
