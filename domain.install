@@ -102,3 +102,18 @@ function domain_uninstall() {
  * You must first upgrade to Drupal 6.x.2.3 or higher, and then proceed to Drupal 7.
  *
  */
+
+/**
+ * Update block deltas to Drupal 7.
+ */
+function domain_update_7000() {
+  // Get an array of the renamed block deltas, organized by module.
+  $renamed_deltas = array(
+    'domain' => array(
+      '0' => 'switcher',
+      '1' => 'information',
+    ),
+  );
+  update_fix_d7_block_deltas($sandbox, $renamed_deltas);
+  return t('Domain Access blocks updated.');
+}

@@ -1,5 +1,9 @@
 // $Id$
 
+21-MAR-2010
+-- Fixes bootstrap issue for CLI and update.php.
+-- Makes blocks work and provides upgrade path for deltas.
+
 18-MAR-2010
 -- Patch #744522 by hefox. Pass domain_all to the alter hook.
 -- Changes hook_domainview() to match DBTNG.

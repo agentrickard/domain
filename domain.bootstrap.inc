@@ -1,5 +1,6 @@
 <?php
 // $Id$
+
 /**
  * @file
  * Domain bootstrap file.
@@ -70,9 +71,16 @@ function _domain_bootstrap($phase) {
   global $_domain;
   switch ($phase) {
     case DOMAIN_BOOTSTRAP_INIT:
-      // Make sure database is loaded
-      drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE, FALSE);
-      // If the module has been disabled, stop loading.
+      // Make sure database is loaded.
+      // The new update handler causes problems here, so we account for it.
+      // Same with drush or other CLI resources.
+      $new_phase = FALSE;
+      if (function_exists('update_prepare_d7_bootstrap') || drupal_is_cli()) {
+        $new_phase = TRUE;
+      }
+      drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE, $new_phase);
+
+      // If the Domain Access module has been disabled, stop loading.
       $table = domain_get_primary_table('system');
       $check = (bool) db_query("SELECT status FROM $table WHERE name = 'domain' AND type = 'module'")->fetchField();
       if (empty($check)) {

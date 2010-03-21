@@ -275,76 +275,96 @@ function domain_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implement hook_block()
- *
- * A nifty little domain-switcher block, useful during debugging.
- * @TODO: update
-function domain_block($op = 'list', $delta = 0, $edit = array()) {
-  global $_domain, $base_url;
-  $blocks = array();
-  switch ($op) {
-    case 'list':
-      $blocks[0] = array(
-        'info' => t('Domain switcher'),
-      );
-      $blocks[1] = array(
-       'info' => t('Domain access information'),
-      );
-      return $blocks;
-      break;
-    case 'view':
-      switch ($delta) {
-        case 0:
-          $block['subject'] = t('Domain switcher');
-          $items = array();
-          $domains = domain_domains();
-          $msg = FALSE;
-          foreach ($domains as $domain) {
-            if ($domain['valid']) {
-              $title = $domain['sitename'];
-              $allow = TRUE;
-            }
-            else {
-              $title = $domain['sitename'] . ' *';
-              $allow = FALSE;
-              if (user_access('access inactive domains')) {
-                $msg = TRUE;
-                $allow = TRUE;
-              }
-            }
-            if ($allow) {
-              $items[] = l($title, domain_get_uri($domain));
-            }
-          }
-          $block['content'] = theme('item_list', $items);
-          if ($msg) {
-            $block['content'] .= t('<em>* Inactive domain.</em>');
-          }
-          break;
-        case 1:
-          $block['content'] = '';
-          if (arg(0) == 'node' && is_numeric(arg(1))) {
-            $block['subject'] = t('Domain access information');
-            $this_node = node_load(arg(1));
-            $output = '';
-            if (!empty($this_node->subdomains)) {
-              $output .= theme('item_list', $this_node->subdomains, t('Assigned domains'));
-            }
-            $this_domain = domain_get_node_match($this_node->nid);
-            $output .= theme('item_list', array($this_domain['sitename']), t('Source domain'));
-            if (empty($output)) {
-              $output = t('This node is not assigned to a domain.');
-            }
-            $block['content'] = '<p>' . t('%node is published with the following Domain Access rules:', array('%node' => $this_node->title)) . '</p>' . $output;
-          }
-          return $block;
-          break;
-      }
-      return $block;
-      break;
-  }
+ * Implements hook_block_info().
+ */
+function domain_block_info() {
+  $blocks['switcher'] = array(
+    'info' => t('Domain switcher'),
+  );
+  $blocks['information'] = array(
+   'info' => t('Domain access information'),
+  );
+  return $blocks;
 }
-*/
+
+/**
+ * Implements hook_block_view().
+ */
+function domain_block_view($delta = '') {
+  // Dispatch to sub-function.
+  if (empty($delta)) {
+    return;
+  }
+  $function = 'domain_block_view_' . $delta;
+  return $function();
+}
+
+/**
+ * A nifty little domain-switcher block, useful during debugging.
+ *
+ * @see domain_block_view()
+ */
+function domain_block_view_switcher() {
+  $output = 'hi';
+  $list = array();
+  $domains = domain_domains();
+  $msg = FALSE;
+  foreach ($domains as $domain) {
+    if ($domain['valid']) {
+      $title = $domain['sitename'];
+      $allow = TRUE;
+    }
+    else {
+      $title = $domain['sitename'] . ' *';
+      $allow = FALSE;
+      if (user_access('access inactive domains')) {
+        $msg = TRUE;
+        $allow = TRUE;
+      }
+    }
+    if ($allow) {
+      $list[] = l($title, domain_get_uri($domain));
+    }
+  }
+  $items = array('items' => $list);
+  $output = theme('item_list', $items);
+  return array(
+    'subject' => t('Domain switcher'),
+    'content' => $output,
+  );
+}
+
+/**
+ * Prints information about the current node.
+ *
+ * @see domain_block_view()
+ */
+function domain_block_view_information() {
+  $output = '';
+  $node = menu_get_object();
+  if (empty($node->nid)) {
+    return;
+  }
+  // Print the assigned domains.
+  if (!empty($node->subdomains)) {
+    $output .= theme('item_list', array('items' => $node->subdomains, 'title' => t('Assigned domains')));
+  }
+  // Print the link source domain.
+  $this_domain = domain_get_node_match($node->nid);
+  $output .= theme('item_list', array('items' => array($this_domain['sitename']), 'title' => t('Source domain')));
+  if (empty($output)) {
+    $output = t('This node is not assigned to a domain.');
+  }
+  else {
+    $output = '<p>' . t('%node is published with the following Domain Access rules:', array('%node' => $node->title)) . '</p>' . $output;
+  }
+
+  return array(
+    'subject' => t('Domain access information'),
+    'content' => $output,
+  );
+}
+
 /**
  * Implements hook_user_load()
  *
@@ -533,132 +553,6 @@ function domain_form_user_form_alter(&$form, &$form_state) {
   }
 }
 
-/* 
- * TODO: update
- *
-function domain_user($op, &$edit, &$account, $category = NULL) {
-  switch ($op) {
-    case 'load':
-      $domains = domain_get_user_domains($account);
-      $account->domain_user = $domains;
-      break;
-    case 'form':
-    case 'register':
-      if (is_null($category) || $category == 'account') {
-        global $_domain;
-        $result = db_query("SELECT domain_id, subdomain, sitename, scheme FROM {domain}");
-        $options = array();
-        // Get the domains for this user, but ignore roles unless told to use them.
-        $add_roles = variable_get('domain_add_roles', 0);
-        // In the register case, we take the 'new user' settings.
-        if ($op == 'register') {
-          $add_roles = TRUE;
-        }
-        $account->domain_user = domain_get_user_domains($account, $add_roles, TRUE);
-        // By default, the requesting domain is assigned.
-        if (empty($account->domain_user)) {
-          ($_domain['domain_id'] == 0) ? $default  = array(-1) : $default = array($_domain['domain_id'] => $_domain['domain_id']);
-        }
-        else {
-          $default = $account->domain_user;
-        }
-        $options[-1] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
-        while ($data = db_fetch_array($result)) {
-          $options[$data['domain_id']] = check_plain($data['sitename']);
-        }
-        // Replace the zero record to -1.
-        unset($options[0]);
-        $format = domain_select_format();
-        if (user_access('assign domain editors')) {
-          $form['domain_user'] = array(
-            '#type' => 'fieldset',
-            '#title' => t('Domain access'),
-            '#collapsible' => TRUE,
-            '#collapsed' => FALSE,
-            '#weight' => 1
-          );
-          $form['domain_user']['domain_user'] = array(
-            '#type' => empty($format) ? 'checkboxes' : 'select',
-            '#options' => $options,
-            '#title' => t('Domain access settings'),
-            '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain nodes" permission.'),
-            '#default_value' => $default
-          );
-          if ($format) {
-            $form['domain_user']['domain_user']['#multiple'] = TRUE;
-            $form['domain_user']['domain_user']['#size'] = count($options) > 10 ? 10 : count($options);
-          }
-        }
-        else {
-          $form['domain_user'] = array(
-            '#type' => 'value',
-            '#value' => $default
-          );
-        }
-        return $form;
-      }
-      break;
-    case 'validate':
-      return array('domain_user' => $edit['domain_user']);
-      break;
-    case 'insert':
-    case 'update':
-      // If our field element is missing, do nothing.
-      if (!isset($edit['domain_user'])) {
-        return;
-      }
-      // Clear and reset the {domain_editor} table.
-      db_query("DELETE FROM {domain_editor} WHERE uid = %d", $account->uid);
-      if (empty($edit['domain_user'])) {
-        return;
-      }
-      foreach ($edit['domain_user'] as $domain_id => $status) {
-        if ($status != 0) {
-          // Convert the -1 checkboxes to a zero.
-          if ($domain_id == -1) {
-            $domain_id = 0;
-          }
-          db_query("INSERT INTO {domain_editor} (uid, domain_id) VALUES (%d, %d)", $account->uid, $domain_id);
-        }
-      }
-      // Clear the $edit field.
-      $edit['domain_user'] = NULL;
-      break;
-    case 'view':
-      if (user_access('assign domain editors')) {
-        $account->content['domain'] = array(
-          '#type' => 'user_profile_category',
-          '#weight' => 10,
-          '#title' => t('Domain status'),
-        );
-        if (empty($account->domain_user)) {
-          $output = t('This user is not assigned to a domain.');
-        }
-        else {
-          $output = '<ul>';
-          foreach ($account->domain_user as $id) {
-            if (abs($id) > 0) {
-              if ($id > 0) {
-                $domain = domain_lookup($id);
-                $output .= '<li>' . $domain['sitename'] . '</li>';
-              }
-              else {
-                $output .= '<li>' . variable_get('domain_sitename', variable_get('site_name', 'Drupal')) . '</li>';
-              }
-            }
-          }
-          $output .= '</ul>';
-        }
-        $account->content['domain']['domain_settings'] = array(
-          '#type' => 'user_profile_item',
-          '#title' => t('Domain settings'),
-          '#value' => $output,
-        );
-        break;
-    }
-  }
-}
-*/
 /**
  * Implement hook_user_operations().
 
