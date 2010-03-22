@@ -2554,21 +2554,46 @@ function domain_field_extra_fields() {
  *
  * TODO: http://api.drupal.org/api/function/hook_token_info/7
  */
-function domain_token_list($type = 'all') {
+function domain_token_info() {
+  $type = array(
+    'name' => t('Domains'),
+    'description' => t('Tokens related to domains.'),
+  );
+
   // Current domain tokens.
-  $tokens['domain']['domain-id'] = t('The current domain ID.');
-  $tokens['domain']['domain-name'] = t('The current domain name, lowercased and with only alphanumeric characters.');
-  $tokens['domain']['domain-name-raw'] = t('The current domain name. WARNING - raw user input. NOT path safe.');
-  $tokens['domain']['domain-url'] = t('The current domain\'s URL, lowercased and with only alphanumeric characters.');
-  $tokens['domain']['domain-url-raw'] = t('The current domain\'s URL. WARNING - raw user input. NOT path safe.');
-  $tokens['domain']['domain-subdomain'] = t('The current subdomain, lowercased and with only alphanumeric characters. Only works with *.example.com formats');
-  $tokens['domain']['domain-subdomain-raw'] = t('The current subdomain. Only works with *.example.com formats. WARNING - raw user input. NOT path safe.');
+  $tokens['domain-id']  = array(
+    'name' => t('Domain id'),
+    'description' => t('The current domain ID.'),
+  );
+  $tokens['domain-name']  = array(
+    'name' => t('Domain name'),
+    'description' => t('The current domain name, lowercased and with only alphanumeric characters.'),
+  );
+  $tokens['domain-url']  = array(
+    'name' => t('Domain URL'),
+    'description' => t('The current domain\'s URL, lowercased and with only alphanumeric characters.'),
+  );
+  $tokens['domain-subdomain']  = array(
+    'name' => t('Subdomain'),
+    'description' => t('The current subdomain, lowercased and with only alphanumeric characters. Only works with *.example.com formats'),
+  );
   // Default domain tokens.
-  $tokens['domain']['domain-default-id'] = t('The default domain ID.');
-  $tokens['domain']['domain-default-name'] = t('The default domain name, lowercased and with only alphanumeric characters.');
-  $tokens['domain']['domain-default-name-raw'] = t('The default domain name. WARNING - raw user input. NOT path safe.');
-  $tokens['domain']['domain-default-url'] = t('The default domain\'s URL, lowercased and with only alphanumeric characters.');
-  $tokens['domain']['domain-default-url-raw'] = t('The default domain\'s URL. WARNING - raw user input. NOT path safe.');
+  $tokens['domain-default-id']  = array(
+    'name' => t('Default domain id'),
+    'description' => t('The default domain ID.'),
+  );
+  $tokens['domain-default-name']  = array(
+    'name' => t('Default domain name'),
+    'description' => t('The default domain name, lowercased and with only alphanumeric characters.'),
+  );
+  $tokens['domain-default-url']  = array(
+    'name' => t('Default domain URL'),
+    'description' => t('The default domain\'s URL, lowercased and with only alphanumeric characters.'),
+  );
+  return array(
+    'types' => array('domain' => $type),
+    'tokens' => array('domain' => $tokens),
+  );
 
   return $tokens;
 }
@@ -2578,12 +2603,9 @@ function domain_token_list($type = 'all') {
  *
  * TODO: http://api.drupal.org/api/function/hook_tokens/7
  */
-function domain_token_values($type, $object = NULL, $options = array()) {
-  global $_domain;
-  if ($type != 'global') {
-    return;
-  }
-
+function domain_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  // Get common elements.
+  $_domain = domain_get_domain();
   $default_domain = domain_default(FALSE);
   $subdomain_elements = explode('.', $_domain['subdomain']);
   if (count($subdomain_elements) > 2) {
@@ -2596,19 +2618,20 @@ function domain_token_values($type, $object = NULL, $options = array()) {
   // Current domain tokens.
   $tokens['domain-id'] = $_domain['domain_id'];
   $tokens['domain-name'] = domain_url_encode($_domain['sitename']);
-  $tokens['domain-name-raw'] = check_plain($_domain['sitename']);
   $tokens['domain-url'] = domain_url_encode($_domain['subdomain']);
-  $tokens['domain-url-raw'] = check_plain($_domain['subdomain']);
   $tokens['domain-subdomain'] = domain_url_encode($subdomain);
-  $tokens['domain-subdomain-raw'] = check_plain($subdomain);
 
   // Default domain
   $tokens['domain-default-id'] = $default_domain['domain_id'];
   $tokens['domain-default-name'] = domain_url_encode($default_domain['sitename']);
-  $tokens['domain-default-name-raw'] = check_plain($default_domain['sitename']);
   $tokens['domain-default-url'] = domain_url_encode($default_domain['subdomain']);
-  $tokens['domain-default-url-raw'] = check_plain($default_domain['subdomain']);
 
+  // Sanitize the tokens, if necessary.
+  if (!empty($options['sanitize'])) {
+    foreach ($tokens as $key => $value) {
+      $tokens[$key] = check_plain($value);
+    }
+  }
   return $tokens;
 }
 

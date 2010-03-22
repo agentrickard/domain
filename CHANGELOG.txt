@@ -1,5 +1,8 @@
 // $Id$
 
+22-MAR-2010
+-- Upgrades token and field support.
+
 21-MAR-2010
 -- Fixes bootstrap issue for CLI and update.php.
 -- Makes blocks work and provides upgrade path for deltas.
