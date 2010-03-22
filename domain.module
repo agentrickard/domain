@@ -254,10 +254,6 @@ function domain_permission() {
  */
 function domain_theme($existing, $type, $theme, $path) {
   $themes = array(
-    'domain_admin_users_form' => array(
-      'variables' => array('form' => array()),
-      'file' => 'domain.admin.inc',
-    ),
     'domain_batch_form' => array(
       'render element' => 'form',
       'file' => 'domain.admin.inc',
@@ -554,8 +550,8 @@ function domain_form_user_form_alter(&$form, &$form_state) {
 }
 
 /**
- * Implement hook_user_operations().
-
+ * Implements hook_user_operations().
+ */
 function domain_user_operations() {
   if (!user_access('assign domain editors')) {
     return;
@@ -567,15 +563,16 @@ function domain_user_operations() {
     ),
   );
 }
- */
 
 /**
  * Implement hook_form_alter().
  */
-function domain_form_user_admin1_account_alter(&$form, $form_state) {
+function domain_form_user_admin_account_alter(&$form, $form_state) {
   if (!user_access('assign domain editors')) {
     return;
   }
+  $form['options']['#weight'] = -2;
+  $_domain = domain_get_domain();
   $options = array();
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
@@ -608,10 +605,12 @@ function domain_form_user_admin1_account_alter(&$form, $form_state) {
     $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
   }
   // Add our domain elements.
-  foreach (array_keys($form['name']) as $uid) {
-    $form['user_domains'][$uid][0] = array('#value' => theme('item_list', _domain_user_list($uid)));
+  $ops = array_pop($form['accounts']['#header']);
+  $form['accounts']['#header']['domain_user'] = array('data' => t('Assigned Domains'));
+  foreach (array_keys($form['accounts']['#options']) as $uid) {
+    $form['accounts']['#options'][$uid]['domain_user'] = theme('item_list', array('items' => _domain_user_list($uid)));
   }
-  $form['#theme'] = 'domain_admin_users_form';
+  $form['accounts']['#header']['operations'] = $ops;
   $form['#submit'][] = 'domain_update_users';
 }
 
@@ -627,14 +626,15 @@ function _domain_user_list($uid) {
   $temp_account = new stdClass;
   $temp_account->uid = $uid;
   $list = domain_get_user_domains($temp_account, FALSE);
-  $domains = array();
+  $domains = domain_domains();
+  $user_domains = array();
   foreach ($list as $domain_id) {
     if ($domain_id == -1) {
       $domain_id = 0;
     }
-    $domains[] = check_plain(db_result(db_query("SELECT sitename FROM {domain} WHERE domain_id = %d ORDER BY domain_id ASC", $domain_id)));
+    $user_domains[] = check_plain($domains[$domain_id]['sitename']);
   }
-  return $domains;
+  return $user_domains;
 }
 
 /**
@@ -655,13 +655,17 @@ function domain_update_users($form, &$form_state) {
     return;
   }
   foreach ($values['accounts'] as $uid) {
-    db_query("DELETE FROM {domain_editor} WHERE uid = %d", $uid);
+    db_delete('domain_editor')
+      ->condition('uid', $uid)
+      ->execute();
     foreach (array_filter($values['domains']) as $domain_id) {
       // Cannot use 0 as a checkbox.
       if ($domain_id == -1) {
         $domain_id = 0;
       }
-      db_query("INSERT INTO {domain_editor} (uid, domain_id) VALUES (%d, %d)", $uid, $domain_id);
+      db_insert('domain_editor')
+        ->fields(array('uid' => $uid, 'domain_id' => $domain_id))
+        ->execute();
     }
   }
 }

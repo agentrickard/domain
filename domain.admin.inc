@@ -857,50 +857,6 @@ function domain_batch_form($form, &$form_state, $action, $batch, $domains) {
 /**
  * FormsAPI theming.
  */
-function theme_domain_admin_users_form($form) {
-  // Overview table:
-  $header = array(
-    array('data' => t('Username'), 'field' => 'u.name'),
-    array('data' => t('Status'), 'field' => 'u.status'),
-    t('Roles'),
-    t('Domains'),
-    array('data' => t('Member for'), 'field' => 'u.created', 'sort' => 'desc'),
-    array('data' => t('Last access'), 'field' => 'u.access'),
-    t('Operations')
-  );
-  $output = drupal_render($form['options']);
-  $output .= drupal_render($form['domain']);
-  if (isset($form['name']) && is_array($form['name'])) {
-    foreach (element_children($form['name']) as $key) {
-      $rows[] = array(
-        drupal_render($form['accounts'][$key]),
-        drupal_render($form['name'][$key]),
-        drupal_render($form['status'][$key]),
-        drupal_render($form['roles'][$key]),
-        drupal_render($form['user_domains'][$key]),
-        drupal_render($form['member_for'][$key]),
-        drupal_render($form['last_access'][$key]),
-        drupal_render($form['operations'][$key]),
-      );
-    }
-  }
-  else {
-    $rows[] = array(array('data' => t('No users available.'), 'colspan' => '7'));
-  }
-
-  $output .= theme('table', array('header' => $header, 'rows' => $rows));
-  if ($form['pager']['#value']) {
-    $output .= drupal_render($form['pager']);
-  }
-
-  $output .= drupal_render($form);
-
-  return $output;
-}
-
-/**
- * FormsAPI theming.
- */
 function theme_domain_batch_form($variables) {
   $form = $variables['form'];
   $output = '';
