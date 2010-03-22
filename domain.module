@@ -1426,9 +1426,6 @@ function domain_node_grants($account, $op) {
   if ($op == 'view') {
     if (!empty($_domain['site_grant'])) {
       $grants['domain_site'][] = 0;
-      if ($rules) {
-        $grants['domain_site']['group'] = 'domain';
-      }
     }
 
     // Grant based on active domain.
