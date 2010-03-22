@@ -2385,7 +2385,8 @@ function domain_batch_validate($values) {
     case 'domain_root':
       foreach ($batch as $key => $value) {
         $subdomain = strtolower(urlencode($value));
-        $check = (bool) db_query_range("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id <> %d", $value, $key);
+        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :subdomain AND domain_id <> :domain_id", 
+          array(':subdomain' => $value, ':domain_id' => $key))->fetchField();
         if ($check > 0 || ($key > 0 && $value == variable_get('domain_root', ''))) {
           form_set_error('domain_batch', t('Each domain value must be unique.'));
         }
@@ -2393,7 +2394,8 @@ function domain_batch_validate($values) {
       break;
     case 'domain_sitename':
       foreach ($batch as $key => $value) {
-        $check = (bool) db_query_range("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id <> %d", $value, $key);
+        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = :sitename AND domain_id <> :domain_id", 
+          array(':sitename' => $value, ':domain_id' => $key))->fetchField();
         if ($check > 0 || ($key > 0 && $value == variable_get('domain_sitename', 'Drupal'))) {
           form_set_error('domain_batch', t('Each site name value must be unique.'));
         }

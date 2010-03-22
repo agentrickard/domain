@@ -726,11 +726,11 @@ function domain_batch_list($batch) {
       $rows[] = array(array('data' => '<strong>' . t('%module options', array('%module' => $value['#module'])) . '</strong>', 'colspan' => 2));
       $group = $value['#module'];
     }
-    $rows[] = array(l($value['#form']['#title'], 'admin/build/domain/batch/' . $key), $value['#meta_description']);
+    $rows[] = array(l($value['#form']['#title'], 'admin/config/domain/batch/' . $key), $value['#meta_description']);
   }
   $output = '<p>' . t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') . '</p>';
   $output .= '<p><em>' . t('Note that you will only be shown domains on which each action may be performed.  If the module is not yet configured, some actions may be empty.') . '</em></p>';
-  return $output . theme('table', $header, $rows);
+  return $output . theme('table', array('header' => $header, 'rows' => $rows));
 }
 
 /**
@@ -763,14 +763,13 @@ function domain_batch_sort($a, $b) {
  * @return
  *   A themed table of links and descriptions for batch actions.
  */
-function domain_batch_form($form, $form_state, $action, $batch, $domains) {
+function domain_batch_form($form, &$form_state, $action, $batch, $domains) {
   $default = array();
   drupal_set_title($batch['#form']['#title']);
 
   $form = array();
   $form['message'] = array(
-    '#type' => 'markup',
-    '#value' => theme('domain_batch_title', $batch)
+    '#markup' => theme('domain_batch_title', array('batch' => $batch))
   );
 
   // For some values, allow every record to be updated.
@@ -784,7 +783,8 @@ function domain_batch_form($form, $form_state, $action, $batch, $domains) {
       '#description' => t('By entering a value below and checking the <strong>Apply to all domains</strong> option, you can set the desired value for all domains.'),
     );
     $form['domain_batch_all']['batch_all_setting'] = $batch['#form'];
-    $form['domain_batch_all']['batch_all_setting']['#default_value'] = $batch['#system_default'];
+    $form['domain_batch_all']['batch_all_setting']['#required'] = FALSE;
+    $form['domain_batch_all']['batch_all_setting']['#default_value'] = isset($batch['#system_default']) ? $batch['#system_default'] : NULL;
     $form['domain_batch_all']['batch_override'] = array(
       '#type' => 'checkbox',
       '#title' => t('Apply to all domains'),
@@ -819,7 +819,7 @@ function domain_batch_form($form, $form_state, $action, $batch, $domains) {
       }
     }
     elseif ($batch['#domain_action'] == 'custom' && isset($batch['#lookup'])) {
-      $default[$domain['domain_id']] = $batch['#system_default'];
+      $default[$domain['domain_id']] = isset($batch['#system_default']) ? $batch['#system_default'] : NULL;
       $func = $batch['#lookup'];
       $setting = $func($domain);
       if ($setting != -1) {
@@ -859,7 +859,6 @@ function domain_batch_form($form, $form_state, $action, $batch, $domains) {
  */
 function theme_domain_admin_users_form($form) {
   // Overview table:
-  dsm($form);
   $header = array(
     array('data' => t('Username'), 'field' => 'u.name'),
     array('data' => t('Status'), 'field' => 'u.status'),
@@ -869,7 +868,6 @@ function theme_domain_admin_users_form($form) {
     array('data' => t('Last access'), 'field' => 'u.access'),
     t('Operations')
   );
-dsm($header);
   $output = drupal_render($form['options']);
   $output .= drupal_render($form['domain']);
   if (isset($form['name']) && is_array($form['name'])) {
@@ -892,10 +890,10 @@ dsm($header);
 
   $output .= theme('table', array('header' => $header, 'rows' => $rows));
   if ($form['pager']['#value']) {
-#    $output .= drupal_render($form['pager']);
+    $output .= drupal_render($form['pager']);
   }
 
- # $output .= drupal_render($form);
+  $output .= drupal_render($form);
 
   return $output;
 }
@@ -903,7 +901,8 @@ dsm($header);
 /**
  * FormsAPI theming.
  */
-function theme_domain_batch_form($form) {
+function theme_domain_batch_form($variables) {
+  $form = $variables['form'];
   $output = '';
   $output = drupal_render($form['message']);
   if (isset($form['domain_batch_all'])) {
@@ -918,9 +917,9 @@ function theme_domain_batch_form($form) {
     $rows[] = $row;
     $form['domain_batch'][$key]['#title'] = $temp;
   }
-  $output .= drupal_render($form['domain_batch']);
-  $output .= theme('table', $header, $rows);
-  $output .= drupal_render($form);
+  $output .= drupal_render_children($form['domain_batch']);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= drupal_render_children($form);
   return $output;
 }
 
@@ -930,10 +929,10 @@ function theme_domain_batch_form($form) {
  * @param $batch
  *   The batch function to be performed.
  */
-function theme_domain_batch_title($batch) {
+function theme_domain_batch_title($variables) {
   $output = '';
-  $output = '<p>' . $batch['#meta_description'] . '</p>';
-  if (!empty($batch['#required'])) {
+  $output = '<p>' . $variables['batch']['#meta_description'] . '</p>';
+  if (!empty($variables['batch']['#required'])) {
     $output .= '<p><em>' . t('All values are required.') . '</em></p>';
   }
   return $output;
@@ -963,29 +962,22 @@ function domain_batch_form_submit($form, &$form_state) {
   $item = $form_state['values']['batch_item'];
   switch ($form_state['values']['handler']) {
     case 'domain':
-      foreach ($form_state['values']['domain_batch'] as $key => $value) {
-        // Note that $type in the query below is a sanitzed value passed from domain_batch_data_type().
-        db_query("UPDATE {domain} SET %s = " . domain_batch_data_type($form_state['values']['data_type']) . " WHERE domain_id = %d", $item, $value, $key);
+      foreach ($form_state['values']['domain_batch'] as $domain_id => $value) {
+        db_update('domain')
+          ->fields(array($item => $value))
+          ->condition('domain_id', $domain_id)
+          ->execute();
         // Update the variable for the root domain
-        if (!empty($form_state['values']['variable']) && $key == 0) {
+        if (!empty($form_state['values']['variable']) && $domain_id == 0) {
           variable_set($form_state['values']['variable'], $value);
         }
       }
       break;
     case 'domain_conf':
-      foreach ($form_state['values']['domain_batch'] as $key => $value) {
+      foreach ($form_state['values']['domain_batch'] as $domain_id => $value) {
         $settings = array();
         if ($key > 0 || empty($form_state['values']['variable'])) {
-          $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $key));
-          if (isset($data['settings'])) {
-            $settings = domain_unserialize($data['settings']);
-            $settings[$item] = $value;
-            db_query("UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d", serialize($settings), $key);
-          }
-          else {
-            $settings[$item] = $value;
-            db_query("INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)", $key, serialize($settings));
-          }
+          domain_conf_variable_save($domain_id, $item, $value); 
         }
         elseif (!empty($form_state['values']['variable'])) {
           variable_set($form_state['values']['variable'], $value);
@@ -998,11 +990,15 @@ function domain_batch_form_submit($form, &$form_state) {
         if ($value == 1) {
           if (is_array($table)) {
             foreach ($table as $current) {
-              db_query("DELETE FROM {%s} WHERE domain_id = %d", $current, $key);
+              db_delete($current)
+                ->condition(array('domain_id', $key))
+                ->execute();
             }
           }
           else {
-            db_query("DELETE FROM {%s} WHERE domain_id = %d", $table, $key);
+            db_delete($table)
+              ->condition(array('domain_id', $key))
+              ->execute();
           }
         }
       }
@@ -1015,32 +1011,6 @@ function domain_batch_form_submit($form, &$form_state) {
       break;
   }
   drupal_set_message(t('Settings have been updated successfully.'));
-}
-
-/**
- * Converts a data type indicator into a sql-safe string.
- *
- * @param $type
- *   The data type defined in hook_domainbatch().
- * @return
- *   A sql-safe string ('%s', %d, %f, %b) for use with db_query().
- */
-function domain_batch_data_type($type) {
-  $return = "'%s'";
-  switch ($type) {
-    case 'string':
-      break;
-    case 'integer':
-      $return = "%d";
-      break;
-    case 'float':
-      $return = "%f";
-      break;
-    case 'binary':
-      $return = "%b";
-      break;
-  }
-  return $return;
 }
 
 /**
