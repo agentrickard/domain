@@ -794,12 +794,33 @@ function domain_set_primary_domain() {
   if (!empty($_SERVER['HTTPS'])) {
     $scheme = 'https';
   }
-  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $root, $site, $scheme);
-  if (!db_affected_rows()) {
-    db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, $site, $scheme, 1);
+  $check = (bool) db_query_range("SELECT COUNT(domain_id) FROM {domain} WHERE domain_id = :domain_id", 0, 1, array(':domain_id' => 0))->fetchField();
+  if (empty($check)) {
+    db_insert('domain')
+      ->fields(array(
+          'subdomain' => $root,
+          'sitename' => $site,
+          'scheme' => $scheme,
+          'valid' => 1,
+      ))
+      ->execute();
     // MySQL won't let us insert row 0 into an autoincrement table.
     // Similar to the {users} table, this leaves us with no row 1.
-    db_query("UPDATE {domain} SET domain_id = domain_id - 1");
+    db_update('domain')
+      ->fields(array('domain_id' => 0))
+      ->condition('domain_id', 1)
+      ->execute();
+  }
+  else {
+    db_update('domain')
+      ->fields(array(
+          'subdomain' => $root,
+          'sitename' => $site,
+          'scheme' => $scheme,
+          'valid' => 1,
+      ))
+      ->condition('domain_id', 0)
+      ->execute();
   }
   // Set the default domain variables.
   variable_set('domain_root', $root);
