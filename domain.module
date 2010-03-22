@@ -259,7 +259,7 @@ function domain_theme($existing, $type, $theme, $path) {
       'file' => 'domain.admin.inc',
     ),
     'domain_batch_form' => array(
-      'variables' => array('form' => array()),
+      'render element' => 'form',
       'file' => 'domain.admin.inc',
     ),
     'domain_batch_title' => array(
@@ -267,7 +267,7 @@ function domain_theme($existing, $type, $theme, $path) {
       'file' => 'domain.admin.inc',
     ),
     'domain_roles_form' => array(
-      'variables' => array('form' => array()),
+      'render element' => 'form',
       'file' => 'domain.admin.inc',
     ),
   );

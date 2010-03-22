@@ -16,7 +16,7 @@
  *  A sortable table of active domain records, or an error message.
  */
 function domain_view() {
-  global $_domain;
+  $_domain = domain_get_domain();
   $output = t('<p>The following domains have been created for your site.  The currently active domain <strong>is shown in boldface</strong>.  You
                     may click on a domain to change the currently active domain.  Your default domain has an ID of %id.</p>', array('%id' => variable_get('domain_default', 0)));
   $header = array(
@@ -244,25 +244,15 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     <em>Users will be taken from www.example.com to example.com, so your domains must be registered without the www. prefix.</em>')
   );
 
-  // Check to see if the node_access patch is enabled.  If it is, then
-  // we need to know if more than one node_access module is running.
-  $modules = count(module_implements('node_grants'));
+  /* TODO: enable this?
+  $form['domain_advanced']['domain_access_rules'] = array(
+    '#type' => 'radios',
+    '#title' => t('Node access settings'),
+    '#default_value' => variable_get('domain_access_rules', 0),
+    '#options' => array(0 => t('Use the default Drupal behavior (OR)'), 1 => t('Check Domain Access in addition to other modules (AND)')),
+    '#description' => t('Controls how Domain Access interacts with access control modules such as Organic Groups. Requires the multiple_node_access patch.')
+  );*/
 
-  if (!function_exists('domain_node_access_grants_sql') ||  $modules < 2) {
-    $disabled = TRUE;
-    variable_set('domain_access_rules', 0);
-  }
-  // Do not show this form element unless it is necessary
-  if ($modules > 1) {
-    $form['domain_advanced']['domain_access_rules'] = array(
-      '#type' => 'radios',
-      '#title' => t('Node access settings'),
-      '#disabled' => $disabled,
-      '#default_value' => variable_get('domain_access_rules', 0),
-      '#options' => array(0 => t('Use the default Drupal behavior (OR)'), 1 => t('Check Domain Access in addition to other modules (AND)')),
-      '#description' => t('Controls how Domain Access interacts with access control modules such as Organic Groups. Requires the multiple_node_access patch.')
-    );
-  }
   $form['domain_advanced']['domain_search'] = array(
     '#type' => 'radios',
     '#title' => t('Search settings'),
@@ -869,8 +859,8 @@ function domain_batch_form($form, $form_state, $action, $batch, $domains) {
  */
 function theme_domain_admin_users_form($form) {
   // Overview table:
+  dsm($form);
   $header = array(
-    theme('table_select_header_cell'),
     array('data' => t('Username'), 'field' => 'u.name'),
     array('data' => t('Status'), 'field' => 'u.status'),
     t('Roles'),
@@ -879,7 +869,7 @@ function theme_domain_admin_users_form($form) {
     array('data' => t('Last access'), 'field' => 'u.access'),
     t('Operations')
   );
-
+dsm($header);
   $output = drupal_render($form['options']);
   $output .= drupal_render($form['domain']);
   if (isset($form['name']) && is_array($form['name'])) {
@@ -900,12 +890,12 @@ function theme_domain_admin_users_form($form) {
     $rows[] = array(array('data' => t('No users available.'), 'colspan' => '7'));
   }
 
-  $output .= theme('table', $header, $rows);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
   if ($form['pager']['#value']) {
-    $output .= drupal_render($form['pager']);
+#    $output .= drupal_render($form['pager']);
   }
 
-  $output .= drupal_render($form);
+ # $output .= drupal_render($form);
 
   return $output;
 }
@@ -1111,7 +1101,8 @@ function domain_roles_form($form, $form_state) {
 /**
  * FormsAPI theming.
  */
-function theme_domain_roles_form($form) {
+function theme_domain_roles_form($variables) {
+  $form = $variables['form'];
   $output = '';
   $header = array(t('Domains'));
   $rows = array();
@@ -1135,7 +1126,7 @@ function theme_domain_roles_form($form) {
     $rows[] = $row;
   }
   $output .= drupal_render($form['domain_add_roles']);
-  $output .= theme('table', $header, $rows);
-  $output .= drupal_render($form);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= drupal_render_children($form);
   return $output;
 }
