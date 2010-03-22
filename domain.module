@@ -794,7 +794,7 @@ function domain_set_primary_domain() {
   if (!empty($_SERVER['HTTPS'])) {
     $scheme = 'https';
   }
-  $check = (bool) db_query_range("SELECT COUNT(domain_id) FROM {domain} WHERE domain_id = :domain_id", 0, 1, array(':domain_id' => 0))->fetchField();
+  $check = (bool) db_query("SELECT COUNT(domain_id) FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => 0))->fetchField();
   if (empty($check)) {
     db_insert('domain')
       ->fields(array(
@@ -982,7 +982,7 @@ function domain_valid_domain($subdomain) {
  */
 function domain_unique_domain($subdomain) {
   $count = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchField();
-  return !(bool) $count;
+  return empty($count);
 }
 
 /**
@@ -1120,6 +1120,9 @@ function domain_reset_domain($bootstrap = FALSE) {
  * This value is stored in a global, but having a function
  * will let us replace that with a static function in D7.
  *
+ * This function should be used by all callers who do not
+ * need to modify the global variable.
+ *
  * @return
  *   An array of data defining the currently active domain.
  */
@@ -1136,7 +1139,7 @@ function domain_get_domain() {
  *   The message to print. Optional. If passed, this string must be translated and safe.
  */
 function domain_check_primary($msg = 'default') {
-  global $_domain;
+  $_domain = domain_get_domain();
   $default = domain_default();
   if ($_domain['domain_id'] != $default['domain_id']) {
     if ($msg == 'default') {
@@ -1220,7 +1223,7 @@ function domain_get_uri($domain) {
  *   The currently active $domain array, provided by domain_lookup().
  */
 function domain_goto($domain) {
-  global $_domain;
+  $_domain = domain_get_domain();
   // We must be on the proper domain, see http://drupal.org/node/186153.
   if ($domain != -1 && $_domain['domain_id'] != $domain['domain_id']) {
     $path = domain_get_uri($domain);
@@ -1294,65 +1297,9 @@ function domain_node_delete($node) {
  * the {domain_access} table when editing nodes.  Since not all users can see the
  * domain access editing checkboxes, we pass some node_access values as hidden elements.
  *
- * @TODO: update
+ * @TODO: update devel generate integration
 function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-  switch ($op) {
-    case 'prepare':
-    case 'load':
-      // Cannot load if the node has not been created yet.
-      if (!isset($node->nid)) {
-        return;
-      }
-      // Append the domain grants to the node for editing.
-      $domains = domain_get_node_domains($node->nid);
-      $node->domains = $domains['domain_id'];
-      $node->domain_site = $domains['domain_site'];
-      $node->subdomains = array();
-      if ($node->domain_site) {
-        $node->subdomains[] = t('All affiliates');
-      }
-      foreach ($node->domains as $gid) {
-        if ($gid > 0) {
-          $domain = domain_lookup($gid);
-          $node->subdomains[] = $domain['sitename'];
-        }
-        else {
-          $node->subdomains[] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
-        }
-      }
-      break;
-    case 'view':
-      // Search module casts both $a3 and $a4 as FALSE, not NULL.
-      // We check that to hide this data from search and other nodeapi
-      // calls that are neither a teaser nor a page view.
-      if ($a3 !== FALSE || $a4 !== FALSE) {
-        $output = '';
-        $debug = variable_get('domain_debug', 0);
-        if ($debug && user_access('set domain access')) {
-          if (!empty($node->subdomains)) {
-            $output = theme('item_list', $node->subdomains, t('Assigned domains'));
-            $node->content['subdomains'] = array('#value' => $output, '#weight' => 20);
-          }
-          if (!empty($node->editors)) {
-            $output = theme('item_list', $node->editors, t('Editors'));
-            $node->content['editors'] = array('#value' => $output, '#weight' => 21);
-          }
-          if (empty($output)) {
-            $node->content['domain'] = array('#value' => t('This node is not assigned to a domain.'), '#weight' => 22);
-          }
-        }
-      }
-      break;
-    case 'delete':
-      // Remove records from the {domain_access} table.
-      db_query("DELETE FROM {domain_access} WHERE nid = %d", $node->nid);
-      break;
-    case 'insert':
-    case 'update':
-      // We cannot use the global domain here, since it can be modified.
-      $domain = domain_initial_domain();
-      $_SESSION['domain_save_id'] = $domain['domain_id'];
-      break;
+
     case 'presave':
       if (!empty($node->devel_generate)) {
         // Build $domains array based on domains checked in the generate form
@@ -1443,9 +1390,7 @@ function domain_get_node_domains($nid) {
     return $lookup[$nid];
   }
   $domains = array('domain_id' => array(), 'domain_site' => FALSE);
-  $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = :nid AND (realm = 'domain_id' OR realm = 'domain_site')", 
-    array(':nid' => $nid)
-  );
+  $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = :nid AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => $nid));
   foreach ($result as $data) {
     // Transform the 0 to -1, since {domain_access} is unsigned.
     ($data->gid == 0) ? $gid = -1 : $gid = $data->gid;
@@ -1465,13 +1410,16 @@ function domain_get_node_domains($nid) {
  *
  * Informs the node access system what permissions the user has.  By design
  * all users are in the realm defined by the currently active domain_id.
+ *
+ * In Drupal 7, you may modify these grants in your own module, through
+ * the function hook_node_grants_alter().
+ *
+ * @see domain_strict_node_grants_alter()
+ * @link http://api.drupal.org/api/function/hook_node_grants_alter/7
  */
 function domain_node_grants($account, $op) {
   $_domain = domain_get_domain();
   $grants = array();
-
-  // Do we need to use complex rules?
-  $rules = variable_get('domain_access_rules', FALSE);
 
   // By design, all users can see content sent to all affiliates,
   // but the $_domain['site_grant'] can be set to FALSE.
@@ -1485,21 +1433,12 @@ function domain_node_grants($account, $op) {
 
     // Grant based on active domain.
     $grants['domain_id'][] = $_domain['domain_id'];
-    if ($rules) {
-      $grants['domain_id']['group'] = 'domain';
-    }
+
     // In special cases, we grant the ability to view all nodes.  That is,
     // we simply get out of the way of other node_access rules.
     // We do this with the universal 'domain_all' grant.
     if (domain_grant_all()) {
-      // If no other node access modules are present, return our grant.
-      // Otherwise, we just step out of the way.
-      if ($rules) {
-        $grants = array();
-      }
-      else {
-        $grants = array('domain_all' => array(0));
-      }
+      $grants = array('domain_all' => array(0));
     }
   }
   else {
@@ -1519,10 +1458,6 @@ function domain_node_grants($account, $op) {
             else {
               $grants['domain_id'][] = 0;
             }
-            // Advanced rules let us access check unpublished nodes for editing.
-            if ($rules) {
-              $grants['domain_id']['check'] = TRUE;
-            }
           }
         }
       }
@@ -1536,6 +1471,13 @@ function domain_node_grants($account, $op) {
  *
  * Set permissions for a node to be written to the database.  By design
  * if no options are selected, the node is assigned to the main site.
+ *
+ * Developers: if you modify these grants with hook_node_access_records_alter(),
+ * you may also need to call _domain_store_grants() to update the
+ * {domain_access} table properly.
+ *
+ * @see _domain_store_grants
+ * @link http://api.drupal.org/api/function/hook_node_access_records_alter/7
  *
  * @TODO: check unpublished node status handling.
  */
@@ -1617,18 +1559,6 @@ function domain_node_access_records($node) {
     );
   }
 
-  // Let Domain Access module extensions act to override the defaults.
-  static $_modules;
-  if (!isset($_modules)) {
-    $_modules = module_implements('domainrecords');
-  }
-  if (!empty($_modules)) {
-    foreach ($_modules as $module) {
-      // Cannot use module_invoke_all() since these are passed by reference.
-      $function = $module . '_domainrecords';
-      $function($grants, $node);
-    }
-  }
   // Store our records in the {domain_access} table.
   _domain_store_grants($node->nid, $grants);
 
@@ -1795,7 +1725,8 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   }
   
   // Grab the globals we need.
-  global $_domain, $user;
+  global $user;
+  $_domain = domain_get_domain();
 
   // By default, the requesting domain is assigned.
   $default = array($_domain['domain_id']);
@@ -1825,8 +1756,8 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
-  // This lets CCK adjust the weight of our element using domain_content_extra_fields().
-  $weight = module_exists('content') ? content_extra_field_weight($form['type']['#value'], 'domain') : 1;
+  // This lets FieldAPI adjust the weight of our element using domain_field_extra_fields().
+  $weight = module_exists('field_ui') ? field_extra_field_weight('node', $form['type']['#value'], 'domain') : 1;
   // If the user is a site admin, show the form, otherwise pass it silently.
   if (user_access('set domain access')) {
     $form['domain'] = array(
@@ -1962,7 +1893,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
           }
           if (!empty($list)) {
             $form['domain']['domains_notes'] = array(
-             '#value' => '<label><strong>' . t('Publishing status:') . '</strong></label>' . theme('item_list', $list) . '<div class="description">' . t('This content has also been published to these affiliates.') . '</div>',
+             '#markup' => '<label><strong>' . t('Publishing status:') . '</strong></label>' . theme('item_list', array('items' => $list)) . '<div class="description">' . t('This content has also been published to these affiliates.') . '</div>',
             );
           }
           break;
@@ -2214,11 +2145,7 @@ function domain_invalid_domain_requested() {
   }
 
   // Check to see if this is a node page. These are redirected to a visible page, if possible.
-  $item = menu_get_item();
-  $nid = NULL;
-  if ($item['path'] == 'node/%') {
-    $node = node_load(arg(1));
-  }
+  $node = menu_get_object();
   if (empty($node->nid)) {
     $path = $item['href'];
     if (drupal_is_front_page($item['href'])) {
@@ -2566,7 +2493,7 @@ function domain_domainignore() {
  * Implement hook_node_access_explain for devel.module
  */
 function domain_node_access_explain($row) {
-  global $_domain;
+  $_domain = domain_get_domain();
   $active = $_domain['subdomain'];
   $domain = domain_lookup($row->gid);
   $return = t('Domain Access') . ' -- ';
@@ -2603,24 +2530,29 @@ function domain_node_access_acknowledge($grant) {
 }
 
 /**
- * Implement hook_content_extra_fields()
+ * Implement hook_field_extra_fields()
  *
- * CCK hook to allow sorting of the domain settings field.
+ * Field hook to allow sorting of the domain settings field.
  */
-function domain_content_extra_fields($type_name = NULL) {
-  if (!empty($type_name)) {
-    return array(
-      'domain' => array(
-        'label' => t('Domain access'),
-        'description' => t('Domain-specific settings for posts.'),
-        'weight' => 1,
-      ),
-    );
+function domain_field_extra_fields() {
+  $base = array(
+    'domain' => array(
+      'label' => t('Domain access'),
+      'description' => t('Domain Access settings.'),
+      'weight' => 1,
+    ),
+  );
+  // Seriously FieldAPI? I have to do this?!?
+  foreach (node_type_get_names() as $name => $value) {
+    $extra['node'][$name] = $base;
   }
+  return $extra;
 }
 
 /**
  * Implement hook_token_list().
+ *
+ * TODO: http://api.drupal.org/api/function/hook_token_info/7
  */
 function domain_token_list($type = 'all') {
   // Current domain tokens.
@@ -2643,6 +2575,8 @@ function domain_token_list($type = 'all') {
 
 /**
  * Implement hook_token_values().
+ *
+ * TODO: http://api.drupal.org/api/function/hook_tokens/7
  */
 function domain_token_values($type, $object = NULL, $options = array()) {
   global $_domain;
