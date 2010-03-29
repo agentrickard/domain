@@ -4,7 +4,7 @@
 /**
  * @defgroup domain_source Domain Source: editor-defined links.
  *
- * Creates a source domain for linking to content from other domains.
+ * Creates a canonical source domain for linking to content from other domains.
  */
 
 /**
@@ -20,189 +20,209 @@ define('DOMAIN_SOURCE_USE_ACTIVE', -5);
  * Implement hook_form_alter()
  */
 function domain_source_form_alter(&$form, &$form_state, $form_id) {
-  // Apply to all node editing forms, but make sure we are not on the CCK field configuration form.
-  // See http://drupal.org/node/186624.
-  if ($form['#id'] == 'node-form' && !isset($form['#node']->cck_dummy_node_form)) {
-    global $_domain, $user;
-    if (!empty($form['#node']->nid)) {
-      $default_source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $form['#node']->nid));
-    }
-    if (!isset($default_source)) {
-      $default_source = $_domain['domain_id'];
-    }
-    // Prevent invalid domains from being used.
-    $lookup = domain_lookup($default_source);
-    if ($default_source != DOMAIN_SOURCE_USE_ACTIVE && empty($lookup['valid'])) {
-      $default_source = NULL;
-    }
-    $account = $user;
-    domain_get_user_domains($account);
-    // Only uses with 'set domain access' can assign content to all affilaites, so they get a new option.
-    // This option allows domain source to be ignored on a per-node basis.
-    $options = array();
-    if (user_access('set domain access')) {
-      $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
-    }
-    $domains = domain_domains();
-    $show = FALSE;
-    if (user_access('set domain access')) {
-      $show = TRUE;
-      foreach ($domains as $domain) {
-        if ($domain['valid']) {
-          $options[$domain['domain_id']] = $domain['sitename'];
-        }
-      }
-    }
-    // In the case of users with limited permissions, option 3 is the "show options" value.
-    else if (user_access('publish to any assigned domain') && !empty($account->domain_user)) {
-      $show = FALSE;
-      // Get the user's allowed domains.
-      foreach ($domains as $domain) {
-        $key = $domain['domain_id'];
-        if ($domain['domain_id'] == 0) {
-          $key = -1;
-        }
-        if ($domain['valid'] && $user->domain_user[$key] != 0) {
-          $options[$key] = $domain['sitename'];
-        }
-      }
-      // Is this node assigned to a source that the user can control?
-      if (isset($form['#node']->domain_source)) {
-        // Transform the 0 to -1 for lookups.
-        $source = ($form['#node']->domain_source == 0) ? -1 : $form['#node']->domain_source;
-      }
-      else {
-        $source = NULL;
-        $show = TRUE;
-      }
-      if (!is_null($source) && isset($account->domain_user[$source])) {
-        if ($account->domain_user[$source] == $source) {
-          $show = TRUE;
-        }
-        else {
-          $name = ($source != -5) ? $domains[$source]['sitename'] : t('the active domain');
-          $form['domain']['domain_source_notes'] = array(
-            '#value' => '<label><b>'. t('Source domain:') .'</b></label><div class="description">'.
-              t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $name)) .'</div>',
-          );
-        }
-      }
-    }
-    // Determine how to show the form element.
-    if ($show) {
-      $form['domain']['domain_source'] = array(
-        '#type' => 'select',
-        '#title' => t('Source domain'),
-        '#options' => $options,
-        '#default_value' => $default_source,
-        '#description' => t('This affiliate will be used to write links to this content from other affiliates, as needed.')
-      );
-    }
-    // Non-privileged users just have the current domain assigned.
-    else {
-      $form['domain']['domain_source'] = array(
-        '#type' => 'value',
-        '#value' => $default_source,
-      );
-    }
+  // Apply to all node editing forms only.
+  if (empty($form['#node_edit_form'])) {
+    return;
   }
-  // Integration with Domain Content
-  else if ($form_id == 'domain_content_form') {
-    global $_domain;
-    $options = array();
-    $domains = domain_domains();
-    if (user_access('set domain access')) {
-      foreach ($domains as $domain) {
+  global $user;
+  $_domain = domain_get_domain();
+  if (!empty($form['#node']->nid)) {
+    $default_source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $form['#node']->nid))->fetchField();
+  }
+  if (!isset($default_source)) {
+    $default_source = $_domain['domain_id'];
+  }
+  // Prevent invalid domains from being used.
+  $lookup = domain_lookup($default_source);
+  if ($default_source != DOMAIN_SOURCE_USE_ACTIVE && empty($lookup['valid'])) {
+    $default_source = NULL;
+  }
+  $account = $user;
+  domain_get_user_domains($account);
+  // Only uses with 'set domain access' can assign content to all affilaites, so they get a new option.
+  // This option allows domain source to be ignored on a per-node basis.
+  $options = array();
+  if (user_access('set domain access')) {
+    $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
+  }
+  $domains = domain_domains();
+  $show = FALSE;
+  if (user_access('set domain access')) {
+    $show = TRUE;
+    foreach ($domains as $domain) {
+      if ($domain['valid']) {
         $options[$domain['domain_id']] = $domain['sitename'];
       }
-      $form['domain']['domain_source'] = array(
-        '#type' => 'select',
-        '#title' => t('Source domain'),
-        '#options' => $options,
-        '#default_value' => $_domain['domain_id'],
-        '#description' => t('This affiliate will be linked to from other affiliates, as needed.')
-      );
-      $form['#validate'][] = 'domain_source_validate';
-      $form['#submit'][] = 'domain_source_update_nodes';
     }
+  }
+  // In the case of users with limited permissions, option 3 is the "show options" value.
+  else if (user_access('publish to any assigned domain') && !empty($account->domain_user)) {
+    $show = FALSE;
+    // Get the user's allowed domains.
+    foreach ($domains as $domain) {
+      $key = $domain['domain_id'];
+      if ($domain['domain_id'] == 0) {
+        $key = -1;
+      }
+      if ($domain['valid'] && $user->domain_user[$key] != 0) {
+        $options[$key] = $domain['sitename'];
+      }
+    }
+    // Is this node assigned to a source that the user can control?
+    if (isset($form['#node']->domain_source)) {
+      // Transform the 0 to -1 for lookups.
+      $source = ($form['#node']->domain_source == 0) ? -1 : $form['#node']->domain_source;
+    }
+    else {
+      $source = NULL;
+      $show = TRUE;
+    }
+    if (!is_null($source) && isset($account->domain_user[$source])) {
+      if ($account->domain_user[$source] == $source) {
+        $show = TRUE;
+      }
+      else {
+        $name = ($source != -5) ? $domains[$source]['sitename'] : t('the active domain');
+        $form['domain']['domain_source_notes'] = array(
+          '#value' => '<label><strong>' . t('Source domain:') . '</strong></label><div class="description">'.
+            t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $name)) . '</div>',
+        );
+      }
+    }
+  }
+  // Determine how to show the form element.
+  if ($show) {
+    $form['domain']['domain_source'] = array(
+      '#type' => 'select',
+      '#title' => t('Source domain'),
+      '#options' => $options,
+      '#default_value' => $default_source,
+      '#description' => t('This affiliate will be used to write links to this content from other affiliates, as needed.')
+    );
+  }
+  // Non-privileged users just have the current domain assigned.
+  else {
+    $form['domain']['domain_source'] = array(
+      '#type' => 'value',
+      '#value' => $default_source,
+    );
   }
 }
 
 /**
- * Implement hook_nodeapi()
+ * Integrate with Domain Content.
  */
-function domain_source_nodeapi(&$node, $op, $a3, $a4) {
-  global $_domain;
-  switch ($op) {
-    case 'validate':
-      // If not set, we ignore.
-      if (!isset($node->domain_source)) {
-        return;
-      }
-      // Cast the key from zero to -1 to match the data coming from the input.
-      ($node->domain_source == 0) ? $key = -1 : $key = $node->domain_source;
-      // Check the domain and domains_raw variables to set up the allowed source list.
-      $allowed = array();
-      if (!empty($node->domains)) {
-        $allowed = $node->domains;
-      }
-      if (!empty($node->domains_raw)) {
-        $allowed = array_merge($allowed, $node->domains_raw);
-      }
-      if ($node->domain_site && $key == -1) {
-        // This case is acceptable, so we let it pass.
-        // I find this code easier to read than a compound IF statement.
-      }
-      // Here we account for both the 'domains_raw' and 'domains' options.
-      else if ($node->domain_source != DOMAIN_SOURCE_USE_ACTIVE && !in_array($key, $allowed)) {
-        form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
-      }
-      break;
-    case 'insert':
-    case 'update':
-      global $_domain;
-      // If not set, we came from a drupal_execute() or other external call, so use the current domain.
-      if (!isset($node->domain_source)) {
-        $node->domain_source = $_domain['domain_id'];
-      }
-      // Prevent invalid domains from being used.
-      $lookup = domain_lookup($node->domain_source);
-      if ($node->domain_source != DOMAIN_SOURCE_USE_ACTIVE && empty($lookup['valid'])) {
-        $node->domain_source = NULL;
-      }
-      db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);
-      if (!is_null($node->domain_source)) {
-        db_query("INSERT INTO {domain_source} (nid, domain_id) VALUES (%d, %d)", $node->nid, $node->domain_source);
-      }
-      break;
-    case 'delete':
-      db_query("DELETE FROM {domain_source} WHERE nid = %d", $node->nid);
-      break;
-    case 'load':
-      if ($node->nid) {
-        $source = domain_source_lookup($node->nid, $node->domains, $node->domain_site);
-        $node->domain_source = $source['domain_id'];
-      }
-      break;
-    case 'view':
-      // Search module casts both $a3 and $a4 as FALSE, not NULL.
-      // We check that to hide this data from search and other nodeapi
-      // calls that are neither a teaser nor a page view.
-      if ($a3 !== FALSE || $a4 !== FALSE) {
-        if (variable_get('domain_debug', 0) && user_access('set domain access') && isset($node->domain_source)) {
-          $source = domain_get_node_match($node->nid);
-          $extra = ' ';
-          $use_active = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
-          if ($use_active === FALSE) {
-            $extra .= t('(determined automatically)');
-          }
-          else if ($use_active == DOMAIN_SOURCE_USE_ACTIVE) {
-            $extra .= t('(using active domain)');
-          }
-          $node->content['domain_source'] = array('#value' => '<p>'. t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . $extra .'</p>', '#weight' => 25);
-        }
-      }
-      break;
+function domain_source_form_domain_content_form_alter(&$form, &$form_state) {
+  $_domain = domain_get_domain();
+  $options = array();
+  $domains = domain_domains();
+  if (user_access('set domain access')) {
+    foreach ($domains as $domain) {
+      $options[$domain['domain_id']] = $domain['sitename'];
+    }
+    $form['domain']['domain_source'] = array(
+      '#type' => 'select',
+      '#title' => t('Source domain'),
+      '#options' => $options,
+      '#default_value' => $_domain['domain_id'],
+      '#description' => t('This affiliate will be linked to from other affiliates, as needed.')
+    );
+    $form['#validate'][] = 'domain_source_validate';
+    $form['#submit'][] = 'domain_source_update_nodes';
+  }
+}
+
+/**
+ * Implements hook_node_validate().
+ */
+function domain_source_node_validate($node, $form) {
+  // If not set, we ignore.
+  if (!isset($node->domain_source)) {
+    return;
+  }
+  // Cast the key from zero to -1 to match the data coming from the input.
+  ($node->domain_source == 0) ? $key = -1 : $key = $node->domain_source;
+  // Check the domain and domains_raw variables to set up the allowed source list.
+  $allowed = array();
+  if (!empty($node->domains)) {
+    $allowed = $node->domains;
+  }
+  if (!empty($node->domains_raw)) {
+    $allowed = array_merge($allowed, $node->domains_raw);
+  }
+  if ($node->domain_site && $key == -1) {
+    // This case is acceptable, so we let it pass.
+    // I find this code easier to read than a compound IF statement.
+  }
+  // Here we account for both the 'domains_raw' and 'domains' options.
+  else if ($node->domain_source != DOMAIN_SOURCE_USE_ACTIVE && !in_array($key, $allowed)) {
+    form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
+  }
+}
+
+/**
+ * Implements hook_node_load().
+ */
+function domain_source_node_load($nodes, $types) { 
+  foreach ($nodes as $node) {
+    // Cannot load if the node has not been created yet.
+    if (!isset($node->nid)) {
+      continue;
+    }
+    $source = domain_source_lookup($node->nid, $node->domains, $node->domain_site);
+    $nodes[$node->nid]->domain_source = $source['domain_id'];
+  }
+}
+
+/**
+ * Implements hook_node_insert()
+ */
+function domain_source_node_insert($node) {
+  db_insert('domain_source')
+    ->fields(array(
+      'nid' => $node->nid,
+      'domain_id' => $node->domain_source,
+    ))
+    ->execute();
+}
+
+/**
+ * Implements hook_node_update()
+ */
+function domain_source_node_update($node) {
+  domain_source_node_delete($node);
+  domain_source_node_insert($node);
+}
+
+/**
+ * Implements hook_node_delete()
+ */
+function domain_source_node_delete($node) {
+  db_delete('domain_source')
+    ->condition('nid', $node->nid)
+    ->execute();
+}
+
+/**
+ * Implements hook_node_view()
+ *
+ * Display debugging information for a node.
+ */
+function domain_source_node_view($node, $view_mode) {
+  if (empty($node->nid) || !in_array($view_mode, array('full', 'teaser'))) {
+    return;
+  }
+  if (variable_get('domain_debug', 0) && user_access('set domain access') && isset($node->domain_source)) {
+    $source = domain_get_node_match($node->nid);
+    $extra = ' ';
+    $use_active = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $node->nid))->fetchField();
+    if ($use_active === FALSE) {
+      $extra .= t('(determined automatically)');
+    }
+    else if ($use_active == DOMAIN_SOURCE_USE_ACTIVE) {
+      $extra .= t('(using active domain)');
+    }
+    $node->content['domain_source'] = array('#markup' => '<p>' . t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . $extra . '</p>', '#weight' => 25);
   }
 }
 
@@ -219,7 +239,7 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
 function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
   global $_domain;
 
-  $source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $nid));
+  $source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $nid))->fetchField();
 
   if ($source === FALSE) {
     $source = variable_get('domain_default_source', 0);
@@ -246,7 +266,7 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
 }
 
 /**
- * Implement hook_domain_source_node_alter().
+ * Implement hook_domain_source_alter().
  *
  * @param &$source
  *   The domain array from domain_get_node_match(), passed by reference.
@@ -270,8 +290,15 @@ function domain_source_update_nodes($form, &$form_state) {
     $source = $form_state['values']['domain_source'];
     foreach ($form_state['values']['nodes'] as $key => $value) {
       if ($key == $value) {
-        db_query("DELETE FROM {domain_source} WHERE nid = %d", $key);
-        db_query("INSERT INTO {domain_source} (nid, domain_id) VALUES (%d, %d)", $key, $source);
+        db_delete('domain_source')
+          ->condition('nid', $key)
+          ->execute();
+        db_insert('domain_source')
+          ->fields(array(
+            'nid' => $key,
+            'domain_id' => $source,
+          ))
+          ->execute();
       }
     }
   }
@@ -302,15 +329,18 @@ function domain_source_validate($form, &$form_state) {
  */
 function domain_source_domainupdate($op, $domain, $form_state = array()) {
   if ($op == 'delete' && $domain['domain_id'] > 0) {
-    db_query("DELETE FROM {domain_source} WHERE domain_id = %d", $domain['domain_id']);
+    db_delete('domain_source')
+      ->condition('domain_id', $domain['domain_id'])
+      ->execute();
   }
 }
 
 /**
  * Implement hook_views_api().
- */
+
 function domain_source_views_api() {
   if (module_exists('domain_views')) {
     return array('api' => 2.0);
   }
 }
+ */

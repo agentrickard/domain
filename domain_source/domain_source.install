@@ -7,28 +7,19 @@
  */
 
 /**
- * Implement hook_install()
- */
-function domain_source_install() {
-  drupal_install_schema('domain_source');
-}
-
-/**
  * Implement hook_schema()
  */
 function domain_source_schema() {
   $schema['domain_source'] = array(
+    'description' => 'Stores the canonical domain for each node.',
     'fields' => array(
       'nid' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
       'domain_id' => array('type' => 'int', 'not null' => TRUE, 'default' => 0)),
     'primary key' => array('nid'),
+    'foreign_keys' => array(
+      'nid' => array('node' => 'nid'),
+      'domain_id' => array('domain' => 'domain_id'),
+    ),
   );
   return $schema;
-}
-
-/**
- * Implement hook_uninstall()
- */
-function domain_source_uninstall() {
-  drupal_uninstall_schema('domain_source');
 }
