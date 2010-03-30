@@ -22,27 +22,26 @@ function domain_conf_domain_bootstrap_full($domain) {
   // from the primary domain, which need to be loaded from cache.
   // @link http://drupal.org/node/412156
   if ($check) {
-    global $_domain;
+    $_domain = domain_get_domain();
     if ($domain['domain_id'] == 0 && $check != $_domain['domain_id']) {
       _domain_conf_load_primary(TRUE);
     }
   }
   // Flag that we have already loaded.
   $check = $domain['domain_id'];
-  $data = array();
-  $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+  $data = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {
     global $conf;
-    $settings = domain_unserialize($data['settings']);
+    $settings = domain_unserialize($data);
     // Overwrite the $conf variables.
     foreach ($settings as $key => $value) {
       // Language handling is a special case.
       if ($key == 'language_default') {
         $table = domain_get_primary_table('system');
-        $language = (bool) db_result(db_query("SELECT status FROM $table WHERE name = 'locale' AND type = 'module'"));
+        $language = (bool) db_query("SELECT status FROM $table WHERE name = 'locale' AND type = 'module'")->fetchField();
         if ($language) {
           $table = domain_get_primary_table('languages');
-          $temp = db_fetch_object(db_query("SELECT * FROM $table WHERE language = '%s'", $value));
+          $temp = db_query("SELECT * FROM $table WHERE language = :language", array(':language' => $value))->fetchObject();
           if (!empty($temp)) {
             $value = $temp;
             $GLOBALS['language'] = $temp;
@@ -76,7 +75,7 @@ function domain_conf_init() {
  */
 function domain_conf_menu() {
   $items = array();
-  $items['admin/build/domain/conf/%domain'] = array(
+  $items['admin/config/domain/conf/%domain'] = array(
     'title' => 'Domain site settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -84,7 +83,7 @@ function domain_conf_menu() {
     'page arguments' => array(4),
     'file' => 'domain_conf.admin.inc',
   );
-  $items['admin/build/domain/conf-reset/%domain'] = array(
+  $items['admin/config/domain/conf-reset/%domain'] = array(
     'title' => 'Domain site settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -101,27 +100,10 @@ function domain_conf_menu() {
 function domain_conf_theme() {
   $themes = array(
     'domain_conf_reset' => array(
-      'arguments' => array('domain' => array()),
+      'variables' => array('domain' => array()),
     ),
   );
   return $themes;
-}
-
-/**
- * Implement hook_enable().
- *
- * Register domain_conf with the domain module so it's loaded during domain
- * bootstrap and can implement domain_bootstrap hooks.
- */
-function domain_conf_enable() {
-  domain_bootstrap_register();
-}
-
-/**
- * Implement hook_disable().
- */
-function domain_conf_disable() {
-  domain_bootstrap_unregister('domain_conf');
 }
 
 /**
@@ -135,7 +117,7 @@ function domain_conf_domainlinks($domain) {
   if ($domain['domain_id'] > 0 || !empty($extra)) {
     $links[] = array(
       'title' => t('settings'),
-      'path' => 'admin/build/domain/conf/'. $domain['domain_id']
+      'path' => 'admin/config/domain/conf/'. $domain['domain_id']
     );
     return $links;
   }
@@ -158,7 +140,7 @@ function domain_conf_domainwarnings() {
   );
   $return = array();
   foreach ($forms as $form) {
-    $return[$form] = 'admin/build/domain/conf/%domain_id';
+    $return[$form] = 'admin/config/domain/conf/%domain_id';
   }
   return $return;
 }
@@ -237,24 +219,6 @@ function domain_conf_domainbatch() {
     '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
-  // Change the site footer.
-  $batch['site_footer'] = array(
-    '#form' => array(
-      '#title' => t('Site footer'),
-      '#type' => 'textarea',
-      '#cols' => 30,
-      '#rows' => 5,
-      '#description' => t('This text will be displayed at the bottom of each page for this domain.'),
-    ),
-    '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('site_footer', ''),
-    '#variable' => 'site_footer',
-    '#meta_description' => t('Set the site footer for all domains.'),
-    '#data_type' => 'string',
-    '#weight' => -8,
-    '#update_all' => TRUE,
-    '#group' => t('Site configuration'),
-  );
   // Change the site frontpage.
   $batch['site_frontpage'] = array(
     '#form' => array(
@@ -315,7 +279,7 @@ function domain_conf_domainbatch() {
     '#group' => t('Administrative theme'),
   );
   // Change the timezone.
-  $zones = _system_zonelist();
+  $zones = system_time_zones();
   $batch['date_default_timezone'] = array(
     '#form' => array(
       '#title' => t('Timezone default'),
@@ -446,35 +410,19 @@ function domain_conf_domainbatch() {
   // Change the menus
   if (module_exists('menu')) {
     $menus = menu_get_menus();
-    $batch['menu_default_node_menu'] = array(
-      '#form' => array(
-        '#title' => t('Default menu for content'),
-        '#type' => 'select',
-        '#options' => $menus,
-        '#description' => t('Choose the menu to be the default in the menu options in the content authoring form.'),
-      ),
-      '#domain_action' => 'domain_conf',
-      '#system_default' => variable_get('menu_default_node_menu', 0),
-      '#variable' => 'menu_default_node_menu',
-      '#meta_description' => t('Set the default menu options for the content authoring form in all domains.'),
-      '#data_type' => 'string',
-      '#weight' => 0,
-      '#update_all' => TRUE,
-      '#group' => t('Menu settings'),
-      '#module' => t('Menu'),
-    );
     $menus[0] = t('Do not use for this site');
-    $batch['menu_primary_links_source'] = array(
+    $main = variable_get('menu_main_links_source', 'main-menu');
+    $batch['menu_main_links_source'] = array(
       '#form' => array(
-        '#title' => t('Primary links menu'),
+        '#title' => t('Source for the Main links'),
         '#type' => 'select',
         '#options' => $menus,
-        '#description' => t('Select the primary links for this site.'),
+        '#description' => t('Select what should be displayed as the Main links (typically at the top of the page).'),
       ),
       '#domain_action' => 'domain_conf',
-      '#system_default' => variable_get('menu_primary_links_source', 0),
+      '#system_default' => $main,
       '#variable' => 'menu_primary_links_source',
-      '#meta_description' => t('Set the primary links menu in all domains.'),
+      '#meta_description' => t('Select what should be displayed as the Main links (typically at the top of the page).'),
       '#data_type' => 'string',
       '#weight' => 2,
       '#update_all' => TRUE,
@@ -483,10 +431,10 @@ function domain_conf_domainbatch() {
     );
     $batch['menu_secondary_links_source'] = array(
       '#form' => array(
-        '#title' => t('Secondary links menu'),
+        '#title' => t('Source for the Secondary links'),
         '#type' => 'select',
         '#options' => $menus,
-        '#description' => t('Select the secondary links for this site.'),
+        '#description' => t("Select the source for the Secondary links. An advanced option allows you to use the same source for both Main links (currently %main) and Secondary links: if your source menu has two levels of hierarchy, the top level menu links will appear in the Main links, and the children of the active link will appear in the Secondary links." , array('%main' => $menus[$main])),
       ),
       '#domain_action' => 'domain_conf',
       '#system_default' => variable_get('menu_secondary_links_source', 0),
@@ -513,8 +461,10 @@ function domain_conf_domainbatch() {
  */
 function domain_conf_domainupdate($op, $domain, $form_state = array()) {
   if ($op == 'delete') {
-    db_query("DELETE FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']);
-    cache_clear_all('variables', 'cache');
+    db_delete('domain_conf')
+      ->condition('domain_id', $domain['domain_id'])
+      ->execute();
+    cache_clear_all('variables', 'cache_bootstrap');
   }
 }
 

@@ -7,28 +7,18 @@
  */
 
 /**
- * Implement hook_install()
- */
-function domain_conf_install() {
-  drupal_install_schema('domain_conf');
-}
-
-/**
  * Implement hook_schema()
  */
 function domain_conf_schema() {
   $schema['domain_conf'] = array(
+    'description' => 'Stores custom settings for each domain.',
     'fields' => array(
       'domain_id' => array('type' => 'int', 'not null' => TRUE, 'default' => 0),
       'settings' => array('type' => 'blob', 'not null' => FALSE)),
     'primary key' => array('domain_id'),
+    'foreign_keys' => array(
+      'domain_id' => array('domain' => 'domain_id'),
+    ),
   );
   return $schema;
-}
-
-/**
- * Implement hook_uninstall()
- */
-function domain_conf_uninstall() {
-  drupal_uninstall_schema('domain_conf');
 }

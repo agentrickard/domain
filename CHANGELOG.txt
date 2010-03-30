@@ -2,6 +2,7 @@
 
 30-MAR-2010
 -- #752570 by brucepearson. Reset domain node lookup static on node save.
+-- Ports Domain Conf. Needs more updating.
 
 29-MAR-2010
 -- Upgrades Domain Source.

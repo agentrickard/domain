@@ -21,15 +21,20 @@ function domain_conf_page($domain) {
   if ($domain == -1) {
     return t('Invalid page requested.');
   }
+  $output = theme('domain_conf_reset', array('domain' => $domain));
 
-  $output = theme('domain_conf_reset', $domain);
   if ($domain['domain_id'] > 0) {
     drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
-    return $output . drupal_get_form('domain_conf_form', $domain);
+    $form = drupal_get_form('domain_conf_form', $domain);
   }
   else if ($domain['domain_id'] == 0) {
-    return $output . drupal_get_form('domain_conf_default', $domain);
+    $form = drupal_get_form('domain_conf_default', $domain);
   }
+  $form['intro'] = array(
+    '#weight' => -5,
+    '#markup' => $output,
+  );
+  return $form;
 }
 
 /**
@@ -41,15 +46,14 @@ function domain_conf_page($domain) {
  * @param $domain
  *   The domain currently being updated.
  */
-function domain_conf_form($form_state, $domain) {
+function domain_conf_form($form, $form_state, $domain) {
   $form = array();
   $batch = module_invoke_all('domainbatch');
   $settings = array();
-  $data = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+  $data = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {
     $settings = domain_unserialize($data);
   }
-
   $default_group = t('Site configuration');
   foreach ($batch as $key => $action) {
     if ($action['#domain_action'] != 'domain_conf') {
@@ -160,15 +164,20 @@ function domain_conf_form_submit($form, &$form_state) {
     $settings[$key] = $value;
   }
   // INSERT or UPDATE?
-  $check = 0;
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = %d", $form_state['values']['domain_id']));
+  $check = (bool) db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $form_state['values']['domain_id']))->fetchField();
   if ($check > 0) {
-    $sql = "UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d";
-    db_query($sql, serialize($settings), $form_state['values']['domain_id']);
+    db_update('domain_conf')
+      ->fields(array('settings' => serialize($settings)))
+      ->condition('domain_id', $form_state['values']['domain_id'])
+      ->execute();
   }
   else {
-    $sql = "INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)";
-    db_query($sql, $form_state['values']['domain_id'], serialize($settings));
+    db_insert('domain_conf')
+      ->fields(array(
+        'domain_id' => $form_state['values']['domain_id'],
+        'settings' => serialize($settings)
+      ))
+      ->execute();
   }
   drupal_set_message(t('Domain options saved successfully.'));
   // Clear the cache.
@@ -200,9 +209,9 @@ function domain_conf_reset($domain) {
  *   Themed HTML form.
  */
 
-function domain_conf_reset_form($form_state, $domain) {
+function domain_conf_reset_form($form, $form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $form = confirm_form($extra, t('Are you sure you wish to reset the settings for %name?', array('%name' => $domain['sitename'])), 'admin/build/domain/conf/'. $domain['domain_id'], t('Submitting this form will restore default settings for this domain.'));
+  $form = confirm_form($extra, t('Are you sure you wish to reset the settings for %name?', array('%name' => $domain['sitename'])), 'admin/config/domain/conf/'. $domain['domain_id'], t('Submitting this form will restore default settings for this domain.'));
   return $form;
 }
 
@@ -210,9 +219,11 @@ function domain_conf_reset_form($form_state, $domain) {
  * FormsAPI for domain_conf_reset_form().
  */
 function domain_conf_reset_form_submit($form, &$form_state) {
-  db_query("DELETE FROM {domain_conf} WHERE domain_id = %d", $form_state['values']['domain_id']);
+  db_delete('domain_conf')
+    ->condition('domain_id', $form_state['values']['domain_id'])
+    ->execute();
   drupal_set_message(t('Domain configuration settings have been reset.'));
-  $form_state['redirect'] = 'admin/build/domain/conf/'. $form_state['values']['domain_id'];
+  $form_state['redirect'] = 'admin/config/domain/conf/'. $form_state['values']['domain_id'];
   // Clear the cache.
   cache_clear_all();
 }
@@ -225,12 +236,13 @@ function domain_conf_reset_form_submit($form, &$form_state) {
  * @return
  *   Themed HTML messages.
  */
-function theme_domain_conf_reset($domain) {
+function theme_domain_conf_reset($variables) {
+  $domain = $variables['domain'];
   $output = '';
   $output .= '<p>'. t('These settings will replace or supplement your default site settings when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
-  $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+  $data = db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {
-    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/build/domain/conf-reset/'. $domain['domain_id']))) .'</p>';
+    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/config/domain/conf-reset/'. $domain['domain_id']))) .'</p>';
   }
   return $output;
 }
