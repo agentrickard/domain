@@ -1,5 +1,8 @@
 // $Id$
 
+30-MAR-2010
+-- #752570 by brucepearson. Reset domain node lookup static on node save.
+
 29-MAR-2010
 -- Upgrades Domain Source.
 -- Rolls 7.x.2.0-alpha2.
