@@ -1,5 +1,9 @@
 // $Id$
 
+30-MAR-2010
+
+-- #752570 by brucepearson. Reset domain node lookup static on node save.
+
 18-MAR-2010
 
 -- Patch #744522 by hefox. Pass domain_all to the alter hook.
