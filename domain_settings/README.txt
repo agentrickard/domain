@@ -13,6 +13,7 @@ CONTENTS
 
 1.  Introduction
 1.1   Use-Case
+1.2   Form Options
 2.  Installation
 2.1   Dependencies
 2.2   Permissions
@@ -47,9 +48,18 @@ maintainer, and out of scope for the Domain Access project.
 Domain Settings makes it so that any form that uses system_settings_form() can
 be told to submit changes to a specific domain. For example, if you want to
 change the Site Information for one of your affiliates you can go to
-/admin/settings/site-information from any of the affiliates, enter the
+/admin/config/site-information from any of the affiliates, enter the
 desired information, select the appropriate affiliate from the 'Domain-specific
 settings' section and save the setting for that affiliate.
+
+----
+1.2 Form Options
+
+When saving a system setting, you will be given the option to save the
+value to a specific domain or to all domains.
+
+Simply select the domain the setting should apply to. If you are unsure,
+using 'all domains' will reset all values to those set by the form submission.
 
 ----
 2.  Installation
@@ -78,15 +88,15 @@ domain, regardless of the active domain.
 2.3   Exceptions
 
 This module only works with forms that do not modify the handling of
-system_settings_form. As a result certain core forms (e.g., forums, and
-date/time) cannot be made domain-specific.
+system_settings_form. As a result certain core forms (e.g., forums)
+cannot be made domain-specific.
 
 ----
 3.   Configuration Options
 
 When active, the Domain Settings module provides a 'Domain-specific settings'
 section in the settings tab of the Domain Access settings page (found at path
-'admin/build/domain/settings'). In this section you can configure the following
+'admin/config/domain/settings'). In this section you can configure the following
 behaviors.
 
 ----
@@ -97,6 +107,21 @@ settings can be set to either the primary domain or the active domain.
 
 This setting can be very helpful in preventing accidental misconfiguration of
 your sites.
+
+There are three options:
+
+  -- Use the default domain
+  Mimics the behavior of Drupal core and only saves the variable to the
+  primary domain of your site.
+  
+  -- Use the active domain
+  Defaults the form to store values for the current domain.
+  
+  -- All domains
+  Defaults the form to submit the values to the primary domain and to erase
+  custom values set for other domains. This option is included if you want
+  this default behavior, but if this is what you selected, you should probably
+  disable the entiure module.
 
 ----
 3.2   Disallowed Forms

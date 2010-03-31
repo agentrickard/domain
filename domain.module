@@ -1948,6 +1948,10 @@ function domain_form_system_site_information_settings_alter(&$form, &$form_state
  * FormsAPI submit handler to track site name changes.
  */
 function domain_form_sitename_submit($form, &$form_state) {
+  // When using Domain Settings, we cannot save this value.
+  if (isset($form['domain_settings'])) {
+    return;
+  }
   db_update('domain')
     ->condition('domain_id', 0)
     ->fields(array(

@@ -3,6 +3,8 @@
 31-MAR-2010
 -- Domain Conf ready for testing.
 -- Rolls 7.x.2.0-alpha3.
+-- Domain Settings ready for testing.
+-- Rolls 7.x.2.0-alpha4.
 
 30-MAR-2010
 -- #752570 by brucepearson. Reset domain node lookup static on node save.

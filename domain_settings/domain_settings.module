@@ -18,8 +18,13 @@
 /**
  * Implement hook_perm().
  */
-function domain_settings_perm() {
-  return array('access domain settings form');
+function domain_settings_permission() {
+  $permissions = array(
+    'access domain settings form' => array(
+      'title' => t('Access domain settings form'),
+    ),
+  );
+  return $permissions;
 }
 
 /**
@@ -32,7 +37,7 @@ function domain_settings_perm() {
  * administrator's denied list.
  */
 function domain_settings_form_alter(&$form, $form_state, $form_id) {
-  global $_domain;
+  $_domain = domain_get_domain();
 
   // Remove settings that cannot be used reliably.
   $disallow = domain_settings_disallow();
@@ -47,7 +52,7 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
   $form['buttons']['#weight'] = $weight + 2;
   $domain_weight = $weight + 1;
   $form['#submit'][] = 'domain_settings_form_submit';
-  $options = array();
+  $options = array(-5 => t('All domains'));
   // Get the display format of the form element.
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
@@ -66,16 +71,21 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
     '#collapsed' => FALSE,
     '#weight' => $domain_weight,
   );
+  // Set the proper default.
+  $behavior = variable_get('domain_settings_behavior', 0);
   $default = $_domain['domain_id'];
-  if (!variable_get('domain_settings_behavior', 0) || $default == 0) {
-    $default = -1;
+  if ($behavior  == 1) {
+    $default = $_domain['domain_id'];
+  }
+  if ($behavior  == 2) {
+    $default = -5;
   }
   $form['domain_settings']['domain_id'] = array(
     '#type' => empty($format) ? 'radios' : 'select',
     '#title' => t('Save settings for'),
     '#options' => $options,
     '#required' => TRUE,
-    '#description' => t('Select the domain to which these settings apply.'),
+    '#description' => t('Select the domain to which these settings apply. If you select <em>All domains</em>, domain-specific settings will be removed.'),
     '#default_value' => $default,
   );
   if ($format) {
@@ -94,10 +104,6 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
  */
 function domain_settings_form_submit($form, &$form_state) {
   $domain_id = $form_state['values']['domain_id'];
-  $reset = FALSE;
-  if ($form_state['values']['op'] == $form_state['values']['reset']) {
-    $reset = TRUE;
-  }
   $values = array();
   foreach ($form_state['values'] as $key => $value) {
     if (!in_array($key, array('op', 'submit', 'reset', 'form_build_id', 'form_token', 'form_id', 'domain_id'))) {
@@ -106,21 +112,23 @@ function domain_settings_form_submit($form, &$form_state) {
   }
   // -1 is the primary domain.
   foreach ($values as $name => $value) {
-    if ($domain_id == -1) {
-      if ($reset) {
-        variable_del($name);
+    if ($domain_id == -1 || $domain_id == -5) {
+      variable_set($name, $value);
+      // Update the site name of the primary domain, if needed.
+      if ($name == 'site_name') {
+        db_update('domain')
+          ->condition('domain_id', 0)
+          ->fields(array(
+            'sitename' => $form_state['values']['site_name'],
+          ))
+          ->execute();
       }
-      else {
-        variable_set($name, $value);
+      if ($domain_id == -5) {
+        domain_conf_variable_delete($domain_id, $name);
       }
     }
     else {
-      if ($reset) {
-        domain_conf_variable_delete($domain_id, $name);
-      }
-      else {
-        domain_conf_variable_save($domain_id, $name, $value);
-      }
+      domain_conf_variable_save($domain_id, $name, $value);
     }
   }
   module_invoke_all('domain_settings', $domain_id, $values);
@@ -141,7 +149,7 @@ function domain_settings_domainform(&$form) {
   $form['domain_settings_module']['domain_settings_behavior'] = array(
     '#type' => 'radios',
     '#title' => t('Domain settings behavior'),
-    '#options' => array(0 => t('Use the default domain'), 1 => t('Use the active domain')),
+    '#options' => array(0 => t('Use the default domain'), 1 => t('Use the active domain'), 2 => t('All domains')),
     '#default_value' => variable_get('domain_settings_behavior', 0),
     '#description' => t('Default form value when submitting system settings.')
   );
