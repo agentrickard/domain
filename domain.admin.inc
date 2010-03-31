@@ -812,7 +812,7 @@ function domain_batch_form($form, &$form_state, $action, $batch, $domains) {
         $default[$domain['domain_id']] = $batch['#system_default'];
       }
       // Check for domain-specific settings.
-      $result = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain['domain_id']));
+      $result = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
       $settings = domain_unserialize($result);
       if (isset($settings[$action])) {
         $default[$domain['domain_id']] = $settings[$action];
@@ -932,7 +932,7 @@ function domain_batch_form_submit($form, &$form_state) {
     case 'domain_conf':
       foreach ($form_state['values']['domain_batch'] as $domain_id => $value) {
         $settings = array();
-        if ($key > 0 || empty($form_state['values']['variable'])) {
+        if ($domain_id > 0 || empty($form_state['values']['variable'])) {
           domain_conf_variable_save($domain_id, $item, $value); 
         }
         elseif (!empty($form_state['values']['variable'])) {

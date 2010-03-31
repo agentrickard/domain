@@ -22,3 +22,22 @@ function domain_conf_schema() {
   );
   return $schema;
 }
+
+/**
+ * UPDATE FUNCTION
+ *
+ * Some variable names changed in Drupal 7.
+ */
+
+/**
+ * Return an array of variable changes.
+ */
+function domain_conf_d7_variable_changes() {
+  $removed = array(
+    'menu_default_node_menu',
+  );
+  $renamed = array(
+    'menu_primary_links_source' => 'menu_main_links_source',
+  );
+  return array('removed' => $removed, 'renamed' => $renamed);
+}
