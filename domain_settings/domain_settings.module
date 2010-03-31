@@ -116,6 +116,7 @@ function domain_settings_form_submit($form, &$form_state) {
       variable_set($name, $value);
       // Update the site name of the primary domain, if needed.
       if ($name == 'site_name') {
+        variable_set('domain_sitename', $value);
         db_update('domain')
           ->condition('domain_id', 0)
           ->fields(array(
