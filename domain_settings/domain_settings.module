@@ -73,7 +73,7 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
   );
   // Set the proper default.
   $behavior = variable_get('domain_settings_behavior', 0);
-  $default = $_domain['domain_id'];
+  $default = -1;
   if ($behavior == 1) {
     $default = ($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id'];
   }
