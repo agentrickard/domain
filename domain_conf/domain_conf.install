@@ -24,20 +24,70 @@ function domain_conf_schema() {
 }
 
 /**
- * UPDATE FUNCTION
- *
- * Some variable names changed in Drupal 7.
+ * Update block deltas to Drupal 7.
  */
+function domain_conf_update_7000() {
+  // Get an array of the renamed block deltas, organized by module.
+  $renamed_deltas = array(
+    'domain' => array(
+      'domain-primary-links' => 'domain-main-links',
+    ),
+  );
+  update_fix_d7_block_deltas($sandbox, $renamed_deltas);
+  return t('Domain Conf blocks updated.');
+}
 
 /**
- * Return an array of variable changes.
+ * Some variable names changed in Drupal 7.
+ */
+function domain_conf_update_7001() {
+  $changes = domain_conf_d7_variable_changes();
+  $domains = domain_domains();
+  $result = db_query("SELECT domain_id, settings FROM {domain_conf}");
+  foreach ($result as $object) {
+    if (!isset($domains[$object->domain_id])) {
+      // Remove cruft from the table.
+      db_delete('domain_conf')
+        ->condition('domain_id', $object->domain_id)
+        ->execute();
+    }
+    else {
+      // Update the record with the new variables.
+      $settings = domain_unserialize($object->settings);
+      foreach ($changes['removed'] as $key) {
+        if (isset($settings[$key])) {
+          unset($settings[$key]);
+        }
+      }
+      foreach ($changes['renamed'] as $key => $value) {
+        if (isset($settings[$key])) {
+          $settings[$value] = $settings[$key];
+          unset($settings[$key]);
+        }
+      }
+      db_update('domain_conf')
+        ->fields(array('settings' => serialize($settings)))
+        ->condition('domain_id', $object->domain_id)
+        ->execute();
+    }
+  }
+  return t('Domain Conf variables updated.');
+}
+
+/**
+ * Return an array of variable changes from Drupal 6 to 7.
  */
 function domain_conf_d7_variable_changes() {
   $removed = array(
     'menu_default_node_menu',
+    'site_mission',
+    'site_footer',
+    'page_compression',
   );
   $renamed = array(
     'menu_primary_links_source' => 'menu_main_links_source',
+    'site_offline' => 'maintenance_mode',
+    'site_offline_message' => 'maintenance_mode_message',
   );
   return array('removed' => $removed, 'renamed' => $renamed);
 }

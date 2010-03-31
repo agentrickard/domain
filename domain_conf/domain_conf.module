@@ -63,7 +63,7 @@ function domain_conf_init() {
   // Allow sites to add implementations of hook_domainconf() without hacking.
   // See http://drupal.org/node/236877.
   if (arg(0) == 'admin') {
-    $extra = drupal_get_path('module', 'domain_conf') .'/domain_conf.inc';
+    $extra = drupal_get_path('module', 'domain_conf') . '/domain_conf.inc';
     if (file_exists($extra)) {
       include $extra;
     }
@@ -117,7 +117,7 @@ function domain_conf_domainlinks($domain) {
   if ($domain['domain_id'] > 0 || !empty($extra)) {
     $links[] = array(
       'title' => t('settings'),
-      'path' => 'admin/config/domain/conf/'. $domain['domain_id']
+      'path' => 'admin/config/domain/conf/' . $domain['domain_id']
     );
     return $links;
   }
@@ -131,10 +131,10 @@ function domain_conf_domainwarnings() {
   // These are the forms for variables set by Domain Conf.
   $forms = array(
     'system_admin_theme_settings',
-    'system_date_time_settings',
     'system_performance_settings',
+    'system_regional_settings',
     'system_site_information_settings',
-    'system_site_maintenance_settings',
+    'system_site_maintenance_mode',
     'locale_languages_overview_form',
     'menu_configure',
   );
@@ -196,24 +196,6 @@ function domain_conf_domainbatch() {
     '#system_default' => variable_get('site_slogan', ''),
     '#variable' => 'site_slogan',
     '#meta_description' => t('Set the site slogan for all domains.'),
-    '#data_type' => 'string',
-    '#weight' => -8,
-    '#update_all' => TRUE,
-    '#group' => t('Site configuration'),
-  );
-  // Change the site slogan.
-  $batch['site_mission'] = array(
-    '#form' => array(
-      '#title' => t('Site mission'),
-      '#type' => 'textarea',
-      '#cols' => 30,
-      '#rows' => 5,
-      '#description' => t('The mission statement or focus for this domain.'),
-    ),
-    '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('site_mission', ''),
-    '#variable' => 'site_mission',
-    '#meta_description' => t('Set the site mission for all domains.'),
     '#data_type' => 'string',
     '#weight' => -8,
     '#update_all' => TRUE,
@@ -300,9 +282,9 @@ function domain_conf_domainbatch() {
   $batch['cache'] = array(
     '#form' => array(
       '#type' => 'radios',
-      '#title' => t('Caching mode'),
-      '#options' => array(CACHE_DISABLED => t('Disabled'), CACHE_NORMAL => t('Normal (recommended for production sites, no side effects)')),
-      '#description' => t('Enabling the page cache will offer a significant performance boost. Drupal can store and send compressed cached pages requested by <em>anonymous</em> users. By caching a web page, Drupal does not have to construct the page each time it is viewed.') .'<em> '. t('Aggressive mode caching is not supported when using Domain Access.') .'</em>',
+      '#title' => t('Page cache for anonymous users'),
+      '#default_value' => variable_get('cache', CACHE_DISABLED),
+      '#options' => array(CACHE_DISABLED => t('Disabled'), CACHE_NORMAL => t('Normal (recommended)')),
     ),
     '#domain_action' => 'domain_conf',
     '#system_default' => variable_get('cache', CACHE_DISABLED),
@@ -315,13 +297,14 @@ function domain_conf_domainbatch() {
   );
   // Change the cache lifetime.
   $period = drupal_map_assoc(array(0, 60, 180, 300, 600, 900, 1800, 2700, 3600, 10800, 21600, 32400, 43200, 86400), 'format_interval');
-  $period[0] = '<'. t('none') .'>';
+  $period[0] = '<' . t('none') . '>';
   $batch['cache_lifetime'] = array(
     '#form' => array(
       '#type' => 'select',
       '#title' => t('Minimum cache lifetime'),
+      '#default_value' => variable_get('cache_lifetime', 0),
       '#options' => $period,
-      '#description' => t('On high-traffic sites, it may be necessary to enforce a minimum cache lifetime. The minimum cache lifetime is the minimum amount of time that will elapse before the cache is emptied and recreated, and is applied to both page and block caches. A larger minimum cache lifetime offers better performance, but users will not see new content for a longer period of time.')
+      '#description' => t('The minimum amount of time that will elapse before the caches are recreated.')
     ),
     '#domain_action' => 'domain_conf',
     '#system_default' => variable_get('cache_lifetime', 0),
@@ -332,42 +315,25 @@ function domain_conf_domainbatch() {
     '#update_all' => TRUE,
     '#group' => t('Performance'),
   );
-  // Change the page compression settings.
-  $batch['page_compression'] = array(
-    '#form' => array(
-      '#type' => 'radios',
-      '#title' => t('Page compression'),
-      '#options' => array(t('Disabled'), t('Enabled')),
-      '#description' => t("By default, Drupal compresses the pages it caches in order to save bandwidth and improve download times. This option should be disabled when using a webserver that performs compression."),
-    ),
-    '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('page_compression', TRUE),
-    '#variable' => 'page_compression',
-    '#meta_description' => t('Set the page compression status for all domains.'),
-    '#data_type' => 'integer',
-    '#weight' => -5,
-    '#update_all' => TRUE,
-    '#group' => t('Performance'),
-  );
   // Toggle the site offline status.
-  $batch['site_offline'] = array(
+  $batch['maintenance_mode'] = array(
     '#form' => array(
-      '#title' => t('Site status'),
-      '#type' => 'radios',
-      '#options' => array(t('Online'), t('Off-line')),
-      '#description' => t('Toggle online/offline status.'),
+      '#type' => 'checkbox',
+      '#title' => t('Put site into maintenance mode'),
+      '#default_value' => variable_get('maintenance_mode', 0),
+      '#description' => t('When enabled, only users with the "Access site in maintenance mode" <a href="@permissions-url">permission</a> are able to access your site to perform maintenance; all other visitors see the maintenance mode message configured below. Authorized users can log in directly via the <a href="@user-login">user login</a> page.', array('@permissions-url' => url('admin/people/permissions'), '@user-login' => url('user'))),
     ),
     '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('site_offline', 0),
-    '#variable' => 'site_offline',
-    '#meta_description' => t('Set the online / offline status for all domains.'),
+    '#system_default' => variable_get('maintenance_mode', 0),
+    '#variable' => 'maintenance_mode',
+    '#meta_description' => t('Set maintenance for all domains.'),
     '#data_type' => 'integer',
     '#weight' => -4,
     '#update_all' => TRUE,
-    '#group' => t('Site status'),
+    '#group' => t('Maintenance mode'),
   );
   // Change the site offline message.
-  $batch['site_offline_message'] = array(
+  $batch['maintenance_mode_message'] = array(
     '#form' => array(
       '#title' => t('Site offline message'),
       '#type' => 'textarea',
@@ -377,12 +343,12 @@ function domain_conf_domainbatch() {
     ),
     '#domain_action' => 'domain_conf',
     '#system_default' => t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', array('@site' => variable_get('site_name', 'Drupal'))),
-    '#variable' => 'site_offline_message',
+    '#variable' => 'maintenance_mode_message',
     '#meta_description' => t('Set the site offline message for all domains.'),
     '#data_type' => 'string',
     '#weight' => -2,
     '#update_all' => TRUE,
-    '#group' => t('Site status'),
+    '#group' => t('Maintenance mode'),
   );
   // Change the default language.
   if (module_exists('locale')) {
@@ -502,35 +468,49 @@ function domain_conf_api($all = FALSE, $settings = array()) {
 }
 
 /**
- * Implement hook_block().
- *
- * The primary links and secondary links blocks do not respect our settings,
- * so we replace it with the following blocks.
+ * Implements hook_block_info().
  */
-function domain_conf_block($op = 'list', $delta = 0, $edit = array()) {
-  if ($op == 'list') {
-    $blocks = array();
-    $blocks['domain-primary-links']['info'] = t('Domain primary links');
-    $blocks['domain-secondary-links']['info'] = t('Domain secondary links');
-    // Menu blocks can't be cached because each menu item can have
-    // a custom access callback. menu.inc manages its own caching.
-    $blocks['domain-primary-links']['cache'] = BLOCK_NO_CACHE;
-    $blocks['domain-secondary-links']['cache'] = BLOCK_NO_CACHE;
-    return $blocks;
+function domain_conf_block_info() {
+  $blocks = array();
+  $blocks['domain-main-links'] = array(
+    'info' => t('Domain main links'),
+  );
+  $blocks['domain-secondary-links'] = array(
+    'info' => t('Domain secondary links'),
+  );
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function domain_conf_block_view($delta = '') {
+  // Dispatch to sub-function.
+  if (empty($delta)) {
+    return;
   }
-  else if ($op == 'view') {
-    $menus = menu_get_menus();
-    $string = str_replace('domain-', '', $delta);
-    $source = 'menu_'. str_replace('-', '_', $string) .'_source';
-    $delta = variable_get($source, $string);
-    // Some domains can disable primary and secondary links.
-    if (empty($delta)) {
-      return;
-    }
-    $data['subject'] = check_plain($menus[$string]);
-    $data['content'] = menu_tree($delta);
-    return $data;
+  // Get the menu information.
+  $menus = menu_get_menus();
+  $string = str_replace('domain-', '', $delta);
+  $source = 'menu_' . str_replace('-', '_', $string) . '_source';
+  $data = variable_get($source, $string);
+  // Some domains can disable primary and secondary links.
+  if (empty($data)) {
+    return;
   }
+  // In D7, secondary links may be children of main links.
+  if ($delta == 'domain-secondary-links' && variable_get('menu_secondary_links_source', 'user-menu') == variable_get('menu_main_links_source', 'main-menu')) {
+    // This does not work right now.
+  }
+  // Output the block.
+  $output = menu_tree($data);
+  $name = str_replace('-links', '-menu', $string);
+  // Build the block.
+  $block = array(
+    'subject' => check_plain($menus[$name]),
+    'content' => $output,
+  );
+  return $block;
 }
 
 /**
@@ -587,7 +567,7 @@ function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $res
   }
   if (!isset($settings[$domain_id]) || $reset) {
     // Get the current settings for this domain, if any.
-    $data = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+    $data = domain_unserialize(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField());
     if (empty($data)) {
       $data = array();
     }
@@ -611,7 +591,7 @@ function domain_conf_language_options() {
   foreach ($languages as $key => $lang) {
     $extra = '';
     if ($lang->native != $lang->name) {
-      $extra = ' ('. $lang->name .')';
+      $extra = ' (' . $lang->name . ')';
     }
     $options[$key] = check_plain($lang->native . $extra);
   }
@@ -639,7 +619,7 @@ function _domain_conf_load_primary($unset = FALSE) {
     // Account for table prefixing.
     $cache_table = domain_get_primary_table('cache');
     // Load the query.
-    $data = db_result(db_query("SELECT data FROM $cache_table WHERE cid = 'variables'"));
+    $data = db_query("SELECT data FROM $cache_table WHERE cid = 'variables'")->fetchField();
     if (!empty($data)) {
       $settings = domain_unserialize($data);
     }
@@ -648,8 +628,8 @@ function _domain_conf_load_primary($unset = FALSE) {
     else {
       $variable_table = domain_get_primary_table('variable');
       $result = db_query("SELECT name, value FROM $variable_table");
-      while ($vars = db_fetch_array($result)) {
-        $data[$vars['name']] = domain_unserialize($vars['value']);
+      foreach ($result as $vars) {
+        $data[$vars->name] = domain_unserialize($vars->value);
       }
       $settings = $data;
     }
@@ -673,7 +653,7 @@ function _domain_conf_load_primary($unset = FALSE) {
  */
 function domain_conf_variable_delete($domain_id, $variable) {
   // Get the current settings for this domain, if any.
-  $settings = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  $settings = domain_unserialize(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField());
   // Settings found, remove them.
   if (!empty($settings)) {
     unset($settings[$variable]);
@@ -709,7 +689,7 @@ function domain_conf_variable_save($domain_id, $variable, $value = NULL) {
       ->fields(array('settings' => serialize($settings)))
       ->execute();
   }
-  else if (domain_lookup($domain_id) != -1) {
+  elseif (domain_lookup($domain_id) != -1) {
     $settings = array($variable => $value);
     db_insert('domain_conf')
       ->fields(array('domain_id' => $domain_id, 'settings' => serialize($settings)))

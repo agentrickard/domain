@@ -274,11 +274,12 @@ function domain_theme($existing, $type, $theme, $path) {
  * Implements hook_block_info().
  */
 function domain_block_info() {
+  $blocks = array();
   $blocks['switcher'] = array(
     'info' => t('Domain switcher'),
   );
   $blocks['information'] = array(
-   'info' => t('Domain access information'),
+    'info' => t('Domain access information'),
   );
   return $blocks;
 }

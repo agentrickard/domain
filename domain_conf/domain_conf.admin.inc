@@ -27,7 +27,7 @@ function domain_conf_page($domain) {
     drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
     $form = drupal_get_form('domain_conf_form', $domain);
   }
-  else if ($domain['domain_id'] == 0) {
+  elseif ($domain['domain_id'] == 0) {
     $form = drupal_get_form('domain_conf_default', $domain);
   }
   $form['intro'] = array(
@@ -75,7 +75,7 @@ function domain_conf_form($form, $form_state, $domain) {
     // Change the path for the frontpage.
     if ($key == 'site_frontpage') {
       global $base_url;
-      $prefix = $base_url .'/';
+      $prefix = $base_url . '/';
       $_path = parse_url($prefix);
       $str = $_path['host'];
       $fix = preg_replace("/$str/", $domain['subdomain'], $prefix, 1);
@@ -87,7 +87,7 @@ function domain_conf_form($form, $form_state, $domain) {
   $form[$default_group]['site_name'] = array(
     '#disabled' => TRUE,
     '#title' => t('Site name'),
-    '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/'. $domain['domain_id']))),
+    '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/' . $domain['domain_id']))),
     '#type' => 'textfield',
     '#default_value' => $domain['sitename'],
     '#weight' => -100,
@@ -211,7 +211,7 @@ function domain_conf_reset($domain) {
 
 function domain_conf_reset_form($form, $form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $form = confirm_form($extra, t('Are you sure you wish to reset the settings for %name?', array('%name' => $domain['sitename'])), 'admin/config/domain/conf/'. $domain['domain_id'], t('Submitting this form will restore default settings for this domain.'));
+  $form = confirm_form($extra, t('Are you sure you wish to reset the settings for %name?', array('%name' => $domain['sitename'])), 'admin/config/domain/conf/' . $domain['domain_id'], t('Submitting this form will restore default settings for this domain.'));
   return $form;
 }
 
@@ -223,7 +223,7 @@ function domain_conf_reset_form_submit($form, &$form_state) {
     ->condition('domain_id', $form_state['values']['domain_id'])
     ->execute();
   drupal_set_message(t('Domain configuration settings have been reset.'));
-  $form_state['redirect'] = 'admin/config/domain/conf/'. $form_state['values']['domain_id'];
+  $form_state['redirect'] = 'admin/config/domain/conf/' . $form_state['values']['domain_id'];
   // Clear the cache.
   cache_clear_all();
 }
@@ -239,10 +239,10 @@ function domain_conf_reset_form_submit($form, &$form_state) {
 function theme_domain_conf_reset($variables) {
   $domain = $variables['domain'];
   $output = '';
-  $output .= '<p>'. t('These settings will replace or supplement your default site settings when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
+  $output .= '<p>' . t('These settings will replace or supplement your default site settings when %name is the active domain.', array('%name' => $domain['sitename'])) . '</p>';
   $data = db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {
-    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/config/domain/conf-reset/'. $domain['domain_id']))) .'</p>';
+    $output .= '<p>' . t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/config/domain/conf-reset/' . $domain['domain_id']))) . '</p>';
   }
   return $output;
 }
