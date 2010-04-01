@@ -1,7 +1,7 @@
 ; $Id$
 name = "Domain Alias"
 description = "Advanced domain matching methods for Domain Access."
-core = 6.x
+core = 7.x
 package = Domain Access
 dependencies[] = domain
 files[] = domain_alias.admin.inc

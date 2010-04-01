@@ -12,7 +12,8 @@
  * Implement hook_schema().
  */
 function domain_alias_schema() {
-  $schema['domain_alias'] = array('description' => 'Domain aliases and patterns for domain entries in {domain}.',
+  $schema['domain_alias'] = array(
+    'description' => 'Domain aliases and patterns for domain entries.',
     'fields' => array(
       'alias_id' => array('type' => 'serial',
         'description' => 'The primary identifier for an alias/pattern.',
@@ -40,21 +41,11 @@ function domain_alias_schema() {
       ),
     'primary key' => array('alias_id'),
     'indexes' => array('pattern' => array('pattern'), 'domain' => array('domain_id')),
-    );
+    'foreign_keys' => array(
+      'uid' => array('user' => 'uid'),
+      'domain_id' => array('domain' => 'domain_id'),
+    ),
+  );
 
   return $schema;
-}
-
-/**
- * Implement hook_install().
- */
-function domain_alias_install() {
-  drupal_install_schema('domain_alias');
-}
-
-/**
- * Implement hook_uninstall().
- */
-function domain_alias_uninstall() {
-  drupal_uninstall_schema('domain_alias');
 }

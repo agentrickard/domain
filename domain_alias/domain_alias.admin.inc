@@ -12,7 +12,7 @@
  * Edit aliases
  *
  * @param $domain
- *  The $domain object created by domain_lookup().
+ *    The $domain object created by domain_lookup().
  */
 function domain_alias($domain) {
   if (!is_array($domain)) {
@@ -25,25 +25,25 @@ function domain_alias($domain) {
  * FAPI for editing domain aliases
  *
  * @param $form_state
- * The current form state, passed by FormsAPI.
+ *   The current form state, passed by FormsAPI.
  * @param $domain
- * An array containing the record from the {domain} table.
+ *   An array containing the record from the {domain} table.
  * @param $arguments
- * An array of additional hidden key/value pairs to pass to the form.
- * Used by child modules to control behaviors.
+ *   An array of additional hidden key/value pairs to pass to the form.
+ *   Used by child modules to control behaviors.
  */
-function domain_alias_form($form_state, $domain, $arguments = array()) {
+function domain_alias_form($form, &$form_state, $domain, $arguments = array()) {
   $form = array();
-  drupal_set_title(t('Edit domain aliases: %domain', array('%domain' => $domain['subdomain'])));
+  drupal_set_title(t('Edit domain aliases for !domain', array('!domain' => $domain['subdomain'])));
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $record_edit_url = 'admin/build/domain/'. ($domain['domain_id'] == 0 ? '' : 'edit/'. $domain['domain_id']);
+  $record_edit_url = 'admin/build/domain/' . ($domain['domain_id'] == 0 ? '' : 'edit/' . $domain['domain_id']);
   $form['domain_help'] = array(
     '#type' => 'markup',
-    '#value' => domain_alias_help_text(),
+    '#markup' => domain_alias_help_text(),
   );
   $form['domain'] = array(
     '#type' => 'markup',
-    '#value' => t('Registered aliases for <a href="!url"%title</a>', array('!url' => url($record_edit_url), '%title' => $domain['subdomain'])),
+    '#markup' => t('Registered aliases for <a href="!url"%title</a>', array('!url' => url($record_edit_url), '%title' => $domain['subdomain'])),
   );
   $form['domain_alias'] = array(
     '#tree' => TRUE,
@@ -76,11 +76,11 @@ function domain_alias_form($form_state, $domain, $arguments = array()) {
   }
   $form['domain_new'] = array(
     '#type' => 'markup',
-    '#value' => t('Add new aliases'),
+    '#markup' => t('Add new aliases'),
   );
   $form['domain_new_help'] = array(
     '#type' => 'markup',
-    '#value' => t('To create a new alias, enter the matching pattern. Check the <em>redirect</em> box if you would like requests made to the alias to redirect to the registered domain.
+    '#markup' => t('To create a new alias, enter the matching pattern. Check the <em>redirect</em> box if you would like requests made to the alias to redirect to the registered domain.
       <em>You may enter up to five (5) aliases at a time.</em>'),
   );
   $form['domain_alias_new'] = array(
@@ -150,15 +150,15 @@ function domain_alias_form_validate($form, &$form_state) {
  * Helper function to validate alias entries.
  *
  * @param $alias
- * The form element defining the alias.
+ *   The form element defining the alias.
  * @param $id
- * The form array id, either a number or an alias_id.
+ *   The form array id, either a number or an alias_id.
  * @param $aliases
- * The array of currently processed alias strings.
+ *   The array of currently processed alias strings.
  * @param $type
- * The type of alias, used to determine form errors.
+ *   The type of alias, used to determine form errors.
  * @return
- * A valid alias string, or an error.
+ *   A valid alias string, or an error.
  */
 function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   $alias = $alias['pattern'];
@@ -179,7 +179,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
     form_error($form[$type][$id]['pattern'], t('You may only have one colon ":" character in each alias.'));
     return;
   }
-  else if ($count == 1) {
+  elseif ($count == 1) {
     $int = substr($alias, strpos($alias, ':') + 1);
     if (!is_numeric($int)) {
       form_error($form[$type][$id]['pattern'], t('A colon may only be followed by an integer indicating the proper port.'));
@@ -194,7 +194,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   // 5) Check that the alias is not a direct match for a registered domain.
   $check = preg_match('/[a-z0-9\.\+\-:]*$/', $alias);
   if ($check == 1) {
-    $test = db_result(db_query("SELECT COUNT(*) FROM {domain} WHERE subdomain = '%s'", $alias));
+    $test = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :alias", array(':alias' => $alias))->fetchField();
     if ($test > 0) {
       form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record. ', array('%name' => $alias)));
     }
@@ -204,7 +204,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   $_pattern = str_replace(array_keys($replace), $replace, $alias);
   foreach ($aliases as $_alias) {
     $_alias_pattern = str_replace(array_keys($replace), $replace, $_alias);
-    if (preg_match('@'. $_pattern .'@i', $_alias) || preg_match('@'. $_alias_pattern .'@i', $alias)) {
+    if (preg_match('@' . $_pattern . '@i', $_alias) || preg_match('@' . $_alias_pattern . '@i', $alias)) {
       form_error($form[$type][$id]['pattern'], t('%name matches %existing. You must use unique values.', array('%name' => $alias, '%existing' => $_alias)));
       break;
     }
@@ -212,10 +212,10 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   // 7) Check that the alias or a pattern matching the same domain name does not exist.
   $_pattern = _domain_alias_placeholders_to_sql($alias);
   if (isset($form_state['values']['domain_id']) && $_pattern != $form_state['values']['domain_id']) {
-    $_alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = '%s' OR pattern  = '%s'", $_pattern, $form_state['values']['domain_id']));
+    $_alias = db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = :pattern1 OR pattern  = :pattern2", array(':pattern1' => $_pattern, ':pattern2' => $form_state['values']['domain_id']))->fetchAssoc();
   }
   else {
-    $_alias = db_fetch_array(db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = '%s'", $_pattern));
+    $_alias = db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = :pattern", array(':pattern' => $_pattern))->fetchAssoc();
   }
   if (!empty($_alias)) {
     form_error($form[$type][$id]['pattern'],
@@ -223,7 +223,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
         array(
           '%name' => $alias,
           '%existing' => _domain_alias_placeholders_from_sql($_alias['pattern']),
-          '!url' => url('admin/build/domain/alias/'. $_alias['domain_id']),
+          '!url' => url('admin/build/domain/alias/' . $_alias['domain_id']),
           '!id' => $_alias['domain_id'],
           '!aid' => $_alias['alias_id']
         )
@@ -241,17 +241,31 @@ function domain_alias_form_submit($form, &$form_state) {
   foreach ($form_state['values']['domain_alias_new'] as $id => $alias) {
     if (!empty($alias['pattern'])) {
       $alias['pattern'] = _domain_alias_placeholders_to_sql($alias['pattern']);
-      db_query("INSERT INTO {domain_alias} (domain_id, pattern, redirect) VALUES ('%d', '%s', '%d')", $form_state['values']['domain_id'], $alias['pattern'], intval($alias['redirect']));
+      db_insert('domain_alias')
+        ->fields(array(
+            'domain_id' => $form_state['values']['domain_id'],
+            'pattern' => $alias['pattern'],
+            'redirect' => intval($alias['redirect']),
+          ))
+        ->execute();
     }
   }
   if (isset($form_state['values']['domain_alias'])) {
     foreach ($form_state['values']['domain_alias'] as $id => $alias) {
       $alias['pattern'] = _domain_alias_placeholders_to_sql($alias['pattern']);
       if ($alias['delete']) {
-        db_query("DELETE FROM {domain_alias} WHERE alias_id = %d", $id);
+        db_delete('domain_alias')
+          ->condition('alias_id', $id)
+          ->execute();
       }
       else {
-        db_query("UPDATE {domain_alias} SET pattern = '%s', redirect = '%d' WHERE alias_id = %d", $alias['pattern'], intval($alias['redirect']), $id);
+        db_update('domain_alias')
+          ->condition('alias_id', $id)
+          ->fields(array(
+              'pattern' => $alias['pattern'],
+              'redirect' => intval($alias['redirect']),
+            ))
+          ->execute();
       }
     }
   }
@@ -263,11 +277,13 @@ function domain_alias_form_submit($form, &$form_state) {
 /**
  * Form theming.
  */
-function theme_domain_alias_form($form) {
+function theme_domain_alias_form($variables) {
+  $form = $variables['form'];
   $output = '';
+
   $redirect = t('Check the redirect box to send requests for an alias to the registered domain.');
   $output .= drupal_render($form['domain_help']);
-  $output .= '<br /><h3>'. drupal_render($form['domain']) .'</h3>';
+  $output .= '<br /><h3>' . drupal_render($form['domain']) . '</h3>';
   // Edit existing records.
   $elements = element_children($form['domain_alias']);
   if (!empty($elements)) {
@@ -281,15 +297,15 @@ function theme_domain_alias_form($form) {
         drupal_render($form['domain_alias'][$element]['delete']),
       );
     }
-    $output .= theme('table', $header, $rows);
-    $output .= '<p><em>'. $redirect .'</em></p>';
+    $output .= theme('table', array('header' => $header, 'rows' => $rows));
+    $output .= '<p><em>' . $redirect . '</em></p>';
   }
   else {
-    $output .= '<p>'. t('There are no aliases recorded for this domain.') .'</p>';
+    $output .= '<p>' . t('There are no aliases recorded for this domain.') . '</p>';
   }
   // Add new records.
-  $output .= '<br /><h3>'. drupal_render($form['domain_new']) .'</h3>';
-  $output .= '<p>'. drupal_render($form['domain_new_help']) .'</p>';
+  $output .= '<br /><h3>' . drupal_render($form['domain_new']) . '</h3>';
+  $output .= '<p>' . drupal_render($form['domain_new_help']) . '</p>';
   $header = array(t('Redirect'), t('Pattern'));
   $rows = array();
   foreach (element_children($form['domain_alias_new']) as $element) {
@@ -298,9 +314,9 @@ function theme_domain_alias_form($form) {
       drupal_render($form['domain_alias_new'][$element]['pattern']),
     );
   }
-  $output .= theme('table', $header, $rows);
-  $output .= '<p><em>'. $redirect .'</em></p>';
-  $output .= drupal_render($form);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= '<p><em>' . $redirect . '</em></p>';
+  $output .= drupal_render_children($form);
   return $output;
 }
 
