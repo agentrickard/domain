@@ -164,7 +164,7 @@ function hook_domainlinks($domain) {
   if (user_access('my permission') && $domain['domain_id'] > 0) {
     $links[] = array(
       'title' => t('settings'),
-      'path' => 'admin/config/domain/myaction/'. $domain['domain_id']
+      'path' => 'admin/config/domain/myaction/' . $domain['domain_id']
     );
     return $links;
   }
@@ -222,7 +222,7 @@ function hook_domaincron($domain) {
   $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n ORDER BY n.changed"), 0, 1);
   $node = db_fetch_object($result);
   // Set a variable for each domain containing the last node updated.
-  variable_set('domain_'. $domain['domain_id'] .'_lastnode', $node->nid);
+  variable_set('domain_' . $domain['domain_id'] . '_lastnode', $node->nid);
 }
 
 /**
@@ -239,7 +239,7 @@ function hook_domaincron($domain) {
 function hook_domaininstall() {
   // If MyModule is being used, check to see that it is installed correctly.
   if (module_exists('mymodule') && !function_exists('_mymodule_load')) {
-    drupal_set_message(t('MyModule is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => drupal_get_path('module', 'mymodule') .'/INSTALL.txt')));
+    drupal_set_message(t('MyModule is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => drupal_get_path('module', 'mymodule') . '/INSTALL.txt')));
   }
 }
 
