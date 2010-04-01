@@ -8,7 +8,7 @@
  */
 
 /**
- * Implement hook_drush_command().
+ * Implements hook_drush_command().
  */
 function domain_drush_command() {
   $items = array();
@@ -21,7 +21,7 @@ function domain_drush_command() {
 }
 
 /**
- * Implement hook_drush_help().
+ * Implements hook_drush_help().
  */
 function domain_drush_help($section) {
   $items = domain_drush_command();

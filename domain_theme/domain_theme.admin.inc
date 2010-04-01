@@ -39,7 +39,7 @@ function domain_theme_page($domain) {
 }
 
 /**
- * Implement hook_form_alter().
+ * Implements hook_form_alter().
  *
  * Since we have this in an include file, it is only called
  * by our module's invocation of this form.
@@ -110,7 +110,7 @@ function domain_theme_form_system_themes_form_alter(&$form, &$form_state) {
 }
 
 /**
- * Implement hook_form_alter().
+ * Implements hook_form_alter().
  *
  * This function is a helper to a normal hook_form_alter implementation,
  * where we add additonal form elemtns if we are dealing with domain-specific

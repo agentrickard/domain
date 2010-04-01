@@ -37,7 +37,7 @@ define('DOMAIN_ASSIGN_USERS', TRUE);
 define('DOMAIN_LIST_SIZE', 25);
 
 /**
- * Implement hook_init().
+ * Implements hook_init().
  *
  * Inititalizes a global $_domain variable if necessary (usually that's done in
  * domain_bootstrap.inc) and loads information on current domain.
@@ -106,7 +106,7 @@ function domain_init() {
 }
 
 /**
- * Implement hook_menu()
+ * Implements hook_menu()
  */
 function domain_menu() {
   $items = array();
@@ -214,7 +214,7 @@ function domain_menu() {
 }
 
 /**
- * Implement hook_permission()
+ * Implements hook_permission()
  */
 function domain_permission() {
   $permissions = array(
@@ -250,7 +250,7 @@ function domain_permission() {
 }
 
 /**
- * Implement hook_theme()
+ * Implements hook_theme()
  */
 function domain_theme($existing, $type, $theme, $path) {
   $themes = array(
@@ -376,14 +376,14 @@ function domain_user_load($users) {
 }
 
 /**
- * Implements hook_user_insert() 
+ * Implements hook_user_insert()
  */
 function domain_user_insert(&$edit, $account, $category) {
   domain_user_save(&$edit, $account, $category);
 }
 
 /**
- * Implements hook_user_update() 
+ * Implements hook_user_update()
  */
 function domain_user_update(&$edit, $account, $category) {
   domain_user_save(&$edit, $account, $category);
@@ -471,14 +471,14 @@ function domain_user_view($account, $view_mode) {
 }
 
 /**
- * Implement hook_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter().
  */
 function domain_form_user_profile_form_alter(&$form, &$form_state) {
   domain_form_user_form_alter(&$form, &$form_state);
 }
 
 /**
- * Implement hook_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter().
  */
 function domain_form_user_register_form_alter(&$form, &$form_state) {
   domain_form_user_form_alter(&$form, &$form_state);
@@ -566,7 +566,7 @@ function domain_user_operations() {
 }
 
 /**
- * Implement hook_form_alter().
+ * Implements hook_form_alter().
  */
 function domain_form_user_admin_account_alter(&$form, $form_state) {
   if (!user_access('assign domain editors')) {
@@ -672,7 +672,7 @@ function domain_update_users($form, &$form_state) {
 }
 
  /**
- * Implement hook_cron()
+ * Implements hook_cron()
  *
  * This function invokes hook_domaincron() and allows
  * Domain Access modules to run functions for all active affiliates.
@@ -1158,7 +1158,7 @@ function domain_check_primary($msg = 'default') {
 }
 
 /**
- * Implement hook_domainload()
+ * Implements hook_domainload()
  *
  * Adds the home page 'path' and 'site_grant' boolean.
  */
@@ -1396,7 +1396,7 @@ function domain_get_node_domains($nid, $reset = FALSE, $return = FALSE) {
       return $lookup[$nid];
     }
     // If reset and no return needed, unset and return.
-    else if (empty($return)) {
+    elseif (empty($return)) {
       unset($lookup[$nid]);
       return;
     }
@@ -1419,7 +1419,7 @@ function domain_get_node_domains($nid, $reset = FALSE, $return = FALSE) {
 }
 
 /**
- * Implement hook_node_grants.
+ * Implements hook_node_grants.
  *
  * Informs the node access system what permissions the user has.  By design
  * all users are in the realm defined by the currently active domain_id.
@@ -1477,7 +1477,7 @@ function domain_node_grants($account, $op) {
 }
 
 /**
- * Implement hook_node_access_records()
+ * Implements hook_node_access_records()
  *
  * Set permissions for a node to be written to the database.  By design
  * if no options are selected, the node is assigned to the main site.
@@ -1701,7 +1701,7 @@ function domain_enable() {
 }
 
 /**
- * Implement hook_form_alter()
+ * Implements hook_form_alter()
  *
  * This function is crucial, as it appends our node access elements to the node edit form.
  * For users without the "set domain access" permission, this happens silently.
@@ -1738,7 +1738,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   if (empty($form['#node_edit_form'])) {
     return;
   }
-  
+
   // Grab the globals we need.
   global $user;
   $_domain = domain_get_domain();
@@ -2134,7 +2134,7 @@ function domain_resolve_host($name = '') {
  * The current (host) domain name as a String.
  */
 function domain_request_name() {
-  if (isset($_SERVER['HTTP_HOST'])) { 
+  if (isset($_SERVER['HTTP_HOST'])) {
     // We lower case this, since EXAMPLE.com == example.com.
     return strtolower(rtrim($_SERVER['HTTP_HOST']));
   }
@@ -2288,7 +2288,7 @@ function domain_lookup_simple($name, $reset = FALSE) {
 }
 
 /**
- * Implement hook_domaininstall()
+ * Implements hook_domaininstall()
  */
 function domain_domaininstall() {
   // Set the proper variables for our bootstrap load, as a precaution.
@@ -2296,7 +2296,7 @@ function domain_domaininstall() {
 }
 
 /**
- * Implement hook_domainupdate()
+ * Implements hook_domainupdate()
  *
  * @TODO: reassign orphans?
  */
@@ -2320,7 +2320,7 @@ function domain_domainupdate($op, $domain, $form_state = array()) {
 }
 
 /**
- * Implement hook_domainbatch()
+ * Implements hook_domainbatch()
  */
 function domain_domainbatch() {
   // Change all the domain names at once.
@@ -2407,7 +2407,7 @@ function domain_batch_validate($values) {
     case 'domain_root':
       foreach ($batch as $key => $value) {
         $subdomain = strtolower(urlencode($value));
-        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :subdomain AND domain_id <> :domain_id", 
+        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :subdomain AND domain_id <> :domain_id",
           array(':subdomain' => $value, ':domain_id' => $key))->fetchField();
         if ($check > 0 || ($key > 0 && $value == variable_get('domain_root', ''))) {
           form_set_error('domain_batch', t('Each domain value must be unique.'));
@@ -2416,7 +2416,7 @@ function domain_batch_validate($values) {
       break;
     case 'domain_sitename':
       foreach ($batch as $key => $value) {
-        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = :sitename AND domain_id <> :domain_id", 
+        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = :sitename AND domain_id <> :domain_id",
           array(':sitename' => $value, ':domain_id' => $key))->fetchField();
         if ($check > 0 || ($key > 0 && $value == variable_get('domain_sitename', 'Drupal'))) {
           form_set_error('domain_batch', t('Each site name value must be unique.'));
@@ -2503,7 +2503,7 @@ function _domain_path_modules() {
 }
 
 /**
- * Implement hook_domainignore().
+ * Implements hook_domainignore().
  */
 function domain_domainignore() {
   // In Drupal 6, the update script behaves differently than D5, so we ignore it.
@@ -2511,7 +2511,7 @@ function domain_domainignore() {
 }
 
 /**
- * Implement hook_node_access_explain for devel.module
+ * Implements hook_node_access_explain for devel.module
  */
 function domain_node_access_explain($row) {
   $_domain = domain_get_domain();
@@ -2542,7 +2542,7 @@ function domain_node_access_explain($row) {
 }
 
 /**
- * Implement hook_node_access_acknowlegde for devel.module
+ * Implements hook_node_access_acknowlegde for devel.module
  */
 function domain_node_access_acknowledge($grant) {
   if ($grant['realm'] == 'domain_all') {
@@ -2551,7 +2551,7 @@ function domain_node_access_acknowledge($grant) {
 }
 
 /**
- * Implement hook_field_extra_fields()
+ * Implements hook_field_extra_fields()
  *
  * Field hook to allow sorting of the domain settings field.
  */
@@ -2676,7 +2676,7 @@ function domain_url_encode($string) {
 }
 
 /**
- * Implement hook_simpletest()
+ * Implements hook_simpletest()
  */
 function domain_simpletest() {
   $module_name = 'domain';

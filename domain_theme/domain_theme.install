@@ -7,14 +7,14 @@
  */
 
 /**
- * Implement hook_install()
+ * Implements hook_install()
  */
 function domain_theme_install() {
   drupal_install_schema('domain_theme');
 }
 
 /**
- * Implement hook_schema()
+ * Implements hook_schema()
  */
 function domain_theme_schema() {
   $schema['domain_theme'] = array(
@@ -30,7 +30,7 @@ function domain_theme_schema() {
 }
 
 /**
- * Implement hook_uninstall()
+ * Implements hook_uninstall()
  */
 function domain_theme_uninstall() {
   drupal_uninstall_schema('domain_theme');

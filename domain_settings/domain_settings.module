@@ -16,7 +16,7 @@
  */
 
 /**
- * Implement hook_perm().
+ * Implements hook_perm().
  */
 function domain_settings_permission() {
   $permissions = array(
@@ -28,7 +28,7 @@ function domain_settings_permission() {
 }
 
 /**
- * Implement hook_form_alter()
+ * Implements hook_form_alter()
  *
  * This function checks the #submit value of the form to see
  * if system_settings_form() has been invoked. If so, we may
@@ -192,7 +192,7 @@ function domain_settings_disallow() {
 }
 
 /**
- * Implement hook_domain_warnings_alter().
+ * Implements hook_domain_warnings_alter().
  */
 function domain_settings_domain_warnings_alter(&$forms) {
   // Forms which Domain Settings handles and are set as warnings.

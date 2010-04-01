@@ -17,7 +17,7 @@
 define('DOMAIN_SOURCE_USE_ACTIVE', -5);
 
 /**
- * Implement hook_form_alter()
+ * Implements hook_form_alter()
  */
 function domain_source_form_alter(&$form, &$form_state, $form_id) {
   // Apply to all node editing forms only.
@@ -56,7 +56,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
     }
   }
   // In the case of users with limited permissions, option 3 is the "show options" value.
-  else if (user_access('publish to any assigned domain') && !empty($account->domain_user)) {
+  elseif (user_access('publish to any assigned domain') && !empty($account->domain_user)) {
     $show = FALSE;
     // Get the user's allowed domains.
     foreach ($domains as $domain) {
@@ -155,7 +155,7 @@ function domain_source_node_validate($node, $form) {
     // I find this code easier to read than a compound IF statement.
   }
   // Here we account for both the 'domains_raw' and 'domains' options.
-  else if ($node->domain_source != DOMAIN_SOURCE_USE_ACTIVE && !in_array($key, $allowed)) {
+  elseif ($node->domain_source != DOMAIN_SOURCE_USE_ACTIVE && !in_array($key, $allowed)) {
     form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
   }
 }
@@ -163,7 +163,7 @@ function domain_source_node_validate($node, $form) {
 /**
  * Implements hook_node_load().
  */
-function domain_source_node_load($nodes, $types) { 
+function domain_source_node_load($nodes, $types) {
   foreach ($nodes as $node) {
     // Cannot load if the node has not been created yet.
     if (!isset($node->nid)) {
@@ -219,7 +219,7 @@ function domain_source_node_view($node, $view_mode) {
     if ($use_active === FALSE) {
       $extra .= t('(determined automatically)');
     }
-    else if ($use_active == DOMAIN_SOURCE_USE_ACTIVE) {
+    elseif ($use_active == DOMAIN_SOURCE_USE_ACTIVE) {
       $extra .= t('(using active domain)');
     }
     $node->content['domain_source'] = array('#markup' => '<p>' . t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . $extra . '</p>', '#weight' => 25);
@@ -249,7 +249,7 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
     $source = $_domain['domain_id'];
   }
   // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
-  else if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
+  elseif ($source == DOMAIN_SOURCE_USE_ACTIVE) {
     $source = $_domain['domain_id'];
   }
   // When called from url_rewrite_outbound(), we have no data.
@@ -266,7 +266,7 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
 }
 
 /**
- * Implement hook_domain_source_alter().
+ * Implements hook_domain_source_alter().
  *
  * @param &$source
  *   The domain array from domain_get_node_match(), passed by reference.
@@ -316,14 +316,14 @@ function domain_source_validate($form, &$form_state) {
     }
     // Here we account for both the 'domains_raw' and 'domains' options.
     // If selected, these clauses will not be zero.
-    else if (!$form_state['values']['domains'][$key] && (!empty($form_state['values']['domains_raw']) && !in_array($key, $form_state['values']['domains_raw']))) {
+    elseif (!$form_state['values']['domains'][$key] && (!empty($form_state['values']['domains_raw']) && !in_array($key, $form_state['values']['domains_raw']))) {
       form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
     }
   }
 }
 
 /**
- * Implement hook_domainupdate()
+ * Implements hook_domainupdate()
  *
  * When deleting domain records, we remove all traces from the {domain_source} table.
  */
@@ -336,7 +336,7 @@ function domain_source_domainupdate($op, $domain, $form_state = array()) {
 }
 
 /**
- * Implement hook_views_api().
+ * Implements hook_views_api().
 
 function domain_source_views_api() {
   if (module_exists('domain_views')) {

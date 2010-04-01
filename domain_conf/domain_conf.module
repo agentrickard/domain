@@ -57,7 +57,7 @@ function domain_conf_domain_bootstrap_full($domain) {
 }
 
 /**
- * Implement hook_init()
+ * Implements hook_init()
  */
 function domain_conf_init() {
   // Allow sites to add implementations of hook_domainconf() without hacking.
@@ -71,7 +71,7 @@ function domain_conf_init() {
 }
 
 /**
- * Implement hook_menu()
+ * Implements hook_menu()
  */
 function domain_conf_menu() {
   $items = array();
@@ -95,7 +95,7 @@ function domain_conf_menu() {
 }
 
 /**
- * Implement hook_theme()
+ * Implements hook_theme()
  */
 function domain_conf_theme() {
   $themes = array(
@@ -107,7 +107,7 @@ function domain_conf_theme() {
 }
 
 /**
- * Implement hook_domainlinks()
+ * Implements hook_domainlinks()
  */
 function domain_conf_domainlinks($domain) {
   static $extra;
@@ -125,7 +125,7 @@ function domain_conf_domainlinks($domain) {
 }
 
 /**
- * Implement hook_domainwarnings()
+ * Implements hook_domainwarnings()
  */
 function domain_conf_domainwarnings() {
   // These are the forms for variables set by Domain Conf.
@@ -146,7 +146,7 @@ function domain_conf_domainwarnings() {
 }
 
 /**
- * Implement hook_domainbatch()
+ * Implements hook_domainbatch()
  */
 function domain_conf_domainbatch() {
   $batch = array();
@@ -423,7 +423,7 @@ function domain_conf_domainbatch() {
 }
 
 /**
- * Implement hook_domainupdate().
+ * Implements hook_domainupdate().
  */
 function domain_conf_domainupdate($op, $domain, $form_state = array()) {
   if ($op == 'delete') {

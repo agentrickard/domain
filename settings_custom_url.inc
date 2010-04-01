@@ -11,7 +11,7 @@
  */
 
 /**
- * Implement hook_url_outbound_alter().
+ * Implements hook_url_outbound_alter().
  *
  * Forces absolute paths for domains when needed.
  */
@@ -60,7 +60,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
       // Check to see if this is a node or comment link and set $nid accordingly.
       // We static the $nid results to make this more efficient.
       $pattern = explode('/', $original_path);
-  
+
       // Advanced pattern matching, we find the node id based on token %n in the path string.
       if (!isset($nodepaths)) {
         $pathdata = variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n\r\nnode/%n/outline");
@@ -127,7 +127,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
         // TODO: merge this code with the above for cleanup.
       }
     }
-    // We may have to implement hook_domainpath().
+    // We may have to Implements hook_domainpath().
     if (!isset($path_rewrite)) {
       $path_rewrite = count(_domain_path_modules());
     }

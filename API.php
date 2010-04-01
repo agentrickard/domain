@@ -259,7 +259,7 @@ function hook_domaininstall() {
  * @return
  *   Return values vary based on the $op value.
  *   -- 'header' return a $header array formatted as per theme_table().
- *   -- 'query' modify the $query object. For details see 
+ *   -- 'query' modify the $query object. For details see
  *       @link http://drupal.org/node/310075
  *   -- 'data' return an array of $data elements to print in the row.
  *
@@ -315,7 +315,7 @@ function hook_domainform(&$form) {
  *  may have values that vary on each domain.
  *
  * @return
- *   An associative array where the keys form_id values representing forms 
+ *   An associative array where the keys form_id values representing forms
  *   that require warnings. The value should return a link for where the
  *   form may be set for the current domain. If no link exists, you should
  *   pass NULL as the value.

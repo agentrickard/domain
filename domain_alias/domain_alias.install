@@ -9,7 +9,7 @@
  */
 
 /**
- * Implement hook_schema().
+ * Implements hook_schema().
  */
 function domain_alias_schema() {
   $schema['domain_alias'] = array(

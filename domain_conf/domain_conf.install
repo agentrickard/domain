@@ -7,7 +7,7 @@
  */
 
 /**
- * Implement hook_schema()
+ * Implements hook_schema()
  */
 function domain_conf_schema() {
   $schema['domain_conf'] = array(

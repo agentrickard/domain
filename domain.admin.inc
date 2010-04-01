@@ -42,8 +42,8 @@ function domain_view() {
   module_invoke_all('domainview', 'query', array(), $query);
   // Add the tablesort.
   $query = $query
-   ->extend('TableSort')
-   ->orderByHeader($header);
+    ->extend('TableSort')
+    ->orderByHeader($header);
   $query = $query->extend('PagerDefault')->limit(variable_get('domain_list_size', DOMAIN_LIST_SIZE));
   // Get the domains.
   $result = $query->execute();
@@ -933,7 +933,7 @@ function domain_batch_form_submit($form, &$form_state) {
       foreach ($form_state['values']['domain_batch'] as $domain_id => $value) {
         $settings = array();
         if ($domain_id > 0 || empty($form_state['values']['variable'])) {
-          domain_conf_variable_save($domain_id, $item, $value); 
+          domain_conf_variable_save($domain_id, $item, $value);
         }
         elseif (!empty($form_state['values']['variable'])) {
           variable_set($form_state['values']['variable'], $value);

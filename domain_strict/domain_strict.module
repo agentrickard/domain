@@ -14,7 +14,7 @@
  */
 
 /**
- * Implement hook_domaingrants()
+ * Implements hook_domaingrants()
  *
  * In Domain Strict, we only let users see content on domains that
  * they are registered with.  So we check the $user object in order

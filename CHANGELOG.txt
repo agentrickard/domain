@@ -1,5 +1,10 @@
 // $Id$
 
+01-APR-2010
+-- Domain Alias ready for testing.
+-- Rolls 7.x.2.0-alpha5.
+-- No fooling!
+
 31-MAR-2010
 -- Domain Conf ready for testing.
 -- Rolls 7.x.2.0-alpha3.
@@ -154,7 +159,7 @@
 
 24-OCT-2009
 
--- #529026 by davereid. Updates the URL Alter integration to match Drupal 7. 
+-- #529026 by davereid. Updates the URL Alter integration to match Drupal 7.
     Requires URL Alter module 6.x.1.2.
 -- #540684 by Bartezz. Allows Domain Source to set the active domain as source.
 -- #561282 by kotu, nonsie, nirbhasa, Bartezz. Removes the auto-filtering of domains
@@ -655,7 +660,7 @@
 05-JUL-2008
 
 -- Moving domain_init() to domain_boot() broke hook_domainload(). So
-    we have to keep domaion_init().  We also have to implement hook_boot()
+    we have to keep domaion_init().  We also have to Implements hook_boot()
     in modules that use hook_domainload().  See the API for details.
 -- Fixes issue with Domain User.  We do strip the ports off of restricted usernames.
 -- #277046 by hardfocus.  Implements a new hook_domainignore() to tell the

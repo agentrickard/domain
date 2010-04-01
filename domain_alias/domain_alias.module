@@ -20,7 +20,7 @@
  */
 
 /**
- * Implement hook_domain_bootstrap_lookup().
+ * Implements hook_domain_bootstrap_lookup().
  *
  * Tries to match the given domain name against patterns in the {domain_alias}
  * table and, if successful, updates information in given parameter $domain.
@@ -53,7 +53,7 @@ function domain_alias_domain_bootstrap_lookup($domain) {
 }
 
 /**
- * Implement hook_init().
+ * Implements hook_init().
  *
  * If redirection is enabled for the active domain alias then we redirect to the
  * main domain.
@@ -69,7 +69,7 @@ function domain_alias_init() {
 }
 
 /**
- * Implement hook_menu().
+ * Implements hook_menu().
  */
 function domain_alias_menu() {
   $items = array();
@@ -85,7 +85,7 @@ function domain_alias_menu() {
 }
 
 /**
- * Implement hook_theme().
+ * Implements hook_theme().
  */
 function domain_alias_theme() {
   return array(
@@ -101,7 +101,7 @@ function domain_alias_theme() {
 
 /**
  * Implements hook_block_info().
- */ 
+ */
 function domain_alias_block_info() {
   $blocks = array();
   $blocks['domain_alias'] = array(
@@ -124,7 +124,7 @@ function domain_alias_block_view($delta = '') {
 }
 
 /**
- * Implement hook_block().
+ * Implements hook_block().
  */
 function domain_alias_block($op = 'list', $delta = 0, $edit = array()) {
   $blocks = array();
@@ -197,7 +197,7 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
     }
     elseif (intval($alias_id)) {
       $alias = db_query("SELECT alias_id, domain_id, pattern, redirect FROM {domain_alias} WHERE alias_id = :alias_id", array(':alias_id' => $alias_id))->fetchAssoc();
-      
+
     }
     // If we found a match, prepare the readable version.
     if (isset($alias['alias_id'])) {
@@ -294,7 +294,7 @@ function domain_alias_list($domain_id, $reset = FALSE) {
 }
 
 /**
- * Implement hook_domainload()
+ * Implements hook_domainload()
  *
  * Adds a list of all aliases for the current domain.
  */
@@ -307,7 +307,7 @@ function domain_alias_domainload(&$domain) {
 }
 
 /**
- * Implement hook_domainupdate().
+ * Implements hook_domainupdate().
  *
  * When a {domain} entry is deleted also delete all related {domain_alias} entries.
  */
@@ -322,7 +322,7 @@ function domain_alias_domainupdate($op, $domain = array(), $form_state = array()
 }
 
 /**
- * Implement hook_domainview().
+ * Implements hook_domainview().
  */
 function domain_alias_domainview($op, $domain = array(), $query = NULL) {
   switch ($op) {
@@ -360,7 +360,7 @@ function domain_alias_domainview($op, $domain = array(), $query = NULL) {
 }
 
 /**
- * Implement hook_domainlinks()
+ * Implements hook_domainlinks()
  */
 function domain_alias_domainlinks($domain) {
   $links[] = array(
@@ -371,7 +371,7 @@ function domain_alias_domainlinks($domain) {
 }
 
 /**
- * Implement hook_domainnav().
+ * Implements hook_domainnav().
  *
  * Ensure that active domains are correctly marked as active.
  */

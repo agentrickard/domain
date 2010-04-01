@@ -19,7 +19,7 @@
  */
 
 /**
- * Implement hook_menu()
+ * Implements hook_menu()
  */
 function domain_content_menu() {
   $items = array();
@@ -78,14 +78,14 @@ function domain_content_menu() {
 }
 
 /**
- * Implement hook_perm().
+ * Implements hook_perm().
  */
 function domain_content_perm() {
   return array('configure domain content', 'review content for all domains');
 }
 
 /**
- * Implement hook_theme().
+ * Implements hook_theme().
  */
 function domain_content_theme() {
   $themes = array(
@@ -138,7 +138,7 @@ function domain_content_check($domain_id) {
     $editor = TRUE;
   }
   // Can this user see the active site?
-  else if ($rule && $domain_id > 0 && $domain_id == $domains[$domain_id]) {
+  elseif ($rule && $domain_id > 0 && $domain_id == $domains[$domain_id]) {
     $editor = TRUE;
   }
   if ($editor) {
@@ -148,7 +148,7 @@ function domain_content_check($domain_id) {
 }
 
 /**
- * Implement hook_node_operations()
+ * Implements hook_node_operations()
  */
 function domain_content_node_operations() {
   // Only privileged users can perform this operation.
@@ -186,7 +186,7 @@ function domain_content_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implement hook_domainlinks()
+ * Implements hook_domainlinks()
  */
 function domain_content_domainlinks($domain) {
   $links[] = array(

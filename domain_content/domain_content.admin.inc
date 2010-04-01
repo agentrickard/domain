@@ -117,7 +117,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
     $_domain['site_grant'] = FALSE;
     drupal_set_title(t('Content for !domain', array('!domain' => $_domain['sitename'])));
   }
-  else if ($all_affiliates) {
+  elseif ($all_affiliates) {
     $_domain['site_grant'] = TRUE;
     drupal_set_title(t('Content for all affiliate sites'));
   }

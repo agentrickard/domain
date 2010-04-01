@@ -54,7 +54,7 @@ As of 6.x.2.0, Domain Navigation has one permission:
 
   - 'access domain navigation'
   This permission allows users to view the Domain Navigation block.
-  
+
 The module also uses the following inherited permission:
 
   - 'access inactive domains'
@@ -168,7 +168,7 @@ The domainnav hook allows other modules to add parameters to the $options
 array that is passed to theme functions.  It is intended for use with
 custom theme functions of theme overrides that you may use.
 
-To use the function, implement hook_domainnav($domain).  You should return
+To use the function, Implements hook_domainnav($domain).  You should return
 an array of values to append to $options.
 
 Default parameters are passed in the $domain variable and should not be changed;

@@ -196,7 +196,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   if ($check == 1) {
     $test = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :alias", array(':alias' => $alias))->fetchField();
     if ($test > 0) {
-      form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record. ', array('%name' => $alias)));
+      form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record.', array('%name' => $alias)));
     }
   }
   // 6) Check that the alias doesn't match another alias defined for this domain.

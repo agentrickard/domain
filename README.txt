@@ -541,7 +541,7 @@ Due to the way node_access() works, the following limitations should be noted.
   - Users who look at the sites and have the 'administer nodes' permission
     can always see all content on all sites, which can be confusing.  To
     enforce Domain Access rules on these users, you may enable the
-    'Enforce rules on administrators' setting described in 4.3.3. 
+    'Enforce rules on administrators' setting described in 4.3.3.
 
   - Users who have the 'edit any TYPE nodes' permission will be able to edit
     nodes that do not belong to their domain.
@@ -634,7 +634,7 @@ When you create a new domain record, simply fill in the form:
   a domain to Inactive restricts access to users with the 'access inactive
   domains' permission. This feature is useful for staging content and testing
   new domain configurations.
-  
+
   NOTE: Users who try to access an inactive domain will have the attempt
   reported in the site logs. When this occurs, the module will try to redirect
   the user to the appropriate content on an active domain. If no match is
@@ -981,7 +981,7 @@ are available by default.
   - Edit all domain status flags
 
 Additional batch actions are made available for the Domain Configuration
-module.  Other modules may implement hook_domainbatch() to provide
+module.  Other modules may Implements hook_domainbatch() to provide
 additional batch actions.
 
 It may be necessary to enter the batch form from the primary domain.
