@@ -206,70 +206,6 @@ function theme_domain_theme_reset($variables) {
 }
 
 /**
- * Implements hook_form_alter().
- *
- * This function is a helper to a normal hook_form_alter implementation,
- * where we add additonal form elemtns if we are dealing with domain-specific
- * form settings.
- */
-function domain_theme_form_alter(&$form, &$form_state, $form_id) {
-  // We cannot use a named form_alter here because of color module.
-  // Color submit must happen first, and a named function destroys that.
-  if ($form_id != 'system_theme_settings') {
-    return;
-  }
-  $theme = arg(4);
-  $domain_id = arg(5);
-  $themes = list_themes();
-
-  $domain = domain_load($domain_id);
-  if ($domain == -1 || !array_key_exists($theme, $themes)) {
-    return drupal_access_denied();
-  }
-
-  drupal_set_title(t('!site : %theme settings', array('!site' => $domain['sitename'], '%theme' => $theme)));
-  // Which domain are we editing?
-  $form['domain_id'] = array(
-    '#type' => 'value',
-    '#value' => $domain['domain_id'],
-  );
-  $form['theme'] = array(
-    '#type' => 'value',
-    '#value' => $theme,
-  );
-
-   // We have to remove the core submit handler, but keep other handlers.
-  $form['#submit'][100] = 'domain_theme_settings_submit';
-  foreach ($form['#submit'] as $key => $value) {
-    if ($value == 'system_theme_settings_submit') {
-      unset($form['#submit'][$key]);
-    }
-  }
-  ksort($form['#submit']);
-
-  // Check for the presence of color.module.
-  $color_info = NULL;
-  if (module_exists('color')) {
-    $color_info = color_get_info($theme);
-  }
-  if (empty($color_info)) {
-    return;
-  }
-
-  // Color module will reset the values in {variable}. which we don't
-  // want to happen. So we have to grab the existing values and store
-  // them so that we can set the {variable} table correctly.
-  // TODO: Make this work with Domain Prefix.
-  $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
-  foreach ($vars as $variable) {
-    $name = 'color_'. $theme .'_'. $variable;
-    $value = db_result(db_query("SELECT value FROM {variable} WHERE name = '%s'", $name));
-    $color_settings[$name] = isset($value) ? $value : NULL;
-  }
-  $form['domain_color_defaults'] = array('#type' => 'value', '#value' => $color_settings);
-}
-
-/**
  * The domain theme page callback router.
  *
  * @param $theme
@@ -280,15 +216,14 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
 function domain_theme_settings($theme, $domain) {
   // Load the system form file.
   include_once(drupal_get_path('module', 'system') .'/system.admin.inc');
-
-  $settings = db_fetch_array(db_query("SELECT theme, settings FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain['domain_id'], $theme));
+  $settings = db_query("SELECT theme, settings FROM {domain_theme} WHERE domain_id = :domain_id AND theme = :theme", array(':domain_id' => $domain['domain_id'], ':theme' => $theme))->fetchAssoc();
   drupal_set_message(t('You are viewing the %theme settings for %domain.', array('%theme' => $theme, '%domain' => $domain['sitename'])));
   // Write uploads to the proper directory.
   if ($domain['domain_id'] > 0) {
     global $conf;
-    $conf['file_directory_path'] = file_directory_path() .'/domain-'. $domain['domain_id'];
+   # $conf['file_public_path'] = file_directory_path('public') .'/domain-'. $domain['domain_id'];
   }
-
+  drupal_set_title(t('!site : !theme settings', array('!site' => $domain['sitename'], '!theme' => $theme)));
   // If there are settings, we have to load ours.
   if (!empty($settings)) {
     domain_theme_set_variables($settings);
@@ -304,16 +239,11 @@ function domain_theme_settings($theme, $domain) {
  */
 function domain_theme_settings_submit($form, &$form_state) {
   $values = $form_state['values'];
+#  dsm($values);
   $filepath = NULL;
-  $reset = FALSE;
-  $form_state['redirect'] = 'admin/config/domain/theme/'. $values['domain_id'];
+#  $form_state['redirect'] = 'admin/config/domain/theme/'. $values['domain_id'];
   $domain = domain_lookup($values['domain_id']);
-  if ($values['op'] == $values['reset']) {
-    db_query("DELETE FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $values['domain_id'], $values['theme']);
-    drupal_set_message(t('The %theme settings for %domain have been reset.', array('%theme' => $values['theme'], '%domain' => $domain['sitename'])));
-    $reset = TRUE;
-  }
-
+  $filepath = file_directory_path('public') .'/domain-'. $domain['domain_id'];
   $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
   foreach ($vars as $variable) {
     $preset = variable_get('color_'. $values['theme'] .'_'. $variable, '');
@@ -338,38 +268,54 @@ function domain_theme_settings_submit($form, &$form_state) {
     $filepath = domain_theme_get_color_path($values['color_'. $values['theme'] .'_stylesheets'][0]);
   }
 
-  // If a reset, stop here.
-  if ($reset) {
-    return;
-  }
-
   $key = $values['var'];
   $domain_id = $values['domain_id'];
   $theme = $values['theme'];
-  // If no record exists, we behave differently.
-  $check = db_result(db_query("SELECT COUNT(*) FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme));
-  if ($values['op'] == $values['reset'] && $check > 0) {
-    db_query("UPDATE {domain_theme} SET settings = NULL, filepath = NULL WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
-    drupal_set_message(t('The configuration options have been reset to their default values.'));
+  // Exclude unnecessary elements before saving.
+  unset($values['var'], $values['submit'], $values['reset'], $values['form_id'], $values['op'], $values['form_build_id'], $values['form_token'], $values['domain_id'], $values['domain_color'], $values['domain_color_defaults'], $values['logo_upload'], $values['favicon_upload']);
+  $settings = serialize($values);
+  // Insert or Update?
+  $check = db_query("SELECT COUNT(domain_id) FROM {domain_theme} WHERE domain_id = :domain_id AND theme = :theme", array(':domain_id' => $domain_id, ':theme' => $theme))->fetchField();
+  // This lookup returns -1 on failure.
+  $check = domain_theme_lookup($domain_id, $theme);
+  // Update.
+  if ($check != -1) {
+    db_update('domain_theme')
+      ->fields(array(
+        'settings' => $settings,
+        'filepath' => $filepath,
+      ))
+      ->condition('domain_id', $domain_id)
+      ->condition('theme', $theme)
+      ->execute();
   }
+  // Insert.
   else {
-    // Exclude unnecessary elements before saving.
-    unset($values['var'], $values['submit'], $values['reset'], $values['form_id'], $values['op'], $values['form_build_id'], $values['form_token'], $values['domain_id'], $values['domain_color'], $values['domain_color_defaults']);
-    $settings = serialize($values);
-    if ($check > 0) {
-      db_query("UPDATE {domain_theme} SET settings = %b, filepath = '%s' WHERE domain_id = %d AND theme = '%s'", $settings, $filepath, $domain_id, $theme);
-    }
-    else {
-      db_query("INSERT INTO {domain_theme} (domain_id, theme, settings, status, filepath) VALUES (%d, '%s', %b, 0, '%s')", $domain_id, $theme, $settings, $filepath);
-    }
-    drupal_set_message(t('The configuration options have been saved.'));
+    db_insert('domain_theme')
+      ->fields(array(
+        'domain_id' => $domain_id,
+        'theme' => $theme,
+        'settings' => $settings,
+        'status' => 0,
+        'filepath' => $filepath,
+      ))
+      ->execute();
   }
+  drupal_set_message(t('The configuration options have been saved.'));
   // If nothing is active, then we make this one active.
-  $active = db_result(db_query("SELECT COUNT(*) FROM {domain_theme} WHERE domain_id = %d AND status = 1", $domain_id));
+  $active = db_query("SELECT COUNT(domain_id) FROM {domain_theme} WHERE domain_id = :domain_id AND status = 1", array(':domain_id' => $domain_id))->fetchField();
   if (empty($active)) {
-    db_query("UPDATE {domain_theme} SET status = 1 WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
+    db_update('domain_theme')
+      ->fields(array(
+        'status' => 1,
+      ))
+      ->condition('domain_id', $domain_id)
+      ->condition('theme', $theme)
+      ->execute();
     drupal_set_message(t('%theme has been set as the default theme for %domain', array('%theme' => $theme, '%domain' => $domain['sitename'])));
   }
   // Clear the cache.
   cache_clear_all();
+  global $conf;
+  $conf['file_public_path'] = file_directory_path('public') .'/domain-'. $domain['domain_id'];
 }

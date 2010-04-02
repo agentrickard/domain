@@ -42,6 +42,7 @@ function domain_theme_set_variables($theme) {
   global $conf;
   if (!empty($theme['settings'])) {
     $settings = domain_unserialize($theme['settings']);
+#    dsm($settings);
     $conf['theme_'. $theme['theme'] .'_settings'] = $settings;
     // Account for color module.
     $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
@@ -289,3 +290,65 @@ function domain_theme_get_color_path($path) {
   return current(array_slice(array_reverse(explode('/', $path)), 1, 1));
 }
 
+/**
+ * Implements hook_form_alter().
+ *
+ * This function is a helper to a normal hook_form_alter implementation,
+ * where we add additonal form elemtns if we are dealing with domain-specific
+ * form settings.
+ */
+function domain_theme_form_alter(&$form, &$form_state, $form_id) {
+  // We cannot use a named form_alter here because of color module.
+  // Color submit must happen first, and a named function destroys that.
+  if ($form_id != 'system_theme_settings' || arg(2) != 'domain') {
+    return;
+  }
+  $theme = arg(4);
+  $domain_id = arg(5);
+  $themes = list_themes();
+
+  $domain = domain_load($domain_id);
+  if ($domain == -1 || !array_key_exists($theme, $themes)) {
+    return drupal_access_denied();
+  }
+
+  // Which domain are we editing?
+  $form['domain_id'] = array(
+    '#type' => 'value',
+    '#value' => $domain['domain_id'],
+  );
+  $form['theme'] = array(
+    '#type' => 'value',
+    '#value' => $theme,
+  );
+
+   // We have to remove the core submit handler, but keep other handlers.
+  $form['#submit'][100] = 'domain_theme_settings_submit';
+  foreach ($form['#submit'] as $key => $value) {
+    if ($value == 'system_theme_settings_submit') {
+      unset($form['#submit'][$key]);
+    }
+  }
+  ksort($form['#submit']);
+
+  // Check for the presence of color.module.
+  $color_info = NULL;
+  if (module_exists('color')) {
+    $color_info = color_get_info($theme);
+  }
+  if (empty($color_info)) {
+    return;
+  }
+
+  // Color module will reset the values in {variable}. which we don't
+  // want to happen. So we have to grab the existing values and store
+  // them so that we can set the {variable} table correctly.
+  // TODO: Make this work with Domain Prefix.
+  $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
+  foreach ($vars as $variable) {
+    $name = 'color_'. $theme .'_'. $variable;
+    $value = db_query("SELECT value FROM {variable} WHERE name = :name", array(':name' => $name))->fetchField();
+    $color_settings[$name] = isset($value) ? $value : NULL;
+  }
+  $form['domain_color_defaults'] = array('#type' => 'value', '#value' => $color_settings);
+}
