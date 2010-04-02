@@ -15,98 +15,194 @@
  *  The $domain object created by domain_lookup().
  */
 function domain_theme_page($domain) {
-  global $custom_theme;
   if (isset($domain['domain_id'])) {
-    // Set the custom theme, for display.
-    $custom_theme = variable_get('theme_default', 'garland');
-    $theme = domain_theme_lookup($domain['domain_id']);
-    // The above returns -1 on failure.
-    if ($theme != -1) {
-      $custom_theme = $theme['theme'];
-      drupal_set_message(t('You are viewing the active theme for %domain.', array('%domain' => $domain['sitename'])));
-    }
 
     // Load the system form file.
     include_once drupal_get_path('module', 'system') .'/system.admin.inc';
 
+    // Set the page title and generate the form.
     drupal_set_title(t('!site : Domain theme settings', array('!site' => $domain['sitename'])));
-    $output = theme_domain_theme_reset($domain);
-    return $output . drupal_get_form('system_themes_form');
+    return drupal_get_form('domain_theme_form', $domain);
   }
   else {
     return t('Invalid domain request.');
   }
 }
 
-/**
- * Implements hook_form_alter().
- *
- * Since we have this in an include file, it is only called
- * by our module's invocation of this form.
- */
-function domain_theme_form_system_themes_form_alter(&$form, &$form_state) {
-  $domain_id = arg(4);
-  $domain = domain_load($domain_id);
-  if ($domain == -1) {
-    return drupal_access_denied();
-  }
+function domain_theme_form($form, &$form_state, $domain) {
+  $form = array();
   // Get the current $theme for this domain, if available.
   $theme = domain_theme_lookup($domain['domain_id']);
   if ($theme['theme']) {
-    $form['theme_default']['#default_value'] = $theme['theme'];
+    $default = $theme['theme'];
   }
   else {
-    $form['theme_default']['#default_value'] = '';
+    $default = variable_get('theme_default', 'garland');
     if (empty($_POST)) {
       drupal_set_message(t('No theme has been set for this domain.'));
     }
   }
-  // Unset options that are not allowed.
-  $available = $form['status']['#options'];
-  $allowed = $form['status']['#default_value'];
-  foreach ($available as $key => $value) {
-    if (!in_array($key, $allowed)) {
-      // If the theme was disabled, then we have to set a new default
-      if ($key == $theme['theme']) {
-        $form['theme_default']['#default_value'] = '';
-        if (empty($_POST)) {
-          drupal_set_message(t('The chosen theme is no longer available for this domain.'), 'status', FALSE);
-        }
-      }
-      unset($form[$key]);
-      unset($form['status']['#options'][$key]);
-      unset($form['theme_default']['#options'][$key]);
-    }
-    else {
-      $form['status']['#disabled'] = TRUE;
-    }
-
-    if (isset($form[$key]) && isset($form[$key]['operations'])) {
-      $form[$key]['operations']= array(
-        '#value' => l(t('configure'), 'admin/build/domain/theme/'. $key .'/'. $domain['domain_id'] .'/theme-settings'),
-      );
-    }
-  }
-  // Use our own submit buttons.
-  $unset = array('buttons', '#submit');
-  foreach ($unset as $key) {
-    unset($form[$key]);
-  }
   // Message to users.
   $form['intro'] = array(
-    '#value' => t('<p>Select the default theme for this domain.</p>'),
+    '#markup' => t('<p>Select the default theme for this domain. You may only select themes <a href="!url">activated for all sites</a>.</p>', array('!url' => url('admin/appearance'))) . theme_domain_theme_reset(array('domain' => $domain)),
   );
   // Which domain are we editing?
   $form['domain_id'] = array(
     '#type' => 'value',
     '#value' => $domain['domain_id'],
   );
-  // Our submit handlers.
-  $form['#submit'][] = 'domain_theme_submit';
+  $themes = _system_theme_list();
+  $form['theme'] = array(
+    '#tree' => TRUE,
+    '#description' => t('To enable additional themes, <a href="!url">configure them globally</a>', array('!url' => url('admin/appearance'))),
+  );
+  foreach ($themes as $key => $theme) {
+    if ($theme->status) {
+      $form['theme'][$key] = array(
+        '#type' => 'radio',
+        '#return_value' => $key,
+        '#parents' => array('theme'),
+        '#default_value' => ($key == $default) ? $key : FALSE,
+      );
+    }
+  }
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Set domain theme'),
   );
+  return $form;
+}
+
+
+function domain_theme_form_submit($form, &$form_state) {
+  // Update or Insert?
+  $domain_id = $form_state['values']['domain_id'];
+  $theme = $form_state['values']['theme'];
+  // Set all themes in this domain to null status.
+  db_update('domain_theme')
+    ->fields(array(
+      'status' => 0,
+    ))
+    ->condition('domain_id', $domain_id)
+    ->execute();
+  // Now activate the selected theme.
+  // This lookup returns -1 on failure.
+  $check = domain_theme_lookup($domain_id, $theme);
+  // Update.
+  if ($check != -1) {
+    db_update('domain_theme')
+      ->fields(array(
+        'status' => 1,
+      ))
+      ->condition('domain_id', $domain_id)
+      ->condition('theme', $theme)
+      ->execute();
+  }
+  // Insert.
+  else {
+    db_insert('domain_theme')
+      ->fields(array(
+        'domain_id' => $domain_id,
+        'theme' => $theme,
+        'settings' => '',
+        'status' => 1,
+        'filepath' => '',
+      ))
+      ->execute();
+  }
+  // Return to the correct page.
+  $form_state['redirect'] = 'admin/config/domain/theme/' . $domain_id;
+  // Clear the cache.
+  cache_clear_all();
+}
+/**
+ * FormsAPI theming.
+ */
+function theme_domain_theme_form($variables) {
+  $form = $variables['form'];
+  $output = '';
+  $output .= drupal_render($form['intro']);
+  $themes = _system_theme_list();
+  $header = array(t('Screenshot'), t('Theme'), t('Default'), t('Options'));
+  $rows = array();
+  foreach (element_children($form['theme']) as $key) {
+    $default = '';
+    if ($form['theme'][$key]['#value'] == $key) {
+      $default = t('(default theme)');
+    }
+    $row = array(
+      theme('image', array('path' => $themes[$key]->info['screenshot'])),
+      '<h3>' . check_plain($themes[$key]->info['name'] . ' ' . $themes[$key]->info['version']) . ' ' . $default .  '</h3>' . check_plain($themes[$key]->info['description']),
+      drupal_render($form['theme'][$key]),
+      l('configure', 'admin/config/domain/theme/'. $key .'/'. $form['domain_id']['#value'] .'/theme-settings')
+    );
+    $rows[] = $row;
+  }
+
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  $output .= drupal_render_children($form);
+  return $output;
+}
+
+/**
+ * Resets theme settings by removing the domain row from {domain_theme}.
+ *
+ * @param $domain
+ * The $domain object created by domain_lookup().
+ * @return
+ * A confirmation form.
+ */
+function domain_theme_reset($domain) {
+  if ($domain == -1) {
+    return t('An invalid request has been made.');
+  }
+  return drupal_get_form('domain_theme_reset_form', $domain);
+}
+
+/**
+ * FormsAPI for resetting a domain themes.
+ *
+ * @param $domain
+ * The $domain object for the selected domain.
+ * @return
+ * Themed HTML form.
+ */
+function domain_theme_reset_form($form, $form_state, $domain) {
+  $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/config/domain/theme/'. $domain['domain_id'], t('Submitting this form will restore default theme for this domain.'));
+  return $form;
+}
+
+/**
+ * FormsAPI for domain_theme_reset_form.
+ */
+function domain_theme_reset_form_submit($form, &$form_state) {
+  db_delete('domain_theme')
+    ->condition('domain_id', $form_state['values']['domain_id'])
+    ->execute();
+  drupal_set_message(t('Domain theme settings have been reset.'));
+  $form_state['redirect'] = 'admin/config/domain/theme/'. $form_state['values']['domain_id'];
+  // Clear the cache.
+  cache_clear_all();
+}
+
+/**
+ * Theme a message at the top of domain theme pages.
+ *
+ * @param $domain
+ * The $domain object for the selected domain.
+ * @return
+ * Themed HTML messages.
+ */
+function theme_domain_theme_reset($variables) {
+  $domain = $variables['domain'];
+  $output = '';
+  $output .= '<p>'. t('These settings will replace your default site theme when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
+  $data = db_query("SELECT theme FROM {domain_theme} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchAssoc();
+  if (!empty($data)) {
+    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/config/domain/theme-reset/'. $domain['domain_id']))) .'</p>';
+  }
+  return $output;
 }
 
 /**
@@ -174,85 +270,6 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * FormsAPI submit handler for the theme settings
- */
-function domain_theme_submit($form, &$form_state) {
-  $theme = $form_state['values']['theme_default'];
-  $domain_id = $form_state['values']['domain_id'];
-  $settings = NULL; // This is a placeholder for advanced functions.
-  db_query("UPDATE {domain_theme} SET status = 0 WHERE domain_id = %d", $domain_id);
-  $check = domain_theme_lookup($domain_id, $theme);
-  if ($check == -1) {
-    db_query("INSERT INTO {domain_theme} (domain_id, theme, settings, status) VALUES (%d, '%s', %b, 1)", $domain_id, $theme, $settings);
-  }
-  else {
-    db_query("UPDATE {domain_theme} SET status = 1 WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
-  }
-  // Return to the correct page.
-  $form_state['redirect'] = 'admin/build/domain/theme/'. $domain_id;
-  // Clear the cache.
-  cache_clear_all();
-}
-
-/**
- * Resets theme settings by removing the domain row from {domain_theme}.
- *
- * @param $domain
- * The $domain object created by domain_lookup().
- * @return
- * A confirmation form.
- */
-function domain_theme_reset($domain) {
-  if ($domain == -1) {
-    return t('An invalid request has been made.');
-  }
-  return drupal_get_form('domain_theme_reset_form', $domain);
-}
-
-/**
- * FormsAPI for resetting a domain themes.
- *
- * @param $domain
- * The $domain object for the selected domain.
- * @return
- * Themed HTML form.
- */
-function domain_theme_reset_form($form_state, $domain) {
-  $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/build/domain/theme/'. $domain['domain_id'], t('Submitting this form will restore default theme for this domain.'));
-  return $form;
-}
-
-/**
- * FormsAPI for domain_theme_reset_form.
- */
-function domain_theme_reset_form_submit($form, &$form_state) {
-  db_query("DELETE FROM {domain_theme} WHERE domain_id = %d", $form_state['values']['domain_id']);
-  drupal_set_message(t('Domain theme settings have been reset.'));
-  $form_state['redirect'] = 'admin/build/domain/theme/'. $form_state['values']['domain_id'];
-  // Clear the cache.
-  cache_clear_all();
-}
-
-/**
- * Theme a message at the top of domain theme pages.
- *
- * @param $domain
- * The $domain object for the selected domain.
- * @return
- * Themed HTML messages.
- */
-function theme_domain_theme_reset($domain) {
-  $output = '';
-  $output .= '<p>'. t('These settings will replace your default site theme when %name is the active domain.', array('%name' => $domain['sitename'])) .'</p>';
-  $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE domain_id = %d", $domain['domain_id']));
-  if (!empty($data)) {
-    $output .= '<p>'. t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/build/domain/theme-reset/'. $domain['domain_id']))) .'</p>';
-  }
-  return $output;
-}
-
-/**
  * The domain theme page callback router.
  *
  * @param $theme
@@ -289,7 +306,7 @@ function domain_theme_settings_submit($form, &$form_state) {
   $values = $form_state['values'];
   $filepath = NULL;
   $reset = FALSE;
-  $form_state['redirect'] = 'admin/build/domain/theme/'. $values['domain_id'];
+  $form_state['redirect'] = 'admin/config/domain/theme/'. $values['domain_id'];
   $domain = domain_lookup($values['domain_id']);
   if ($values['op'] == $values['reset']) {
     db_query("DELETE FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $values['domain_id'], $values['theme']);

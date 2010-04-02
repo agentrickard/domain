@@ -19,26 +19,25 @@
 /**
  * Implements hook_init()
  */
-function domain_theme_init() {
+function domain_theme_custom_theme() {
+  $_domain = domain_get_domain();
+  // Allow the admin theme and other custom themes to be retained.
+  $item = menu_get_item();
+  if (!empty($item['theme_callback'])) {
+    return;
+  }
   // Assign the theme selected, based on the active domain.
-  global $_domain, $custom_theme;
-  // If the theme has already been set (such as an admin theme), only load settings.
-  if (empty($custom_theme)) {
-    $theme = domain_theme_lookup($_domain['domain_id']);
-  }
-  else {
-    $theme = domain_theme_lookup($_domain['domain_id'], $custom_theme);
-  }
+  $theme = domain_theme_lookup($_domain['domain_id']);
   // The above returns -1 on failure.
   if ($theme != -1) {
-    // Set our domain-specific theme.
-    if (empty($custom_theme)) {
-      $custom_theme = $theme['theme'];
-    }
     domain_theme_set_variables($theme);
+    return $theme['theme'];
   }
 }
 
+/**
+ * Set the stored variables for a domain.
+ */
 function domain_theme_set_variables($theme) {
   global $conf;
   if (!empty($theme['settings'])) {
@@ -72,7 +71,7 @@ function domain_theme_set_variables($theme) {
 function domain_theme_menu() {
   $items = array();
   // Menu items for configuring themes.
-  $items['admin/build/domain/theme/%domain'] = array(
+  $items['admin/config/domain/theme/%domain'] = array(
     'title' => 'Domain theme settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -80,7 +79,7 @@ function domain_theme_menu() {
     'page arguments' => array(4),
     'file' => 'domain_theme.admin.inc',
   );
-  $items['admin/build/domain/theme-reset/%domain'] = array(
+  $items['admin/config/domain/theme-reset/%domain'] = array(
     'title' => 'Domain theme settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -88,7 +87,7 @@ function domain_theme_menu() {
     'page arguments' => array(4),
     'file' => 'domain_theme.admin.inc',
   );
-  $items['admin/build/domain/theme/%/%domain/theme-settings'] = array(
+  $items['admin/config/domain/theme/%/%domain/theme-settings'] = array(
     'title' => 'Configure domain theme settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -105,7 +104,11 @@ function domain_theme_menu() {
 function domain_theme_theme() {
   $themes = array(
     'domain_theme_reset' => array(
-      'arguments' => array('domain' => array()),
+      'variables' => array('domain' => array()),
+    ),
+    'domain_theme_form' => array(
+      'render element' => 'form',
+      'file' => 'domain_theme.admin.inc',
     ),
   );
   return $themes;
@@ -127,10 +130,10 @@ function domain_theme_theme() {
  */
 function domain_theme_lookup($domain_id, $theme = NULL, $reset = FALSE) {
   if (!is_null($theme)) {
-    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings, status FROM {domain_theme} WHERE domain_id = %d AND theme= '%s'", $domain_id, $theme));
+    $return = db_query("SELECT domain_id, theme, settings, status FROM {domain_theme} WHERE domain_id = :domain_id AND theme= :theme", array(':domain_id' => $domain_id, ':theme' => $theme))->fetchAssoc();
   }
   else {
-    $return = db_fetch_array(db_query("SELECT domain_id, theme, settings, status FROM {domain_theme} WHERE domain_id = %d AND status = 1", $domain_id));
+    $return = db_query("SELECT domain_id, theme, settings, status FROM {domain_theme} WHERE domain_id = :domain_id AND status = 1", array(':domain_id' => $domain_id))->fetchAssoc();
   }
   if (empty($return)) {
     $return = -1;
@@ -145,7 +148,7 @@ function domain_theme_domainlinks($domain) {
   if ($domain['domain_id'] > 0) {
     $links[] = array(
       'title' => t('theme'),
-      'path' => 'admin/build/domain/theme/'. $domain['domain_id']
+      'path' => 'admin/config/domain/theme/' . $domain['domain_id']
     );
     return $links;
   }
@@ -158,7 +161,11 @@ function domain_theme_domainlinks($domain) {
 function domain_theme_domainform(&$form) {
   // Set the module weight for Domain Theme,
   $module_weight = variable_get('domain_theme_weight', 0);
-  db_query("UPDATE {system} SET weight = %d WHERE name = 'domain_theme' AND type = 'module'", $module_weight);
+  db_update('system')
+    ->fields(array('weight' => $module_weight))
+    ->condition(array('name' => 'domain_theme', 'type' => 'module'))
+    ->execute();
+#  db_query("UPDATE {system} SET weight = %d WHERE name = 'domain_theme' AND type = 'module'", $module_weight);
 
   // Add the form element to the main screen.
   $form['domain_theme'] = array(
@@ -265,7 +272,7 @@ function domain_theme_domainwarnings() {
   );
   $return = array();
   foreach ($forms as $form) {
-    $return[$form] =  'admin/build/domain/theme/%domain_id';
+    $return[$form] =  'admin/config/domain/theme/%domain_id';
   }
   return $return;
 }
