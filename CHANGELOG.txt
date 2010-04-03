@@ -1,5 +1,9 @@
 // $Id$
 
+03-APR-2010
+-- Fixes file uploads for Domain Theme.
+-- Rolls 7.x.2.0-alpha6.
+
 02-APR-2010
 -- Most of Domain Theme is working.
 

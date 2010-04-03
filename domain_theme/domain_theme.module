@@ -42,14 +42,13 @@ function domain_theme_set_variables($theme) {
   global $conf;
   if (!empty($theme['settings'])) {
     $settings = domain_unserialize($theme['settings']);
-#    dsm($settings);
-    $conf['theme_'. $theme['theme'] .'_settings'] = $settings;
+    $conf['theme_' . $theme['theme'] . '_settings'] = $settings;
     // Account for color module.
     $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
     // In some cases, where the domain uses the default color palette
     // and the primary theme does not, we may only have the palette
     // stored, in which case, we have to load that data and ignore the rest.
-    $palette_var = 'color_'. $theme['theme'] .'_palette';
+    $palette_var = 'color_' . $theme['theme'] . '_palette';
     if (!isset($settings[$palette_var])) {
       if (isset($settings['palette'])) {
         $conf[$palette_var] = $settings['palette'];
@@ -57,7 +56,7 @@ function domain_theme_set_variables($theme) {
     }
     else {
       foreach ($vars as $variable) {
-        $name = 'color_'. $theme['theme'] .'_'. $variable;
+        $name = 'color_' . $theme['theme'] . '_' . $variable;
         if (isset($settings[$name])) {
           $conf[$name] = $settings[$name];
         }
@@ -322,7 +321,8 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
     '#value' => $theme,
   );
 
-   // We have to remove the core submit handler, but keep other handlers.
+  // We have to remove the core submit handler, but keep other handlers.
+  // Otherwise, our changes get saved to the {variables} table.
   $form['#submit'][100] = 'domain_theme_settings_submit';
   foreach ($form['#submit'] as $key => $value) {
     if ($value == 'system_theme_settings_submit') {
@@ -346,7 +346,7 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   // TODO: Make this work with Domain Prefix.
   $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
   foreach ($vars as $variable) {
-    $name = 'color_'. $theme .'_'. $variable;
+    $name = 'color_' . $theme . '_' . $variable;
     $value = db_query("SELECT value FROM {variable} WHERE name = :name", array(':name' => $name))->fetchField();
     $color_settings[$name] = isset($value) ? $value : NULL;
   }

@@ -16,6 +16,7 @@ CONTENTS
 1.2   Contributors
 2.  Installation
 2.1   Dependencies
+2.2   Upgrading to Drupal 7
 3.  Configuration Options
 3.1   Theme Settings
 3.2   Domain-Specific Themes
@@ -61,6 +62,15 @@ database.
 2.1 Dependencies
 
 Domain Theme requires the Domain Access module be installed and active.
+
+----
+2.2   Upgrading to Drupal 7
+
+When you upgrade the module to Drupal 7, you may need to reset your theme
+settings for each domain. There are internal changes to the theme system that
+cannot be automated during the update process. 
+
+You should check your logo and favicon files after performing an upgrade.
 
 ----
 3.  Configuration Options
@@ -117,7 +127,12 @@ If you configure a theme's settings without having selected a default theme for
 the domain, that theme will be made the default.
 
 NOTE: When viewing this configuration page, the theme's domain-specific
-settings will be displayed and the page's theme will change.
+settings will be displayed.
+
+NOTE: In Drupal 7, the logo and favicon files you upload per theme are no
+longer renamed to match the theme name. In order to have custom logos
+and favicons, you may need to name the files appropriately before they are
+uploaded.
 
 ----
 3.4 Color Module Notes
@@ -144,6 +159,9 @@ under the 'Theme settings' header.
 
 You may need to experiment with various weights before finding the correct
 setting for your site. Lower weights execute first. Zero is the default weight.
+
+By design, Domain Theme should not reset the theme for a page if another
+module has already done so.
 
 ----
 4.  Batch Updates
