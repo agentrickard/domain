@@ -3,6 +3,7 @@
 05-APR-2010
 
 -- Patch #762292 by Daemon_Byte. Fixes error message in Domain User.
+-- #756162. Better grant handling for Domain Content updates.
 
 30-MAR-2010
 
