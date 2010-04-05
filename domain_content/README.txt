@@ -42,7 +42,7 @@ Domain Access is a node access module.  By design, Drupal's default content
 administration page does not respect node access rules.
 
 The Domain Content provides an additional set of batch content administration
-pages that respect the node access rules set by the Doamin Access module.
+pages that respect the node access rules set by the Domain Access module.
 
 ----
 2.  Installation

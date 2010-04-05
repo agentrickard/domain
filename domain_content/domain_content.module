@@ -393,30 +393,3 @@ function domain_content_node_operations_process_form($arguments) {
   }
   return $form;
 }
-
-/**
- * Custom operation submit for Views Bulk Operations.
- */
-function domain_content_node_operations_process_submit($form, &$form_state) {
-  // This is a three step form, and our action is on step three.
-  if ($form_state['values']['step'] == 2) {
-    return array($form, $form_state);
-  }
-  return domain_content_node_operations_submit($form, $form_state);
-}
-
-/**
- * Submit handler for Views Bulk Operations.
- *
- * We need this because VBO processes nodes differently.
- */
-function domain_content_node_operations_submit($form, &$form_state) {
-  $options = array();
-  $options['domain_site'] = FALSE;
-  if ($form_state['values']['domain_site']) {
-    $options['domain_site'] = TRUE;
-  }
-  $options['domain_id'] = array_filter($form_state['values']['domains']);
-  $nids = array_keys($form_state['storage'][1]['objects']['selection']);
-  domain_content_update_nodes($nids, $options);
-}
