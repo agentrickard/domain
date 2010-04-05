@@ -7,6 +7,15 @@
  */
 
 /**
+ * Implements hook_uninstall().
+ */
+function domain_nav_uninstall() {
+  // Remove our variables.
+  variable_del('domain_nav_block');
+  variable_del('domain_nav_theme');
+}
+
+/**
  * Update block deltas to Drupal 7.
  */
 function domain_nav_update_7000() {
