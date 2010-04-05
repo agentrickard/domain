@@ -78,10 +78,15 @@ function domain_content_menu() {
 }
 
 /**
- * Implements hook_perm().
+ * Implements hook_permission().
  */
-function domain_content_perm() {
-  return array('configure domain content', 'review content for all domains');
+function domain_content_permission() {
+  $permissions = array(
+    'review content for all domains' => array(
+      'title' => t('Access inactive domains'),
+    ),
+  );
+  return $permissions;
 }
 
 /**
@@ -90,7 +95,7 @@ function domain_content_perm() {
 function domain_content_theme() {
   $themes = array(
     'domain_content_admin_nodes' => array(
-      'arguments' => array('form' => array()),
+      'variables' => array('form' => array()),
       'file' => 'domain_content.admin.inc',
     ),
   );
@@ -101,10 +106,10 @@ function domain_content_theme() {
  * Access control for menu items.  There may be another way to do this in Drupal 6.
  *
  * @param $check
- * The access check value passed from hook_menu().
+ *   The access check value passed from hook_menu().
  */
 function domain_content_menu_check() {
-  if (user_access('administer nodes')) {
+  if (user_access('access content overview')) {
     return TRUE;
   }
   if (user_access('edit domain nodes') || user_access('review content for all domains')) {
@@ -180,15 +185,9 @@ function domain_content_node_operations() {
  * Callback for domain_content_node_operations().
  *
  * This callback is required, but we actually do our action inside
- * of domain_content_update_nodes().
- *
- * In the case of VBO, an actual form is passed here. Otherwise, we
- * let our form submit handler process things.
+ * of domain_content_process_nodes().
  */
-function domain_content_node_operations_process($nodes, $form = array(), $form_state = array()) {
-  if (!empty($form_state['values'])) {
-    domain_content_node_operations_submit($form, $form_state);
-  }
+function domain_content_node_operations_process($nodes) {
 }
 
 /**
@@ -308,11 +307,6 @@ function domain_content_process_nodes($form, &$form_state) {
  * Abstraction function that lets us update access rules.
  */
 function domain_content_update_nodes($nids, $options) {
-  static $load_nodes;
-  // Do other modules have a stake in the node grants set by Domain Access?
-  if (!isset($load_nodes)) {
-    $load_nodes = (bool) count(module_implements('domainrecords'));
-  }
   // If our operation is run, then we have to manually change the
   // {node_access} table.  The rest of the process will clear the cache,
   // so this should be a safe operation.
@@ -320,14 +314,8 @@ function domain_content_update_nodes($nids, $options) {
   $domains = $options['domain_id'];
   $behavior = $options['behavior'];
   foreach ($nids as $nid) {
-    // If other modules need to respond, we have to load the full node.
-    if ($load_nodes) {
-      $node = node_load($nid);
-    }
-    else {
-      $node = new stdClass();
-      $node->nid = $nid;
-    }
+    // Other modules need to respond, we have to load the full node.
+    $node = node_load($nid);
     // Make sure the node is valid.
     if ($node->nid > 0) {
       // If modifying values, do so here.
@@ -357,20 +345,8 @@ function domain_content_update_nodes($nids, $options) {
       // Use our new options, as set above.
       $node->domain_site = $domain_site;
       $node->domains = $domains;
-      // Run our storage hook. This handles {domain_access} and returns
-      // the records we need for {node_access}.
-      $grants = domain_node_access_records($node);
-      // Get all the grants returned.
-      $realms = array('domain_site', 'domain_id');
-      foreach ($grants as $grant) {
-        if (!in_array($grant['realm'], $realms)) {
-          $realms[] = $grant['realm'];
-        }
-      }
       // Delete our grants and rebuild.
-      foreach ($realms as $realm) {
-        node_access_write_grants($node, $grants, $realm);
-      }
+      node_access_acquire_grants($node);
     }
   }
   // Clear the cache.

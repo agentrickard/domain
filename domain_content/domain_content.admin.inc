@@ -12,14 +12,14 @@
  * The domain content page of menu callbacks.
  *
  * @return
- *  A link group for each domain the user can access.
+ *   A link group for each domain the user can access.
  */
 function domain_content_page() {
   $content = array();
   $content = system_admin_menu_block(menu_get_item('admin/domain/content'));
   // Print the list of options.
   if (!empty($content)) {
-    $output = theme('admin_block_content', $content);
+    $output = theme('admin_block_content', array('content' => $content));
   }
   // There was an error or invalid request.
   else {
@@ -49,7 +49,6 @@ function domain_content_list() {
       unset($user->domain_user[-1]);
       $user->domain_user[0] = 0;
     }
-    $query = "SELECT domain_id, subdomain, sitename, scheme FROM {domain} WHERE domain_id IN (". db_placeholders($user->domain_user, 'int') .")";
   }
   // Table information
   $header = array(
@@ -58,15 +57,28 @@ function domain_content_list() {
     array('data' => t('Content count')),
     array('data' => t('Site'), 'field' => 'subdomain'),
   );
-  $query .= tablesort_sql($header);
-  $result = pager_query($query, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0, NULL, $user->domain_user);
+  // Set up the base query.
+  $query = db_select('domain', 'd')
+    ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
+  // Add the tablesort.
+  $query = $query
+    ->extend('TableSort')
+    ->orderByHeader($header);
+  $query = $query->extend('PagerDefault')->limit(variable_get('domain_list_size', DOMAIN_LIST_SIZE));
+  // Get the domains.
+  $result = $query->execute();
+#  $query .= tablesort_sql($header);
+#  $result = pager_query($query, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0, NULL, $user->domain_user);
+  foreach ($result as $data) {
+    $domains[] = (array) $data;
+  }
   $rows = array();
-  while ($domain = db_fetch_array($result)) {
+  foreach ($domains as $domain) {
     $path = trim(domain_get_path($domain), '/');
     $rows[] = array(
       $domain['domain_id'],
       l(t('!sitename content', array('!sitename' => $domain['sitename'])), 'admin/domain/content/'. $domain['domain_id']),
-      (int) db_result(db_query("SELECT COUNT(*) FROM {domain_access} WHERE gid = %d AND realm = 'domain_id'", $domain['domain_id'])),
+      (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField(),
       l(t('view site'), $path),
     );
   }
@@ -74,14 +86,14 @@ function domain_content_list() {
   $all = array(
     '-',
     l(t('Content assigned to all affiliates'), 'admin/domain/content/all'),
-    (int) db_result(db_query("SELECT COUNT(*) FROM {domain_access} WHERE gid = 0 AND realm = 'domain_site'")),
+    (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => 0, ':realm' => 'domain_site'))->fetchField(),    
     '',
   );
   array_unshift($rows, $all);
   if (!empty($rows)) {
     $output = '<p>'. t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate.') .'</p>';
-    $output .= theme_table($header, $rows);
-    $output .= theme('pager', NULL, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0);
+    $output .= theme('table', array('header' => $header, 'rows' => $rows));
+    $output .= theme('pager', array());
     return $output;
   }
   else {
@@ -104,7 +116,7 @@ function domain_content_list() {
  *  A link group for each domain the user can access.
  */
 function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
-  global $_domain;
+  $_domain = domain_get_domain();
 
   // Load the active domain, which is not necessarily the current domain.
   if (!is_null($domain_id) && $domain_id != $_domain['domain_id']) {
@@ -159,7 +171,7 @@ function domain_content_admin() {
  * @return
  *  A form array according to the FormsAPI.
  */
-function domain_content_form($form_state) {
+function domain_content_form($form, &$form_state) {
   global $_domain;
   $filter = node_build_filter_query();
 
@@ -304,7 +316,8 @@ function domain_content_filter_operations(&$operations) {
  *
  * @ingroup themes
  */
-function theme_domain_content_admin_nodes($form) {
+function theme_domain_content_admin_nodes($variables) {
+  $form = $variables['form'];
   // Overview table:
   $header = array(theme('table_select_header_cell'), t('Title'), t('Affiliates'), t('Type'), t('Author'), t('Status'), t('Operations'));
   $output = '';
@@ -328,12 +341,12 @@ function theme_domain_content_admin_nodes($form) {
     $rows[] = array(array('data' => t('No posts available.'), 'colspan' => '6'));
   }
 
-  $output .= theme('table', $header, $rows);
+  $output .= theme('table', array('header' => $header, 'rows' => $rows));
   if ($form['pager']['#value']) {
     $output .= drupal_render($form['pager']);
   }
 
-  $output .= drupal_render($form);
+  $output .= drupal_render_children($form);
 
   return $output;
 }
