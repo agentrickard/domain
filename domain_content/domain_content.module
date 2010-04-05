@@ -81,7 +81,7 @@ function domain_content_menu() {
  * Implement hook_perm().
  */
 function domain_content_perm() {
-  return array('configure domain content', 'review content for all domains');
+  return array('review content for all domains');
 }
 
 /**

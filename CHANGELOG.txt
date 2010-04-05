@@ -6,6 +6,7 @@
 -- #756162. Better grant handling for Domain Content updates.
 -- #757746 by drupalok. Better options for batch updates.
 -- #710712 by fizk and nonsie. Better handling of hook_node_operations().
+-- Removes unused permission from Domain Content.
 
 30-MAR-2010
 
