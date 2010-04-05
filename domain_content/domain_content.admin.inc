@@ -137,10 +137,12 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   // KILLSWITCH CASE: returns an error
   else {
     drupal_set_message(t('Invalid request'), 'error');
-    $output .= t('<p>The specified domain does not exist.</p>');
+    $output = t('<p>The specified domain does not exist.</p>');
     return $output;
   }
-  $output .= domain_content_admin();
+  $output = drupal_get_form('domain_content_admin');
+  // Reset the active domain.
+  domain_reset_domain();
   return $output;
 }
 
@@ -154,15 +156,25 @@ function domain_content_admin() {
   // Load the form basics for administering nodes.
   include_once drupal_get_path('module', 'node') .'/node.admin.inc';
 
-  $output = drupal_get_form('node_filter_form');
-
-  if (isset($_POST['nodes']) && $_POST['operation'] == 'delete') {
-    return drupal_get_form('node_multiple_delete_confirm', $_POST['nodes']);
+  if (isset($form_state['values']['operation']) && $form_state['values']['operation'] == 'delete') {
+    return node_multiple_delete_confirm($form, $form_state, array_filter($form_state['values']['nodes']));
   }
-  // Call the form first, to allow for the form_values array to be populated.
-  $output .= drupal_get_form('domain_content_form');
+  $form['filter'] = node_filter_form();
+  $form['#submit'][] = 'node_filter_form_submit';
 
-  return $output;
+  // Privileged users can make global changes to Domain Access permissions.
+  if (user_access('set domain access')) {
+    domain_content_add_form_widget($form);
+  }
+  $form['admin'] = domain_content_form();
+  $form['#theme'] = 'domain_content_admin_nodes';
+  $form['#validate'][] = 'node_admin_nodes_validate';
+  $form['#submit'][] = 'node_admin_nodes_submit';
+  $form['#submit'][] = 'domain_content_process_nodes';
+  // Filter the available operations based on user permissions.
+  domain_content_filter_operations($form['options']['operation']['#options']);
+
+  return $form;
 }
 
 /**
@@ -171,50 +183,202 @@ function domain_content_admin() {
  * @return
  *  A form array according to the FormsAPI.
  */
-function domain_content_form($form, &$form_state) {
-  global $_domain;
-  $filter = node_build_filter_query();
+function domain_content_form() {
+  module_load_include('inc', 'node', 'node.admin');
+  $_domain = domain_get_domain();
+  $admin_access = user_access('administer nodes');
 
-  // Bypass the superuser permissions by forcing an AND on {domain_access}.
-  $filter['join'] .= " INNER JOIN {domain_access} dac ON dac.nid = n.nid ";
-  $arg = arg(3);
+  // Build the 'Update options' form.
+  $form['options'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Update options'),
+    '#attributes' => array('class' => array('container-inline')),
+    '#access' => $admin_access,
+  );
+  $options = array();
+  foreach (module_invoke_all('node_operations') as $operation => $array) {
+    $options[$operation] = $array['label'];
+  }
+  $form['options']['operation'] = array(
+    '#type' => 'select',
+    '#options' => $options,
+    '#default_value' => 'approve',
+  );
+  $form['options']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Update'),
+    '#validate' => array('node_admin_nodes_validate'),
+    '#submit' => array('node_admin_nodes_submit'),
+  );
 
-  if ($arg != 'all') {
-    // In this case, we must check the domain_id grant.
-    // We use intval() here for security, since we are not filtering the query parameter otherwise.
-    if (empty($filter['where'])) {
-      $filter['where'] = " WHERE dac.realm = 'domain_id' AND dac.gid = ". intval($_domain['domain_id']) ." ";
+  // Enable language column if translation module is enabled
+  // or if we have any node with language.
+  $multilanguage = (module_exists('translation') || db_query("SELECT COUNT(*) FROM {node} WHERE language <> :language", array(':language' => LANGUAGE_NONE))->fetchField());
+
+  // Build the sortable table header.
+  $header = array(
+    'title' => array('data' => t('Title'), 'field' => 'n.title'),
+    'domains' => array('data' => t('Affiliates')),
+    'type' => array('data' => t('Type'), 'field' => 'n.type'),
+    'author' => t('Author'),
+    'status' => array('data' => t('Status'), 'field' => 'n.status'),
+    'changed' => array('data' => t('Updated'), 'field' => 'n.changed', 'sort' => 'desc')
+  );
+
+  if ($multilanguage) {
+    $header['language'] = array('data' => t('Language'), 'field' => 'n.language');
+  }
+  $header['operations'] = array('data' => t('Operations'));
+
+  $query = db_select('node', 'n')->extend('PagerDefault')->extend('TableSort');
+  node_build_filter_query($query);
+
+  if (!user_access('bypass node access')) {
+    // If the user is able to view their own unpublished nodes, allow them
+    // to see these in addition to published nodes. Check that they actually
+    // have some unpublished nodes to view before adding the condition.
+    if (user_access('view own unpublished content') && $own_unpublished = db_query('SELECT nid FROM {node} WHERE uid = :uid AND status = :status', array(':uid' => $GLOBALS['user']->uid, ':status' => 0))->fetchCol()) {
+      $query->condition(db_or()
+        ->condition('n.status', 1)
+        ->condition('n.nid', $own_unpublished, 'IN')
+      );
     }
     else {
-      $filter['where'] .= " AND dac.realm = 'domain_id' AND dac.gid = ". intval($_domain['domain_id']) ." ";
+      // If not, restrict the query to published nodes.
+      $query->condition('n.status', 1);
     }
   }
+  // Restrict the query to the active domain.
+  domain_alter_node_query($query);
+
+  $nids = $query
+    ->fields('n',array('nid'))
+    ->limit(50)
+    ->orderByHeader($header)
+    ->execute()
+    ->fetchCol();
+  $nodes = node_load_multiple($nids);
+
+  // Prepare the list of nodes.
+  $languages = language_list();
+  $destination = drupal_get_destination();
+  $options = array();
+  foreach ($nodes as $node) {
+    $l_options = $node->language != LANGUAGE_NONE ? array('language' => $languages[$node->language]) : array();
+    $options[$node->nid] = array(
+      'title' => array(
+        'data' => array(
+          '#type' => 'link',
+          '#title' => $node->title,
+          '#href' => 'node/' . $node->nid,
+          '#options' => $l_options,
+          '#suffix' => ' ' . theme('mark', array('type' => node_mark($node->nid, $node->changed))),
+        ),
+      ),
+      'type' => check_plain(node_type_get_name($node)),
+      'author' => theme('username', array('account' => $node)),
+      'status' => $node->status ? t('published') : t('not published'),
+      'changed' => format_date($node->changed, 'short'),
+    );
+    if ($multilanguage) {
+      $options[$node->nid]['language'] = $node->language == LANGUAGE_NONE ? t('Language neutral') : t($languages[$node->language]->name);
+    }
+    // Build a list of all the accessible operations for the current node.
+    $operations = array();
+    if (node_access('update', $node)) {
+      $operations['edit'] = array(
+        'title' => t('edit'),
+        'href' => 'node/' . $node->nid . '/edit',
+        'query' => $destination,
+      );
+    }
+    if (node_access('delete', $node)) {
+      $operations['delete'] = array(
+        'title' => t('delete'),
+        'href' => 'node/' . $node->nid . '/delete',
+        'query' => $destination,
+      );
+    }
+    $options[$node->nid]['operations'] = array();
+    if (count($operations) > 1) {
+      // Render an unordered list of operations links.
+      $options[$node->nid]['operations'] = array(
+        'data' => array(
+          '#theme' => 'links__node_operations',
+          '#links' => $operations,
+          '#attributes' => array('class' => array('links', 'inline')),
+        ),
+      );
+    }
+    elseif (!empty($operations)) {
+      // Render the first and only operation as a link.
+      $link = reset($operations);
+      $options[$node->nid]['operations'] = array(
+        'data' => array(
+          '#type' => 'link',
+          '#title' => $link['title'],
+          '#href' => $link['href'],
+          '#options' => array('query' => $link['query']),
+        ),
+      );
+    }
+    // Set the assigned domains.
+    $options[$node->nid]['domains'] = domain_content_view_domains($node);
+  }
+  // Only use a tableselect when the current user is able to perform any
+  // operations.
+  if ($admin_access) {
+    $form['nodes'] = array(
+      '#type' => 'tableselect',
+      '#header' => $header,
+      '#options' => $options,
+      '#empty' => t('No content available.'),
+    );
+  }
+  // Otherwise, use a simple table.
   else {
-    // Or check the domain_site grant.
-    if (empty($filter['where'])) {
-      $filter['where'] = " WHERE dac.realm = 'domain_site' AND dac.gid = 0 ";
-    }
-    else {
-      $filter['where'] .= " AND dac.realm = 'domain_site' AND dac.gid = 0 ";
-    }
+    $form['nodes'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $options,
+      '#empty' => t('No content available.'),
+    );
   }
 
-  $result = pager_query(db_rewrite_sql('SELECT n.nid FROM {node} n '. $filter['join'] . $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
+  $form['pager'] = array('#markup' => theme('pager', array('tags' => NULL)));
 
-  // Reset the active domain.
-  domain_reset_domain();
+  return $form;
 
-  $nodes = array();
+  // Users must have passed at least one access check to have batch options.
+  if ((user_access('administer nodes') || user_access('set domain access')) && !empty($nodes)) {
+    $form['options'] = array('#type' => 'fieldset',
+      '#title' => t('Update options'),
+      '#prefix' => '<div class="container-inline">',
+      '#suffix' => '</div>',
+      '#weight' => -1
+    );
+    $options = array();
+    foreach (module_invoke_all('node_operations') as $operation => $array) {
+      $options[$operation] = $array['label'];
+    }
+    $form['options']['operation'] = array('#type' => 'select', '#options' => $options,  '#default_value' => 'approve');
+    $form['options']['submit'] = array('#type' => 'submit', '#value' => t('Update'));
+    $form['nodes'] = array('#type' => 'checkboxes', '#options' => $nodes);
+    // Filter the available operations based on user permissions.
+    domain_content_filter_operations($form['options']['operation']['#options']);
+  }
+  $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
+  $form['#theme'] = 'domain_content_admin_nodes';
+  $form['#validate'][] = 'node_admin_nodes_validate';
+  $form['#submit'][] = 'node_admin_nodes_submit';
+  $form['#submit'][] = 'domain_content_process_nodes';
+  return $form;
+}
 
-  // Loop through the nodes to build the form
-  while ($nid = db_fetch_object($result)) {
-    $node = node_load($nid->nid);
-
-    $form['title'][$node->nid] = array('#value' => l($node->title, 'node/'. $node->nid) .' '. theme('mark', node_mark($node->nid, $node->changed)));
-    $form['name'][$node->nid] =  array('#value' => check_plain(node_get_types('name', $node)));
-    $form['username'][$node->nid] = array('#value' => theme('username', $node));
-    $form['status'][$node->nid] =  array('#value' =>  ($node->status ? t('published') : t('not published')));
-
+/**
+ * Format domains for this node.
+ */
+function domain_content_view_domains($node) {
     $node_domains = array();
     if (!empty($node->domains)) {
       foreach ($node->domains as $domain) {
@@ -241,40 +405,7 @@ function domain_content_form($form, &$form_state) {
         $items[$source->domain_id] .= '*';
       }
     }
-    $form['domains'][$node->nid] =  array('#value' => theme('item_list', $items));
-    if (node_access('update', $node)) {
-      $form['operations'][$node->nid] = array('#value' => l(t('edit'), 'node/'. $node->nid .'/edit', array('query' => drupal_get_destination())));
-      $nodes[$node->nid] = '';
-    }
-  }
-  // Privileged users can make global changes to Domain Access permissions.
-  if (user_access('set domain access')) {
-    domain_content_add_form_widget($form);
-  }
-  // Users must have passed at least one access check to have batch options.
-  if ((user_access('administer nodes') || user_access('set domain access')) && !empty($nodes)) {
-    $form['options'] = array('#type' => 'fieldset',
-      '#title' => t('Update options'),
-      '#prefix' => '<div class="container-inline">',
-      '#suffix' => '</div>',
-      '#weight' => -1
-    );
-    $options = array();
-    foreach (module_invoke_all('node_operations') as $operation => $array) {
-      $options[$operation] = $array['label'];
-    }
-    $form['options']['operation'] = array('#type' => 'select', '#options' => $options,  '#default_value' => 'approve');
-    $form['options']['submit'] = array('#type' => 'submit', '#value' => t('Update'));
-    $form['nodes'] = array('#type' => 'checkboxes', '#options' => $nodes);
-    // Filter the available operations based on user permissions.
-    domain_content_filter_operations($form['options']['operation']['#options']);
-  }
-  $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
-  $form['#theme'] = 'domain_content_admin_nodes';
-  $form['#validate'][] = 'node_admin_nodes_validate';
-  $form['#submit'][] = 'node_admin_nodes_submit';
-  $form['#submit'][] = 'domain_content_process_nodes';
-  return $form;
+    return theme('item_list', array('items' => $items));
 }
 
 /**
@@ -310,43 +441,14 @@ function domain_content_filter_operations(&$operations) {
  * Replaces the default theme function for the node administration form.
  *
  * @param $form
- *  FormsAPI representation of the batch node edit form.
+ *   FormsAPI representation of the batch node edit form.
  * @return
- *  A themed HTML form.
+ *   A themed HTML form.
  *
  * @ingroup themes
  */
 function theme_domain_content_admin_nodes($variables) {
   $form = $variables['form'];
-  // Overview table:
-  $header = array(theme('table_select_header_cell'), t('Title'), t('Affiliates'), t('Type'), t('Author'), t('Status'), t('Operations'));
-  $output = '';
-  $output .= drupal_render($form['domain']);
-  $output .= drupal_render($form['options']);
-  if (isset($form['title']) && is_array($form['title'])) {
-    foreach (element_children($form['title']) as $key) {
-      $row = array();
-      $row[] = drupal_render($form['nodes'][$key]);
-      $row[] = drupal_render($form['title'][$key]);
-      $row[] = drupal_render($form['domains'][$key]);
-      $row[] = drupal_render($form['name'][$key]);
-      $row[] = drupal_render($form['username'][$key]);
-      $row[] = drupal_render($form['status'][$key]);
-      $row[] = drupal_render($form['operations'][$key]);
-      $rows[] = $row;
-    }
-
-  }
-  else  {
-    $rows[] = array(array('data' => t('No posts available.'), 'colspan' => '6'));
-  }
-
-  $output .= theme('table', array('header' => $header, 'rows' => $rows));
-  if ($form['pager']['#value']) {
-    $output .= drupal_render($form['pager']);
-  }
-
-  $output .= drupal_render_children($form);
-
+  $output = drupal_render_children($form);
   return $output;
 }

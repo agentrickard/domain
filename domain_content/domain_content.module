@@ -95,7 +95,7 @@ function domain_content_permission() {
 function domain_content_theme() {
   $themes = array(
     'domain_content_admin_nodes' => array(
-      'variables' => array('form' => array()),
+      'render element' => 'form',
       'file' => 'domain_content.admin.inc',
     ),
   );
@@ -109,7 +109,7 @@ function domain_content_theme() {
  *   The access check value passed from hook_menu().
  */
 function domain_content_menu_check() {
-  if (user_access('access content overview')) {
+  if (user_access('administer nodes')) {
     return TRUE;
   }
   if (user_access('edit domain nodes') || user_access('review content for all domains')) {

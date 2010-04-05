@@ -2721,12 +2721,19 @@ function domain_simpletest() {
  * If enabled, force admins to use Domain Access rules.
  */
 function domain_query_node_access_alter(QueryAlterableInterface $query) {
-  $_domain = domain_get_domain();
   $admin_force = variable_get('domain_force_admin', FALSE);
   // In any of the following cases, do not enforce any rules.
   if (empty($admin_force) || !user_access('bypass node access') || domain_grant_all()) {
     return;
   }
+  domain_alter_node_query($query);
+}
+
+/**
+ * Abstraction to allow query alters outside of node access.
+ */
+function domain_alter_node_query(QueryAlterableInterface $query) {
+  $_domain = domain_get_domain();
   $domain_id = (int) $_domain['domain_id'];
   $tables = $query->getTables();
   foreach ($tables as $nalias => $tableinfo) {
@@ -2747,4 +2754,5 @@ function domain_query_node_access_alter(QueryAlterableInterface $query) {
       $query->distinct();
     }
   }
+
 }
