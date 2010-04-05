@@ -59,7 +59,8 @@ CONTENTS
 4.8.2   Domain Node Types
 4.9   Batch Updating
 4.10  Assigning Users to Domains
-4.11 Batch Assignment of Users to Domains
+4.11  Batch Assignment of Users to Domains
+4.11.1  Form Behavior
 5.  Blocks
 5.1   Block -- Domain Switcher
 5.2   Block -- Domain Access Information
@@ -1060,6 +1061,25 @@ Note that this form also shows you a list of domains that a user is
 currently assigned to.
 
 If these elements do not appear, you do not have the proper permissions.
+
+----
+4.11.1 Form Behavior
+
+In 6.x.2.5 and higher, you may select one of two options when updating domains.
+
+Under the 'Update behavior' form element, you may choose:
+
+  [] Replace old values with new settings
+  [] Add new settings to existing values
+  [] Remove selected domains from existing values
+
+Choosing 'replace' will erase any current domain affiliation for the selected users
+and replace them with those entered into the form. Choosing 'add' will merge the
+new values with the existing values. Choosing 'remove' will remove the new values
+from the existing ones.
+
+This new feature is helpful when you want to alter domain settings, but do not
+want all users to be assigned to the same domains.
 
 ----
 5.  Blocks

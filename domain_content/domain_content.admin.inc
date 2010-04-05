@@ -255,6 +255,13 @@ function domain_content_form($form_state) {
       '#collapsed' => TRUE,
       '#prefix' => '<div class="description">'. t('If you select <em>Change affiliate publishing options</em> above, you should confirm the <em>Affiliate publishing options</em> settings below.') .'</div>'
     );
+    $form['domain']['behavior'] = array(
+      '#type' => 'radios',
+      '#title' => t('Update behavior'),
+      '#options' => array(0 => t('Replace old values with new settings'), 1 => t('Add new settings to existing values'), 2 => t('Remove selected domains from existing values')),
+      '#description' => t('Defines how new grants will be applied to the updated nodes.'),
+      '#default_value' => 0,
+    );
     $form['domain']['domain_site'] = array(
       '#type' => 'checkbox',
       '#prefix' => t('<p><b>Publishing options:</b>'),
@@ -371,6 +378,30 @@ function domain_content_update_nodes($form, &$form_state) {
     }
     // Make sure the node is valid.
     if ($node->nid > 0) {
+      // If modifying values, do so here.
+      if (!empty($form_state['values']['behavior'])) {
+        $current = domain_get_node_domains($node->nid);
+        // Add values to the current set.
+        if ($form_state['values']['behavior'] == 1) {
+          if (!empty($current['domain_site'])) {
+            $domain_site = TRUE;
+          }
+          $domains += $current['domain_id'];
+        }
+        // Remove values from the current set.
+        else {
+          foreach ($domains as $domain_id) {
+            if (isset($current['domain_id'][$domain_id])) {
+              unset($current['domain_id'][$domain_id]);
+            }
+          }
+          $domains = $current['domain_id'];
+          // If all affiliates is selected, remove it.
+          if ($domain_site) {
+            $domain_site = FALSE;
+          }
+        }
+      }
       // Use our new options, as set above.
       $node->domain_site = $domain_site;
       $node->domains = $domains;

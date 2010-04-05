@@ -22,6 +22,7 @@ CONTENTS
 4.  Content Editing
 4.1   Affiliates
 4.2   Domain Access Options
+4.3   Form Behavior
 5.  Developer Notes
 
 
@@ -146,8 +147,27 @@ By default, the currently active domain will be chosen, as will the value set fo
 promoting new nodes to all affiliates.
 
 WARNING: It is possible that you may move some nodes to domains other
-than the currently active domain.  If so, some nodes will be reomved from
+than the currently active domain.  If so, some nodes will be removed from
 the form after you submit the update.  This behavior is normal and desired.
+
+----
+4.3 Form Behavior
+
+In 6.x.2.5 and higher, you may select one of two options when updating domains.
+
+Under the 'Update behavior' form element, you may choose:
+
+  [] Replace old values with new settings
+  [] Add new settings to existing values
+  [] Remove selected domains from existing values
+
+Choosing 'replace' will erase any current domain affiliation for the selected nodes
+and replace them with those entered into the form. Choosing 'add' will merge the
+new values with the existing values. Choosing 'remove' will remove the new values
+from the existing ones.
+
+This new feature is helpful when you want to alter domain settings, but do not
+want all nodes to be assigned to the same affiliates.
 
 ----
 5.  Developer Notes
