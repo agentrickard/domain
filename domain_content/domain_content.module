@@ -148,16 +148,28 @@ function domain_content_check($domain_id) {
 }
 
 /**
+ * Implement hook_domainlinks()
+ */
+function domain_content_domainlinks($domain) {
+  $links[] = array(
+    'title' => t('content'),
+    'path' => 'admin/domain/content/'. $domain['domain_id']
+  );
+  return $links;
+}
+
+/**
  * Implement hook_node_operations()
  */
 function domain_content_node_operations() {
   // Only privileged users can perform this operation.
   // Do not show this on the default node editing form.
-  if (arg(0) == 'admin' &&  arg(1) == 'domain' && user_access('set domain access')) {
+  if (user_access('set domain access')) {
     $operations = array(
       'domain' => array(
       'label' => t('Change affiliate publishing options'),
-      'callback' => 'domain_content_node_operations_access',
+      'callback' => 'domain_content_node_operations_process',
+      'configurable' => TRUE,
       )
     );
     return $operations;
@@ -169,8 +181,14 @@ function domain_content_node_operations() {
  *
  * This callback is required, but we actually do our action inside
  * of domain_content_update_nodes().
+ *
+ * In the case of VBO, an actual form is passed here. Otherwise, we
+ * let our form submit handler process things.
  */
-function domain_content_node_operations_access($nodes) {
+function domain_content_node_operations_process($nodes, $form = array(), $form_state = array()) {
+  if (!empty($form_state['values'])) {
+    domain_content_node_operations_submit($form, $form_state);
+  }
 }
 
 /**
@@ -179,20 +197,226 @@ function domain_content_node_operations_access($nodes) {
  *
  * @link http://drupal.org/node/336218
  */
-function domain_content_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'node_multiple_delete_confirm') {
-    $form['#redirect'] = $_GET['q'];
+function domain_content_form_node_multiple_delete_confirm_alter(&$form, &$form_state) {
+  $form['#redirect'] = $_GET['q'];
+}
+
+/**
+ * Allow domain assignment to be made from the default content form.
+ */
+function domain_content_form_node_admin_content_alter(&$form, &$form_state) {
+  // Privileged users can make global changes to Domain Access permissions.
+  if (!user_access('set domain access')) {
+    return;
+  }
+
+  // Add our form elements.
+  domain_content_add_form_widget($form);
+  $form['domain']['#weight'] = -1;
+
+  // We cannot alter in a submit function to this form, so we fake it on post.
+  if (isset($form_state['post']['operation']) && $form_state['post']['operation'] == 'domain') {
+    $form_state['values'] = $form_state['post'];
+    domain_content_process_nodes($form, $form_state);
+    // Set this back to not confuse the form handler.
+    unset($form_state['values']);
   }
 }
 
 /**
- * Implement hook_domainlinks()
+ * Abstraction function for selecting domains for batch operations.
  */
-function domain_content_domainlinks($domain) {
-  $links[] = array(
-    'title' => t('content'),
-    'path' => 'admin/domain/content/'. $domain['domain_id']
+function domain_content_add_form_widget(&$form) {
+  global $_domain;
+  // We have different settings for the two form contexts.
+  // A blank form comes from core.
+  $prefix = '<div class="description">'. t('If you select <em>Change affiliate publishing options</em>, you should confirm the <em>Affiliate publishing options</em> settings below.') .'</div>';
+  $collapsed = TRUE;
+  if (empty($form)) {
+    $prefix = '';
+    $collapsed = FALSE;
+  }
+  $options = array();
+  $format = domain_select_format();
+  foreach (domain_domains() as $data) {
+    // Cannot pass zero in checkboxes.
+    $key = $data['domain_id'] == 0 ? -1 : $data['domain_id'];
+    // The domain must be valid.
+    if ($data['valid'] || user_access('access inactive domains')) {
+      // Filter checkboxes but not select lists.
+      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
+    }
+  }
+  $form['domain'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Affiliate publishing options'),
+    '#collapsible' => TRUE,
+    '#collapsed' => $collapsed,
+    '#prefix' => $prefix,
   );
-  return $links;
+  $form['domain']['behavior'] = array(
+    '#type' => 'radios',
+    '#title' => t('Update behavior'),
+    '#options' => array(0 => t('Replace old values with new settings'), 1 => t('Add new settings to existing values'), 2 => t('Remove selected domains from existing values')),
+    '#description' => t('Defines how new grants will be applied to the updated nodes.'),
+    '#default_value' => 0,
+  );
+  $form['domain']['domain_site'] = array(
+    '#type' => 'checkbox',
+    '#prefix' => t('<p><b>Publishing options:</b>'),
+    '#suffix' => '</p>',
+    '#title' => t('Send to all affiliates'),
+    '#required' => FALSE,
+    '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
+    '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
+  );
+  $form['domain']['domains'] = array(
+    '#type' => empty($format) ? 'checkboxes' : 'select',
+    '#title' => t('Publish to'),
+    '#options' => $options,
+    '#required' => FALSE,
+    '#description' => t('Select which affiliates can access this content.'),
+    '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
+  );
+  if ($format) {
+    $form['domain']['domains']['#multiple'] = TRUE;
+    $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
+  }
+}
 
+/**
+ * Process the form submission.
+ *
+ * This callback works for the normal operations callback.
+ */
+function domain_content_process_nodes($form, &$form_state) {
+  if ($form_state['values']['operation'] != 'domain') {
+    return;
+  }
+  $options = array();
+  $options['domain_site'] = FALSE;
+  if ($form_state['values']['domain_site']) {
+    $options['domain_site'] = TRUE;
+  }
+  $options['domain_id'] = array_filter($form_state['values']['domains']);
+  $nids = array_filter($form_state['values']['nodes']);
+  $options['behavior'] = $form_state['values']['behavior'];
+  domain_content_update_nodes($nids, $options);
+}
+
+/**
+ * Abstraction function that lets us update access rules.
+ */
+function domain_content_update_nodes($nids, $options) {
+  static $load_nodes;
+  // Do other modules have a stake in the node grants set by Domain Access?
+  if (!isset($load_nodes)) {
+    $load_nodes = (bool) count(module_implements('domainrecords'));
+  }
+  // If our operation is run, then we have to manually change the
+  // {node_access} table.  The rest of the process will clear the cache,
+  // so this should be a safe operation.
+  $domain_site = $options['domain_site'];
+  $domains = $options['domain_id'];
+  $behavior = $options['behavior'];
+  foreach ($nids as $nid) {
+    // If other modules need to respond, we have to load the full node.
+    if ($load_nodes) {
+      $node = node_load($nid);
+    }
+    else {
+      $node = new stdClass();
+      $node->nid = $nid;
+    }
+    // Make sure the node is valid.
+    if ($node->nid > 0) {
+      // If modifying values, do so here.
+      if (!empty($behavior)) {
+        $current = domain_get_node_domains($node->nid);
+        // Add values to the current set.
+        if ($behavior == 1) {
+          if (!empty($current['domain_site'])) {
+            $domain_site = TRUE;
+          }
+          $domains += $current['domain_id'];
+        }
+        // Remove values from the current set.
+        else {
+          foreach ($domains as $domain_id) {
+            if (isset($current['domain_id'][$domain_id])) {
+              unset($current['domain_id'][$domain_id]);
+            }
+          }
+          $domains = $current['domain_id'];
+          // If all affiliates is selected, remove it.
+          if ($domain_site) {
+            $domain_site = FALSE;
+          }
+        }
+      }
+      // Use our new options, as set above.
+      $node->domain_site = $domain_site;
+      $node->domains = $domains;
+      // Run our storage hook. This handles {domain_access} and returns
+      // the records we need for {node_access}.
+      $grants = domain_node_access_records($node);
+      // Get all the grants returned.
+      $realms = array('domain_site', 'domain_id');
+      foreach ($grants as $grant) {
+        if (!in_array($grant['realm'], $realms)) {
+          $realms[] = $grant['realm'];
+        }
+      }
+      // Delete our grants and rebuild.
+      foreach ($realms as $realm) {
+        node_access_write_grants($node, $grants, $realm);
+      }
+    }
+  }
+  // Clear the cache.
+  cache_clear_all();
+}
+
+/**
+ *  Custom form stage for Views Bulk Operations.
+ *
+ * @param $arguments
+ *   The Views arguments passed by VBO.
+ * @return
+ *   A custom form element for this multi-step process.
+ */
+function domain_content_node_operations_process_form($arguments) {
+  $form = array();
+  domain_content_add_form_widget($form);
+  if (isset($form['admin']['options']['operation'])) {
+    $form['admin']['options']['#weight'] = -10;
+  }
+  return $form;
+}
+
+/**
+ * Custom operation submit for Views Bulk Operations.
+ */
+function domain_content_node_operations_process_submit($form, &$form_state) {
+  // This is a three step form, and our action is on step three.
+  if ($form_state['values']['step'] == 2) {
+    return array($form, $form_state);
+  }
+  return domain_content_node_operations_submit($form, $form_state);
+}
+
+/**
+ * Submit handler for Views Bulk Operations.
+ *
+ * We need this because VBO processes nodes differently.
+ */
+function domain_content_node_operations_submit($form, &$form_state) {
+  $options = array();
+  $options['domain_site'] = FALSE;
+  if ($form_state['values']['domain_site']) {
+    $options['domain_site'] = TRUE;
+  }
+  $options['domain_id'] = array_filter($form_state['values']['domains']);
+  $nids = array_keys($form_state['storage'][1]['objects']['selection']);
+  domain_content_update_nodes($nids, $options);
 }

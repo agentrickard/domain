@@ -237,52 +237,7 @@ function domain_content_form($form_state) {
   }
   // Privileged users can make global changes to Domain Access permissions.
   if (user_access('set domain access')) {
-    $options = array();
-    $format = domain_select_format();
-    foreach (domain_domains() as $data) {
-      // Cannot pass zero in checkboxes.
-      ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
-      // The domain must be valid.
-      if ($data['valid'] || user_access('access inactive domains')) {
-        // Filter checkboxes but not select lists.
-        $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
-      }
-    }
-    $form['domain'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('Affiliate publishing options'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-      '#prefix' => '<div class="description">'. t('If you select <em>Change affiliate publishing options</em> above, you should confirm the <em>Affiliate publishing options</em> settings below.') .'</div>'
-    );
-    $form['domain']['behavior'] = array(
-      '#type' => 'radios',
-      '#title' => t('Update behavior'),
-      '#options' => array(0 => t('Replace old values with new settings'), 1 => t('Add new settings to existing values'), 2 => t('Remove selected domains from existing values')),
-      '#description' => t('Defines how new grants will be applied to the updated nodes.'),
-      '#default_value' => 0,
-    );
-    $form['domain']['domain_site'] = array(
-      '#type' => 'checkbox',
-      '#prefix' => t('<p><b>Publishing options:</b>'),
-      '#suffix' => '</p>',
-      '#title' => t('Send to all affiliates'),
-      '#required' => FALSE,
-      '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
-      '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
-    );
-    $form['domain']['domains'] = array(
-      '#type' => empty($format) ? 'checkboxes' : 'select',
-      '#title' => t('Publish to'),
-      '#options' => $options,
-      '#required' => FALSE,
-      '#description' => t('Select which affiliates can access this content.'),
-      '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
-    );
-    if ($format) {
-      $form['domain']['domains']['#multiple'] = TRUE;
-      $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
-    }
+    domain_content_add_form_widget($form);
   }
   // Users must have passed at least one access check to have batch options.
   if ((user_access('administer nodes') || user_access('set domain access')) && !empty($nodes)) {
@@ -306,7 +261,7 @@ function domain_content_form($form_state) {
   $form['#theme'] = 'domain_content_admin_nodes';
   $form['#validate'][] = 'node_admin_nodes_validate';
   $form['#submit'][] = 'node_admin_nodes_submit';
-  $form['#submit'][] = 'domain_content_update_nodes';
+  $form['#submit'][] = 'domain_content_process_nodes';
   return $form;
 }
 
@@ -340,92 +295,6 @@ function domain_content_filter_operations(&$operations) {
 }
 
 /**
- * FormAPI function that lets us update access rules.
- */
-function domain_content_update_nodes($form, &$form_state) {
-  static $load_nodes;
-
-  // If our operation is flagged, then we have to manually change the
-  // {node_access} table.  The rest of the process will clear the cache,
-  // so this should be a safe operation.
-  if ($form_state['values']['operation'] != 'domain') {
-    return;
-  }
-
-  // Set the site grant.
-  $domain_site = FALSE;
-  if ($form_state['values']['domain_site']) {
-    $domain_site = TRUE;
-  }
-
-  // Filter the domain input.
-  $domains = array_filter($form_state['values']['domains']);
-
-  // Do other modules have a stake in the node grants set by Domain Access?
-  if (!isset($load_nodes)) {
-    $load_nodes = (bool) count(module_implements('domainrecords'));
-  }
-
-  // Loop through the selected nodes and rewrite the records.
-  foreach ($form_state['values']['nodes'] as $nid) {
-    // If other modules need to respond, we have to load the full node.
-    if ($load_nodes) {
-      $node = node_load($nid);
-    }
-    else {
-      $node = new stdClass();
-      $node->nid = $nid;
-    }
-    // Make sure the node is valid.
-    if ($node->nid > 0) {
-      // If modifying values, do so here.
-      if (!empty($form_state['values']['behavior'])) {
-        $current = domain_get_node_domains($node->nid);
-        // Add values to the current set.
-        if ($form_state['values']['behavior'] == 1) {
-          if (!empty($current['domain_site'])) {
-            $domain_site = TRUE;
-          }
-          $domains += $current['domain_id'];
-        }
-        // Remove values from the current set.
-        else {
-          foreach ($domains as $domain_id) {
-            if (isset($current['domain_id'][$domain_id])) {
-              unset($current['domain_id'][$domain_id]);
-            }
-          }
-          $domains = $current['domain_id'];
-          // If all affiliates is selected, remove it.
-          if ($domain_site) {
-            $domain_site = FALSE;
-          }
-        }
-      }
-      // Use our new options, as set above.
-      $node->domain_site = $domain_site;
-      $node->domains = $domains;
-      // Run our storage hook. This handles {domain_access} and returns
-      // the records we need for {node_access}.
-      $grants = domain_node_access_records($node);
-      // Get all the grants returned.
-      $realms = array('domain_site', 'domain_id');
-      foreach ($grants as $grant) {
-        if (!in_array($grant['realm'], $realms)) {
-          $realms[] = $grant['realm'];
-        }
-      }
-      // Delete our grants and rebuild.
-      foreach ($realms as $realm) {
-        node_access_write_grants($node, $grants, $realm);
-      }
-    }
-  }
-  // Clear the cache.
-  cache_clear_all();
-}
-
-/**
  * Replaces the default theme function for the node administration form.
  *
  * @param $form
@@ -439,8 +308,8 @@ function theme_domain_content_admin_nodes($form) {
   // Overview table:
   $header = array(theme('table_select_header_cell'), t('Title'), t('Affiliates'), t('Type'), t('Author'), t('Status'), t('Operations'));
   $output = '';
-  $output .= drupal_render($form['options']);
   $output .= drupal_render($form['domain']);
+  $output .= drupal_render($form['options']);
   if (isset($form['title']) && is_array($form['title'])) {
     foreach (element_children($form['title']) as $key) {
       $row = array();
