@@ -29,8 +29,11 @@ CONTENTS
 ----
 1.  Introduction
 
-The Domain Content provides an alternate view for batch editing site content.
+The Domain Content provides an alternate page for batch editing site content.
 The module is part of the Domain Access module group.
+
+For administrative users, this module also enables a new batch update
+operation on the Content administration screen.
 
 ----
 1.1 Use-Case
@@ -174,4 +177,5 @@ want all nodes to be assigned to the same affiliates.
 
 A companion module that handles this function for Comments is also needed.
 
-Contributions welcome.
+For support for Views Bulk Operations (which was released after this module)
+see the Domain Actions project: http://drupal.org/project/domain_actions.

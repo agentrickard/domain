@@ -5,6 +5,7 @@
 -- Rolls 7.x.2.0-alpha 7.
 -- #756162. Better grant handling for Domain Content updates.
 -- #757746 by drupalok. Better options for batch updates.
+-- #710712 by fizk and nonsie. Better handling of hook_node_operations().
 
 03-APR-2010
 -- Fixes file uploads for Domain Theme.
