@@ -498,6 +498,13 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     '#prefix' => '<div class="description">'. t('If you select <em>Assign users to domains</em> above, you should confirm the <em>Affiliate editor options</em> settings below.') .'</div>',
     '#weight' => -1,
   );
+  $form['domain']['behavior'] = array(
+    '#type' => 'radios',
+    '#title' => t('Update behavior'),
+    '#options' => array(0 => t('Replace old values with new settings'), 1 => t('Add new settings to existing values'), 2 => t('Remove selected domains from existing values')),
+    '#description' => t('Defines how new grants will be applied to the updated users.'),
+    '#default_value' => 0,
+  );
   $form['domain']['domains'] = array(
     '#type' => empty($format) ? 'checkboxes' : 'select',
     '#title' => t('Assign to'),
@@ -557,9 +564,32 @@ function domain_update_users($form, &$form_state) {
   if ($values['operation'] != 'domain') {
     return;
   }
+  // Get the domains for this user, but ignore roles unless told to use them.
+  $add_roles = variable_get('domain_add_roles', 0);
+  // Loop through the selected accounts.
+  $domains = array_filter($values['domains']);
   foreach ($values['accounts'] as $uid) {
+    // If appending values, do so here.
+    if (!empty($form_state['values']['behavior'])) {
+      $account = new stdClass();
+      $account->uid = $uid;
+      $current = domain_get_user_domains($account, $add_roles, TRUE);
+      // Behavior 1: add new domains.
+      if ($form_state['values']['behavior'] == 1) {
+        $domains += $current;
+      }
+      // Behavior 2: remove new domains.
+      else {
+        foreach ($domains as $domain_id) {
+          if (isset($current[$domain_id])) {
+            unset($current[$domain_id]);
+          }
+        }
+        $domains = $current;
+      }
+    }
     db_query("DELETE FROM {domain_editor} WHERE uid = %d", $uid);
-    foreach (array_filter($values['domains']) as $domain_id) {
+    foreach ($domains as $domain_id) {
       // Cannot use 0 as a checkbox.
       if ($domain_id == -1) {
         $domain_id = 0;

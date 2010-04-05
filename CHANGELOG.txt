@@ -4,6 +4,7 @@
 
 -- Patch #762292 by Daemon_Byte. Fixes error message in Domain User.
 -- #756162. Better grant handling for Domain Content updates.
+-- #757746 by drupalok. Better options for batch updates.
 
 30-MAR-2010
 
