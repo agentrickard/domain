@@ -180,15 +180,9 @@ function domain_content_node_operations() {
  * Callback for domain_content_node_operations().
  *
  * This callback is required, but we actually do our action inside
- * of domain_content_update_nodes().
- *
- * In the case of VBO, an actual form is passed here. Otherwise, we
- * let our form submit handler process things.
+ * of domain_content_process_nodes().
  */
-function domain_content_node_operations_process($nodes, $form = array(), $form_state = array()) {
-  if (!empty($form_state['values'])) {
-    domain_content_node_operations_submit($form, $form_state);
-  }
+function domain_content_node_operations_process($nodes) {
 }
 
 /**
