@@ -1,5 +1,9 @@
 // $Id$
 
+05-APR-2010
+
+-- Patch #762292 by Daemon_Byte. Fixes error message in Domain User.
+
 30-MAR-2010
 
 -- #752570 by brucepearson. Reset domain node lookup static on node save.

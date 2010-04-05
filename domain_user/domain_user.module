@@ -242,7 +242,7 @@ function domain_user_user($op, &$edit, &$account, $category = NULL) {
           }
         }
       }
-      if (isset($edit['domain_create_user']) && !user_access('create personal domain', $account) && !user_access('create user domains')) {
+      if (isset($edit['domain_create_user']) && !(user_access('create personal domain', $account) || user_access('create user domains'))) {
         drupal_set_message(t('Your personal URL could not be created.'));
       }
       // Throw away what we do not need.
