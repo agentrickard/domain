@@ -3,6 +3,7 @@
 05-APR-2010
 -- Updates Domain Nav.
 -- Rolls 7.x.2.0-alpha 7.
+-- #756162. Better grant handling for Domain Content updates.
 
 03-APR-2010
 -- Fixes file uploads for Domain Theme.

@@ -336,37 +336,57 @@ function domain_content_filter_operations(&$operations) {
  * FormAPI function that lets us update access rules.
  */
 function domain_content_update_nodes($form, &$form_state) {
+  static $load_nodes;
+
   // If our operation is flagged, then we have to manually change the
   // {node_access} table.  The rest of the process will clear the cache,
   // so this should be a safe operation.
-  if ($form_state['values']['operation'] == 'domain') {
-    if ($form_state['values']['domain_site']) {
-      $domain_site = TRUE;
+  if ($form_state['values']['operation'] != 'domain') {
+    return;
+  }
+
+  // Set the site grant.
+  $domain_site = FALSE;
+  if ($form_state['values']['domain_site']) {
+    $domain_site = TRUE;
+  }
+
+  // Filter the domain input.
+  $domains = array_filter($form_state['values']['domains']);
+
+  // Do other modules have a stake in the node grants set by Domain Access?
+  if (!isset($load_nodes)) {
+    $load_nodes = (bool) count(module_implements('domainrecords'));
+  }
+
+  // Loop through the selected nodes and rewrite the records.
+  foreach ($form_state['values']['nodes'] as $nid) {
+    // If other modules need to respond, we have to load the full node.
+    if ($load_nodes) {
+      $node = node_load($nid);
     }
-    $domains = array();
-    foreach ($form_state['values']['domains'] as $key => $value) {
-      // Cannot pass zero in checkboxes, so these are converted from -1.
-      if (abs($key) > 0 && $key == $value) {
-        ($key == -1) ? $id = 0 : $id = $value;
-        $domains[] = $id;
+    else {
+      $node = new stdClass();
+      $node->nid = $nid;
+    }
+    // Make sure the node is valid.
+    if ($node->nid > 0) {
+      // Use our new options, as set above.
+      $node->domain_site = $domain_site;
+      $node->domains = $domains;
+      // Run our storage hook. This handles {domain_access} and returns
+      // the records we need for {node_access}.
+      $grants = domain_node_access_records($node);
+      // Get all the grants returned.
+      $realms = array('domain_site', 'domain_id');
+      foreach ($grants as $grant) {
+        if (!in_array($grant['realm'], $realms)) {
+          $realms[] = $grant['realm'];
+        }
       }
-    }
-    foreach ($form_state['values']['nodes'] as $nid) {
-      if ($nid > 0) {
-        // Delete anything not selected.
-        // We have to update both the {node_access} and {domain_access} tables.
-        db_query("DELETE FROM {node_access} WHERE nid = %d AND realm IN ('domain_id', 'domain_site')", $nid);
-        db_query("DELETE FROM {domain_access} WHERE nid = %d", $nid);
-        if (isset($domain_site)) {
-          db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, 0, 'domain_site', 1, 0, 0);
-          db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, 0, 'domain_site');
-        }
-        if (!empty($domains)) {
-          foreach ($domains as $id) {
-            db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", $nid, $id, 'domain_id', 1, 1, 1);
-            db_query("INSERT INTO {domain_access} (nid, gid, realm) VALUES (%d, %d, '%s')", $nid, $id, 'domain_id');
-          }
-        }
+      // Delete our grants and rebuild.
+      foreach ($realms as $realm) {
+        node_access_write_grants($node, $grants, $realm);
       }
     }
   }
