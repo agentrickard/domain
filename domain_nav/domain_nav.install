@@ -1,0 +1,21 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install file for Domain Nav.
+ */
+
+/**
+ * Update block deltas to Drupal 7.
+ */
+function domain_nav_update_7000() {
+  // Get an array of the renamed block deltas, organized by module.
+  $renamed_deltas = array(
+    'domain_nav' => array(
+      '0' => 'default',
+    ),
+  );
+  update_fix_d7_block_deltas($sandbox, $renamed_deltas);
+  return t('Domain Access blocks updated.');
+}

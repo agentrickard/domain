@@ -25,7 +25,7 @@ define('DOMAIN_NAV_MENU', TRUE);
  */
 function domain_nav_init() {
   // In the Garland header, we have to force the block to appear correctly.
-  drupal_add_css(drupal_get_path('module', 'domain_nav') .'/domain_nav.css');
+  drupal_add_css(drupal_get_path('module', 'domain_nav') . '/domain_nav.css');
 }
 
 /**
@@ -52,14 +52,14 @@ function domain_nav_menu() {
       if (empty($domain['valid'])) {
         $type = MENU_SUGGESTED_ITEM;
       }
-      $items['domain/'. filter_xss_admin($domain['subdomain'])] = array(
+      $items['domain/' . filter_xss_admin($domain['subdomain'])] = array(
         'title' => $domain['sitename'],
         'type' => $type,
         'page callback' => 'drupal_goto',
         'page arguments' => array($domain['path']),
         'access callback' => 'domain_nav_check',
         'access arguments' => array(TRUE),
-        'description' => 'Go to '. filter_xss_admin($domain['subdomain']),
+        'description' => 'Go to ' . filter_xss_admin($domain['subdomain']),
       );
     }
   }
@@ -70,18 +70,23 @@ function domain_nav_menu() {
  * Menu access check.
  *
  * @param $access
- * The status set by our menu checks, which is always TRUE.  It defaults to
- * FALSE here because that is a good habit.
+ *   The status set by our menu checks, which is always TRUE.  It defaults to
+ *   FALSE here because that is a good habit.
  */
 function domain_nav_check($access = FALSE) {
   return $access;
 }
 
 /**
-  * Implements hook_perm().
+  * Implements hook_permission().
   */
-function domain_nav_perm() {
-  return array('access domain navigation');
+function domain_nav_permission() {
+  $permissions = array(
+    'access domain navigation' => array(
+      'title' => t('Access domain navigation links'),
+    ),
+  );
+  return $permissions;
 }
 
 /**
@@ -90,57 +95,71 @@ function domain_nav_perm() {
 function domain_nav_theme() {
   $themes = array(
     'domain_nav_default' => array(
-      'arguments' => array('options' => array()),
+      'variables' => array('options' => array()),
     ),
     'domain_nav_ul' => array(
-      'arguments' => array('options' => array()),
+      'variables' => array('options' => array()),
     ),
     'domain_nav_menus' => array(
-      'arguments' => array('options' => array()),
+      'variables' => array('options' => array()),
     ),
   );
   return $themes;
 }
 
 /**
- * Implements hook_block()
+ * Implements hook_block_info().
  */
-function domain_nav_block($op='list', $delta = 0, $edit = array()) {
+function domain_nav_block_info() {
   $block = array();
-  switch ($op) {
-    case 'list':
-      $block[0]['info'] = t('Domain list navigator');
-      break;
-    case 'view':
-      $block['subject'] = '';
-      $block['content'] = domain_nav_render();
-      break;
-    case 'configure':
-      $form['domain_nav_block'] = array(
-        '#type' => 'radios',
-        '#title' => t('Link paths'),
-        '#default_value' => variable_get('domain_nav_block', 0),
-        '#options' => array(0 => t('Link to site home page'), 1 => t('Link to active url')),
-      );
-      $options = array(
-        'default' => t('JavaScript select list'),
-        'menus' => t('Menu-style tab links'),
-        'ul' => t('Unordered list of links'),
-      );
-      $form['domain_nav_theme'] = array(
-        '#type' => 'radios',
-        '#title' => t('Link theme'),
-        '#default_value' => variable_get('domain_nav_theme', 'default'),
-        '#options' => $options,
-      );
-      return $form;
-      break;
-    case 'save':
-      variable_set('domain_nav_block', $edit['domain_nav_block']);
-      variable_set('domain_nav_theme', $edit['domain_nav_theme']);
-      break;
-  }
+  $block['default'] = array(
+    'info' => t('Domain list navigator'),
+  );
   return $block;
+}
+
+
+/**
+ * Implements hook_block_view().
+ */
+function domain_nav_block_view($delta = '') {
+  $block = array(
+    'subject' => '',
+    'content' => domain_nav_render(),
+  );
+  return $block;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function domain_nav_block_configure($delta = '') {
+  $form['domain_nav_block'] = array(
+    '#type' => 'radios',
+    '#title' => t('Link paths'),
+    '#default_value' => variable_get('domain_nav_block', 0),
+    '#options' => array(0 => t('Link to site home page'), 1 => t('Link to active url')),
+  );
+  $options = array(
+    'default' => t('JavaScript select list'),
+    'menus' => t('Menu-style tab links'),
+    'ul' => t('Unordered list of links'),
+  );
+  $form['domain_nav_theme'] = array(
+    '#type' => 'radios',
+    '#title' => t('Link theme'),
+    '#default_value' => variable_get('domain_nav_theme', 'default'),
+    '#options' => $options,
+  );
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function domain_nav_block_save($delta = '', $edit = array()) {
+  variable_set('domain_nav_block', $edit['domain_nav_block']);
+  variable_set('domain_nav_theme', $edit['domain_nav_theme']);
 }
 
 /**
@@ -150,21 +169,21 @@ function domain_nav_block($op='list', $delta = 0, $edit = array()) {
  *   domain_nav_render($paths = 0, $style = 'default');
  *
  * @param $paths
- *  A boolean flag indicating how to write links to other domains:
+ *   A boolean flag indicating how to write links to other domains:
  *    0 == link to home page of selected domain
  *    1 == link to current url on selected domain
  *
  * @param $style
- *  Indicates which theme function to invoke.  Default options are:
+ *   Indicates which theme function to invoke.  Default options are:
  *    'default' == theme_domain_nav_default()
  *    'menus' == theme_domain_nav_menus()
  *    'ul' == theme_domain_nav_ul()
  *
  * @return
- *  A themed HTML object for navigation.
+ *   A themed HTML object for navigation.
  */
 function domain_nav_render($paths = NULL, $style = NULL) {
-  global $_domain;
+  $_domain = domain_get_domain();
   if (!user_access('access domain navigation')) {
     return;
   }
@@ -203,17 +222,17 @@ function domain_nav_render($paths = NULL, $style = NULL) {
       $options[$value['domain_id']] = $value;
     }
   }
-  $theme = 'domain_nav_'. $style;
+  $theme = 'domain_nav_' . $style;
   drupal_alter('domain_nav_options', $options);
-  $content = theme($theme, $options);
+  $content = theme($theme, array('options' => $options));
   return $content;
 }
 
 /**
  * Themes the domain list as a JavaScript selection form.
  *
- * @param $options
- *  An array of information about each domain.  Options contain the following:
+ * @param $variables
+ *   An array of information about each domain.  Options contain the following:
  *
  *    - domain_id -- the unique identifier of this domain
  *    - subdomain -- the host path of the url for this domain
@@ -223,15 +242,16 @@ function domain_nav_render($paths = NULL, $style = NULL) {
  *
  *  If hook_domainnav() is invoked, additonal elements may be present.
  */
-function theme_domain_nav_default($options) {
-  global $_domain;
+function theme_domain_nav_default($variables) {
+  $_domain = domain_get_domain();
+  $options = $variables['options'];
   $current = $options[$_domain['domain_id']];
   $output = '<form class="domain-list" action="">';
   $output .= '<select onchange="if (this.value) location.href=this.value;">';
-  $output .= '<option value="'. $current['path'] .'">'. t('Jump to...') .'</option>';
+  $output .= '<option value="' . $current['path'] . '">' . t('Jump to...') . '</option>';
   foreach ($options as $key => $value) {
     (isset($value['active'])) ? $selected = ' selected' : $selected = '';
-    $output .= '<option value="'. $value['path'] .'"'. $selected .'>'. filter_xss_admin($value['sitename']) .'</option>';
+    $output .= '<option value="' . $value['path'] . '"' . $selected . '>' . filter_xss_admin($value['sitename']) . '</option>';
   }
   $output .= '</select>';
   $output .= '</form>';
@@ -241,33 +261,35 @@ function theme_domain_nav_default($options) {
 /**
  * Themes the domain list as an unordered list of links.
  *
- * @param $options
- *  An array of information about each domain.
+ * @param $variables
+ *   An array of information about each domain.
  */
-function theme_domain_nav_ul($options) {
+function theme_domain_nav_ul($variables) {
+  $options = $variables['options'];
   foreach ($options as $key => $value) {
     (isset($value['active'])) ? $active = 'active' : $active =  '';
     $class = "domain-id-". $value['domain_id'] ." ". $active;
     $items[] = l($value['sitename'], $value['path'], array('attributes' => array('class' => $class)));
   }
-  return theme('item_list', $items);
+  return theme('item_list', array('items' => $items));
 }
 
 /**
  * Themes the domain list as a menu-style group of tabs.
  *
- * @param $options
- *  An array of information about each domain.
+ * @param $variables
+ *   An array of information about each domain.
  */
-function theme_domain_nav_menus($options) {
+function theme_domain_nav_menus($variables) {
+  $options = $variables['options'];
   foreach ($options as $key => $value) {
     (isset($value['active'])) ? $active = 'active' : $active =  '';
     $items[] = array(
       'data' => l($value['sitename'], $value['path']),
-      'class' => "domain-id-". $value['domain_id'] ." ". $active,
+      'attribute' => array('class' => "domain-id-". $value['domain_id'] . ' ' . $active),
     );
   }
-  return theme('item_list', $items, NULL, 'ul', array('class' => 'tabs primary'));
+  return theme('item_list', array('items' => $items, 'attributes' => array('class' => 'tabs primary')));
 }
 
 /**
