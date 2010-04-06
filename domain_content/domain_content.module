@@ -370,20 +370,3 @@ function domain_content_update_nodes($nids, $options) {
   // Clear the cache.
   cache_clear_all();
 }
-
-/**
- *  Custom form stage for Views Bulk Operations.
- *
- * @param $arguments
- *   The Views arguments passed by VBO.
- * @return
- *   A custom form element for this multi-step process.
- */
-function domain_content_node_operations_process_form($arguments) {
-  $form = array();
-  domain_content_add_form_widget($form);
-  if (isset($form['admin']['options']['operation'])) {
-    $form['admin']['options']['#weight'] = -10;
-  }
-  return $form;
-}
