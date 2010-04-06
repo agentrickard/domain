@@ -90,19 +90,6 @@ function domain_content_permission() {
 }
 
 /**
- * Implements hook_theme().
- */
-function domain_content_theme() {
-  $themes = array(
-    'domain_content_admin_nodes' => array(
-      'render element' => 'form',
-      'file' => 'domain_content.admin.inc',
-    ),
-  );
-  return $themes;
-}
-
-/**
  * Access control for menu items.  There may be another way to do this in Drupal 6.
  *
  * @param $check
@@ -172,10 +159,10 @@ function domain_content_node_operations() {
   if (user_access('set domain access')) {
     $operations = array(
       'domain' => array(
-      'label' => t('Change affiliate publishing options'),
-      'callback' => 'domain_content_node_operations_process',
-      'configurable' => TRUE,
-      )
+        'label' => t('Change affiliate publishing options'),
+        'callback' => 'domain_content_node_operations_process',
+        'configurable' => TRUE,
+      ),
     );
     return $operations;
   }
@@ -211,15 +198,9 @@ function domain_content_form_node_admin_content_alter(&$form, &$form_state) {
 
   // Add our form elements.
   domain_content_add_form_widget($form);
-  $form['domain']['#weight'] = -1;
-
-  // We cannot alter in a submit function to this form, so we fake it on post.
-  if (isset($form_state['post']['operation']) && $form_state['post']['operation'] == 'domain') {
-    $form_state['values'] = $form_state['post'];
-    domain_content_process_nodes($form, $form_state);
-    // Set this back to not confuse the form handler.
-    unset($form_state['values']);
-  }
+  $form['admin']['#weight'] = 4;
+  $form['domain']['#weight'] = 2;
+  $form['admin']['options']['submit']['#submit'][] = 'domain_content_process_nodes';
 }
 
 /**
@@ -351,21 +332,4 @@ function domain_content_update_nodes($nids, $options) {
   }
   // Clear the cache.
   cache_clear_all();
-}
-
-/**
- *  Custom form stage for Views Bulk Operations.
- *
- * @param $arguments
- *   The Views arguments passed by VBO.
- * @return
- *   A custom form element for this multi-step process.
- */
-function domain_content_node_operations_process_form($arguments) {
-  $form = array();
-  domain_content_add_form_widget($form);
-  if (isset($form['admin']['options']['operation'])) {
-    $form['admin']['options']['#weight'] = -10;
-  }
-  return $form;
 }

@@ -155,6 +155,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
 function domain_content_admin() {
   // Load the form basics for administering nodes.
   include_once drupal_get_path('module', 'node') .'/node.admin.inc';
+  drupal_add_css(drupal_get_path('module', 'domain_content') . '/domain_content.css');
 
   if (isset($form_state['values']['operation']) && $form_state['values']['operation'] == 'delete') {
     return node_multiple_delete_confirm($form, $form_state, array_filter($form_state['values']['nodes']));
@@ -167,12 +168,10 @@ function domain_content_admin() {
     domain_content_add_form_widget($form);
   }
   $form['admin'] = domain_content_form();
-  $form['#theme'] = 'domain_content_admin_nodes';
-  $form['#validate'][] = 'node_admin_nodes_validate';
-  $form['#submit'][] = 'node_admin_nodes_submit';
-  $form['#submit'][] = 'domain_content_process_nodes';
+
+  $form['admin']['options']['submit']['#submit'][] = 'domain_content_process_nodes';
   // Filter the available operations based on user permissions.
-  domain_content_filter_operations($form['options']['operation']['#options']);
+  domain_content_filter_operations($form['admin']['options']['operation']['#options']);
 
   return $form;
 }
@@ -348,31 +347,6 @@ function domain_content_form() {
   $form['pager'] = array('#markup' => theme('pager', array('tags' => NULL)));
 
   return $form;
-
-  // Users must have passed at least one access check to have batch options.
-  if ((user_access('administer nodes') || user_access('set domain access')) && !empty($nodes)) {
-    $form['options'] = array('#type' => 'fieldset',
-      '#title' => t('Update options'),
-      '#prefix' => '<div class="container-inline">',
-      '#suffix' => '</div>',
-      '#weight' => -1
-    );
-    $options = array();
-    foreach (module_invoke_all('node_operations') as $operation => $array) {
-      $options[$operation] = $array['label'];
-    }
-    $form['options']['operation'] = array('#type' => 'select', '#options' => $options,  '#default_value' => 'approve');
-    $form['options']['submit'] = array('#type' => 'submit', '#value' => t('Update'));
-    $form['nodes'] = array('#type' => 'checkboxes', '#options' => $nodes);
-    // Filter the available operations based on user permissions.
-    domain_content_filter_operations($form['options']['operation']['#options']);
-  }
-  $form['pager'] = array('#value' => theme('pager', NULL, 50, 0));
-  $form['#theme'] = 'domain_content_admin_nodes';
-  $form['#validate'][] = 'node_admin_nodes_validate';
-  $form['#submit'][] = 'node_admin_nodes_submit';
-  $form['#submit'][] = 'domain_content_process_nodes';
-  return $form;
 }
 
 /**
@@ -435,20 +409,4 @@ function domain_content_filter_operations(&$operations) {
     unset($operations['sticky']);
     unset($operations['unsticky']);
   }
-}
-
-/**
- * Replaces the default theme function for the node administration form.
- *
- * @param $form
- *   FormsAPI representation of the batch node edit form.
- * @return
- *   A themed HTML form.
- *
- * @ingroup themes
- */
-function theme_domain_content_admin_nodes($variables) {
-  $form = $variables['form'];
-  $output = drupal_render_children($form);
-  return $output;
 }

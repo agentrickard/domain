@@ -1,0 +1,17 @@
+/* $Id: */
+
+/* Override the default multiselect layout in system-behavior.css. */
+#domain-content-admin dl.multiselect dd, dl.multiselect dd .form-item {
+  width: 20em; /* 6em label + 14em select */
+}
+#domain-content-admin dl.multiselect dd .form-item label {
+  display: block;
+  float: left; /* LTR */
+  width: 6em;
+  font-weight: normal;
+}
+#domain-content-admin-buttons {
+  float: left; /* LTR */
+  margin-left: 0.5em; /* LTR */
+  clear: right; /* LTR */
+}

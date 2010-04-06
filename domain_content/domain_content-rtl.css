@@ -1,0 +1,15 @@
+/* $Id: */
+
+#domain-content-admin dl.multiselect dd .form-item label {
+  display: block;
+  float: right;
+  width: 6em;
+  font-weight: normal;
+}
+
+#domain-content-admin-buttons {
+  float: right;
+  margin-left: 0;
+  margin-right: 0.5em;
+  clear: left;
+}
