@@ -67,11 +67,10 @@ function domain_content_list() {
   $query = $query->extend('PagerDefault')->limit(variable_get('domain_list_size', DOMAIN_LIST_SIZE));
   // Get the domains.
   $result = $query->execute();
-#  $query .= tablesort_sql($header);
-#  $result = pager_query($query, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0, NULL, $user->domain_user);
   foreach ($result as $data) {
     $domains[] = (array) $data;
   }
+  // Create the table.
   $rows = array();
   foreach ($domains as $domain) {
     $path = trim(domain_get_path($domain), '/');
@@ -107,13 +106,12 @@ function domain_content_list() {
  * fetches the appropirate content for batch editing.
  *
  * @param $domain_id
- *  The unique identifier for the currently active domain.
+ *   The unique identifier for the currently active domain.
  * @param $all_affiliates
- *  A boolean flag that indicates whether to grant the domain_site node access
- *  realm for this content view.
- *
+ *   A boolean flag that indicates whether to grant the domain_site node access
+ *   realm for this content view.
  * @return
- *  A link group for each domain the user can access.
+ *   A link group for each domain the user can access.
  */
 function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   $_domain = domain_get_domain();
@@ -150,7 +148,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
  * Content admin page callback.
  *
  * @return
- *  A themed HTML batch content editing form.
+ *   A themed HTML batch content editing form.
  */
 function domain_content_admin() {
   // Load the form basics for administering nodes.
@@ -180,7 +178,7 @@ function domain_content_admin() {
  * Rewrites node_admin_nodes() to use db_rewrite_sql().
  *
  * @return
- *  A form array according to the FormsAPI.
+ *   A form array according to the FormsAPI.
  */
 function domain_content_form() {
   module_load_include('inc', 'node', 'node.admin');
@@ -386,9 +384,9 @@ function domain_content_view_domains($node) {
  * Filters the node batch operations based on the user's permissions.
  *
  * @param &$operations
- * The complete list of operations, passed by reference.
+ *   The complete list of operations, passed by reference.
  * @return
- * No return value. Modify by reference.
+ *   No return value. Modify by reference.
  */
 function domain_content_filter_operations(&$operations) {
   $settings = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
