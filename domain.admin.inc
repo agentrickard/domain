@@ -625,7 +625,6 @@ function domain_advanced_form($form, $form_state) {
     'options' => t('Publishing options'),
     'comment_settings' => t('Comment settings'),
     'path' => t('Path aliasing'),
-    'attachments' => t('File attachments')
   );
   ksort($options);
   $form['domain_form']['domain_form_elements'] = array(
