@@ -5,7 +5,7 @@
  * @file
  * Administration functions for the domain module.
  *
- * These functions only need to be accessed from admin/build/domain, so we put them in a separate include file.
+ * These functions only need to be accessed from admin/config/domain, so we put them in a separate include file.
  * @ingroup domain
  */
 
@@ -174,7 +174,7 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     '#required' => TRUE,
     '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
     '#options' => array(1 => t('Show on all affiliate sites'), 2 => t('Only show on selected sites')),
-    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.<br />If set to <em>Only show on selected sites</em>, you must configure the <a href="!url">Node-type specific settings</a>.', array('!url' => url('admin/build/domain/advanced')))
+    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.<br />If set to <em>Only show on selected sites</em>, you must configure the <a href="!url">Node-type specific settings</a>.', array('!url' => url('admin/config/domain/advanced')))
   );
 
   $form['domain_behavior']['domain_debug'] = array(
@@ -478,7 +478,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
   $form['#validate'][] = 'domain_form_validate';
-  $form['#redirect'] = array('admin/build/domain/view');
+  $form['#redirect'] = array('admin/config/domain/view');
   return $form;
 }
 

@@ -4,6 +4,7 @@
 -- #763025 by hefox. Site names cannot be update_all.
 -- Ports Domain Content.
 -- Rolls 7.x.2.0-beta 1. Stable test release!
+-- #763634 by carlotron. Bad node-settings link on settings page.
 
 05-APR-2010
 -- Updates Domain Nav.
