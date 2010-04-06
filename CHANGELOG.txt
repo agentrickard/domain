@@ -1,5 +1,8 @@
 // $Id$
 
+06-APR-2010
+-- #763025 by hefox. Site names cannot be update_all.
+
 05-APR-2010
 -- Updates Domain Nav.
 -- Rolls 7.x.2.0-alpha 7.

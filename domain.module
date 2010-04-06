@@ -2387,7 +2387,7 @@ function domain_domainbatch() {
     '#variable' => 'domain_sitename',
     '#validate' => 'domain_batch_validate',
     '#data_type' => 'string',
-    '#update_all' => TRUE,
+    '#update_all' => FALSE,
     '#weight' => -10,
   );
   // Change all the schemes at once.
