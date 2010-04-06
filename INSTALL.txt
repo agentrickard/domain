@@ -244,7 +244,7 @@ installation.
 
 The primary domain will use the SERVER_NAME value of the request made
 when installing the module. This value may be edited by going to
-Admin > Build > Domains and editing the Primary Domain value.
+Admin > Configuration > Domains and editing the Primary Domain value.
 
 After you install the module, you should visit Admin > Users > Permissions
 and set the module permissions; normally you will give your site
@@ -253,8 +253,8 @@ administrators the following permissions:
     -- 'administer domains'
     -- 'set domain access'
 
-After saving permissions, go to Admin > Build > Domains and configure
-your site's Primary Domain.
+After saving permissions, go to Admin > Configuration > Domains and
+configure your site's Primary Domain.
 
 For more information, see README.txt.
 
@@ -283,18 +283,12 @@ subdirectory from site visitors, you may set $base_url dynamically.
 See the instructions at http://drupal.org/node/633726.
 
 ----
-4.2   $db_prefix
+4.2   $databases
 
-The $db_prefix value allows for table prefixing of your Drupal database
+The $databases value allows for table prefixing of your Drupal database
 in the event that you run more than one site from a single database.
 
-$db_prefix can be used normally with Domain Access.
-
-However, the Domain Prefix module provides for dynamic table prefixing
-based on the currently active domain.  If you use the Domain Prefix module
-you can only set $db_prefix as a string value, not an array.
-
-For more detail, see INSTALL.txt in the domain_prefix folder.
+$databases can be used normally with Domain Access.
 
 ----
 4.3   $cookie_domain
@@ -326,7 +320,7 @@ how your site is being requested.
 If you do not add settings.inc to your settings.php file, Domain Access will
 fail to load and report an error message to site administrators.
 
-IMPORTANT: You must add these lines to settings.php after the $db_url
+IMPORTANT: You must add these lines to settings.php after $databases
 has been set; otherwise, Drupal will fail to load. Normally, you should add
 these lines to the end of the settings.php file.
 

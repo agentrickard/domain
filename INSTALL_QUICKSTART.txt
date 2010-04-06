@@ -34,11 +34,10 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
     site configuration.  See INSTALL.txt for further help.
 
     IMPORTANT: You must add these lines to settings.php after the
-    $db_url. Normally, you should add these lines to the end of the
+    $databases. Normally, you should add these lines to the end of the
     settings.php file.
 
-4. Go to Admin > Build > Modules.  There you will see the Domain
-    module group.
+4. Go to Admin > Modules.  There you will see the Domain module group.
 
     Only enable the Domain Acccess module.
 
@@ -58,16 +57,13 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
 
 6. Read the main README.txt file for the Domain Access module.
 
-7. Go to Admin > Build > Domain and configure the module.
+7. Go to Admin > Configuration > Domain and configure the module.
 
-8. Note that as of 6.x.2.0, the primary domain is created for you on
-    installation.
-
-9. Now you are ready to explore the options available to you.
+8. Now you are ready to explore the options available to you.
 
     The Domain Access suite contains a number of optional helper
     modules.  You do not need to use any of these modules, but
-    they may add features that you desire.
+    they may add desirable features.
 
     Each of the modules has its own INSTALL.txt and README.txt files.
     Please read them carefully before activating them.

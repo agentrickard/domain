@@ -6,6 +6,7 @@
 -- Rolls 7.x.2.0-beta 1. Stable test release!
 -- #763634 by caroltron. Bad node-settings link on settings page.
 -- #763638 by caroltron. Remove file attachments setting.
+-- #763630 by caroltron. Updates installation instructions.
 
 05-APR-2010
 -- Updates Domain Nav.
