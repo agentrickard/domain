@@ -203,18 +203,10 @@ function domain_content_form_node_admin_content_alter(&$form, &$form_state) {
   if (!user_access('set domain access')) {
     return;
   }
-
   // Add our form elements.
   domain_content_add_form_widget($form);
   $form['domain']['#weight'] = -1;
-
-  // We cannot alter in a submit function to this form, so we fake it on post.
-  if (isset($form_state['post']['operation']) && $form_state['post']['operation'] == 'domain') {
-    $form_state['values'] = $form_state['post'];
-    domain_content_process_nodes($form, $form_state);
-    // Set this back to not confuse the form handler.
-    unset($form_state['values']);
-  }
+  $form['admin']['options']['submit']['#submit'][] = 'domain_content_process_nodes';
 }
 
 /**

@@ -3,6 +3,7 @@
 06-APR-2010
 
 -- #763025 by hefox. Site names cannot be update_all.
+-- Better handling of hook_node_operations submit handler.
 
 05-APR-2010
 
