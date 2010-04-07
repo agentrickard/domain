@@ -3,6 +3,7 @@
 07-APR-2010
 
 -- Make domain_block link absolute.
+-- #758772. handle site name value properly in Domain Settings.
 
 06-APR-2010
 

@@ -87,6 +87,15 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
       unset($form['#submit'][$key]);
     }
   }
+  if (isset($form['site_name'])) {
+    $form['site_name']['#description'] .= ' <em>'. t('This value will change the registered name of the selected domain.') .'</em>';
+  }
+  // Disable special sitename variable handling.
+  foreach ($form['#submit'] as $key => $value) {
+    if ($value == 'domain_form_sitename_submit') {
+      unset($form['#submit'][$key]);
+    }
+  }
 }
 
 /**
@@ -109,17 +118,31 @@ function domain_settings_form_submit($form, &$form_state) {
     if ($domain_id == -1) {
       if ($reset) {
         variable_del($name);
+        if ($name == 'site_name') {
+          db_query("UPDATE {domain} SET sitename = '%s' WHERE domain_id = 0", 'Drupal');
+          variable_set('domain_sitename', 'Drupal');
+        }
       }
       else {
         variable_set($name, $value);
+        if ($name == 'site_name') {
+          db_query("UPDATE {domain} SET sitename = '%s' WHERE domain_id = 0", $value);
+          variable_set('domain_sitename', $value);
+        }
       }
     }
     else {
       if ($reset) {
         domain_conf_variable_delete($domain_id, $name);
+        if ($name == 'site_name') {
+          db_query("UPDATE {domain} SET sitename = '%s' WHERE domain_id = %d", 'Drupal', $domain_id);
+        }
       }
       else {
         domain_conf_variable_save($domain_id, $name, $value);
+        if ($name == 'site_name') {
+          db_query("UPDATE {domain} SET sitename = '%s' WHERE domain_id = %d", $value, $domain_id);
+        }
       }
     }
   }
