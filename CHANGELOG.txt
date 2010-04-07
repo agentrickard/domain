@@ -3,7 +3,8 @@
 07-APR-2010
 
 -- Make domain_block link absolute.
--- #758772. handle site name value properly in Domain Settings.
+-- #758772. Handle site name value properly in Domain Settings.
+-- #755456 by Michelle. Allow Domain Settings to reset all values.
 
 06-APR-2010
 

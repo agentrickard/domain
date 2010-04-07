@@ -47,7 +47,7 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
   $form['buttons']['#weight'] = $weight + 2;
   $domain_weight = $weight + 1;
   $form['#submit'][] = 'domain_settings_form_submit';
-  $options = array();
+  $options = array(-5 => t('All domains'));
   // Get the display format of the form element.
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
@@ -66,16 +66,21 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
     '#collapsed' => FALSE,
     '#weight' => $domain_weight,
   );
-  $default = $_domain['domain_id'];
-  if (!variable_get('domain_settings_behavior', 0) || $default == 0) {
-    $default = -1;
+  // Set the proper default.
+  $behavior = variable_get('domain_settings_behavior', 0);
+  $default = -1;
+  if ($behavior == 1) {
+    $default = ($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id'];
+  }
+  if ($behavior == 2) {
+    $default = -5;
   }
   $form['domain_settings']['domain_id'] = array(
     '#type' => empty($format) ? 'radios' : 'select',
     '#title' => t('Save settings for'),
     '#options' => $options,
     '#required' => TRUE,
-    '#description' => t('Select the domain to which these settings apply.'),
+    '#description' => t('Select the domain to which these settings apply. If you select <em>All domains</em>, domain-specific settings will be removed.'),
     '#default_value' => $default,
   );
   if ($format) {
@@ -115,7 +120,7 @@ function domain_settings_form_submit($form, &$form_state) {
   }
   // -1 is the primary domain.
   foreach ($values as $name => $value) {
-    if ($domain_id == -1) {
+    if ($domain_id == -1 || $domain_id == -5) {
       if ($reset) {
         variable_del($name);
         if ($name == 'site_name') {
@@ -145,6 +150,11 @@ function domain_settings_form_submit($form, &$form_state) {
         }
       }
     }
+    if ($domain_id == -5 && !$reset) {
+      foreach (domain_domains() as $id => $value) {
+        domain_conf_variable_delete($id, $name);
+      }
+    }
   }
   module_invoke_all('domain_settings', $domain_id, $values);
   cache_clear_all();
@@ -164,7 +174,7 @@ function domain_settings_domainform(&$form) {
   $form['domain_settings_module']['domain_settings_behavior'] = array(
     '#type' => 'radios',
     '#title' => t('Domain settings behavior'),
-    '#options' => array(0 => t('Use the default domain'), 1 => t('Use the active domain')),
+    '#options' => array(0 => t('Use the default domain'), 1 => t('Use the active domain'), 2 => t('All domains')),
     '#default_value' => variable_get('domain_settings_behavior', 0),
     '#description' => t('Default form value when submitting system settings.')
   );
