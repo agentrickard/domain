@@ -92,6 +92,9 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
     $form['domain_settings']['domain_id']['#multiple'] = FALSE;
     $form['domain_settings']['domain_id']['#size'] = count($options) > 10 ? 10 : count($options);
   }
+  if (isset($form['site_name'])) {
+    $form['site_name']['#description'] = ' <em>'. t('This value will change the registered name of the selected domain.') .'</em>';
+  }
   foreach ($form['#submit'] as $key => $value) {
     if ($value == 'system_settings_form_submit') {
       unset($form['#submit'][$key]);
@@ -125,11 +128,22 @@ function domain_settings_form_submit($form, &$form_state) {
           ->execute();
       }
       if ($domain_id == -5) {
-        domain_conf_variable_delete($domain_id, $name);
+        foreach(domain_domains() as $id => $value) {
+          domain_conf_variable_delete($id, $name);
+        }
       }
     }
     else {
       domain_conf_variable_save($domain_id, $name, $value);
+      if ($name == 'site_name') {
+        variable_set('domain_sitename', $value);
+        db_update('domain')
+          ->condition('domain_id', $domain_id)
+          ->fields(array(
+            'sitename' => $form_state['values']['site_name'],
+          ))
+          ->execute();
+      }
     }
   }
   module_invoke_all('domain_settings', $domain_id, $values);
