@@ -2,7 +2,7 @@
 
 07-APR-2010
 -- #758772. Handle site name value properly in Domain Settings.
-
+-- #733964 by TimAlsop. Allow sorting of domains.
 
 06-APR-2010
 -- #763025 by hefox. Site names cannot be update_all.

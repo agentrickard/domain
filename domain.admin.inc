@@ -20,9 +20,10 @@ function domain_view() {
   $output = t('<p>The following domains have been created for your site.  The currently active domain <strong>is shown in boldface</strong>.  You
                     may click on a domain to change the currently active domain.  Your default domain has an ID of %id.</p>', array('%id' => variable_get('domain_default', 0)));
   $header = array(
-    array('data' => t('Id'), 'field' => 'd.domain_id'),
+    array('data' => t('Weight'), 'field' => 'd.weight'),
     array('data' => t('Domain'), 'field' => 'd.subdomain'),
     array('data' => t('Site name'), 'field' => 'd.sitename'),
+    array('data' => t('Id'), 'field' => 'd.domain_id'),
     array('data' => t('Status'), 'field' => 'd.valid'),
     array('data' => t('Scheme'), 'field' => 'd.scheme'),
   );
@@ -37,7 +38,7 @@ function domain_view() {
 
   // Set up the base query.
   $query = db_select('domain', 'd')
-    ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
+    ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid', 'weight'));
   // Get any tablesort sql from other modules.
   module_invoke_all('domainview', 'query', array(), $query);
   // Add the tablesort.
@@ -81,7 +82,7 @@ function domain_view() {
     }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
-    $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<strong>' . $link . '</strong>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
+    $row = array($domain['weight'], ($domain['domain_id'] == $_domain['domain_id']) ? '<strong>' . $link . '</strong>' : $link, filter_xss_admin($domain['sitename']), $domain['domain_id'], $valid, $domain['scheme']);
     // Let other modules add data.
     $data = array();
     foreach (module_implements('domainview') as $module) {
@@ -193,23 +194,6 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     '#default_value' => variable_get('domain_force_admin', 0),
     '#options' => array(0 => t('Do not enforce'), 1 => t('Restrict node views for administrators')),
     '#description' => t('If set, users with the <em>administer nodes</em> permission and user 1 <em>will view the site with Domain Access restrictions enforced</em>. See the README for more details.')
-  );
-
-  $options = array(
-    'id' => t('Creation order, oldest > newest'),
-    'rid' => t('Creation order, newest > oldest'),
-    'name' => t('Sitename, A > Z'),
-    'rname' => t('Sitename, Z > A'),
-    'url' => t('URL, A > Z'),
-    'rurl' => t('URL, Z > A')
-  );
-  $form['domain_behavior']['domain_sort'] = array(
-    '#type' => 'radios',
-    '#title' => t('Sort domain lists'),
-    '#required' => TRUE,
-    '#default_value' => variable_get('domain_sort', 'id'),
-    '#options' => $options,
-    '#description' => t('Controls the display of domain lists to end users.')
   );
   $form['domain_behavior']['domain_list_size'] = array(
     '#type' => 'select',
@@ -395,6 +379,7 @@ function domain_values_from_form_state($form_state) {
     'scheme'    => $form_state['values']['scheme'],
     'valid'     => $form_state['values']['valid'],
     'domain_id' => $form_state['values']['domain_id'],
+    'weight' => $form_state['values']['weight'],
   );
 }
 
@@ -475,6 +460,12 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#options' => array(1 => t('Active'), 0 => t('Inactive')),
     '#default_value' => isset($domain['valid']) ? $domain['valid'] : 1,
     '#description' => t('Must be set to "Active" for users to navigate to this domain.')
+  );
+  $form['domain']['weight'] = array(
+    '#type' => 'weight',
+    '#title' => t('Weight'),
+    '#required' => TRUE,
+    '#default_value' => isset($domain['weight']) ? $domain['weight'] : 0,
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
   $form['#validate'][] = 'domain_form_validate';
