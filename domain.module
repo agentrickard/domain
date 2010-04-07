@@ -295,7 +295,7 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
               }
             }
             if ($allow) {
-              $items[] = l($title, domain_get_uri($domain));
+              $items[] = l($title, domain_get_uri($domain), array('absoulte' => TRUE));
             }
           }
           $block['content'] = theme('item_list', $items);
