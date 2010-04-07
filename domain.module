@@ -302,7 +302,7 @@ function domain_block_view($delta = '') {
  * @see domain_block_view()
  */
 function domain_block_view_switcher() {
-  $output = 'hi';
+  $output = '';
   $list = array();
   $domains = domain_domains();
   $msg = FALSE;
@@ -320,7 +320,7 @@ function domain_block_view_switcher() {
       }
     }
     if ($allow) {
-      $list[] = l($title, domain_get_uri($domain));
+      $list[] = l($title, domain_get_uri($domain), array('absolute' => TRUE));
     }
   }
   $items = array('items' => $list);
@@ -1235,7 +1235,6 @@ function domain_get_path($domain) {
  */
 function domain_get_uri($domain) {
   $request_uri = request_uri();
-
   $modules = _domain_path_modules();
   if (!empty($modules) && !drupal_is_front_page()) {
     // If needed, let modules modify the path alias.
@@ -2754,5 +2753,4 @@ function domain_alter_node_query(QueryAlterableInterface $query) {
       $query->distinct();
     }
   }
-
 }

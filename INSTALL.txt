@@ -22,7 +22,7 @@ CONTENTS
 3.1   After Installation
 4.  Configuring settings.php
 4.1   $base_url
-4.2   $db_prefix
+4.2   $databases
 4.3   $cookie_domain
 4.4   Add settings.inc
 4.4.1   Installation
