@@ -160,12 +160,11 @@ function domain_theme_domainlinks($domain) {
  */
 function domain_theme_domainform(&$form) {
   // Set the module weight for Domain Theme,
-  $module_weight = variable_get('domain_theme_weight', 0);
   db_update('system')
-    ->fields(array('weight' => $module_weight))
-    ->condition(array('name' => 'domain_theme', 'type' => 'module'))
+    ->fields(array('weight' => variable_get('domain_theme_weight', 0)))
+    ->condition('name', 'domain_theme')
+    ->condition('type', 'module')
     ->execute();
-#  db_query("UPDATE {system} SET weight = %d WHERE name = 'domain_theme' AND type = 'module'", $module_weight);
 
   // Add the form element to the main screen.
   $form['domain_theme'] = array(

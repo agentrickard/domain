@@ -1,5 +1,8 @@
 // $Id$
 
+09-APR-2010
+-- Patch #607824 (40) by pebosi. Fixes db and reference errors.
+
 07-APR-2010
 -- #758772. Handle site name value properly in Domain Settings.
 -- #733964 by TimAlsop. Allow sorting of domains.
