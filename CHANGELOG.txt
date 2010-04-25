@@ -4,6 +4,7 @@
 
 -- Patch #769640 by davidwthomas. Fixes pgSQL error in Domain Content.
 -- #770650 by nonsie. Ensure the site_grant is loaded in bootstrap. Edge case.
+-- #775028 by brucepearson. Allow DA to be disabled for XMLRPC.
 
 07-APR-2010
 

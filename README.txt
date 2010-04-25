@@ -52,6 +52,7 @@ CONTENTS
 4.4.5   Node Access Settings
 4.5   Special Page Requests
 4.5.1   Cron Handling
+4.5.2   XMLRPC Handling
 4.6   Node Link Patterns
 4.7   The Domain List
 4.8   Node Settings
@@ -899,6 +900,12 @@ this option checked.  Doing so allows Domain Access to ignore access checks
 for nodes when cron runs.
 
 Note that this does not affect node access permissions set by other modules.
+
+----
+4.5.2   XMLRPC Handling
+
+Similar to the above, you may check this option to disable Domain Access
+rules when Drupal is invoked using XMLRPC.
 
 ----
 4.6   Node Link Patterns
