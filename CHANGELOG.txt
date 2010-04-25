@@ -2,6 +2,7 @@
 
 25-APR-2010
 -- Rollback of #733964 to prepare a clean upgrade path.
+-- #770650 by nonsie. Ensure the site_grant is loaded in bootstrap. Edge case.
 
 09-APR-2010
 -- Patch #607824 (40) by pebosi. Fixes db and reference errors.

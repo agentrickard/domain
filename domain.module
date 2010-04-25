@@ -53,7 +53,7 @@ function domain_init() {
   }
 
   // Error handling in case the module is not installed correctly.
-  if (empty($_domain)) {
+  if (!isset($_domain['domain_id'])) {
     $_domain['error'] = '-1';
   }
   // If $_domain['error'] is present, then set a message and stop.
