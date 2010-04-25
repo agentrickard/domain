@@ -187,7 +187,7 @@ function domain_content_form($form_state) {
     }
   }
 
-  $result = pager_query(db_rewrite_sql('SELECT n.nid FROM {node} n '. $filter['join'] . $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
+  $result = pager_query(db_rewrite_sql('SELECT n.nid, n.changed FROM {node} n '. $filter['join'] . $filter['where'] .' ORDER BY n.changed DESC'), 50, 0, NULL, $filter['args']);
 
   // Reset the active domain.
   domain_reset_domain();
