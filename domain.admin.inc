@@ -310,6 +310,13 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     '#description' => t('Normally, you should leave this setting active.  See the README for more information.')
   );
 
+  $form['domain_all']['domain_xmlrpc_rule'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => variable_get('domain_xmlrpc_rule', 0),
+    '#title' => t('Treat xmlrpc.php as a special page request.'),
+    '#description' => t('Enable this setting if you have trouble with remote data calls over XMLRPC.  See the README for more information.')
+  );
+
   $form['domain_paths'] = array(
     '#type' => 'fieldset',
     '#title' => t('Node link patterns'),

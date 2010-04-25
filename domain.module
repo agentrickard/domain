@@ -2078,10 +2078,14 @@ function domain_grant_all($reset= FALSE) {
     }
 
     // On cron runs, we normally have to disable Domain Access.  See http://drupal.org/node/197488.
-    if (!$grant && variable_get('domain_cron_rule', 1)) {
+    // We also check XMLRPC. See http://drupal.org/node/775028.
+    if (!$grant) {
       $ref = explode('/', request_uri());
       $script = array_pop($ref);
-      if ($script == 'cron.php') {
+      if (variable_get('domain_cron_rule', 1) && $script == 'cron.php') {
+        $grant = TRUE;
+      }
+      else if (variable_get('domain_xmlrpc_rule', 0) && $script == 'xmlrpc.php') {
         $grant = TRUE;
       }
     }
