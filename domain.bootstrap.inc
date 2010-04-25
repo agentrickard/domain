@@ -106,6 +106,10 @@ function _domain_bootstrap($phase) {
       if (!domain_settings_setup_ok()) {
         return FALSE;
       }
+
+      // Grant access to all affiliates. See http://drupal.org/node/770650
+      $_domain['site_grant'] = DOMAIN_SITE_GRANT;
+
       _domain_bootstrap_invoke_all('full', $_domain);
       break;
   }
