@@ -52,12 +52,10 @@ function domain_schema() {
       'subdomain' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
       'sitename' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
       'scheme' => array('type' => 'varchar', 'length' => '8', 'not null' => TRUE, 'default' => 'http'),
-      'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1'),
-      'weight' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0)),
+      'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1')),
     'primary key' => array('domain_id'),
     'indexes' => array(
-      'subdomain' => array('subdomain'),
-      'weight' => array('weight')
+      'subdomain' => array('subdomain')
     ),
   );
   $schema['domain_access'] = array(
@@ -78,7 +76,7 @@ function domain_schema() {
     'description' => 'Stores domain information for each user',
     'fields' => array(
       'uid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-      'domain_id' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0)),
+      'domain_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
     'primary key' => array('uid', 'domain_id'),
     'foreign_keys' => array(
       'uid' => array('user' => 'uid'),
@@ -118,13 +116,4 @@ function domain_update_7000() {
   );
   update_fix_d7_block_deltas($sandbox, $renamed_deltas);
   return t('Domain Access blocks updated.');
-}
-
-/**
- * Add sorting to domains.
- */
-function domain_update_7001() {
-  db_add_field('domain', 'weight', array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0), array());
-  db_add_index('domain', 'weight', array('weight'));
-  variable_del('domain_sort');
 }
