@@ -985,7 +985,7 @@ function domain_valid_domain($subdomain) {
   elseif (substr_count($subdomain, ':') == 1) {
     $parts = explode(':', $subdomain);
     $port = (int) $parts[1];
-    if (empty($port) || $port != (float) $parts[1]) {
+    if (strcmp($port, $parts[1])) {
       $error_list[] = t('The port protocol must be an integer.');
     }
   }
@@ -998,7 +998,7 @@ function domain_valid_domain($subdomain) {
     $error_list[] = t('The domain must not end with a dot (.)');
   }
   // Check for valid characters
-  $pattern = '/^[a-z0-9\.\+\-\*\?:]*$/i';
+  $pattern = '/^[a-z0-9\.\-:]*$/i';
   if (!preg_match($pattern, $subdomain)) {
     $error_list[] = t('Only alphanumeric characters, dashes, and a colon are allowed.');
   }
