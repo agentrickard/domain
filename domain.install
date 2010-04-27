@@ -214,3 +214,12 @@ function domain_update_6204() {
   }
   return $ret;
 }
+
+/**
+ * Remove dead user accounts from {domain_editor}.
+ */
+function domain_update_6205() {
+  $ret = array();
+  $ret[] = update_sql("DELETE FROM {domain_editor} WHERE uid NOT IN (SELECT u.uid FROM {users} u)");
+  return $ret;
+}

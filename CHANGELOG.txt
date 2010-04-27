@@ -3,6 +3,7 @@
 27-APR-2010
 
 -- #621512. Clean up some validation handling.
+-- #783134 by xenophyle. Delete {domain_editor} records on user delete. Requires update.php.
 
 25-APR-2010
 

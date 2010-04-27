@@ -452,8 +452,11 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
           '#title' => t('Domain settings'),
           '#value' => $output,
         );
-        break;
-    }
+      }
+      break;
+    case 'delete':
+      db_query("DELETE FROM {domain_editor} WHERE uid = %d", $account->uid);
+      break;
   }
 }
 
