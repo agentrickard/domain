@@ -251,6 +251,8 @@ function domain_get_primary_table($table) {
  * for retrieving similar data objects. So we must be sure to
  * unserialize these safely.
  *
+ * This may have been fixed in Drupal 7.
+ *
  * @param $object
  *   The serialized object.
  * @return $data
@@ -263,7 +265,7 @@ function domain_unserialize($object) {
   if (empty($object)) {
     return;
   }
-  return unserialize(pg_unescape_bytea($object));
+  return unserialize($object);
 }
 
 /**
