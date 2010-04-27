@@ -268,20 +268,3 @@ function domain_unserialize($object) {
   return unserialize($object);
 }
 
-/**
- * Store the initially loaded domain, for later use.
- *
- * @param $domain
- *   The domain global value. This should only be called once.
- * @return $initial
- *   A copy of the initial $_domain global value.
- *
- * @see domain_init()
- */
-function domain_initial_domain($domain = array()) {
-  static $initial;
-  if (!isset($initial) && !empty($domain)) {
-    $initial = $domain;
-  }
-  return $initial;
-}
