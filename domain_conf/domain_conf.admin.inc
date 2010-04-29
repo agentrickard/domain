@@ -151,24 +151,26 @@ function domain_conf_default($domain) {
  * FormsAPI for domain_conf_form().
  */
 function domain_conf_form_submit($form, &$form_state) {
+  $new_settings = array();
   // Throw away what we don't need.
   $ignore = array('form_token', 'form_id', 'form_build_id', 'op', 'submit', 'domain_id');
   foreach ($form_state['values'] as $key => $value) {
     if (in_array($key, $ignore) || (empty($value) && $value === 0)) {
       continue;
     }
-    $settings[$key] = $value;
+    $new_settings[$key] = $value;
   }
   // INSERT or UPDATE?
-  $check = 0;
-  $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = %d", $form_state['values']['domain_id']));
-  if ($check > 0) {
+  $result = db_fetch_object(db_query("SELECT domain_id, settings FROM {domain_conf} WHERE domain_id = %d", $form_state['values']['domain_id']));
+  if (!empty($result->settings)) {
+    $settings = domain_unserialize($result->settings);
+    $merged_settings = array_merge($settings, $new_settings);
     $sql = "UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d";
-    db_query($sql, serialize($settings), $form_state['values']['domain_id']);
+    db_query($sql, serialize($merged_settings), $form_state['values']['domain_id']);
   }
   else {
     $sql = "INSERT INTO {domain_conf} (domain_id, settings) VALUES (%d, %b)";
-    db_query($sql, $form_state['values']['domain_id'], serialize($settings));
+    db_query($sql, $form_state['values']['domain_id'], serialize($new_settings));
   }
   drupal_set_message(t('Domain options saved successfully.'));
   // Clear the cache.

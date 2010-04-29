@@ -1026,7 +1026,7 @@ function domain_batch_form_submit($form, &$form_state) {
       }
       break;
   }
-  drupal_set_message(t('Settings have been updated successfully.'));
+  drupal_set_message(t('Settings have been updated successfully.'), 'status', FALSE);
 }
 
 /**

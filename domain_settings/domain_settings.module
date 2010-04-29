@@ -232,3 +232,95 @@ function domain_settings_domain_warnings_alter(&$forms) {
     }
   }
 }
+
+/**
+ * Handle the erasure of Domain Conf settings properly.
+ */
+function domain_settings_form_domain_conf_reset_form_alter(&$form, &$form_state) {
+  $form['#submit'] = array('domain_settings_reset_form_submit');
+  $form['domain_settings_erase'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Retain values from Domain Settings module.'),
+    '#default_value' => 1,
+    '#weight' => 1,
+  );
+  $form['actions']['#weight'] = 2;
+}
+
+/**
+ * Form submit handler to batch reset custom settings.
+ *
+ * @see domain_conf_reset_form()
+ */
+function domain_settings_reset_form_submit($form, &$form_state) {
+  if (empty($form_state['values']['domain_settings_erase'])) {
+    domain_conf_reset_form_submit($form, $form_state);
+    return;
+  }
+  drupal_set_message(t('Domain configuration settings have been reset. Custom module settings have been retained.'));
+  $form_state['redirect'] = 'admin/build/domain/conf/'. $form_state['values']['domain_id'];
+  domain_settings_reset($form_state['values']['domain_id']);
+  // Clear the cache.
+  cache_clear_all();
+}
+
+/**
+ * Handle the batch erasure of Domain Conf settings properly.
+ */
+function domain_settings_form_domain_batch_form_alter(&$form, &$form_state) {
+  if (!isset($form['#parameters'][2]) || $form['#parameters'][2] != 'domain_conf') {
+    return;
+  }
+  $form['#submit'] = array('domain_settings_batch_form_submit');
+  $form['domain_settings_erase'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Retain values from Domain Settings module.'),
+    '#default_value' => 1,
+    '#weight' => 1,
+  );
+  $form['submit']['#weight'] = 2;
+}
+
+/**
+ * Submit handler for batch domain settings.
+ */
+function domain_settings_batch_form_submit($form, &$form_state) {
+  if (empty($form_state['values']['domain_settings_erase'])) {
+    domain_batch_form_submit($form, $form_state);
+    return;
+  }
+  foreach (array_filter($form_state['values']['domain_batch']) as $domain_id=> $value) {
+    domain_settings_reset($domain_id);
+  }
+  drupal_set_message(t('Domain configuration settings have been reset. Custom module settings have been retained.'));
+  // Clear the cache.
+  cache_clear_all();
+}
+
+/**
+ * Erase Domain Conf and Batch settings but keep those set by this module.
+ *
+ * @param $domain_id
+ *   The domain_id to reset.
+ */
+function domain_settings_reset($domain_id) {
+  // Get the conf elements and erase them from the record.
+  $batch = module_invoke_all('domainbatch');
+  $conf = module_invoke_all('domainconf');
+  $list = array_merge(array_keys($batch), array_keys($conf));
+  // Get the existing data.
+  $data = db_fetch_array(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id));
+  if (empty($data)) {
+    return;
+  }
+  // Erase the settings by key.
+  $settings = domain_unserialize($data['settings']);
+  foreach ($list as $item) {
+    if (isset($settings[$item])) {
+      unset($settings[$item]);
+    }
+  }
+  // Write the update.
+  $sql = "UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d";
+  db_query($sql, serialize($settings), $form_state['values']['domain_id']);
+}

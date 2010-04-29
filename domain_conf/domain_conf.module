@@ -72,6 +72,8 @@ function domain_conf_init() {
       include $extra;
     }
   }
+  global $conf;
+  dsm($conf);
 }
 
 /**
