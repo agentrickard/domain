@@ -1,5 +1,8 @@
 // $Id$
 
+29-APR-2010
+-- #624626. Properly ignore domain settings in Domain Conf.
+
 27-APR-2010
 -- #621512. Clean up some validation handling.
 -- #769818 by manfer. Remove pg_escape_bytea().
