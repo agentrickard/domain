@@ -694,9 +694,10 @@ function domain_batch($action = NULL) {
   // If we are doing a delete action, only valid domains can be acted upon.
   $allowed = array();
   if (!empty($batch[$action]['#table'])) {
-    $data = db_query("SELECT domain_id FROM {%s}", $batch[$action]['#table']);
-    while ($test = db_result($data)) {
-      $allowed[] = $domains[$test];
+    $table = db_escape_table($batch[$action]['#table']);
+    $result = db_query("SELECT domain_id FROM {$table}");
+    foreach ($result as $test) {
+      $allowed[] = $domains[$test->domain_id];
     }
     if (empty($allowed)) {
       return t('There are no valid domains on which to perform this action.  The likely reason is that no records exist in the specified table.');
@@ -955,13 +956,13 @@ function domain_batch_form_submit($form, &$form_state) {
           if (is_array($table)) {
             foreach ($table as $current) {
               db_delete($current)
-                ->condition(array('domain_id', $key))
+                ->condition('domain_id', $key)
                 ->execute();
             }
           }
           else {
             db_delete($table)
-              ->condition(array('domain_id', $key))
+              ->condition('domain_id', $key)
               ->execute();
           }
         }
@@ -974,7 +975,7 @@ function domain_batch_form_submit($form, &$form_state) {
       }
       break;
   }
-  drupal_set_message(t('Settings have been updated successfully.'));
+  drupal_set_message(t('Settings have been updated successfully.'), 'status', FALSE);
 }
 
 /**

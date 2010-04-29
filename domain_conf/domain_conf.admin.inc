@@ -155,27 +155,32 @@ function domain_conf_default($domain) {
  * FormsAPI for domain_conf_form().
  */
 function domain_conf_form_submit($form, &$form_state) {
+  $new_settings = array();
   // Throw away what we don't need.
   $ignore = array('form_token', 'form_id', 'form_build_id', 'op', 'submit', 'domain_id');
   foreach ($form_state['values'] as $key => $value) {
     if (in_array($key, $ignore) || (empty($value) && $value === 0)) {
       continue;
     }
-    $settings[$key] = $value;
+    $new_settings[$key] = $value;
   }
   // INSERT or UPDATE?
-  $check = (bool) db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $form_state['values']['domain_id']))->fetchField();
-  if ($check > 0) {
+  $result = db_query("SELECT domain_id, settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $form_state['values']['domain_id']))->fetchObject();
+  if (!empty($result->settings)) {
+    $settings = domain_unserialize($result->settings);
+    $merged_settings = array_merge($settings, $new_settings);
     db_update('domain_conf')
-      ->fields(array('settings' => serialize($settings)))
-      ->condition('domain_id', $form_state['values']['domain_id'])
+      ->fields(array(
+          'settings' => serialize($merged_settings),
+      ))
+      ->condition('domain_id', $result->domain_id)
       ->execute();
   }
   else {
     db_insert('domain_conf')
       ->fields(array(
         'domain_id' => $form_state['values']['domain_id'],
-        'settings' => serialize($settings)
+        'settings' => serialize($new_settings)
       ))
       ->execute();
   }
