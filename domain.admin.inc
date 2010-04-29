@@ -808,7 +808,9 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
     '#title' => $batch['#form']['#title'],
     '#description' => $batch['#meta_description']
   );
-
+  if ($batch['#domain_action'] == 'domain_conf' && $batch['#form']['#type'] == 'select') {
+    $batch['#form']['#options'] = array('domain-conf-ignore' => t('Use primary domain settings')) + $batch['#form']['#options'];
+  }
   foreach ($domains as $domain) {
     // Set the current value according to the stored values.
     if (isset($domain[$action])) {
