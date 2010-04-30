@@ -1793,7 +1793,15 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   // By default, the requesting domain is assigned.
   $default = array($_domain['domain_id']);
   // How is core content handled for this site?
-  $behavior = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+  // In D7, type handling is strict, so make this value 0 or 1.
+  // @TODO: clean up DOMAIN_INSTALL handling.
+  $all_sites = (int) variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+  if ($all_sites == 1) {
+    $behavior = 1;
+  }
+  else {
+    $behavior = variable_get('domain_node_' . $form['#node']->type, 0);
+  }
   if ($_domain['domain_id'] == 0) {
     $default[] = -1;
   }
@@ -1836,7 +1844,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#title' => t('Send to all affiliates'),
       '#required' => FALSE,
       '#description' => t('Select if this content can be shown to all affiliates. This setting will override the options below, but you must still select a domain that "owns" this content.'),
-      '#default_value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : variable_get('domain_node_' . $form['#node']->type, $behavior),
+      '#default_value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : $behavior,
     );
     $form['domain']['domains'] = array(
       '#type' => empty($format) ? 'checkboxes' : 'select',
@@ -1920,7 +1928,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
           );
           // We must preserve publishing options that the user cannot access, but only for
           // existing nodes.
-          if ($form['#node']->nid) {
+          if (!empty($form['#node']->nid)) {
             $raw = $raw_options;
           }
           else {
@@ -1943,7 +1951,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
           }
           // Show the options that cannot be changed.
           $list = array();
-          if ($form['#node']->domain_site) {
+          if (!empty($form['#node']->domain_site)) {
             $list[]['data'] = t('All affiliates');
           }
           if (!empty($raw)) {
@@ -1964,7 +1972,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     // These form elements are hidden from non-privileged users, by design.
     $form['domain_site'] = array(
       '#type' => 'value',
-      '#value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : variable_get('domain_node_' . $form['#node']->type, $behavior),
+      '#value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : $behavior,
     );
     // Domains that have been assigned and cannot be changed.
     $form['domains_raw'] = array(

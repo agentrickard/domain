@@ -1,5 +1,8 @@
 // $Id$
 
+30-APR-2010
+-- #771454 by manfer. Removes notices and bad node visibility settings.
+
 29-APR-2010
 -- #624626. Properly ignore domain settings in Domain Conf.
 -- #775224 by antiorario. Domain Conf and Domain Settings interfere with each other.

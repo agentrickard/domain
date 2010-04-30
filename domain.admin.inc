@@ -605,7 +605,12 @@ function domain_delete_form_submit($form, &$form_state) {
 function domain_advanced_form($form, $form_state) {
   $form = array();
   $node_types = node_type_get_names();
-  $default = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+  // In D7, type handling is strict, so make this value 0 or 1.
+  // @TODO: clean up DOMAIN_INSTALL handling.
+  $default = (int) variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+  if ($default == 2) {
+    $default = 0;
+  }
   $form['domain_node'] = array(
     '#type' => 'fieldset',
     '#title' => t('Domain node types'),
