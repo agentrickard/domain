@@ -5,6 +5,7 @@
 -- #774692 by hawkdrupal. Allow the error sequence to be skipped. Load default
     domain in event of installation failure to prevent SQL errors.
 -- Prevent errors in domain_get_domain().
+-- patch #782208 by bleen18. Excellent Views caching patch.
 
 29-APR-2010
 
