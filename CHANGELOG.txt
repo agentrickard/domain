@@ -1,5 +1,10 @@
 // $Id$
 
+04-MAY-2010
+-- #774692 by hawkdrupal. Allow the error sequence to be skipped. Load default
+    domain in event of installation failure to prevent SQL errors.
+-- Prevent errors in domain_get_domain().
+
 30-APR-2010
 -- #771454 by manfer. Removes notices and bad node visibility settings.
 

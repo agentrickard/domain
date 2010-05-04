@@ -388,11 +388,23 @@ include 'settings.inc';
 After editing your settings.php file, go to Admin > Build > Domains.  You may
 see a warning at the top of the page:
 
-  "Domain access failed to load during phase: -1. Please check your settings.php
-  file and site configuration."
+  "Domain access failed to load during phase: bootstrap include. Please check your
+  settings.php file and site configuration."
 
 This message means that your PHP server cannot find the include file.  You
 may need to test other path options for the include code.
+
+When this occurs, the default domain will be loaded, but custom settings or
+themes for other domains will not.
+
+If the module is working correctly and you are getting persistent errors due to web
+crawlers, you may disable this warning. To do so, edit settings.php and add the
+following lines to the bottom of the file:
+
+  $conf['domain_hide_errors'] = TRUE;
+
+This will suppress the warning messages. See http://drupal.org/node/774692 for
+background.
 
 ----
 4.4.5   Additional Resources

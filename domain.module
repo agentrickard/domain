@@ -54,20 +54,26 @@ function domain_init() {
 
   // Error handling in case the module is not installed correctly.
   if (!isset($_domain['domain_id'])) {
-    $_domain['error'] = '-1';
+    $_domain = domain_default();
+    $_domain['error'] = 'bootstrap include';
   }
   // If $_domain['error'] is present, then set a message and stop.
   if (!isset($error) && isset($_domain['error'])) {
-    $error = 'Domain access failed to load during phase: ' . $_domain['error'] . '. Please check your settings.php file and site configuration.';
+    $error = 'Domain access failed to load during phase: '. $_domain['error'] .'. Please check your settings.php file and site configuration.';
     // Do not show on form submissions, when enabling the module.
     if (empty($_POST)) {
-      // Show a warning to admin users.
-      if (user_access('administer domains')) {
-        drupal_set_message($error, 'error', FALSE);
+      // Show a warning to admin users, if enabled.
+      // You may disable this warning by adding:
+      // $conf['domain_hide_errors'] = TRUE;
+      // to the bottom of settings.php.
+      $hide = variable_get('domain_hide_errors', FALSE);
+      if (user_access('administer domains') && empty($hide)) {
+        drupal_set_message($error, 'error');
       }
-      watchdog('Domain Access', $error, NULL, WATCHDOG_ERROR);
+      if (empty($hide)) {
+        watchdog('Domain Access', $error, NULL, WATCHDOG_ERROR);
+      }
     }
-    return;
   }
   // End of the error handling routine.
 
@@ -121,6 +127,31 @@ function domain_initial_domain($domain = array()) {
     $initial = $domain;
   }
   return $initial;
+}
+
+/**
+ * Unserialize an object stored in {domain_*} tables.
+ *
+ * PostGRES has issues with bytea fields, and while this is
+ * handled cleanly in cache_get(), we have our own functions
+ * for retrieving similar data objects. So we must be sure to
+ * unserialize these safely.
+ *
+ * This may have been fixed in Drupal 7.
+ *
+ * @param $object
+ *   The serialized object.
+ * @return $data
+ *   Properly unserialized data or an empty string if the $object
+ *   contained no data.
+ *
+ * @see http://drupal.org/node/686146
+ */
+function domain_unserialize($object) {
+  if (empty($object)) {
+    return;
+  }
+  return unserialize($object);
 }
 
 /**
@@ -1180,7 +1211,9 @@ function domain_reset_domain($bootstrap = FALSE) {
  *   An array of data defining the currently active domain.
  */
 function domain_get_domain() {
-  return $GLOBALS['_domain'];
+  if (isset($GLOBALS['_domain'])) {
+    return $GLOBALS['_domain'];
+  }
 }
 
 /**
