@@ -4,6 +4,7 @@
 
 -- #774692 by hawkdrupal. Allow the error sequence to be skipped. Load default
     domain in event of installation failure to prevent SQL errors.
+-- Prevent errors in domain_get_domain().
 
 29-APR-2010
 

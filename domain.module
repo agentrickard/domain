@@ -1080,7 +1080,9 @@ function domain_reset_domain($bootstrap = FALSE) {
  *   An array of data defining the currently active domain.
  */
 function domain_get_domain() {
-  return $GLOBALS['_domain'];
+  if (isset($GLOBALS['_domain'])) {
+    return $GLOBALS['_domain'];
+  }
 }
 
 /**
