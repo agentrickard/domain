@@ -1,5 +1,9 @@
 // $Id$
 
+07-MAY-2010
+
+-- patch #761556 by hefox. Better abstraction for domain creation. New domain_save() function.
+
 04-MAY-2010
 
 -- #774692 by hawkdrupal. Allow the error sequence to be skipped. Load default

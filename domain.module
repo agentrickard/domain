@@ -689,6 +689,36 @@ function domain_load($domain_id = NULL) {
 }
 
 /**
+ * Domain save function.
+ *
+ * @param $values
+ *   Form value information.
+ * @param $edit
+ *   Form state information.
+ * @return
+ *   $domain array on success or -1 on failure.
+ */
+function domain_save($values, $edit) {
+  // Update or insert a record?
+  $update = (isset($values['domain_id']) && is_numeric($values['domain_id'])) ? array('domain_id') : array();
+
+  if (!empty($update)) {
+    $action = 'update';
+  }
+  else {
+    $action = 'create';
+  }
+
+  drupal_write_record('domain', $values, $update);
+
+  // Let other modules act.
+  $domain = domain_lookup(NULL, $values['subdomain']);
+  module_invoke_all('domainupdate', $action, $domain, $edit);
+  // Return the recorded domain.
+  return $domain;
+}
+
+/**
  * Runs a lookup against the {domain} table.  One of the two values must be present
  *
  * This function also calls hook_domainload(), which lets module developers overwrite
