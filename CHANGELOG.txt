@@ -4,6 +4,9 @@
 
 -- patch #785818 by nonsie and mikeytown2. Update domain validation sequence
     to require lowercase; support non-ASCII domains; and add hook_domain_validate_alter().
+-- #793558 by hawkdrupal. Updates Domain Source to handle new batch form options.
+-- Creates the 6.x.2.5 release.
+-- Requires running update.php.
 
 07-MAY-2010
 

@@ -124,9 +124,11 @@ Possible options are:
 
   -- Domain sitename
   Indicates the content is expressly assigned to a source domain.
+
   -- Domain sitename 'determined automatically'
   Indicates that no source domain is set, and the module is using default
   behavior to determine the proper source domain.
+
   -- Domain sitename 'using current domain'
   Indicates the content link should not be rewritten, unless necessary, and to
   view it on the current domain.
@@ -135,10 +137,15 @@ Possible options are:
 3.3 Integration with Domain Content
 
 This module adds an element to the Domain Content batch editing screen to
-allow for the batch assignment of source domains.
+allow for the batch assignment of source domains. It is also available to
+editors who can use the default Content administration form.
 
 However, this feature is currently only available to users with the 'set domain
 access' permission.
+
+When using this form, you may select to ingore Domain Source by selecting
+'Do not change' in the form element.  When using this feature, you will not
+be allowed to remove the source domain from any content being updated.
 
 ----
 4.  Developer Notes

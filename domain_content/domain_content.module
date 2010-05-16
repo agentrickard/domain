@@ -203,6 +203,10 @@ function domain_content_form_node_admin_content_alter(&$form, &$form_state) {
   if (!user_access('set domain access')) {
     return;
   }
+  // Do nothing on the delete screen.
+  if (isset($form['operation']['#value']) && $form['operation']['#value'] == 'delete') {
+    return;
+  }
   // Add our form elements.
   domain_content_add_form_widget($form);
   $form['domain']['#weight'] = -1;
