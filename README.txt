@@ -38,6 +38,8 @@ CONTENTS
 4.1.2   Site Name
 4.1.3   Domain URL Scheme
 4.2   Creating Domain Records
+4.2.1   Restricted Characters in Domains
+4.2.2   Altering Domain Name Validation
 4.3   Domain Module Behaviors
 4.3.1   New Content Settings
 4.3.2   Debugging Status
@@ -661,6 +663,40 @@ to help you debug your DNS configuration and may be safely ignored.
 NOTE: Users who attempt to access an unregistered domain will be
 redirected to the primary domain automatically.
 
+----
+4.2.1  Restricted Characters in Domains
+
+When creating a domain record, you are restricted to the valid character set
+for Internet domain names.  By design, this includes only the ASCII 
+alphanumeric character set (a-z 0-9) plus the special characters dot (.)
+dash (-) and colon (:). A colon may only be followed by a port number.
+
+Domains must be lowercase. Domain matching with HTTP_HOST is not
+case-sensitive.
+
+With the advent of Internationalized Domain Names (IDNs), domain servers
+are beginning to recognize non-ASCII domain names. To enable support for
+non-ASCII domain names, you must add the following lines to the bottom
+of your settings.php file:
+
+  // Allow registration of non-ASCII domain strings.
+  $conf['domain_allow_non_ascii'] = TRUE;
+
+For background, see the following:
+
+  http://tools.ietf.org/html/rfc819
+  http://tools.ietf.org/html/rfc1035
+  http://en.wikipedia.org/wiki/Internationalized_domain_name
+  http://blog.icann.org/2010/05/idn-cctlds/
+
+----
+4.2.2   Altering Domain Name Validation
+
+If you wish to enforce special business rules for domain name validation,
+you may implement hook_domain_validate_alter() in your module.
+
+This hook will allow your module to intercept and alter any errors found
+by the normal domain validation process.  See API.php for details.
 
 ----
 4.3   Domain Module Behaviors

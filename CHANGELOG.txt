@@ -1,5 +1,10 @@
 // $Id$
 
+16-MAY-2010
+
+-- patch #785818 by nonsie and mikeytown2. Update domain validation sequence
+    to require lowercase; support non-ASCII domains; and add hook_domain_validate_alter().
+
 07-MAY-2010
 
 -- patch #761556 by hefox. Better abstraction for domain creation. New domain_save() function.
