@@ -54,7 +54,7 @@ As of 6.x.2.0, Domain Navigation has one permission:
 
   - 'access domain navigation'
   This permission allows users to view the Domain Navigation block.
-  
+
 The module also uses the following inherited permission:
 
   - 'access inactive domains'

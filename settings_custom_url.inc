@@ -76,7 +76,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
       // Check to see if this is a node or comment link and set $nid accordingly.
       // We static the $nid results to make this more efficient.
       $pattern = explode('/', $original_path);
-  
+
       // Advanced pattern matching, we find the node id based on token %n in the path string.
       if (!isset($nodepaths)) {
         $pathdata = variable_get('domain_paths', "node/%n\r\nnode/%n/edit\r\ncomment/reply/%n\r\nnode/add/book/parent/%n\r\nbook/export/html/%n\r\nnode/%n/outline");

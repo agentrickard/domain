@@ -113,10 +113,10 @@ There are three options:
   -- Use the default domain
   Mimics the behavior of Drupal core and only saves the variable to the
   primary domain of your site.
-  
+
   -- Use the active domain
   Defaults the form to store values for the current domain.
-  
+
   -- All domains
   Defaults the form to submit the values to the primary domain and to erase
   custom values set for other domains. This option is included if you want

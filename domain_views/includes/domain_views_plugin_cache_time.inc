@@ -3,7 +3,7 @@
 
 /**
  * @file
- *  Domain Views plugin that caches views on a per domain basis. 
+ *  Domain Views plugin that caches views on a per domain basis.
  *  This is necessary for views that filter on "current domain"
  *  (ex. SELECT * FROM {node} WHERE domain_source = current_domain)
  *  otherwise "current domain" will be cached.
@@ -57,7 +57,7 @@ class domain_views_plugin_cache_time extends views_plugin_cache_time {
      */
     global $user;
     global $_domain;
-    
+
     if (!isset($this->_output_key)) {
       $key_data = array(
         'result' => $this->view->result,

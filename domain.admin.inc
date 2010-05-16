@@ -444,8 +444,8 @@ function domain_form($form_state, $domain = array(), $arguments = array()) {
     }
   }
   $form = array();
-  
-  $form['#domain'] = $domain; 
+
+  $form['#domain'] = $domain;
   // The $arguments arrray allows other modules to pass values to change the bahavior
   // of submit and validate functions.
   if (!empty($arguments)) {

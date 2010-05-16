@@ -545,7 +545,7 @@ Due to the way node_access() works, the following limitations should be noted.
   - Users who look at the sites and have the 'administer nodes' permission
     can always see all content on all sites, which can be confusing.  To
     enforce Domain Access rules on these users, you may enable the
-    'Enforce rules on administrators' setting described in 4.3.3. 
+    'Enforce rules on administrators' setting described in 4.3.3.
 
   - Users who have the 'edit any TYPE nodes' permission will be able to edit
     nodes that do not belong to their domain.
@@ -638,7 +638,7 @@ When you create a new domain record, simply fill in the form:
   a domain to Inactive restricts access to users with the 'access inactive
   domains' permission. This feature is useful for staging content and testing
   new domain configurations.
-  
+
   NOTE: Users who try to access an inactive domain will have the attempt
   reported in the site logs. When this occurs, the module will try to redirect
   the user to the appropriate content on an active domain. If no match is
@@ -667,7 +667,7 @@ redirected to the primary domain automatically.
 4.2.1  Restricted Characters in Domains
 
 When creating a domain record, you are restricted to the valid character set
-for Internet domain names.  By design, this includes only the ASCII 
+for Internet domain names.  By design, this includes only the ASCII
 alphanumeric character set (a-z 0-9) plus the special characters dot (.)
 dash (-) and colon (:). A colon may only be followed by a port number.
 

@@ -319,7 +319,7 @@ function hook_domainform(&$form) {
  *  may have values that vary on each domain.
  *
  * @return
- *   An associative array where the keys form_id values representing forms 
+ *   An associative array where the keys form_id values representing forms
  *   that require warnings. The value should return a link for where the
  *   form may be set for the current domain. If no link exists, you should
  *   pass NULL as the value.

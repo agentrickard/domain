@@ -177,7 +177,7 @@
 
 24-OCT-2009
 
--- #529026 by davereid. Updates the URL Alter integration to match Drupal 7. 
+-- #529026 by davereid. Updates the URL Alter integration to match Drupal 7.
     Requires URL Alter module 6.x.1.2.
 -- #540684 by Bartezz. Allows Domain Source to set the active domain as source.
 -- #561282 by kotu, nonsie, nirbhasa, Bartezz. Removes the auto-filtering of domains
