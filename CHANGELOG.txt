@@ -1,5 +1,8 @@
 // $Id$
 
+17-MAY-2010
+-- Update cache settings for Doamin Conf.
+
 04-MAY-2010
 -- #774692 by hawkdrupal. Allow the error sequence to be skipped. Load default
     domain in event of installation failure to prevent SQL errors.

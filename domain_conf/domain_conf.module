@@ -282,15 +282,15 @@ function domain_conf_domainbatch() {
     '#group' => t('Timezone settings'),
   );
   // Change the caching mode.
+  $cache = variable_get('cache', 0);
   $batch['cache'] = array(
     '#form' => array(
-      '#type' => 'radios',
-      '#title' => t('Page cache for anonymous users'),
-      '#default_value' => variable_get('cache', CACHE_DISABLED),
-      '#options' => array(CACHE_DISABLED => t('Disabled'), CACHE_NORMAL => t('Normal (recommended)')),
+      '#type' => 'checkbox',
+      '#title' => t('Cache pages for anonymous users'),
+      '#default_value' => $cache,
     ),
     '#domain_action' => 'domain_conf',
-    '#system_default' => variable_get('cache', CACHE_DISABLED),
+    '#system_default' => $cache,
     '#variable' => 'cache',
     '#meta_description' => t('Set the page cache options for all domains.'),
     '#data_type' => 'integer',
