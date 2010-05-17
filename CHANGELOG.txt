@@ -5,6 +5,8 @@
 -- patch #785818 by nonsie and mikeytown2. Update domain validation sequence
     to require lowercase; support non-ASCII domains; and add hook_domain_validate_alter().
 -- patch #761556 by hefox. Better abstraction for domain creation. New domain_save() function.
+-- #793558 by hawkdrupal. Updates Domain Source to handle new batch form options.
+-- Rolls 7.x.2.0-beta2.
     
 04-MAY-2010
 -- #774692 by hawkdrupal. Allow the error sequence to be skipped. Load default

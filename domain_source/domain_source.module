@@ -15,6 +15,7 @@
  */
 
 define('DOMAIN_SOURCE_USE_ACTIVE', -5);
+define('DOMAIN_SOURCE_IGNORE', -10);
 
 /**
  * Implements hook_form_alter()
@@ -112,24 +113,39 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Integrate with Domain Content.
  */
-function domain_source_form_domain_content_form_alter(&$form, &$form_state) {
+function domain_source_form_domain_content_admin_alter(&$form, &$form_state) {
   $_domain = domain_get_domain();
+  if (!user_access('set domain access')) {
+    return;
+  }
   $options = array();
   $domains = domain_domains();
-  if (user_access('set domain access')) {
-    foreach ($domains as $domain) {
-      $options[$domain['domain_id']] = $domain['sitename'];
-    }
-    $form['domain']['domain_source'] = array(
-      '#type' => 'select',
-      '#title' => t('Source domain'),
-      '#options' => $options,
-      '#default_value' => $_domain['domain_id'],
-      '#description' => t('This affiliate will be linked to from other affiliates, as needed.')
-    );
-    $form['#validate'][] = 'domain_source_validate';
-    $form['#submit'][] = 'domain_source_update_nodes';
+  // Options.
+  $options[DOMAIN_SOURCE_IGNORE] = t('Do not change');
+  $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
+  foreach ($domains as $domain) {
+    $options[$domain['domain_id']] = $domain['sitename'];
   }
+  $form['domain']['domain_source'] = array(
+    '#type' => 'select',
+    '#title' => t('Source domain'),
+    '#options' => $options,
+    '#default_value' => $_domain['domain_id'],
+    '#description' => t('The canonical domain for the selected content. This element replaces existing settings for all selections.')
+  );
+  $form['admin']['options']['submit']['#validate'][] = 'domain_source_validate';
+  $form['admin']['options']['submit']['#submit'][] = 'domain_source_update_nodes';
+}
+
+/**
+ * Form integration with Administer nodes.
+ */
+function domain_source_form_node_admin_content_alter(&$form, &$form_state) {
+  // Do nothing on the delete screen.
+  if (isset($form['operation']['#value']) && $form['operation']['#value'] == 'delete') {
+    return;
+  }
+  domain_source_form_domain_content_form_alter($form, $form_state);
 }
 
 /**
@@ -310,13 +326,33 @@ function domain_source_update_nodes($form, &$form_state) {
 function domain_source_validate($form, &$form_state) {
   if ($form_state['values']['operation'] == 'domain') {
     ($form_state['values']['domain_source'] == 0) ? $key = -1 : $key = $form_state['values']['domain_source'];
-    if ($form_state['values']['domain_site'] && $key == -1) {
-      // This case is acceptable, so we let it pass.
-      // I find this code easier to read than a compound IF statement.
+    if ($form_state['values']['domain_site'] && $key == -1 || $key == DOMAIN_SOURCE_USE_ACTIVE) {
+      // These cases are acceptable, so we let them pass.
+      // I find this code easier to read than a compound negative IF statement.
     }
-    // Here we account for both the 'domains_raw' and 'domains' options.
-    // If selected, these clauses will not be zero.
-    elseif (!$form_state['values']['domains'][$key] && (!empty($form_state['values']['domains_raw']) && !in_array($key, $form_state['values']['domains_raw']))) {
+    else if ($key == DOMAIN_SOURCE_IGNORE) {
+      // In this case, we need to check all the selected nodes, which is resource intensive.
+      $nodes = array_filter($form_state['values']['nodes']);
+      foreach ($nodes as $nid) {
+        $source = domain_source_lookup($nid);
+        $key = ($source['domain_id'] == 0) ? -1 : $source['domain_id'];
+        // Test for the first two behaviors, which add domains to the node.
+        $behavior = $form_state['values']['behavior'];
+        if ($behavior < 2) {
+          if (empty($form_state['values']['domains'][$key])) {
+            $node = node_load($nid);
+            form_set_error('domain_source', t('The source affiliate must be selected as a publishing option. %title is assigned to %domain.', array('%title' => $node->title, '%domain' => $source['sitename'])));
+          }
+        }
+        // Do not allow removal of the source domain when removing domains from the node.
+        else if (!empty($form_state['values']['domains'][$key])) {
+          $node = node_load($nid);
+          form_set_error('domain_source', t('The source affiliate must be selected as a publishing option. %title is assigned to %domain.', array('%title' => $node->title, '%domain' => $source['sitename'])));
+        }
+      }
+    }
+    // The source domain must have been selected.
+    else if (empty($form_state['values']['domains'][$key])) {
       form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
     }
   }

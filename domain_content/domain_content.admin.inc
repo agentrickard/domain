@@ -372,9 +372,9 @@ function domain_content_view_domains($node) {
     }
     if (module_exists('domain_source')) {
       $source = NULL;
-      $source = db_fetch_object(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $node->nid));
-      if (!empty($source) && isset($items[$source->domain_id])) {
-        $items[$source->domain_id] .= '*';
+      $source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $node->nid))->fetchField();
+      if (!empty($source) && isset($items[$source])) {
+        $items[$source] .= '*';
       }
     }
     return theme('item_list', array('items' => $items));
