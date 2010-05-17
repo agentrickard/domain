@@ -449,6 +449,12 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#collapsible' => TRUE
   );
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+  if (!variable_get('domain_allow_non_ascii', FALSE)) {
+    $description = t('Can only contain lowercase alphanumeric characters, dashes and a colon (if using alternative ports).');
+  }
+  else {
+    $description = t('Can contain lowercase alphanumeric and ASCII characters, dashes and a colon (if using alternative ports).');
+  }
   $form['domain']['subdomain'] = array(
     '#type' => 'textfield',
     '#title' => t('Domain'),
@@ -456,7 +462,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => $domain['subdomain'],
-    '#description' => t('The allowed domain, using the full <em>path.example.com</em> format.  Can only contain lower-case alphanumeric characters, dashes and a colon (if using alternative ports).  Leave off the http:// and the trailing slash and do not include any paths.')
+    '#description' => t('The allowed domain, using the full <em>path.example.com</em> format. Leave off the http:// and the trailing slash and do not include any paths.') . ' ' . $description
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
@@ -494,12 +500,17 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
  */
 function domain_form_validate($form, &$form_state) {
   $subdomain = $form_state['values']['subdomain'];
+  $error_list = array();
   $domain_changed = (bool) strcmp($form_state['values']['subdomain'], $form['domain']['subdomain']['#default_value']);
-  if ($domain_changed) {
-    $error_list = domain_validate($subdomain);
-    foreach ($error_list as $error) {
-      form_set_error('subdomain', $error);
-    }
+  if ($domain_changed && !domain_unique_domain($subdomain)) {
+    $error_list[] = t('The domain value must be unique.');
+  }
+  $error = domain_valid_domain($subdomain);
+  if (!empty($error)) {
+    $error_list[] = $error;
+  }
+  foreach ($error_list as $error) {
+    form_set_error('subdomain', $error);
   }
 }
 

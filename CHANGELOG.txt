@@ -2,7 +2,9 @@
 
 17-MAY-2010
 -- Update cache settings for Doamin Conf.
-
+-- patch #785818 by nonsie and mikeytown2. Update domain validation sequence
+    to require lowercase; support non-ASCII domains; and add hook_domain_validate_alter().
+    
 04-MAY-2010
 -- #774692 by hawkdrupal. Allow the error sequence to be skipped. Load default
     domain in event of installation failure to prevent SQL errors.
