@@ -1,7 +1,7 @@
 // $Id$
 
 17-MAY-2010
--- Update cache settings for Doamin Conf.
+-- Update cache settings for Domain Conf.
 -- patch #785818 by nonsie and mikeytown2. Update domain validation sequence
     to require lowercase; support non-ASCII domains; and add hook_domain_validate_alter().
 -- patch #761556 by hefox. Better abstraction for domain creation. New domain_save() function.
