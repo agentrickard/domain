@@ -438,6 +438,8 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     }
   }
   $form = array();
+  
+  $form['#domain'] = $domain; 
   // The $arguments arrray allows other modules to pass values to change the bahavior
   // of submit and validate functions.
   if (!empty($arguments)) {
@@ -518,24 +520,21 @@ function domain_form_validate($form, &$form_state) {
  * Implement domain_form submit hook.
  */
 function domain_form_submit($form, &$form_state) {
-  // Populate sql values used in both queries.
   $values = domain_values_from_form_state($form_state);
-
-  // Update or create a new domain depending on presence of domain_id.
-  if (!is_null($values['domain_id'])) {
-    drupal_write_record('domain', $values, 'domain_id');
-    $action = 'update';
+  // Set the proper message
+  if (!empty($values['domain_id'])) {
     $message = t('Domain record updated.');
   }
   else {
-    drupal_write_record('domain', $values);
-    $action = 'create';
     $message = t('Domain record created.');
   }
+  // Run the save routine.
+  $domain = domain_save($values, $form_state);
 
-  // Let other modules act.
-  $domain = domain_lookup(NULL, $values['subdomain']);
-  module_invoke_all('domainupdate', $action, $domain, $form_state);
+  // If return is not a $domain array, something went wrong.
+  if ($domain == -1) {
+    $message = t('Domain record failed.');
+  }
 
   // Hide the message for the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
