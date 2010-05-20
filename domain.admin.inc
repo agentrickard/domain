@@ -95,7 +95,7 @@ function domain_view() {
     $rows[] = $row;
   }
   if (!empty($rows)) {
-    $output .= theme_table($header, $rows);
+    $output .= theme_table($header, $rows, array('id' => 'domain-list'));
     $output .= theme('pager', NULL, variable_get('domain_list_size', DOMAIN_LIST_SIZE), 0);
     return $output;
   }

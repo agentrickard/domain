@@ -1,5 +1,9 @@
 // $Id$
 
+20-MAY-2010
+
+-- patch #803700 by Michelle. Adds a div id to the domain list table, for theming.
+
 16-MAY-2010
 
 -- patch #785818 by nonsie and mikeytown2. Update domain validation sequence
