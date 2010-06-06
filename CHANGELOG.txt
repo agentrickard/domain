@@ -4,6 +4,7 @@
 -- Replaces parse_url() with drupal_parse_url().
 -- Branches the 7-x-2 release to bugfix only.
 -- Releases 7.x.2.0.
+-- #733964. Allow weighting of domains.
 
 20-MAY-2010
 -- patch #803700 by Michelle. Adds a div id to the domain list table, for theming.

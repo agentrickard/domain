@@ -852,13 +852,13 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   // Run the lookup, if needed.
   if (!isset($domains[$key]) || $reset) {
     if ($subdomain) {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchAssoc();
+      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchAssoc();
     }
     elseif ($domain_id == 0) {
       $domain = domain_default();
     }
     else {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchAssoc();
+      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchAssoc();
     }
     // Did we get a valid result?
     if (isset($domain['domain_id'])) {
@@ -958,14 +958,12 @@ function domain_domains($reset = FALSE) {
   if (empty($domains) || $reset) {
     $domains = array();
     // Query the db for active domain records.
-    $result = db_query("SELECT domain_id FROM {domain}", array(), array('fetch' => PDO::FETCH_ASSOC));
+    $result = db_query("SELECT domain_id FROM {domain} ORDER BY weight", array(), array('fetch' => PDO::FETCH_ASSOC));
     foreach ($result as $data) {
       $domain = domain_lookup($data['domain_id'], NULL, TRUE);
       $domains[$domain['domain_id']] = $domain;
     }
   }
-  $sort = variable_get('domain_sort', 'id');
-  uasort($domains, '_domain_' . $sort . '_sort');
   return $domains;
 }
 

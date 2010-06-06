@@ -744,8 +744,8 @@ multiple node access modules, not all rules will be applied.
 4.3.4   Sort Domain Lists
 
 Both the Domain Switcher block and the Domain Nav module provide an
-end-user visible list of domains.  The domain sorting settings control how
-these lists are generated and presented to the user.
+end-user visible list of domains.  Use the 'weight' value of each domain
+to set its sort order. Lower values float to the top of lists.
 
 ----
 4.3.5   Domain Selection Format
