@@ -1302,7 +1302,7 @@ function domain_get_path($domain) {
   if (empty($base_url)) {
     return check_url($domain['scheme'] . '://' . $domain['subdomain']);
   }
-  $_url = parse_url($base_url);
+  $_url = drupal_parse_url($base_url);
   // PHP 5 does not return an empty path element.
   if (!isset($_url['path'])) {
     $_url['path'] = '/';
@@ -1839,7 +1839,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   if ($seo) {
     // We cannot use the global domain here, since it can be modified.
     $domain = domain_initial_domain();
-    $action = parse_url($form['#action']);
+    $action = drupal_parse_url($form['#action']);
     if (isset($action['query'])) {
       $action['path'] .= '?';
     }

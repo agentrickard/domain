@@ -76,7 +76,7 @@ function domain_conf_form($form, $form_state, $domain) {
     if ($key == 'site_frontpage') {
       global $base_url;
       $prefix = $base_url . '/';
-      $_path = parse_url($prefix);
+      $_path = drupal_parse_url($prefix);
       $str = $_path['host'];
       $fix = preg_replace("/$str/", $domain['subdomain'], $prefix, 1);
       $form[$default_group]['site_frontpage']['#field_prefix'] = $fix;
