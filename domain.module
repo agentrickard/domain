@@ -1300,7 +1300,7 @@ function domain_get_path($domain) {
   if (empty($base_url)) {
     return check_url($domain['scheme'] . '://' . $domain['subdomain']);
   }
-  $_url = drupal_parse_url($base_url);
+  $_url = parse_url($base_url);
   // PHP 5 does not return an empty path element.
   if (!isset($_url['path'])) {
     $_url['path'] = '/';
@@ -1309,6 +1309,7 @@ function domain_get_path($domain) {
   if (substr($_url['path'], -1) != '/') {
     $_url['path'] .= '/';
   }
+
   $path = check_url($domain['scheme'] . '://' . $domain['subdomain'] . $_url['path']);
   return $path;
 }
