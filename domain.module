@@ -1900,7 +1900,8 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     }
   }
   // This lets FieldAPI adjust the weight of our element using domain_field_extra_fields().
-  $weight = module_exists('field_ui') ? field_extra_field_weight('node', $form['type']['#value'], 'domain') : 1;
+  // @TODO: fix then when fields in core finally works.
+  # $weight = module_exists('field_ui') ? field_extra_field_weight('node', $form['type']['#value'], 'domain') : 1;
   // If the user is a site admin, show the form, otherwise pass it silently.
   if (user_access('set domain access')) {
     $form['domain'] = array(
@@ -2693,6 +2694,8 @@ function domain_node_access_acknowledge($grant) {
  * Implements hook_field_extra_fields()
  *
  * Field hook to allow sorting of the domain settings field.
+ *
+ * @TODO: chase the field api for changes, as this is broken.
  */
 function domain_field_extra_fields() {
   $base = array(
