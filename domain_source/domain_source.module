@@ -145,7 +145,7 @@ function domain_source_form_node_admin_content_alter(&$form, &$form_state) {
   if (isset($form['operation']['#value']) && $form['operation']['#value'] == 'delete') {
     return;
   }
-  domain_source_form_domain_content_form_alter($form, $form_state);
+  domain_source_form_domain_content_admin_alter($form, $form_state);
 }
 
 /**
