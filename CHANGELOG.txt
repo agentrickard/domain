@@ -1,5 +1,9 @@
 // $Id$
 
+09-JUN-2010
+-- Fixes bad function call in Domain Source.
+-- Releases 7.x.2.1
+
 06-JUN-2010
 -- Replaces parse_url() with drupal_parse_url().
 -- Branches the 7-x-2 release to bugfix only.
