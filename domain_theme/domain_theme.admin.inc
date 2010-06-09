@@ -51,7 +51,7 @@ function domain_theme_form($form, &$form_state, $domain) {
     '#type' => 'value',
     '#value' => $domain['domain_id'],
   );
-  $themes = _system_theme_list();
+  $themes = system_rebuild_theme_data();
   $form['theme'] = array(
     '#tree' => TRUE,
     '#description' => t('To enable additional themes, <a href="!url">configure them globally</a>', array('!url' => url('admin/appearance'))),
@@ -122,7 +122,7 @@ function theme_domain_theme_form($variables) {
   $form = $variables['form'];
   $output = '';
   $output .= drupal_render($form['intro']);
-  $themes = _system_theme_list();
+  $themes = system_rebuild_theme_data();
   $header = array(t('Screenshot'), t('Theme'), t('Default'), t('Options'));
   $rows = array();
   foreach (element_children($form['theme']) as $key) {
