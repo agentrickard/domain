@@ -238,7 +238,10 @@ function domain_source_node_view($node, $view_mode) {
     elseif ($use_active == DOMAIN_SOURCE_USE_ACTIVE) {
       $extra .= t('(using active domain)');
     }
-    $node->content['domain_source'] = array('#markup' => '<p>' . t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . $extra . '</p>', '#weight' => 25);
+    if (!isset($node->content['domain']['#markup'])) {
+      $node->content['domain']['#markup'] = '';
+    }
+    $node->content['domain']['#markup'] .= '<p>' . t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . $extra . '</p>';
   }
 }
 

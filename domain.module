@@ -1391,18 +1391,18 @@ function domain_node_view($node, $view_mode) {
     return;
   }
   $output = '';
+
   if (variable_get('domain_debug', 0) && user_access('set domain access')) {
     if (!empty($node->subdomains)) {
-      $output = theme('item_list', array('items' => $node->subdomains, 'title' => t('Assigned domains')));
-      $node->content['subdomains'] = array('#markup' => $output, '#weight' => 20);
+      $output .= theme('item_list', array('items' => $node->subdomains, 'title' => t('Assigned domains')));
     }
     if (!empty($node->editors)) {
-      $output = theme('item_list', array('items' => $node->editors, 'title' => t('Editors')));
-      $node->content['editors'] = array('#markup' => $output, '#weight' => 21);
+      $output .= theme('item_list', array('items' => $node->editors, 'title' => t('Editors')));
     }
     if (empty($output)) {
-      $node->content['domain'] = array('#markup' => t('This node is not assigned to a domain.'), '#weight' => 22);
+      $output = t('This node is not assigned to a domain.');
     }
+    $node->content['domain'] = array('#markup' => $output);
   }
 }
 
@@ -1899,9 +1899,6 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
-  // This lets FieldAPI adjust the weight of our element using domain_field_extra_fields().
-  // @TODO: fix then when fields in core finally works.
-  # $weight = module_exists('field_ui') ? field_extra_field_weight('node', $form['type']['#value'], 'domain') : 1;
   // If the user is a site admin, show the form, otherwise pass it silently.
   if (user_access('set domain access')) {
     $form['domain'] = array(
@@ -1909,7 +1906,6 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#title' => t('Domain access options'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
-      '#weight' => $weight,
     );
     $form['domain']['domain_site'] = array(
       '#type' => 'checkbox',
@@ -2707,7 +2703,8 @@ function domain_field_extra_fields() {
   );
   // Seriously FieldAPI? I have to do this?!?
   foreach (node_type_get_names() as $name => $value) {
-    $extra['node'][$name] = $base;
+    $extra['node'][$name]['form'] = $base;
+    $extra['node'][$name]['display'] = $base;
   }
   return $extra;
 }

@@ -1,5 +1,8 @@
 // $Id$
 
+12-JUN-2010
+-- #825734. Fixes use of hook_field_extra_fields().
+
 09-JUN-2010
 -- Fixes bad function call in Domain Source.
 -- Releases 7.x.2.1
