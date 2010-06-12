@@ -315,7 +315,7 @@ function domain_theme_settings_submit($form, &$form_state) {
   cache_clear_all();
   // Finish processing the form.
   drupal_set_message(t('The configuration options have been saved.'));
-  $form_state['redirect'] = 'admin/config/domain/theme/' . $values['domain_id'];
+  $form_state['redirect'] = 'admin/config/domain/theme/' . $domain_id;
 }
 
 /**
