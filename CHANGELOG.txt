@@ -3,6 +3,7 @@
 12-JUN-2010
 -- #825734. Fixes use of hook_field_extra_fields().
 -- Fixes bad index warning in domain_theme.admin.
+-- Removes all uses of drupal_parse_url().
 
 09-JUN-2010
 -- Fixes bad function call in Domain Source.
