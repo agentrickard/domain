@@ -2293,13 +2293,14 @@ function domain_invalid_domain_requested() {
   // Check to see if this is a node page. These are redirected to a visible page, if possible.
   $node = menu_get_object();
   if (empty($node->nid)) {
+    $item = menu_get_item();
     $path = $item['href'];
     if (drupal_is_front_page($item['href'])) {
       $path = '';
     }
     $default = domain_default();
     // Log the access attempt.
-    watchdog('domain', 'Invalid domain requested by %user on %domain; redirected to %default.', array('%user' => $user->name, '%domain' => $_domain['sitename'], '%default' => $default['sitename']), WATCHDOG_WARNING);
+    watchdog('domain', 'Invalid domain requested by %user on %domain; redirected to %default.', array('%user' => isset($user->name) ? $user->name : variable_get('anonymous', t('Anonymous')), '%domain' => $_domain['sitename'], '%default' => $default['sitename']), WATCHDOG_WARNING);
     drupal_goto($default['path'] . drupal_get_path_alias($path));
   }
   // Try to find the proper redirect for a node.

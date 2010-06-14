@@ -1,5 +1,8 @@
 // $Id$
 
+14-JUN-2010
+-- Fixes index warnings in domain_invalid_domain_requested().
+
 12-JUN-2010
 -- #825734. Fixes use of hook_field_extra_fields().
 -- Fixes bad index warning in domain_theme.admin.
