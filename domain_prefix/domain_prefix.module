@@ -46,14 +46,7 @@ function domain_prefix_domain_bootstrap_full($domain) {
     }
     $db_prefix = $new_prefix;
   }
-}
-
-/**
- * Implement hook_init().
- *
- * Check for prefixes of the url_alias table, and if present add hook_domainprefix().
- */
-function domain_prefix_init() {
+  // Check for prefixes of the url_alias table, and if present add hook_domainprefix().
   $count = db_result(db_query("SELECT COUNT(*) FROM {domain_prefix} WHERE status > 1 AND tablename = 'url_alias'"));
   if (!empty($count)) {
     include 'domain_prefix.path.inc';
