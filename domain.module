@@ -37,6 +37,23 @@ define('DOMAIN_ASSIGN_USERS', TRUE);
 define('DOMAIN_LIST_SIZE', 25);
 
 /**
+ * Module setup tasks.
+ *
+ * 1. Adds the domain user data to the $user object.
+ * 2. Ensures that our custom_url_rewrite_outbound() is loaded.
+ *
+ * @link http://drupal.org/node/529026
+ * @link http://drupal.org/node/820062
+ */
+function domain_boot() {
+  global $user;
+  // Load domain information to the $user object.
+  $user->domain_user = domain_get_user_domains($user);
+  // Properly load custom_url_rewrite_outbound().
+  include_once('settings_custom_url.inc');
+}
+
+/**
  * Implements hook_init().
  *
  * Inititalizes a global $_domain variable if necessary (usually that's done in
@@ -106,9 +123,6 @@ function domain_init() {
 
   // Set the site name to the domain-specific name.
   $conf['site_name'] = $_domain['sitename'];
-
-  // Properly load custom_url_rewrite_outbound().
-  include_once(drupal_get_path('module', 'domain') . '/settings_custom_url.inc');
 }
 
 /**

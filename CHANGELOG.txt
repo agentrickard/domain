@@ -1,5 +1,9 @@
 // $Id$
 
+19-JUN-2010
+-- patch #820062 by threeps, obstikle, whatmiami. Load custom_url handler in domain_boot()
+    to prevent possible conflicts with other modules.
+
 14-JUN-2010
 -- Fixes index warnings in domain_invalid_domain_requested().
 
