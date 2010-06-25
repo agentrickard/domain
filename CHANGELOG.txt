@@ -1,5 +1,9 @@
 // $Id$
 
+25-JUN-2010
+
+-- patch #835208 by dougp. Fixes type check on zero values for Domain Conf.
+
 19-JUN-2010
 
 -- patch #820062 by threeps, obstikle, whatmiami. Load custom_url handler in domain_boot()
