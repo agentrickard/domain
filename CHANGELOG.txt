@@ -1,5 +1,9 @@
 // $Id$
 
+26-JUN-2010
+
+-- patch #754092 by mathiaz.sk. Bad variable reset in Domain Prefix.
+
 25-JUN-2010
 
 -- patch #835208 by dougp. Fixes type check on zero values for Domain Conf.
