@@ -459,7 +459,7 @@ function domain_conf_api($all = FALSE, $settings = array()) {
           $value[$element]['#default_value'] = $settings[$element];
         }
       }
-      if ($value['#domain_setting'] == TRUE || $all == TRUE) {
+      if (!empty($value['#domain_setting']) || $all == TRUE) {
         // Discard the #domain_setting flag; it is not needed.
         unset($value['#domain_setting']);
         // Set the $options array.

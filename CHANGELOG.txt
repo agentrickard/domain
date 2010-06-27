@@ -1,5 +1,8 @@
 // $Id$
 
+26-JUN-2010
+-- Fixes index error in Domain Conf.
+
 25-JUN-2010
 -- patch #835208 by dougp. Fixes type check on zero values for Domain Conf.
 
