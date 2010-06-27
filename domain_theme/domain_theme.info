@@ -4,5 +4,6 @@ description = Assign themes to domains created by the Domain Access module
 package = Domain Access
 dependencies[] = domain
 core = 7.x
+files[] = domain_theme.domain.inc
 files[] = domain_theme.module
 files[] = domain_theme.admin.inc

@@ -108,6 +108,19 @@ function domain_nav_theme() {
 }
 
 /**
+ * Implements hook_hook_info().
+ */
+function domain_nav_hook_info() {
+  $hooks['domain_nav'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_nav_options_alter'] = array(
+    'group' => 'domain',
+  );
+  return $hooks;
+}
+
+/**
  * Implements hook_block_info().
  */
 function domain_nav_block_info() {
@@ -217,7 +230,7 @@ function domain_nav_render($paths = NULL, $style = NULL) {
       $value['path'] = $path;
       // Allow other modules to add elements to the array.
       $extra = array();
-      $extra = module_invoke_all('domainnav', $value);
+      $extra = module_invoke_all('domain_nav', $value);
       $value = array_merge($value, $extra);
       $options[$value['domain_id']] = $value;
     }
@@ -240,7 +253,7 @@ function domain_nav_render($paths = NULL, $style = NULL) {
  *    - path -- the link path (a Drupal-formatted path)
  *    - active -- a boolean flag indicating the currently active domain
  *
- *  If hook_domainnav() is invoked, additonal elements may be present.
+ *  If hook_domain_nav() is invoked, additonal elements may be present.
  */
 function theme_domain_nav_default($variables) {
   $_domain = domain_get_domain();
@@ -293,9 +306,30 @@ function theme_domain_nav_menus($variables) {
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implements hook_domain_insert()
  */
-function domain_nav_domainupdate($op, $domain, $form_state = array()) {
+function domain_nav_domain_insert($domain, $form_values = array()) {
+  domain_nav_rebuild_menu();
+}
+
+/**
+ * Implements hook_domain_update()
+ */
+function domain_nav_domain_update($domain, $form_values = array()) {
+  domain_nav_rebuild_menu();
+}
+
+/**
+ * Implements hook_domain_delete()
+ */
+function domain_nav_domain_delete($domain, $form_values = array()) {
+  domain_nav_rebuild_menu();
+}
+
+/**
+ * Helper function for domain update hooks.
+ */
+function domain_nav_rebuild_menu() {
   // Only execute if the menu is turned on.
   if (DOMAIN_NAV_MENU == TRUE) {
     // We rebuild the menu, since the domain records have changed.

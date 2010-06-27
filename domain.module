@@ -220,7 +220,7 @@ function domain_menu() {
     'weight' => -6
   );
   // Register the batch actions as menu callbacks
-  $batch = module_invoke_all('domainbatch');
+  $batch = module_invoke_all('domain_batch');
   if (!empty($batch)) {
     $items['admin/config/domain/batch'] = array(
       'title' => 'Batch updating',
@@ -331,6 +331,81 @@ function domain_theme($existing, $type, $theme, $path) {
     ),
   );
   return $themes;
+}
+
+/**
+ * Implements hook_hook_info().
+ *
+ * Allows the use of $module.domain.inc files.
+ */
+function domain_hook_info() {
+  $hooks['domain_load'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_insert'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_update'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_delete'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_link'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_cron'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_install'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_ignore'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_view'] = array(
+    'group' => 'domain',
+  );
+  // Replace with form alter?
+  $hooks['domain_form'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_warning'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_source_alter'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_source_path_alter'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_batch'] = array(
+    'group' => 'domain',
+  );
+  // Test that these work.
+  $hooks['domain_bootstrap_lookup'] = array(
+    'group' => 'domain',
+  );
+  // Test that these work.
+  $hooks['domain_bootstrap_full'] = array(
+    'group' => 'domain',
+  );
+  // Rename to hook_domain_path
+  $hooks['domain_path'] = array(
+    'group' => 'domain',
+  );
+  // Rename to hook_domain_warning_alter
+  $hooks['domain_warning_alter'] = array(
+    'group' => 'domain',
+  );
+  // Replace with form_alter?
+  $hooks['domain_settings'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_validate_alter'] = array(
+    'group' => 'domain',
+  );
+  return $hooks;
 }
 
 /**
@@ -767,12 +842,12 @@ function domain_update_users($form, &$form_state) {
  /**
  * Implements hook_cron()
  *
- * This function invokes hook_domaincron() and allows
+ * This function invokes hook_domain_cron() and allows
  * Domain Access modules to run functions for all active affiliates.
  */
 function domain_cron() {
   // Check to see if this function is needed at all.
-  $modules = module_implements('domaincron');
+  $modules = module_implements('domain_cron');
   if (!empty($modules)) {
     // Get the domain list.
     $domains = domain_domains();
@@ -780,7 +855,7 @@ function domain_cron() {
     foreach ($domains as $domain) {
       domain_set_domain($domain['domain_id'], TRUE);
       foreach ($modules as $module) {
-        module_invoke($module, 'domaincron', $domain);
+        module_invoke($module, 'domain_cron', $domain);
       }
     }
     // Reset the active domain.
@@ -813,28 +888,29 @@ function domain_load($domain_id = NULL) {
  * Domain save function.
  *
  * @param $values
- *   Form value information.
- * @param $edit
- *   Form state information.
+ *   Form value information required to edit a domain.
+ * @param $form_values
+ *   Form values passed to the submit handler. May be used by other
+ *   modules.
  * @return
  *   $domain array on success or -1 on failure.
  */
-function domain_save($values, $edit) {
+function domain_save($values, $form_values) {
   // Update or insert a record?
   $update = (isset($values['domain_id']) && is_numeric($values['domain_id'])) ? array('domain_id') : array();
 
   if (!empty($update)) {
-    $action = 'update';
+    $action = 'domain_update';
   }
   else {
-    $action = 'create';
+    $action = 'domain_insert';
   }
 
   drupal_write_record('domain', $values, $update);
 
   // Let other modules act.
   $domain = domain_lookup(NULL, $values['subdomain']);
-  module_invoke_all('domainupdate', $action, $domain, $edit);
+  module_invoke_all($action, $domain, $form_values);
   // Return the recorded domain.
   return $domain;
 }
@@ -842,7 +918,7 @@ function domain_save($values, $edit) {
 /**
  * Runs a lookup against the {domain} table.  One of the two values must be present
  *
- * This function also calls hook_domainload(), which lets module developers overwrite
+ * This function also calls hook_domain_load(), which lets module developers overwrite
  * or add to the $domain array.
  *
  * @param $domain_id
@@ -853,7 +929,7 @@ function domain_save($values, $edit) {
  *   A boolean flag to clear the static variable if necessary.
  * @return
  *   An array containing the requested row from the {domain} table, plus the
- *   elements added by hook_domainload().  Returns -1 on failure.
+ *   elements added by hook_domain_load().  Returns -1 on failure.
  */
 function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   static $domains;
@@ -956,7 +1032,7 @@ function domain_set_primary_domain() {
   variable_set('domain_sitename', $site);
 
   // Allow other modules to respond to changes.
-  module_invoke_all('domainupdate', 'update', domain_default(TRUE));
+  module_invoke_all('domain_update', domain_default(TRUE));
 }
 
 /**
@@ -1176,24 +1252,24 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
 }
 
 /**
- * Helper function for passing hook_domainload() by reference.
+ * Helper function for passing hook_domain_load() by reference.
  *
  * @param $domain
  *   The domain array defined by domain_lookup().
  * @param $reset
  *    A boolean flag to clear the static variable if necessary.
  * @return
- *   The $domain array, modified by reference by hook_domainload() implementations.
+ *   The $domain array, modified by reference by hook_domain_load() implementations.
  */
 function domain_api($domain, $reset = FALSE) {
   static $_modules;
   if (!isset($_modules) || $reset) {
-    $_modules = module_implements('domainload');
+    $_modules = module_implements('domain_load');
   }
   if (!empty($_modules)) {
     foreach ($_modules as $module) {
       // Cannot use module_invoke_all() since these are passed by reference.
-      $function = $module . '_domainload';
+      $function = $module . '_domain_load';
       $function($domain);
     }
   }
@@ -1290,11 +1366,11 @@ function domain_check_primary($msg = 'default') {
 }
 
 /**
- * Implements hook_domainload()
+ * Implements hook_domain_load()
  *
  * Adds the home page 'path' and 'site_grant' boolean.
  */
-function domain_domainload(&$domain) {
+function domain_domain_load(&$domain) {
   // Get the path to the home page for this domain.
   $domain['path'] = domain_get_path($domain);
   // Grant access to all affiliates.
@@ -1840,7 +1916,7 @@ function domain_enable() {
  */
 function domain_form_alter(&$form, &$form_state, $form_id) {
   // There are forms that we never want to alter, and they are passed here.
-  $forms = module_invoke_all('domainignore');
+  $forms = module_invoke_all('domain_ignore');
   if (in_array($form_id, $forms)) {
     return;
   }
@@ -2430,41 +2506,37 @@ function domain_lookup_simple($name, $reset = FALSE) {
 }
 
 /**
- * Implements hook_domaininstall()
+ * Implements hook_domain_install()
  */
-function domain_domaininstall() {
+function domain_domain_install() {
   // Set the proper variables for our bootstrap load, as a precaution.
   domain_bootstrap_register();
 }
 
 /**
- * Implements hook_domainupdate()
+ * Implements hook_domain_delete()
  *
  * @TODO: reassign orphans?
  */
-function domain_domainupdate($op, $domain, $form_state = array()) {
-  switch ($op) {
-    case 'delete':
-      if ($domain != -1) {
-        // Remove domain-specific entries from tables and clear the cache.
-        db_delete('domain_access')
-          ->condition('gid', $domain['domain_id'])
-          ->condition('realm', 'domain_id')
-          ->execute();
-        db_delete('domain_editor')
-          ->condition('domain_id', $domain['domain_id'])
-          ->execute();
-      }
-      break;
+function domain_domain_delete($domain, $form_values = array()) {
+  if ($domain != -1) {
+    // Remove domain-specific entries from tables and clear the cache.
+    db_delete('domain_access')
+      ->condition('gid', $domain['domain_id'])
+      ->condition('realm', 'domain_id')
+      ->execute();
+    db_delete('domain_editor')
+      ->condition('domain_id', $domain['domain_id'])
+      ->execute();
   }
   // In all cases, we need to force a menu rebuild, which also clears the cache.
   menu_rebuild();
 }
 
 /**
- * Implements hook_domainbatch()
+ * Implements hook_domain_batch()
  */
-function domain_domainbatch() {
+function domain_domain_batch() {
   // Change all the domain names at once.
   $batch = array();
   $batch['subdomain'] = array(
@@ -2540,7 +2612,7 @@ function domain_domainbatch() {
 }
 
 /**
- * Validate handler for hook_domainbatch()
+ * Validate handler for hook_domain_batch()
  */
 function domain_batch_validate($values) {
   $case = $values['variable'];
@@ -2588,7 +2660,7 @@ function domain_warning_check($form_id) {
     global $_domain;
     // Add the list of forms
     $forms = array();
-    $forms = module_invoke_all('domainwarnings');
+    $forms = module_invoke_all('domain_warning');
     drupal_alter('domain_warnings', $forms);
     if ($form_id == 'domain_batch_form' || (arg(2) != 'domain' && in_array($form_id, array_keys($forms)))) {
       $default = domain_default();
@@ -2617,7 +2689,7 @@ function domain_warning_check($form_id) {
 }
 
 /**
- * Helper function for passing hook_domainpath() by reference.
+ * Helper function for passing hook_domain_path() by reference.
  *
  * @param $domain_id
  * The domain_id taken from {domain}.
@@ -2626,14 +2698,14 @@ function domain_warning_check($form_id) {
  * @param $path_language
  * Optional language code to look up the path in.
  * @return
- * The $path, modified by reference by hook_domainpath() implementations.
+ * The $path, modified by reference by hook_domain_path() implementations.
  */
 function domain_path($domain_id, $path, $path_language = '') {
   $modules = _domain_path_modules();
   if (!empty($modules)) {
     foreach ($modules as $module) {
       // Cannot use module_invoke_all() since these are passed by reference.
-      $function = $module . '_domainpath';
+      $function = $module . '_domain_path';
       $function($domain_id, $path, $path_language);
     }
   }
@@ -2646,15 +2718,15 @@ function domain_path($domain_id, $path, $path_language = '') {
 function _domain_path_modules() {
   static $modules;
   if (!isset($modules)) {
-    $modules = module_implements('domainpath');
+    $modules = module_implements('domain_path');
   }
   return $modules;
 }
 
 /**
- * Implements hook_domainignore().
+ * Implements hook_domain_ignore().
  */
-function domain_domainignore() {
+function domain_domain_ignore() {
   // In Drupal 6, the update script behaves differently than D5, so we ignore it.
   return array('update_script_selection_form');
 }

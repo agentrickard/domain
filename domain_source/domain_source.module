@@ -285,20 +285,6 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
 }
 
 /**
- * Implements hook_domain_source_alter().
- *
- * @param &$source
- *   The domain array from domain_get_node_match(), passed by reference.
- * @param $nid
- *   The node id.
- * @return
- *   No return value; modify $source by reference.
- */
-function domain_source_domain_source_alter(&$source, $nid) {
-  $source = domain_source_lookup($nid);
-}
-
-/**
  * FormAPI function that lets us update access rules.
  */
 function domain_source_update_nodes($form, &$form_state) {
@@ -358,19 +344,6 @@ function domain_source_validate($form, &$form_state) {
     else if (empty($form_state['values']['domains'][$key])) {
       form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
     }
-  }
-}
-
-/**
- * Implements hook_domainupdate()
- *
- * When deleting domain records, we remove all traces from the {domain_source} table.
- */
-function domain_source_domainupdate($op, $domain, $form_state = array()) {
-  if ($op == 'delete' && $domain['domain_id'] > 0) {
-    db_delete('domain_source')
-      ->condition('domain_id', $domain['domain_id'])
-      ->execute();
   }
 }
 

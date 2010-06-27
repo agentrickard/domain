@@ -21,7 +21,7 @@ CONTENTS
 3.3   Menu Items
 4.  Developer Notes
 4.1   domain_nav_render()
-4.2   hook_domainnav()
+4.2   hook_domain_nav()
 
 ----
 1.  Introduction
@@ -162,13 +162,13 @@ And $style indicates which theme function to invoke.  Default options are:
   'ul' == theme_domain_nav_ul()
 
 ----
-4.2 hook_domainnav()
+4.2 hook_domain_nav()
 
-The domainnav hook allows other modules to add parameters to the $options
+The domain_nav hook allows other modules to add parameters to the $options
 array that is passed to theme functions.  It is intended for use with
 custom theme functions of theme overrides that you may use.
 
-To use the function, Implements hook_domainnav($domain).  You should return
+To use the function, Implements hook_domain_nav($domain).  You should return
 an array of values to append to $options.
 
 Default parameters are passed in the $domain variable and should not be changed;

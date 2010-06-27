@@ -127,7 +127,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
         // TODO: merge this code with the above for cleanup.
       }
     }
-    // We may have to Implements hook_domainpath().
+    // We may have to Implements hook_domain_path().
     if (!isset($path_rewrite)) {
       $path_rewrite = count(_domain_path_modules());
     }

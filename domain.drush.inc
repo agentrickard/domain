@@ -42,6 +42,7 @@ function drush_domain_list() {
     'scheme' => dt('scheme'),
     'valid' => dt('active'),
     'domain_id' => dt('domain_id'),
+    'weight' => dt('weight'),
   );
   $rows = array(array_values($header));
   foreach ($domains as $domain) {

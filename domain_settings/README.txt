@@ -42,7 +42,7 @@ It is often desireable for affiliates to have domain specific settings. This
 was originally addressed using the Domain Configuration module to expose
 certain settings through a single UI, but other settings and especially those
 from contributed modules could only be included by adding exceptions in
-hook_domainconf() or hook_domainbatch(). This is cumbersome for the site
+hook_domain_conf() or hook_domain_batch(). This is cumbersome for the site
 maintainer, and out of scope for the Domain Access project.
 
 Domain Settings makes it so that any form that uses system_settings_form() can

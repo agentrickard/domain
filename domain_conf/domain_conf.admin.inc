@@ -40,7 +40,7 @@ function domain_conf_page($domain) {
 /**
  * Custom form to generate domain-specific site settings.
  *
- * The items on this form are taken from hook_domainbatch() and hook_domainconf().
+ * The items on this form are taken from hook_domain_batch() and hook_domain_conf().
  * See the API for more information.
  *
  * @param $domain
@@ -48,7 +48,7 @@ function domain_conf_page($domain) {
  */
 function domain_conf_form($form, $form_state, $domain) {
   $form = array();
-  $batch = module_invoke_all('domainbatch');
+  $batch = module_invoke_all('domain_batch');
   $settings = array();
   $data = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {

@@ -4,6 +4,7 @@ description = Creates a canonical source domain for linking to content from othe
 package = Domain Access
 dependencies[] = domain
 core = 7.x
+files[] = domain_source.domain.inc
 files[] = domain_source.install
 files[] = domain_source.module
 files[] = domain_source.views.inc

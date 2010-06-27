@@ -28,7 +28,7 @@ function domain_view() {
     array('data' => t('Scheme'), 'field' => 'd.scheme'),
   );
   // Get header elements from other modules
-  $extra = module_invoke_all('domainview', 'header');
+  $extra = module_invoke_all('domain_view', 'header');
   $header = array_merge($header, $extra);
   $header[] = array('data' => t('Actions'));
 
@@ -40,7 +40,7 @@ function domain_view() {
   $query = db_select('domain', 'd')
     ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid', 'weight'));
   // Get any tablesort sql from other modules.
-  module_invoke_all('domainview', 'query', array(), $query);
+  module_invoke_all('domain_view', 'query', array(), $query);
   // Add the tablesort.
   $query = $query
     ->extend('TableSort')
@@ -72,7 +72,7 @@ function domain_view() {
     }
     // Add advanced settings from other modules.
     $items = array();
-    $items = module_invoke_all('domainlinks', $domain);
+    $items = module_invoke_all('domain_link', $domain);
     if (!empty($items)) {
       foreach ($items as $item) {
         if (!empty($item)) {
@@ -85,8 +85,8 @@ function domain_view() {
     $row = array($domain['weight'], ($domain['domain_id'] == $_domain['domain_id']) ? '<strong>' . $link . '</strong>' : $link, filter_xss_admin($domain['sitename']), $domain['domain_id'], $valid, $domain['scheme']);
     // Let other modules add data.
     $data = array();
-    foreach (module_implements('domainview') as $module) {
-      $add = module_invoke($module, 'domainview', 'data', $domain);
+    foreach (module_implements('domain_view') as $module) {
+      $add = module_invoke($module, 'domain_view', 'data', $domain);
       $row = array_merge($row, $add);
     }
     // Add the actions.
@@ -112,7 +112,7 @@ function domain_view() {
 function domain_configure() {
   if (empty($_POST)) {
     // Is the module installed correctly?
-    module_invoke_all('domaininstall');
+    module_invoke_all('domain_install');
   }
   // Return the configuration form.
   return drupal_get_form('domain_configure_form');
@@ -318,10 +318,10 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
   );
 
   // Allow submodules to add elements to the form.
-  $modules = module_implements('domainform');
+  $modules = module_implements('domain_form');
   if (!empty($modules)) {
     foreach ($modules as $module) {
-      $func = $module . '_domainform';
+      $func = $module . '_domain_form';
       $func($form);
     }
   }
@@ -365,7 +365,7 @@ function domain_configure_form_submit($form, &$form_state) {
     ))
     ->execute();
   // Allow other modules to respond to changes.
-  module_invoke_all('domainupdate', 'update', domain_default(TRUE));
+  module_invoke_all('domain_update', domain_default(TRUE));
 }
 
 /**
@@ -583,7 +583,7 @@ function domain_delete_form_submit($form, &$form_state) {
     ->execute();
 
   // Let other modules act.
-  module_invoke_all('domainupdate', 'delete', $domain, $form_state);
+  module_invoke_all('domain_delete', $domain, $form_state['values']);
 
   // Hide the message from the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
@@ -671,7 +671,7 @@ function domain_check_response($domain) {
  *
  * @param $action
  *   The name of the action to perform; corresponds to the keys of the $batch array
- *   returned by hook_domainbatch().
+ *   returned by hook_domain_batch().
  * @return
  *   The appropriate form, or a list of actions, or an error.
  */
@@ -682,7 +682,7 @@ function domain_batch($action = NULL) {
     return t('There are no domains configured for this site.');
   }
 
-  $batch = module_invoke_all('domainbatch');
+  $batch = module_invoke_all('domain_batch');
   // We must have some actions, otherwise, no point.
   if (empty($batch)) {
     return t('There are no batch actions configured.');
@@ -720,7 +720,7 @@ function domain_batch($action = NULL) {
  * Lists available batch updates for the domain module.
  *
  * @param $batch
- *   An array of batch actions, as defined by hook_domainbatch().
+ *   An array of batch actions, as defined by hook_domain_batch().
  * @return
  *   A themed table of links and descriptions for batch actions.
  */
@@ -768,9 +768,9 @@ function domain_batch_sort($a, $b) {
  *   The current form state, passed by FormsAPI.
  * @param $action
  *   The name of the action to perform; corresponds to the keys of the $batch array
- *   returned by hook_domainbatch().
+ *   returned by hook_domain_batch().
  * @param $batch
- *   The batch data for this $action, as defined by hook_domainbatch().
+ *   The batch data for this $action, as defined by hook_domain_batch().
  * @param $domains
  *   The current settings for each domain.
  * @return

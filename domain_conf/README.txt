@@ -20,7 +20,7 @@ CONTENTS
 2.3   Menu Blocks
 3.  Batch Updates
 4.  Developer Notes
-4.1   Extending Options with hook_domainconf()
+4.1   Extending Options with hook_domain_conf()
 4.2   Setting Variables for Domains
 4.3   Using domain_conf.inc
 4.4   Database Schema
@@ -145,12 +145,12 @@ The following form elements were removed during beta testing:
 See http://drupal.org/node/197692 for the reasons.
 
 ----
-4.1   Extending Options with hook_domainconf()
+4.1   Extending Options with hook_domain_conf()
 
 The module works by applying hook_form_alter() to the form:
 'system_settings_form' and then adding addiitonal fields from other forms.
 
-hook_domainconf() allows developers to add additional form elements.
+hook_domain_conf() allows developers to add additional form elements.
 
 Note that you may use this hook to create variables that are independent
 of other Drupal modules.  To do so, be sure to set the '#domain_setting' flag
@@ -160,7 +160,7 @@ to TRUE before returning your $form array.
 
 Please see the full documentation in the API.
 
-http://therickards.com/api/function/hook_domainconf/Domain
+http://therickards.com/api/function/hook_domain_conf/Domain
 
 ----
 4.2   Setting Variables for Domains
@@ -175,7 +175,7 @@ Complete documentation of this function is in API.php.
 ----
 4.3   Using domain_conf.inc
 
-The normal method for using hook_domainconf() is to have the hook implemented
+The normal method for using hook_domain_conf() is to have the hook implemented
 in other modules.
 
 However, the community development process may mean that it will take time for
@@ -195,9 +195,9 @@ file:
 ====
 <?php
 /**
- * Implements hook_domainconf() to add the user picture.
+ * Implements hook_domain_conf() to add the user picture.
  */
-function user_domainconf() {
+function user_domain_conf() {
   $form['pictures'] = array(
     '#type' => 'fieldset',
     '#title' => t('User picture'),
