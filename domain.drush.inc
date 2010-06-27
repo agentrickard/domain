@@ -37,12 +37,12 @@ function domain_drush_help($section) {
 function drush_domain_list() {
   $domains = domain_domains();
   $header = array(
+    'weight' => dt('weight'),
     'sitename' => dt('sitename'),
     'subdomain' => dt('domain'),
     'scheme' => dt('scheme'),
     'valid' => dt('active'),
     'domain_id' => dt('domain_id'),
-    'weight' => dt('weight'),
   );
   $rows = array(array_values($header));
   foreach ($domains as $domain) {
