@@ -4,6 +4,7 @@
 -- #763442. Massive API cleanup. 7.x.3 branch is no longer compatible with
     7.x.2!
 -- Adds weight field to drush domain-list.
+-- Fixes index error in Domain Conf.
 
 25-JUN-2010
 -- patch #835208 by dougp. Fixes type check on zero values for Domain Conf.
