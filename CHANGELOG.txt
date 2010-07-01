@@ -1,5 +1,9 @@
 // $Id$
 
+01-JUL-2010
+
+-- #840220 by dougp. Pass full form values to hook_domain_settings().
+
 26-JUN-2010
 
 -- patch #754092 by mathiaz.sk. Bad variable reset in Domain Prefix.

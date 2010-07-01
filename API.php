@@ -773,7 +773,7 @@ function hook_domain_warnings_alter(&$forms) {
  *   The domain the variable is being saved for. This is not always
  *   the current domain.
  * @param $values
- *   The variable values being changed, an array in the format $name => $value.
+ *   The form values being submitted, an array in the format $name => $value.
  *  @return
  *   No return required.
  */
