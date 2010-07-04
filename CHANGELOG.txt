@@ -1,5 +1,8 @@
 // $Id$
 
+04-JUL-2010
+-- #840220 by dougp. Pass full form values to hook_domain_settings().
+
 26-JUN-2010
 -- Fixes index error in Domain Conf.
 
