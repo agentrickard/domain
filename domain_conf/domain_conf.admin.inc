@@ -87,7 +87,7 @@ function domain_conf_form($form, $form_state, $domain) {
   $form[$default_group]['site_name'] = array(
     '#disabled' => TRUE,
     '#title' => t('Site name'),
-    '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/' . $domain['domain_id']))),
+    '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/config/domain/edit/' . $domain['domain_id']))),
     '#type' => 'textfield',
     '#default_value' => $domain['sitename'],
     '#weight' => -100,

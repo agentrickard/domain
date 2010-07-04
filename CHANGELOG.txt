@@ -2,6 +2,7 @@
 
 04-JUL-2010
 -- #840220 by dougp. Pass full form values to hook_domain_settings().
+-- Fixes bad link in Domain Conf.
 
 27-JUN-2010
 -- #763442. Massive API cleanup. 7.x.3 branch is no longer compatible with
