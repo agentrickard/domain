@@ -115,12 +115,11 @@ function domain_content_list() {
  */
 function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   $_domain = domain_get_domain();
-
   // Load the active domain, which is not necessarily the current domain.
   if (!is_null($domain_id) && $domain_id != $_domain['domain_id']) {
     domain_set_domain($domain_id);
+    $_domain = domain_get_domain();
   }
-
   $output = '';
   // Override the $_domain global so we can see the appropriate content
   if (!is_null($domain_id)) {
@@ -246,7 +245,7 @@ function domain_content_form() {
     }
   }
   // Restrict the query to the active domain.
-  domain_alter_node_query($query);
+  domain_alter_node_query($query, FALSE);
 
   $nids = $query
     ->fields('n',array('nid'))

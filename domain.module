@@ -2855,8 +2855,13 @@ function domain_query_node_access_alter(QueryAlterableInterface $query) {
 
 /**
  * Abstraction to allow query alters outside of node access.
+ *
+ * @param $query
+ *   A dynamic node query.
+ * @param $all_affiliates
+ *   Boolean value indicating whether to grant the 'domain_site' grant.
  */
-function domain_alter_node_query(QueryAlterableInterface $query) {
+function domain_alter_node_query(QueryAlterableInterface $query, $all_affiliates = TRUE) {
   $_domain = domain_get_domain();
   $domain_id = (int) $_domain['domain_id'];
   $tables = $query->getTables();
@@ -2865,10 +2870,12 @@ function domain_alter_node_query(QueryAlterableInterface $query) {
     if (!($table instanceof SelectQueryInterface) && $table == 'node') {
       $access_alias = $query->join('domain_access', 'da_admin', "da_admin.nid = {$nalias}.nid");
       $or = db_or();
-      $or->condition(db_and()
-        ->condition("{$access_alias}.gid", 0)
-        ->condition("{$access_alias}.realm", 'domain_site')
-      );
+      if ($all_affiliates) {
+        $or->condition(db_and()
+          ->condition("{$access_alias}.gid", 0)
+          ->condition("{$access_alias}.realm", 'domain_site')
+        );
+      }
       $or->condition(db_and()
         ->condition("{$access_alias}.gid", $domain_id)
         ->condition("{$access_alias}.realm", 'domain_id')

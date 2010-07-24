@@ -1,5 +1,8 @@
 // $Id$
 
+24-JUL-2010
+-- Fixes DBTNG errors in Domain Content.
+
 04-JUL-2010
 -- #840220 by dougp. Pass full form values to hook_domain_settings().
 -- Fixes bad link in Domain Conf.
