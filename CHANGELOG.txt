@@ -2,6 +2,7 @@
 
 24-JUL-2010
 -- Adds the .domain.inc fiules to CVS. No idea what happend to them.
+-- Fixes DBTNG errors in Domain Content.
 
 04-JUL-2010
 -- #840220 by dougp. Pass full form values to hook_domain_settings().
