@@ -748,3 +748,48 @@ function hook_domain_validate_alter(&$error_list, $subdomain) {
     $error_list[] = t('Only .org domains may be registered.');
   }
 }
+
+/**
+ * Allow modules to change the status of the 'domain_all' grant.
+ *
+ * hook_domain_grant_all_alter() fires _after_ Domain Access has
+ * determined if a page should ignore Domain Access rules or not. It
+ * can be used to extend the core functionality. For a use-case see the
+ * discussion about autocomplete callbacks.
+ *
+ * @link http://drupal.org/node/842338
+ *
+ * Note that granting access may introduce security issues,
+ * so module authors need to be very aware of the conditions that should
+ * trigger a TRUE response.
+ *
+ * Also note that the status of this function cannot be changed _during_ a
+ * page load. Drupal's Node Access system only allows these permissions
+ * to be set once per callback.
+ *
+ * @param $grant
+ *   A boolean value. FALSE indicates that Domain Access rules should
+ *   be enforced. TRUE indicates to ignore Domain Access.
+ * @param $options
+ *   An array of optional information gathered by domain_grant_all(). This
+ *   keyed array may contain the following values:
+ *    'script' == The name of invoking script if the page is called by cron.php
+ *      or xmlrpc.php instead of Drupal's standard index.php. Presence indicates
+ *      that the function returned TRUE.
+ *    'search' == Indicates that we are on a search page and searching across
+ *      all domains has been enabled.
+ *    'pages' == The matching pattern list for page-specific access.
+ *    'page_match' == Indicates that one of the page-specific matches returned
+ *      TRUE.
+ * @return
+ *   No return value. Alter $grant by reference.
+ *
+ * @see domain_grant_all()
+ */
+function hook_domain_grant_all_alter(&$grant, $options) {
+  // Always show all nodes on admin pages.
+  $base_path = arg(0);
+  if ($base_path == 'admin') {
+    $grant = TRUE;
+  }
+}

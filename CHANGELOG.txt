@@ -1,7 +1,10 @@
 // $Id$
 
+01-AUG-2010
+-- #842338 by johnpitcairn. Allow other modules to alter domain_grant_all().
+
 24-JUL-2010
--- Adds the .domain.inc fiules to CVS. No idea what happend to them.
+-- Adds the .domain.inc files to CVS. No idea what happend to them.
 -- Fixes DBTNG errors in Domain Content.
 
 04-JUL-2010
