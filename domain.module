@@ -2179,11 +2179,13 @@ function domain_form_devel_generate_content_form_alter(&$form, &$form_state) {
  */
 function domain_grant_all($reset= FALSE) {
   static $grant;
+  $options = array();
   if (!isset($grant) || $reset) {
     $grant = FALSE;
 
     // Search is the easy case, so we check it first.
     if (variable_get('domain_search', 0) && arg(0) == 'search') {
+      $options['search'] = TRUE;
       $grant = TRUE;
     }
 
@@ -2193,9 +2195,11 @@ function domain_grant_all($reset= FALSE) {
       $ref = explode('/', request_uri());
       $script = array_pop($ref);
       if (variable_get('domain_cron_rule', 1) && $script == 'cron.php') {
+        $options['script'] = $script;
         $grant = TRUE;
       }
       else if (variable_get('domain_xmlrpc_rule', 0) && $script == 'xmlrpc.php') {
+        $options['script'] = $script;
         $grant = TRUE;
       }
     }
@@ -2203,6 +2207,7 @@ function domain_grant_all($reset= FALSE) {
     if (!$grant) {
       // We check the paths registered by the special pages setting.
       $pages = variable_get('domain_grant_all', "user/*/track");
+      $options['pages'] = $pages;
       $regexp = '/^(' . preg_replace(array('/(\r\n?|\n)/', '/\\\\\*/', '/(^|\|)\\\\<front\\\\>($|\|)/'), array('|', '.*', '\1' . preg_quote(variable_get('site_frontpage', 'node'), '/') . '\2'), preg_quote($pages, '/')) . ')$/';
       // Compare with the internal and path alias (if any).
       $page_match = preg_match($regexp, $_GET['q']);
@@ -2213,10 +2218,14 @@ function domain_grant_all($reset= FALSE) {
         }
       }
       if ($page_match) {
+        $options['page_match'] = TRUE;
         $grant = TRUE;
       }
     }
   }
+  // Allow other modules to change the defaults.
+  drupal_alter('domain_grant_all', $grant, $options);
+
   return $grant;
 }
 

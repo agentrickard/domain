@@ -1,5 +1,8 @@
 // $Id$
 
+01-AUG-2010
+-- #842338 by johnpitcairn. Allow other modules to alter domain_grant_all().
+
 24-JUL-2010
 -- Fixes DBTNG errors in Domain Content.
 
