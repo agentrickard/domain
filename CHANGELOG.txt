@@ -3,6 +3,7 @@
 01-AUG-2010
 
 #864128 by OnkelTem and brt. Duplicate entry of default domain.
+#842338 by johnpitcairn. Allow other modules to alter domain_grant_all().
 
 01-JUL-2010
 
