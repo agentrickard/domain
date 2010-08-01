@@ -1,5 +1,9 @@
 // $Id$
 
+01-AUG-2010
+
+#864128 by OnkelTem and brt. Duplicate entry of default domain.
+
 01-JUL-2010
 
 -- #840220 by dougp. Pass full form values to hook_domain_settings().

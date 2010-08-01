@@ -382,8 +382,12 @@ function domain_configure_form_submit($form, &$form_state) {
     return;
   }
   $subdomain = $form_state['values']['domain_root'];
-  db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme']);
-  if (!db_affected_rows()) {
+  // Insert query or update query?
+  $count = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE domain_id = 0"));
+  if ($count > 0) {
+    db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme']);
+  }
+  else {
     db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $form_state['values']['domain_root'], $form_state['values']['domain_sitename'], $form_state['values']['domain_scheme'], 1);
     // MySQL won't let us insert row 0 into an autoincrement table.
     db_query("UPDATE {domain} SET domain_id = 0 WHERE subdomain = '%s'", $form_state['values']['domain_root']);
