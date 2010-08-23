@@ -27,6 +27,11 @@ define('DOMAIN_PREFIX_UPDATE', 16);
  * Implementats hook_domain_bootstrap_full().
  */
 function domain_prefix_domain_bootstrap_full($domain) {
+  static $original_prefix;
+  global $db_prefix;
+  if (!isset($original_prefix)) {
+    $original_prefix = $db_prefix;
+  }
   $tables = array();
   $prefix = 'domain_'. $domain['domain_id'] .'_';
   $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > %d", $domain['domain_id'], 1);
@@ -34,7 +39,6 @@ function domain_prefix_domain_bootstrap_full($domain) {
     $tables[] = $data['tablename'];
   }
   if (!empty($tables)) {
-    global $db_prefix;
     $new_prefix = array();
     // There might be global prefixing; if so, prepend the global.
     if (is_string($db_prefix)) {
@@ -45,6 +49,9 @@ function domain_prefix_domain_bootstrap_full($domain) {
       $new_prefix[$table] = $prefix;
     }
     $db_prefix = $new_prefix;
+  }
+  else {
+    $db_prefix = $original_prefix;
   }
   // Check for prefixes of the url_alias table, and if present add hook_domainprefix().
   $count = db_result(db_query("SELECT COUNT(*) FROM {domain_prefix} WHERE status > 1 AND tablename = 'url_alias'"));

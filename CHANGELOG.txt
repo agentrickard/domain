@@ -1,5 +1,9 @@
 // $Id$
 
+23-AUG-2010
+
+-- #883180 by morningtime and zerno. Domain Prefix does not properly reset when switching domains.
+
 01-AUG-2010
 
 -- #864128 by OnkelTem and brt. Duplicate entry of default domain.
