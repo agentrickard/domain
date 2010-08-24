@@ -2107,12 +2107,13 @@ function domain_resolve_host($name = '') {
  * The current (host) domain name as a String.
  */
 function domain_request_name() {
-  if (isset($_SERVER['HTTP_HOST'])) {
+  if (!empty($_SERVER['HTTP_HOST'])) {
     // We lower case this, since EXAMPLE.com == example.com.
     return strtolower(rtrim($_SERVER['HTTP_HOST']));
   }
   else {
-    return '';
+    $domain = domain_default();
+    return $domain['subdomain'];
   }
 }
 

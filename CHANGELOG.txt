@@ -1,5 +1,9 @@
 // $Id$
 
+24-AUG-2010
+
+-- #848856 by jastern. Ensure that emoty HTTP_HOST value does not crash DA.
+
 23-AUG-2010
 
 -- #883180 by morningtime and zerno. Domain Prefix does not properly reset when switching domains.
