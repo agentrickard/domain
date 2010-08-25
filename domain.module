@@ -88,7 +88,7 @@ function domain_init() {
         drupal_set_message($error, 'error');
       }
       if (empty($hide)) {
-        watchdog('Domain Access', $error, NULL, WATCHDOG_ERROR);
+        watchdog('domain', $error, NULL, WATCHDOG_ERROR);
       }
     }
   }
