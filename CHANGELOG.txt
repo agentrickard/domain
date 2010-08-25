@@ -1,5 +1,8 @@
 // $Id$
 
+25-AUG-2010
+-- #884756 by nonsie. Fix watchdog label.
+
 24-AUG-2010
 -- #848856 by jastern. Ensure that emoty HTTP_HOST value does not crash DA.
 
