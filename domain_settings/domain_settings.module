@@ -115,6 +115,10 @@ function domain_settings_form_submit($form, &$form_state) {
   }
   // -1 is the primary domain.
   foreach ($values as $name => $value) {
+    //Handle checkboxes when array_filter is set. (Do not return empty checkboxes at all)
+    if (!$reset && is_array($value) && isset($form_state['values']['array_filter'])) {
+      $value = array_keys(array_filter($value));
+    }
     if ($domain_id == -1 || $domain_id == -5) {
       variable_set($name, $value);
       // Update the site name of the primary domain, if needed.
