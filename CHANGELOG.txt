@@ -4,6 +4,7 @@
 
 -- #884756 by nonsie. Fix watchdog label.
 -- #873706 by Jasu_M. Domain settings must filter checkbox values.
+-- #227947 by yhager and bleen18 (and others). Fix redirect to primary domain issue.
 
 24-AUG-2010
 

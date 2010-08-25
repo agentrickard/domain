@@ -260,7 +260,7 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
     $domain_site = $lookup['domain_site'];
     $domains = $lookup['domain_id'];
   }
-  if (empty($domain_site) && !in_array($source, $domains)) {
+  if (empty($domain_site) && !in_array($source, $domains) && !empty($domains)) {
     $source = current($domains);
   }
   $domain_id = ($source == -1) ? 0 : $source;
