@@ -3,6 +3,7 @@
 25-AUG-2010
 
 -- #884756 by nonsie. Fix watchdog label.
+-- #873706 by Jasu_M. Domain settings must filter checkbox values.
 
 24-AUG-2010
 
