@@ -220,7 +220,7 @@ function domain_conf_block_view($delta = '') {
  */
 function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
   global $conf, $_domain;
-  domain_conf_variable_save($domain_id, $variable);
+  domain_conf_variable_save($domain_id, $variable, $value);
   // Clear the cache.
   cache_clear_all('variables', 'cache');
   // If we are on the active domain, set the active variable.
