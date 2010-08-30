@@ -2,6 +2,7 @@
 
 30-AUG-2010
 -- Fixes missing argument in domain_conf_variable_set().
+-- #895284 by mac_perlinksi. Fixes bad variable from #873706.
 
 25-AUG-2010
 -- #884756 by nonsie. Fix watchdog label.
