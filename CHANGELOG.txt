@@ -3,6 +3,7 @@
 31-AUG-2010
 
 -- Auto-install the primary domain.
+-- Update custom_url_rewrite_outbound.patch to Drupal 5.23.
 
 20-NOV-2009
 

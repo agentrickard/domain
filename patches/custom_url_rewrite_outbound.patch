@@ -1,13 +1,6 @@
-? custom_url_rewrite_outbound.patch
-? multiple_node_access.patch
-Index: includes/common.inc
-===================================================================
-RCS file: /cvs/drupal/drupal/includes/common.inc,v
-retrieving revision 1.611.2.24
-diff -u -p -r1.611.2.24 common.inc
---- includes/common.inc	13 May 2009 17:10:36 -0000	1.611.2.24
-+++ includes/common.inc	31 May 2009 18:19:47 -0000
-@@ -1320,7 +1320,17 @@ function url($path = NULL, $query = NULL
+--- includes/common.inc.orig	2010-08-31 13:56:21.000000000 -0400
++++ includes/common.inc	2010-08-31 13:56:53.000000000 -0400
+@@ -1331,7 +1331,17 @@ function url($path = NULL, $query = NULL
      $clean_url = (bool)variable_get('clean_url', '0');
    }
  
