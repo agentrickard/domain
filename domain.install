@@ -51,6 +51,17 @@ function domain_install() {
   }
   // Create the 'all' realm for Domain Access.
   db_query("INSERT INTO {node_access} VALUES (0, 0, 'domain_all', 1, 0, 0)");
+  // Set the primary domain.
+  $root = strtolower(rtrim($_SERVER['SERVER_NAME']));
+  $site = variable_get('site_name', 'Drupal');
+  $scheme = 'http';
+  if (!empty($_SERVER['HTTPS'])) {
+    $scheme = 'https';
+  }
+  // Set the default domain variables.
+  variable_set('domain_root', $root);
+  variable_set('domain_scheme', $scheme);
+  variable_set('domain_sitename', $site);
 }
 
 /**

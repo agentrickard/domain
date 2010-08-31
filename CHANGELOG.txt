@@ -1,5 +1,9 @@
 // $Id$
 
+31-AUG-2010
+
+-- Auto-install the primary domain.
+
 20-NOV-2009
 
 -- #620596. Fixes domain source handling for some users.
