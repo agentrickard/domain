@@ -27,11 +27,15 @@ define('DOMAIN_PREFIX_UPDATE', 16);
  * Implementats hook_domain_bootstrap_full().
  */
 function domain_prefix_domain_bootstrap_full($domain) {
+  // We must make sure that we can reset the $db_prefix to that
+  // provided by settings.php, which is available the first time this
+  // function is called.
   static $original_prefix;
   global $db_prefix;
   if (!isset($original_prefix)) {
     $original_prefix = $db_prefix;
   }
+  // Now load the dynamic tables.
   $tables = array();
   $prefix = 'domain_'. $domain['domain_id'] .'_';
   $result = db_query("SELECT tablename FROM {domain_prefix} WHERE domain_id = %d AND status > %d", $domain['domain_id'], 1);
@@ -48,7 +52,15 @@ function domain_prefix_domain_bootstrap_full($domain) {
     foreach ($tables as $table) {
       $new_prefix[$table] = $prefix;
     }
-    $db_prefix = $new_prefix;
+    // Keep existing $db_prefix values as they were defined in settings.php,
+    // in case they're not overwritten in $new_prefix.
+    // See http://drupal.org/node/632950 for background.
+    if (is_array($db_prefix)) {
+      $db_prefix = array_merge($db_prefix, $new_prefix);
+    }
+    else {
+      $db_prefix = $new_prefix;
+    }
   }
   else {
     $db_prefix = $original_prefix;

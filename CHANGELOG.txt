@@ -1,5 +1,9 @@
 // $Id$
 
+31-AUG-2010
+
+-- #632950 by zserno. Fixes $db_prefix when used as an array in Domain Prefix.
+
 30-AUG-2010
 
 -- #895284 by mac_perlinksi. Fixes bad variable from #873706.
