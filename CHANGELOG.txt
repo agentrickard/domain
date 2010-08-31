@@ -4,6 +4,7 @@
 
 -- Auto-install the primary domain.
 -- Update custom_url_rewrite_outbound.patch to Drupal 5.23.
+-- Wrap Domain Prefix define statements in quotes.
 
 20-NOV-2009
 
