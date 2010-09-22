@@ -199,6 +199,7 @@ function domain_theme_domainbatch() {
       '#options' => array(0 => 1, 1 => t('Reset')),
       '#description' => t('Delete custom theme settings for this domain.'),
     ),
+    '#permission' => 'administer themes',
     '#domain_action' => 'domain_delete',
     '#system_default' => 0,
     '#meta_description' => t('Delete custom theme settings for domains as supplied by Domain Theme.'),

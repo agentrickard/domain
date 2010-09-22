@@ -43,7 +43,7 @@ function domain_content_menu() {
   if (count($domains) <= variable_get('domain_list_size', DOMAIN_LIST_SIZE)) {
     foreach ($domains as $domain) {
       $items['admin/domain/content/' . $domain['domain_id']] = array(
-        'title' => filter_xss_admin($domain['sitename']) .' content',
+        'title' => check_plain($domain['sitename']) .' content',
         'page callback' => 'domain_content_view',
         'page arguments' => array($domain['domain_id'], FALSE),
         'access callback' => 'domain_content_check',

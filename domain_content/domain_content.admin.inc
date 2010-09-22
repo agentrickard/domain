@@ -76,7 +76,7 @@ function domain_content_list() {
     $path = trim(domain_get_path($domain), '/');
     $rows[] = array(
       $domain['domain_id'],
-      l(t('!sitename content', array('!sitename' => $domain['sitename'])), 'admin/domain/content/'. $domain['domain_id']),
+      l(t('@sitename content', array('@sitename' => $domain['sitename'])), 'admin/domain/content/'. $domain['domain_id']),
       (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField(),
       l(t('view site'), $path),
     );
@@ -124,7 +124,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   // Override the $_domain global so we can see the appropriate content
   if (!is_null($domain_id)) {
     $_domain['site_grant'] = FALSE;
-    drupal_set_title(t('Content for !domain', array('!domain' => $_domain['sitename'])));
+    drupal_set_title(t('Content for @domain', array('@domain' => $_domain['sitename'])));
   }
   elseif ($all_affiliates) {
     $_domain['site_grant'] = TRUE;
@@ -366,7 +366,7 @@ function domain_content_view_domains($node) {
     }
     if (!empty($node_domains)) {
       foreach ($node_domains as $item) {
-        $items[$item['domain_id']] = $item['sitename'];
+        $items[$item['domain_id']] = check_plain($item['sitename']);
       }
     }
     if (module_exists('domain_source')) {

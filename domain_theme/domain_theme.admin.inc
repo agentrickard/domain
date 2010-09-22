@@ -21,7 +21,7 @@ function domain_theme_page($domain) {
     include_once drupal_get_path('module', 'system') . '/system.admin.inc';
 
     // Set the page title and generate the form.
-    drupal_set_title(t('!site : Domain theme settings', array('!site' => $domain['sitename'])));
+    drupal_set_title(t('@site : Domain theme settings', array('@site' => $domain['sitename'])));
     return drupal_get_form('domain_theme_form', $domain);
   }
   else {
@@ -220,7 +220,7 @@ function domain_theme_settings($theme, $domain) {
   // Set the proper context for the user.
   $settings = db_query("SELECT theme, settings FROM {domain_theme} WHERE domain_id = :domain_id AND theme = :theme", array(':domain_id' => $domain['domain_id'], ':theme' => $theme))->fetchAssoc();
   drupal_set_message(t('You are viewing the %theme settings for %domain.', array('%theme' => $theme, '%domain' => $domain['sitename'])), 'status', FALSE);
-  drupal_set_title(t('!site : !theme settings', array('!site' => $domain['sitename'], '!theme' => $theme)));
+  drupal_set_title(t('@site : @theme settings', array('@site' => $domain['sitename'], '@theme' => $theme)));
 
   // If there are settings, we have to load ours.
   if (!empty($settings)) {

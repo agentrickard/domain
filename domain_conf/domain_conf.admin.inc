@@ -56,7 +56,8 @@ function domain_conf_form($form, $form_state, $domain) {
   }
   $default_group = t('Site configuration');
   foreach ($batch as $key => $action) {
-    if ($action['#domain_action'] != 'domain_conf') {
+    $permission = isset($action['#permission']) ? $action['#permission'] : 'administer domains';
+    if (!user_access($permission) || $action['#domain_action'] != 'domain_conf') {
       continue;
     }
     if ($action['#form']['#type'] == 'select') {
@@ -84,15 +85,16 @@ function domain_conf_form($form, $form_state, $domain) {
   }
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   // Site name must be edited at the domain creation screen.
-  $form[$default_group]['site_name'] = array(
-    '#disabled' => TRUE,
-    '#title' => t('Site name'),
-    '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/config/domain/edit/' . $domain['domain_id']))),
-    '#type' => 'textfield',
-    '#default_value' => $domain['sitename'],
-    '#weight' => -100,
-  );
-
+  if (isset($form[$default_group]['site_name'])) {
+    $form[$default_group]['site_name'] = array(
+      '#disabled' => TRUE,
+      '#title' => t('Site name'),
+      '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/config/domain/edit/' . $domain['domain_id']))),
+      '#type' => 'textfield',
+      '#default_value' => $domain['sitename'],
+      '#weight' => -100,
+    );
+  }
   // Locale module is a little tricky, so handle it properly.
   $str = t('Language settings');
   if (isset($form[$str]['language_default']) && !isset($settings['language_default'])) {
