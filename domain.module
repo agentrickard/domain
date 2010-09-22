@@ -221,7 +221,7 @@ function domain_menu() {
     foreach ($batch as $key => $value) {
       $items['admin/build/domain/batch/'. $key] = array(
         'title' => $value['#form']['#title'],
-        'access arguments' => array('administer domains'),
+        'access arguments' => isset($value['#permission']) ? array($value['#permission']) : array('administer domains'),
         'type' => MENU_CALLBACK,
         'page callback' => 'domain_batch',
         'page arguments' => array($key),
@@ -355,10 +355,14 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
             $this_node = node_load(arg(1));
             $output = '';
             if (!empty($this_node->subdomains)) {
-              $output .= theme('item_list', $this_node->subdomains, t('Assigned domains'));
+              $items = array();
+              foreach($this_node->subdomains as $name) {
+                $items[] = check_plain($name);
+              }
+              $output .= theme('item_list', $items, t('Assigned domains'));
             }
             $this_domain = domain_get_node_match($this_node->nid);
-            $output .= theme('item_list', array($this_domain['sitename']), t('Source domain'));
+            $output .= theme('item_list', array(check_plain($this_domain['sitename'])), t('Source domain'));
             if (empty($output)) {
               $output = t('This node is not assigned to a domain.');
             }
@@ -483,10 +487,10 @@ function domain_user($op, &$edit, &$account, $category = NULL) {
             if (abs($id) > 0) {
               if ($id > 0) {
                 $domain = domain_lookup($id);
-                $output .= '<li>'. $domain['sitename'] .'</li>';
+                $output .= '<li>'. check_plain($domain['sitename']) .'</li>';
               }
               else {
-                $output .= '<li>'. variable_get('domain_sitename', variable_get('site_name', 'Drupal')) .'</li>';
+                $output .= '<li>'. check_plain(variable_get('domain_sitename', variable_get('site_name', 'Drupal'))) .'</li>';
               }
             }
           }
@@ -1272,11 +1276,19 @@ function domain_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
         $debug = variable_get('domain_debug', 0);
         if ($debug && user_access('set domain access')) {
           if (!empty($node->subdomains)) {
-            $output = theme('item_list', $node->subdomains, t('Assigned domains'));
+            $items = array();
+            foreach ($node->subdomains as $name) {
+              $items[] = check_plain($name);
+            }
+            $output = theme('item_list', $items, t('Assigned domains'));
             $node->content['subdomains'] = array('#value' => $output, '#weight' => 20);
           }
           if (!empty($node->editors)) {
-            $output = theme('item_list', $node->editors, t('Editors'));
+            $items = array();
+            foreach ($node->editors as $name) {
+              $items[] = check_plain($name);
+            }
+            $output = theme('item_list', $items, t('Editors'));
             $node->content['editors'] = array('#value' => $output, '#weight' => 21);
           }
           if (empty($output)) {
@@ -1866,7 +1878,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
               foreach ($raw as $did) {
                 ($did == -1) ? $id = 0 : $id = $did;
                 $raw_domains = domain_lookup($id);
-                $list[]['data'] = $raw_domains['sitename'];
+                $list[]['data'] = check_plain($raw_domains['sitename']);
               }
             }
             if (!empty($list)) {

@@ -18,7 +18,7 @@ class domain_views_handler_filter_domain_domain_id extends views_handler_filter_
       $domain_options = array('***CURRENT_DOMAIN***' => t('Current Domain'));
       $domains = domain_domains();
       foreach ($domains as $domain) {
-        $domain_options[$domain['domain_id']] = $domain['sitename'];
+        $domain_options[$domain['domain_id']] = check_plain($domain['sitename']);
         }
       $this->value_options = $domain_options;
     }

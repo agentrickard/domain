@@ -1,5 +1,9 @@
 // $Id$
 
+22-SEP-2010
+
+-- Creates the 6.x.2.6 release.
+
 31-AUG-2010
 
 -- #632950 by zserno. Fixes $db_prefix when used as an array in Domain Prefix.

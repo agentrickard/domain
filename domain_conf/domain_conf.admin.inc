@@ -24,7 +24,7 @@ function domain_conf_page($domain) {
 
   $output = theme('domain_conf_reset', $domain);
   if ($domain['domain_id'] > 0) {
-    drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
+    drupal_set_title(t('!@ite : Domain site settings', array('@site' => $domain['sitename'])));
     return $output . drupal_get_form('domain_conf_form', $domain);
   }
   else if ($domain['domain_id'] == 0) {
@@ -52,7 +52,8 @@ function domain_conf_form($form_state, $domain) {
 
   $default_group = t('Site configuration');
   foreach ($batch as $key => $action) {
-    if ($action['#domain_action'] != 'domain_conf') {
+    $permission = isset($action['#permission']) ? $action['#permission'] : 'administer domains';
+    if (!user_access($permission) || $action['#domain_action'] != 'domain_conf') {
       continue;
     }
     if ($action['#form']['#type'] == 'select') {
@@ -80,15 +81,16 @@ function domain_conf_form($form_state, $domain) {
   }
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   // Site name must be edited at the domain creation screen.
-  $form[$default_group]['site_name'] = array(
-    '#disabled' => TRUE,
-    '#title' => t('Site name'),
-    '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/'. $domain['domain_id']))),
-    '#type' => 'textfield',
-    '#default_value' => $domain['sitename'],
-    '#weight' => -100,
-  );
-
+  if (isset($form[$default_group]['site_name'])) {
+    $form[$default_group]['site_name'] = array(
+      '#disabled' => TRUE,
+      '#title' => t('Site name'),
+      '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/build/domain/edit/'. $domain['domain_id']))),
+      '#type' => 'textfield',
+      '#default_value' => $domain['sitename'],
+      '#weight' => -100,
+    );
+  }
   // Locale module is a little tricky, so handle it properly.
   $str = t('Language settings');
   if (isset($form[$str]['language_default']) && !isset($settings['language_default'])) {
@@ -119,7 +121,7 @@ function domain_conf_form($form_state, $domain) {
  */
 
 function domain_conf_default($domain) {
-  drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
+  drupal_set_title(t('@site : Domain site settings', array('@site' => $domain['sitename'])));
   $form = array();
   // Grab any extra elements defined by other modules.
   $extra = domain_conf_api();

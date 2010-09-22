@@ -53,7 +53,7 @@ function domain_nav_menu() {
         $type = MENU_SUGGESTED_ITEM;
       }
       $items['domain/'. filter_xss_admin($domain['subdomain'])] = array(
-        'title' => $domain['sitename'],
+        'title' => check_plain($domain['sitename']),
         'type' => $type,
         'page callback' => 'drupal_goto',
         'page arguments' => array($domain['path']),

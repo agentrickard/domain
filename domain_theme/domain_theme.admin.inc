@@ -29,7 +29,7 @@ function domain_theme_page($domain) {
     // Load the system form file.
     include_once drupal_get_path('module', 'system') .'/system.admin.inc';
 
-    drupal_set_title(t('!site : Domain theme settings', array('!site' => $domain['sitename'])));
+    drupal_set_title(t('@site : Domain theme settings', array('@site' => $domain['sitename'])));
     $output = theme_domain_theme_reset($domain);
     return $output . drupal_get_form('system_themes_form');
   }
@@ -131,7 +131,7 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
     return drupal_access_denied();
   }
 
-  drupal_set_title(t('!site : %theme settings', array('!site' => $domain['sitename'], '%theme' => $theme)));
+  drupal_set_title(t('@site : %theme settings', array('@site' => $domain['sitename'], '%theme' => $theme)));
   // Which domain are we editing?
   $form['domain_id'] = array(
     '#type' => 'value',

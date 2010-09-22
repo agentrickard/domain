@@ -744,7 +744,12 @@ function domain_batch_list($batch) {
   }
   uasort($batch, 'domain_batch_sort');
   $group = '';
+  
   foreach ($batch as $key => $value) {
+    $permission = isset($value['#permission']) ? $value['#permission'] : 'administer domains';
+    if (!user_access($permission)) {
+      continue;
+    }
     if ($group != $value['#module']) {
       $rows[] = array(array('data' => '<strong>'. t('%module options', array('%module' => $value['#module'])) .'</strong>', 'colspan' => 2));
       $group = $value['#module'];
@@ -854,7 +859,7 @@ function domain_batch_form($form_state, $action, $batch, $domains) {
     // Take the settings from the $batch array.
     $form['domain_batch'][$domain['domain_id']] = $batch['#form'];
     // Add the domain-specific elements.
-    $form['domain_batch'][$domain['domain_id']]['#sitename'] = $domain['sitename'];
+    $form['domain_batch'][$domain['domain_id']]['#sitename'] = check_plain($domain['sitename']);
     if (isset($default[$domain['domain_id']])) {
       $form['domain_batch'][$domain['domain_id']]['#default_value'] = $default[$domain['domain_id']];
     }

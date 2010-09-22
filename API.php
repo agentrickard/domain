@@ -318,6 +318,9 @@ function hook_domainform(&$form) {
  *  Allows a warning message to be printed when entering specific forms that
  *  may have values that vary on each domain.
  *
+ * NOTE: The responding module is required to check that the user has access to this form
+ * setting. Failure to check access on the form elements may introduce a security risk.
+ *
  * @return
  *   An associative array where the keys form_id values representing forms
  *   that require warnings. The value should return a link for where the
@@ -474,6 +477,9 @@ function hook_domainconf() {
  * --- 'domain_delete' == used to delete rows from specific tables.  If this is used, the #table value must be present.
  * --- 'custom' == used if you need your own submit handler. Must be paired with a #submit parameter.
  *
+ * - '#permission' [optional] A string identifying the permission required to access this setting.
+ *    If not provided, defaults to 'administer domains'.
+ *
  * - '#submit' [optional] Used with the 'custom' #domain_action to define a custom submit handler for the form.  This value
  * should be a valid function name.  It will be passed the $form_values array for processing.
  *
@@ -526,6 +532,7 @@ function hook_domainbatch() {
       '#description' => t('A description for the form'),
       '#required' => TRUE,
     ),
+    '#permission' => 'administer domains',
     '#domain_action' => 'domain_conf',
     '#meta_description' => t('Edit my setting value.'),
     '#variable' => 'domain_mysetting',

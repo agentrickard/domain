@@ -37,6 +37,6 @@ class domain_views_handler_argument_domain_access_gid extends views_handler_argu
     foreach ($domains as $domain) {
       $domain_options[$domain['domain_id']] = $domain['sitename'];
     }
-    return isset($domain_options[$domain_id]) ? $domain_options[$domain_id] : t('Unknown domain');
+    return isset($domain_options[$domain_id]) ? check_plain($domain_options[$domain_id]) : t('Unknown domain');
   }
 }

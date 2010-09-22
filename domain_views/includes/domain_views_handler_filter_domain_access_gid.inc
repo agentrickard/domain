@@ -17,7 +17,7 @@ class domain_views_handler_filter_domain_access_gid extends views_handler_filter
       $domain_options = array('-1' => t('Any domain -- use with "Is not one of"'), '***CURRENT_DOMAIN***' => t('Current Domain'));
       $domains = domain_domains();
       foreach ($domains as $domain) {
-        $domain_options[$domain['domain_id']] = $domain['sitename'];
+        $domain_options[$domain['domain_id']] = check_plain($domain['sitename']);
         }
       $this->value_options = $domain_options;
     }
