@@ -24,7 +24,7 @@ function domain_conf_page($domain) {
 
   $output = theme('domain_conf_reset', $domain);
   if ($domain['domain_id'] > 0) {
-    drupal_set_title(t('!@ite : Domain site settings', array('@site' => $domain['sitename'])));
+    drupal_set_title(t('@site : Domain site settings', array('@site' => $domain['sitename'])));
     return $output . drupal_get_form('domain_conf_form', $domain);
   }
   else if ($domain['domain_id'] == 0) {
