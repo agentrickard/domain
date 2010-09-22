@@ -328,7 +328,7 @@ function domain_prefix_form($domain_id, $arguments = array()) {
   $default = domain_default();
   domain_goto($default);
   $domain = domain_lookup($domain_id);
-  drupal_set_title(t('Table prefixing for !domain', array('!domain' => $domain['sitename'])));
+  drupal_set_title(t('Table prefixing for @domain', array('@domain' => $domain['sitename'])));
   // Remove the disallowed tables.
   $disallow = domain_prefix_disallow();
 

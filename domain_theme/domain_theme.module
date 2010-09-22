@@ -64,7 +64,7 @@ function domain_theme_page($domain_id) {
   if ($domain['domain_id']) {
     // Ensure we are on the proper domain.
     domain_goto($domain);
-    drupal_set_title(t('!site : Domain theme settings', array('!site' => $domain['sitename'])));
+    drupal_set_title(t('@site : Domain theme settings', array('@site' => $domain['sitename'])));
     include_once('domain_theme_form.inc');
     return $output . drupal_get_form('system_themes');
   }
@@ -211,6 +211,7 @@ function domain_theme_domainbatch() {
       '#options' => array(t('Reset')),
       '#description' => t('Delete custom theme settings for this domain.'),
     ),
+    '#permission' => 'administer site configuration',
     '#domain_action' => 'domain_delete',
     '#system_default' => 0,
     '#meta_description' => t('Delete custom theme settings for domains as supplied by Domain Theme.'),

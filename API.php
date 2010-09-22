@@ -360,6 +360,9 @@ function hook_domainwarnings() {
  * file and place that inside the domain_conf directory.  This file should begin with <?php and conform
  * to Drupal coding standards.
  *
+ * NOTE: The responding module is required to check that the user has access to this form
+ * setting. Failure to check access on the form elements may introduce a security risk.
+ *
  * @return
  *  A $form array element as defined by the FormsAPI.
  *
@@ -408,6 +411,9 @@ function hook_domainconf() {
  *  Typically, this will be the result of a variable_get().  For domain_delete operations, this value should be set to zero (0).
  *
  * - '#meta_description' [required] Used to describe your action to end users.
+ *
+ * - '#permission' [optional] A string identifying the permission required to access this setting.
+ *    If not provided, defaults to 'administer domains'.
  *
  * - '#domain_action' [required] Indicates what submit action will be invoked for this setting.  Allowed values are:
  * --- 'domain' == writes the value to the {domain} table.  Normally, contributed modules will not use this option.
@@ -459,6 +465,7 @@ function hook_domainbatch() {
       '#description' => t('A description for the form'),
       '#required' => TRUE,
     ),
+    '#permission' => 'administer site configuration',
     '#domain_action' => 'domain_conf',
     '#meta_description' => t('Edit my setting value.'),
     '#variable' => 'domain_mysetting',

@@ -25,7 +25,7 @@ function domain_conf_menu($may_cache) {
     $items[] = array(
       'title' => t('Domain site settings'),
       'path' => 'admin/build/domain/conf',
-      'access' => user_access('administer domains'),
+      'access' => user_access('administer domains') && user_access('administer site congifuration'),
       'type' => MENU_CALLBACK,
       'callback' => 'domain_conf_page',
       'callback arguments' => array(arg(4))
@@ -33,7 +33,7 @@ function domain_conf_menu($may_cache) {
     $items[] = array(
       'title' => t('Domain site settings'),
       'path' => 'admin/build/domain/conf-reset',
-      'access' => user_access('administer domains'),
+      'access' => user_access('administer domains') && user_access('administer site congifuration'),
       'type' => MENU_CALLBACK,
       'callback' => 'domain_conf_reset',
       'callback arguments' => array(arg(4))
@@ -63,7 +63,7 @@ function domain_conf_page($domain_id) {
   if ($domain['domain_id'] > 0) {
     // Ensure we are on the proper domain.
     domain_goto($domain);
-    drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
+    drupal_set_title(t('@site : Domain site settings', array('@site' => $domain['sitename'])));
     return $output . drupal_get_form('system_site_information_settings');
   }
   else if ($domain['domain_id'] == 0) {
@@ -84,7 +84,7 @@ function domain_conf_page($domain_id) {
  */
 
 function domain_conf_default($domain) {
-  drupal_set_title(t('!site : Domain site settings', array('!site' => $domain['sitename'])));
+  drupal_set_title(t('@site : Domain site settings', array('@site' => $domain['sitename'])));
   $form = array();
   // Grab any extra elements defined by other modules.
   $extra = domain_conf_api();
@@ -546,6 +546,9 @@ function domain_conf_domainbatch() {
     '#data_type' => 'string',
     '#weight' => -8,
   );
+  foreach ($batch as $item => $values) {
+    $batch[$item]['#permission'] = 'administer site configuration';
+  }
   return $batch;
 }
 

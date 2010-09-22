@@ -47,7 +47,7 @@ function domain_nav_menu($may_cache) {
       }
       $items[] = array(
         'path' => 'domain/'. $domain['subdomain'], // Can't use absolute paths, so we goto.
-        'title' => $domain['sitename'],
+        'title' => check_plain($domain['sitename']),
         'description' => t('Go to !domain', array('!domain' => $domain['subdomain'])),
         'callback' => 'drupal_goto',
         'callback arguments' => array($domain['path']),

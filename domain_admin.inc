@@ -809,6 +809,10 @@ function domain_batch_list($batch) {
   $rows = array();
   uasort($batch, 'domain_batch_sort');
   foreach ($batch as $key => $value) {
+    $permission = isset($value['#permission']) ? $value['#permission'] : 'administer domains';
+    if (!user_access($permission)) {
+      continue;
+    }
     $rows[] = array(l($value['#form']['#title'], 'admin/build/domain/batch/'. $key), $value['#meta_description']);
   }
   $output = '<p>'. t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') .'</p>';

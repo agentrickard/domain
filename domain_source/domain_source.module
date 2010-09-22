@@ -29,7 +29,7 @@ function domain_source_form_alter($form_id, &$form) {
     if (user_access('set domain access')) {
       $show = TRUE;
       foreach ($domains as $domain) {
-        $options[$domain['domain_id']] = $domain['sitename'];
+        $options[$domain['domain_id']] = check_plain($domain['sitename']);
       }
     }
     // In the case of users with limited permissions, option 3 is the "show options" value.
