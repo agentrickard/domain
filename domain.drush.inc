@@ -48,7 +48,7 @@ function drush_domain_list() {
   foreach ($domains as $domain) {
     $row = array();
     foreach ($header as $key => $name) {
-      $row[] = $domain[$key];
+      $row[] = check_plain($domain[$key]);
     }
     $rows[] = $row;
   }

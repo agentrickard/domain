@@ -235,7 +235,7 @@ function domain_menu() {
     foreach ($batch as $key => $value) {
       $items['admin/config/domain/batch/' . $key] = array(
         'title' => $value['#form']['#title'],
-        'access arguments' => array('administer domains'),
+        'access arguments' => isset($value['#permission']) ? array($value['#permission']) : array('administer domains'),
         'type' => MENU_CALLBACK,
         'page callback' => 'domain_batch',
         'page arguments' => array($key),
@@ -486,7 +486,7 @@ function domain_block_view_information() {
   }
   // Print the link source domain.
   $this_domain = domain_get_node_match($node->nid);
-  $output .= theme('item_list', array('items' => array($this_domain['sitename']), 'title' => t('Source domain')));
+  $output .= theme('item_list', array('items' => array(check_plain($this_domain['sitename'])), 'title' => t('Source domain')));
   if (empty($output)) {
     $output = t('This node is not assigned to a domain.');
   }
@@ -1464,7 +1464,7 @@ function domain_node_load($nodes, $types) {
     foreach ($nodes[$node->nid]->domains as $gid) {
       ($gid == -1) ? $key = 0 : $key = $gid;
       $domain = domain_lookup($key);
-      $nodes[$node->nid]->subdomains[] = check_plain($domain['sitename']);
+      $nodes[$node->nid]->subdomains[] = $domain['sitename'];
     }
   }
 }
@@ -1482,10 +1482,18 @@ function domain_node_view($node, $view_mode) {
 
   if (variable_get('domain_debug', 0) && user_access('set domain access')) {
     if (!empty($node->subdomains)) {
-      $output .= theme('item_list', array('items' => $node->subdomains, 'title' => t('Assigned domains')));
+      $items = array();
+      foreach ($node->subdomains as $name) {
+        $items[] = check_plain($name);
+      }
+      $output .= theme('item_list', array('items' => $items, 'title' => t('Assigned domains')));
     }
     if (!empty($node->editors)) {
-      $output .= theme('item_list', array('items' => $node->editors, 'title' => t('Editors')));
+      $items = array();
+      foreach ($node->editors as $name) {
+        $items[] = check_plain($name);
+      }
+      $output .= theme('item_list', array('items' => $items, 'title' => t('Editors')));
     }
     if (empty($output)) {
       $output = t('This node is not assigned to a domain.');
@@ -2116,7 +2124,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             foreach ($raw as $did) {
               ($did == -1) ? $id = 0 : $id = $did;
               $raw_domains = domain_lookup($id);
-              $list[]['data'] = $raw_domains['sitename'];
+              $list[]['data'] = check_plain($raw_domains['sitename']);
             }
           }
           if (!empty($list)) {

@@ -1,5 +1,9 @@
 // $Id$
 
+22-SEP-2010
+
+-- Changes incorporated from 7.x.2.4 release.
+
 30-AUG-2010
 -- Fixes missing argument in domain_conf_variable_set().
 -- #895284 by mac_perlinksi. Fixes bad variable from #873706.
