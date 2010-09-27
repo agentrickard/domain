@@ -1,5 +1,8 @@
 // $Id$
 
+27-SEP-2010
+-- #924408 to handle unpublished nodes with reference to #920614.
+
 22-SEP-2010
 -- Creates the 7.x.2.4 release.
 
