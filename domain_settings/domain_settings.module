@@ -252,7 +252,7 @@ function domain_settings_reset_form_submit($form, &$form_state) {
     return;
   }
   drupal_set_message(t('Domain configuration settings have been reset. Custom module settings have been retained.'));
-  $form_state['redirect'] = 'admin/config/domain/conf/'. $form_state['values']['domain_id'];
+  $form_state['redirect'] = 'admin/structure/domain/conf/'. $form_state['values']['domain_id'];
   domain_settings_reset($form_state['values']['domain_id']);
   // Clear the cache.
   cache_clear_all();

@@ -68,7 +68,7 @@ function domain_theme_domain_link($domain) {
   if ($domain['domain_id'] > 0) {
     $links[] = array(
       'title' => t('theme'),
-      'path' => 'admin/config/domain/theme/' . $domain['domain_id']
+      'path' => 'admin/structure/domain/theme/' . $domain['domain_id']
     );
     return $links;
   }
@@ -85,7 +85,7 @@ function domain_theme_domain_warning() {
   );
   $return = array();
   foreach ($forms as $form) {
-    $return[$form] =  'admin/config/domain/theme/%domain_id';
+    $return[$form] =  'admin/structure/domain/theme/%domain_id';
   }
   return $return;
 }

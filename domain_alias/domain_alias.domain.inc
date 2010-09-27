@@ -14,7 +14,7 @@
 function domain_alias_domain_link($domain) {
   $links[] = array(
     'title' => t('aliases'),
-    'path' => 'admin/config/domain/alias/' . $domain['domain_id']
+    'path' => 'admin/structure/domain/alias/' . $domain['domain_id']
   );
   return $links;
 }
@@ -89,7 +89,7 @@ function domain_alias_domain_view($op, $domain = array(), $query = NULL) {
         }
       }
       $linktext = empty($pieces) ? 'add alias' : 'edit aliases';
-      $action[] = l($linktext, 'admin/config/domain/alias/' . $domain['domain_id']);
+      $action[] = l($linktext, 'admin/structure/domain/alias/' . $domain['domain_id']);
       $pieces = array_merge($action, $pieces);
       if (!empty($pieces)) {
         return array(theme('item_list', array('items' => $pieces)));

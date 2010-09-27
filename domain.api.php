@@ -112,7 +112,7 @@ function hook_domain_link($domain) {
   if (user_access('my permission') && $domain['domain_id'] > 0) {
     $links[] = array(
       'title' => t('settings'),
-      'path' => 'admin/config/domain/myaction/' . $domain['domain_id']
+      'path' => 'admin/structure/domain/myaction/' . $domain['domain_id']
     );
     return $links;
   }
@@ -193,7 +193,7 @@ function hook_domain_install() {
 
 /**
  * Allows Domain modules to add columns to the domain list view at
- * path 'admin/config/domain/view'.
+ * path 'admin/structure/domain/view'.
  *
  * @param $op
  *   The operation being performed.  Valid requests are:

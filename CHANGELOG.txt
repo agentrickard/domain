@@ -5,6 +5,7 @@
 -- Moves API.php to domain.api.php in accordance with new standards.
 -- Updates README for file name change.
 -- Adds and documents new Drush 3 commands.
+-- #924470. Fix menu callbacks in D7.
 
 22-SEP-2010
 -- Changes incorporated from 7.x.2.4 release.

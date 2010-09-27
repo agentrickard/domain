@@ -174,23 +174,23 @@ function domain_unserialize($object) {
 function domain_menu() {
   $items = array();
   $admin = user_access('administer domains');
-  $items['admin/config/domain'] = array(
+  $items['admin/structure/domain'] = array(
     'title' => 'Domains',
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_view',
     'file' => 'domain.admin.inc',
-    'description' => 'Settings for the Domain Access module.',
+    'description' => 'Manage and configure domains.',
   );
-  $items['admin/config/domain/view'] = array(
+  $items['admin/structure/domain/view'] = array(
     'title' => 'Domain list',
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_view',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'domain.admin.inc',
     'description' => 'View list of registered domains.',
     'weight' => -10
   );
-  $items['admin/config/domain/settings'] = array(
+  $items['admin/structure/domain/settings'] = array(
     'title' => 'Settings',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
@@ -199,17 +199,17 @@ function domain_menu() {
     'description' => 'Configure Domain Access settings.',
     'weight' => -8
   );
-  $items['admin/config/domain/create'] = array(
+  $items['admin/structure/domain/create'] = array(
     'title' => 'Create domain',
     'access arguments' => array('administer domains'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_form'),
     'file' => 'domain.admin.inc',
     'description' => 'Create new domain record.',
     'weight' => -7
     );
-  $items['admin/config/domain/advanced'] = array(
+  $items['admin/structure/domain/advanced'] = array(
     'title' => 'Node settings',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
@@ -222,7 +222,7 @@ function domain_menu() {
   // Register the batch actions as menu callbacks
   $batch = module_invoke_all('domain_batch');
   if (!empty($batch)) {
-    $items['admin/config/domain/batch'] = array(
+    $items['admin/structure/domain/batch'] = array(
       'title' => 'Batch updating',
       'access arguments' => array('administer domains'),
       'type' => MENU_LOCAL_TASK,
@@ -233,7 +233,7 @@ function domain_menu() {
     );
     // Get the submenu items
     foreach ($batch as $key => $value) {
-      $items['admin/config/domain/batch/' . $key] = array(
+      $items['admin/structure/domain/batch/' . $key] = array(
         'title' => $value['#form']['#title'],
         'access arguments' => isset($value['#permission']) ? array($value['#permission']) : array('administer domains'),
         'type' => MENU_CALLBACK,
@@ -245,7 +245,7 @@ function domain_menu() {
       );
     }
   }
-  $items['admin/config/domain/roles'] = array(
+  $items['admin/structure/domain/roles'] = array(
     'title' => 'User defaults',
     'access arguments' => array('administer domains'),
     'type' => MENU_LOCAL_TASK,
@@ -255,7 +255,7 @@ function domain_menu() {
     'description' => 'Default domain settings for users.',
     'weight' => -4
   );
-  $items['admin/config/domain/edit/%domain'] = array(
+  $items['admin/structure/domain/edit/%domain'] = array(
     'title' => 'Edit domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,
@@ -264,7 +264,7 @@ function domain_menu() {
     'description' => 'Edit domain record.',
     'file' => 'domain.admin.inc',
   );
-  $items['admin/config/domain/delete/%domain'] = array(
+  $items['admin/structure/domain/delete/%domain'] = array(
     'title' => 'Delete domain record',
     'access arguments' => array('administer domains'),
     'type' => MENU_CALLBACK,

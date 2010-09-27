@@ -111,7 +111,7 @@ function domain_theme_form_submit($form, &$form_state) {
       ->execute();
   }
   // Return to the correct page.
-  $form_state['redirect'] = 'admin/config/domain/theme/' . $domain_id;
+  $form_state['redirect'] = 'admin/structure/domain/theme/' . $domain_id;
   // Clear the cache.
   cache_clear_all();
 }
@@ -134,7 +134,7 @@ function theme_domain_theme_form($variables) {
       theme('image', array('path' => $themes[$key]->info['screenshot'])),
       '<h3>' . check_plain($themes[$key]->info['name'] . ' ' . $themes[$key]->info['version']) . ' ' . $default .  '</h3>' . check_plain($themes[$key]->info['description']),
       drupal_render($form['theme'][$key]),
-      l('configure', 'admin/config/domain/theme/' . $key . '/' . $form['domain_id']['#value'] . '/theme-settings')
+      l('configure', 'admin/structure/domain/theme/' . $key . '/' . $form['domain_id']['#value'] . '/theme-settings')
     );
     $rows[] = $row;
   }
@@ -169,7 +169,7 @@ function domain_theme_reset($domain) {
  */
 function domain_theme_reset_form($form, $form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/config/domain/theme/' . $domain['domain_id'], t('Submitting this form will restore default theme for this domain.'));
+  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/structure/domain/theme/' . $domain['domain_id'], t('Submitting this form will restore default theme for this domain.'));
   return $form;
 }
 
@@ -181,7 +181,7 @@ function domain_theme_reset_form_submit($form, &$form_state) {
     ->condition('domain_id', $form_state['values']['domain_id'])
     ->execute();
   drupal_set_message(t('Domain theme settings have been reset.'));
-  $form_state['redirect'] = 'admin/config/domain/theme/' . $form_state['values']['domain_id'];
+  $form_state['redirect'] = 'admin/structure/domain/theme/' . $form_state['values']['domain_id'];
   // Clear the cache.
   cache_clear_all();
 }
@@ -200,7 +200,7 @@ function theme_domain_theme_reset($variables) {
   $output .= '<p>' . t('These settings will replace your default site theme when %name is the active domain.', array('%name' => $domain['sitename'])) . '</p>';
   $data = db_query("SELECT theme FROM {domain_theme} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchAssoc();
   if (!empty($data)) {
-    $output .= '<p>' . t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/config/domain/theme-reset/' . $domain['domain_id']))) . '</p>';
+    $output .= '<p>' . t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/structure/domain/theme-reset/' . $domain['domain_id']))) . '</p>';
   }
   return $output;
 }
@@ -315,7 +315,7 @@ function domain_theme_settings_submit($form, &$form_state) {
   cache_clear_all();
   // Finish processing the form.
   drupal_set_message(t('The configuration options have been saved.'));
-  $form_state['redirect'] = 'admin/config/domain/theme/' . $domain_id;
+  $form_state['redirect'] = 'admin/structure/domain/theme/' . $domain_id;
 }
 
 /**

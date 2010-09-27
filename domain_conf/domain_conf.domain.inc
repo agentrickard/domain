@@ -19,7 +19,7 @@ function domain_conf_domain_link($domain) {
   if ($domain['domain_id'] > 0 || !empty($extra)) {
     $links[] = array(
       'title' => t('settings'),
-      'path' => 'admin/config/domain/conf/' . $domain['domain_id']
+      'path' => 'admin/structure/domain/conf/' . $domain['domain_id']
     );
     return $links;
   }
@@ -42,7 +42,7 @@ function domain_conf_domain_warning() {
   );
   $return = array();
   foreach ($forms as $form) {
-    $return[$form] = 'admin/config/domain/conf/%domain_id';
+    $return[$form] = 'admin/structure/domain/conf/%domain_id';
   }
   return $return;
 }

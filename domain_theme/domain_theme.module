@@ -71,7 +71,7 @@ function domain_theme_set_variables($theme) {
 function domain_theme_menu() {
   $items = array();
   // Menu items for configuring themes.
-  $items['admin/config/domain/theme/%domain'] = array(
+  $items['admin/structure/domain/theme/%domain'] = array(
     'title' => 'Domain theme settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -79,7 +79,7 @@ function domain_theme_menu() {
     'page arguments' => array(4),
     'file' => 'domain_theme.admin.inc',
   );
-  $items['admin/config/domain/theme-reset/%domain'] = array(
+  $items['admin/structure/domain/theme-reset/%domain'] = array(
     'title' => 'Domain theme settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -87,7 +87,7 @@ function domain_theme_menu() {
     'page arguments' => array(4),
     'file' => 'domain_theme.admin.inc',
   );
-  $items['admin/config/domain/theme/%/%domain/theme-settings'] = array(
+  $items['admin/structure/domain/theme/%/%domain/theme-settings'] = array(
     'title' => 'Configure domain theme settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
