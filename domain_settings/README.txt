@@ -96,7 +96,7 @@ cannot be made domain-specific.
 
 When active, the Domain Settings module provides a 'Domain-specific settings'
 section in the settings tab of the Domain Access settings page (found at path
-'admin/config/domain/settings'). In this section you can configure the following
+'admin/structure/domain/settings'). In this section you can configure the following
 behaviors.
 
 ----

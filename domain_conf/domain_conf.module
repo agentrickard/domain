@@ -78,7 +78,7 @@ function domain_conf_init() {
  */
 function domain_conf_menu() {
   $items = array();
-  $items['admin/config/domain/conf/%domain'] = array(
+  $items['admin/structure/domain/conf/%domain'] = array(
     'title' => 'Domain site settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -86,7 +86,7 @@ function domain_conf_menu() {
     'page arguments' => array(4),
     'file' => 'domain_conf.admin.inc',
   );
-  $items['admin/config/domain/conf-reset/%domain'] = array(
+  $items['admin/structure/domain/conf-reset/%domain'] = array(
     'title' => 'Domain site settings',
     'type' => MENU_CALLBACK,
     'access arguments' => array('administer domains'),
@@ -120,7 +120,7 @@ function domain_conf_domainlinks($domain) {
   if ($domain['domain_id'] > 0 || !empty($extra)) {
     $links[] = array(
       'title' => t('settings'),
-      'path' => 'admin/config/domain/conf/' . $domain['domain_id']
+      'path' => 'admin/structure/domain/conf/' . $domain['domain_id']
     );
     return $links;
   }
@@ -143,7 +143,7 @@ function domain_conf_domainwarnings() {
   );
   $return = array();
   foreach ($forms as $form) {
-    $return[$form] = 'admin/config/domain/conf/%domain_id';
+    $return[$form] = 'admin/structure/domain/conf/%domain_id';
   }
   return $return;
 }

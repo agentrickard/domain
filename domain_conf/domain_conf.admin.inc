@@ -89,7 +89,7 @@ function domain_conf_form($form, $form_state, $domain) {
     $form[$default_group]['site_name'] = array(
       '#disabled' => TRUE,
       '#title' => t('Site name'),
-      '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/config/domain/edit/' . $domain['domain_id']))),
+      '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/structure/domain/edit/' . $domain['domain_id']))),
       '#type' => 'textfield',
       '#default_value' => $domain['sitename'],
       '#weight' => -100,
@@ -218,7 +218,7 @@ function domain_conf_reset($domain) {
 
 function domain_conf_reset_form($form, $form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $form = confirm_form($extra, t('Are you sure you wish to reset the settings for %name?', array('%name' => $domain['sitename'])), 'admin/config/domain/conf/' . $domain['domain_id'], t('Submitting this form will restore default settings for this domain.'));
+  $form = confirm_form($extra, t('Are you sure you wish to reset the settings for %name?', array('%name' => $domain['sitename'])), 'admin/structure/domain/conf/' . $domain['domain_id'], t('Submitting this form will restore default settings for this domain.'));
   return $form;
 }
 
@@ -230,7 +230,7 @@ function domain_conf_reset_form_submit($form, &$form_state) {
     ->condition('domain_id', $form_state['values']['domain_id'])
     ->execute();
   drupal_set_message(t('Domain configuration settings have been reset.'));
-  $form_state['redirect'] = 'admin/config/domain/conf/' . $form_state['values']['domain_id'];
+  $form_state['redirect'] = 'admin/structure/domain/conf/' . $form_state['values']['domain_id'];
   // Clear the cache.
   cache_clear_all();
 }
@@ -249,7 +249,7 @@ function theme_domain_conf_reset($variables) {
   $output .= '<p>' . t('These settings will replace or supplement your default site settings when %name is the active domain.', array('%name' => $domain['sitename'])) . '</p>';
   $data = db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {
-    $output .= '<p>' . t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/config/domain/conf-reset/' . $domain['domain_id']))) . '</p>';
+    $output .= '<p>' . t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/structure/domain/conf-reset/' . $domain['domain_id']))) . '</p>';
   }
   return $output;
 }

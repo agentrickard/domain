@@ -5,7 +5,7 @@
  * @file
  * Administration functions for the domain module.
  *
- * These functions only need to be accessed from admin/config/domain, so we put them in a separate include file.
+ * These functions only need to be accessed from admin/structure/domain, so we put them in a separate include file.
  * @ingroup domain
  */
 
@@ -62,12 +62,12 @@ function domain_view() {
         $extra = domain_conf_api();
       }
       if (!empty($extra)) {
-        $actions[] = l(t('settings'), 'admin/config/domain/conf/0');
+        $actions[] = l(t('settings'), 'admin/structure/domain/conf/0');
       }
     }
     else {
-      $actions[] = l(t('edit'), 'admin/config/domain/edit/' . $domain['domain_id']);
-      $actions[] = l(t('delete'), 'admin/config/domain/delete/' . $domain['domain_id']);
+      $actions[] = l(t('edit'), 'admin/structure/domain/edit/' . $domain['domain_id']);
+      $actions[] = l(t('delete'), 'admin/structure/domain/delete/' . $domain['domain_id']);
     }
     // Add advanced settings from other modules.
     $items = array();
@@ -174,7 +174,7 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     '#required' => TRUE,
     '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
     '#options' => array(1 => t('Show on all affiliate sites'), 2 => t('Only show on selected sites')),
-    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.<br />If set to <em>Only show on selected sites</em>, you must configure the <a href="!url">Node-type specific settings</a>.', array('!url' => url('admin/config/domain/advanced')))
+    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.<br />If set to <em>Only show on selected sites</em>, you must configure the <a href="!url">Node-type specific settings</a>.', array('!url' => url('admin/structure/domain/advanced')))
   );
 
   $form['domain_behavior']['domain_debug'] = array(
@@ -493,7 +493,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
   $form['#validate'][] = 'domain_form_validate';
-  $form['#redirect'] = array('admin/config/domain/view');
+  $form['#redirect'] = array('admin/structure/domain/view');
   return $form;
 }
 
@@ -574,7 +574,7 @@ function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
   return confirm_form(
     $form,
     t('Are you sure you wish to delete the domain record for <strong>%domain</strong>?', array('%domain' => $domain['subdomain'])),
-    'admin/config/domain/view',
+    'admin/structure/domain/view',
     NULL,
     t('Delete domain record'),
     t('Cancel')
@@ -597,7 +597,7 @@ function domain_delete_form_submit($form, &$form_state) {
   // Hide the message from the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message(t('Domain record deleted.'));
-    $form_state['redirect'] = 'admin/config/domain/view';
+    $form_state['redirect'] = 'admin/structure/domain/view';
   }
 
   // Notify that node access needs to be rebuilt.
@@ -753,7 +753,7 @@ function domain_batch_list($batch) {
       $rows[] = array(array('data' => '<strong>' . t('%module options', array('%module' => $value['#module'])) . '</strong>', 'colspan' => 2));
       $group = $value['#module'];
     }
-    $rows[] = array(l($value['#form']['#title'], 'admin/config/domain/batch/' . $key), $value['#meta_description']);
+    $rows[] = array(l($value['#form']['#title'], 'admin/structure/domain/batch/' . $key), $value['#meta_description']);
   }
   $output = '<p>' . t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') . '</p>';
   $output .= '<p><em>' . t('Note that you will only be shown domains on which each action may be performed.  If the module is not yet configured, some actions may be empty.') . '</em></p>';
