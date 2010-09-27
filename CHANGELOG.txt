@@ -4,6 +4,7 @@
 -- #924408 to handle unpublished nodes with reference to #920614.
 -- Moves API.php to domain.api.php in accordance with new standards.
 -- Updates README for file name change.
+-- Adds and documents new Drush 3 commands.
 
 22-SEP-2010
 -- Changes incorporated from 7.x.2.4 release.

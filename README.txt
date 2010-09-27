@@ -78,8 +78,8 @@ CONTENTS
 7.2   The $_domain Global
 7.3   Database Schema
 7.4   API
-7.5   drush and Domain Access
-7.6   Domain Tokens
+7.5   Domain Tokens
+8.  Drush commands
 
 
 ----
@@ -1428,19 +1428,7 @@ The most important developer functions are the internal module hooks:
   http://therickards.com/api/group/hooks/Domain
 
 ----
-7.5 drush and Domain Access
-
-Using drush, treat a Domain Access site like a multi-site install.  If you do not supply
-a URI flag, drush gets confused and will error out.
-
-Enter drush commands in the format:
-
-  >> drush --uri=www.example.com NORMAL COMMAND
-
-Generally, use the primary domain as the --uri flag.
-
-----
-7.6   Domain Tokens
+7.5   Domain Tokens
 
 The module provides the following replacement tokens.
 
@@ -1470,3 +1458,59 @@ The module provides the following replacement tokens.
     The default domain\'s URL, lowercased and with only alphanumeric characters.
   'domain-default-url-raw'
     The default domain\'s URL. WARNING - raw user input. NOT path safe.
+
+----
+8.  Drush commands
+
+Domain Access supports Drush version 3.x. The following commands are available.
+Type 'drush help' for more information.
+
+  'drush domain-list'
+    Shows a table of the domains registered for your site. You may use 'drush domains'
+    as a shortcut command.
+
+  'drush domain-add DOMAIN SITENAME --options'
+    Add a new domain to your site. The DOMAIN parameter is required and must be unique
+    and validly formed (e.g. example.com). Possible options are:
+      --inactive=1/0
+      Set the domain to inactive by passing 1. Default is 0.
+      --https=1/0
+      Set the domain to use https instead of http by passing 1. Default is 0.
+      --weight=X
+      Set the weight of the domain to an integer value. Default is 0.
+
+    Sample command:
+
+      drush domain-add example.com 'My New Site' --https=1
+
+    Will create the domain:
+      sitename: My New Site
+      subdomain: example.com
+      valid: yes
+      scheme: https://
+      weight: 0
+      
+  'drush generate-domains BASE_DOMAIN --count=15'
+    Autogenerate a set of domains for testing. Aliased to 'drush gend'. Will use the provided
+    BASE_DOMAIN as the primary domain, defaulting to 'example.com'.
+  
+    This command creates domains in the format *.BASE_DOMAIN. The BASE_DOMAIN
+    must be properly formed. By default, the command will create 15 new domains, but you
+    may specify the number using --count=X.
+  
+    The domains created are the words one through ten (1-10), foo, bar, baz, and the
+    non-matching domain 'myBASE_DOMAIN', which is used for cookie testing. Site names
+    are simple uppercase versions of the 3rd-level domain element. All domains are set to
+    use http:// and are set as valid. Weighting is auto-incremented by creation order.
+  
+    Creating more than 15 domains will begin incrementing domains with numeric 3rd-level
+    elements, such as 20.BASE_DOMAIN.
+  
+    The purpose of this command is to help me in UX testing, since many aspects of the user
+    interface must change to accomodate large numbers of domains. The defaults are optimized
+    for my development environment, and will not be altered.
+  
+    Sample command:
+    
+      drush gend example.com --count=20
+  
