@@ -696,7 +696,7 @@ If you wish to enforce special business rules for domain name validation,
 you may implement hook_domain_validate_alter() in your module.
 
 This hook will allow your module to intercept and alter any errors found
-by the normal domain validation process.  See API.php for details.
+by the normal domain validation process.  See domain.api.php for details.
 
 ----
 4.3   Domain Module Behaviors
@@ -1419,7 +1419,7 @@ delete content on specific domains.  Its structure is:
 7.4 API
 
 The Domain Access module has an API for internal module hooks.  Documentation is
-included in the download as API.php and can be viewed online at:
+included in the download as domain.api.php and can be viewed online at:
 
   http://therickards.com/api
 
