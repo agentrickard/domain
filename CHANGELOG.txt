@@ -1,7 +1,9 @@
 // $Id$
 
-22-SEP-2010
+27-SEP-2010
+-- #924408 to handle unpublished nodes with reference to #920614.
 
+22-SEP-2010
 -- Changes incorporated from 7.x.2.4 release.
 
 30-AUG-2010

@@ -1709,10 +1709,6 @@ function domain_node_grants($account, $op) {
  */
 function domain_node_access_records($node) {
   global $_domain;
-  // We assert no rights over unpublished nodes for now.
-  if (!$node->status) {
-    return;
-  }
   // Define the $grants array.
   $grants = array();
   // Check to see if the node domains were set properly.
@@ -1746,7 +1742,7 @@ function domain_node_access_records($node) {
     $grants[] = array(
       'realm' => 'domain_site',
       'gid' => 0,
-      'grant_view' => 1,
+      'grant_view' => $node->status,
       'grant_update' => 0,
       'grant_delete' => 0,
       'priority' => 0,         // If this value is > 0, then other grants will not be recorded
@@ -1762,7 +1758,7 @@ function domain_node_access_records($node) {
         $grants[] = array(
           'realm' => 'domain_id',
           'gid' => $key,
-          'grant_view' => 1,
+          'grant_view' => $node->status,
           'grant_update' => 1,
           'grant_delete' => 1,
           'priority' => 0,
@@ -1776,12 +1772,12 @@ function domain_node_access_records($node) {
   // default domain of all existing nodes to the root domain.
   else {
     $grants[] = array(
-    'realm' => 'domain_id',
-    'gid' => 0,
-    'grant_view' => 1,
-    'grant_update' => 1,
-    'grant_delete' => 1,
-    'priority' => 0,
+      'realm' => 'domain_id',
+      'gid' => 0,
+      'grant_view' => $node->status,
+      'grant_update' => 1,
+      'grant_delete' => 1,
+      'priority' => 0,
     );
   }
 
