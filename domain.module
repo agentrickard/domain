@@ -179,13 +179,13 @@ function domain_menu() {
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_view',
     'file' => 'domain.admin.inc',
-    'description' => 'Settings for the Domain Access module.',
+    'description' => 'Manage and configure domains.',
   );
   $items['admin/structure/domain/view'] = array(
     'title' => 'Domain list',
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_view',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'domain.admin.inc',
     'description' => 'View list of registered domains.',
     'weight' => -10
@@ -202,7 +202,7 @@ function domain_menu() {
   $items['admin/structure/domain/create'] = array(
     'title' => 'Create domain',
     'access arguments' => array('administer domains'),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_form'),
     'file' => 'domain.admin.inc',
