@@ -1,5 +1,9 @@
 // $Id$
 
+28-SEP-2010
+
+-- Patch #924610 by mrfelton. Fixes typo in Domain Conf.
+
 22-SEP-2010
 
 -- Creates the 6.x.2.6 release.
