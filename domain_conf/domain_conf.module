@@ -14,7 +14,7 @@
  */
 
 /**
- * Implementats hook_domain_bootstrap_full().
+ * Implements hook_domain_bootstrap_full().
  */
 function domain_conf_domain_bootstrap_full($domain) {
   static $check;
