@@ -5,6 +5,7 @@
 -- Patch #924610 by mrfelton. Fixes typo in Domain Conf.
 -- #920292 by Jorkkeri. Fixes missing variable in user form.
 -- #912990 by bleen18. Only set form action when one is present.
+-- Creates the 6.x.2.7 release.
 
 22-SEP-2010
 
