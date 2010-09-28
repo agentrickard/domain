@@ -3,6 +3,7 @@
 28-SEP-2010
 
 -- #912990 by bleen18. Only set form action when one is present.
+-- Creates the 5.x.1.16 release.
 
 22-SEP-2010
 
