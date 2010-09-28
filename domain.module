@@ -707,6 +707,7 @@ function domain_user_operations() {
  * Implements hook_form_alter().
  */
 function domain_form_user_admin_account_alter(&$form, $form_state) {
+  global $_domain;
   if (!user_access('assign domain editors')) {
     return;
   }
@@ -1929,7 +1930,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   // If SEO is turned on, then form actions need to be absolute paths
   // to the currently active domain.  See http://drupal.org/node/196217.
   $seo = variable_get('domain_seo', 0);
-  if ($seo) {
+  if ($seo && isset($form['#action'])) {
     // We cannot use the global domain here, since it can be modified.
     $domain = domain_initial_domain();
     $action = parse_url($form['#action']);

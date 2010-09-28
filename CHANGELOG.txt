@@ -1,5 +1,9 @@
 // $Id$
 
+28-SEP-2010
+-- #920292 by Jorkkeri. Fixes missing variable in user form.
+-- #912990 by bleen18. Only set form action when one is present.
+
 27-SEP-2010
 -- #924408 to handle unpublished nodes with reference to #920614.
 -- Moves API.php to domain.api.php in accordance with new standards.
