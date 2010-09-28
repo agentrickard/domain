@@ -1,5 +1,9 @@
 // $Id$
 
+28-SEP-2010
+
+-- #912990 by bleen18. Only set form action when one is present.
+
 22-SEP-2010
 
 -- Creates the 5.x.1.15 release.

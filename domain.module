@@ -1031,7 +1031,7 @@ function domain_form_alter($form_id, &$form) {
   // If SEO is turned on, then form actions need to be absolute paths
   // to the currently active domain.  See http://drupal.org/node/196217.
   $seo = variable_get('domain_seo', 0);
-  if ($seo) {
+  if ($seo && isset($form['#action'])) {
     global $_domain;
     $action = parse_url($form['#action']);
     if ($action['query']) {
