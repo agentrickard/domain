@@ -69,10 +69,6 @@ function domain_alias_domain_view($op, $domain = array(), $query = NULL) {
     case 'header':
       return array(array('data' => t('Aliases')));
       break;
-    case 'query':
-      $query->leftJoin('domain_alias', 'dalias', 'd.domain_id = dalias.domain_id');
-      $query->addField('dalias', 'pattern');
-      break;
     case 'data':
       if (empty($domain)) {
         return;
