@@ -1,5 +1,8 @@
 // $Id$
 
+29-SEP-2010
+-- #926514. Corrects bad query for domain_alias_domainlist().
+
 28-SEP-2010
 -- Patch #924610 by mrfelton. Fixes typo in Domain Conf.
 -- #920292 by Jorkkeri. Fixes missing variable in user form.
