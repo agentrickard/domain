@@ -194,6 +194,10 @@ function domain_source_node_load($nodes, $types) {
  * Implements hook_node_insert()
  */
 function domain_source_node_insert($node) {
+  // If not set, we ignore.
+  if (!isset($node->domain_source)) {
+    return;
+  }
   db_insert('domain_source')
     ->fields(array(
       'nid' => $node->nid,

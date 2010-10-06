@@ -1,5 +1,8 @@
 // $Id$
 
+06-OCT-2010
+-- #933694 by arthurf. Fixes query error in domain_source_node_insert().
+
 29-SEP-2010
 -- #926514. Corrects bad query for domain_alias_domainlist().
 
