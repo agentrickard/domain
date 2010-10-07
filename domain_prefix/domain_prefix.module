@@ -65,6 +65,10 @@ function domain_prefix_domain_bootstrap_full($domain) {
   else {
     $db_prefix = $original_prefix;
   }
+  // This function may already be loaded, see http://drupal.org/node/929540.
+  if (function_exists('domain_prefix_domainpath')) {
+    return;
+  }
   // Check for prefixes of the url_alias table, and if present add hook_domainprefix().
   $count = db_result(db_query("SELECT COUNT(*) FROM {domain_prefix} WHERE status > 1 AND tablename = 'url_alias'"));
   if (!empty($count)) {

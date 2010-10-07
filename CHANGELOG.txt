@@ -1,5 +1,9 @@
 // $Id$
 
+07-OCT-2010
+
+-- Patch #929540 by lilott8. Do not load domain_prefix.path.inc twice.
+
 28-SEP-2010
 
 -- Patch #924610 by mrfelton. Fixes typo in Domain Conf.
