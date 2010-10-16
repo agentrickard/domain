@@ -76,7 +76,7 @@ function domain_alias_menu() {
   $items['admin/structure/domain/alias/%domain'] = array(
     'title' => 'Edit domain aliases',
     'access arguments' => array('administer domains'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'page callback' => 'domain_alias',
     'page arguments' => array(4),
     'file' => 'domain_alias.admin.inc',

@@ -380,10 +380,9 @@ function domain_source_domainupdate($op, $domain, $form_state = array()) {
 
 /**
  * Implements hook_views_api().
-
+ */
 function domain_source_views_api() {
   if (module_exists('domain_views')) {
     return array('api' => 2.0);
   }
 }
- */
