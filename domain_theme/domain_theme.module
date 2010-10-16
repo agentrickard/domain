@@ -73,7 +73,7 @@ function domain_theme_menu() {
   // Menu items for configuring themes.
   $items['admin/structure/domain/theme/%domain'] = array(
     'title' => 'Domain theme settings',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_theme_page',
     'page arguments' => array(4),
@@ -81,7 +81,7 @@ function domain_theme_menu() {
   );
   $items['admin/structure/domain/theme-reset/%domain'] = array(
     'title' => 'Domain theme settings',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_theme_reset',
     'page arguments' => array(4),
@@ -89,7 +89,7 @@ function domain_theme_menu() {
   );
   $items['admin/structure/domain/theme/%/%domain/theme-settings'] = array(
     'title' => 'Configure domain theme settings',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_theme_settings',
     'page arguments' => array(4, 5),

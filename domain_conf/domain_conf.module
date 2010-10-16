@@ -80,7 +80,7 @@ function domain_conf_menu() {
   $items = array();
   $items['admin/structure/domain/conf/%domain'] = array(
     'title' => 'Domain site settings',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_conf_page',
     'page arguments' => array(4),
@@ -88,7 +88,7 @@ function domain_conf_menu() {
   );
   $items['admin/structure/domain/conf-reset/%domain'] = array(
     'title' => 'Domain site settings',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_conf_reset',
     'page arguments' => array(4),

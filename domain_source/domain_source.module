@@ -353,10 +353,9 @@ function domain_source_validate($form, &$form_state) {
 
 /**
  * Implements hook_views_api().
-
+ */
 function domain_source_views_api() {
   if (module_exists('domain_views')) {
     return array('api' => 2.0);
   }
 }
- */

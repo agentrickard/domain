@@ -236,7 +236,7 @@ function domain_menu() {
       $items['admin/structure/domain/batch/' . $key] = array(
         'title' => $value['#form']['#title'],
         'access arguments' => isset($value['#permission']) ? array($value['#permission']) : array('administer domains'),
-        'type' => MENU_CALLBACK,
+        'type' => MENU_VISIBLE_IN_BREADCRUMB,
         'page callback' => 'domain_batch',
         'page arguments' => array($key),
         'file' => 'domain.admin.inc',
@@ -258,7 +258,7 @@ function domain_menu() {
   $items['admin/structure/domain/edit/%domain'] = array(
     'title' => 'Edit domain record',
     'access arguments' => array('administer domains'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_form', 4),
     'description' => 'Edit domain record.',
@@ -267,7 +267,7 @@ function domain_menu() {
   $items['admin/structure/domain/delete/%domain'] = array(
     'title' => 'Delete domain record',
     'access arguments' => array('administer domains'),
-    'type' => MENU_CALLBACK,
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_delete_form', 4),
     'description' => 'Delete domain record.',
