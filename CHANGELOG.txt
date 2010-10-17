@@ -1,5 +1,9 @@
 // $Id$
 
+17-OCT-2010
+-- Cleans up the install / uninstall process.
+-- Documents drush installation.
+
 16-OCT-2010
 -- #931468. Use MENU_VISIBLE_IN_BREADCRUMB where proper.
 -- Fixes drush script error in domain generation.

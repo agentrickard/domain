@@ -65,7 +65,32 @@ function domain_schema() {
  * Implements hook_uninstall()
  */
 function domain_uninstall() {
-  variable_del('domain_bootstrap_modules');
+  $variables = array(
+    'domain_behavior',
+    'domain_bootstrap_modules',
+    'domain_cron_rule',
+    'domain_debug',
+    'domain_default_source',
+    'domain_force_admin',
+    'domain_form_elements',
+    'domain_grant_all',
+    'domain_list_size',
+    'domain_paths',
+    'domain_search',
+    'domain_select_format',
+    'domain_seo',
+    'domain_www',
+    'domain_xmlrpc_rule',
+  );
+  if (function_exists('node_type_get_types')) {
+    $types = node_type_get_types();
+    foreach ($types as $key => $type) {
+      $variables[] = 'domain_node_' . $key;
+    }
+  }
+  foreach ($variables as $variable) {
+    variable_del($variable);
+  }
 }
 
 /**
