@@ -1071,6 +1071,10 @@ function domain_validate($subdomain) {
  */
 function domain_valid_domain($subdomain) {
   $error_list = array();
+  // Check for at least one dot.
+  if (substr_count($subdomain, '.') == 0) {
+    $error_list[] = t('At least one dot (.) is required.');
+  }
   // Check for one colon only.
   if (substr_count($subdomain, ':') > 1) {
     $error_list[] = t('Only one colon (:) is allowed.');
