@@ -205,13 +205,7 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
   if ($empty = drush_get_option('empty')) {
     db_query("TRUNCATE TABLE {domain}");
   }
-  else {
-    $domains = domain_domains(TRUE);
-    if (isset($domains[0])) {
-      return drush_set_error('domain', dt('You cannot use @primary for generating domains. You are currently using @domain', array('@primary' => $primary, '@domain' => $domains[0]['subdomain'])));
-    }
-  }
-  $error = domain_drush_validate_domain($primary);
+  $error = domain_valid_domain($primary);
   if (!empty($error)) {
     return drush_set_error('domain', $error);
   }

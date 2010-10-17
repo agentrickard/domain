@@ -2,6 +2,7 @@
 
 16-OCT-2010
 -- #931468. Use MENU_VISIBLE_IN_BREADCRUMB where proper.
+-- Fixes drush script error in domain generation.
 
 06-OCT-2010
 -- #933694 by arthurf. Fixes query error in domain_source_node_insert().
