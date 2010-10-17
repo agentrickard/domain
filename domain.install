@@ -10,35 +10,7 @@
  * Implements hook_install()
  */
 function domain_install() {
-  $root = strtolower(rtrim($_SERVER['SERVER_NAME']));
-  $site = variable_get('site_name', 'Drupal');
-  $scheme = 'http';
-  if (!empty($_SERVER['HTTPS'])) {
-    $scheme = 'https';
-  }
-  db_insert('domain')
-    ->fields(array(
-        'subdomain' => $root,
-        'sitename' => $site,
-        'scheme' => $scheme,
-        'valid' => 1,
-    ))
-    ->execute();
-  // MySQL won't let us insert row 0 into an autoincrement table.
-  // Similar to the {users} table, this leaves us with no row 1.
-  db_update('domain')
-    ->fields(array('domain_id' => 0))
-    ->condition('domain_id', 1)
-    ->execute();
-
-  // Set the default domain variables.
-  variable_set('domain_root', $root);
-  variable_set('domain_scheme', $scheme);
-  variable_set('domain_sitename', $site);
-  // Tag the default domain.
-  // In a later update function, we will remove the 0 record
-  // and change this value.
-  variable_set('domain_default', 0);
+  domain_set_primary_domain();
 }
 
 /**
@@ -53,7 +25,8 @@ function domain_schema() {
       'sitename' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
       'scheme' => array('type' => 'varchar', 'length' => '8', 'not null' => TRUE, 'default' => 'http'),
       'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1'),
-      'weight' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0)),
+      'weight' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0),
+      'is_default' => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
     'primary key' => array('domain_id'),
     'indexes' => array(
       'subdomain' => array('subdomain'),
@@ -92,9 +65,7 @@ function domain_schema() {
  * Implements hook_uninstall()
  */
 function domain_uninstall() {
-  db_delete('variable')
-    ->condition('name', db_like('domain_') . '%', 'LIKE')
-    ->execute();
+  variable_del('domain_bootstrap_modules');
 }
 
 /**
@@ -127,4 +98,18 @@ function domain_update_7001() {
   db_add_field('domain', 'weight', array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0), array());
   db_add_index('domain', 'weight', array('weight'));
   variable_del('domain_sort');
+  return t('Domain sorting added.');
+}
+
+/**
+ * Add default domain flag and weight the default higher.
+ */
+function domain_update_7002() {
+  db_add_field('domain', 'is_default', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0), array());
+  $default = variable_get('domain_default', 0);
+  db_update('domain')
+    ->fields(array('is_default' => 1, 'weight' => -1))
+    ->condition('domain_id', $default)
+    ->execute();
+  variable_del('domain_default');
 }

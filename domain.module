@@ -103,10 +103,11 @@ function domain_init() {
     $_domain['subdomain'] = str_replace('www.', '', $_domain['subdomain']);
     $www_replaced = TRUE;
   }
-
   // Add information from domain_lookup but keep existing values (domain_id and subdomain)
   $domain = domain_lookup($_domain['domain_id']);
-  $_domain = array_merge($domain, $_domain);
+  if ($domain != -1) {
+    $_domain = array_merge($domain, $_domain);
+  }
 
   // Set the initial domain record, for later reference. See http://drupal.org/node/706490.
   domain_initial_domain($_domain);
@@ -177,18 +178,20 @@ function domain_menu() {
   $items['admin/structure/domain'] = array(
     'title' => 'Domains',
     'access arguments' => array('administer domains'),
-    'page callback' => 'domain_view',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_overview_form'),
     'file' => 'domain.admin.inc',
     'description' => 'Manage and configure domains.',
   );
   $items['admin/structure/domain/view'] = array(
     'title' => 'Domain list',
     'access arguments' => array('administer domains'),
-    'page callback' => 'domain_view',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_overview_form'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'domain.admin.inc',
-    'description' => 'View list of registered domains.',
-    'weight' => -10
+    'description' => 'View domains for the site.',
+    'weight' => -12
   );
   $items['admin/structure/domain/settings'] = array(
     'title' => 'Settings',
@@ -326,6 +329,10 @@ function domain_theme($existing, $type, $theme, $path) {
       'file' => 'domain.admin.inc',
     ),
     'domain_roles_form' => array(
+      'render element' => 'form',
+      'file' => 'domain.admin.inc',
+    ),
+    'domain_overview_form' => array(
       'render element' => 'form',
       'file' => 'domain.admin.inc',
     ),
@@ -897,6 +904,12 @@ function domain_load($domain_id = NULL) {
  *   $domain array on success or -1 on failure.
  */
 function domain_save($values, $form_values) {
+  // Must this be the default domain?
+  // Used in cases where there are no domains present.
+  $count = db_query("SELECT COUNT(domain_id) FROM {domain}")->fetchField();
+  if ($count < 2) {
+    $values['is_default'] = 1;
+  }
   // Update or insert a record?
   $update = (isset($values['domain_id']) && is_numeric($values['domain_id'])) ? array('domain_id') : array();
 
@@ -977,13 +990,17 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
 function domain_default($reset = FALSE) {
   static $default;
   if (empty($default) || $reset) {
-    $default['domain_id'] = 0;
-    $default['sitename'] = variable_get('domain_sitename', variable_get('site_name', 'Drupal'));
-    $default['subdomain'] = variable_get('domain_root', '');
-    $default['scheme'] = variable_get('domain_scheme', 'http');
-    // Set the valid flag.
-    $default['valid'] = TRUE;
+    $default = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE is_default = 1")->fetchAssoc();
     // Let submodules overwrite the defaults, if they wish.
+    if (empty($default)) {
+      $default = array(
+        'domain_id' => 0,
+        'subdomain' => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '',
+        'sitename' => variable_get('site_name', 'Drupal'),
+        'scheme' => empty($_SERVER['HTTPS']) ? 'http' : 'https',
+        'valid' => 1,
+      );
+    }
     $default = domain_api($default);
   }
   return $default;
@@ -993,7 +1010,10 @@ function domain_default($reset = FALSE) {
  * Set the primary domain properly, if necessary.
  */
 function domain_set_primary_domain() {
-  $root = strtolower(rtrim($_SERVER['SERVER_NAME']));
+  $root = strtolower(rtrim($_SERVER['HTTP_HOST']));
+  if ($error = domain_valid_domain($root)) {
+    return;
+  }
   $site = variable_get('site_name', 'Drupal');
   $scheme = 'http';
   if (!empty($_SERVER['HTTPS'])) {
@@ -1006,11 +1026,14 @@ function domain_set_primary_domain() {
           'subdomain' => $root,
           'sitename' => $site,
           'scheme' => $scheme,
+          'weight' => -1,
           'valid' => 1,
+          'is_default' => 1,
       ))
       ->execute();
     // MySQL won't let us insert row 0 into an autoincrement table.
     // Similar to the {users} table, this leaves us with no row 1.
+    // TODO: remove this.
     db_update('domain')
       ->fields(array('domain_id' => 0))
       ->condition('domain_id', 1)
@@ -1022,16 +1045,13 @@ function domain_set_primary_domain() {
           'subdomain' => $root,
           'sitename' => $site,
           'scheme' => $scheme,
+          'weight' => -1,
           'valid' => 1,
+          'is_default' => 1,
       ))
       ->condition('domain_id', 0)
       ->execute();
   }
-  // Set the default domain variables.
-  variable_set('domain_root', $root);
-  variable_set('domain_scheme', $scheme);
-  variable_set('domain_sitename', $site);
-
   // Allow other modules to respond to changes.
   module_invoke_all('domain_update', domain_default(TRUE));
 }
@@ -1145,6 +1165,10 @@ function domain_validate($subdomain) {
  */
 function domain_valid_domain($subdomain) {
   $error_list = array();
+  // Check for at least one dot.
+  if (substr_count($subdomain, '.') == 0) {
+    $error_list[] = t('At least one dot (.) is required.');
+  }
   // Check for one colon only.
   if (substr_count($subdomain, ':') > 1) {
     $error_list[] = t('Only one colon (:) is allowed.');
@@ -1855,10 +1879,14 @@ function domain_set_default_grant() {
  * Upon enabling this module, store the default view grant
  * in the {node_access} table. Then it assigns all users to
  * the primary domain.
+ *
+ * TODO: revisit the need for the data loop.
  */
 function domain_enable() {
   // Set the default 'domain_all' grant for special pages.
   domain_set_default_grant();
+  // Get the default domain.
+  $default = domain_default();
   // Thanks to the new way that batch processing of node grants is handled, we have to
   // manually define our records if none are present.
   $count = (bool) db_query_range("SELECT 1 FROM {domain_access}", 0, 1)->fetchField();
@@ -1878,7 +1906,7 @@ function domain_enable() {
       if (!empty($rule)) {
         $values[] = array(
           'nid' => $node->nid,
-          'gid' => variable_get('domain_default', 0),
+          'gid' => $default['domain_id'],
           'realm' => 'domain_id',
         );
       }
@@ -1901,7 +1929,7 @@ function domain_enable() {
     )->fetchField();
     if (empty($check)) {
       $values[] = array(
-        'domain_id' => variable_get('default_domain', 0),
+        'domain_id' => $default['domain_id'],
         'uid' => $account->uid,
       );
     }
@@ -2176,7 +2204,6 @@ function domain_form_sitename_submit($form, &$form_state) {
       'sitename' => $form_state['values']['site_name'],
     ))
     ->execute();
-  variable_set('domain_sitename', $form_state['values']['site_name']);
   drupal_set_message(t('Primary domain settings updated.'));
 }
 
@@ -2508,6 +2535,7 @@ function domain_lookup_simple($name, $reset = FALSE) {
     // If no match => use default (0)
     if (!isset($domain['domain_id'])) {
       $domain['domain_id'] = 0;
+      $domain['sitename'] = variable_get('site_name', 'Drupal');
     }
     $domain['subdomain'] = $name;
     // Invoke hook_domain_bootstrap_lookup()
@@ -2565,8 +2593,6 @@ function domain_domain_batch() {
     ),
     '#domain_action' => 'domain',
     '#meta_description' => t('Edit all domain values.'),
-    '#variable' => 'domain_root',
-    '#validate' => 'domain_batch_validate',
     '#data_type' => 'string',
     '#update_all' => FALSE,
     '#weight' => -10,
@@ -2583,8 +2609,6 @@ function domain_domain_batch() {
     ),
     '#domain_action' => 'domain',
     '#meta_description' => t('Edit all domain site names.'),
-    '#variable' => 'domain_sitename',
-    '#validate' => 'domain_batch_validate',
     '#data_type' => 'string',
     '#update_all' => FALSE,
     '#weight' => -10,
@@ -2600,7 +2624,6 @@ function domain_domain_batch() {
     '#domain_action' => 'domain',
     '#meta_description' => t('Edit all domain URL schemes.'),
     '#system_default' => variable_get('domain_scheme', 'http://'),
-    '#variable' => 'domain_scheme',
     '#data_type' => 'string',
     '#update_all' => TRUE,
     '#weight' => -10,
@@ -2624,42 +2647,6 @@ function domain_domain_batch() {
     $batch[$key]['#module'] = t('Domain Access');
   }
   return $batch;
-}
-
-/**
- * Validate handler for hook_domain_batch()
- */
-function domain_batch_validate($values) {
-  $case = $values['variable'];
-  $batch = $values['domain_batch'];
-  switch ($case) {
-    case 'domain_root':
-      $errors = array();
-      foreach ($batch as $key => $value) {
-        $subdomain = strtolower(urlencode($value));
-        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :subdomain AND domain_id <> :domain_id",
-          array(':subdomain' => $value, ':domain_id' => $key))->fetchField();
-        if ($check > 0 || ($key > 0 && $value == variable_get('domain_root', ''))) {
-          form_set_error('domain_batch]['. $key, t('Each domain value must be unique.'));
-        }
-        else {
-          $error = domain_valid_domain($value);
-          if (!empty($error)) {
-            form_set_error('domain_batch]['. $key, $error);
-          }
-        }
-      }
-      break;
-    case 'domain_sitename':
-      foreach ($batch as $key => $value) {
-        $check = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = :sitename AND domain_id <> :domain_id",
-          array(':sitename' => $value, ':domain_id' => $key))->fetchField();
-        if ($check > 0 || ($key > 0 && $value == variable_get('domain_sitename', 'Drupal'))) {
-          form_set_error('domain_batch]['. $key, t('Each site name value must be unique.'));
-        }
-      }
-      break;
-  }
 }
 
 /**

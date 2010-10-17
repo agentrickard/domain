@@ -1340,20 +1340,16 @@ required, but each adds functionality to the core module.
 ----
 7.2 The $_domain Global
 
+NOTE: In Drupal 7, this value is deprecated. You should use domain_get_domain()
+to return the active domain.
+
 During hook_init(), the Domain Access module creates a nwe global variable,
 $_domain, which can be used by other Drupal elements (themes, blocks, modules).
 
 The $_domain global is an array of data taken from the {domain} table for the
-currently active domain. If no active domain is found, default values are used:
+currently active domain. If no active domain is found, default values are used.
 
-  $_domain['domain_id'] = 0;
-  $_domain['sitename'] = variable_get('domain_sitename',
-    variable_get('site_name', 'Drupal'))
-  $_domain['subdomain'] = variable_get('domain_root', '')
-  $_domain['scheme'] = 'http'
-  $_domain['valid'] = TRUE
-  $_domain['path'] = http://example.com
-  $_domain['error'] = ''
+The default domain is marked in the {domain} table 'is_default' column.
 
 Some uses for this global variable might include:
 
@@ -1392,6 +1388,14 @@ contains the following structure:
   - valid
   Char, 1 default 1
   Indicates that this domain is active and can be accessed by site users.
+
+  - weight
+  Integer, default 0
+  The sort value for the domain. Signed integer, with lower being higher in a list.
+
+  - is_default
+  Char, 1 default 0
+  Indicates that this domain is the default.
 
 The {domain_access} table is a partial mirror of the {node_access} table and
 stores information specific to Domain Access.  Its structure is:

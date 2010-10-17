@@ -3,6 +3,10 @@
 16-OCT-2010
 -- #931468. Use MENU_VISIBLE_IN_BREADCRUMB where proper.
 -- Fixes drush script error in domain generation.
+-- Massive cleanup of domain handling, including new default domain settings.
+-- Cleans up weights and primary domain settings form.
+-- Paves way to remove domain id 0.
+-- Checks install/uninstall process with drush and UI.
 
 06-OCT-2010
 -- #933694 by arthurf. Fixes query error in domain_source_node_insert().

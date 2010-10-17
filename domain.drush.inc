@@ -182,11 +182,8 @@ function drush_domain_generate_domains($primary = 'example.com') {
       // For now, we have to reset this to id 0. Later, this will go away.
       db_update('domain')
         ->condition('subdomain', $primary)
-        ->fields(array('domain_id' => 0))
+        ->fields(array('domain_id' => 0, 'is_default' => 1))
         ->execute();
-      variable_set('domain_sitename', variable_get('site_name', 'Drupal'));
-      variable_set('domain_root', $item);
-      variable_set('domain_scheme', 'http');
     }
     drush_print(dt('Created !domain.', array('!domain' => $record['sitename'])));
   }
