@@ -82,6 +82,7 @@ function drush_domain_list() {
     'subdomain' => dt('domain'),
     'scheme' => dt('scheme'),
     'valid' => dt('active'),
+    'is_default' => dt('primary'),
     'domain_id' => dt('domain_id'),
   );
   $rows = array(array_values($header));
@@ -175,18 +176,17 @@ function drush_domain_generate_domains($primary = 'example.com') {
       'subdomain' => strtolower($item),
       'scheme' => 'http',
       'valid' => 1,
-      'weight' => ($item != $primary) ? $key + $start_weight + 1 : 0,
+      'weight' => ($item != $primary) ? $key + $start_weight + 1 : -1,
+      'is_default' => 0,
     );
     $created = domain_save($record, $record);
-    if ($item == $primary) {;
-      // For now, we have to reset this to id 0. Later, this will go away.
-      db_update('domain')
-        ->condition('subdomain', $primary)
-        ->fields(array('domain_id' => 0, 'is_default' => 1))
-        ->execute();
-    }
     drush_print(dt('Created !domain.', array('!domain' => $record['sitename'])));
   }
+  // For now, we have to reset this to id 0. Later, this will go away.
+  db_update('domain')
+    ->condition('subdomain', $primary)
+    ->fields(array('domain_id' => 0, 'is_default' => 1))
+    ->execute();
   if (empty($new)) {
     drush_print(dt('No new domains were created.'));
   }

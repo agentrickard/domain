@@ -906,8 +906,8 @@ function domain_load($domain_id = NULL) {
 function domain_save($values, $form_values) {
   // Must this be the default domain?
   // Used in cases where there are no domains present.
-  $count = db_query("SELECT COUNT(domain_id) FROM {domain}")->fetchField();
-  if ($count < 2) {
+  $count = (bool) db_query("SELECT COUNT(domain_id) FROM {domain} WHERE is_default = 1")->fetchField();
+  if (!$count) {
     $values['is_default'] = 1;
   }
   // Update or insert a record?
@@ -956,13 +956,13 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   // Run the lookup, if needed.
   if (!isset($domains[$key]) || $reset) {
     if ($subdomain) {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchAssoc();
+      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchAssoc();
     }
     elseif ($domain_id == 0) {
       $domain = domain_default();
     }
     else {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchAssoc();
+      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchAssoc();
     }
     // Did we get a valid result?
     if (isset($domain['domain_id'])) {
@@ -999,6 +999,7 @@ function domain_default($reset = FALSE) {
         'sitename' => variable_get('site_name', 'Drupal'),
         'scheme' => empty($_SERVER['HTTPS']) ? 'http' : 'https',
         'valid' => 1,
+        'is_default' => 1
       );
     }
     $default = domain_api($default);

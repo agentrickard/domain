@@ -20,13 +20,13 @@ function domain_schema() {
   $schema['domain'] = array(
     'description' => 'The base table for domain records',
     'fields' => array(
-      'domain_id' => array('type' => 'serial', 'not null' => TRUE),
-      'subdomain' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
-      'sitename' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => ''),
-      'scheme' => array('type' => 'varchar', 'length' => '8', 'not null' => TRUE, 'default' => 'http'),
-      'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1'),
-      'weight' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0),
-      'is_default' => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0)),
+      'domain_id' => array('type' => 'serial', 'not null' => TRUE, 'description' => 'Primary key'),
+      'subdomain' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'Registered DNS entry, will match HTTP_HOST requests'),
+      'sitename' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'Site display name'),
+      'scheme' => array('type' => 'varchar', 'length' => '8', 'not null' => TRUE, 'default' => 'http', 'description' => 'Protocol'),
+      'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1', 'description' => 'Active status'),
+      'weight' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0, 'description' => 'Sort order'),
+      'is_default' => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Indicates primary domain')),
     'primary key' => array('domain_id'),
     'indexes' => array(
       'subdomain' => array('subdomain'),
@@ -36,9 +36,9 @@ function domain_schema() {
   $schema['domain_access'] = array(
     'description' => 'Stores domain information for each node',
     'fields' => array(
-      'nid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-      'gid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-      'realm' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '')),
+      'nid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Node id, foreign key to {node}'),
+      'gid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Node access grant id'),
+      'realm' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'Node access realm')),
     'primary key' => array('nid', 'gid', 'realm'),
     'indexes' => array(
       'nid' => array('nid')
@@ -50,8 +50,8 @@ function domain_schema() {
   $schema['domain_editor'] = array(
     'description' => 'Stores domain information for each user',
     'fields' => array(
-      'uid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0),
-      'domain_id' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0)),
+      'uid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'User id, foreign key to {user}'),
+      'domain_id' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0, 'description' => 'Domain id, foreign key to {domain}')),
     'primary key' => array('uid', 'domain_id'),
     'foreign_keys' => array(
       'uid' => array('user' => 'uid'),

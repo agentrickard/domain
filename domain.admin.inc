@@ -58,13 +58,14 @@ function domain_overview_form($form, &$form_state) {
     );
     return $form;
   }
-  $delta = round(count($domains) / 2);
+  $delta = count($domains);
   $form['domain']['#tree'] = TRUE;
   $form['header'] = array(
     '#type' => 'value',
     '#value' => $header,
   );
   $options = array();
+  $i = -1;
   foreach ($domains as $domain) {
     $domain_array = (array) $domain;
     $options[$domain->domain_id] = '';
@@ -74,7 +75,7 @@ function domain_overview_form($form, &$form_state) {
     );
     $form['domain'][$domain->domain_id]['weight'] = array(
       '#type' => 'weight',
-      '#default_value' => $domain->weight,
+      '#default_value' => $i++,
       '#delta' => $delta,
       '#attributes' => array('class' => array('domain-weight')),
     );
@@ -461,6 +462,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#type' => 'weight',
     '#title' => t('Weight'),
     '#required' => TRUE,
+    '#delta' => count(domain_domains()),
     '#default_value' => isset($domain['weight']) ? $domain['weight'] : 0,
   );
   $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
