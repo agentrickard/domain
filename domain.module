@@ -2797,92 +2797,6 @@ function domain_field_extra_fields() {
 }
 
 /**
- * Implements hook_token_info().
- */
-function domain_token_info() {
-  $type = array(
-    'name' => t('Domains'),
-    'description' => t('Tokens related to domains.'),
-  );
-
-  // Current domain tokens.
-  $tokens['domain-id']  = array(
-    'name' => t('Domain id'),
-    'description' => t('The current domain ID.'),
-  );
-  $tokens['domain-name']  = array(
-    'name' => t('Domain name'),
-    'description' => t('The current domain name, lowercased and with only alphanumeric characters.'),
-  );
-  $tokens['domain-url']  = array(
-    'name' => t('Domain URL'),
-    'description' => t('The current domain\'s URL, lowercased and with only alphanumeric characters.'),
-  );
-  $tokens['domain-subdomain']  = array(
-    'name' => t('Subdomain'),
-    'description' => t('The current subdomain, lowercased and with only alphanumeric characters. Only works with *.example.com formats'),
-  );
-  // Default domain tokens.
-  $tokens['domain-default-id']  = array(
-    'name' => t('Default domain id'),
-    'description' => t('The default domain ID.'),
-  );
-  $tokens['domain-default-name']  = array(
-    'name' => t('Default domain name'),
-    'description' => t('The default domain name, lowercased and with only alphanumeric characters.'),
-  );
-  $tokens['domain-default-url']  = array(
-    'name' => t('Default domain URL'),
-    'description' => t('The default domain\'s URL, lowercased and with only alphanumeric characters.'),
-  );
-  return array(
-    'types' => array('domain' => $type),
-    'tokens' => array('domain' => $tokens),
-  );
-
-  return $tokens;
-}
-
-/**
- * Implements hook_tokens().
- */
-function domain_tokens($type, $tokens, array $data = array(), array $options = array()) {
-  // Only act on our tokens.
-  if ($type != 'domain') {
-    return;
-  }
-  // Get common elements.
-  $_domain = domain_get_domain();
-  $default_domain = domain_default(FALSE);
-  $subdomain_elements = explode('.', $_domain['subdomain']);
-  if (count($subdomain_elements) > 2) {
-    $subdomain = $subdomain_elements[0];
-  }
-  else {
-    $subdomain = 'www';
-  }
-
-  // Current domain tokens.
-  $tokens['domain-id'] = $_domain['domain_id'];
-  $tokens['domain-name'] = domain_url_encode($_domain['sitename']);
-  $tokens['domain-url'] = domain_url_encode($_domain['subdomain']);
-  $tokens['domain-subdomain'] = domain_url_encode($subdomain);
-
-  // Default domain
-  $tokens['domain-default-id'] = $default_domain['domain_id'];
-  $tokens['domain-default-name'] = domain_url_encode($default_domain['sitename']);
-  $tokens['domain-default-url'] = domain_url_encode($default_domain['subdomain']);
-
-  // Sanitize the tokens, if necessary.
-  if (!empty($options['sanitize'])) {
-    foreach ($tokens as $key => $value) {
-      $tokens[$key] = check_plain($value);
-    }
-  }
-  return $tokens;
-}
-
-/**
  * Simple function to clean strings for use in for example paths.
  */
 function domain_url_encode($string) {
@@ -2958,4 +2872,3 @@ function domain_alter_node_query(QueryAlterableInterface $query, $all_affiliates
     }
   }
 }
-
