@@ -1436,32 +1436,24 @@ The most important developer functions are the internal module hooks:
 
 The module provides the following replacement tokens.
 
-  'domain-id'
+  'current-domain:id'
     The current domain ID.
-  'domain-name'
+  'current-domain:name'
     The current domain name, lowercased and with only alphanumeric characters.
-  'domain-name-raw'
-    The current domain name. WARNING - raw user input. NOT path safe.
-  'domain-url'
-    The current domain\'s URL, lowercased and with only alphanumeric characters.
-  'domain-url-raw'
-    The current domain\'s URL. WARNING - raw user input. NOT path safe.
-  'domain-subdomain'
+  'current-domain:url'
+    The current domain's URL, lowercased and with only alphanumeric characters.
+  'current-domain:subdomain'
     The current subdomain, lowercased and with only alphanumeric characters.
     Only works with *.example.com formats
-  'domain-subdomain-raw'
-    The current subdomain. Only works with *.example.com formats. WARNING - raw
-    user input. NOT path safe.
-  'domain-default-id'
+  'default-domain:id'
     The default domain ID.
-  'domain-default-name'
+  'default-domain:name'
     The default domain name, lowercased and with only alphanumeric characters.
-  'domain-default-name-raw'
-    The default domain name. WARNING - raw user input. NOT path safe.
-  'domain-default-url'
+  'default-domain:url'
     The default domain\'s URL, lowercased and with only alphanumeric characters.
-  'domain-default-url-raw'
-    The default domain\'s URL. WARNING - raw user input. NOT path safe.
+  'default-domain:subdomain'
+    The default subdomain, lowercased and with only alphanumeric characters.
+    Only works with *.example.com formats
 
 ----
 8.  Drush commands
