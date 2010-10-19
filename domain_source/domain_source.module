@@ -338,7 +338,7 @@ function domain_source_validate($form, &$form_state) {
       // These cases are acceptable, so we let them pass.
       // I find this code easier to read than a compound negative IF statement.
     }
-    else if ($key == DOMAIN_SOURCE_IGNORE) {
+    elseif ($key == DOMAIN_SOURCE_IGNORE) {
       // In this case, we need to check all the selected nodes, which is resource intensive.
       $nodes = array_filter($form_state['values']['nodes']);
       foreach ($nodes as $nid) {
@@ -353,14 +353,14 @@ function domain_source_validate($form, &$form_state) {
           }
         }
         // Do not allow removal of the source domain when removing domains from the node.
-        else if (!empty($form_state['values']['domains'][$key])) {
+        elseif (!empty($form_state['values']['domains'][$key])) {
           $node = node_load($nid);
           form_set_error('domain_source', t('The source affiliate must be selected as a publishing option. %title is assigned to %domain.', array('%title' => $node->title, '%domain' => $source['sitename'])));
         }
       }
     }
     // The source domain must have been selected.
-    else if (empty($form_state['values']['domains'][$key])) {
+    elseif (empty($form_state['values']['domains'][$key])) {
       form_set_error('domain_source', t('The source affiliate must be selected as a publishing option.'));
     }
   }

@@ -2210,7 +2210,7 @@ function domain_grant_all($reset= FALSE) {
         $options['script'] = $script;
         $grant = TRUE;
       }
-      else if (variable_get('domain_xmlrpc_rule', 0) && $script == 'xmlrpc.php') {
+      elseif (variable_get('domain_xmlrpc_rule', 0) && $script == 'xmlrpc.php') {
         $options['script'] = $script;
         $grant = TRUE;
       }
