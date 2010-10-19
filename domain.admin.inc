@@ -32,7 +32,6 @@ function domain_overview_form($form, &$form_state) {
     array('data' => t('Site name')),
     array('data' => t('Domain')),
     array('data' => t('Id')),
-    array('data' => t('Scheme')),
   );
   // Get header elements from other modules
   $extra = module_invoke_all('domain_view', 'header');
@@ -90,10 +89,6 @@ function domain_overview_form($form, &$form_state) {
     $form['domain'][$domain->domain_id]['domain_id'] = array(
       '#type' => 'markup',
       '#markup' => check_plain($domain->domain_id),
-    );
-    $form['domain'][$domain->domain_id]['scheme'] = array(
-      '#type' => 'markup',
-      '#markup' => check_plain($domain->scheme),
     );
     $actions = array();
     $actions[] = l(t('edit'), 'admin/structure/domain/edit/' . $domain->domain_id);
