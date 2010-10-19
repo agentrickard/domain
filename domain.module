@@ -212,16 +212,6 @@ function domain_menu() {
     'description' => 'Create new domain record.',
     'weight' => -7
     );
-  $items['admin/structure/domain/advanced'] = array(
-    'title' => 'Node settings',
-    'access arguments' => array('administer domains'),
-    'type' => MENU_LOCAL_TASK,
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('domain_advanced_form'),
-    'file' => 'domain.admin.inc',
-    'description' => 'Configure content creation settings for domains.',
-    'weight' => -6
-  );
   // Register the batch actions as menu callbacks
   $batch = module_invoke_all('domain_batch');
   if (!empty($batch)) {
@@ -2175,16 +2165,6 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#type' => 'value',
       '#value' => $raw,
     );
-  }
-
-  // THIS SECTION BREAKS CCK if we don't check for cck_dummy_node_form!  See http://drupal.org/node/186624
-  // and note the !$form['#node']->cck_dummy_node_form in the IF check at the top of the function.
-  // Some editors cannot administer nodes, so we have to add these form elements.
-  if (user_access('edit domain nodes')) {
-    $access = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
-    foreach ($access as $item) {
-      $form[$item]['#access'] = TRUE;
-    }
   }
 }
 

@@ -164,11 +164,32 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     '#type' => 'radios',
     '#title' => t('New content settings'),
     '#required' => TRUE,
-    '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
+    '#default_value' => (int) variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
     '#options' => array(1 => t('Show on all affiliate sites'), 2 => t('Only show on selected sites')),
-    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.<br />If set to <em>Only show on selected sites</em>, you must configure the <a href="!url">Node-type specific settings</a>.', array('!url' => url('admin/structure/domain/advanced')))
+    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.')
   );
-
+  $node_types = node_type_get_names();
+  $form['domain_node'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Send to all affiliates'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#states' => array(
+      'visible' => array(
+        ':input[name=domain_behavior]' => array('value' => '2'),
+      ),
+    ),
+  );
+  foreach ($node_types as $key => $value) {
+    $form['domain_node']['domain_node_' . $key] = array(
+      '#type' => 'checkbox',
+      '#title' => check_plain($value),
+      '#default_value' => variable_get('domain_node_' . $key, 0),
+    );
+  }
+  $form['domain_node']['message'] = array(
+    '#markup' => t('If new content is set to "Show on all affiliate sites," these settings will be ignored.'),
+  );
   $form['domain_debug'] = array(
     '#type' => 'radios',
     '#title' => t('Debugging status'),

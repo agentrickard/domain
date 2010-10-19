@@ -42,6 +42,7 @@ CONTENTS
 4.2.2   Altering Domain Name Validation
 4.3   Domain Module Behaviors
 4.3.1   New Content Settings
+4.3.1.1   Send to All Affiliates
 4.3.2   Debugging Status
 4.3.3   Enforce Rules on Adminstrators
 4.3.4   Domain List Size
@@ -52,19 +53,15 @@ CONTENTS
 4.4.2   Search Engine Optimization
 4.4.3   Default Source Domain
 4.4.4   WWW Prefix Handling
-4.4.5   Node Access Settings
 4.5   Special Page Requests
 4.5.1   Cron Handling
 4.5.2   XMLRPC Handling
 4.6   Node Link Patterns
 4.7   The Domain List
-4.8   Node Settings
-4.8.1   Domain Node Editing
-4.8.2   Domain Node Types
-4.9   Batch Updating
-4.10  Assigning Users to Domains
-4.11  Batch Assignment of Users to Domains
-4.11.1  Form Behavior
+4.8   Batch Updating
+4.9  Assigning Users to Domains
+4.10  Batch Assignment of Users to Domains
+4.10.1  Form Behavior
 5.  Blocks
 5.1   Block -- Domain Switcher
 5.2   Block -- Domain Access Information
@@ -712,8 +709,18 @@ module automatically assigns all content to the currently active domain.
 If this value is set to 'Show on all sites,' then all new content will be
 assigned to all sites _in addition to_ the active domain.
 
-If you set this value to 'Only show on selected sites,' you must configure
-the Node type settings described in section 4.8.2.
+If you set this value to 'Only show on selected sites,' you will be shown
+configuration options per node type, as descbied in 4.3.1.1.
+
+----
+4.3.1.1   Send to All Affiliates
+
+This setting presents a list of all active node types on your site.  By
+checking the box, nodes for that given type will automatically be assigned to
+'all affiliate sites' during node creation and editing.
+
+This setting is only used if the New Content Settings are set to "Only
+show on selected sites."
 
 ----
 4.3.2   Debugging Status
@@ -834,47 +841,6 @@ had requested one.example.com.
 This feature was requested by Rick and Matt at DZone.com
 
 ----
-4.4.5  Node Access Settings
-
-This setting controls how you want Domain Access to interact with other
-node access modules.
-
-If you _are not_ using a module such as Organic Groups or Taxonomy
-Access Control, this setting may be disabled.  This setting is only
-required IF:
-
-  -- You are using more than one node access control module.
-  -- You want to strictly enforce access permissions by requiring
-  both Domain Access and your other module to grant permission.
-
-
-By design, the node access system in Drupal 5 is a permissive system.
-That is, if you are using multiple node access modules, the permissions
-are checked using an OR syntax.
-
-As a result, if any node access module grants access to a node, the user
-is granted access.
-
-The included multiple_node_access.patch (discussed in 2.1.1) alters this
-behavior.  The patch allows Drupal to use AND logic when running more
-than one node access module.
-
-For example, when using OG and DA, Drupal's default behavior is:
-
-  -- Return TRUE if OG is TRUE -or- DA is TRUE.
-
-This patch allows you to enforce the rule as:
-
-  -- Return TRUE if OG is TRUE -and- DA is TRUE.
-
-By design, the default behavior is to use Drupal's OR logic.
-
-For more information, see http://drupal.org/node/191375.
-
-Enabling this feature requires the multiple_node_access patch discussed
-in 2.1.1.
-
-----
 4.5   Special Page Requests
 
 For this feature to work, you must follow the instructions in INSTALL.txt
@@ -991,36 +957,7 @@ Record zero (0) is hardcoded to refer to the "root" site defined as your
 Primary domain name.
 
 ----
-4.8 Node Settings
-
-The Node settings page is divided into two parts, each with a different purpose.
-
-----
-4.8.1 Domain Node Editing
-
-The top section 'Domain node editing' is required for those sites that use the
-advanced editing techniques outlined in section 3.
-
-For users without the 'administer nodes' permission, certain elements of the
-node editing form are hidden. These settings allow the site administrator to
-enable users with the 'edit domain nodes' permission to have access to those
-restricted fields.
-
-By default, 'Comment settings', 'Delete node', 'Publshing options', and 'Path
-aliasing' are enabled.
-
-----
-4.8.2 Domain Node Types
-
-The lower section 'Domain node types' is used to extend the 'New content
-settings' described in 4.1.
-
-Domain node types presents a list of all active node types on your site.  By
-checking the box, nodes for that given type will automatically be assigned to
-'all affiliate sites' during node creation and editing.
-
-----
-4.9   Batch Updating
+4.8   Batch Updating
 
 The module provides for batch actions for common tasks.  These actions are
 useful for making rapid changes across all domains.  The following actions
@@ -1046,7 +983,7 @@ For global settings to apply, you must check the 'Apply to all domains'
 box before submitting the form.
 
 ----
-4.10  Assigning Users to Domains
+4.9  Assigning Users to Domains
 
 New in 6.x.2 is the concept of 'user defaults.' These settings are used to
 assign users to domains basd on the user's site roles.
@@ -1091,7 +1028,7 @@ Settings for the 'new user' are permanently saved to the user account.
 See http://drupal.org/node/313629 for some background about this feature.
 
 ----
-4.11 Batch Assignment of Users to Domains
+4.10 Batch Assignment of Users to Domains
 
 In 6.x.2 and higher, users with the 'administer users' and 'assign domain
 editors' permissions may use the User administration page to batch assign
@@ -1113,7 +1050,7 @@ currently assigned to.
 If these elements do not appear, you do not have the proper permissions.
 
 ----
-4.11.1 Form Behavior
+4.10.1 Form Behavior
 
 In 6.x.2.5 and higher, you may select one of two options when updating domains.
 
