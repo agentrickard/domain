@@ -2056,7 +2056,10 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
           }
           if (!empty($list)) {
             $form['domain']['domains_notes'] = array(
-             '#markup' => '<label><strong>' . t('Publishing status:') . '</strong></label>' . theme('item_list', array('items' => $list)) . '<div class="description">' . t('This content has also been published to these affiliates.') . '</div>',
+              '#type' => 'item',
+              '#title' => t('Publishing status'),
+              '#markup' => theme('item_list', array('items' => $list)),
+              '#description' => t('This content has also been published to these affiliates.'),
             );
           }
           break;

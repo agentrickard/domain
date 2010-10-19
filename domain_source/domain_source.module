@@ -85,8 +85,9 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
       else {
         $name = ($source != -5) ? $domains[$source]['sitename'] : t('the active domain');
         $form['domain']['domain_source_notes'] = array(
-          '#value' => '<label><strong>' . t('Source domain:') . '</strong></label><div class="description">'.
-            t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $name)) . '</div>',
+          '#type' => 'item',
+          '#title' => t('Source domain'),
+          '#markup' => t('This content is assigned to %domain and cannot be reassigned.', array('%domain' => $name)),
         );
       }
     }

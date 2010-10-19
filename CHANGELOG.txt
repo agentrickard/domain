@@ -1,5 +1,8 @@
 // $Id$
 
+19-OCT-2010
+-- Fixes form use of "item" vs. "markup".
+
 16-OCT-2010
 -- #931468. Use MENU_VISIBLE_IN_BREADCRUMB where proper.
 -- Proper validation check for a (.) in domain names.
