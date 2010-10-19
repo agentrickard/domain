@@ -10,7 +10,7 @@
 
 /**
  * Implements hook_domain_link()
- */
+    DEPRECATED
 function domain_content_domain_link($domain) {
   $links[] = array(
     'title' => t('content'),
@@ -18,3 +18,4 @@ function domain_content_domain_link($domain) {
   );
   return $links;
 }
+*/

@@ -2,31 +2,6 @@
 // $Id$
 
 /**
- * @file
- * Domain hooks for Domain Conf.
- *
- * @ingroup domain_conf
- */
-
-/**
- * Implements hook_domain_link()
- */
-function domain_conf_domain_link($domain) {
-  static $extra;
-  if (!isset($extra)) {
-    $extra = domain_conf_api();
-  }
-  if ($domain['domain_id'] > 0 || !empty($extra)) {
-    $links[] = array(
-      'title' => t('settings'),
-      'path' => 'admin/structure/domain/conf/' . $domain['domain_id']
-    );
-    return $links;
-  }
-  return FALSE;
-}
-
-/**
  * Implements hook_domain_warning()
  */
 function domain_conf_domain_warning() {

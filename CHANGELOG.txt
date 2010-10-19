@@ -8,6 +8,10 @@
 -- Removes node editing form settings.
 -- Removes node settings tab.
 -- Clarifies use of Send to All Affiliates setting.
+-- Cleans up admin forms and actions.
+-- Deprecates hook_domainview().
+-- Deprecates hook_domainlinks().
+-- Moves menu sub-items to local tasks.
 
 18-OCT-2010
 -- #361018 by Dave Reid. Updates to new Token API.

@@ -86,40 +86,6 @@ function hook_domain_delete($domain, $form_values = array()) {
 }
 
 /**
- * Returns links to additional functions for the Domain Access module's admin screen
- *
- * Note that if your page requires a user_access check other than 'administer domains'
- * you should explictly check permissions before returning the array.
- *
- * @param $domain
- *   An array of data for the active domain, taken from the {domain} table.
- *   - domain_id -- the unique identifier of this domain
- *   - subdomain -- the host path of the url for this domain
- *   - sitename -- the human-readable name of this domain
- *
- * @return
- *   An array of links to append to the admin screen, in the format:
- *   - title -- the link title
- *   - path -- the link path (a Drupal-formatted path)
- *   The data returned by this function will be passed through the l() function.
- *
- *  If you do not provide a link for a specific domain, return FALSE.
- *
- * @ingroup domain_hooks
- */
-function hook_domain_link($domain) {
-  // These actions do not apply to the primary domain.
-  if (user_access('my permission') && $domain['domain_id'] > 0) {
-    $links[] = array(
-      'title' => t('settings'),
-      'path' => 'admin/structure/domain/myaction/' . $domain['domain_id']
-    );
-    return $links;
-  }
-  return FALSE;
-}
-
-/**
  * Enables modules to add additional parameters to the $domain array
  * for use by the Domain Navigation module.
  *
@@ -188,45 +154,6 @@ function hook_domain_install() {
   // If MyModule is being used, check to see that it is installed correctly.
   if (module_exists('mymodule') && !function_exists('_mymodule_load')) {
     drupal_set_message(t('MyModule is not installed correctly.  Please edit your settings.php file as described in <a href="!url">INSTALL.txt</a>', array('!url' => drupal_get_path('module', 'mymodule') . '/INSTALL.txt')));
-  }
-}
-
-/**
- * Allows Domain modules to add columns to the domain list view at
- * path 'admin/structure/domain/view'.
- *
- * @param $op
- *   The operation being performed.  Valid requests are:
- *   -- 'header' defines a column header according to theme_table.
- *   -- 'query' passes the query object that defines the table structure.
- *       Your module should add its joins and fields here.
- *   -- 'data' defines the data to be written in the column for the
- *       specified domain. These will match the order of your $header.
- * @param $domain
- *   The $domain object prepared by hook_domain_load().
- * @return
- *   Return values vary based on the $op value.
- *   -- 'header' return a $header array formatted as per theme_table().
- *   -- 'query' modify the $query object. For details see
- *       @link http://drupal.org/node/310075
- *   -- 'data' return an array of $data elements to print in the row.
- *
- * @see domain_user_domaininfo()
- *
- * @ingroup domain_hooks
- */
-function hook_domain_view($op, $domain = array(), $query = NULL) {
-  switch ($op) {
-    case 'header':
-      return array(array('data' => t('UID'), 'field' => 'de.uid'));
-      break;
-    case 'query':
-      $query->leftJoin('domain_editor', 'de', 'd.domain_id = de.domain_id');
-      $query->addField('de', 'uid');
-      break;
-    case 'data':
-      return array($domain['uid']);
-      break;
   }
 }
 

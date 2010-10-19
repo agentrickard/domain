@@ -211,7 +211,7 @@ function domain_menu() {
     'file' => 'domain.admin.inc',
     'description' => 'Create new domain record.',
     'weight' => -7
-    );
+  );
   // Register the batch actions as menu callbacks
   $batch = module_invoke_all('domain_batch');
   if (!empty($batch)) {
@@ -248,25 +248,46 @@ function domain_menu() {
     'description' => 'Default domain settings for users.',
     'weight' => -4
   );
-  $items['admin/structure/domain/edit/%domain'] = array(
-    'title' => 'Edit domain record',
+  $items['admin/structure/domain/view/%domain'] = array(
+    'title' => 'View',
+    'title callback' => 'domain_title',
+    'title arguments' => array(4),
     'access arguments' => array('administer domains'),
-    'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_form', 4),
     'description' => 'Edit domain record.',
     'file' => 'domain.admin.inc',
+    'weight' => -10,
   );
-  $items['admin/structure/domain/delete/%domain'] = array(
-    'title' => 'Delete domain record',
+  $items['admin/structure/domain/view/%domain/edit'] = array(
+    'title' => 'Edit',
     'access arguments' => array('administer domains'),
-    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/structure/domain/view/%domain/delete'] = array(
+    'title' => 'Delete',
+    'access arguments' => array('administer domains'),
+    'type' => MENU_LOCAL_TASK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('domain_delete_form', 4),
     'description' => 'Delete domain record.',
     'file' => 'domain.admin.inc',
+    'weight' => 50,
   );
   return $items;
+}
+
+/**
+ * Set the title of a menu callback for domain edits.
+ *
+ * @param $domain
+ *   The domain array.
+ * @return
+ *   A title string.
+ */
+function domain_title($domain) {
+  return $domain['subdomain'];
 }
 
 /**
@@ -348,9 +369,6 @@ function domain_hook_info() {
   $hooks['domain_delete'] = array(
     'group' => 'domain',
   );
-  $hooks['domain_link'] = array(
-    'group' => 'domain',
-  );
   $hooks['domain_cron'] = array(
     'group' => 'domain',
   );
@@ -358,9 +376,6 @@ function domain_hook_info() {
     'group' => 'domain',
   );
   $hooks['domain_ignore'] = array(
-    'group' => 'domain',
-  );
-  $hooks['domain_view'] = array(
     'group' => 'domain',
   );
   // Replace with form alter?

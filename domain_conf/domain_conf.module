@@ -78,15 +78,15 @@ function domain_conf_init() {
  */
 function domain_conf_menu() {
   $items = array();
-  $items['admin/structure/domain/conf/%domain'] = array(
-    'title' => 'Domain site settings',
-    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  $items['admin/structure/domain/view/%domain/config'] = array(
+    'title' => 'Settings',
+    'type' => MENU_LOCAL_TASK,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_conf_page',
     'page arguments' => array(4),
     'file' => 'domain_conf.admin.inc',
   );
-  $items['admin/structure/domain/conf-reset/%domain'] = array(
+  $items['admin/structure/domain/view/%domain/conf-reset'] = array(
     'title' => 'Domain site settings',
     'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),

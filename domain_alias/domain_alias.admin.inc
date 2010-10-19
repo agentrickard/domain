@@ -34,7 +34,7 @@ function domain_alias($domain) {
  */
 function domain_alias_form($form, &$form_state, $domain, $arguments = array()) {
   $form = array();
-  drupal_set_title(t('Edit domain aliases for !domain', array('!domain' => $domain['subdomain'])));
+  drupal_set_title(t('Aliases for !domain', array('!domain' => $domain['subdomain'])));
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   $record_edit_url = 'admin/build/domain/' . ($domain['domain_id'] == 0 ? '' : 'edit/' . $domain['domain_id']);
   $form['domain_help'] = array(

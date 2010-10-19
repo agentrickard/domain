@@ -32,20 +32,18 @@ function domain_overview_form($form, &$form_state) {
     array('data' => t('Site name')),
     array('data' => t('Domain')),
     array('data' => t('Id')),
+    array('data' => t('Active')),
+    array('data' => t('Default')),
+    array('data' => t('Operations')),
   );
-  // Get header elements from other modules
-  $extra = module_invoke_all('domain_view', 'header');
-  $header = array_merge($header, $extra);
-  $header[] = array('data' => t('Operations'));
-  $header[] = array('data' => t('Status'));
-  $header[] = array('data' => t('Default'));
   // Set up the base query.
+  $limit = variable_get('domain_list_size', DOMAIN_LIST_SIZE);
+  $page = isset($_GET['page']) ? $_GET['page'] : 0;
   $query = db_select('domain', 'd')
-    ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid', 'weight', 'is_default'));
-  // Get any tablesort sql from other modules.
-  module_invoke_all('domain_view', 'query', array(), $query);
-  $query->orderBy('weight');
-  $query->extend('PagerDefault')->limit(variable_get('domain_list_size', DOMAIN_LIST_SIZE));
+    ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid', 'weight', 'is_default'))
+    ->orderBy('weight')
+    ->extend('PagerDefault')
+    ->limit($limit);
   // Get the domains.
   $result = $query->execute();
   foreach ($result as $data) {
@@ -57,7 +55,7 @@ function domain_overview_form($form, &$form_state) {
     );
     return $form;
   }
-  $delta = count($domains);
+  $delta = count(domain_domains());
   $form['domain']['#tree'] = TRUE;
   $form['header'] = array(
     '#type' => 'value',
@@ -74,7 +72,7 @@ function domain_overview_form($form, &$form_state) {
     );
     $form['domain'][$domain->domain_id]['weight'] = array(
       '#type' => 'weight',
-      '#default_value' => $i++,
+      '#default_value' => ($page * $limit) + $i++,
       '#delta' => $delta,
       '#attributes' => array('class' => array('domain-weight')),
     );
@@ -90,17 +88,14 @@ function domain_overview_form($form, &$form_state) {
       '#type' => 'markup',
       '#markup' => check_plain($domain->domain_id),
     );
-    $actions = array();
-    $actions[] = l(t('edit'), 'admin/structure/domain/edit/' . $domain->domain_id);
-    $actions[] = l(t('delete'), 'admin/structure/domain/delete/' . $domain->domain_id);
-    $form['domain'][$domain->domain_id]['actions'] = array(
-      '#type' => 'markup',
-      '#markup' => implode(' ', $actions),
-    );
     $form['domain'][$domain->domain_id]['valid'] = array(
       '#type' => 'checkbox',
-      '#title' => !empty($domain->valid) ? t('Active') : t('Inactive'),
+      // '#title' => !empty($domain->valid) ? t('Active') : t('Inactive'),
       '#default_value' => !empty($domain->valid),
+    );
+    $form['domain_actions'][$domain->domain_id] = array(
+      '#type' => 'markup',
+      '#markup' => l(t('edit domain'), 'admin/structure/domain/view/' . $domain->domain_id . '/edit'),
     );
   }
   $form['default_domain'] = array(
@@ -108,7 +103,9 @@ function domain_overview_form($form, &$form_state) {
     '#options' => $options,
     '#default_value' => $default['domain_id'],
   );
-
+  $form['pager'] = array(
+    '#markup' => theme('pager'),
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save'),
@@ -429,18 +426,13 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     }
   }
   $form = array();
-  
+  drupal_set_title(t('Edit !domain', array('!domain' => $domain['subdomain'])));
   $form['#domain'] = $domain; 
   // The $arguments arrray allows other modules to pass values to change the bahavior
   // of submit and validate functions.
   if (!empty($arguments)) {
     $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
   }
-  $form['domain'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Domain record'),
-    '#collapsible' => TRUE
-  );
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   if (!variable_get('domain_allow_non_ascii', FALSE)) {
     $description = t('Can only contain lowercase alphanumeric characters, dashes and a colon (if using alternative ports).');
@@ -560,7 +552,7 @@ function domain_form_submit($form, &$form_state) {
 function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
   // This action should be performed from the primary domain.
   domain_check_primary();
-
+  drupal_set_title(t('Delete !domain', array('!domain' => $domain['sitename'])));
   $form = array();
   // The $arguments arrray allows other modules to pass values to change the bahavior
   // of submit and validate functions.
@@ -1102,6 +1094,7 @@ function theme_domain_overview_form($variables) {
       );
     }
     $row[] = drupal_render($form['default_domain'][$key]);
+    $row[] = drupal_render($form['domain_actions'][$key]);
     $rows[] = array(
       'data' => $row,
       'class' => array('draggable'),

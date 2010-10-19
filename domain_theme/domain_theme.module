@@ -71,15 +71,15 @@ function domain_theme_set_variables($theme) {
 function domain_theme_menu() {
   $items = array();
   // Menu items for configuring themes.
-  $items['admin/structure/domain/theme/%domain'] = array(
-    'title' => 'Domain theme settings',
-    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  $items['admin/structure/domain/view/%domain/theme'] = array(
+    'title' => 'Theme',
+    'type' => MENU_LOCAL_TASK,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_theme_page',
     'page arguments' => array(4),
     'file' => 'domain_theme.admin.inc',
   );
-  $items['admin/structure/domain/theme-reset/%domain'] = array(
+  $items['admin/structure/domain/view/%domain/theme-reset'] = array(
     'title' => 'Domain theme settings',
     'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),
@@ -87,12 +87,12 @@ function domain_theme_menu() {
     'page arguments' => array(4),
     'file' => 'domain_theme.admin.inc',
   );
-  $items['admin/structure/domain/theme/%/%domain/theme-settings'] = array(
+  $items['admin/structure/domain/view/%domain/theme/%/theme-settings'] = array(
     'title' => 'Configure domain theme settings',
     'type' => MENU_VISIBLE_IN_BREADCRUMB,
     'access arguments' => array('administer domains'),
     'page callback' => 'domain_theme_settings',
-    'page arguments' => array(4, 5),
+    'page arguments' => array(4, 6),
     'file' => 'domain_theme.admin.inc',
   );
   return $items;
@@ -222,7 +222,7 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id != 'system_theme_settings' || arg(2) != 'domain') {
     return;
   }
-  $theme = arg(4);
+  $theme = arg(6);
   $domain_id = arg(5);
   $themes = list_themes();
 

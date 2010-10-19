@@ -73,10 +73,10 @@ function domain_alias_init() {
  */
 function domain_alias_menu() {
   $items = array();
-  $items['admin/structure/domain/alias/%domain'] = array(
-    'title' => 'Edit domain aliases',
+  $items['admin/structure/domain/view/%domain/alias'] = array(
+    'title' => 'Aliases',
     'access arguments' => array('administer domains'),
-    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+    'type' => MENU_LOCAL_TASK,
     'page callback' => 'domain_alias',
     'page arguments' => array(4),
     'file' => 'domain_alias.admin.inc',

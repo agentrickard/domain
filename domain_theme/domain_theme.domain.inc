@@ -62,20 +62,6 @@ function domain_theme_domain_batch() {
 }
 
 /**
- * Implements hook_domain_link()
- */
-function domain_theme_domain_link($domain) {
-  if ($domain['domain_id'] > 0) {
-    $links[] = array(
-      'title' => t('theme'),
-      'path' => 'admin/structure/domain/theme/' . $domain['domain_id']
-    );
-    return $links;
-  }
-  return FALSE;
-}
-
-/**
  * Implements hook_domain_warning()
  */
 function domain_theme_domain_warning() {
