@@ -2028,6 +2028,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#title' => t('Domain access options'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
+      '#group' => variable_get('domain_vertical_tab', 0) ? 'additional_settings' : '',
     );
     $form['domain']['domain_site'] = array(
       '#type' => 'checkbox',

@@ -79,6 +79,7 @@ function domain_uninstall() {
     'domain_search',
     'domain_select_format',
     'domain_seo',
+    'domain_vertical_tab',
     'domain_www',
     'domain_xmlrpc_rule',
   );

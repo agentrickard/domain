@@ -3,6 +3,8 @@
 19-OCT-2010
 -- Fixes form use of "item" vs. "markup".
 -- Code cleanup.
+-- Adds setting to place Domain settings in a vertical tab.
+-- Cleans up README.
 
 18-OCT-2010
 -- #361018 by Dave Reid. Updates to new Token API.

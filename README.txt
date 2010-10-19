@@ -44,8 +44,9 @@ CONTENTS
 4.3.1   New Content Settings
 4.3.2   Debugging Status
 4.3.3   Enforce Rules on Adminstrators
-4.3.4   Sort Domain Lists
-4.3.5   Domain Selection Format
+4.3.4   Domain List Size
+4.3.5   Display in Vertical Tabs
+4.3.6   Domain Selection Format
 4.4   Advanced Settings
 4.4.1   Search Settings
 4.4.2   Search Engine Optimization
@@ -741,14 +742,20 @@ NOTE: This feature _only_ applies Domain Access rules. if you are using
 multiple node access modules, not all rules will be applied.
 
 ----
-4.3.4   Sort Domain Lists
+4.3.4   Domain List Size
 
-Both the Domain Switcher block and the Domain Nav module provide an
-end-user visible list of domains.  Use the 'weight' value of each domain
-to set its sort order. Lower values float to the top of lists.
+Sets a break point for the size of domain lists shown to users. If you have a
+large number of domains (e.g. more than 20), you may set this value to
+allow for pagination and truncation of domain lists.
 
 ----
-4.3.5   Domain Selection Format
+4.3.5   Display in Vertical Tabs
+
+When set to 'Yes', places the Domain options in a vertical tab on the node
+editing form.
+
+----
+4.3.6   Domain Selection Format
 
 Controls the form element display when choosing a list of domains. By
 default, Domain Access shows checkboxes, but if your site has a large
