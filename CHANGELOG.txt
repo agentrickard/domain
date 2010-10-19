@@ -1,5 +1,9 @@
 // $Id$
 
+19-OCT-2010
+-- Fixes form use of "item" vs. "markup".
+-- Code cleanup.
+
 18-OCT-2010
 -- #361018 by Dave Reid. Updates to new Token API.
 -- Updates token documentation.
