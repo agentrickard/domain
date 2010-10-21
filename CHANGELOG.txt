@@ -3,6 +3,7 @@
 21-OCT-2010
 -- Adds first two SimpleTests!
 -- Cleans up minor PHP notices.
+-- More tests.
 
 19-OCT-2010
 -- Fixes form use of "item" vs. "markup".

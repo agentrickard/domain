@@ -20,11 +20,36 @@ class DomainTestCase extends DrupalWebTestCase {
       ->condition('is_default', 1)
       ->fields(array('sitename' => 'TestDomainSitename'))
       ->execute();
+    // Create some nodes and users.
+    for ($i = 0; $i < 10; $i++) {
+      $settings = array(
+        'type' => 'page',
+        'title' => $this->randomName(32),
+        'body' => array(LANGUAGE_NONE => array(array($this->randomName(64)))),
+      );
+      $this->drupalCreateNode($settings);
+      // Using drupalCreateUser runs tests we don't want.
+      $edit = array(
+        'name' => $this->randomName(32),
+        'mail' => $this->randomName(32) . '@example.com',
+        'roles' => array(DRUPAL_AUTHENTICATED_RID),
+        'status' => 1,
+      );
+      user_save(NULL, $edit);
+    }
+    // Delete records so we can test the installer.
+    db_query("TRUNCATE {domain_access}");
+    db_query("TRUNCATE {domain_editor}");
   }
 
-
-  // Helper function to create domains.
-  
+  /**
+   * Helper function to create domains.
+   *
+   * @param $base
+   *   A base domain string, in the format 'example.com'.
+   * @return
+   *  An array of subdomain strings.
+   */
   public function DomainCreateDomains($base = NULL) {
     $setup = array(
       'one',
@@ -65,7 +90,7 @@ class DomainInstallTest extends DomainTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Check primary domain',
+      'name' => 'Check install routine',
       'description' => 'Create primary domain record and verify its consistency in the database.',
       'group' => 'Domain Access',
     );
@@ -75,6 +100,35 @@ class DomainInstallTest extends DomainTestCase {
   public function testDomainInstall() {
     $domain = db_query("SELECT sitename FROM {domain} WHERE is_default = 1")->fetch();
     $this->assertTrue($domain->sitename == 'TestDomainSitename', t('Default domain created successfully'));
+  }
+
+  // Check the existence of our default grant.
+  public function testDomainGrantAll() {
+    domain_set_default_grant(TRUE);
+    $check = db_query_range("SELECT 1 FROM {node_access} WHERE realm = :realm AND gid = :gid", 0, 1,
+      array(
+        ':realm' => 'domain_all',
+        ':gid' => 0,
+      )
+    )->fetchField();
+    $this->assertTrue($check > 0, t('Domain all grant stored correctly !check.', array('!check' => $check)));
+  }
+
+  public function testDomainEnable() {
+    // Check nodes.
+    $nid = db_query_range("SELECT n.nid FROM {node} n INNER JOIN {domain_access} da ON n.nid = da.nid", 0, 1)->fetchField();
+    $this->assertTrue(empty($nid), t('Initial nodes have no domain data.'));
+    // Check users.
+    $uid = db_query_range("SELECT u.uid FROM {users} u INNER JOIN {domain_editor} de ON u.uid = de.uid", 0, 1)->fetchField();
+    $this->assertTrue(empty($uid), t('Initial users have no domain data.'));
+    // Run domain_enable.
+    domain_enable();
+    // Check nodes.
+    $nid = db_query_range("SELECT n.nid FROM {node} n INNER JOIN {domain_access} da ON n.nid = da.nid", 0, 1)->fetchField();
+    $this->assertTrue(!empty($nid), t('Nodes have added domain data.'));
+    // Check users.
+    $uid = db_query_range("SELECT u.uid FROM {users} u INNER JOIN {domain_editor} de ON u.uid = de.uid", 0, 1)->fetchField();
+    $this->assertTrue(!empty($uid), t('Users have added domain data.'));
   }
 
 }
@@ -89,7 +143,7 @@ class DomainCreateTest extends DomainTestCase {
     );
   }
   
-  // Create some domains.
+  // Create some domains and verify they match what we expect.
   public function testDomainCreate() {
     $setup = $this->DomainCreateDomains();
     $result = db_query("SELECT sitename, subdomain FROM {domain} WHERE is_default = 0 ORDER BY weight");

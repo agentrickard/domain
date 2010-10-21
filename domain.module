@@ -1856,10 +1856,13 @@ function _domain_store_grants($nid, $grants = array()) {
 
 /**
  * Ensure that the 'domain_all' grant is present.
+ *
+ * @param $reset
+ *   A boolean flag indicating whether to reset the static variable or not.
  */
-function domain_set_default_grant() {
+function domain_set_default_grant($reset = FALSE) {
   static $check = NULL;
-  if (is_null($check)) {
+  if (is_null($check) || $reset) {
     $check = (bool) db_query_range("SELECT 1 FROM {node_access} WHERE realm = :realm AND gid = :gid", 0, 1,
       array(
         ':realm' => 'domain_all',
@@ -1890,7 +1893,7 @@ function domain_set_default_grant() {
  */
 function domain_enable() {
   // Set the default 'domain_all' grant for special pages.
-  domain_set_default_grant();
+  domain_set_default_grant(TRUE);
   // Get the default domain.
   $default = domain_default();
   // Thanks to the new way that batch processing of node grants is handled, we have to
