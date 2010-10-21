@@ -1,5 +1,9 @@
 // $Id$
 
+21-OCT-2010
+
+-- #948668 by sgabe (part 1). Fixes typo in domain_block.
+
 16-OCT-2010
 
 -- Proper validation check for a (.) in domain names.
