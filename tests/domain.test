@@ -6,18 +6,99 @@
  * @file
  * Simpletest for Domain Access
  */
-class DomainCreateTest extends DrupalTestCase {
+class DomainTestCase extends DrupalWebTestCase {
 
-  function get_info() {
-    return array(
-      'name' => t('Domain creation'),
-      'desc' => t('Create domain record and verify its consistency in the database.'),
-      'group' => t('Domain Access'),
-    );
+  // On setup, install our module and create a default domain.
+  public function setUp() {
+    parent::setUp('domain');
+    db_query("TRUNCATE {domain}");
+    if (empty($_SERVER['HTTP_HOST'])) {
+      $_SERVER['HTTP_HOST'] = 'example.com';
+    }
+    domain_set_primary_domain();
+    db_update('domain')
+      ->condition('is_default', 1)
+      ->fields(array('sitename' => 'TestDomainSitename'))
+      ->execute();
   }
 
-  function testCreateDomain() {
-    $domain = $this->randomName();
+
+  // Helper function to create domains.
+  
+  public function DomainCreateDomains($base = NULL) {
+    $setup = array(
+      'one',
+      'two',
+      'three',
+    );
+    $setup = drupal_map_assoc($setup);
+    $base_domain = $base;
+    if (empty($base_domain) && !empty($_SERVER['HTTP_HOST'])) {
+      $base_domain = $_SERVER['HTTP_HOST'];
+    }
+    if (empty($base_domain)) {
+      $base_domain = 'example.com';
+    }
+    $i = 0;
+    foreach ($setup as $subdomain) {
+      $record = array(
+        'sitename' => $subdomain,
+        'subdomain' => $subdomain . '.' . $base_domain,
+        'valid' => 1,
+        'is_default' => 0,
+        'weight' => $i++,
+        'scheme' => 'http',
+      );
+      domain_save($record, $record);
+    }
+    return $setup;
+  }
+
+
+  public function tearDown() {
+    parent::tearDown();
+  }
+
+}
+
+class DomainInstallTest extends DomainTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Check primary domain',
+      'description' => 'Create primary domain record and verify its consistency in the database.',
+      'group' => 'Domain Access',
+    );
+  }
+  
+  // If the default domain is not in the database, the sitename will be default sitename.
+  public function testDomainInstall() {
+    $domain = db_query("SELECT sitename FROM {domain} WHERE is_default = 1")->fetch();
+    $this->assertTrue($domain->sitename == 'TestDomainSitename', t('Default domain created successfully'));
+  }
+
+}
+
+class DomainCreateTest extends DomainTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Create domains',
+      'description' => 'Create random domains and verify consistency in the database.',
+      'group' => 'Domain Access',
+    );
+  }
+  
+  // Create some domains.
+  public function testDomainCreate() {
+    $setup = $this->DomainCreateDomains();
+    $result = db_query("SELECT sitename, subdomain FROM {domain} WHERE is_default = 0 ORDER BY weight");
+    foreach ($result as $record) {
+      $domains[$record->sitename] = array('sitename' => $record->sitename, 'subdomain' => $record->subdomain);
+    }
+    foreach ($domains as $sitename => $domain) {
+      $this->assertTrue($domains[$sitename]['sitename'] == $setup[$sitename], t('Domain %subdomain created successfully', array('%subdomain' => $domain['subdomain'])));
+    }
   }
 
 }

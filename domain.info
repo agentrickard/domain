@@ -10,3 +10,4 @@ files[] = domain.bootstrap.inc
 files[] = domain.module
 files[] = settings_custom_url.inc
 files[] = settings.inc
+files[] = tests/domain.test

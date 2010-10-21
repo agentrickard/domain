@@ -280,7 +280,7 @@ function _domain_alias_placeholders_from_sql($subdomain) {
  *   An array of all aliases defined for given domain_id, indexed by alias_id
  */
 function domain_alias_list($domain_id, $reset = FALSE) {
-  static $aliases = Array();
+  static $aliases = array();
   if (!isset($aliases[$domain_id]) || $reset) {
     $aliases[$domain_id] = array();
     // Query the db for aliases.
