@@ -265,6 +265,7 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
 
   $source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $nid))->fetchField();
 
+  // Default source for nodes with no setting.
   if ($source === FALSE) {
     $source = variable_get('domain_default_source', 0);
   }
@@ -282,9 +283,14 @@ function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE) {
     $domain_site = $lookup['domain_site'];
     $domains = $lookup['domain_id'];
   }
-  if (empty($domain_site) && !in_array($source, $domains) && !empty($domains)) {
+  // domain_get_node_domains() returns the default (0) domain as -1, so we
+  // must transform it here before running a check.
+  $source = ($source == 0) ? -1 : $source;
+  // If no valid source is found, take the first match from the $domains array.
+  if (empty($domain_site) && !empty($domains) && !in_array($source, $domains)) {
     $source = current($domains);
   }
+  // Convert the source id from -1 to 0 and run the lookup.
   $domain_id = ($source == -1) ? 0 : $source;
   return domain_lookup($domain_id);
 }

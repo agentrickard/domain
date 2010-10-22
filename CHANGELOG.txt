@@ -1,5 +1,8 @@
 // $Id$
 
+22-OCT-2010
+-- #934200 by jamesHF. Ensure proper source domain.
+
 21-OCT-2010
 -- Adds first two SimpleTests!
 -- Cleans up minor PHP notices.
