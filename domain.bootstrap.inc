@@ -238,8 +238,15 @@ function domain_get_primary_table($table) {
   if (is_string($db_prefix)) {
     $table = $db_prefix . $table;
   }
+  // If $db_prefix is an array, make sure we get the proper setting.
+  // See http://drupal.org/node/938150
   else if (is_array($db_prefix)) {
-    $table = $db_prefix['default'] . $table;
+    if (!empty($db_prefix[$table])) {
+      $table = $db_prefix[$table] . $table;
+    }
+    else if (!empty($db_prefix['default'])) {
+      $table = $db_prefix['default'] . $table;
+    }
   }
   return db_escape_table($table);
 }
