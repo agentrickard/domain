@@ -3,6 +3,7 @@
 22-OCT-2010
 
 -- #938150 by jahmal. Fixes bug in db_prefix array handling.
+-- #934200 by jamesHF. Ensure proper source domain.
 
 21-OCT-2010
 
