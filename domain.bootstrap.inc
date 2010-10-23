@@ -29,7 +29,7 @@ define('DOMAIN_BOOTSTRAP_INIT', 0);
 define('DOMAIN_BOOTSTRAP_NAME_RESOLVE', 1);
 
 /**
- * Domain bootstrap phase 3: invokes bootstrap hook "hook_domain_bootstrap_full".
+ * Domain bootstrap phase 3: invokes hook_domain_bootstrap_full().
  */
 define('DOMAIN_BOOTSTRAP_FULL', 2);
 
@@ -52,7 +52,8 @@ function domain_bootstrap() {
     }
     elseif ($error === FALSE) {
       // watchdog() is not available here, and there may be other logging.
-      // So we have to write an error message global variable and pick them up in settings,inc.
+      // So we have to write an error message global variable and pick them up
+      // in settings,inc.
       $_domain['error'] = $phase;
       break;
     }
@@ -128,8 +129,8 @@ function _domain_bootstrap($phase) {
  * should usually be first one as well.
  *
  * @param $reset
- *   If set to TRUE the cached list of modules is updated with the value from the
- *   {variable} table again. Default value is FALSE. Optional.
+ *   If set to TRUE the cached list of modules is updated with the value from
+ *   the {variable} table again. Default value is FALSE. Optional.
  * @return
  *   An array of module names.
  */
@@ -230,10 +231,12 @@ function _domain_bootstrap_invoke_all() {
  * @param $table
  *   The name of the base table to lookup.
  * @return
- *   A query-safe table name pointing to the primary domain.
+ *   A query-safe table name pointing to the primary domain and default
+ *   database..
  */
 function domain_get_primary_table($table) {
-  global $db_prefix;
+  global $databases;
+  $db_prefix = isset($databases['default']['default']['prefix']) ? $databases['default']['default']['prefix'] : '';
   if (is_string($db_prefix)) {
     $table = $db_prefix . $table;
   }

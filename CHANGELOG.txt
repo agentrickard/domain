@@ -1,5 +1,8 @@
 // $Id$
 
+23-OCT-2010
+-- #950056. Account for new $databases global.
+
 22-OCT-2010
 -- #934200 by jamesHF. Ensure proper source domain.
 
