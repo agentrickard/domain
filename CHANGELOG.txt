@@ -2,6 +2,7 @@
 
 31-OCT-2010
 -- Patch #957344 by Dave Reid. Add index on {domain}.is_default.
+-- Patch #951936 by nclavaud. Fixes domain_conf_variable_save() empty check.
 
 23-OCT-2010
 -- #950056. Account for new $databases global.
