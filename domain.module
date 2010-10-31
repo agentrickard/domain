@@ -1419,7 +1419,7 @@ function domain_domain_load(&$domain) {
 function domain_get_path($domain) {
   global $base_url;
   if (empty($base_url)) {
-    return check_url($domain['scheme'] . '://' . $domain['subdomain']);
+    return domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'];
   }
   $_url = parse_url($base_url);
   // PHP 5 does not return an empty path element.
@@ -1431,7 +1431,7 @@ function domain_get_path($domain) {
     $_url['path'] .= '/';
   }
 
-  $path = check_url($domain['scheme'] . '://' . $domain['subdomain'] . $_url['path']);
+  $path = domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'] . $_url['path'];
   return $path;
 }
 
@@ -1453,8 +1453,26 @@ function domain_get_uri($domain) {
     $request_uri = url($alias);
   }
 
-  $path = check_url($domain['scheme'] . '://' . $domain['subdomain'] . $request_uri);
+  $path = domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'] . $request_uri;
   return $path;
+}
+
+/**
+ * Ensure that the scheme value has not been hacked.
+ *
+ * Note that Domain Access only supports HTTP and HTTPS.
+ * Other protocols will be removed.
+ *
+ * @param $scheme
+ *   The request protocol for the requested domain.
+ * @return
+ *  Either 'http' or 'https'.
+ */
+function domain_check_scheme($scheme) {
+  if ($scheme != 'https') {
+    $scheme = 'http';
+  }
+  return $scheme;
 }
 
 /**
