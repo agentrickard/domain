@@ -763,9 +763,10 @@ function domain_conf_variable_delete($domain_id, $variable) {
  */
 function domain_conf_variable_save($domain_id, $variable, $value = NULL) {
   // Get the current settings for this domain, if any.
-  $settings = domain_unserialize(db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id)));
+  $serialized = db_result(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = %d", $domain_id));
   // Settings found, update them.
-  if (!empty($settings)) {
+  if ($serialized) {
+    $settings = domain_unserialize($serialized);
     $settings[$variable] = $value;
     db_query("UPDATE {domain_conf} SET settings = %b WHERE domain_id = %d", serialize($settings), $domain_id);
   }
