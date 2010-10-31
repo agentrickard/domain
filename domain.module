@@ -805,7 +805,7 @@ function domain_default($reset = FALSE, $alter = TRUE) {
     $default['scheme'] = variable_get('domain_scheme', 'http');
     // Set the valid flag.
     $default['valid'] = TRUE;
-    if (!$alter) {
+    if ($alter) {
       // Let submodules overwrite the defaults, if they wish.
       $default = domain_api($default);
     }
