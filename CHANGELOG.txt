@@ -5,6 +5,7 @@
 -- Patch #951936 by nclavaud. Fixes domain_conf_variable_save() empty check.
 -- Patch #951276 by longwave. Missing $form_state for domain_conf_default() form.
 -- #934636. Apply a static cache to domain_source_lookup().
+-- #921984 by sitordance. Removes check_url(), which may cause errors. Force HTTP or HTTPS.
 
 23-OCT-2010
 -- #950056. Account for new $databases global.
