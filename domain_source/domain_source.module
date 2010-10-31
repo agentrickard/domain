@@ -43,15 +43,13 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
   // Only uses with 'set domain access' can assign content to all affilaites, so they get a new option.
   // This option allows domain source to be ignored on a per-node basis.
   $options = array();
-  if (user_access('set domain access')) {
-    $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
-  }
   $domains = domain_domains();
   $show = FALSE;
   if (user_access('set domain access')) {
     $show = TRUE;
+    $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
     foreach ($domains as $domain) {
-      if ($domain['valid']) {
+      if ($domain['valid'] || user_access('access inactive domains')) {
         $options[$domain['domain_id']] = $domain['sitename'];
       }
     }
@@ -59,13 +57,14 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
   // In the case of users with limited permissions, option 3 is the "show options" value.
   elseif (user_access('publish to any assigned domain') && !empty($account->domain_user)) {
     $show = FALSE;
+    $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
     // Get the user's allowed domains.
     foreach ($domains as $domain) {
       $key = $domain['domain_id'];
       if ($domain['domain_id'] == 0) {
         $key = -1;
       }
-      if ($domain['valid'] && $user->domain_user[$key] != 0) {
+      if ($user->domain_user[$key] != 0 && ($domain['valid'] || user_access('access inactive domains'))) {
         $options[$key] = $domain['sitename'];
       }
     }
