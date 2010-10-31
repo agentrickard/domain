@@ -71,7 +71,7 @@ function domain_init() {
 
   // Error handling in case the module is not installed correctly.
   if (!isset($_domain['domain_id'])) {
-    $_domain = domain_default();
+    $_domain = domain_default(TRUE);
     $_domain['error'] = 'bootstrap include';
   }
   // If $_domain['error'] is present, then set a message and stop.
@@ -105,7 +105,7 @@ function domain_init() {
   }
 
   // Add information from domain_lookup but keep existing values (domain_id and subdomain)
-  $domain = domain_lookup($_domain['domain_id']);
+  $domain = domain_lookup($_domain['domain_id'], NULL, TRUE);
   $_domain = array_merge($domain, $_domain);
 
   // Set the initial domain record, for later reference. See http://drupal.org/node/706490.
@@ -897,8 +897,18 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
  *
  * @param $reset
  *   A boolean flag indicating whether to reset the static array or not.
+ * @param $alter
+ *   A boolean flag indicating whether to allow hook_domainload(). In
+ *   some cases where external scripts do not pass an HTTP_HOST,
+ *   Drupal does not behave as expected and we cannot trigger this
+ *   API call.
+ *
+ * @see domain_request_name()
+ *
+ * @return
+ *   The domain array for the default domain.
  */
-function domain_default($reset = FALSE) {
+function domain_default($reset = FALSE, $alter = TRUE) {
   static $default;
   if (empty($default) || $reset) {
     $default['domain_id'] = 0;
@@ -907,8 +917,10 @@ function domain_default($reset = FALSE) {
     $default['scheme'] = variable_get('domain_scheme', 'http');
     // Set the valid flag.
     $default['valid'] = TRUE;
-    // Let submodules overwrite the defaults, if they wish.
-    $default = domain_api($default);
+    if ($alter) {
+      // Let submodules overwrite the defaults, if they wish.
+      $default = domain_api($default);
+    }
   }
   return $default;
 }
@@ -2321,7 +2333,7 @@ function domain_request_name() {
     return strtolower(rtrim($_SERVER['HTTP_HOST']));
   }
   else {
-    $domain = domain_default();
+    $domain = domain_default(FALSE, FALSE);
     return $domain['subdomain'];
   }
 }
