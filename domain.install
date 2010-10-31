@@ -30,7 +30,8 @@ function domain_schema() {
     'primary key' => array('domain_id'),
     'indexes' => array(
       'subdomain' => array('subdomain'),
-      'weight' => array('weight')
+      'weight' => array('weight'),
+      'is_default' => array('is_default'),
     ),
   );
   $schema['domain_access'] = array(
@@ -138,4 +139,13 @@ function domain_update_7002() {
     ->condition('domain_id', $default)
     ->execute();
   variable_del('domain_default');
+}
+
+/**
+ * Add an index on {domain}.is_default.
+ */
+function domain_update_7003() {
+  if (!db_index_exists('domain', 'is_default')) {
+    db_add_index('domain', 'is_default', array('is_default'));
+  }
 }
