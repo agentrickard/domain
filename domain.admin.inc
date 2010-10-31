@@ -55,17 +55,8 @@ function domain_view() {
     $domain = domain_api($domain);
     $link = l($domain['subdomain'], domain_get_uri($domain), array('absolute' => TRUE));
     $actions = array();
-    if ($domain['domain_id'] == 0) {
-      // Grab any extra elements defined by other modules.  If so, allow configuration.
-      $extra = array();
-      if (module_exists('domain_conf')) {
-        $extra = domain_conf_api();
-      }
-      if (!empty($extra)) {
-        $actions[] = l(t('settings'), 'admin/structure/domain/conf/0');
-      }
-    }
-    else {
+    if ($domain['domain_id'] > 0) {
+      $actions = array();
       $actions[] = l(t('edit'), 'admin/structure/domain/edit/' . $domain['domain_id']);
       $actions[] = l(t('delete'), 'admin/structure/domain/delete/' . $domain['domain_id']);
     }
