@@ -1,5 +1,9 @@
 // $Id$
 
+31-OCT-2010
+
+-- Patch #928472 by longwave, espirates. Fixes domain conf display error.
+
 22-OCT-2010
 
 -- #938150 by jahmal. Fixes bug in db_prefix array handling.

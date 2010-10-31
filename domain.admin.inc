@@ -58,31 +58,21 @@ function domain_view() {
     // Let submodules overwrite the defaults, if they wish.
     $domain = domain_api($domain);
     $link = l($domain['subdomain'], domain_get_uri($domain), array('absolute' => TRUE));
-    if ($domain['domain_id'] == 0) {
-      // Grab any extra elements defined by other modules.  If so, allow configuration.
-      $extra = array();
-      if (module_exists('domain_conf')) {
-        $extra = domain_conf_api();
-      }
-      if (!empty($extra)) {
-        $actions[] = l(t('settings'), 'admin/build/domain/conf/0');
-      }
-    }
-    else {
+    if ($domain['domain_id'] > 0) {
       $actions = array();
       $actions[] = l(t('edit'), 'admin/build/domain/edit/'. $domain['domain_id']);
       $actions[] = l(t('delete'), 'admin/build/domain/delete/'. $domain['domain_id']);
     }
-      // Add advanced settings from other modules.
-      $items = array();
-      $items = module_invoke_all('domainlinks', $domain);
-      if (!empty($items)) {
-        foreach ($items as $item) {
-          if (!empty($item)) {
-            $actions[] = l($item['title'], $item['path']);
-          }
+    // Add advanced settings from other modules.
+    $items = array();
+    $items = module_invoke_all('domainlinks', $domain);
+    if (!empty($items)) {
+      foreach ($items as $item) {
+        if (!empty($item)) {
+          $actions[] = l($item['title'], $item['path']);
         }
       }
+    }
     // Set the valid flag.
     ($domain['valid'] == 1) ? $valid = t('Active') : $valid = t('Inactive');
     $row = array($domain['domain_id'], ($domain['domain_id'] == $_domain['domain_id']) ? '<b>'. $link .'</b>' : $link, filter_xss_admin($domain['sitename']), $valid, $domain['scheme']);
