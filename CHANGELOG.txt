@@ -7,6 +7,7 @@
 -- #921984 by sitordance. Removes check_url(), which may cause errors. Force HTTP or HTTPS.
 -- #927808 by pyrello, ejh3. Do not fire API calls until modules loaded.
 -- #925368 by mrfelton. Allow source domain to be inactive.
+-- Removes dead sorting functions.
 
 23-OCT-2010
 -- #950056. Account for new $databases global.

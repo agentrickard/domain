@@ -1098,48 +1098,6 @@ function domain_domains($reset = FALSE) {
 }
 
 /**
- * Helper sort function
- */
-function _domain_id_sort($a, $b) {
-  return ($a['domain_id'] < $b['domain_id']) ? -1 : 1;
-}
-
-/**
- * Helper sort function
- */
-function _domain_name_sort($a, $b) {
-  return strcmp($a['sitename'], $b['sitename']);
-}
-
-/**
- * Helper sort function
- */
-function _domain_url_sort($a, $b) {
-  return strcmp($a['subdomain'], $b['subdomain']);
-}
-
-/**
- * Helper sort function
- */
-function _domain_rid_sort($a, $b) {
-  return ($a['domain_id'] > $b['domain_id']) ? -1 : 1;
-}
-
-/**
- * Helper sort function
- */
-function _domain_rname_sort($a, $b) {
-  return strcmp($b['sitename'], $a['sitename']);
-}
-
-/**
- * Helper sort function
- */
-function _domain_rurl_sort($a, $b) {
-  return strcmp($a['subdomain'], $b['subdomain']);
-}
-
-/**
  * Determine the default format for domain list forms.
  */
 function domain_select_format() {
