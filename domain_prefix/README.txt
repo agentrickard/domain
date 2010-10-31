@@ -41,8 +41,6 @@ site's settings.php file.
 Table prefixing is an advanced Drupal option; it should only be performed by
 experienced admins or by those willing to learn how table prefixing functions.
 
-For more information, see http://drupal.org/node/2622.
-
 This module may cause unexpected behavior.  Test any changes to your database
 carefully.
 

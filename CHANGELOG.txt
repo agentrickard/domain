@@ -6,6 +6,7 @@
 -- Patch #951936 by nclavaud. Fixes domain_conf_variable_save() empty check.
 -- Patch #951276 by longwave. Missing $form_state for domain_conf_default() form.
 -- #934636. Apply a static cache to domain_source_lookup().
+-- #934860 by xjm. Remove reference to old prefixing docs.
 
 22-OCT-2010
 
