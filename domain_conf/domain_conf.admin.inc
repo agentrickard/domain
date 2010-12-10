@@ -55,6 +55,7 @@ function domain_conf_form($form, $form_state, $domain) {
   $default_group = t('Site configuration');
   foreach ($batch as $key => $action) {
     $permission = isset($action['#permission']) ? $action['#permission'] : 'administer domains';
+    $collapsed = isset($action['#collapsed']) ? $action['#collapsed'] : FALSE;
     if (!user_access($permission) || $action['#domain_action'] != 'domain_conf') {
       continue;
     }
@@ -67,6 +68,7 @@ function domain_conf_form($form, $form_state, $domain) {
         '#type' => 'fieldset',
         '#title' => $group,
         '#collapsible' => TRUE,
+        '#collapsed' => $collapsed,
       );
     }
     $form[$group][$key] = $action['#form'];
@@ -147,7 +149,6 @@ function domain_conf_form_submit($form, &$form_state) {
       ->execute();
   }
   drupal_set_message(t('Domain options saved successfully.'));
-
   // Clear the cache.
   cache_clear_all();
 }

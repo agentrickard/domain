@@ -387,6 +387,8 @@ function hook_domain_conf() {
  * - '#group' [optional] Used to place elements into fieldsets for the main domain configuration page. If not set, any
  *   new element will be added to the 'Site configuration' fieldset.
  *
+ * - '#collapsed' [optional] Indicates that the form fieldset should appear collapsed on the configuration page.
+ *
  * - '#update_all' [optional] Allows the batch settings form to use one input field to reset all values. This should beginLogging
  * set to TRUE in most cases. If your value must be unique per domain, set this to FALSE or leave empty.
  *
@@ -414,6 +416,7 @@ function hook_domain_batch() {
     '#data_type' => 'string',
     '#weight' => 0,
     '#group' => t('My settings'),
+    '#collapsed' => FALSE,
     '#update_all' => TRUE,
     '#module' => t('Domain Access'),
   );
