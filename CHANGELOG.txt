@@ -3,6 +3,7 @@
 10-DEC-2010
 
 -- Patch #361018 by Dave Reid. Fixes token handling.
+-- Creates the 6.x.2.8 release.
 
 31-OCT-2010
 
