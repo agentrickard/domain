@@ -1,5 +1,9 @@
 // $Id$
 
+10-DEC-2010
+
+-- Patch #361018 by Dave Reid. Fixes token handling.
+
 31-OCT-2010
 
 -- Patch #928472 by longwave, espirates. Fixes domain conf display error.
