@@ -390,6 +390,7 @@ function domain_conf_domainbatch() {
   // Change the menus
   if (module_exists('menu')) {
     $menus = menu_get_menus();
+    $menu_options = $menus;
     $menus[0] = t('Do not use for this site');
     $main = variable_get('menu_main_links_source', 'main-menu');
     $batch['menu_main_links_source'] = array(
@@ -428,7 +429,67 @@ function domain_conf_domainbatch() {
       '#group' => t('Menu settings'),
       '#module' => t('Menu'),
     );
+    $types = node_type_get_types();
+    // Node menu handling is much more complex now.
+    // Call Drupal.menu_update_parent_list() to filter the list of
+    // available default parent menu items based on the selected menus.
+    // This function will not work with multiple form elements on the page.
+    // TODO: Replace or extend the core JS.
+    /*
+    drupal_add_js(
+      '(function ($) { Drupal.menu_update_parent_list(); })(jQuery);',
+      array('scope' => 'footer', 'type' => 'inline')
+    );
+    drupal_add_js(drupal_get_path('module', 'menu') . '/menu.admin.js'));
+    */
+    // To avoid an 'illegal option' error after saving the form we have to load
+    // all available menu items.
+    // Otherwise it is not possible to dynamically add options to the list.
+    // @todo Convert menu_parent_options() into a #process callback.
+    $options = menu_parent_options(menu_get_menus(), array('mlid' => 0));
+    foreach ($types as $type) {
+      $form['menu']['menu_options'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('@type: Available menus', array('@type' => $type->name)),
+        '#options' => $menu_options,
+      );
+      $form['menu']['menu_parent'] = array(
+        '#type' => 'select',
+        '#title' => t('@type: Default parent item', array('@type' => $type->name)),
+        '#options' => $options,
+        '#attributes' => array('class' => array('menu-title-select')),
+      );
+      $batch['menu_options_' . $type->type] = array(
+        '#form' => $form['menu']['menu_options'],
+        '#permission' => 'administer menu',
+        '#domain_action' => 'domain_conf',
+        '#system_default' => variable_get('menu_options_' . $type->type, array('main-menu')),
+        '#variable' => 'menu_options_' . $type->type,
+        '#meta_description' => t('The menus available to place links in for this content type.'),
+        '#data_type' => 'string',
+        '#weight' => 6,
+        '#update_all' => TRUE,
+        '#collapsed' => TRUE,
+        '#group' => t('@type menu settings', array('@type' => $type->name)),
+        '#module' => t('Menu'),
+      );
+      $batch['menu_parent_' . $type->type] = array(
+        '#form' => $form['menu']['menu_parent'],
+        '#permission' => 'administer menu',
+        '#domain_action' => 'domain_conf',
+        '#system_default' => variable_get('menu_parent_' . $type->type, 'main-menu:0'),
+        '#variable' => 'menu_parent_' . $type->type,
+        '#meta_description' => t('Choose the menu item to be the default parent for a new link in the content authoring form.'),
+        '#data_type' => 'string',
+        '#weight' => 6,
+        '#update_all' => TRUE,
+        '#collapsed' => TRUE,
+        '#group' => t('@type menu settings', array('@type' => $type->name)),
+        '#module' => t('Menu'),
+      );
+    }
   }
+  
   foreach ($batch as $key => $value) {
     if (!isset($batch[$key]['#module'])) {
       $batch[$key]['#module'] = t('Domain Configuration');
