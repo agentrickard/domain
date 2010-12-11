@@ -1,5 +1,8 @@
 // $Id$
 
+11-DEC-2010
+-- #995342 by mrgoltra. Domain Nav fails on uninstall.
+
 10-DEC-2010
 -- Patch #361018 by Dave Reid. Fixes token handling.
 -- #969022. Allow handling of new menu settings for Domain Conf.

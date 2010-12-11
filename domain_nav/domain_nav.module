@@ -33,7 +33,8 @@ function domain_nav_init() {
  */
 function domain_nav_menu() {
   $items = array();
-  if (DOMAIN_NAV_MENU == TRUE) {
+  // The exists check is needed on uninstall. See http://drupal.org/node/995342
+  if (DOMAIN_NAV_MENU == TRUE && module_exists('domain')) {
     $root = domain_default();
     $items['domain'] = array(
       'title' => 'Domain',
