@@ -1,5 +1,8 @@
 // $Id$
 
+11-DEC-2010
+-- #995342 by mrgoltra. Domain Nav fails on uninstall.
+
 10-DEC-2010
 -- #969022. Allow handling of new menu settings for Domain Conf.
 
