@@ -1287,7 +1287,7 @@ required, but each adds functionality to the core module.
 NOTE: In Drupal 7, this value is deprecated. You should use domain_get_domain()
 to return the active domain.
 
-During hook_init(), the Domain Access module creates a nwe global variable,
+During hook_init(), the Domain Access module creates a new global variable,
 $_domain, which can be used by other Drupal elements (themes, blocks, modules).
 
 The $_domain global is an array of data taken from the {domain} table for the
