@@ -490,7 +490,6 @@ function domain_form_submit($form, &$form_state) {
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message($message);
   }
-  $form_state['redirect'] = 'domain';
   return $domain;
 }
 

@@ -10,16 +10,19 @@ class DomainTestCase extends DrupalWebTestCase {
 
   // On setup, install our module and create a default domain.
   public function setUp() {
-    parent::setUp('domain');
-    db_query("TRUNCATE {domain}");
-    if (empty($_SERVER['HTTP_HOST'])) {
+    // Prevent simpleTest from vomiting on bootstrap if there
+    // are required submodules.
+    // Right now, this breaks if Domain Alias is enabled???
+    $modules = _domain_bootstrap_modules();
+    parent::setUp($modules);
+
+    // Account for drush and other automated testing to set a proper http value.
+    if (empty($_SERVER['HTTP_HOST']) || $_SERVER['HTTP_HOST'] == 'default') {
       $_SERVER['HTTP_HOST'] = 'example.com';
     }
+    db_query("TRUNCATE {domain}");
     domain_set_primary_domain();
-    db_update('domain')
-      ->condition('is_default', 1)
-      ->fields(array('sitename' => 'TestDomainSitename'))
-      ->execute();
+    db_query("UPDATE {domain} SET sitename = 'TestDomainSitename' WHERE is_default = 1");
     // Create some nodes and users.
     for ($i = 0; $i < 10; $i++) {
       $settings = array(
@@ -87,6 +90,9 @@ class DomainTestCase extends DrupalWebTestCase {
 }
 
 class DomainInstallTest extends DomainTestCase {
+  function setUp() {
+    parent::setUp();
+  }
 
   public static function getInfo() {
     return array(
@@ -134,6 +140,9 @@ class DomainInstallTest extends DomainTestCase {
 }
 
 class DomainCreateTest extends DomainTestCase {
+  function setUp() {
+    parent::setUp();
+  }
 
   public static function getInfo() {
     return array(
