@@ -123,20 +123,11 @@ function domain_content_check($domain_id) {
     return FALSE;
   }
   $domains = domain_get_user_domains($user);
-  $check = FALSE;
-  $editor = FALSE;
-  // Can this user see the default site?
-  if ($rule && $domain_id == 0 && $domains['-1'] == -1) {
-    $editor = TRUE;
-  }
   // Can this user see the active site?
-  elseif ($rule && $domain_id > 0 && $domain_id == $domains[$domain_id]) {
-    $editor = TRUE;
+  if ($domain_id == $domains[$domain_id]) {
+    return TRUE;
   }
-  if ($editor) {
-    $check = TRUE;
-  }
-  return $check;
+  return FALSE;
 }
 
 /**
@@ -208,12 +199,10 @@ function domain_content_add_form_widget(&$form) {
   $options = array();
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
-    // Cannot pass zero in checkboxes.
-    $key = $data['domain_id'] == 0 ? -1 : $data['domain_id'];
     // The domain must be valid.
     if ($data['valid'] || user_access('access inactive domains')) {
       // Filter checkboxes but not select lists.
-      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
+      $options[$data['domain_id']] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
   $form['domain'] = array(
@@ -245,7 +234,7 @@ function domain_content_add_form_widget(&$form) {
     '#options' => $options,
     '#required' => FALSE,
     '#description' => t('Select which affiliates can access this content.'),
-    '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
+    '#default_value' => array($_domain['domain_id']),
   );
   if ($format) {
     $form['domain']['domains']['#multiple'] = TRUE;

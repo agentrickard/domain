@@ -606,10 +606,6 @@ Use this screen to register new allowed domains with your site.  This
 process is especially important for sites using Wildcard DNS, as it prevents
 non-registered sites from resolving.
 
-Note that as of 6.x.2.0, two domains are created for you on installation.
-The first is a placeholder for your default domain. The second is a
-sample domain record.
-
 The first domain will use the HTTP_HOST value of the request made
 when installing the module. This value may be edited by going to
 Admin > Build > Domains and editing the Primary Domain value.
@@ -953,8 +949,8 @@ omissions at http://drupal.org/project/issues/domain.
 
 This screen shows all active domains registered for use with the site.
 
-Record zero (0) is hardcoded to refer to the "root" site defined as your
-Primary domain name.
+From this screen, you may set the default domain, activate or inactivate
+domains or view to the settings for individual domains.
 
 ----
 4.8   Batch Updating

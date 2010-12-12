@@ -56,12 +56,10 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
   // Get the display format of the form element.
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
-    // Cannot pass zero in checkboxes.
-    ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
     // The domain must be valid.
     if ($data['valid'] || user_access('access inactive domains')) {
       // Checkboxes must be filtered, select listts should not.
-      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
+      $options[$data['domain_id']] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
   $form['domain_settings'] = array(
@@ -73,12 +71,15 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
   );
   // Set the proper default.
   $behavior = variable_get('domain_settings_behavior', 0);
-  $default = -1;
   if ($behavior == 1) {
-    $default = ($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id'];
+    $default = $_domain['domain_id'];
   }
-  if ($behavior == 2) {
+  elseif ($behavior == 2) {
     $default = -5;
+  }
+  else {
+    $default_domain = domain_default();
+    $default = $default_domain['domain_id'];
   }
   $form['domain_settings']['domain_id'] = array(
     '#type' => empty($format) ? 'radios' : 'select',
@@ -113,19 +114,20 @@ function domain_settings_form_submit($form, &$form_state) {
       $values[$key] = $value;
     }
   }
-  // -1 is the primary domain.
+  // Get the primary domain.
+  $default_domain = domain_default();
+  $default = $default_domain['domain_id'];
   foreach ($values as $name => $value) {
     // Handle checkboxes when array_filter is set. (Do not return empty checkboxes at all.)
     if (is_array($value) && isset($form_state['values']['array_filter'])) {
       $value = array_keys(array_filter($value));
     }
-    if ($domain_id == -1 || $domain_id == -5) {
+    if ($domain_id == $default || $domain_id == -5) {
       variable_set($name, $value);
       // Update the site name of the primary domain, if needed.
       if ($name == 'site_name') {
-        variable_set('domain_sitename', $value);
         db_update('domain')
-          ->condition('domain_id', 0)
+          ->condition('domain_id', $default)
           ->fields(array(
             'sitename' => $form_state['values']['site_name'],
           ))

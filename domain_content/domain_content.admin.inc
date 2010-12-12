@@ -44,11 +44,6 @@ function domain_content_list() {
     if (empty($user->domain_user)) {
       return drupal_access_denied();
     }
-    // Cast the -1 as 0.
-    if (isset($user->domain_user[-1])) {
-      unset($user->domain_user[-1]);
-      $user->domain_user[0] = 0;
-    }
   }
   // Table information
   $header = array(
@@ -59,10 +54,11 @@ function domain_content_list() {
   );
   // Set up the base query.
   $query = db_select('domain', 'd')
-    ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
+    ->fields('d', array('is_default', 'domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
   // Add the tablesort.
   $query = $query
     ->extend('TableSort')
+    ->orderBy('is_default', 'DESC')
     ->orderByHeader($header);
   $query = $query->extend('PagerDefault')->limit(variable_get('domain_list_size', DOMAIN_LIST_SIZE));
   // Get the domains.
@@ -75,10 +71,10 @@ function domain_content_list() {
   foreach ($domains as $domain) {
     $path = trim(domain_get_path($domain), '/');
     $rows[] = array(
-      $domain['domain_id'],
+      $domain['domain_id'] . (($domain['is_default']) ? ' * ' : ''),
       l(t('@sitename content', array('@sitename' => $domain['sitename'])), 'admin/domain/content/'. $domain['domain_id']),
       (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField(),
-      l(t('view site'), $path),
+      l(t('View @domain', array('@domain' => $domain['subdomain'])), $path),
     );
   }
 
@@ -90,7 +86,7 @@ function domain_content_list() {
   );
   array_unshift($rows, $all);
   if (!empty($rows)) {
-    $output = '<p>'. t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate.') .'</p>';
+    $output = '<p>'. t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate. The default domain is marked with an *.') .'</p>';
     $output .= theme('table', array('header' => $header, 'rows' => $rows));
     $output .= theme('pager', array());
     return $output;
@@ -353,10 +349,8 @@ function domain_content_view_domains($node) {
     $node_domains = array();
     if (!empty($node->domains)) {
       foreach ($node->domains as $domain) {
-        // The root domain is stored as -1, but cast as zero in the global variable.
-        $key = ($domain == -1) ? 0 : $domain;
         // Convert the domain ids to data so we can print them.
-        $node_domains[] = domain_lookup($key);
+        $node_domains[] = domain_lookup($domain);
       }
     }
     // If we have multiple domains, print them.

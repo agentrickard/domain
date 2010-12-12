@@ -555,10 +555,6 @@ function domain_user_save(&$edit, $account, $category) {
   $values = array();
   foreach ($edit['domain_user'] as $domain_id => $status) {
     if ($status != 0) {
-      // Convert the -1 checkboxes to a zero.
-      if ($domain_id == -1) {
-        $domain_id = 0;
-      }
       $values[] = array('uid' => $account->uid, 'domain_id' => $domain_id);
     }
   }
@@ -607,8 +603,7 @@ function domain_user_view($account, $view_mode) {
   else {
     $items = array();
     foreach (array_filter($account->domain_user) as $id) {
-      ($id == -1) ? $key = 0 : $key = $id;
-      $domain = domain_lookup($key);
+      $domain = domain_lookup($id);
       $items[] = check_plain($domain['sitename']);
     }
     $output = theme('item_list', array('items' => $items));
@@ -655,7 +650,7 @@ function domain_form_user_form_alter(&$form, &$form_state) {
   $account->domain_user = domain_get_user_domains($account, $add_roles, TRUE);
   // By default, the requesting domain is assigned.
   if (empty($account->domain_user)) {
-    ($_domain['domain_id'] == 0) ? $default  = array(-1) : $default = array($_domain['domain_id'] => $_domain['domain_id']);
+    $default = array($_domain['domain_id'] => $_domain['domain_id']);
   }
   else {
     $default = $account->domain_user;
@@ -665,10 +660,6 @@ function domain_form_user_form_alter(&$form, &$form_state) {
     $domains = domain_domains();
     $options = array();
     foreach ($domains as $domain) {
-      // Handle 0 and -1
-      if ($domain['domain_id'] == variable_get('default_domain', 0)) {
-       $domain['domain_id'] = -1;
-      }
       $options[$domain['domain_id']] = check_plain($domain['sitename']);
     }
     $format = domain_select_format();
@@ -728,8 +719,6 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
   $options = array();
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
-    // Cannot pass zero in checkboxes.
-    ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
     // The domain must be valid.
     if ($data['valid'] || user_access('access inactive domains')) {
       // Filter checkbox output but not select list.
@@ -757,7 +746,7 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     '#options' => $options,
     '#required' => FALSE,
     '#description' => t('Select which affiliates these users should belong to. <em>Note: this will erase any current assignment for the selsected users.</em>'),
-    '#default_value' => array(($_domain['domain_id'] == 0) ? -1 : $_domain['domain_id']), // Can't use 0 as a checkbox value.
+    '#default_value' => array($_domain['domain_id']),
   );
   if ($format) {
     $form['domain']['domains']['#multiple'] = TRUE;
@@ -788,9 +777,6 @@ function _domain_user_list($uid) {
   $domains = domain_domains();
   $user_domains = array();
   foreach ($list as $domain_id) {
-    if ($domain_id == -1) {
-      $domain_id = 0;
-    }
     $user_domains[] = check_plain($domains[$domain_id]['sitename']);
   }
   return $user_domains;
@@ -841,10 +827,6 @@ function domain_update_users($form, &$form_state) {
       ->condition('uid', $uid)
       ->execute();
     foreach ($domains as $domain_id) {
-      // Cannot use 0 as a checkbox.
-      if ($domain_id == -1) {
-        $domain_id = 0;
-      }
       db_insert('domain_editor')
         ->fields(array('uid' => $uid, 'domain_id' => $domain_id))
         ->execute();
@@ -963,9 +945,6 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
     if ($subdomain) {
       $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchAssoc();
     }
-    elseif ($domain_id == 0) {
-      $domain = domain_default();
-    }
     else {
       $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchAssoc();
     }
@@ -1009,7 +988,7 @@ function domain_default($reset = FALSE, $alter = TRUE) {
     // Let submodules overwrite the defaults, if they wish.
     if (empty($default)) {
       $default = array(
-        'domain_id' => 0,
+        'domain_id' => 0, // Indicates we have not set a real domain.
         'subdomain' => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '',
         'sitename' => variable_get('site_name', 'Drupal'),
         'scheme' => empty($_SERVER['HTTPS']) ? 'http' : 'https',
@@ -1038,7 +1017,7 @@ function domain_set_primary_domain() {
   if (!empty($_SERVER['HTTPS'])) {
     $scheme = 'https';
   }
-  $check = (bool) db_query("SELECT COUNT(domain_id) FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => 0))->fetchField();
+  $check = (bool) db_query("SELECT COUNT(domain_id) FROM {domain} WHERE is_default = 1")->fetchField();
   if (empty($check)) {
     db_insert('domain')
       ->fields(array(
@@ -1050,29 +1029,9 @@ function domain_set_primary_domain() {
           'is_default' => 1,
       ))
       ->execute();
-    // MySQL won't let us insert row 0 into an autoincrement table.
-    // Similar to the {users} table, this leaves us with no row 1.
-    // TODO: remove this.
-    db_update('domain')
-      ->fields(array('domain_id' => 0))
-      ->condition('domain_id', 1)
-      ->execute();
+    // Allow other modules to respond to changes.
+    module_invoke_all('domain_update', domain_default(TRUE));
   }
-  else {
-    db_update('domain')
-      ->fields(array(
-          'subdomain' => $root,
-          'sitename' => $site,
-          'scheme' => $scheme,
-          'weight' => -1,
-          'valid' => 1,
-          'is_default' => 1,
-      ))
-      ->condition('domain_id', 0)
-      ->execute();
-  }
-  // Allow other modules to respond to changes.
-  module_invoke_all('domain_update', domain_default(TRUE));
 }
 
 /**
@@ -1209,7 +1168,6 @@ function domain_unique_domain($subdomain) {
  *   A boolean flag indicating whether to reset the static array or not.
  * @return
  *   An array of domains to which the user is assigned, in the format array($domain_id => $domain_id).
- *   Note that the default domain is -1 here, due to checkbox behavior.
  */
 function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
   static $domains = array();
@@ -1222,12 +1180,7 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
     $domains[$uid] = array();
     $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = :uid", array(':uid' => $uid));
     foreach ($result as $data) {
-      if ($data->domain_id == 0) {
-        $domains[$uid]['-1'] = -1;
-      }
-      else {
-        $domains[$uid][$data->domain_id] = $data->domain_id;
-      }
+      $domains[$uid][$data->domain_id] = $data->domain_id;
     }
     if ($add_roles) {
       if (empty($account->roles)) {
@@ -1482,8 +1435,7 @@ function domain_node_load($nodes, $types) {
       $nodes[$node->nid]->subdomains[] = t('All affiliates');
     }
     foreach ($nodes[$node->nid]->domains as $gid) {
-      ($gid == -1) ? $key = 0 : $key = $gid;
-      $domain = domain_lookup($key);
+      $domain = domain_lookup($gid);
       $nodes[$node->nid]->subdomains[] = $domain['sitename'];
     }
   }
@@ -1641,10 +1593,8 @@ function domain_get_node_domains($nid, $reset = FALSE, $return = FALSE) {
   $domains = array('domain_id' => array(), 'domain_site' => FALSE);
   $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = :nid AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => $nid));
   foreach ($result as $data) {
-    // Transform the 0 to -1, since {domain_access} is unsigned.
-    ($data->gid == 0) ? $gid = -1 : $gid = $data->gid;
     if ($data->realm == 'domain_id') {
-      $domains['domain_id'][$gid] = $gid;
+      $domains['domain_id'][$data->gid] = $data->gid;
     }
     elseif ($data->realm == 'domain_site') {
       $domains['domain_site'] = TRUE;
@@ -1725,10 +1675,10 @@ function domain_node_grants($account, $op) {
  * @see _domain_store_grants
  * @link http://api.drupal.org/api/function/hook_node_access_records_alter/7
  *
- * @TODO: check unpublished node status handling.
  */
 function domain_node_access_records($node) {
-  global $_domain;
+  $_domain = domain_get_domain();
+
   // Define the $grants array.
   $grants = array();
   // Check to see if the node domains were set properly.
@@ -1765,25 +1715,23 @@ function domain_node_access_records($node) {
       'grant_view' => $node->status,
       'grant_update' => 0,
       'grant_delete' => 0,
-      'priority' => 0,         // If this value is > 0, then other grants will not be recorded
+      'priority' => 0, // If this value is > 0, then other grants will not be recorded
     );
   }
-
   // Set the domain-specific grants.
   if (!empty($node->domains)) {
-    foreach ($node->domains as $key => $value) {
-      // We can't use a 0 value in an $options list, so convert -1 to 0.
-      if (abs($value) > 0) {
-        ($key == -1) ? $key = 0 : $key = $key;
-        $grants[] = array(
-          'realm' => 'domain_id',
-          'gid' => $key,
-          'grant_view' => $node->status,
-          'grant_update' => 1,
-          'grant_delete' => 1,
-          'priority' => 0,
-        );
-      }
+    $domains = array_filter($node->domains);
+  }
+  if (!empty($domains)) {
+    foreach (array_filter($node->domains) as $key => $value) {
+      $grants[] = array(
+        'realm' => 'domain_id',
+        'gid' => $key,
+        'grant_view' => $node->status,
+        'grant_update' => 1,
+        'grant_delete' => 1,
+        'priority' => 0,
+      );
     }
   }
   // At least one option must be present, and it is the default site
@@ -1791,9 +1739,10 @@ function domain_node_access_records($node) {
   // If we are enabling the module for the first time, we set the
   // default domain of all existing nodes to the root domain.
   else {
+    $default = domain_default();
     $grants[] = array(
       'realm' => 'domain_id',
-      'gid' => 0,
+      'gid' => $default['domain_id'],
       'grant_view' => $node->status,
       'grant_update' => 1,
       'grant_delete' => 1,
@@ -1994,9 +1943,6 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   else {
     $behavior = variable_get('domain_node_' . $form['#node']->type, 0);
   }
-  if ($_domain['domain_id'] == 0) {
-    $default[] = -1;
-  }
 
   // Some options will be passed as hidden values, we need to run some checks on those.
   if (isset($form['#node']->nid)) {
@@ -2010,12 +1956,10 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   // Get the display format of the form element.
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
-    // Cannot pass zero in checkboxes.
-    ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
     // The domain must be valid.
     if ($data['valid'] || user_access('access inactive domains')) {
       // Checkboxes must be filtered, select lists should not.
-      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
+      $options[$data['domain_id']] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
   // If the user is a site admin, show the form, otherwise pass it silently.
@@ -2146,8 +2090,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
           }
           if (!empty($raw)) {
             foreach ($raw as $did) {
-              ($did == -1) ? $id = 0 : $id = $did;
-              $raw_domains = domain_lookup($id);
+              $raw_domains = domain_lookup($did);
               $list[]['data'] = check_plain($raw_domains['sitename']);
             }
           }
@@ -2246,12 +2189,10 @@ function domain_form_devel_generate_content_form_alter(&$form, &$form_state) {
   // Get the display format of the form element.
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
-    // Cannot pass zero in checkboxes.
-    ($data['domain_id'] == 0) ? $key = -1 : $key = $data['domain_id'];
     // The domain must be valid.
     if ($data['valid'] || user_access('access inactive domains')) {
       // Checkboxes must be filtered, select lists should not.
-      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
+      $options[$data['domain_id']] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
   $form['domain']['domains'] = array(
@@ -2384,7 +2325,8 @@ function domain_resolve_host($name = '') {
  * The current (host) domain name as a String.
  */
 function domain_request_name() {
-  if (!empty($_SERVER['HTTP_HOST'])) {
+  // Drush may set this value to 'default' if it is empty.
+  if (!empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != 'default') {
     // We lower case this, since EXAMPLE.com == example.com.
     return strtolower(rtrim($_SERVER['HTTP_HOST']));
   }
@@ -2436,9 +2378,6 @@ function domain_invalid_domain_requested() {
   }
   elseif (!empty($node->domains)) {
     foreach ($node->domains as $domain_id) {
-      if ($domain_id == -1) {
-        $domain_id = 0;
-      }
       $domain = domain_lookup($domain_id);
       if ($domain['valid']) {
         $redirect = $domain;

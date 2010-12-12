@@ -328,47 +328,7 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
       $func($form);
     }
   }
-  // Add our additional submit handlers.
-  $form['#submit'] = array('domain_configure_form_submit');
   return system_settings_form($form);
-}
-
-/**
- * Validate the primary domain string.
- */
-function domain_configure_form_validate($form, &$form_state) {
-  if (!isset($form_state['values']['domain_root'])) {
-    return;
-  }
-  $subdomain = $form_state['values']['domain_root'];
-  $domain_changed = (bool) strcmp($form_state['values']['domain_root'], $form['domain']['domain_root']['#default_value']);
-  if ($domain_changed) {
-    $error_list = domain_validate($subdomain);
-    foreach ($error_list as $error) {
-      form_set_error('domain_root', $error);
-    }
-  }
-}
-
-/**
- * Save any changes to the primary domain record.
- */
-function domain_configure_form_submit($form, &$form_state) {
-  if (!isset($form_state['values']['domain_root'])) {
-    return;
-  }
-  $subdomain = $form_state['values']['domain_root'];
-  db_update('domain')
-    ->condition('domain_id', 0)
-    ->fields(array(
-      'subdomain' => $subdomain,
-      'sitename' => $form_state['values']['domain_sitename'],
-      'scheme' => $form_state['values']['domain_scheme'],
-      'valid' => 1,
-    ))
-    ->execute();
-  // Allow other modules to respond to changes.
-  module_invoke_all('domain_update', domain_default(TRUE));
 }
 
 /**
@@ -1011,12 +971,7 @@ function domain_roles_form($form, $form_state) {
   );
   $domains = array();
   foreach (domain_domains() as $key => $value) {
-    if ($key > 0) {
-      $domains[$key] = $value['sitename'];
-    }
-    else {
-      $domains[-1] = $value['sitename'];
-    }
+    $domains[$key] = $value['sitename'];
   }
   foreach ($roles as $rid => $role) {
     $form['domain_roles'][$rid]['#tree'] = TRUE;
@@ -1052,9 +1007,6 @@ function theme_domain_roles_form($variables) {
   }
   foreach ($domains as $domain_id => $domain) {
     $row = array();
-    if ($domain_id == 0) {
-      $domain_id = -1;
-    }
     $row[] = filter_xss_admin($domain['sitename']);
     foreach ($roles as $rid => $role) {
       $form['domain_roles'][$rid][$domain_id]['#title'] = '';

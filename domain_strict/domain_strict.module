@@ -34,11 +34,9 @@ function domain_strict_domaingrants(&$grants, $account, $op) {
   $domains = domain_get_user_domains($account);
   if (!empty($domains)) {
     foreach ($domains as $key => $value) {
-      // The -1 is the root domain, since 0 cannot be stored by checkboxes.
-      ($value == -1) ? $id = 0 : $id = $value;
       // If the user has access to the current domain, set that grant.
-      if (abs($value) > 0 && $id == $_domain['domain_id']) {
-        $grants['domain_id'][] = $id;
+      if ($value == $_domain['domain_id']) {
+        $grants['domain_id'][] = $value;
       }
     }
   }

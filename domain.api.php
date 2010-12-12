@@ -608,8 +608,7 @@ function hook_domain_nav_options_alter(&$options) {
   }
   else {
     foreach ($options as $key => $value) {
-      $check = ($key == 0) ? -1 : $key; // Account for -1.
-      if (!in_array($check, $user->domain_user)) {
+      if (!in_array($key, $user->domain_user)) {
         unset($options[$key]);
       }
     }

@@ -1,5 +1,9 @@
 // $Id$
 
+12-DEC-2010
+-- #819904. Removes domain id 0 as a concept. Required update.php.
+-- HEAD is now unstable.
+
 11-DEC-2010
 -- #995342 by mrgoltra. Domain Nav fails on uninstall.
 
