@@ -1,5 +1,8 @@
 // $Id$
 
+13-DEC-2010
+-- Patch #952476 by nonsie, millaraj. Clean up $weight notice.
+
 12-DEC-2010
 -- #819904. Removes domain id 0 as a concept. Requires update.php.
 -- HEAD is now unstable.

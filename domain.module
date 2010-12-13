@@ -2060,7 +2060,6 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             '#title' => t('Affiliate publishing options'),
             '#collapsible' => TRUE,
             '#collapsed' => FALSE,
-            '#weight' => $weight,
           );
           // We must preserve publishing options that the user cannot access, but only for
           // existing nodes.
