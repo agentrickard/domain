@@ -61,7 +61,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
     // Get the user's allowed domains.
     foreach ($domains as $domain) {
       $key = $domain['domain_id'];
-      if ($user->domain_user[$key] != 0 && ($domain['valid'] || user_access('access inactive domains'))) {
+      if (!empty($user->domain_user[$key]) && ($domain['valid'] || user_access('access inactive domains'))) {
         $options[$key] = $domain['sitename'];
       }
     }
