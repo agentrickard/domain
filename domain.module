@@ -722,7 +722,7 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     // The domain must be valid.
     if ($data['valid'] || user_access('access inactive domains')) {
       // Filter checkbox output but not select list.
-      $options[$key] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
+      $options[$data['domain_id']] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }
   $form['domain'] = array(
