@@ -5,3 +5,4 @@ package = Domain Access
 dependencies[] = domain
 core = 7.x
 files[] = domain_nav.module
+stylesheets[all][] = domain_nav.css

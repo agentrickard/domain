@@ -1,5 +1,8 @@
 // $Id$
 
+12-DEC-2010
+-- Fixes JS/CSS loading for Drupal 7.
+
 11-DEC-2010
 -- #995342 by mrgoltra. Domain Nav fails on uninstall.
 

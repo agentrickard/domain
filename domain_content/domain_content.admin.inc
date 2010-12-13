@@ -152,7 +152,8 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
 function domain_content_admin() {
   // Load the form basics for administering nodes.
   include_once drupal_get_path('module', 'node') .'/node.admin.inc';
-  drupal_add_css(drupal_get_path('module', 'domain_content') . '/domain_content.css');
+  $form = array();
+  $form['#attached']['css'] = array(drupal_get_path('module', 'domain_content') . '/domain_content.css');
 
   if (isset($form_state['values']['operation']) && $form_state['values']['operation'] == 'delete') {
     return node_multiple_delete_confirm($form, $form_state, array_filter($form_state['values']['nodes']));
