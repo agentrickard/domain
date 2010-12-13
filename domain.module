@@ -283,9 +283,11 @@ function domain_permission() {
   $permissions = array(
     'administer domains' => array(
       'title' => t('Administer domain records and settings'),
+      'restrict access' => TRUE,
     ),
     'access inactive domains' => array(
       'title' => t('Access inactive domains'),
+      'restrict access' => TRUE,
     ),
     'assign domain editors' => array(
       'title' => t('Assign editors to domains'),
@@ -297,7 +299,7 @@ function domain_permission() {
       'title' => t('Delete any content on assigned domains'),
     ),
     'set domain access' => array(
-      'title' => t('Set domain access status for content'),
+      'title' => t('Set domain access status for all content'),
     ),
     'publish to any assigned domain' => array(
       'title' => t('Publish content to any assigned domain'),
