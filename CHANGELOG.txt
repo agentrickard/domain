@@ -1,7 +1,7 @@
 // $Id$
 
 13-DEC-2010
--- Patch #952476 by nonsie, millaraj. Clean up $weight notice.
+-- Patch #952476 by nonsie, millaraj. Clean up $weight notice and bad index.
 
 12-DEC-2010
 -- Fixes JS/CSS loading for Drupal 7.
