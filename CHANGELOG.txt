@@ -1,5 +1,8 @@
 // $Id$
 
+13-DEC-2010
+-- Patch #952476 by nonsie, millaraj. Clean up $weight notice.
+
 12-DEC-2010
 -- Fixes JS/CSS loading for Drupal 7.
 -- Adds permission warnings for dangerous elements.
