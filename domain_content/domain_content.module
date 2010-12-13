@@ -83,7 +83,8 @@ function domain_content_menu() {
 function domain_content_permission() {
   $permissions = array(
     'review content for all domains' => array(
-      'title' => t('Access inactive domains'),
+      'title' => t('Review content for all domains'),
+      'restrict access' => TRUE,
     ),
   );
   return $permissions;
