@@ -10,10 +10,10 @@ class DomainTestCase extends DrupalWebTestCase {
 
   // On setup, install our module and create a default domain.
   public function setUp() {
-    // Prevent simpleTest from vomiting on bootstrap if there
+    // Prevent simpletest from vomiting on bootstrap if there
     // are required submodules.
-    // Right now, this breaks if Domain Alias is enabled???
     $modules = _domain_bootstrap_modules();
+    module_enable($modules);
     parent::setUp($modules);
 
     // Account for drush and other automated testing to set a proper http value.
@@ -82,7 +82,6 @@ class DomainTestCase extends DrupalWebTestCase {
     return $setup;
   }
 
-
   public function tearDown() {
     parent::tearDown();
   }
@@ -90,9 +89,6 @@ class DomainTestCase extends DrupalWebTestCase {
 }
 
 class DomainInstallTest extends DomainTestCase {
-  function setUp() {
-    parent::setUp();
-  }
 
   public static function getInfo() {
     return array(
@@ -140,9 +136,6 @@ class DomainInstallTest extends DomainTestCase {
 }
 
 class DomainCreateTest extends DomainTestCase {
-  function setUp() {
-    parent::setUp();
-  }
 
   public static function getInfo() {
     return array(
