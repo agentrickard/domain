@@ -312,7 +312,7 @@ function domain_conf_domainbatch() {
       '#options' => $options,
       '#description' => t('Select the administrative theme for this domain.'),
     ),
-    '#permission' => 'administer themes',
+    '#permission' => 'administer site configuration',
     '#domain_action' => 'domain_conf',
     '#system_default' => variable_get('admin_theme', 0),
     '#variable' => 'admin_theme',

@@ -1,5 +1,9 @@
 // $Id$
 
+15-DEC-2010
+
+-- #999462 by bleen18 and Dave Reid. Accidentally calls D7 permission.
+
 10-DEC-2010
 
 -- Patch #361018 by Dave Reid. Fixes token handling.
