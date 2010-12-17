@@ -1,5 +1,9 @@
 // $Id$
 
+16-DEC-2010
+
+-- Patch #973126 by pacproduct. Fix function name in domain_views.
+
 15-DEC-2010
 
 -- #999462 by bleen18 and Dave Reid. Accidentally calls D7 permission.
