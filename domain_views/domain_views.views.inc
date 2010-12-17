@@ -334,7 +334,7 @@ function domain_views_views_plugins() {
 /**
  * Implement hook_views_query_substitutions ()
  */
-function domain_views_query_substitutions($view) {
+function domain_views_views_query_substitutions($view) {
   return array('***CURRENT_DOMAIN***' => $GLOBALS['_domain']['domain_id']);
 }
 
