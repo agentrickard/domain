@@ -16,9 +16,8 @@
  */
 function domain_theme_page($domain) {
   if (isset($domain['domain_id'])) {
-
-    $default = domain_default();
-    if ($domain['domain_id'] == $default['domain_id']) {
+    // Check the current domain.
+    if ($domain['domain_id'] == domain_default_id()) {
       drupal_set_message(t('This is your default domain. Use of this form is discouraged. Set these values through the standard interface.'), 'warning', FALSE);
     }
 

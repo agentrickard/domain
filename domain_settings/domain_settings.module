@@ -79,8 +79,7 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
     $default = -5;
   }
   else {
-    $default_domain = domain_default();
-    $default = $default_domain['domain_id'];
+    $default = domain_default_id();
   }
   $form['domain_settings']['domain_id'] = array(
     '#type' => empty($format) ? 'radios' : 'select',
@@ -116,8 +115,7 @@ function domain_settings_form_submit($form, &$form_state) {
     }
   }
   // Get the primary domain.
-  $default_domain = domain_default();
-  $default = $default_domain['domain_id'];
+  $default = domain_default_id();
   foreach ($values as $name => $value) {
     // Handle checkboxes when array_filter is set. (Do not return empty checkboxes at all.)
     if (is_array($value) && isset($form_state['values']['array_filter'])) {

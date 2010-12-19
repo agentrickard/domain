@@ -1007,6 +1007,24 @@ function domain_default($reset = FALSE, $alter = TRUE) {
 }
 
 /**
+ * Return the id of the default domain.
+ *
+ * Utility function for checking the default domain id; returns
+ * only the 'domain_id' element of the default domain array.
+ *
+ * @return
+ *   The domain_id of the default domain.
+ */
+function domain_default_id() {
+  static $id;
+  if (!isset($id)) {
+    $default = domain_default();
+    $id = $default['domain_id'];
+  }
+  return $id;
+}
+
+/**
  * Set the primary domain properly, if necessary.
  */
 function domain_set_primary_domain() {
@@ -1310,8 +1328,7 @@ function domain_get_domain() {
  */
 function domain_check_primary($msg = 'default') {
   $_domain = domain_get_domain();
-  $default = domain_default();
-  if ($_domain['domain_id'] != $default['domain_id']) {
+  if ($_domain['domain_id'] != domain_default_id()) {
     if ($msg == 'default') {
       drupal_set_message(t('You have been redirected: This page must be accessed from the primary domain.'));
     }

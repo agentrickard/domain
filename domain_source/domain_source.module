@@ -153,8 +153,7 @@ function domain_source_node_validate($node, $form) {
     return;
   }
   $key = $node->domain_source;
-  $default_domain = domain_default();
-  $default = $default_domain['domain_id'];
+  $default = domain_default_id();
   // Check the domain and domains_raw variables to set up the allowed source list.
   $allowed = array();
   if (!empty($node->domains)) {
@@ -328,8 +327,7 @@ function domain_source_update_nodes($form, &$form_state) {
  */
 function domain_source_validate($form, &$form_state) {
   if ($form_state['values']['operation'] == 'domain') {
-    $default_domain = domain_default();
-    $default = $default_domain['domain_id'];
+    $default = domain_default_id();
     $key = $form_state['values']['domain_source'];
     if ($form_state['values']['domain_site'] && $key == $default || $key == DOMAIN_SOURCE_USE_ACTIVE) {
       // These cases are acceptable, so we let them pass.

@@ -21,8 +21,7 @@ function domain_conf_page($domain) {
   if ($domain == -1) {
     return t('Invalid page requested.');
   }
-  $default = domain_default();
-  if ($domain['domain_id'] == $default['domain_id']) {
+  if ($domain['domain_id'] == domain_default_id()) {
     drupal_set_message(t('This is your default domain. Use of this form is discouraged. Set these values through the standard interface.'), 'warning', FALSE);
   }
   $output = theme('domain_conf_reset', array('domain' => $domain));

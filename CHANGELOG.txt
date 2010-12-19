@@ -1,5 +1,8 @@
 // $Id$
 
+19-DEC-2010
+-- Adds domain_default_id() utility function for checking domain status.
+
 13-DEC-2010
 -- Patch #952476 by nonsie, millaraj. Clean up $weight notice and bad index.
 
