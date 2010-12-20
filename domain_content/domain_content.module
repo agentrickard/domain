@@ -38,41 +38,45 @@ function domain_content_menu() {
     'description' => 'View content assigned to all affiliate sites.',
     'weight' => -10
   );
-  // Generate the list of active domains as menu items
-  $domains = domain_domains();
-  if (count($domains) <= variable_get('domain_list_size', DOMAIN_LIST_SIZE)) {
-    foreach ($domains as $domain) {
-      $items['admin/domain/content/' . $domain['domain_id']] = array(
-        'title' => check_plain($domain['sitename']) .' content',
-        'page callback' => 'domain_content_view',
-        'page arguments' => array($domain['domain_id'], FALSE),
-        'access callback' => 'domain_content_check',
-        'access arguments' => array($domain['domain_id']),
+  // Generate the list of active domains as menu items.
+  // We must wrap this check, otherwise the uninstall fails.
+  // See http://drupal.org/node/1003430.
+  if (module_exists('domain')) {
+    $domains = domain_domains();
+    if (count($domains) <= variable_get('domain_list_size', DOMAIN_LIST_SIZE)) {
+      foreach ($domains as $domain) {
+        $items['admin/domain/content/' . $domain['domain_id']] = array(
+          'title' => check_plain($domain['sitename']) .' content',
+          'page callback' => 'domain_content_view',
+          'page arguments' => array($domain['domain_id'], FALSE),
+          'access callback' => 'domain_content_check',
+          'access arguments' => array($domain['domain_id']),
+          'file' => 'domain_content.admin.inc',
+          'description' => 'View content assigned to '. filter_xss_admin($domain['subdomain']),
+          'weight' => $domain['domain_id']
+        );
+      }
+    }
+    else {
+      $items['admin/domain/content/list'] = array(
+        'title' => 'Affiliate site list',
+        'page callback' => 'domain_content_list',
+        'access callback' => 'domain_content_menu_check',
         'file' => 'domain_content.admin.inc',
-        'description' => 'View content assigned to '. filter_xss_admin($domain['subdomain']),
-        'weight' => $domain['domain_id']
+        'description' => 'View your list of affiliates',
+        'weight' => -10
+      );
+      $items['admin/domain/content/%'] = array(
+        'title' => 'Affiliate site list',
+        'page callback' => 'domain_content_view',
+        'page arguments' => array(3, TRUE),
+        'access callback' => 'domain_content_check',
+        'access arguments' => array(3),
+        'file' => 'domain_content.admin.inc',
+        'description' => 'Content list for a domain',
+        'weight' => -10
       );
     }
-  }
-  else {
-    $items['admin/domain/content/list'] = array(
-      'title' => 'Affiliate site list',
-      'page callback' => 'domain_content_list',
-      'access callback' => 'domain_content_menu_check',
-      'file' => 'domain_content.admin.inc',
-      'description' => 'View your list of affiliates',
-      'weight' => -10
-    );
-    $items['admin/domain/content/%'] = array(
-      'title' => 'Affiliate site list',
-      'page callback' => 'domain_content_view',
-      'page arguments' => array(3, TRUE),
-      'access callback' => 'domain_content_check',
-      'access arguments' => array(3),
-      'file' => 'domain_content.admin.inc',
-      'description' => 'Content list for a domain',
-      'weight' => -10
-    );
   }
   return $items;
 }
