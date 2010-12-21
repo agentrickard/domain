@@ -1452,15 +1452,16 @@ function domain_goto($domain) {
  * Implements hook_node_load()
  */
 function domain_node_load($nodes, $types) {
+  // Get the domain data.
+  $domains = domain_get_node_domains($nodes);
   foreach ($nodes as $node) {
     // Cannot load if the node has not been created yet.
     if (!isset($node->nid)) {
       continue;
     }
     // Append the domain grants to the node for editing.
-    $domains = domain_get_node_domains($node->nid);
-    $nodes[$node->nid]->domains = $domains['domain_id'];
-    $nodes[$node->nid]->domain_site = $domains['domain_site'];
+    $nodes[$node->nid]->domains = $domains[$node->nid]['domain_id'];
+    $nodes[$node->nid]->domain_site = $domains[$node->nid]['domain_site'];
     $nodes[$node->nid]->subdomains = array();
     if ($nodes[$node->nid]->domain_site) {
       $nodes[$node->nid]->subdomains[] = t('All affiliates');
@@ -1594,35 +1595,30 @@ function domain_get_path_match($path) {
 }
 
 /**
- * Get the domains for a node.
+ * Get the domains for multiple matches, mimicking node_load().
  *
- * @param $nid
- *   The node id.
+ * @param $nodes
+ *   An array of nodes, keyed by node id, or a single node id.
  * @param $reset
  *   A boolean flag indicating the need to reset the static variable for the node.
- * @param $return
- *   Used with reset. Indicates that a new lookup should be run and the result returned.
- *   @see _domain_store_grants()
+ *
  * @return
- *   An array, consisting of two parts. 'domain_id' is an array of active domain ids. 'domain_site'
- *   is a TRUE/FALSE boolean indicating affiliate status.
+ *   An array of data, keyed by node id, or a single array for a single node.
+ *   The data array, consists of two parts. 'domain_id' is an array of active domain ids.
+ *   'domain_site' is a TRUE/FALSE boolean indicating affiliate status.
  */
-function domain_get_node_domains($nid, $reset = FALSE, $return = FALSE) {
-  static $lookup = array();
-  if (isset($lookup[$nid])) {
-    // If set and valid, return.
-    if (empty($reset)) {
-      return $lookup[$nid];
-    }
-    // If reset and no return needed, unset and return.
-    elseif (empty($return)) {
-      unset($lookup[$nid]);
-      return;
-    }
+function domain_get_node_domains($nodes, $reset = FALSE) {
+  static $lookup;
+  if (isset($lookup) && $reset) {
+    unset($lookup);
+  }
+  $array = is_array($nodes);
+  if (!$array && isset($lookup[$nodes])) {
+    return $lookup[$nodes];
   }
   // Set the proper value for the node.
   $domains = array('domain_id' => array(), 'domain_site' => FALSE);
-  $result = db_query("SELECT gid, realm FROM {domain_access} WHERE nid = :nid AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => $nid));
+  $result = db_query("SELECT nid, gid, realm FROM {domain_access} WHERE nid IN (:nid) AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => array_keys($nodes)));
   foreach ($result as $data) {
     if ($data->realm == 'domain_id') {
       $domains['domain_id'][$data->gid] = $data->gid;
@@ -1630,9 +1626,13 @@ function domain_get_node_domains($nid, $reset = FALSE, $return = FALSE) {
     elseif ($data->realm == 'domain_site') {
       $domains['domain_site'] = TRUE;
     }
+    $lookup[$data->nid] = $domains;
   }
-  $lookup[$nid] = $domains;
-  return $lookup[$nid];
+  // Return all data or just a single node?
+  if ($array) {
+    return $lookup;
+  }
+  return $lookup[$nodes];
 }
 
 /**
