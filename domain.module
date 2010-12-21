@@ -1612,13 +1612,21 @@ function domain_get_node_domains($nodes, $reset = FALSE) {
   if (isset($lookup) && $reset) {
     unset($lookup);
   }
-  $array = is_array($nodes);
+  // Ensure we form our data properly.
+  if (!is_array($nodes)) {
+    $node_ids[$nodes] = $nodes;
+    $array = FALSE;
+  }
+  else {
+    $node_ids = $nodes;
+    $array = TRUE;
+  }
   if (!$array && isset($lookup[$nodes])) {
     return $lookup[$nodes];
   }
   // Set the proper value for the node.
   $domains = array('domain_id' => array(), 'domain_site' => FALSE);
-  $result = db_query("SELECT nid, gid, realm FROM {domain_access} WHERE nid IN (:nid) AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => array_keys($nodes)));
+  $result = db_query("SELECT nid, gid, realm FROM {domain_access} WHERE nid IN (:nid) AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => array_keys($node_ids)));
   foreach ($result as $data) {
     if ($data->realm == 'domain_id') {
       $domains['domain_id'][$data->gid] = $data->gid;
