@@ -180,13 +180,13 @@ function domain_source_node_validate($node, $form) {
  * Implements hook_node_load().
  */
 function domain_source_node_load($nodes, $types) {
+  $source = domain_source_lookup($nodes);
   foreach ($nodes as $node) {
     // Cannot load if the node has not been created yet.
     if (!isset($node->nid)) {
       continue;
     }
-    $source = domain_source_lookup($node->nid, $node->domains, $node->domain_site);
-    $nodes[$node->nid]->domain_source = $source['domain_id'];
+    $nodes[$node->nid]->domain_source = $source[$node->nid]['domain_id'];
   }
 }
 
@@ -204,6 +204,8 @@ function domain_source_node_insert($node) {
       'domain_id' => $node->domain_source,
     ))
     ->execute();
+  // Clear the cache.
+  domain_source_lookup($node->nid, array(), NULL, TRUE);
 }
 
 /**
@@ -250,58 +252,78 @@ function domain_source_node_view($node, $view_mode) {
 }
 
 /**
- * Find the proper source domain for a node.
+ * Get the source domains for multiple matches, mimicking node_load().
  *
- * @param $nid
- *   The node id.
+ * @param $nodes
+ *   An array of nodes, keyed by node id, or a single node id.
  * @param $domains
- *   An optional array of domain ids, which is present when this function is called from hook_nodeapi().
+ *   An optional array of domain ids; can only be used for a single node.
  * @param $domain_site
  *   Optional flag indicating that the node is assigned to all domains.
  * @param $reset
  *   Force a reset of the static data lookup.
  * @return
- *   The active source domain to use; an array returned by domain_lookup().
+ *   An associative array of data, keyed by node id, or a single array.
+ *   The data array is the active source domain to use, as returned by domain_lookup().
  */
-function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE, $reset = FALSE) {
+function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, $reset = FALSE) {
   global $_domain;
   static $lookups;
-  
+  if (isset($lookup) && $reset) {
+    unset($lookup);
+  }
+  if (!is_array($nodes)) {
+    $nid = $nodes;
+    $node_ids = array($nid);
+    $array = FALSE;
+  }
+  else {
+    $node_ids = array_keys($nodes);
+    $array = TRUE;
+  }
   // Static cache.
-  if (!$reset && isset($lookups[$nid])) {
+  if (!$reset && isset($nid) && isset($lookups[$nid])) {
     return $lookups[$nid];
   }
 
-  $source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $nid))->fetchField();
+  $result = db_query("SELECT nid, domain_id FROM {domain_source} WHERE nid IN (:nid)", array(':nid' => $node_ids))->fetchAll();
 
-  // Default source for nodes with no setting.
-  if ($source === FALSE) {
-    $source = variable_get('domain_default_source', 0);
+  foreach ($result as $data) {
+    $source = $data->domain_id;
+    
+    // Default source for nodes with no setting.
+    if ($source === FALSE) {
+      $source = variable_get('domain_default_source', 0);
+    }
+    // Global setting for 'do not change domain.'
+    if ($source == -1) {
+      $source = $_domain['domain_id'];
+    }
+    // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
+    elseif ($source == DOMAIN_SOURCE_USE_ACTIVE) {
+      $source = $_domain['domain_id'];
+    }
+    // When called from url_rewrite_outbound(), we have no data.
+    if (empty($domains)) {
+      $lookup = domain_get_node_domains($data->nid);
+      $domain_site = $lookup['domain_site'];
+      $domains = $lookup['domain_id'];
+    }
+    // domain_get_node_domains() returns the default (0) domain as -1, so we
+    // must transform it here before running a check.
+    $source = ($source == 0) ? -1 : $source;
+    // If no valid source is found, take the first match from the $domains array.
+    if (empty($domain_site) && !empty($domains) && !in_array($source, $domains)) {
+      $source = current($domains);
+    }
+    // Convert the source id from -1 to 0 and run the lookup.
+    $domain_id = ($source == -1) ? 0 : $source;
+    // Lookup the source domain.
+    $lookups[$data->nid] = domain_lookup($source);
   }
-  // Global setting for 'do not change domain.'
-  if ($source == -1) {
-    $source = $_domain['domain_id'];
+  if ($array) {
+    return $lookups;
   }
-  // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
-  elseif ($source == DOMAIN_SOURCE_USE_ACTIVE) {
-    $source = $_domain['domain_id'];
-  }
-  // When called from url_rewrite_outbound(), we have no data.
-  if (empty($domains)) {
-    $lookup = domain_get_node_domains($nid);
-    $domain_site = $lookup['domain_site'];
-    $domains = $lookup['domain_id'];
-  }
-  // domain_get_node_domains() returns the default (0) domain as -1, so we
-  // must transform it here before running a check.
-  $source = ($source == 0) ? -1 : $source;
-  // If no valid source is found, take the first match from the $domains array.
-  if (empty($domain_site) && !empty($domains) && !in_array($source, $domains)) {
-    $source = current($domains);
-  }
-  // Convert the source id from -1 to 0 and run the lookup.
-  $domain_id = ($source == -1) ? 0 : $source;
-  $lookups[$nid] = domain_lookup($domain_id);
   return $lookups[$nid];
 }
 

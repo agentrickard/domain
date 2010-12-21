@@ -1597,8 +1597,10 @@ function domain_get_node_domains($nodes, $reset = FALSE) {
   $domains = array('domain_id' => array(), 'domain_site' => FALSE);
   $result = db_query("SELECT nid, gid, realm FROM {domain_access} WHERE nid IN (:nid) AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => array_keys($node_ids)));
   foreach ($result as $data) {
+    // Transform the 0 to -1, since {domain_access} is unsigned.
+    ($data->gid == 0) ? $gid = -1 : $gid = $data->gid; 
     if ($data->realm == 'domain_id') {
-      $domains['domain_id'][$data->gid] = $data->gid;
+      $domains['domain_id'][$gid] = $gid;
     }
     elseif ($data->realm == 'domain_site') {
       $domains['domain_site'] = TRUE;
