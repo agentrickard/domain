@@ -868,7 +868,7 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   }
   // Get the data from the database. Doing this prevents extra queries.
   if (!isset($result) || $reset) {
-    $result = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain}")->fetchAllAssoc('domain_id');
+    $result = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain}", array(), array('fetch' => PDO::FETCH_ASSOC))->fetchAllAssoc('domain_id');
   }
   // If both are NULL, no lookup can be run.
   if ((is_null($domain_id) && is_null($subdomain)) || $domain_id < 0) {
@@ -877,14 +877,14 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   // Run the lookup, if needed.
   elseif (!isset($domains[$key]) || $reset) {
     if ($subdomain) {
-      foreach ($result as $object) {
-        if ($object->subdomain == $subdomain) {
-          $domain = (array) $object;
+      foreach ($result as $array) {
+        if ($array['subdomain'] == $subdomain) {
+          $domain = $array;
         }
       }
     }
     elseif (isset($result[$domain_id])) {
-      $domain = (array) $result[$domain_id];
+      $domain = $result[$domain_id];
     }
     // Did we get a valid result?
     if (isset($domain['domain_id'])) {
