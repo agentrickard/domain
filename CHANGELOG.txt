@@ -4,6 +4,7 @@
 -- Better static caching for domain_lookup(). Saves queries!
 -- Better static caching for domain_alias_list(). Saves queries!
 -- Optimize domain_get_node_domains() for multiple node loads.
+-- Optimize domain_source_lookup() for multiple node loads.
 
 20-DEC-2010
 -- #1003430 by Mo. Fixes bad function call during uninstall.
