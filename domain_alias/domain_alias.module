@@ -280,11 +280,13 @@ function _domain_alias_placeholders_from_sql($subdomain) {
  *   An array of all aliases defined for given domain_id, indexed by alias_id
  */
 function domain_alias_list($domain_id, $reset = FALSE) {
-  static $aliases = array();
+  static $aliases, $result;
+  // Query the db for aliases.
+  if (!isset($result) || $reset) {
+    $result = db_query("SELECT alias_id, pattern, redirect FROM {domain_alias}", array(), array('fetch' => PDO::FETCH_ASSOC))->FetchAll();
+  }
   if (!isset($aliases[$domain_id]) || $reset) {
     $aliases[$domain_id] = array();
-    // Query the db for aliases.
-    $result = db_query("SELECT alias_id, pattern, redirect FROM {domain_alias} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id), array('fetch' => PDO::FETCH_ASSOC));
     foreach ($result as $data) {
       $data['pattern'] = _domain_alias_placeholders_from_sql($data['pattern']);
       $aliases[$domain_id][$data['alias_id']] = $data;
