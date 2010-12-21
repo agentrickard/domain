@@ -935,20 +935,32 @@ function domain_save($values, $form_values) {
  *   elements added by hook_domain_load().  Returns -1 on failure.
  */
 function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
-  static $domains;
-  // If both are NULL, no lookup can be run.
-  if (is_null($domain_id) && is_null($subdomain)) {
-    return -1;
-  }
+  static $domains, $result;
   // Create a unique key so we can static cache all requests.
   $key = $domain_id . $subdomain;
+  // Shortcut if we know the data.
+  if (!$reset && isset($domains[$key])) {
+    return $domains[$key];
+  }
+  // Get the data from the database. Doing this prevents extra queries.
+  if (!isset($result) || $reset) {
+    $result = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain}", array(':subdomain' => $subdomain))->fetchAllAssoc('domain_id');
+  }
+  // If both are NULL, no lookup can be run.
+  if ((is_null($domain_id) && is_null($subdomain)) || $domain_id < 0) {
+    $domains[$key] = -1;
+  }
   // Run the lookup, if needed.
-  if (!isset($domains[$key]) || $reset) {
+  elseif (!isset($domains[$key]) || $reset) {
     if ($subdomain) {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE subdomain = :subdomain", array(':subdomain' => $subdomain))->fetchAssoc();
+      foreach ($result as $object) {
+        if ($object->subdomain == $subdomain) {
+          $domain = (array) $object;
+        }
+      }
     }
-    else {
-      $domain = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchAssoc();
+    elseif (isset($result[$domain_id])) {
+      $domain = (array) $result[$domain_id];
     }
     // Did we get a valid result?
     if (isset($domain['domain_id'])) {
@@ -1069,7 +1081,7 @@ function domain_domains($reset = FALSE) {
     // Query the db for active domain records.
     $result = db_query("SELECT domain_id FROM {domain} ORDER BY weight", array(), array('fetch' => PDO::FETCH_ASSOC));
     foreach ($result as $data) {
-      $domain = domain_lookup($data['domain_id'], NULL, TRUE);
+      $domain = domain_lookup($data['domain_id'], NULL, $reset);
       $domains[$domain['domain_id']] = $domain;
     }
   }
