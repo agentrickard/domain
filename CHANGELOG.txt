@@ -1,5 +1,8 @@
 // $Id$
 
+22-DEC-2010
+-- Follup patch for better multiple source loading.
+
 21-DEC-2010
 -- Better static caching for domain_lookup(). Saves queries!
 -- Better static caching for domain_alias_list(). Saves queries!
