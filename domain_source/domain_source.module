@@ -195,9 +195,10 @@ function domain_source_node_load($nodes, $types) {
  */
 function domain_source_node_insert($node) {
   // If not set, we ignore.
-  if (!isset($node->domain_source)) {
+  if (!isset($node->domain_source) || is_null($node->domain_source)) {
     return;
   }
+  domain_source_node_delete($node);
   db_insert('domain_source')
     ->fields(array(
       'nid' => $node->nid,
@@ -212,7 +213,6 @@ function domain_source_node_insert($node) {
  * Implements hook_node_update()
  */
 function domain_source_node_update($node) {
-  domain_source_node_delete($node);
   domain_source_node_insert($node);
 }
 
@@ -269,9 +269,11 @@ function domain_source_node_view($node, $view_mode) {
 function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, $reset = FALSE) {
   global $_domain;
   static $lookups;
-  if (isset($lookup) && $reset) {
-    unset($lookup);
+  // Reset?
+  if ($reset) {
+    $lookups = array();
   }
+  // Ensure we format the lookup correctly.
   if (!is_array($nodes)) {
     $nid = $nodes;
     $node_ids = array($nid);
@@ -290,17 +292,9 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
 
   foreach ($result as $data) {
     $source = $data->domain_id;
-    
-    // Default source for nodes with no setting.
-    if ($source === FALSE) {
-      $source = variable_get('domain_default_source', 0);
-    }
-    // Global setting for 'do not change domain.'
-    if ($source == -1) {
-      $source = $_domain['domain_id'];
-    }
+
     // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
-    elseif ($source == DOMAIN_SOURCE_USE_ACTIVE) {
+    if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
       $source = $_domain['domain_id'];
     }
     // When called from url_rewrite_outbound(), we have no data.
@@ -319,7 +313,19 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
     // Convert the source id from -1 to 0 and run the lookup.
     $domain_id = ($source == -1) ? 0 : $source;
     // Lookup the source domain.
-    $lookups[$data->nid] = domain_lookup($source);
+    $lookups[$data->nid] = domain_lookup($domain_id);
+  }
+  // Make sure we found something for every requested node.
+  $no_records = array_diff($node_ids, array_keys($lookups));
+  foreach ($no_records as $nid) {
+    $default_source = variable_get('domain_default_source', 0);
+    // Global setting for 'do not change domain.'
+    if ($default_source == -1) {
+      $lookups[$nid] = $_domain;
+    }
+    else {
+      $lookups[$nid] = domain_lookup($default_source);
+    }
   }
   if ($array) {
     return $lookups;
