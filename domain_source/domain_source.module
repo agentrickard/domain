@@ -304,7 +304,7 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
       $source = current($domains);
     }
     // Lookup the source domain.
-    $lookups[$data->nid] = domain_lookup($domain_id);
+    $lookups[$data->nid] = domain_lookup($source);
   }
   // Make sure we found something for every requested node.
   $no_records = array_diff($node_ids, array_keys($lookups));
