@@ -70,3 +70,19 @@ function domain_test_domain_update($domain, $form_values = array()) {
 function domain_test_domain_delete($domain) {
   domain_test_set('delete');
 }
+
+/**
+ * Implements hook_domain_cron().
+ *
+ * We should both receive a $domain array and be setting the active
+ * domain to the current $domain, so we can test both here.
+ */
+function domain_test_domain_cron($domain) {
+  $_domain = domain_get_domain();
+  if ($_domain['domain_id'] == $domain['domain_id']) {
+    domain_test_set($domain['sitename']);
+  }
+  else {
+    domain_test_set('Failed');
+  }
+}

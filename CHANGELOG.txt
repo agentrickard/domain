@@ -6,6 +6,7 @@
 -- More tests.
 -- Cleaner handling inside domain_save().
 -- Adds domain_delete() abstraction. Tests deletion.
+-- Tests for domain switching. Cron runs.
 
 22-DEC-2010
 -- Follup patch for better multiple source loading.

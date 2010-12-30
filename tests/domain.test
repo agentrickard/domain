@@ -159,6 +159,7 @@ class DomainCreateTest extends DomainTestCase {
     foreach ($domains as $sitename => $domain) {
       $this->assertTrue($domains[$sitename]['sitename'] == $setup[$sitename]['sitename'], t('Domain %subdomain created successfully', array('%subdomain' => $domain['subdomain'])));
     }
+
     // Delete one of the domains.
     domain_delete($setup['three']);
     $deleted_domain = domain_lookup($setup['three']['domain_id'], NULL, TRUE);
@@ -196,6 +197,19 @@ class DomainHookTest extends DomainTestCase {
     $updated_domain = domain_save($new_domain, $new_domain);
     $this->assertTrue($updated_domain['sitename'] == 'testfoo', t('hook_domain_update() fired correctly.'));
 
+    // hook_domain_cron() should run for each domain, setting our static to the name of the domain.
+    // Get the domain list.
+    $domains = domain_domains(TRUE);
+    // Run the hook for each active domain.
+    foreach ($domains as $domain) {
+      domain_set_domain($domain['domain_id'], TRUE);
+      module_invoke('domain_test', 'domain_cron', $domain);
+      $value = domain_test_get();
+      $this->assertTrue($value == $domain['sitename'], t('Domain cron fired for %domain.', array('%domain' => $domain['subdomain'])));
+    }
+    // Reset the active domain.
+    domain_reset_domain(TRUE);
+
     // hook_domain_delete() sets a static value to 'delete' and removes the domain.
     domain_delete($updated_domain);
     $value = domain_test_get();
@@ -204,4 +218,46 @@ class DomainHookTest extends DomainTestCase {
     $this->assertTrue($deleted_domain == -1, t('Domain deleted successfully.'));
   }
 
+}
+
+class DomainSwitchingTest extends DomainTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Domain switching',
+      'description' => 'Ensure that programmtic domain switching works.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  // On setup, install our test module.
+  function setUp() {
+    parent::setUp();
+  }
+
+  // Test domain creation and switching.
+  function testDomainSwtiching() {
+    $_domain = domain_get_domain();
+
+    // Create some domains.
+    $result = $this->domainCreateDomains();
+
+    // Are we currently on the primary domain?
+    $default_id = domain_default_id();
+    $this->assertTrue($_domain['domain_id'] == $default_id, t('Primary domain loaded initially.'));
+
+    // Get the domain list.
+    $domains = domain_domains(TRUE);
+    // Switch to each active domain.
+    foreach ($domains as $domain) {
+      domain_set_domain($domain['domain_id'], TRUE);
+      $active = domain_get_domain();
+      $this->assertTrue($active['domain_id'] == $domain['domain_id'], t('Switched to domain %domain.', array('%domain' => $domain['subdomain'])));
+    }
+    // Reset the active domain.
+    domain_reset_domain(TRUE);
+    $active = domain_get_domain();
+    $this->assertTrue($active['domain_id'] == $_domain['domain_id'], t('Switched back to initial domain.'));
+
+  }
 }
