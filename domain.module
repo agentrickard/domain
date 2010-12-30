@@ -930,7 +930,7 @@ function domain_default($reset = FALSE, $alter = TRUE) {
     $default['valid'] = TRUE;
     if ($alter) {
       // Let submodules overwrite the defaults, if they wish.
-      $default = domain_api($default);
+      $default = domain_api($default, $reset);
     }
   }
   return $default;
