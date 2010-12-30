@@ -1,0 +1,17 @@
+<?php
+// $id$
+
+/**
+ * @file
+ *   Test module for Domain Access hooks.
+ */
+
+/**
+ * Implements hook_domain_load().
+ *
+ * Add a 'test' variable to the domain array.
+ */
+function domain_test_domain_load(&$domain) {
+  // Add a variable to the $domain array.
+  $domain['testvar'] = TRUE;
+}

@@ -1,5 +1,9 @@
 // $Id$
 
+30-DEC-2010
+-- Pass $reset from domain_default() to domain_api().
+-- Adds domain_test.module for hook testing.
+
 22-DEC-2010
 -- Follup patch for better multiple source loading.
 

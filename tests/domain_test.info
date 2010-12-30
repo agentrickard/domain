@@ -1,0 +1,6 @@
+; $Id$
+name = Domain Access Test 
+description = Support module for Domain Access testing.
+package = Testing
+core = 7.x
+hidden = TRUE
