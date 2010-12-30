@@ -4,6 +4,7 @@
 -- Pass $reset from domain_default() to domain_api().
 -- Adds domain_test.module for hook testing.
 -- More tests.
+-- Cleaner handling inside domain_save().
 
 22-DEC-2010
 -- Follup patch for better multiple source loading.
