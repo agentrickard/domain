@@ -1,5 +1,9 @@
 // $Id$
 
+30-DEC-2010
+
+-- Pass $reset from domain_default() to domain_api().
+
 16-DEC-2010
 
 -- Patch #973126 by pacproduct. Fix function name in domain_views.
