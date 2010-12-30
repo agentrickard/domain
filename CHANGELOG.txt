@@ -2,6 +2,7 @@
 
 30-DEC-2010
 -- Pass $reset from domain_default() to domain_api().
+-- Cleaner handling inside domain_save().
 
 22-DEC-2010
 -- Follup patch for better multiple source loading.

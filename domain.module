@@ -835,10 +835,11 @@ function domain_save($values, $edit) {
 
   drupal_write_record('domain', $values, $update);
 
-  // Let other modules act.
-  $domain = domain_lookup(NULL, $values['subdomain']);
-  module_invoke_all('domainupdate', $action, $domain, $edit);
-  // Return the recorded domain.
+  // Let other modules act on a proper copy of the domain.
+  $domain = domain_lookup(NULL, $values['subdomain'], TRUE);
+  module_invoke_all($action, $domain, $form_values);
+  // Lookup the modified record and return it.
+  $domain = domain_lookup(NULL, $values['subdomain'], TRUE);
   return $domain;
 }
 
