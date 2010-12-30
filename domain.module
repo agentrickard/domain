@@ -920,6 +920,25 @@ function domain_save($values, $form_values) {
 }
 
 /**
+ * Delete a domain record.
+ *
+ * @param $domain
+ *   The domain record being deleted.
+ * @param $values
+ *   An array of values passed by a form submit, if any.
+ */
+function domain_delete($domain, $values = array()) {
+  // Delete the record.
+  db_delete('domain')
+    ->condition('domain_id', $domain['domain_id'])
+    ->execute();
+  // Let other modules act.
+  module_invoke_all('domain_delete', $domain, $values);
+  // Notify that node access needs to be rebuilt.
+  node_access_needs_rebuild(TRUE);
+}
+
+/**
  * Runs a lookup against the {domain} table.  One of the two values must be present
  *
  * This function also calls hook_domain_load(), which lets module developers overwrite

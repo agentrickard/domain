@@ -159,6 +159,10 @@ class DomainCreateTest extends DomainTestCase {
     foreach ($domains as $sitename => $domain) {
       $this->assertTrue($domains[$sitename]['sitename'] == $setup[$sitename]['sitename'], t('Domain %subdomain created successfully', array('%subdomain' => $domain['subdomain'])));
     }
+    // Delete one of the domains.
+    domain_delete($setup['three']);
+    $deleted_domain = domain_lookup($setup['three']['domain_id'], NULL, TRUE);
+    $this->assertTrue($deleted_domain == -1, t('Domain %domain deleted successfully.', array('%domain' => $setup['three']['subdomain'])));
   }
 
 }
@@ -188,9 +192,16 @@ class DomainHookTest extends DomainTestCase {
     $new_domain = $result['testfoo'];
     $this->assertTrue($new_domain['sitename'] == 'foobar', t('hook_domain_insert() fired correctly.'));
 
-    // hook_domain_update resaves that domain and set it's sitename back to 'testfoo'.
+    // hook_domain_update() resaves that domain and set it's sitename back to 'testfoo'.
     $updated_domain = domain_save($new_domain, $new_domain);
     $this->assertTrue($updated_domain['sitename'] == 'testfoo', t('hook_domain_update() fired correctly.'));
+
+    // hook_domain_delete() sets a static value to 'delete' and removes the domain.
+    domain_delete($updated_domain);
+    $value = domain_test_get();
+    $this->assertTrue($value == 'delete', t('hook_domain_delete() fired correctly.'));
+    $deleted_domain = domain_lookup($updated_domain['domain_id'], NULL, TRUE);
+    $this->assertTrue($deleted_domain == -1, t('Domain deleted successfully.'));
   }
 
 }

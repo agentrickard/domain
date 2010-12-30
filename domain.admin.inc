@@ -518,7 +518,7 @@ function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
   if (!empty($arguments)) {
     $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
   }
-  $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
+  $form['domain'] = array('#type' => 'value', '#value' => $domain);
 
   return confirm_form(
     $form,
@@ -534,23 +534,14 @@ function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
  * Implement domain_delete_form submit hook.
  */
 function domain_delete_form_submit($form, &$form_state) {
-  // Run the lookup before we delete the row!
-  $domain = domain_lookup($form_state['values']['domain_id']);
-  db_delete('domain')
-    ->condition('domain_id', $form_state['values']['domain_id'])
-    ->execute();
-
-  // Let other modules act.
-  module_invoke_all('domain_delete', $domain, $form_state['values']);
+  // Delete the domain.
+  domain_delete($form_state['values']['domain'], $form_state['values']);
 
   // Hide the message from the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message(t('Domain record deleted.'));
     $form_state['redirect'] = 'admin/structure/domain/view';
   }
-
-  // Notify that node access needs to be rebuilt.
-  node_access_needs_rebuild(TRUE);
 }
 
 /**

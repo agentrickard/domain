@@ -5,6 +5,7 @@
 -- Adds domain_test.module for hook testing.
 -- More tests.
 -- Cleaner handling inside domain_save().
+-- Adds domain_delete() abstraction. Tests deletion.
 
 22-DEC-2010
 -- Follup patch for better multiple source loading.

@@ -80,7 +80,6 @@ function hook_domain_update($domain, $form_values = array()) {
  *
  * @ingroup domain_hooks
  */
-
 function hook_domain_delete($domain, $form_values = array()) {
   db_query("DELETE FROM {mytable} WHERE subdomain = '%s'", $domain['subdomain']);
 }
