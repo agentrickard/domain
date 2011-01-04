@@ -2030,6 +2030,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       $user_domains = array();
       $default_options = array();
       $user_options = array();
+      $raw_options = array();
       if (!empty($user->domain_user)) {
         foreach ($user->domain_user as $key => $value) {
           if (abs($value) > 0) {
