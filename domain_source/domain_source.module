@@ -316,7 +316,10 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
     $lookups[$data->nid] = domain_lookup($domain_id);
   }
   // Make sure we found something for every requested node.
-  $no_records = array_diff($node_ids, array_keys($lookups));
+  $no_records = $node_ids;
+  if (!empty($lookups)) {
+    $no_records = array_diff($node_ids, array_keys($lookups));
+  }
   foreach ($no_records as $nid) {
     $default_source = variable_get('domain_default_source', 0);
     // Global setting for 'do not change domain.'

@@ -1,5 +1,8 @@
 // $Id$
 
+04-JAN-2010
+-- Fixes empty array in domain_source_lookup().
+
 30-DEC-2010
 -- Pass $reset from domain_default() to domain_api().
 -- Cleaner handling inside domain_save().
