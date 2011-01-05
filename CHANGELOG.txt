@@ -1,5 +1,8 @@
 // $Id$
 
+05-JAN-2010
+-- #1013858 by Mo. Fixes theme notice.
+
 04-JAN-2010
 -- Fixes empty array in domain_source_lookup().
 -- #1013858 by Mo. Fixes notice.
