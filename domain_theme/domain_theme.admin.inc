@@ -134,7 +134,7 @@ function theme_domain_theme_form($variables) {
     }
     $row = array(
       theme('image', array('path' => $themes[$key]->info['screenshot'])),
-      '<h3>' . check_plain($themes[$key]->info['name'] . ' ' . $themes[$key]->info['version']) . ' ' . $default .  '</h3>' . check_plain($themes[$key]->info['description']),
+      '<h3>' . $themes[$key]->info['name'] . ' ' . (isset($themes[$key]->info['version']) ? $themes[$key]->info['version'] : '') . ' ' . $default .  '</h3>' . t($themes[$key]->info['description']),
       drupal_render($form['theme'][$key]),
       l('configure', 'admin/structure/domain/view/' . $form['domain_id']['#value'] . '/theme/' . $key . '/theme-settings')
     );
