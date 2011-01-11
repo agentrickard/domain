@@ -110,7 +110,7 @@ Additionally, when a user creates content, that content will automatically be
 assigned to the currently active domain unless the user has specific
 privileges to be able to assign domain access.  Under advanced setups, the
 ability to edit content for a specific domain can be segregated from the
-typical Drupal privilege to 'administer nodes.'
+typical Drupal privilege to 'Bypass content access control.'
 
 For more information about Domain Access privileges, see section 3.
 
@@ -424,13 +424,13 @@ The Domain Access module has the following permissions:
 
   - 'edit domain nodes'
   This permission is for advanced use and substitutes for the normal
-  'administer nodes' permission for sites that give restricted administrative
-  privileges.  See section 3.3 for more information.
+  'Bypass content access control' permission for sites that give restricted
+  administrative privileges.  See section 3.3 for more information.
 
   - 'delete domain nodes'
   This permission is for advanced use and substitutes for the normal
-  'administer nodes' permission for sites that give restricted administrative
-  privileges.  See section 3.3 for more information.
+  'Bypass content access control' permission for sites that give restricted
+  administrative privileges.  See section 3.3 for more information.
 
   - 'set domain access'
   This permission is key.  Users with this permission will be given a user
@@ -502,8 +502,8 @@ This feature was added in response to http://drupal.org/node/188275.
 3.2 Normal Usage
 
 Under a normal Drupal site, a single administrator (or a handful of equally
-trusted administrators) typically have the 'administer nodes' permission and
-individual 'edit TYPE nodes' permissions.
+trusted administrators) typically have the 'Bypass content access control'
+permission and individual 'TYPE: edit all content' permissions.
 
 The only choices for permissions would be who gets to administer the module
 settings and who gets to assign nodes to specific domains.  Generally, only
@@ -540,8 +540,8 @@ Due to the way node_access() works, the following limitations should be noted.
   - Any node that is assigned to more than one domain can be edited
     by any editor who belongs to one of the domains.
 
-  - Users who look at the sites and have the 'administer nodes' permission
-    can always see all content on all sites, which can be confusing.  To
+  - Users who look at the sites and have the 'Bypass content access control'
+    permission can always see all content on all sites, which can be confusing.  To
     enforce Domain Access rules on these users, you may enable the
     'Enforce rules on administrators' setting described in 4.3.3.
 
@@ -730,16 +730,17 @@ all nodes viewable to some users.
 4.3.3   Enforce Rules on Administrators
 
 When using Node Access modules, user 1 (the super-admin) and users with
-the 'administer nodes' permission are not subject to node access rules. This
-is a design feature of Drupal, and it can lead to confusion when viewing your
-site as an administrator.
+the 'Bypass content access control' permission are not subject to node access
+rules. This is a design feature of Drupal, and it can lead to confusion when
+viewing your site as an administrator.
 
 To help with this confusion, the 'Enfore rules on adminstrators' setting can
 be enabled. This setting forces Domain Access rules to be applied _even to
-users who can administer nodes_.
+users who can Bypass content access control_.
 
 The default setting is OFF, but if you regularly login as user 1 or a user with
-the 'administer nodes' permission, you may want to enable this feature.
+the 'Bypass content access control' permission, you may want to enable this
+feature.
 
 NOTE: This feature _only_ applies Domain Access rules. if you are using
 multiple node access modules, not all rules will be applied.
@@ -1182,9 +1183,9 @@ In each of the realms, there are specific rules for node access grants, as
 follows.
 
   - domain_all
-  In some specific cases, like Search, or MySite, or the user's Tracker page
-  we want people to be able to see content across all affiliates.  Only the
-  domain_all grant is assigned in these cases.  This grants only 'grant_view'.
+  In some specific cases, like Search or the user's Tracker page we want people
+  to be able to see content across all affiliates.  Only the domain_all grant is
+  assigned in these cases.  This grants only 'grant_view'.
 
   - domain_site
   By design, all site users, including anonymous users, are granted access to
@@ -1218,15 +1219,15 @@ Under this scenario, User A and User C will be able to edit node 10.
 
 To be more clear about Drupal permissions:
 
-  - User D has 'administer nodes' permission for the site.
-  - User E has 'edit book nodes' permission for the site.
+  - User D has 'Bypass content access control' permission for the site.
+  - User E has the 'Book page: edit all content' permission for the site.
 
 In this case, User D and User E can also edit or delete node 10. This is why
-only super-admins are given 'administer nodes' and 'edit TYPE nodes'
+only super-admins are given 'Bypass content access control' and 'TYPE: edit all content'
 permissions with the Domain Access module.  If you want your affiliate editors
 to have limited permissions, only grant them 'edit domain nodes'.
 
-However, you still need to give users the 'create TYPE nodes' permission
+However, you still need to give users the 'TYPE: Create new content' permission
 normally.  Domain Access does not affect node creation.
 
 Since Domain Access implements node_access() fully, if you uninstall the module
