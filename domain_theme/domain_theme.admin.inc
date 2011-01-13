@@ -242,7 +242,7 @@ function domain_theme_settings_submit($form, &$form_state) {
   // Prepare a filepath for color module settings.
   $filepath = NULL;
   $domain = domain_lookup($values['domain_id']);
-  $filepath = file_directory_path('public') . '/domain-' . $domain['domain_id'];
+  $filepath = file_default_scheme() . ':/'  . '/domain-' . $domain['domain_id'];
   $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
   foreach ($vars as $variable) {
     $preset = variable_get('color_' . $values['theme'] . '_' . $variable, '');

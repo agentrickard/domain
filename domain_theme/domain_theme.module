@@ -223,7 +223,7 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
     return;
   }
   $theme = arg(6);
-  $domain_id = arg(5);
+  $domain_id = arg(4);
   $themes = list_themes();
 
   $domain = domain_load($domain_id);

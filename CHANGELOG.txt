@@ -1,5 +1,9 @@
 // $Id$
 
+13-JAN-2011
+-- #1015076 by Mo. Fixed bad function call in Domain Theme.
+-- Adds domain_conf drush command file.
+
 11-JAN-2011
 -- #1022980. Updates permissions in the README.
 
