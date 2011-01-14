@@ -1,5 +1,8 @@
 // $Id$
 
+14-JAN-2011
+-- #940762. Fixes call stack for hook_domainpath().
+
 13-JAN-2011
 -- #1015076 by Mo. Fixed bad function call in Domain Theme.
 

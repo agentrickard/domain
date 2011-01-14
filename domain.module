@@ -1382,20 +1382,28 @@ function domain_get_path($domain) {
  * Determine an absolute path to the current page
  *
  * @param $domain
- *  The currently active $domain array, provided by domain_lookup().
+ *   The currently active $domain array, provided by domain_lookup().
  * @return
- * The absolute url to the current page on the requested domain.
+ *   The absolute url to the current page on the requested domain.
  */
 function domain_get_uri($domain) {
-  $request_uri = request_uri();
+  global $base_path;
   $modules = _domain_path_modules();
   if (!empty($modules) && !drupal_is_front_page()) {
+    // request_path() does not include base_path, which will be added by the call
+    // to url() below.
+    $request_uri = request_path();
     // If needed, let modules modify the path alias.
-    $alias = domain_path($domain['domain_id'], $_GET['q']);
+    // We cannot use URL here because we need the domain_id data.
+    // TODO: use url() but pass a domain_id option?
+    domain_path($domain['domain_id'], $request_uri, $options, $request_uri, $_GET['q']);
     // Run the result through url() for proper language and path handling.
-    $request_uri = url($alias);
+    $request_uri = url($request_uri, $options);
   }
-
+  // The simple case just uses the inbound path, with the base path present.
+  else {
+    $request_uri = request_uri();
+  }
   $path = domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'] . $request_uri;
   return $path;
 }
@@ -2721,16 +2729,15 @@ function domain_warning_check($form_id) {
  * @return
  * The $path, modified by reference by hook_domainpath() implementations.
  */
-function domain_path($domain_id, $path, $path_language = '') {
+function domain_path($domain_id, &$path, &$options, $original_path) {
   $modules = _domain_path_modules();
   if (!empty($modules)) {
     foreach ($modules as $module) {
       // Cannot use module_invoke_all() since these are passed by reference.
       $function = $module . '_domainpath';
-      $function($domain_id, $path, $path_language);
+      $function($domain_id, $path, $options, $original_path);
     }
   }
-  return $path;
 }
 
 /**

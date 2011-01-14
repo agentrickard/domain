@@ -127,13 +127,13 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
         // TODO: merge this code with the above for cleanup.
       }
     }
-    // We may have to Implements hook_domainpath().
+    // We may have to refactor this for D7.
     if (!isset($path_rewrite)) {
       $path_rewrite = count(_domain_path_modules());
     }
-    // Allow path changes, if needed.
+    // Allow path changes, if needed. This changed significantly in D7.
     if ($path_rewrite > 0 && $path != '') {
-      $path = domain_path($target_domain_id, $original_path, isset($options['language']) ? $options['language']->language : '');
+      domain_path($target_domain_id, $path, $options, $original_path);
     }
   }
 }

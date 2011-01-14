@@ -592,19 +592,25 @@ function hook_domain_bootstrap_full($domain) {
  * Prefix, we only include this function if we know it is necessary.
  *
  * @see domain_prefix_init()
+ * @see hook_url_outbound_alter()
  *
  * @param $domain_id
  *   The domain_id taken from {domain}.
  * @param $path
  *   The internal drupal path to the node.
- * @param $path_language
- *   Language code to look up the path in.
+ * @param $options
+ *   The path options.
+ * @param $original_path
+ *   The raw path request from the URL. 
  *
  * @ingroup domain_hooks
  */
-function hook_domainpath($domain_id, &$path, $path_language = '') {
+function hook_domainpath($domain_id, &$path, &$options, $original_path) {
   // Give a normal path alias
   $path = drupal_get_path_alias($path);
+  // In D7, path alias lookups are done after url_alter, so if the
+  // alias is set, the option must be flagged.
+  $options['alias'] = TRUE;
 }
 
 /**
