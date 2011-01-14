@@ -133,7 +133,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
     }
     // Allow path changes, if needed.
     if ($path_rewrite > 0 && $path != '') {
-      $path = domain_path($target_domain_id, $original_path, isset($options['language']) ? $options['language']->language : '');
+      domain_path($target_domain_id, $path, $options, $original_path);
     }
   }
 }
