@@ -3,6 +3,7 @@
 16-JAN-2011
 -- Patch #944698 by sdelbosc and bpresles. Add node revision support to Domain Views.
 -- Patch #991226 by pacproduct. Accept either a list of allowed or disallowed forms for Domain Settings.
+-- #999138. Allow _localhost_ as a valid domain.
 
 15-JAN-2011
 -- #1015954 by ayeshrajans. Restore configuration save message with Domain Settings. 
