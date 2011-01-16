@@ -47,7 +47,7 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
       '#default_value' => !empty($this->options['link_to_original_domain']),
     );
     // Only list the node links if this is a node view.
-    if ($this->view->base_table == 'node') {
+    if ($this->view->base_table == 'node' || $this->view->base_table == 'node_revisions') {
       $form['list_all_domains'] = array(
         '#title' => t('List all domains this node is published to'),
         '#description' => t('This will override the default setting to show only one domain.'),
@@ -66,11 +66,16 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
     }
     $options = $this->options;
     // Only alter output if requested.
-    if ($this->view->base_table == 'node' && !empty($options['list_all_domains'])) {
+    if (($this->view->base_table == 'node' || $this->view->base_table == 'node_revisions') && !empty($options['list_all_domains'])) {
       // Build a list of nids
       $nids = array();
       foreach ($values as $value) {
-        $nids[] = $value->nid;
+        if (isset($value->node_nid)) {
+          $nids[] = $value->node_nid;
+        }
+        else {
+          $nids[] = $value->nid;
+        }
       }
       $this->field_values = array();
       $query = "SELECT node.nid AS nid, domain.sitename AS domain_sitename, domain.domain_id AS domain_domain_id
@@ -98,6 +103,9 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
     }
     else if (isset($values->nid)) {
       $nid = $values->nid;
+    }
+    elseif (isset($values->node_nid)) {
+      $nid = $values->node_nid;
     }
     $node_path = '';
     if (!empty($nid)) {
@@ -129,6 +137,10 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
     }
     else if (isset($values->nid)) {
       $nid = $values->nid;
+    }
+    elseif (isset($values->node_nid)) {
+      $nid = $values->node_nid;
+      $values->nid = $nid;
     }
     $node_path = '';
     if (!empty($nid)) {

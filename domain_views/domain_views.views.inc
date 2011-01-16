@@ -29,6 +29,12 @@ function domain_views_views_data() {
     'left_field' => 'gid',
     'field' => 'domain_id',
   );
+  //Define the joins between {node_revision} and {domain}.
+  $data['domain']['table']['join']['node_revisions'] = array(
+    'left_table' => 'domain_access',
+    'left_field' => 'gid',
+    'field' => 'domain_id',
+  );
   // Define the fields.
   $data['domain']['domain_id'] = array(
     'title' => t('Domain ID'),
@@ -114,6 +120,11 @@ function domain_views_views_data() {
   $data['domain_access']['table']['group'] = t('Domain Access');
   // Define the joins.
   $data['domain_access']['table']['join']['node'] = array(
+    'left_field' => 'nid',
+    'field' => 'nid',
+  );
+  // Define the join between {node_revisions} and {domain_access} table
+  $data['domain_access']['table']['join']['node_revisions'] = array(
     'left_field' => 'nid',
     'field' => 'nid',
   );
@@ -207,6 +218,11 @@ function domain_views_views_data() {
     'field' => 'uid',
   );
   $data['domain_editor']['table']['join']['node'] = array(
+    'left_field' => 'uid',
+    'field' => 'uid',
+  );
+  // Define the join between {node_revisions} and {domain_editor} table
+  $data['domain_editor']['table']['join']['node_revisions'] = array(
     'left_field' => 'uid',
     'field' => 'uid',
   );

@@ -1,5 +1,8 @@
 // $Id$
 
+16-JAN-2011
+-- Patch #944698 by sdelbosc and bpresles. Add node revision support to Domain Views.
+
 15-JAN-2011
 -- #1015954 by ayeshrajans. Restore configuration save message with Domain Settings. 
 
