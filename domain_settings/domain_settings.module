@@ -251,7 +251,7 @@ function domain_settings_add_element($form_id) {
   // Cache results.
   static $forms_visibility;
   if (isset($forms_visibility[$form_id])) {
-   # return $forms_visibility[$form_id];
+    return $forms_visibility[$form_id];
   }
 
   // These forms are known to be problematic, so omit them.
@@ -275,7 +275,6 @@ function domain_settings_add_element($form_id) {
   // If we want to show the setting on all forms except those listed:
   if ($filter_method == DOMAIN_SETTINGS_SHOW_EXCEPT_LISTED) {
     $forms_to_ignore = array_merge($user_listed_forms, $disallow);
-
     $forms_visibility[$form_id] = !in_array($form_id, $forms_to_ignore);
   }
   // If we want to show the settings only on listed forms:
