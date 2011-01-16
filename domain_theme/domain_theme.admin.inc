@@ -12,7 +12,7 @@
  * The domain theme page callback router.
  *
  * @param $domain
- *  The $domain object created by domain_lookup().
+ *   The $domain object created by domain_lookup().
  */
 function domain_theme_page($domain) {
   if (isset($domain['domain_id'])) {
@@ -29,10 +29,21 @@ function domain_theme_page($domain) {
     return drupal_get_form('domain_theme_form', $domain);
   }
   else {
-    return t('Invalid domain request.');
+    $build['content'] = array(
+      '#markup' => t('Invalid domain request.'),
+    );
+    return $build;
   }
 }
 
+/**
+ * Form callback to set theme per domain.
+ *
+ * @param $domain
+ *   The $domain object created by domain_lookup().
+ * @return
+ *   An HTML form.
+ */
 function domain_theme_form($form, &$form_state, $domain) {
   $form = array();
   // Get the current $theme for this domain, if available.
@@ -75,7 +86,9 @@ function domain_theme_form($form, &$form_state, $domain) {
   return $form;
 }
 
-
+/**
+ * Form submit handler.
+ */
 function domain_theme_form_submit($form, &$form_state) {
   // Update or Insert?
   $domain_id = $form_state['values']['domain_id'];
@@ -117,6 +130,7 @@ function domain_theme_form_submit($form, &$form_state) {
   // Clear the cache.
   cache_clear_all();
 }
+
 /**
  * FormsAPI theming.
  */
@@ -150,9 +164,9 @@ function theme_domain_theme_form($variables) {
  * Resets theme settings by removing the domain row from {domain_theme}.
  *
  * @param $domain
- * The $domain object created by domain_lookup().
+ *   The $domain object created by domain_lookup().
  * @return
- * A confirmation form.
+ *   A confirmation form.
  */
 function domain_theme_reset($domain) {
   if ($domain == -1) {
@@ -165,9 +179,9 @@ function domain_theme_reset($domain) {
  * FormsAPI for resetting a domain themes.
  *
  * @param $domain
- * The $domain object for the selected domain.
+ *   The $domain object for the selected domain.
  * @return
- * Themed HTML form.
+ *   A themed HTML form.
  */
 function domain_theme_reset_form($form, $form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
@@ -192,9 +206,9 @@ function domain_theme_reset_form_submit($form, &$form_state) {
  * Theme a message at the top of domain theme pages.
  *
  * @param $domain
- * The $domain object for the selected domain.
+ *   The $domain object for the selected domain.
  * @return
- * Themed HTML messages.
+ *   Themed HTML messages.
  */
 function theme_domain_theme_reset($variables) {
   $domain = $variables['domain'];
@@ -211,9 +225,9 @@ function theme_domain_theme_reset($variables) {
  * The domain theme page callback router.
  *
  * @param $theme
- *  The theme being configured.
+ *   The theme being configured.
  * @param $domain
- *  The $domain object created by domain_lookup().
+ *   The $domain object created by domain_lookup().
  */
 function domain_theme_settings($domain, $theme) {
   // Load the system form file.

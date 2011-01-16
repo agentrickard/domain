@@ -670,6 +670,7 @@ function domain_batch($action = NULL) {
  *   A themed table of links and descriptions for batch actions.
  */
 function domain_batch_list($batch) {
+  $build = array();
   $header = array(t('Action'), t('Description'));
   $rows = array();
   foreach ($batch as $key => $value) {
@@ -693,7 +694,17 @@ function domain_batch_list($batch) {
   }
   $output = '<p>' . t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') . '</p>';
   $output .= '<p><em>' . t('Note that you will only be shown domains on which each action may be performed.  If the module is not yet configured, some actions may be empty.') . '</em></p>';
-  return $output . theme('table', array('header' => $header, 'rows' => $rows));
+  // Return the build array.
+  $build['header'] = array(
+    '#markup' => $output,
+  );
+  $build['content'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#attributes' =>  array('id' => 'domain-list'),
+  );
+  return $build;
 }
 
 /**
