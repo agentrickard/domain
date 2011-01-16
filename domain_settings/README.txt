@@ -20,7 +20,8 @@ CONTENTS
 2.3   Exceptions
 3.  Configuration Options
 3.1  Domain Settings Behavior
-3.2   Disallowed Forms
+3.2  Form Visibility
+3.3  Allowed and Disallowed Forms
 
 
 ----
@@ -124,11 +125,46 @@ There are three options:
   disable the entiure module.
 
 ----
-3.2   Disallowed Forms
+3.2  Form Visibility
 
-Domain-specific settings can be disallowed for particular forms by entering a
+Like Drupal blocks, the Domain Settings form can be exposed or hidden
+to a specific list of forms. The 'Visibility of domain-specific settings on forms'
+setting allows you to specify the behavior you want.
+
+  -- Show on every system settings form, except those listed below.
+  This option will display Domain Settings on all eligible forms except those
+  which are listed here.
+  
+  -- Show only on system settings forms listed below.
+  This option will display Domain Settings only on eligible forms which are
+  listed here.
+  
+Note that the following forms cannot be used in either case, due to known
+conflicts.
+
+  -- domain_settings_form
+  -- system_file_system_settings
+  -- system_performance_settings
+
+----
+3.3  Allowed and Disallowed Forms
+
+Domain-specific settings can be (dis)allowed for particular forms by entering a
 list of form_ids, one per line. This option is useful for site administrators
 who wish to prevent domain-specific settings on certain forms.
 
 Form ids are an internal Drupal identifier. Check api.drupal.org for the
 specific form functions that control settings pages.
+
+You may also look at the generated HTML for the form 'id' element. This
+value can normally be used if you convert a dash (-) to an underscore (_).
+
+For example, the Site Information form at admin/settings/site-information
+creates this HTML:
+
+  <form action="/admin/settings/site-information"
+    accept-charset="UTF-8" method="post" 
+    id="system-site-information-settings">
+
+The form_id is therefore 'system_site_information_settings', which may be
+entered in the form, omitting the quote marks.

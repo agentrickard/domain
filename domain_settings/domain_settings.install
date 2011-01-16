@@ -1,0 +1,22 @@
+<?php
+// $Id$
+
+/**
+ * Rename the variable 'domain_settings_ignore' regarding the way
+ * domain_settings manage the visibility of the domain-specific settings on forms.
+ */
+function domain_settings_update_6000() {
+  $ret = array();
+
+  // Get existing variable:
+  $old_settings = variable_get('domain_settings_ignore', '');
+  // Save the variable with another name if it exists:
+  if (!empty($old_settings)) {
+    variable_set('domain_settings_forms', $old_settings);
+  }
+
+  // Delete the old variable:
+  variable_del('domain_settings_ignore');
+
+  return $ret;
+}
