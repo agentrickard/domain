@@ -16,7 +16,17 @@
  */
 
 /**
- * Implements hook_perm().
+ * Forms filtering method constants.
+ *
+ * Used to specify how to filter forms on which we want to add the
+ * domain-specific settings form element.
+ */
+define('DOMAIN_SETTINGS_SHOW_EXCEPT_LISTED', 0);
+define('DOMAIN_SETTINGS_SHOW_ONLY_LISTED', 1);
+define('DOMAIN_SETTINGS_ALL_DOMAINS', -5);
+
+/**
+ * Implements hook_permission().
  */
 function domain_settings_permission() {
   $permissions = array(
@@ -41,19 +51,23 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
   $_domain = domain_get_domain();
 
   // Remove settings that cannot be used reliably.
-  $disallow = domain_settings_disallow();
-  if (!user_access('access domain settings form') || in_array($form_id, $disallow) || !isset($form['#submit']) || !in_array('system_settings_form_submit', $form['#submit'])) {
+  if (!user_access('access domain settings form') || // Does the user have access?
+      !isset($form['#submit']) || // Is there a submit handler?
+      !in_array('system_settings_form_submit', $form['#submit']) || // Is the handler the default?
+      !domain_settings_add_element($form_id)) // Is this form_id allowed?
+  {
     return;
   }
+
   // Set our drop down's weight to be one lighter than the submit button's,
   // ensuring that it always appears right above it (assuming nobody else
-  // form_alter()s us out.)
+  // form_alters us out.)
   drupal_set_message(t('This form is domain-sensitive, be sure you select the proper domain before saving.'), 'warning', FALSE);
   $weight = isset($form['buttons']['#weight']) ? $form['buttons']['#weight'] : 0;
   $form['buttons']['#weight'] = $weight + 2;
   $domain_weight = $weight + 1;
   $form['#submit'][] = 'domain_settings_form_submit';
-  $options = array(-5 => t('All domains'));
+  $options = array(DOMAIN_SETTINGS_ALL_DOMAINS => t('All domains'));
   // Get the display format of the form element.
   $format = domain_select_format();
   foreach (domain_domains() as $data) {
@@ -76,7 +90,7 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
     $default = $_domain['domain_id'];
   }
   elseif ($behavior == 2) {
-    $default = -5;
+    $default = DOMAIN_SETTINGS_ALL_DOMAINS;
   }
   else {
     $default = domain_default_id();
@@ -121,7 +135,7 @@ function domain_settings_form_submit($form, &$form_state) {
     if (is_array($value) && isset($form_state['values']['array_filter'])) {
       $value = array_keys(array_filter($value));
     }
-    if ($domain_id == $default || $domain_id == -5) {
+    if ($domain_id == $default || $domain_id == DOMAIN_SETTINGS_ALL_DOMAINS) {
       variable_set($name, $value);
       // Update the site name of the primary domain, if needed.
       if ($name == 'site_name') {
@@ -132,7 +146,7 @@ function domain_settings_form_submit($form, &$form_state) {
           ))
           ->execute();
       }
-      if ($domain_id == -5) {
+      if ($domain_id == DOMAIN_SETTINGS_ALL_DOMAINS) {
         foreach(domain_domains() as $id => $value) {
           domain_conf_variable_delete($id, $name);
         }
@@ -183,41 +197,76 @@ function domain_settings_domain_form(&$form) {
     '#default_value' => variable_get('domain_settings_behavior', 0),
     '#description' => t('Default form value when submitting system settings.')
   );
-  $form['domain_settings_module']['domain_settings_ignore'] = array(
+
+  $form['domain_settings_module']['domain_settings_form_visibility'] = array(
+    '#type' => 'radios',
+    '#title' => t('Visibility of domain-specific settings on forms'),
+    '#options' => array(
+      DOMAIN_SETTINGS_SHOW_EXCEPT_LISTED => t('Show on every system settings form, except those listed below.'),
+      DOMAIN_SETTINGS_SHOW_ONLY_LISTED => t('Show only on system settings forms listed below.'),
+    ),
+    '#default_value' => variable_get('domain_settings_form_visibility', DOMAIN_SETTINGS_SHOW_EXCEPT_LISTED),
+  );
+  $form['domain_settings_module']['domain_settings_forms'] = array(
     '#type' => 'textarea',
-    '#title' => t('Disallowed forms'),
+    '#title' => t('Forms'),
     '#rows' => 5,
     '#cols' => 40,
-    '#default_value' => variable_get('domain_settings_ignore', ''),
-    '#description' => t('Disallow domain-specific settings by entering a list of form_ids, one per line.'),
+    '#default_value' => variable_get('domain_settings_forms', ''),
+    '#description' => t('Allow or disallow specific forms by entering a list of form_ids, one per line.'),
   );
 }
 
 /**
- * Helper function to disallow specific forms from the interface.
+ * Helper function to test if a form has to display the domain-specific
+ * settings, based on 'domain_settings' settings the user defined.
  *
- * By design, the configuration for Domain Access itself is disallowed.
+ * By design, the configuration for Domain Access itself is disallowed
+ * (and some other forms known to be problematic).
+ *
+ * @param $form_id
+ *   The form_id string that we want to test.
+ * @return
+ *    Boolean TRUE if the given form_id has to display the domain-
+ *    specific settings. FALSE otherwise.
  */
-function domain_settings_disallow() {
-  static $forms;
-
-  if (!isset($forms)) {
-    $items = array();
-    $list = trim(variable_get('domain_settings_ignore', ''));
-    if (!empty($list)) {
-      $match = preg_replace('/(\r\n?|\n)/', '|', $list);
-      $items = explode("|", $match);
-    }
-    // These forms are known to be problematic, so omit them.
-    $default = array(
-      'domain_configure_form',
-      'system_file_system_settings', // Changing file paths is dangerous.
-      'system_performance_settings', // JS and CSS aggregation is not supported.
-    );
-    $forms = array_merge($default, $items);
+function domain_settings_add_element($form_id) {
+  // Cache results.
+  static $forms_visibility;
+  if (isset($forms_visibility[$form_id])) {
+   # return $forms_visibility[$form_id];
   }
 
-  return $forms;
+  // These forms are known to be problematic, so omit them.
+  $disallow = array(
+    'domain_configure_form',
+    'system_file_system_settings', // Changing file paths is dangerous.
+    'system_performance_settings', // JS and CSS aggregation is not supported.
+  );
+
+  // Retrieve the form filtering method:
+  $filter_method = variable_get('domain_settings_form_visibility', DOMAIN_SETTINGS_SHOW_EXCEPT_LISTED);
+
+  // Retrieve the user-listed forms:
+  $user_listed_forms = array();
+  $setting_var = trim(variable_get('domain_settings_forms', ''));
+  if (!empty($setting_var)) {
+    $match = preg_replace('/(\r\n?|\n)/', '|', $setting_var);
+    $user_listed_forms = explode("|", $match);
+  }
+
+  // If we want to show the setting on all forms except those listed:
+  if ($filter_method == DOMAIN_SETTINGS_SHOW_EXCEPT_LISTED) {
+    $forms_to_ignore = array_merge($user_listed_forms, $disallow);
+    $forms_visibility[$form_id] = !in_array($form_id, $forms_to_ignore);
+  }
+  // If we want to show the settings only on listed forms:
+  else if ($filter_method == DOMAIN_SETTINGS_SHOW_ONLY_LISTED) {
+    $forms_to_authorize = array_diff($user_listed_forms, $disallow);
+    $forms_visibility[$form_id] = in_array($form_id, $forms_to_authorize);
+  }
+
+  return $forms_visibility[$form_id];
 }
 
 /**
