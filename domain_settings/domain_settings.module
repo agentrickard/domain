@@ -214,7 +214,6 @@ function domain_settings_domainform(&$form) {
     '#default_value' => variable_get('domain_settings_behavior', 0),
     '#description' => t('Default form value when submitting system settings.')
   );
-
   $form['domain_settings_module']['domain_settings_form_visibility'] = array(
     '#type' => 'radios',
     '#title' => t('Visibility of domain-specific settings on forms'),
