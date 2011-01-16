@@ -16,9 +16,15 @@
  *  A sortable table of active domain records, or an error message.
  */
 function domain_view() {
+  $build = array();
   $_domain = domain_get_domain();
-  $output = t('<p>The following domains have been created for your site.  The currently active domain <strong>is shown in boldface</strong>.  You
-                    may click on a domain to change the currently active domain.  Your default domain has an ID of %id.</p>', array('%id' => variable_get('domain_default', 0)));
+  $build['header']['#prefix'] = '<p>';
+  $build['header']['#markup'] = t('The following domains have been created for your site.  
+    The currently active domain <strong>is shown in boldface</strong>.  You
+    may click on a domain to change the currently active domain.  Your default
+    domain has an ID of %id.', array('%id' => variable_get('domain_default', 0))
+  );
+  $build['header']['#suffix'] = '</p>';
   $header = array(
     array('data' => t('Id'), 'field' => 'd.domain_id'),
     array('data' => t('Domain'), 'field' => 'd.subdomain'),
@@ -85,14 +91,21 @@ function domain_view() {
     $rows[] = $row;
   }
   if (!empty($rows)) {
-    $table = array('header' => $header, 'rows' => $rows, 'attributes' => array('id' => 'domain-list'));
-    $output .= theme('table', $table);
-    $pager = array();
-    $output .= theme('pager', $pager);
-    return $output;
+    $build['content'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#attributes' =>  array('id' => 'domain-list'),
+    );
+    $build['pager']['#theme'] = 'pager';
+    return $build;
   }
   else {
-    return t('No domains have been configured.');
+    $build = array();
+    $build['no_content']['#prefix'] = '<p>';
+    $build['no_content']['#markup'] = t('No domains have been configured.');
+    $build['no_content']['#suffix'] = '</p>';
+    return $build;
   }
 }
 
@@ -716,6 +729,7 @@ function domain_batch($action = NULL) {
  *   A themed table of links and descriptions for batch actions.
  */
 function domain_batch_list($batch) {
+  $build = array();
   $header = array(t('Action'), t('Description'));
   $rows = array();
   foreach ($batch as $key => $value) {
@@ -739,7 +753,17 @@ function domain_batch_list($batch) {
   }
   $output = '<p>' . t('Batch updates allow you to edit values for multiple domains at one time.  These functions are helpful when moving your sites from staging to production, or any time you need to make mass changes quickly.  The following batch update actions may be performed.') . '</p>';
   $output .= '<p><em>' . t('Note that you will only be shown domains on which each action may be performed.  If the module is not yet configured, some actions may be empty.') . '</em></p>';
-  return $output . theme('table', array('header' => $header, 'rows' => $rows));
+  // Return the build array.
+  $build['header'] = array(
+    '#markup' => $output,
+  );
+  $build['content'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#attributes' =>  array('id' => 'domain-list'),
+  );
+  return $build;
 }
 
 /**

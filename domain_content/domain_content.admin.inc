@@ -15,6 +15,7 @@
  *   A link group for each domain the user can access.
  */
 function domain_content_page() {
+  $build = array();
   $content = array();
   $content = system_admin_menu_block(menu_get_item('admin/domain/content'));
   // Print the list of options.
@@ -25,7 +26,10 @@ function domain_content_page() {
   else {
     $output = t('There are no valid domains configured.');
   }
-  return $output;
+  $build['content'] = array(
+    '#markup' => $output,
+  );
+  return $build;
 }
 
 /**
@@ -36,6 +40,7 @@ function domain_content_page() {
  */
 function domain_content_list() {
   global $user;
+  $build = array();
   if (user_access('administer nodes') || user_access('review content for all domains')) {
     // Return all domains.
     $query = "SELECT domain_id, subdomain, sitename, scheme FROM {domain} d";
@@ -91,13 +96,23 @@ function domain_content_list() {
   array_unshift($rows, $all);
   if (!empty($rows)) {
     $output = '<p>'. t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate.') .'</p>';
-    $output .= theme('table', array('header' => $header, 'rows' => $rows));
-    $output .= theme('pager', array());
-    return $output;
+    $build['header'] = array(
+      '#markup' => $output,
+    );
+    $build['content'] = array(
+      '#theme' => 'table',
+      '#header' => $header,
+      '#rows' => $rows,
+      '#attributes' =>  array('id' => 'domain-list'),
+    );
+    $build['pager']['#theme'] = 'pager';
   }
   else {
-    return t('You do not have editing access to any domains. Please contact your site administrator.');
+    $build['content'] = array(
+      '#markup' => t('You do not have editing access to any domains. Please contact your site administrator.'),
+    );
   }
+  return $build;
 }
 
 /**
@@ -114,6 +129,7 @@ function domain_content_list() {
  *   A link group for each domain the user can access.
  */
 function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
+  $build = array();
   $_domain = domain_get_domain();
   // Load the active domain, which is not necessarily the current domain.
   if (!is_null($domain_id) && $domain_id != $_domain['domain_id']) {
@@ -134,8 +150,10 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
   // KILLSWITCH CASE: returns an error
   else {
     drupal_set_message(t('Invalid request'), 'error');
-    $output = t('<p>The specified domain does not exist.</p>');
-    return $output;
+    $build['content'] = array(
+      '#markup' => t('<p>The specified domain does not exist.</p>'),
+    );
+    return $build;
   }
   $output = drupal_get_form('domain_content_admin');
   // Reset the active domain.
