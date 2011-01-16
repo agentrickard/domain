@@ -1393,6 +1393,7 @@ function domain_get_uri($domain) {
     // request_path() does not include base_path, which will be added by the call
     // to url() below.
     $request_uri = request_path();
+    $options = array();
     // If needed, let modules modify the path alias.
     // We cannot use URL here because we need the domain_id data.
     // TODO: use url() but pass a domain_id option?
