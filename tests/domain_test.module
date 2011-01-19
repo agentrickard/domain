@@ -86,3 +86,14 @@ function domain_test_domain_cron($domain) {
     domain_test_set('Failed');
   }
 }
+
+/**
+ * Implements hook_domain_validate_alter().
+ *
+ * Remove any errors on validation.
+ */
+function domain_test_domain_validate_alter(&$errors, $subdomain) {
+  if ($subdomain == 'thisshouldfail') {
+    $errors = array();
+  }
+}

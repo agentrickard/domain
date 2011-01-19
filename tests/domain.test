@@ -153,6 +153,7 @@ class DomainCreateTest extends DomainTestCase {
   function testDomainCreate() {
     $setup = $this->domainCreateDomains();
     $result = db_query("SELECT sitename, subdomain FROM {domain} WHERE is_default = 0 ORDER BY weight");
+
     foreach ($result as $record) {
       $domains[$record->sitename] = array('sitename' => $record->sitename, 'subdomain' => $record->subdomain);
     }
@@ -164,6 +165,32 @@ class DomainCreateTest extends DomainTestCase {
     domain_delete($setup['three']);
     $deleted_domain = domain_lookup($setup['three']['domain_id'], NULL, TRUE);
     $this->assertTrue($deleted_domain == -1, t('Domain %domain deleted successfully.', array('%domain' => $setup['three']['subdomain'])));
+  }
+
+  // Try to create badly formed domains.
+  function testDomainValidate() {
+    $tests = array(
+      'localhost' => array(),
+      'nodotsinstring' => array(t('At least one dot (.) is required, except for <em>localhost</em>.')),
+      'example.com:2000:1' => array(t('Only one colon (:) is allowed.')),
+      'example.com:foo' => array(t('The port protocol must be an integer.')),
+      '.example.com' => array(t('The domain must not begin with a dot (.)')),
+      'example.com.' => array(t('The domain must not end with a dot (.)')),
+      '$.example.com' => array(t('Only alphanumeric characters, dashes, and a colon are allowed.')),
+      'EXAMPLE.com' => array(t('Only lower-case characters are allowed.')),
+    );
+    foreach ($tests as $subdomain => $error) {
+      $return = domain_validate($subdomain);
+      if ($subdomain == 'localhost' && empty($return)) {
+        $return = TRUE;
+      }
+      $this->assertTrue(!empty($return), t('!message', array('!message' => !empty($error) ? $error[0] : t('<em>localhost</em> is an allowed domain string.'))));
+    }
+    // Test for the non-alphanumeric character override.
+    global $conf;
+    $conf['domain_allow_non_ascii'] = TRUE;
+    $return = domain_validate('$%#!.com');
+    $this->assertTrue(empty($return), t('ASCII character override value allowed.'));
   }
 
 }
@@ -216,6 +243,10 @@ class DomainHookTest extends DomainTestCase {
     $this->assertTrue($value == 'delete', t('hook_domain_delete() fired correctly.'));
     $deleted_domain = domain_lookup($updated_domain['domain_id'], NULL, TRUE);
     $this->assertTrue($deleted_domain == -1, t('Domain deleted successfully.'));
+    
+    // hook_domain_validate_alter() allows any domain to be valid.
+    $return = domain_validate('thisshouldfail');
+    $this->assertTrue(empty($return), t('hook_domain_validate_alter() fired correctly.'));
   }
 
 }
@@ -260,4 +291,5 @@ class DomainSwitchingTest extends DomainTestCase {
     $this->assertTrue($active['domain_id'] == $_domain['domain_id'], t('Switched back to initial domain.'));
 
   }
+
 }
