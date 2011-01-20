@@ -1,5 +1,8 @@
 // $Id$
 
+20-JAN-2011
+-- #1034412. Fixes error in domain_alias_list() static cache.
+
 19-JAN-2011
 -- Adds tests for domain validation.
 
