@@ -283,13 +283,13 @@ function domain_alias_list($domain_id, $reset = FALSE) {
   static $aliases, $result;
   // Query the db for aliases.
   if (!isset($result) || $reset) {
-    $result = db_query("SELECT alias_id, pattern, redirect FROM {domain_alias}", array(), array('fetch' => PDO::FETCH_ASSOC))->FetchAll();
+    $result = db_query("SELECT domain_id, alias_id, pattern, redirect FROM {domain_alias}", array(), array('fetch' => PDO::FETCH_ASSOC))->FetchAll();
   }
   if (!isset($aliases[$domain_id]) || $reset) {
     $aliases[$domain_id] = array();
     foreach ($result as $data) {
       $data['pattern'] = _domain_alias_placeholders_from_sql($data['pattern']);
-      $aliases[$domain_id][$data['alias_id']] = $data;
+      $aliases[$data['domain_id']][$data['alias_id']] = $data;
     }
   }
   return $aliases[$domain_id];

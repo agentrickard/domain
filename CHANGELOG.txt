@@ -1,5 +1,8 @@
 // $Id$
 
+20-JAN-2011
+-- #1034412. Fixes error in domain_alias_list() static cache.
+
 16-JAN-2011
 -- Patch #991226 by pacproduct. Accept either a list of allowed or disallowed forms for Domain Settings.
 -- Fixes url() error.
