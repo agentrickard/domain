@@ -1,5 +1,8 @@
 // $Id$
 
+23-JAN-2011
+-- #1026346. Fixes default theme handling.
+
 20-JAN-2011
 -- #1034412. Fixes error in domain_alias_list() static cache.
 
