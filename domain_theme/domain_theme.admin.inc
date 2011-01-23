@@ -254,8 +254,8 @@ function domain_theme_settings($domain, $theme) {
 function domain_theme_settings_submit($form, &$form_state) {
   $values = $form_state['values'];
   // Prepare a filepath for color module settings.
-  $filepath = NULL;
   $domain = domain_lookup($values['domain_id']);
+  // We aren't using $filepath in Drupal 7; this can probably be removed.
   $filepath = file_default_scheme() . ':/'  . '/domain-' . $domain['domain_id'];
   $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
   foreach ($vars as $variable) {
@@ -276,6 +276,7 @@ function domain_theme_settings_submit($form, &$form_state) {
       }
     }
   }
+  
   // Set the filepath for color module.
   if (!empty($values['color_' . $values['theme'] . '_stylesheets'][0])) {
     $filepath = domain_theme_get_color_path($values['color_' . $values['theme'] . '_stylesheets'][0]);
@@ -332,6 +333,33 @@ function domain_theme_settings_submit($form, &$form_state) {
   // Finish processing the form.
   drupal_set_message(t('The configuration options have been saved.'));
   $form_state['redirect'] = 'admin/structure/domain/view/' . $domain_id . '/theme';
+}
+
+/**
+ * Custom submit handler.
+ *
+ * If the theme is saved as 'default', we have to be sure not to delete
+ * existing color directories. This section is copied from color.module.
+ *
+ * @see color_form_submit().
+ */
+function domain_theme_color_submit($form, &$form_state) {
+  $theme = $form_state['values']['theme'];
+  $info = $form_state['values']['info'];
+
+  // Resolve palette.
+  $palette = $form_state['values']['palette'];
+  if ($form_state['values']['scheme'] != '') {
+    foreach ($palette as $key => $color) {
+      if (isset($info['schemes'][$form_state['values']['scheme']]['colors'][$key])) {
+        $palette[$key] = $info['schemes'][$form_state['values']['scheme']]['colors'][$key];
+      }
+    }
+    $palette += $info['schemes']['default']['colors'];
+  }
+  if (implode(',', color_get_palette($theme, TRUE)) == implode(',', $palette)) {
+    $form_state['values']['palette']['domain_default'] = 'xyz';
+  }
 }
 
 /**

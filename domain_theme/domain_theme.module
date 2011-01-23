@@ -249,15 +249,37 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
       unset($form['#submit'][$key]);
     }
   }
-  ksort($form['#submit']);
 
-  // Check for the presence of color.module.
+  // Check for the presence of color.module. If it exists, we have to account
+  // for it and run a check to ensure we don't delete the main site's theme
+  // folder if we set a domain theme to the default scheme.
   $color_info = NULL;
   if (module_exists('color')) {
     $color_info = color_get_info($theme);
+    $form['#submit'][-100] = 'domain_theme_color_submit';
   }
+
+  // Order of operation becomes:
+  // domain_theme_color_submit()
+  // color_form_submit()
+  // domain_theme_settings_submit()
+  ksort($form['#submit']);
+
+  // If no color module, we are done.
   if (empty($color_info)) {
     return;
+  }
+
+  // Label the scheme correctly.
+  // Since may have added a 'domain_default' element to the palette,
+  // color module might think we are not using the default theme.
+  $current_scheme = variable_get('color_' . $theme . '_palette', array());
+  if (isset($current_scheme['domain_default'])) {
+    unset($current_scheme['domain_default']);
+    $info = color_get_info($theme);
+    if (isset($info['schemes']['default']['colors']) && implode(',', $info['schemes']['default']['colors']) == implode(',', $current_scheme)) {
+      $form['color']['scheme']['#default_value'] = 'default';
+    }
   }
 
   // Color module will reset the values in {variable}. which we don't
