@@ -2,6 +2,7 @@
 
 23-JAN-2011
 -- #1026346. Fixes default theme handling.
+-- Creates the 7.x.2.8 release.
 
 20-JAN-2011
 -- #1034412. Fixes error in domain_alias_list() static cache.
