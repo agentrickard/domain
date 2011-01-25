@@ -270,7 +270,7 @@ class DomainHookTest extends DomainTestCase {
         }
       }
     }
-    $this->assertTrue($new_domain['newtest']['domain_id'] == $return['domain_id'], t('hook_domain_bootstrap_lookup() ran correctly.'));
+    $this->assertTrue($new_domain['newtest']['domain_id'] == $return['domain_id'], t('hook_domain_bootstrap_lookup() fired correctly.'));
 
     // hook_domain_bootstrap_full() fires after a domain is determined.
     // This hook does not allow a return value, so we modify the $_domain global.
@@ -283,7 +283,7 @@ class DomainHookTest extends DomainTestCase {
       }
     }
     $return = domain_get_domain();
-    $this->assertTrue(!empty($return['test_full']), t('hook_domain_bootstrap_full() ran correctly.'));
+    $this->assertTrue(!empty($return['test_full']), t('hook_domain_bootstrap_full() fired correctly.'));
   }
 
 }
