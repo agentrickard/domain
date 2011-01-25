@@ -97,3 +97,25 @@ function domain_test_domain_validate_alter(&$errors, $subdomain) {
     $errors = array();
   }
 }
+
+/**
+ * Implements hook_domain_bootstrap_lookup().
+ *
+ * Match 'local.test' to 'newtest.example.com'.
+ */
+function domain_test_domain_bootstrap_lookup($domain) {
+  if ($domain != 'local.test') {
+    return;
+  }
+  $domain = domain_lookup(NULL, 'newtest.example.com', TRUE);
+  return $domain;
+}
+
+/**
+ * Implements hook_domain_bootstrap_full().
+ *
+ * Add a $domain['test_full'] element to the array.
+ */
+function domain_test_domain_bootstrap_full($domain) {
+  $GLOBALS['_domain']['test_full'] = TRUE;
+}

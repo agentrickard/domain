@@ -1,5 +1,8 @@
 // $Id$
 
+24-JAN-2011
+-- Adds domain_boostrap hook tests.
+
 23-JAN-2011
 -- #1026346. Fixes default theme handling.
 
