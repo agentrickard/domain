@@ -1391,16 +1391,22 @@ function domain_get_node_match($nid) {
   }
   // Load the domain data for this node -- but only take the first match.
   $id = db_result(db_query_range("SELECT gid FROM {domain_access} WHERE nid = %d AND realm = '%s' ORDER BY gid", $nid, 'domain_id', 0, 1));
-  $source = domain_lookup($id);
-  drupal_alter('domain_source', $source, $nid);
-  $domain[$nid] = $source;
+
+  // If a match was found, return it. Otherwise, we may be saving a node
+  // in which case, let it fall through. See http://drupal.org/node/624360.
+  $source = NULL;
+  if ($id !== FALSE) {
+    $source = domain_lookup($id);
+    drupal_alter('domain_source', $source, $nid);
+    $domain[$nid] = $source;
+  }
   return $source;
 }
 
 /**
  * Allow the lookup of path rewrites.
  *
- * Note that unlinke domain_get_node_match(), this function assumes
+ * Note that unlike domain_get_node_match(), this function assumes
  * that all links will be written to the current domain.
  *
  * @param $path
