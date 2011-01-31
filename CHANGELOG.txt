@@ -1,5 +1,8 @@
 // $Id$
 
+30-JAN-2011
+-- Patch #1046844 by arthurf. domain_bootstrap() breaks page cache on D7.
+
 27-JAN-2011
 -- Patch #624360 by bpresles. Fixes redirection in the event that other modules call url() during node_save().
 

@@ -41,6 +41,11 @@ function domain_bootstrap() {
   // Initialize our global variable.
   $_domain = array();
 
+  // Ensure that core globals are loaded.
+  if (!isset($GLOBALS['base_root'])) {
+    drupal_settings_initialize();
+  }
+
   $phases = array(DOMAIN_BOOTSTRAP_INIT, DOMAIN_BOOTSTRAP_NAME_RESOLVE, DOMAIN_BOOTSTRAP_FULL);
   foreach ($phases as $phase) {
     // We return NULL if the domain module is not enabled.  This prevents
@@ -245,4 +250,3 @@ function domain_get_primary_table($table) {
   }
   return db_escape_table($table);
 }
-
