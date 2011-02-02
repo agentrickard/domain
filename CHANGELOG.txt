@@ -1,5 +1,8 @@
 // $Id$
 
+02-FEB-2011
+-- Documentation #1039918 by Michelle.  Adds alias / wildcard information.
+
 30-JAN-2011
 -- Patch #1046844 by arthurf. domain_bootstrap() breaks page cache on D7.
 
