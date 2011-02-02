@@ -1,5 +1,8 @@
 // $Id$
 
+02-FEB-2011
+-- Documentation #1039918 by Michelle.  Adds alias / wildcard information.
+
 27-JAN-2011
 -- Patch #624360 by bpresles. Fixes redirection in the event that other modules call url() during node_save().
 
