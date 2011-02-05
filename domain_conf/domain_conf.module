@@ -60,20 +60,6 @@ function domain_conf_domain_bootstrap_full($domain) {
 }
 
 /**
- * Implements hook_init()
- */
-function domain_conf_init() {
-  // Allow sites to add implementations of hook_domain_conf() without hacking.
-  // See http://drupal.org/node/236877.
-  if (arg(0) == 'admin') {
-    $extra = drupal_get_path('module', 'domain_conf') . '/domain_conf.inc';
-    if (file_exists($extra)) {
-      include $extra;
-    }
-  }
-}
-
-/**
  * Implements hook_menu()
  */
 function domain_conf_menu() {

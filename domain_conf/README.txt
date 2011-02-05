@@ -175,53 +175,7 @@ Complete documentation of this function is in API.php.
 ----
 4.3   Using domain_conf.inc
 
-The normal method for using hook_domain_conf() is to have the hook implemented
-in other modules.
-
-However, the community development process may mean that it will take time for
-the hook to be implemented in modules that you may be using.
-
-To allow for this fact without harming the upgrade path for Domain
-Configuration, it is possible to create a domain_conf.inc file that you place
-inside the domain_conf directory.
-
-This file should be a PHP file, and it should conform to Drupal coding
-standards.
-
-For example, to add the user picture default setting to the module without
-patching user.module or domain_conf.module, you may create the following
-file:
-
-====
-<?php
-/**
- * Implements hook_domain_conf() to add the user picture.
- */
-function user_domain_conf() {
-  $form['pictures'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('User picture'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-  $form['pictures']['user_picture_default'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Default picture'),
-    '#default_value' => variable_get('user_picture_default', ''),
-    '#size' => 30,
-    '#maxlength' => 255,
-    '#description' => t('URL of picture to display for users with no custom
-      picture selected. Leave blank for none.')
-  );
-  return $form;
-}
-====
-
-NOTE: Before upgrading the Domain module, be sure to save this file
-so that it may be replaced in the event it is deleted.  Note also that the
-domain_conf.inc file is not included in the module package.
-
-See http://drupal.org/node/236877 for additional background.
+This functionality has been deprecated. Use hook_domain_conf() normally.
 
 ----
 4.4   Database Schema
