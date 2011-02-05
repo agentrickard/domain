@@ -99,7 +99,7 @@ function drush_domain_list() {
 /**
  * Generate a list of domains for testing.
  *
- * In my environment, I name subdomains one.* two.* up to ten. I also use 
+ * In my environment, I name subdomains one.* two.* up to ten. I also use
  * foo.* bar.* and baz.*. We also want a non-subdomain here and use
  * myexample.com.
  *
@@ -160,7 +160,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
   if ($count > 15 || empty($prepared)) {
     // Find the highest numbered test domain.
     $start = db_query("SELECT sitename FROM {domain} WHERE sitename LIKE 'test%' ORDER BY domain_id DESC")->fetchField();
-    $start = (int) str_ireplace('test', '', $start); 
+    $start = (int) str_ireplace('test', '', $start);
     $j = count($prepared);
     for ($i = $start + 1; $j <= $count; $i++) {
       $prepared[] = 'test' . $i . '.' . $primary;

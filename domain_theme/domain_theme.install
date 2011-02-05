@@ -7,7 +7,7 @@
  */
 
 /**
- * Implements hook_schema()
+ * Implements hook_schema().
  */
 function domain_theme_schema() {
   $schema['domain_theme'] = array(
@@ -27,7 +27,7 @@ function domain_theme_schema() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implements hook_uninstall().
  */
 function domain_theme_uninstall() {
   variable_del('domain_theme_weight');

@@ -41,6 +41,7 @@ function domain_theme_page($domain) {
  *
  * @param $domain
  *   The $domain object created by domain_lookup().
+ *
  * @return
  *   An HTML form.
  */
@@ -148,9 +149,9 @@ function theme_domain_theme_form($variables) {
     }
     $row = array(
       theme('image', array('path' => $themes[$key]->info['screenshot'])),
-      '<h3>' . $themes[$key]->info['name'] . ' ' . (isset($themes[$key]->info['version']) ? $themes[$key]->info['version'] : '') . ' ' . $default .  '</h3>' . t($themes[$key]->info['description']),
+      '<h3>' . $themes[$key]->info['name'] . ' ' . (isset($themes[$key]->info['version']) ? $themes[$key]->info['version'] : '') . ' ' . $default . '</h3>' . t($themes[$key]->info['description']),
       drupal_render($form['theme'][$key]),
-      l('configure', 'admin/structure/domain/view/' . $form['domain_id']['#value'] . '/theme/' . $key . '/theme-settings')
+      l(t('configure'), 'admin/structure/domain/view/' . $form['domain_id']['#value'] . '/theme/' . $key . '/theme-settings')
     );
     $rows[] = $row;
   }
@@ -165,6 +166,7 @@ function theme_domain_theme_form($variables) {
  *
  * @param $domain
  *   The $domain object created by domain_lookup().
+ * 
  * @return
  *   A confirmation form.
  */
@@ -180,12 +182,13 @@ function domain_theme_reset($domain) {
  *
  * @param $domain
  *   The $domain object for the selected domain.
+ * 
  * @return
  *   A themed HTML form.
  */
 function domain_theme_reset_form($form, $form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
-  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/structure/domain/view/' . $domain['domain_id'] .'/theme', t('Submitting this form will restore default theme for this domain.'));
+  $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/structure/domain/view/' . $domain['domain_id'] . '/theme', t('Submitting this form will restore default theme for this domain.'));
   return $form;
 }
 
@@ -207,6 +210,7 @@ function domain_theme_reset_form_submit($form, &$form_state) {
  *
  * @param $domain
  *   The $domain object for the selected domain.
+ * 
  * @return
  *   Themed HTML messages.
  */
@@ -256,7 +260,7 @@ function domain_theme_settings_submit($form, &$form_state) {
   // Prepare a filepath for color module settings.
   $domain = domain_lookup($values['domain_id']);
   // We aren't using $filepath in Drupal 7; this can probably be removed.
-  $filepath = file_default_scheme() . ':/'  . '/domain-' . $domain['domain_id'];
+  $filepath = file_default_scheme() . ':/' . '/domain-' . $domain['domain_id'];
   $vars = array('palette', 'stylesheets', 'logo', 'files', 'screenshot');
   foreach ($vars as $variable) {
     $preset = variable_get('color_' . $values['theme'] . '_' . $variable, '');
@@ -276,7 +280,7 @@ function domain_theme_settings_submit($form, &$form_state) {
       }
     }
   }
-  
+
   // Set the filepath for color module.
   if (!empty($values['color_' . $values['theme'] . '_stylesheets'][0])) {
     $filepath = domain_theme_get_color_path($values['color_' . $values['theme'] . '_stylesheets'][0]);
@@ -341,7 +345,7 @@ function domain_theme_settings_submit($form, &$form_state) {
  * If the theme is saved as 'default', we have to be sure not to delete
  * existing color directories. This section is copied from color.module.
  *
- * @see color_form_submit().
+ * @see color_form_submit()
  */
 function domain_theme_color_submit($form, &$form_state) {
   $theme = $form_state['values']['theme'];

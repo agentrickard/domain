@@ -55,6 +55,7 @@ class DomainTestCase extends DrupalWebTestCase {
    *   An array of subdomains to create.
    * @param $base
    *   A base domain string, in the format 'example.com'.
+   *
    * @return
    *  An array of created domains.
    */
@@ -98,7 +99,7 @@ class DomainInstallTest extends DomainTestCase {
       'group' => 'Domain Access',
     );
   }
-  
+
   // If the default domain is not in the database, the sitename will be default sitename.
   public function testDomainInstall() {
     $domain = db_query("SELECT sitename FROM {domain} WHERE is_default = 1")->fetch();
@@ -148,7 +149,7 @@ class DomainCreateTest extends DomainTestCase {
       'group' => 'Domain Access',
     );
   }
-  
+
   // Create some domains and verify they match what we expect.
   function testDomainCreate() {
     $setup = $this->domainCreateDomains();
@@ -243,7 +244,7 @@ class DomainHookTest extends DomainTestCase {
     $this->assertTrue($value == 'delete', t('hook_domain_delete() fired correctly.'));
     $deleted_domain = domain_lookup($updated_domain['domain_id'], NULL, TRUE);
     $this->assertTrue($deleted_domain == -1, t('Domain deleted successfully.'));
-    
+ 
     // hook_domain_validate_alter() allows any domain to be valid.
     $return = domain_validate('thisshouldfail');
     $this->assertTrue(empty($return), t('hook_domain_validate_alter() fired correctly.'));

@@ -9,7 +9,7 @@
  */
 
 /**
- * Implements hook_domain_batch()
+ * Implements hook_domain_batch().
  */
 function domain_theme_domain_batch() {
   $batch = array();
@@ -62,7 +62,7 @@ function domain_theme_domain_batch() {
 }
 
 /**
- * Implements hook_domain_warning()
+ * Implements hook_domain_warning().
  */
 function domain_theme_domain_warning() {
   $forms =  array(

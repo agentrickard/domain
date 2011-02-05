@@ -3,6 +3,7 @@
 05-FEB-2011
 -- Cleans up domain.api.php.
 -- Removes the old use of domain_conf.inc.
+-- Code standards cleanup.
 
 02-FEB-2011
 -- Documentation #1039918 by Michelle.  Adds alias / wildcard information.

@@ -7,14 +7,14 @@
  */
 
 /**
- * Implements hook_install()
+ * Implements hook_install().
  */
 function domain_install() {
   domain_set_primary_domain();
 }
 
 /**
- * Implements hook_schema()
+ * Implements hook_schema().
  */
 function domain_schema() {
   $schema['domain'] = array(
@@ -63,7 +63,7 @@ function domain_schema() {
 }
 
 /**
- * Implements hook_uninstall()
+ * Implements hook_uninstall().
  */
 function domain_uninstall() {
   $variables = array(

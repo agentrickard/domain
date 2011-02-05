@@ -3,11 +3,11 @@
 
 /**
  * @file
- * Install file.
+ * Install file for Domain Conf.
  */
 
 /**
- * Implements hook_schema()
+ * Implements hook_schema().
  */
 function domain_conf_schema() {
   $schema['domain_conf'] = array(

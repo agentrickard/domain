@@ -14,6 +14,7 @@
  *
  * @param $domain
  *   The $domain object created by domain_lookup().
+ *
  * @return
  *   The appropriate form or an error message.
  */
@@ -37,8 +38,8 @@ function domain_conf_page($domain) {
 /**
  * Custom form to generate domain-specific site settings.
  *
- * The items on this form are taken from hook_domain_batch() and hook_domain_conf().
- * See the API for more information.
+ * The items on this form are taken from hook_domain_batch() and
+ * hook_domain_conf(). See the API for more information.
  *
  * @param $domain
  *   The domain currently being updated.
@@ -157,6 +158,7 @@ function domain_conf_form_submit($form, &$form_state) {
  *
  * @param $domain
  *   The $domain object created by domain_lookup().
+ *
  * @return
  *   A confirmation form.
  */
@@ -173,6 +175,7 @@ function domain_conf_reset($domain) {
  *
  * @param $domain
  *   The $domain object for the selected domain.
+ *
  * @return
  *   Themed HTML form.
  */
@@ -201,6 +204,7 @@ function domain_conf_reset_form_submit($form, &$form_state) {
  *
  * @param $domain
  *   The $domain object for the selected domain.
+ *
  * @return
  *   Themed HTML messages.
  */
@@ -210,7 +214,7 @@ function theme_domain_conf_reset($variables) {
   $output .= '<p>' . t('These settings will replace or supplement your default site settings when %name is the active domain.', array('%name' => $domain['sitename'])) . '</p>';
   $data = db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {
-    $output .= '<p>' . t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/structure/domain/view/' . $domain['domain_id'] . '/conf-reset')))  . '</p>';
+    $output .= '<p>' . t('You may <a href="!url">erase these settings</a> to restore the default behavior.', array('!url' => url('admin/structure/domain/view/' . $domain['domain_id'] . '/conf-reset'))) . '</p>';
   }
   return $output;
 }

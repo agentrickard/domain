@@ -77,7 +77,7 @@ function domain_content_list() {
     $path = trim(domain_get_path($domain), '/');
     $rows[] = array(
       $domain['domain_id'] . (($domain['is_default']) ? ' * ' : ''),
-      l(t('@sitename content', array('@sitename' => $domain['sitename'])), 'admin/domain/content/'. $domain['domain_id']),
+      l(t('@sitename content', array('@sitename' => $domain['sitename'])), 'admin/domain/content/' . $domain['domain_id']),
       (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField(),
       l(t('View @domain', array('@domain' => $domain['subdomain'])), $path),
     );
@@ -86,12 +86,12 @@ function domain_content_list() {
   $all = array(
     '-',
     l(t('Content assigned to all affiliates'), 'admin/domain/content/all'),
-    (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => 0, ':realm' => 'domain_site'))->fetchField(),    
+    (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => 0, ':realm' => 'domain_site'))->fetchField(),
     '',
   );
   array_unshift($rows, $all);
   if (!empty($rows)) {
-    $output = '<p>'. t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate.') .'</p>';
+    $output = '<p>' . t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate.') . '</p>';
     $build['header'] = array(
       '#markup' => $output,
     );
@@ -113,6 +113,7 @@ function domain_content_list() {
 
 /**
  * Content administration for a specific domain.
+ *
  * This callback puts the user on the current domain and then
  * fetches the appropirate content for batch editing.
  *
@@ -121,6 +122,7 @@ function domain_content_list() {
  * @param $all_affiliates
  *   A boolean flag that indicates whether to grant the domain_site node access
  *   realm for this content view.
+ *
  * @return
  *   A link group for each domain the user can access.
  */
@@ -165,7 +167,7 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
  */
 function domain_content_admin() {
   // Load the form basics for administering nodes.
-  include_once drupal_get_path('module', 'node') .'/node.admin.inc';
+  include_once drupal_get_path('module', 'node') . '/node.admin.inc';
   $form = array();
   $form['#attached']['css'] = array(drupal_get_path('module', 'domain_content') . '/domain_content.css');
 
@@ -263,7 +265,7 @@ function domain_content_form() {
   domain_alter_node_query($query, FALSE);
 
   $nids = $query
-    ->fields('n',array('nid'))
+    ->fields('n', array('nid'))
     ->limit(50)
     ->orderByHeader($header)
     ->execute()
@@ -397,6 +399,7 @@ function domain_content_view_domains($node) {
  *
  * @param &$operations
  *   The complete list of operations, passed by reference.
+ *
  * @return
  *   No return value. Modify by reference.
  */

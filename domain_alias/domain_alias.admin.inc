@@ -157,6 +157,7 @@ function domain_alias_form_validate($form, &$form_state) {
  *   The array of currently processed alias strings.
  * @param $type
  *   The type of alias, used to determine form errors.
+ *
  * @return
  *   A valid alias string, or an error.
  */

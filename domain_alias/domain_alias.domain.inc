@@ -26,7 +26,7 @@ function domain_alias_domain_nav($domain) {
 }
 
 /**
- * Implements hook_domain_load()
+ * Implements hook_domain_load().
  *
  * Adds a list of all aliases for the current domain.
  */

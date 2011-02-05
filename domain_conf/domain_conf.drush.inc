@@ -44,14 +44,14 @@ function domain_conf_drush_help($section) {
 function drush_domain_conf_set($domain_id, $name, $value) {
   if ($domain_id != 'all') {
     domain_conf_variable_set($domain_id, $name, $value);
-   drush_print('Variable set.');
+    drush_print('Variable set.');
   }
   else {
     variable_set($name, $value);
     foreach (domain_domains(TRUE) as $domain) {
       domain_conf_variable_delete($domain['domain_id'], $name);
     }
-     drush_print('Variable set for all domains.');
+    drush_print('Variable set for all domains.');
   }
 }
 

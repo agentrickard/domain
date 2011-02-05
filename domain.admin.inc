@@ -132,7 +132,7 @@ function domain_overview_form_submit($form, &$form_state) {
       ->condition('domain_id', $domain_id)
       ->execute();
     }
-    
+
   drupal_set_message(t('Domain settings updated'));
 }
 
@@ -339,6 +339,7 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
  *
  * @param $form_state
  *   From state from the submit_hook
+ *
  * @return array
  *   Array of domain values for insert and update sql operations
  */
@@ -387,7 +388,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
   }
   $form = array();
   drupal_set_title(t('Edit !domain', array('!domain' => $domain['subdomain'])));
-  $form['#domain'] = $domain; 
+  $form['#domain'] = $domain;
   // The $arguments arrray allows other modules to pass values to change the bahavior
   // of submit and validate functions.
   if (!empty($arguments)) {
@@ -621,6 +622,7 @@ function domain_check_response($domain) {
  * @param $action
  *   The name of the action to perform; corresponds to the keys of the $batch array
  *   returned by hook_domain_batch().
+ *
  * @return
  *   The appropriate form, or a list of actions, or an error.
  */
@@ -666,6 +668,7 @@ function domain_batch($action = NULL) {
  *
  * @param $batch
  *   An array of batch actions, as defined by hook_domain_batch().
+ *
  * @return
  *   A themed table of links and descriptions for batch actions.
  */
@@ -680,7 +683,7 @@ function domain_batch_list($batch) {
   }
   uasort($batch, 'domain_batch_sort');
   $group = '';
-  
+
   foreach ($batch as $key => $value) {
     $permission = isset($value['#permission']) ? $value['#permission'] : 'administer domains';
     if (!user_access($permission)) {
@@ -734,6 +737,7 @@ function domain_batch_sort($a, $b) {
  *   The batch data for this $action, as defined by hook_domain_batch().
  * @param $domains
  *   The current settings for each domain.
+ *
  * @return
  *   A themed table of links and descriptions for batch actions.
  */

@@ -2,7 +2,14 @@
 // $Id$
 
 /**
- * Implements hook_domain_warning()
+ * @file
+ * Domain hooks for Domain Conf.
+ *
+ * @ingroup domain_conf
+ */
+
+/**
+ * Implements hook_domain_warning().
  */
 function domain_conf_domain_warning() {
   // These are the forms for variables set by Domain Conf.
@@ -23,7 +30,7 @@ function domain_conf_domain_warning() {
 }
 
 /**
- * Implements hook_domain_batch()
+ * Implements hook_domain_batch().
  */
 function domain_conf_domain_batch() {
   $batch = array();
