@@ -928,7 +928,7 @@ function theme_domain_batch_form($form) {
   if (isset($form['domain_batch_all'])) {
     $output .= drupal_render($form['domain_batch_all']);
   }
-  $header = array(t('Id'), t('Sitename'), t('Setting'));
+  $header = array(t('Id'), t('Site name'), t('Setting'));
   $rows = array();
   foreach (element_children($form['domain_batch']) as $key) {
     $temp = $form['domain_batch'][$key]['#title'];
