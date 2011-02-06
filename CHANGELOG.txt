@@ -1,5 +1,8 @@
 // $Id$
 
+06-FEB-2011
+-- #1052522 by Ayesh. Improve usability of batch update screens.
+
 02-FEB-2011
 -- Documentation #1039918 by Michelle.  Adds alias / wildcard information.
 
