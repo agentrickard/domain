@@ -1,5 +1,8 @@
 // $Id$
 
+06-FEB-2011
+-- #1052522 by Ayesh. Improve usability of batch update screens.
+
 05-FEB-2011
 -- Cleans up domain.api.php.
 -- Removes the old use of domain_conf.inc.
