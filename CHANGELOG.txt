@@ -1,5 +1,8 @@
 // $Id$
 
+13-FEB-2011
+-- #1059108 by skizzo. Fixes HTML validation in Domain Nav.
+
 06-FEB-2011
 -- #1052522 by Ayesh. Improve usability of batch update screens.
 

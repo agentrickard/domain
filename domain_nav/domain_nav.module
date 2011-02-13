@@ -252,15 +252,15 @@ function theme_domain_nav_default($variables) {
   $_domain = domain_get_domain();
   $options = $variables['options'];
   $current = $options[$_domain['domain_id']];
-  $output = '<form class="domain-list" action="">';
+  $output = '<form class="domain-list" action=""><div class="domain-pointless-validator-class">';
   $output .= '<select onchange="if (this.value) location.href=this.value;">';
   $output .= '<option value="' . $current['path'] . '">' . t('Jump to...') . '</option>';
   foreach ($options as $key => $value) {
-    (isset($value['active'])) ? $selected = ' selected' : $selected = '';
+    (isset($value['active'])) ? $selected = ' selected="selected"' : $selected = '';
     $output .= '<option value="' . $value['path'] . '"' . $selected . '>' . filter_xss_admin($value['sitename']) . '</option>';
   }
   $output .= '</select>';
-  $output .= '</form>';
+  $output .= '</div></form>';
   return $output;
 }
 
