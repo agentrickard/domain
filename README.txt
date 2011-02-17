@@ -621,7 +621,7 @@ sample domain record.
 
 The first domain will use the HTTP_HOST value of the request made
 when installing the module. This value may be edited by going to
-Admin > Build > Domains and editing the Primary Domain value.
+Admin > Structure > Domains and editing the Primary Domain value.
 
 The second domain will be given the value test.example.com, where
 example.com is the Primary Domain value. This domain is set to be
@@ -880,7 +880,7 @@ in 2.1.1.
 
 For this feature to work, you must follow the instructions in INSTALL.txt
 regarding custom_url_rewrite_outbound().  If you have not followed the
-instructions, you should see a warning at the top of the Admin > Build > Domains
+instructions, you should see a warning at the top of the Admin > Structure > Domains
 page.
 
 In normal uses, such as the default home page, you want to restrict access
