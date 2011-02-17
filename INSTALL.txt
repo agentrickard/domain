@@ -268,7 +268,7 @@ installation.
 
 The primary domain will use the SERVER_NAME value of the request made
 when installing the module. This value may be edited by going to
-Admin > Configuration > Domains and editing the Primary Domain value.
+Admin > Structure > Domains and editing the Primary Domain value.
 
 After you install the module, you should visit Admin > Users > Permissions
 and set the module permissions; normally you will give your site
@@ -277,7 +277,7 @@ administrators the following permissions:
     -- 'administer domains'
     -- 'set domain access'
 
-After saving permissions, go to Admin > Configuration > Domains and
+After saving permissions, go to Admin > Structure > Domains and
 configure your site's Primary Domain.
 
 For more information, see README.txt.
@@ -409,7 +409,7 @@ include 'settings.inc';
 ----
 4.4.4   Testing Your Configuration
 
-After editing your settings.php file, go to Admin > Build > Domains.  You may
+After editing your settings.php file, go to Admin > Structure > Domains.  You may
 see a warning at the top of the page:
 
   "Domain access failed to load during phase: bootstrap include. Please check your

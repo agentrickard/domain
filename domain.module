@@ -1669,8 +1669,8 @@ function domain_get_path_match($path) {
  */
 function domain_get_node_domains($nodes, $reset = FALSE) {
   static $lookup;
-  if (isset($lookup) && $reset) {
-    unset($lookup);
+  if (!isset($lookup) || $reset) {
+    $lookup = array();
   }
   // Ensure we form our data properly.
   if (!is_array($nodes)) {

@@ -64,7 +64,7 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
 
 7. Read the main README.txt file for the Domain Access module.
 
-8. Go to Admin > Configuration > Domain and configure the module.
+8. Go to Admin > Structure > Domain and configure the module.
 
 9. Now you are ready to explore the options available to you.
 

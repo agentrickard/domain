@@ -35,15 +35,39 @@ define('DOMAIN_BOOTSTRAP_FULL', 2);
 
 /**
  * Domain module bootstrap: calls all bootstrap phases.
+ *
+ * Effectively, we add our own bootstrap phase to Drupal core.
+ * This allows us to do selective configuration changes before Drupal
+ * has a chance to react. For example, the Domain Conf module allows
+ * page caching to be set to "on" for example.com but "off" for
+ * no-cache.example.com.
+ *
+ * The big issues here are command-line interactions, which are slightly
+ * different; and the fact that drupal_settings_initialize() is needed to
+ * properly hit the page cache.
+ *
+ * The initial check for GLOBALS['base_root'] lets us know that we have
+ * already run the normal configuration routine and are now free to alter
+ * settings per-domain.
+ *
+ * Note that this problem is largely caused by the need to jump ahead
+ * in drupal_bootstrap() in order to have database functions available.
  */
 function domain_bootstrap() {
   global $_domain;
   // Initialize our global variable.
   $_domain = array();
 
-  // Ensure that core globals are loaded.
+  // Ensure that core globals are loaded so that we don't break page caching.
+  // See http://drupal.org/node/1046844
   if (!isset($GLOBALS['base_root'])) {
+    // $conf is set before settings.php is invoked. Do not let $conf get reset to an array().
+    // See http://drupal.org/node/1056152
+    $settings_conf = $GLOBALS['conf'] ;
+    // Sadly, we have to call this function from within itself.
+    // Thankfully, include_once prevents us from making major errors.
     drupal_settings_initialize();
+    $GLOBALS['conf'] = $settings_conf;
   }
 
   $phases = array(DOMAIN_BOOTSTRAP_INIT, DOMAIN_BOOTSTRAP_NAME_RESOLVE, DOMAIN_BOOTSTRAP_FULL);
