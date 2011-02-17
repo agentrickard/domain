@@ -170,7 +170,7 @@ files do not make things clear enough.
 
 After you have enabled multiple DNS entries to resolve to your single,
 default Drupal installation, you may activate the module and configure its
-settings at Admin > Build > Domains.
+settings at Admin > Structure > Domains.
 
 ----
 2.3 Setting DOMAIN_INSTALL_RULE
@@ -270,7 +270,7 @@ The primary domain will use the SERVER_NAME value of the request made
 when installing the module. This value may be edited by going to
 Admin > Structure > Domains and editing the Primary Domain value.
 
-After you install the module, you should visit Admin > Users > Permissions
+After you install the module, you should visit Admin > People > Permissions
 and set the module permissions; normally you will give your site
 administrators the following permissions:
 
