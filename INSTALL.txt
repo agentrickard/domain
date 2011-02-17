@@ -253,7 +253,7 @@ administrators the following permissions:
     -- 'administer domains'
     -- 'set domain access'
 
-After saving permissions, go to Admin > Configuration > Domains and
+After saving permissions, go to Admin > Structure > Domains and
 configure your site's Primary Domain.
 
 For more information, see README.txt.

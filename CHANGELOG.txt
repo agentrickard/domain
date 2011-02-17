@@ -1,5 +1,9 @@
 // $Id$
 
+17-FEB-2011
+-- Patch #1056152 by R.Muilwijk. Fixes conf loading.
+-- Documentation by Doug Vann. Fix admin path.
+
 13-FEB-2011
 -- #1059108 by skizzo. Fixes HTML validation in Domain Nav.
 
@@ -11,6 +15,7 @@
 
 30-JAN-2011
 -- Patch #1046844 by arthurf. domain_bootstrap() breaks page cache on D7.
+-- Creates the 7.x.2.9 release.
 
 27-JAN-2011
 -- Patch #624360 by bpresles. Fixes redirection in the event that other modules call url() during node_save().
