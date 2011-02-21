@@ -1514,12 +1514,17 @@ function domain_node_load($nodes, $types) {
     $nodes[$node->nid]->domains = $domains[$node->nid]['domain_id'];
     $nodes[$node->nid]->domain_site = $domains[$node->nid]['domain_site'];
     $nodes[$node->nid]->subdomains = array();
-    if ($nodes[$node->nid]->domain_site) {
+    if (!empty($nodes[$node->nid]->domain_site)) {
       $nodes[$node->nid]->subdomains[] = t('All affiliates');
     }
-    foreach ($nodes[$node->nid]->domains as $gid) {
-      $domain = domain_lookup($gid);
-      $nodes[$node->nid]->subdomains[] = $domain['sitename'];
+    if (!empty($nodes[$node->nid]->domains)) {
+      foreach ($nodes[$node->nid]->domains as $gid) {
+        $domain = domain_lookup($gid);
+        $nodes[$node->nid]->subdomains[] = $domain['sitename'];
+      }
+    }
+    else {
+      $nodes[$node->nid]->subdomains[] = t('This node is not assigned to a domain.');
     }
   }
 }
