@@ -2573,10 +2573,9 @@ function domain_lookup_simple($name, $reset = FALSE) {
     if (!is_array($domain)) {
       $domain = array();
     }
-    // If no match => use default (0)
+    // If no match => use default domain.
     if (!isset($domain['domain_id'])) {
-      $domain['domain_id'] = 0;
-      $domain['sitename'] = variable_get('site_name', 'Drupal');
+      $domain['domain_id'] = domain_default_id();
     }
     $domain['subdomain'] = $name;
     // Invoke hook_domain_bootstrap_lookup()
