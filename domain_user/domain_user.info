@@ -1,4 +1,3 @@
-;  $Id$
 name = Domain User
 description = Creates unique subdomains for registered users.
 package = Domain Access

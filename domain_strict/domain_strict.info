@@ -1,4 +1,3 @@
-;  $Id$
 name = Domain Strict
 description = Forces users to be assigned to a domain in order to view content on that domain.
 package = Domain Access

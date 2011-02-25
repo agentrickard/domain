@@ -1,4 +1,3 @@
-// $Id$
 
 13-FEB-2011
 -- #1059108 by skizzo. Fixes HTML validation in Domain Nav.

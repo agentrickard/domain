@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @defgroup domain_views Domain Views: provides a views filter

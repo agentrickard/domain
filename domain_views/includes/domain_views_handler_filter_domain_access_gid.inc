@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Interface between domain_views.module and views.module.

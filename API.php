@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @defgroup domain_hooks Domain hook functions

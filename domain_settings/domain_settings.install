@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Rename the variable 'domain_settings_ignore' regarding the way

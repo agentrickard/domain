@@ -1,5 +1,4 @@
 <?php
-// $Id$
 /**
  * @file
  * Domain bootstrap file.

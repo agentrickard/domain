@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @defgroup domain_prefix Domain Prefix: dynamic table prefixing
