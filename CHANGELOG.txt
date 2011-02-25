@@ -1,4 +1,3 @@
-// $Id$
 
 21-FEB-2011
 -- Issue #1065470 by LTW Dhaniel. Fixes potentially empty array in node_load.

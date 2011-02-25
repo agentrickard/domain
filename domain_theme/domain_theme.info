@@ -1,4 +1,3 @@
-;$Id$
 name = Domain Theme
 description = Assign themes to domains created by the Domain Access module
 package = Domain Access

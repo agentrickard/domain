@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @defgroup domain Domain Access: A domain-based access control system

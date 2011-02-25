@@ -1,4 +1,3 @@
-;  $Id$
 name = Domain Configuration
 description = Advanced site configuration options for Domain Access.
 package = Domain Access
