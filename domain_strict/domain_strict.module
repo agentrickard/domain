@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * @defgroup domain_strict Domain Strict: strict access control

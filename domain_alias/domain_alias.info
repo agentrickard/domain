@@ -1,4 +1,3 @@
-; $Id$
 name = "Domain Alias"
 description = "Advanced domain matching methods for Domain Access."
 core = 7.x

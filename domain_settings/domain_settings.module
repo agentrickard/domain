@@ -1,6 +1,5 @@
 <?php
 
-// $Id$
 
 /**
  * @defgroup domain_settings Domain Settings : expanded site configuration options for Domain Access

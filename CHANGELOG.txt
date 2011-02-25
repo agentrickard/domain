@@ -1,4 +1,3 @@
-// $Id$
 
 23-FEB-2011
 -- Issue #1069108 by omercioglu. Fix domain alias bootstrap error.
