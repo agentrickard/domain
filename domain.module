@@ -357,7 +357,9 @@ function domain_block_view($delta = '') {
     return;
   }
   $function = 'domain_block_view_' . $delta;
-  return $function();
+  if (function_exists($function)) {
+    return $function();
+  }
 }
 
 /**
