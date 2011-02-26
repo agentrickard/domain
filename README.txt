@@ -934,7 +934,7 @@ are available by default.
   - Edit all domain status flags
 
 Additional batch actions are made available for the Domain Configuration
-module.  Other modules may Implements hook_domain_batch() to provide
+module.  Other modules may implement hook_domain_batch() to provide
 additional batch actions.
 
 It may be necessary to enter the batch form from the primary domain.
