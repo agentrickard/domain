@@ -1,4 +1,3 @@
-
 /**
  * @file
  * Quickstart INSTALL file for Domain Access.
@@ -35,6 +34,9 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
     IMPORTANT: You must add these lines to settings.php after the
     $databases. Normally, you should add these lines to the end of the
     settings.php file.
+
+    NOTE: If you perform a Drupal core version upgrade, you must
+    remove these lines from settings.php.  See UPGRADE.txt for details.
 
 4. Go to Admin > Modules.  There you will see the Domain module group.
 
@@ -73,3 +75,17 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
 
     Each of the modules has its own INSTALL.txt and README.txt files.
     Please read them carefully before activating them.
+
+----
+USING DRUSH
+
+NOTE: When installing from drush, it is proper to pass the URI value for your
+site. Include the full path to the installation, as below:
+
+  drush pm-enable domain --uri=http://example.com/optional_subdirectory
+
+Then clear the node access cache:
+
+  drush cache-clear
+
+When prompted, select either option [1] or option [5] to rebuild node access.

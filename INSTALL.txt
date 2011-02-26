@@ -1,4 +1,3 @@
-
 /**
  * @file
  * INSTALL file for Domain Access.
@@ -18,7 +17,8 @@ CONTENTS
 2.4   Setting DOMAIN_SITE_GRANT
 2.5   Setting DOMAIN_ASSIGN_USERS
 3.   Installing the Module
-3.1   After Installation
+3.1   Using Drush
+3.2   After Installation
 4.  Configuring settings.php
 4.1   $base_url
 4.2   $databases
@@ -236,7 +236,30 @@ default module behavior, you may install Domain Access like any
 other Drupal module.
 
 ----
-3.1   After Installation
+3.1   Using Drush
+
+When installing from drush, it is proper to pass the URI value for your
+site. Include the full path to the installation, as below:
+
+  drush pm-enable domain --uri=http://example.com/optional_subdirectory
+
+If your site is not installed in a subdirectory, the command would be:
+
+  drush pm-enable domain --uri=http://example.com/
+
+Passing the --uri variable tells Domain Access what the default domain for
+your site will be. Without this information, the default domain cannot be
+created from the command line.
+
+After installing via drush, you must rebuild the node access table. Run the
+command:
+
+  drush cache-clear
+
+When prompted, select either option [1] or option [5] to rebuild node access.
+
+----
+3.2   After Installation
 
 Note that as of 6.x.2.0, the primary domain is created for you on
 installation.
@@ -322,6 +345,9 @@ fail to load and report an error message to site administrators.
 IMPORTANT: You must add these lines to settings.php after $databases
 has been set; otherwise, Drupal will fail to load. Normally, you should add
 these lines to the end of the settings.php file.
+
+NOTE: If you perform a Drupal core version upgrade, you must remove these
+lines from settings.php.  See UPGRADE.txt for details.
 
 ----
 4.4.1  Installation

@@ -1,27 +1,90 @@
-
-
 /**
  * @file
- * UPGRADE instructions for Domain Access 6.x.2
+ * Upgrade instructions for Domain Access
  */
 
 CONTENTS
 --------
 
-1. Who Needs to Upgrade?
-2. How to Upgrade
-3. Error Notices
-4. Change Summary
-5. Upgrading From Drupal 5
+1. Upgrading from Drupal 6 to Drupal 7
+2. Upgrading from Domain Access 6.x.1 to 6.x.2
+2.1. Who Needs to Upgrade?
+2.2. How to Upgrade
+2.3. Error Notices
+2.4. Change Summary
+3. Upgrading From Drupal 5
+
 
 ----
-1. Who Needs to Upgrade?
+1. Upgrading from Drupal 6 to Drupal 7
+
+To upgrade Domain Access from Drupal 6 to Drupal 7, you should follow
+Drupal's guide (found in the core UPGRADE.txt file in Drupal's root directory.)
+
+When upgrading, follow the additional steps below to ensure that the required
+changes for Domain Access do not interfere with Drupal's update process.
+
+  -- Remove the Domain Access include line from settings.php.
+
+    /**
+     * Add the domain module setup routine.
+     */
+    include './sites/all/modules/domain/settings.inc';
+  
+  See INSTALL.txt for more information about this code.
+
+  -- Update Drupal, following the process described in the core UPGRADE.txt.
+  This step includes disabling (but not uninstalling) all Domain Access modules
+  before you continue.
+
+  -- Download Domain Access for Drupal 7.
+
+  -- Run the database update script.
+  This step will make the necessary changes that update Domain Access for
+  Drupal 7.
+
+  -- Enable the Domain Access module.
+
+  -- Add the Domain Access settings line back to settings.php. Be sure to
+  include these lines _below_ the database configuration information. (The
+  Drupal update may place the new $databases array at the bottom of
+  settings.php.)
+  
+    /**
+     * Add the domain module setup routine.
+     */
+    include DRUPAL_ROOT . './sites/all/modules/domain/settings.inc';
+  
+  Refer to the Domain Access INSTALL.txt for information about the new syntax
+  for the Domain Access include.
+
+  -- If prompted, rebuild content access permissions.
+
+  -- Enable Domain submodules (if desired).
+
+  -- If using Domain Conf, check the main menu settings
+  (admin/structure/menu/settings) which core may not have updated.
+
+You should now be ready to use your Drupal 7 site.
+
+----
+2. Upgrading from Domain Access 6.x.1 to 6.x.2
+
+If you are using Domain Access 6.x.1, you must upgrade to 6.x.2 before
+migrating to Drupal 7. This section outlines that upgrade process.
+
+----
+2.1  Who Needs to Upgrade?
 
 If you are using Domain Access prior to 6.x.2.0, then you should
 follow these upgrade instructions.
 
+Note that if you are upgrading from 6.x.1 to 7.x.2, you must first perform this
+update in Drupal 6.
+
+
 ----
-2. How to Upgrade
+2.2  How to Upgrade
 
 In previous versions, Domain Access asked you to make several
 changes to your site's settings.php file.  The 6.x.2.0 version
@@ -97,7 +160,7 @@ site permissions accordingly. The upgrade does not split permissions for you.
 There are also new permissions documented in README.txt.
 
 ----
-3. Error Notices
+2.3  Error Notices
 
 If your module is not configured correctly, you should see an error notice
 on the top of the page -- this message is shown only to users with the
@@ -110,7 +173,7 @@ at http://drupal.org/project/domain.
 
 
 ----
-4. Change Summary
+2.4  Change Summary
 
 Below are some notes about the changes to the new version.
 
@@ -128,10 +191,13 @@ Below are some notes about the changes to the new version.
 -- The new function domain_get_user_domains($uid) can be used
     to find which domains as user is assigned to.
 
-----
-5. Upgrading from Drupal 5
 
-The upgrade process should work fine when upgrading from Drupal 5.
+----
+3. Upgrading from Drupal 5
+
+The upgrade process should work fine when upgrading from Drupal 5 to Drupal 6.
+
+Upgrading from Drupal 5 to Drupal 7 is not supported.
 
 Best practice is to disable contributed modules when upgrading Drupal.
 Be sure you disable (but do not uninstall) the Domain Access module

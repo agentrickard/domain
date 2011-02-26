@@ -247,15 +247,6 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
     <em>Users will be taken from www.example.com to example.com, so your domains must be registered without the www. prefix.</em>')
   );
 
-  /* TODO: enable this?
-  $form['domain_advanced']['domain_access_rules'] = array(
-    '#type' => 'radios',
-    '#title' => t('Node access settings'),
-    '#default_value' => variable_get('domain_access_rules', 0),
-    '#options' => array(0 => t('Use the default Drupal behavior (OR)'), 1 => t('Check Domain Access in addition to other modules (AND)')),
-    '#description' => t('Controls how Domain Access interacts with access control modules such as Organic Groups. Requires the multiple_node_access patch.')
-  );*/
-
   $form['domain_advanced']['domain_search'] = array(
     '#type' => 'radios',
     '#title' => t('Search settings'),

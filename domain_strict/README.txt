@@ -1,4 +1,3 @@
-
 /**
  * @file
  * README file for Domain Strict.
