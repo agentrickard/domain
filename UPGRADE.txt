@@ -1,6 +1,6 @@
 /**
  * @file
- * UPGRADE instructions for Domain Access 6.x.2
+ * Upgrade instructions for Domain Access
  */
 
 CONTENTS
