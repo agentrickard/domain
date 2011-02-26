@@ -67,8 +67,7 @@ function domain_init() {
   if (!is_array($_domain)) {
     $_domain = array();
   }
-$default = db_query("SELECT * FROM {domain} WHERE domain_id = 0")->fetchAssoc();
-dsm($default);
+
   // Error handling in case the module is not installed correctly.
   if (!isset($_domain['domain_id'])) {
     $_domain = domain_default(TRUE);

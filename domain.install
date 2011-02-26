@@ -116,3 +116,18 @@ function domain_update_7000() {
   update_fix_d7_block_deltas($sandbox, $renamed_deltas);
   return t('Domain Access blocks updated.');
 }
+
+/**
+ * Change the edit and delete permissions.
+ */
+function domain_update_7001() {
+  db_update('role_permission')
+    ->condition('permission', 'edit domain nodes')
+    ->fields(array('permission' => 'edit domain content'))
+    ->execute();
+  db_update('role_permission')
+    ->condition('permission', 'delete domain nodes')
+    ->fields(array('permission' => 'delete domain content'))
+    ->execute();
+  return t('Updated Domain Access permission names.');
+}
