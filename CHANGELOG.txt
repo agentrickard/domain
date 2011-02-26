@@ -10,6 +10,7 @@
 -- Improves README.txt.
 -- Removes old Domain Conf INSTALL.txt.
 -- Cleans files after the Git migration.
+-- Issue #1074144 by yrro. Fixes bad permission name change.
 
 21-FEB-2011
 -- Issue #1065470 by LTW Dhaniel. Fixes potentially empty array in node_load.
