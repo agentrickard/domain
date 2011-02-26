@@ -50,9 +50,9 @@ function domain_conf_update_7001() {
         ->condition('domain_id', $object->domain_id)
         ->execute();
     }
-    else {
+    elseif (!empty($object->settings)) {
       // Update the record with the new variables.
-      $settings = domain_unserialize($object->settings);
+      $settings = unserialize($object->settings);
       foreach ($changes['removed'] as $key) {
         if (isset($settings[$key])) {
           unset($settings[$key]);
