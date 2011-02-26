@@ -1,3 +1,15 @@
+/**
+ * @file
+ * Changelog file for Domain Access HEAD.
+ */
+
+
+26-FEB-2011
+-- Issue #1072772 by clashar. Fixes Drupal 6 => 7 upgrade path. Adds
+   documentation for core upgrade.
+-- Improves README.txt.
+-- Removes old Domain Conf INSTALL.txt.
+-- Cleans files after the Git migration.
 
 23-FEB-2011
 -- Issue #1069108 by omercioglu. Fix domain alias bootstrap error.

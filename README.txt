@@ -1,4 +1,3 @@
-
 /**
  * @file
  * README file for Domain Access.
@@ -19,8 +18,7 @@ CONTENTS
 1.4.2   Cron Handling
 1.4.3   Updating Your Site
 2.  Installation
-2.1   Patches to Drupal Core
-2.1.1   multiple_node_access.patch
+2.1   Edits to settings.php
 2.2   Server Configuration
 2.3   Creating Domain Records
 2.4   Setting DOMAIN_INSTALL_RULE
@@ -134,10 +132,31 @@ was concern that, if given a choice to make, local editors would not assign the
 content correctly.  Therefore, the module handles this automatically, and local
 editors have no control over which domains their content is published to.
 
+This video from DrupalCon Paris explains the module in detail:
+
+  http://www.archive.org/details/SharingcontentacrossmultiplesiteswithDomainAccess
+
 ----
 1.2 Examples
 
 For the original example of the module in use, see http://skirt.com/.
+
+For case-studies, see:
+
+  http://drupal.org/node/369398
+  http://www.trellon.com/content/blog/sharing-content-domain-access
+
+Sites using Domain Access include:
+
+    * www.barnard.edu (Drupal 7)
+    * www.interlochen.org
+    * www.skirt.com
+    * www.dzone.com
+    * www.itgjamaica.com
+    * www.rowelevenwines.com
+    * www.weecology.org
+    * www.komonews.com/communities
+
 
 ----
 1.3   Using Multiple Node Access Modules
@@ -146,32 +165,16 @@ Node Access is a complex issue in Drupal.  Typically, sites will only use
 one node access module at a time.  In some cases, you may require
 more advances acceess control rules.
 
-Domain Access attempts to integrate with other node access modules
-in two ways:
+Two important issues to understand are:
 
-  -- First, the multiple_node_access patch allows you to configure the
-      Domain Access module to use AND logic instead of OR logic when
-      adding Domain Access controls to your site.
-  -- Second, Domain Access does not use db_rewrite_sql in any way.
-      The module lets Drupal's core node access system handle this.
+  1. User 1 and users with the 'Bypass node access' permission are not
+  subject to node access rules. See section 4.3.3 for more details.
 
-As a result, there may exist conflicts between Domain Access and other
-contributed modules that try to solve this issue.
+  2. Node Access is a permissive API. If you use more than one Node Access
+  module (such as Organic Groups), if either module grants access, users will
+  be given access.
 
-Domain Access has been tested to work with the Organic Groups module,
-but may require the solution in http://drupal.org/node/234087.
-
-If you experience conflicts with other node access modules, you
-should uninstall the multiple_node_access patch.  This will restore the
-default Drupal behavior that your other modules are expecting.
-
-For background, see:
-
-  -- http://drupal.org/node/196922
-  -- http://drupal.org/node/191375
-  -- http://drupal.org/node/122173
-  -- http://drupal.org/node/201156
-  -- http://drupal.org/node/234087
+Changes to these core behaviors require custom code solutions.
 
 ----
 1.4   Known Issues
@@ -224,14 +227,7 @@ http://drupal.org/project/issues/domain
 ----
 1.4.3   Updating Your Site
 
-If prefixing database tables, it is possible that Drupal's update.php script
-may not update all mdoule tables correctly.
-
-This issue only occurs if you use the Domain Prefix module.  It is possible
-that database updates will not be applied to prefixed tables.
-
-For more information, see the Drupal Upgrades section of the Domain Prefix
-README.txt file.
+For upgrade instructions, see the provided UPGRADE.txt.
 
 ----
 2.  Installation
@@ -256,43 +252,9 @@ for your web site. Existing content will be set to be visible on all new
 domains.  If you wish to alter this behavior, see sections 2.4 through 2.6.
 
 ----
-2.1 Patch to Drupal Core
+2.1   Edits to settings.php
 
-The following patch is optional.  They affect advanced behavior of the
-Domain Access module.
-
-The patch is distributed in the 'patches' folder of the download.
-
-To apply the patch, copy the file to your root Drupal folder.
-Then follow the instructions at: http://drupal.org/patch/apply
-
-----
-2.1.1 multiple_node_access.patch
-
-NOTE: The multiple node access patch has been deprecated.
-This patch was rejected for Drupal core for version 7. The new database
-layer makes it unnecessary.
-
-If you wish to use Domain Access with another node access
-module, try using the Domain Advanced module.
-
-http://drupal.org/project/domain_adv
-
-Original documentation is below:
-
-You should apply this patch only if you use Domain Access along with
-another Node Access module, such as Organic Groups (OG), and
-have need of advanced access controls.
-
-The multiple_node_access.patch allows Drupal to run more than one
-node access control scheme in parallel.  Instead of using OR logic to
-determine node access, this patch uses subselects to enable AND logic
-for multiple node access rules.
-
-WARNING: This patch uses subselect statements and requires pgSQL or
-MySQL 4.1 or higher.
-
-Developers: see http://drupal.org/node/191375 for more information.
+Please see the documentation in INSTALL.txt or INSTALL_QUICKSTART.txt
 
 ----
 2.2 Server Configuration
