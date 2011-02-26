@@ -409,7 +409,7 @@ function domain_content_filter_operations(&$operations) {
     return;
   }
   // You must be able to edit to view this page, so check for the new delete perm.
-  if (!user_access('delete domain nodes')) {
+  if (!user_access('delete domain content')) {
     unset($operations['delete']);
   }
   // The publish, promote and sticky operations all depend on having $settings['options'].

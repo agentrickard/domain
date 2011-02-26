@@ -376,11 +376,11 @@ permissions.
 
 The Domain Access module has the following permissions:
 
-  - 'administer domains'
+  - 'Administer domain records and settings'
   This permission allows users to create and manage domain records
   and settings.
 
-  - 'access inactive domains'
+  - 'Access inactive domains'
   This permission allows users to navigate to domains which are marked
   as inactive. Users with this permission may also assign content to an
   inactive domain.
@@ -388,19 +388,19 @@ The Domain Access module has the following permissions:
   'assign domain editors'
   This permission allows users to assign themselves and other users as
   affiliate editors.  For those users to act as editors, their role(s) must also
-  have the 'edit domain nodes' permission.
+  have the 'Edit any content on assigned domains' permission.
 
-  - 'edit domain nodes'
+  - 'Edit any content on assigned domains'
   This permission is for advanced use and substitutes for the normal
   'Bypass content access control' permission for sites that give restricted
   administrative privileges.  See section 3.3 for more information.
 
-  - 'delete domain nodes'
+  - 'Delete any content on assigned domains'
   This permission is for advanced use and substitutes for the normal
   'Bypass content access control' permission for sites that give restricted
   administrative privileges.  See section 3.3 for more information.
 
-  - 'set domain access'
+  - 'Set domain access status for all content'
   This permission is key.  Users with this permission will be given a user
   interface for assigning users and nodes to specific domains.  Users without
   this permission cannot assign domain access; their nodes will automatically
@@ -413,19 +413,19 @@ The Domain Access module has the following permissions:
   If the user does not have this permission, the book page will only be shown
   to users who are on http://one.example.com.
 
-  - 'publish from default domain'
-  - 'publish from assigned domain'
-  - 'publish to any assigned domain'
+  - 'Publish content only from the default domain'
+  - 'Publish content only from assigned domain'
+  - 'Publish content to any assigned domain'
   This group of permission provides a limited set of options for users to create
   and edit content on your site.  Users who have this permission will have their
   node editing forms processed according to the following rules:
 
-  -- 'publish from default domain'
+  -- 'Publish content only from the default domain'
   Before being presented the editing form, users will be taken to the root
   domain.  If the node is not visible on the root domain, the user may not be
   able to edit the node.
 
-  -- 'publish from assigned domain'
+  -- 'Publish content only from assigned domain'
   Before being presented the editing form, users will be taken to the
   first domain assigned to their user account.  This function is most useful
   when you users are only allowed to enter content from a single domain.
@@ -442,7 +442,7 @@ The Domain Access module has the following permissions:
   In effect, a user assigned to 'one.example.com' will only be able to post
   to that domain, even if she clicks Create Content from two.example.com.
 
-  -- 'publish to any assigned domain'
+  -- 'Publish content to any assigned domain'
   The node editing form is shown normally, and the user is presented a
   list of checkboxes or a multiple select list.  These options represent the
   affiliate domains that the user is allowed to publish content to, according
@@ -456,9 +456,9 @@ The Domain Access module has the following permissions:
   options, the user will not be allowed to post or edit!
 
   NOTE: Users who are assgined _none_ of these permissions and cannot
-  'set domain access' will have the default form values passed as hidden fields.
-  This is the default option.  It will assign all content to the domain from
-  which the form is entered.
+  'Set domain access status for all content' will have the default form values
+  passed as hidden fields. This setting is the default option.  It will assign
+  all content to the domain from which the form is entered.
 
 Note also that the user is not given the ability to promote content to
 'all affiliates'.  Users who need this ability should be given the 'set domain
@@ -476,8 +476,8 @@ permission and individual 'TYPE: edit all content' permissions.
 The only choices for permissions would be who gets to administer the module
 settings and who gets to assign nodes to specific domains.  Generally, only
 users who you trust to 'administer site configuration' should be given the
-'administer domains' permission.  As for 'set domain access,' that can be given
-to any user you trust to use the UI properly.
+'Administer domain records and settings' permission.  As for 'set domain
+access,' that can be given to any user you trust to use the UI properly.
 
 ----
 3.3 Advanced Usage
@@ -489,16 +489,18 @@ These permissons grant the ability for a user to edit and delete all nodes of a
 given type.
 
 In the Domain Access model, these permissions are not used in favor of the
-provided 'edit domain nodes' and 'delete domain nodes' permissions.  These
-permissions  allow editors only to edit (and delete) nodes that belong to their
-domain.
+provided 'Edit any content on assigned domains' and 'Delete any content on
+assigned domains' permissions.  These permissions  allow editors only to edit
+(and delete) nodes that belong to their domain.
 
-To enable this feature, you should grant the 'edit domain nodes' and
-(optionally) the 'delete domain nodes' permission to some roles. Then assign
-individual users accounts to specific domains to assign them as Domain Editors.
+To enable this feature, you should grant the 'Edit any content on assigned
+domains' and (optionally) the 'Delete any content on assigned domains'
+permission to some roles. Then assign individual users accounts to specific
+domains to assign them as Domain Editors.
 
-NOTE: Users with the 'delete domain nodes' permission must also be given
-the 'edit domain nodes' permission in order to delete content.
+NOTE: Users with the 'Delete any content on assigned domains' permission must
+also be given the 'Edit any content on assigned domains' permission in order to
+delete content due to the location of the delete form in Drupal.
 
 ----
 3.4 Limitations
@@ -509,8 +511,8 @@ Due to the way node_access() works, the following limitations should be noted.
     by any editor who belongs to one of the domains.
 
   - Users who look at the sites and have the 'Bypass content access control'
-    permission can always see all content on all sites, which can be confusing.  To
-    enforce Domain Access rules on these users, you may enable the
+    permission can always see all content on all sites, which can be confusing.
+    To enforce Domain Access rules on these users, you may enable the
     'Enforce rules on administrators' setting described in 4.3.3.
 
   - Users who have the 'edit any TYPE nodes' permission will be able to edit
@@ -690,9 +692,9 @@ show on selected sites."
 4.3.2   Debugging Status
 
 If enabled, this will append node access information to the bottom of each
-node.  This data is only viewable by uses with the 'set domain access'
-privilege.  It is provided for debugging, since 'adminiseter nodes' will make
-all nodes viewable to some users.
+node.  This data is only viewable by uses with the 'Set domain access status for
+all content' privilege.  It is provided for debugging, since 'adminiseter nodes'
+will make all nodes viewable to some users.
 
 ----
 4.3.3   Enforce Rules on Administrators
@@ -810,8 +812,8 @@ This feature was requested by Rick and Matt at DZone.com
 
 For this feature to work, you must follow the instructions in INSTALL.txt
 regarding custom_url_rewrite_outbound().  If you have not followed the
-instructions, you should see a warning at the top of the Admin > Structure > Domains
-page.
+instructions, you should see a warning at the top of the Admin > Structure >
+Domains page.
 
 In normal uses, such as the default home page, you want to restrict access
 to content based on the active domain.  However, in certain cases, this
@@ -1025,10 +1027,10 @@ Under the 'Update behavior' form element, you may choose:
   [] Add new settings to existing values
   [] Remove selected domains from existing values
 
-Choosing 'replace' will erase any current domain affiliation for the selected users
-and replace them with those entered into the form. Choosing 'add' will merge the
-new values with the existing values. Choosing 'remove' will remove the new values
-from the existing ones.
+Choosing 'replace' will erase any current domain affiliation for the selected
+users and replace them with those entered into the form. Choosing 'add' will
+merge the new values with the existing values. Choosing 'remove' will remove the
+new values from the existing ones.
 
 This new feature is helpful when you want to alter domain settings, but do not
 want all users to be assigned to the same domains.
@@ -1060,7 +1062,7 @@ module provides block and menu items intended for end users.
 
 The Domain Access Information block lets you view node access rules for any
 node when you are viewing that node.  This block can help you debug the
-module for user accounts that do not have the 'set domain access' permission.
+module for user accounts that do not have the 'Set domain access status for all content' permission.
 
 NOTE: By design, this block is viewable by all users.  However, its content
 should only be shown to site developers or during debugging.  You should use
@@ -1079,10 +1081,10 @@ is assigned to that domain or to all domains.
 ----
 6.1   Assigning Domain Access
 
-Users who have the 'set domain access' permission can assign any node to any or
-all registered sites.  During node editing, a series of options will be
-displayed as checkboxes or a multiple select list under the heading
-"Domain access options":
+Users who have the 'Set domain access status for all content' permission can
+assign any node to any or all registered sites.  During node editing, a series
+of options will be displayed as checkboxes or a multiple select list under the
+heading "Domain access options":
 
   Publishing options:
     []  Send to all affiliates
@@ -1104,24 +1106,25 @@ assign the node to your default domain.
 
 When creating new content, the currently active domain will be selected for you.
 
-For users who do not have the 'set domain access' permission, the assignment
-will be done through a hidden form element.  The node will be assigned to the
-currently active domain or, if configured , to all domains.
+For users who do not have the 'Set domain access status for all content'
+permission, the assignment will be done through a hidden form element.  The node
+will be assigned to the currently active domain or, if configured, to all
+domains.
 
 ----
 6.2.  Editor Access
 
 Whenever a user account is created and the Domain Access module is active, user
 accounts will automatically be tagged with the name of the active domain from
-which they registered their account.  Users with the 'set domain access'
-permission may assign individual users to specific domains in the same way that
-nodes can be defined.
+which they registered their account.  Users with the 'Set domain access status
+for all content' permission may assign individual users to specific domains in
+the same way that nodes can be defined.
 
 These user settings are used to determine what domains an editor belongs to.
-Users with the 'edit domain nodes' permission can edit any node that belongs to
-the same domain that the user does.  (Remember that users and nodes can both
-belong to multiple domains.)  However, nodes that are assigned to 'all
-affiliates' do not grant editing privileges to all editors.
+Users with the 'Edit any content on assigned domains' permission can edit any
+node that belongs to the same domain that the user does.  (Remember that users
+and nodes can both belong to multiple domains.)  However, nodes that are
+assigned to 'all affiliates' do not grant editing privileges to all editors.
 
 ----
 6.3   Realms
@@ -1160,8 +1163,8 @@ follows.
   the gid '0' for realm 'domain_site'.  This grant allows all users to see
   content assigned to 'all affliates'.  This grants 'grant_view' to all users.
   Users who belong to the current domain and are assigned the
-  'edit domain nodes' or 'delete domain nodes' permissions will be given
-  'update' and 'delete' grants, respectively.
+  'Edit any content on assigned domains' or 'Delete any content on assigned
+  domains' permissions will be given 'update' and 'delete' grants, respectively.
 
   - domain_id
   When a user, including anonymous users, views a page, the active domain is
@@ -1191,9 +1194,10 @@ To be more clear about Drupal permissions:
   - User E has the 'Book page: edit all content' permission for the site.
 
 In this case, User D and User E can also edit or delete node 10. This is why
-only super-admins are given 'Bypass content access control' and 'TYPE: edit all content'
-permissions with the Domain Access module.  If you want your affiliate editors
-to have limited permissions, only grant them 'edit domain nodes'.
+only super-admins are given 'Bypass content access control' and 'TYPE: edit all
+content' permissions with the Domain Access module.  If you want your affiliate
+editors to have limited permissions, only grant them 'Edit any content on
+assigned domains'.
 
 However, you still need to give users the 'TYPE: Create new content' permission
 normally.  Domain Access does not affect node creation.
@@ -1300,7 +1304,8 @@ contains the following structure:
 
   - weight
   Integer, default 0
-  The sort value for the domain. Signed integer, with lower being higher in a list.
+  The sort value for the domain. Signed integer, with lower being higher in a
+  list.
 
   - is_default
   Char, 1 default 0
@@ -1371,12 +1376,12 @@ Domain Access supports Drush version 3.x. The following commands are available.
 Type 'drush help' for more information.
 
   'drush domain-list'
-    Shows a table of the domains registered for your site. You may use 'drush domains'
-    as a shortcut command.
+    Shows a table of the domains registered for your site. You may use 'drush
+    domains' as a shortcut command.
 
   'drush domain-add DOMAIN SITENAME --options'
-    Add a new domain to your site. The DOMAIN parameter is required and must be unique
-    and validly formed (e.g. example.com). Possible options are:
+    Add a new domain to your site. The DOMAIN parameter is required and must be
+    unique and validly formed (e.g. example.com). Possible options are:
       --inactive=1/0
       Set the domain to inactive by passing 1. Default is 0.
       --https=1/0
@@ -1396,24 +1401,26 @@ Type 'drush help' for more information.
       weight: 0
       
   'drush generate-domains BASE_DOMAIN --count=15'
-    Autogenerate a set of domains for testing. Aliased to 'drush gend'. Will use the provided
-    BASE_DOMAIN as the primary domain, defaulting to 'example.com'.
+    Autogenerate a set of domains for testing. Aliased to 'drush gend'. Will use
+    the provided BASE_DOMAIN as the primary domain, defaulting to 'example.com'.
   
     This command creates domains in the format *.BASE_DOMAIN. The BASE_DOMAIN
-    must be properly formed. By default, the command will create 15 new domains, but you
-    may specify the number using --count=X.
+    must be properly formed. By default, the command will create 15 new domains,
+    but you may specify the number using --count=X.
   
-    The domains created are the words one through ten (1-10), foo, bar, baz, and the
-    non-matching domain 'myBASE_DOMAIN', which is used for cookie testing. Site names
-    are simple uppercase versions of the 3rd-level domain element. All domains are set to
-    use http:// and are set as valid. Weighting is auto-incremented by creation order.
+    The domains created are the words one through ten (1-10), foo, bar, baz, and
+    the non-matching domain 'myBASE_DOMAIN', which is used for cookie testing.
+    Site names are simple uppercase versions of the 3rd-level domain element.
+    All domains are set to use http:// and are set as valid. Weighting is
+    auto-incremented by creation order.
   
-    Creating more than 15 domains will begin incrementing domains with numeric 3rd-level
-    elements, such as 20.BASE_DOMAIN.
+    Creating more than 15 domains will begin incrementing domains with numeric
+    3rd-level elements, such as 20.BASE_DOMAIN.
   
-    The purpose of this command is to help me in UX testing, since many aspects of the user
-    interface must change to accomodate large numbers of domains. The defaults are optimized
-    for my development environment, and will not be altered.
+    The purpose of this command is to help me in UX testing, since many aspects
+    of the user interface must change to accomodate large numbers of domains.
+    The defaults are optimized for my development environment, and will not be
+    altered.
   
     Sample command:
     

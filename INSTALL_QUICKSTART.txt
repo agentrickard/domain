@@ -56,7 +56,7 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
     the following permissions:
 
     -- 'assign domain editors'
-    -- 'edit domain nodes'
+    -- 'edit domain content'
 
     For more information see README.txt.
 

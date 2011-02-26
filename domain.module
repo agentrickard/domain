@@ -523,7 +523,7 @@ function domain_block_view_information() {
  *
  * Attached domain_id records to all registering users.  These
  * are used to determine which 'domain_editor' group that users
- * with the 'edit domain nodes' and 'delete domain nodes' permissions are in.
+ * with the 'edit domain content' and 'delete domain content' permissions are in.
  */
 function domain_user_load($users) {
   foreach ($users as $uid => $account) {
@@ -681,7 +681,7 @@ function domain_form_user_form_alter(&$form, &$form_state) {
       '#type' => empty($format) ? 'checkboxes' : 'select',
       '#options' => $options,
       '#title' => t('Domain access settings'),
-      '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain nodes" permission.'),
+      '#description' => t('Select the affiliates that this user belongs to.  Used to grant editing permissions for users with the "edit domain content" permission.'),
       '#default_value' => $default
     );
     if ($format) {
@@ -1745,9 +1745,9 @@ function domain_node_grants($account, $op) {
   else {
     // The $account may not have domain information loaded, so get it.
     $domains = domain_get_user_domains($account);
-    $perm = 'delete domain nodes';
+    $perm = 'delete domain content';
     if ($op == 'update') {
-      $perm = 'edit domain nodes';
+      $perm = 'edit domain content';
     }
     if (user_access($perm, $account)) {
       if (!empty($domains)) {
