@@ -1,3 +1,11 @@
+/**
+ * @file
+ * Changelog file for Domain Access 6.x-2.x.
+ */
+
+26-FEB-2011
+-- Cleans files after the Git migration.
+-- Adds documentation for core upgrade.
 
 13-FEB-2011
 -- #1059108 by skizzo. Fixes HTML validation in Domain Nav.
