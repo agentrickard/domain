@@ -3,6 +3,10 @@
  * Changelog file for Domain Access 6.x-2.x.
  */
 
+27-FEB-2011
+-- Issue #1074168 by yrro. Fixes bad index call in Domain Content.
+-- Creates the 6.x.2.10 release.
+
 26-FEB-2011
 -- Cleans files after the Git migration.
 -- Adds documentation for core upgrade.
