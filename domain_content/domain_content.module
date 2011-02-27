@@ -115,6 +115,9 @@ function domain_content_menu_check() {
  *
  * @param $domain_id
  *   An id representing the currently active domain record.
+ *
+ * @return
+ *  Boolean true or false.
  */
 function domain_content_check($domain_id) {
   global $user;
@@ -122,24 +125,19 @@ function domain_content_check($domain_id) {
   if (user_access('bypass node access') || user_access('review content for all domains')) {
     return TRUE;
   }
+  // Otherwise, the user must be able to edit domain nodes.
   $rule = user_access('edit domain content');
-  // Otherwise, the user must be able to edit domain content.
   if (!$rule) {
     return FALSE;
   }
   $domains = domain_get_user_domains($user);
-  $editor = FALSE;
-
-  // Can this user see the default site?
-  if ($rule && $domain_id == 0 && !empty($domains[-1])) {
-    $editor = TRUE;
+  $domains = array();
+  $key = ($domain_id == 0) ? -1 : $domain_id;
+  // Can this user see the requested site?
+  if (!empty($domains[$key])) {
+    return TRUE;
   }
-  // Can this user see the active site?
-  elseif ($rule && $domain_id > 0 && !empty($domains['domain_id'])) {
-    $editor = TRUE;
-  }
-
-  return $editor;
+  return FALSE;
 }
 
 /**
