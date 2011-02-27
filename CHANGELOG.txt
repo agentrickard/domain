@@ -6,6 +6,8 @@
 27-FEB-2011
 -- Issue #1074168 by yrro. Fixes bad index call in Domain Content.
 -- Creates the 7.x.2.10 release.
+-- Removes a stray debug array.
+-- Creates the 7.x.2.11 release.
 
 26-FEB-2011
 -- Issue #1072772 by clashar. Fixes Drupal 6 => 7 upgrade path. Adds

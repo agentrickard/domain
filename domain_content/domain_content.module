@@ -131,7 +131,6 @@ function domain_content_check($domain_id) {
     return FALSE;
   }
   $domains = domain_get_user_domains($user);
-  $domains = array();
   $key = ($domain_id == 0) ? -1 : $domain_id;
   // Can this user see the requested site?
   if (!empty($domains[$key])) {
