@@ -3,6 +3,9 @@
  * Changelog file for Domain Access HEAD.
  */
 
+27-FEB-2011
+-- Issue #1074168 by yrro. Fixes bad index call in Domain Content.
+-- Reorders the 7.x.3 update functions correctly.
 
 26-FEB-2011
 -- Issue #1072772 by clashar. Fixes Drupal 6 => 7 upgrade path. Adds

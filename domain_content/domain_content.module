@@ -115,21 +115,24 @@ function domain_content_menu_check() {
  *
  * @param $domain_id
  *   An id representing the currently active domain record.
+ *
+ * @return
+ *  Boolean true or false.
  */
 function domain_content_check($domain_id) {
   global $user;
-  // If the user can administer nodes, just return TRUE.
-  if (user_access('administer nodes') || user_access('review content for all domains')) {
+  // If the user can bypass node access, just return TRUE.
+  if (user_access('bypass node access') || user_access('review content for all domains')) {
     return TRUE;
   }
-  $rule = user_access('edit domain content');
   // Otherwise, the user must be able to edit domain content.
+  $rule = user_access('edit domain content');
   if (!$rule) {
     return FALSE;
   }
   $domains = domain_get_user_domains($user);
-  // Can this user see the active site?
-  if ($domain_id == $domains[$domain_id]) {
+  // Can this user see the requested site?
+  if (!empty($domains[$domain_id])) {
     return TRUE;
   }
   return FALSE;

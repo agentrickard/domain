@@ -133,9 +133,47 @@ function domain_update_7001() {
 }
 
 /**
- * Remove the zero record from the database.
+ * Add sorting to domains.
  */
 function domain_update_7300() {
+  if (db_field_exists('domain', 'weight')) {
+    return('No update required');
+  }
+  db_add_field('domain', 'weight', array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0), array());
+  db_add_index('domain', 'weight', array('weight'));
+  variable_del('domain_sort');
+  return t('Domain sorting added.');
+}
+
+/**
+ * Add default domain flag and weight the default higher.
+ */
+function domain_update_7301() {
+  if (db_field_exists('domain', 'is_default')) {
+    return('No update required');
+  }
+  db_add_field('domain', 'is_default', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0), array());
+  $default = variable_get('domain_default', 0);
+  db_update('domain')
+    ->fields(array('is_default' => 1, 'weight' => -1))
+    ->condition('domain_id', $default)
+    ->execute();
+  variable_del('domain_default');
+}
+
+/**
+ * Add an index on {domain}.is_default.
+ */
+function domain_update_7302() {
+  if (!db_index_exists('domain', 'is_default')) {
+    db_add_index('domain', 'is_default', array('is_default'));
+  }
+}
+
+/**
+ * Remove the zero record from the database.
+ */
+function domain_update_7303() {
   // We grab the default domain, remove it from the database, and
   // then re-save it into the table, using the new value as the default domain.
   $default = db_query("SELECT * FROM {domain} WHERE domain_id = 0")->fetchAssoc();
@@ -175,42 +213,4 @@ function domain_update_7300() {
   variable_del('domain_scheme');
   // Update message.
   return t('Domain Access updated successfully');
-}
-
-/**
- * Add sorting to domains.
- */
-function domain_update_7301() {
-  if (db_field_exists('domain', 'weight')) {
-    return('No update required');
-  }
-  db_add_field('domain', 'weight', array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0), array());
-  db_add_index('domain', 'weight', array('weight'));
-  variable_del('domain_sort');
-  return t('Domain sorting added.');
-}
-
-/**
- * Add default domain flag and weight the default higher.
- */
-function domain_update_7302() {
-  if (db_field_exists('domain', 'is_default')) {
-    return('No update required');
-  }
-  db_add_field('domain', 'is_default', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0), array());
-  $default = variable_get('domain_default', 0);
-  db_update('domain')
-    ->fields(array('is_default' => 1, 'weight' => -1))
-    ->condition('domain_id', $default)
-    ->execute();
-  variable_del('domain_default');
-}
-
-/**
- * Add an index on {domain}.is_default.
- */
-function domain_update_7303() {
-  if (!db_index_exists('domain', 'is_default')) {
-    db_add_index('domain', 'is_default', array('is_default'));
-  }
 }
