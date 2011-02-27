@@ -24,7 +24,7 @@
 17-FEB-2011
 -- Patch #1056152 by R.Muilwijk. Fixes conf loading.
 -- Documentation by Doug Vann. Fix admin path.
--- #1053335 by alarfaj. Fix E_ALL notice.
+-- #1053334 by alarfaj. Fix E_ALL notice.
 
 13-FEB-2011
 -- #1059108 by skizzo. Fixes HTML validation in Domain Nav.
