@@ -118,8 +118,8 @@ function domain_content_menu_check() {
  */
 function domain_content_check($domain_id) {
   global $user;
-  // If the user can administer nodes, just return TRUE.
-  if (user_access('administer nodes') || user_access('review content for all domains')) {
+  // If the user can bypass node access, just return TRUE.
+  if (user_access('bypass node access') || user_access('review content for all domains')) {
     return TRUE;
   }
   $rule = user_access('edit domain content');
@@ -128,20 +128,18 @@ function domain_content_check($domain_id) {
     return FALSE;
   }
   $domains = domain_get_user_domains($user);
-  $check = FALSE;
   $editor = FALSE;
+
   // Can this user see the default site?
-  if ($rule && $domain_id == 0 && $domains['-1'] == -1) {
+  if ($rule && $domain_id == 0 && !empty($domains[-1])) {
     $editor = TRUE;
   }
   // Can this user see the active site?
-  elseif ($rule && $domain_id > 0 && $domain_id == $domains[$domain_id]) {
+  elseif ($rule && $domain_id > 0 && !empty($domains['domain_id'])) {
     $editor = TRUE;
   }
-  if ($editor) {
-    $check = TRUE;
-  }
-  return $check;
+
+  return $editor;
 }
 
 /**
