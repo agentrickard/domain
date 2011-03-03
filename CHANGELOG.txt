@@ -3,6 +3,11 @@
  * Changelog file for Domain Access HEAD.
  */
 
+03-MAR-2011
+-- Issue #1078266 by ununpentium. Bad logic in menu message. See also
+    #983746.
+-- Issue #1075926 by yyro. Proper filtering of domain lists in Domain Content.
+
 27-FEB-2011
 -- Issue #1074168 by yrro. Fixes bad index call in Domain Content.
 -- Reorders the 7.x.3 update functions correctly.

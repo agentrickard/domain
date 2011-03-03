@@ -62,9 +62,6 @@ changes for Domain Access do not interfere with Drupal's update process.
 
   -- Enable Domain submodules (if desired).
 
-  -- If using Domain Conf, check the main menu settings
-  (admin/structure/menu/settings) which core may not have updated.
-
 You should now be ready to use your Drupal 7 site.
 
 ----

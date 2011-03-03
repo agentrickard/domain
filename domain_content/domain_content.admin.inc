@@ -40,14 +40,13 @@ function domain_content_page() {
 function domain_content_list() {
   global $user;
   $build = array();
-  if (user_access('administer nodes') || user_access('review content for all domains')) {
-    // Return all domains.
-    $query = "SELECT domain_id, subdomain, sitename, scheme FROM {domain} d";
-  }
-  else {
+  $show_all = user_access('bypass node access') || user_access('review content for all domains');
+
+  if (!$show_all) {
     if (empty($user->domain_user)) {
       return drupal_access_denied();
     }
+    $user_domains = array_filter($user->domain_user);
   }
   // Table information
   $header = array(
@@ -59,6 +58,10 @@ function domain_content_list() {
   // Set up the base query.
   $query = db_select('domain', 'd')
     ->fields('d', array('is_default', 'domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
+  // Filter by user access to assigned domains.
+  if (!$show_all) {
+    $query->condition('domain_id', $user_domains, 'IN');
+  }
   // Add the tablesort.
   $query = $query
     ->extend('TableSort')
@@ -77,7 +80,7 @@ function domain_content_list() {
     $rows[] = array(
       $domain['domain_id'] . (($domain['is_default']) ? ' * ' : ''),
       l(t('@sitename content', array('@sitename' => $domain['sitename'])), 'admin/domain/content/' . $domain['domain_id']),
-      (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField(),
+      number_format((int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField()),
       l(t('View @domain', array('@domain' => $domain['subdomain'])), $path),
     );
   }
@@ -85,7 +88,7 @@ function domain_content_list() {
   $all = array(
     '-',
     l(t('Content assigned to all affiliates'), 'admin/domain/content/all'),
-    (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => 0, ':realm' => 'domain_site'))->fetchField(),
+    number_format((int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => 0, ':realm' => 'domain_site'))->fetchField()),
     '',
   );
   array_unshift($rows, $all);
