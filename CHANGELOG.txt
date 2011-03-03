@@ -3,6 +3,9 @@
  * Changelog file for Domain Access 6.x-2.x.
  */
 
+03-MAR-2011
+-- Adds number_format to Domain Count counts.
+
 27-FEB-2011
 -- Issue #1074168 by yrro. Fixes bad index call in Domain Content.
 -- Creates the 6.x.2.10 release.
