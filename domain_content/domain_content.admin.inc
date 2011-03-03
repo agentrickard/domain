@@ -39,19 +39,17 @@ function domain_content_page() {
  */
 function domain_content_list() {
   global $user;
-  $build = array();
-  if (user_access('administer nodes') || user_access('review content for all domains')) {
-    // Return all domains.
-    $query = "SELECT domain_id, subdomain, sitename, scheme FROM {domain} d";
-  }
-  else {
+  $show_all = user_access('bypass node access') || user_access('review content for all domains');
+
+  if (!$show_all) {
     if (empty($user->domain_user)) {
       return drupal_access_denied();
     }
-    // Cast the -1 as 0.
-    if (isset($user->domain_user[-1])) {
-      unset($user->domain_user[-1]);
-      $user->domain_user[0] = 0;
+    $user_domains = array_filter($user->domain_user);
+    // We don't bother to unset the -1 here, since it won't matter to the query.
+    // Cast the -1 as domain 0 for the query.
+    if (!empty($user->domain_user[-1])) {
+      $user_domains[] = 0;
     }
   }
   // Table information
@@ -64,6 +62,10 @@ function domain_content_list() {
   // Set up the base query.
   $query = db_select('domain', 'd')
     ->fields('d', array('domain_id', 'sitename', 'subdomain', 'scheme', 'valid'));
+  // Filter by user access to assigned domains.
+  if (!$show_all) {
+    $query->condition('domain_id', $user_domains, 'IN');
+  }
   // Add the tablesort.
   $query = $query
     ->extend('TableSort')
@@ -74,6 +76,7 @@ function domain_content_list() {
   foreach ($result as $data) {
     $domains[] = (array) $data;
   }
+
   // Create the table.
   $rows = array();
   foreach ($domains as $domain) {
@@ -86,6 +89,7 @@ function domain_content_list() {
     );
   }
 
+  // Add entry for 'all affiliates'
   $all = array(
     '-',
     l(t('Content assigned to all affiliates'), 'admin/domain/content/all'),
@@ -93,6 +97,9 @@ function domain_content_list() {
     '',
   );
   array_unshift($rows, $all);
+
+  // Build result table for UI
+  $build = array();
   if (!empty($rows)) {
     $output = '<p>'. t('The table below shows all the affiliates sites whose content you may edit. Click on the site name link to see all content assigned to that affiliate.') .'</p>';
     $build['header'] = array(

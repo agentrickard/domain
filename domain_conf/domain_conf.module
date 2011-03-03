@@ -415,7 +415,7 @@ function domain_conf_domainbatch() {
         '#title' => t('Source for the Secondary links'),
         '#type' => 'select',
         '#options' => $menus,
-        '#description' => t("Select the source for the Secondary links. An advanced option allows you to use the same source for both Main links (currently %main) and Secondary links: if your source menu has two levels of hierarchy, the top level menu links will appear in the Main links, and the children of the active link will appear in the Secondary links." , array('%main' => $menus[$main])),
+        '#description' => t("Select the source for the Secondary links. An advanced option allows you to use the same source for both Main links (currently %main) and Secondary links: if your source menu has two levels of hierarchy, the top level menu links will appear in the Main links, and the children of the active link will appear in the Secondary links." , array('%main' => isset($menus[$main]) ? $menus[$main] : t('No main links'))),
       ),
       '#permission' => 'administer menu',
       '#domain_action' => 'domain_conf',
