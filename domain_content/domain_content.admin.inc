@@ -84,7 +84,7 @@ function domain_content_list() {
     $rows[] = array(
       $domain['domain_id'],
       l(t('@sitename content', array('@sitename' => $domain['sitename'])), 'admin/domain/content/'. $domain['domain_id']),
-      (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField(),
+      number_format((int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => $domain['domain_id'], ':realm' => 'domain_id'))->fetchField()),
       l(t('view site'), $path),
     );
   }
@@ -93,7 +93,7 @@ function domain_content_list() {
   $all = array(
     '-',
     l(t('Content assigned to all affiliates'), 'admin/domain/content/all'),
-    (int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => 0, ':realm' => 'domain_site'))->fetchField(),    
+    number_format((int) db_query("SELECT COUNT(nid) FROM {domain_access} WHERE gid = :gid AND realm = :realm", array(':gid' => 0, ':realm' => 'domain_site'))->fetchField()),
     '',
   );
   array_unshift($rows, $all);
