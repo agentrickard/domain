@@ -1706,7 +1706,10 @@ function domain_get_node_domains($nodes, $reset = FALSE) {
   if ($array) {
     return $lookup;
   }
-  return $lookup[$nodes];
+  if (isset($lookup[$nodes])) {
+    return $lookup[$nodes];
+  }
+  return $domains;
 }
 
 /**
