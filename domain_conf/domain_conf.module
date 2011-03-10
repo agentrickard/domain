@@ -163,6 +163,7 @@ function domain_conf_block_view($delta = '') {
   // Get the menu information.
   $menus = menu_get_menus();
   $string = str_replace('domain-', '', $delta);
+  $name = str_replace('-links', '-menu', $string);
   $source = 'menu_' . str_replace('-', '_', $string) . '_source';
   $data = variable_get($source, $string);
   // Some domains can disable primary and secondary links.
@@ -178,7 +179,6 @@ function domain_conf_block_view($delta = '') {
   }
   // Output the block.
   $output = menu_tree($data);
-  $name = str_replace('-links', '-menu', $string);
   // Build the block.
   $block = array(
     'subject' => check_plain($menus[$name]),
