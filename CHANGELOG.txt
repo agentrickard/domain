@@ -5,6 +5,7 @@
 
 09-MAR-2011
 -- Issue #1086048 by ununpentium, cgross. Bad hook call in domain_save().
+-- Issue #1086886 by GalainHH. Bad variable check in domain_conf_block_view().
 
 05-MAR-2011
 -- Issue #1080840 by ununpentium. Fixes index notice in domain_get_node_domains().
