@@ -3,6 +3,9 @@
  * Changelog file for Domain Access HEAD.
  */
 
+11-MAR-2011
+-- Issue #1080840 by gineta. Fixes bad index in domain_node_load().
+
 09-MAR-2011
 -- Issue #1086886 by GalainHH. Bad variable check in domain_conf_block_view().
 
