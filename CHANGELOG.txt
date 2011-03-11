@@ -3,6 +3,9 @@
  * Changelog file for Domain Access 6.x-2.x.
  */
 
+11-MAR-2011
+-- Patch #1083916 by TidalWave. Fixes empty array in user form.
+
 03-MAR-2011
 -- Adds number_format to Domain Count counts.
 

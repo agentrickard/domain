@@ -569,9 +569,11 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     $form['domain']['domains']['#multiple'] = TRUE;
     $form['domain']['domains']['#size'] = count($options) > 10 ? 10 : count($options);
   }
-  // Add our domain elements.
-  foreach (array_keys($form['name']) as $uid) {
-    $form['user_domains'][$uid][0] = array('#value' => theme('item_list', _domain_user_list($uid)));
+  // Add our domain elements. $form['name'] should be an array of matching users.
+  if (!empty($form['name'])) {
+    foreach (array_keys($form['name']) as $uid) {
+      $form['user_domains'][$uid][0] = array('#value' => theme('item_list', _domain_user_list($uid)));
+    }
   }
   $form['#theme'] = 'domain_admin_users_form';
   $form['#submit'][] = 'domain_update_users';
