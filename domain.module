@@ -1458,8 +1458,9 @@ function domain_node_load($nodes, $types) {
       continue;
     }
     // Append the domain grants to the node for editing.
-    $nodes[$node->nid]->domains = $domains[$node->nid]['domain_id'];
-    $nodes[$node->nid]->domain_site = $domains[$node->nid]['domain_site'];
+    $nodes[$node->nid]->domains = isset($domains[$node->nid]['domain_id']) ? $domains[$node->nid]['domain_id'] : array();
+    // If the node is not assigned, grant to all domains to prevent errors.
+    $nodes[$node->nid]->domain_site = isset($domains[$node->nid]['domain_site']) ? $domains[$node->nid]['domain_site'] : variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
     $nodes[$node->nid]->subdomains = array();
     if (!empty($nodes[$node->nid]->domain_site)) {
       $nodes[$node->nid]->subdomains[] = t('All affiliates');
