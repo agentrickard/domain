@@ -4,7 +4,7 @@
  */
 
 31-MAR-2011
--- Moves HEAD to 7.x-3.x branch.
+-- Moves HEAD to 7.x-3.x branch for Git.
 
 11-MAR-2011
 -- Issue #1080840 by gineta. Fixes bad index in domain_node_load().
