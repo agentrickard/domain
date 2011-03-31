@@ -1467,8 +1467,7 @@ function domain_node_load($nodes, $types) {
     }
     if (!empty($nodes[$node->nid]->domains)) {
       foreach ($nodes[$node->nid]->domains as $gid) {
-        ($gid == -1) ? $key = 0 : $key = $gid;
-        $domain = domain_lookup($key);
+        $domain = domain_lookup($gid);
         $nodes[$node->nid]->subdomains[] = $domain['sitename'];
       }
     }
@@ -1618,7 +1617,7 @@ function domain_get_path_match($path) {
  *   'domain_site' is a TRUE/FALSE boolean indicating affiliate status.
  */
 function domain_get_node_domains($nodes, $reset = FALSE) {
-  static $lookup;
+  $lookup = &drupal_static(__FUNCTION__);
   if (!isset($lookup) || $reset) {
     $lookup = array();
   }
@@ -1631,22 +1630,29 @@ function domain_get_node_domains($nodes, $reset = FALSE) {
     $node_ids = $nodes;
     $array = TRUE;
   }
+  // If not an array, just return the requested data.
   if (!$array && isset($lookup[$nodes])) {
     return $lookup[$nodes];
   }
-  // Set the proper value for the node.
+  // Set the proper value for the node, but include a default.
   $domains = array('domain_id' => array(), 'domain_site' => FALSE);
-  $result = db_query("SELECT nid, gid, realm FROM {domain_access} WHERE nid IN (:nid) AND (realm = 'domain_id' OR realm = 'domain_site')", array(':nid' => array_keys($node_ids)));
+  $records = array();
+  $result = db_query("SELECT nid, gid, realm FROM {domain_access} WHERE nid IN (:nid)", array(':nid' => array_keys($node_ids)));
+  // While this should return records for every node, we cannot guarantee success.
   foreach ($result as $data) {
-    // Transform the 0 to -1, since {domain_access} is unsigned.
-    ($data->gid == 0) ? $gid = -1 : $gid = $data->gid; 
     if ($data->realm == 'domain_id') {
-      $domains['domain_id'][$gid] = $gid;
+      $records[$data->nid]['domain_id'][$data->gid] = $data->gid;
     }
     elseif ($data->realm == 'domain_site') {
-      $domains['domain_site'] = TRUE;
+      $records[$data->nid]['domain_site'] = TRUE;
     }
-    $lookup[$data->nid] = $domains;
+  }
+  // Run through the nodes and ensure they have proper data.
+  foreach ($node_ids as $nid => $value) {
+    $lookup[$nid] = $domains;
+    if (isset($records[$nid])) {
+      $lookup[$nid] = $records[$nid];
+    }
   }
   // Return all data or just a single node?
   if ($array) {

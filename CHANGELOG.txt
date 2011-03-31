@@ -3,6 +3,9 @@
  * Changelog file for Domain Access 7.x-2.x branch
  */
 
+31-MAR-2011
+-- Patch #1109486 by bancek. Fix errors in domain_get_node_domains().
+
 11-MAR-2011
 -- Issue #1080840 by gineta. Fixes bad index in domain_node_load().
 
