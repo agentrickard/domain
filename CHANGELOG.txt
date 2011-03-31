@@ -5,6 +5,8 @@
 
 31-MAR-2011
 -- Moves HEAD to 7.x-3.x branch for Git.
+-- Patch #1109486 by bancek. Fix errors in domain_get_node_domains().
+-- Adds basic tests for domain_node_load() and domain_get_node_domains().
 
 11-MAR-2011
 -- Issue #1080840 by gineta. Fixes bad index in domain_node_load().

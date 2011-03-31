@@ -199,7 +199,7 @@ class DomainHookTest extends DomainTestCase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Test domain hooks',
+      'name' => 'Domain module hooks',
       'description' => 'Fire domain hooks and test responses.',
       'group' => 'Domain Access',
     );
@@ -293,7 +293,7 @@ class DomainSwitchingTest extends DomainTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Domain switching',
-      'description' => 'Ensure that programmtic domain switching works.',
+      'description' => 'Ensure that programmatic domain switching works.',
       'group' => 'Domain Access',
     );
   }
@@ -328,5 +328,114 @@ class DomainSwitchingTest extends DomainTestCase {
     $this->assertTrue($active['domain_id'] == $_domain['domain_id'], t('Switched back to initial domain.'));
 
   }
+}
 
+class DomainUnitTest extends DomainTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Domain unit tests',
+      'description' => 'Tests for function encapsulation.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  // On setup, install our test module.
+  function setUp() {
+    parent::setUp();
+  }
+
+  // Test that domain_node_load() and domain_get_node_domains() functions properly.
+  function testDomainGetNodeDomains() {
+    $count = db_query("SELECT COUNT(domain_id) FROM {domain}")->fetchField();
+    $this->assertTrue($count == 1, t('Primary domain created.'));
+    // Reset the default domain.
+    $domain = domain_default(TRUE);
+    // By design, there should be 10 nodes created with default domain assignment.
+    $count = db_query("SELECT COUNT(nid) FROM {node}")->fetchField();
+    $this->assertTrue($count == 10, t('Ten initial nodes created.'));
+    $count = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE realm = 'domain_id'")->fetchField();
+    $this->assertTrue($count == 10, t('Initial nodes are assigned to the default domain.'));
+    $count = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE realm = 'domain_site'")->fetchField();
+    $this->assertTrue($count == 10, t('Initial nodes are assigned to all affiliates.'));
+    // Create three more domains.
+    $this->domainCreateDomains();
+    $count = db_query("SELECT COUNT(domain_id) FROM {domain}")->fetchField();
+    $this->assertTrue($count == 4, t('Three new domains created.'));
+    // Reset the domains.
+    $domains = domain_domains(TRUE);
+    // Fetch the existing node ids.
+    $node_ids = array_keys(db_query("SELECT nid FROM {node}")->FetchAllAssoc('nid'));
+    // On node load, these should all be assigned to domain_site and domain_id = 1.
+    $nodes = node_load_multiple($node_ids);
+    // Check domains.
+    $set = TRUE;
+    foreach ($nodes as $node) {
+      if (!isset($node->domains)) {
+        $set = FALSE;
+      }
+      if (empty($node->domains)) {
+        $set = FALSE;
+      }
+      if (empty($node->domains[1])) {
+        $set = FALSE;
+      }
+      if (count($node->domains) > 1) {
+        $set = FALSE;
+      }
+      if (!$set) {
+        break;
+      }
+    }
+    $this->assertTrue(!empty($set), t('All nodes return proper domain assignment.'));
+    // Check domain_site.
+    $set = TRUE;
+    foreach ($nodes as $node) {
+      if (!isset($node->domain_site)) {
+        $set = FALSE;
+      }
+      if (empty($node->domain_site)) {
+        $set = FALSE;
+      }
+      if (!$set) {
+        break;
+      }
+    }
+    $this->assertTrue(!empty($set), t('All nodes return proper affiliate assignment.'));
+    // Check subdomains.
+    $set = TRUE;
+    foreach ($nodes as $node) {
+      if (!isset($node->subdomains)) {
+        $set = FALSE;
+      }
+      if (empty($node->subdomains)) {
+        $set = FALSE;
+      }
+      if (empty($node->subdomains[0])) {
+        $set = FALSE;
+      }
+      if ($node->subdomains[0] != t('All affiliates')) {
+        $set = FALSE;
+      }
+      if ($node->subdomains[1] != $domain['sitename']) {
+        $set = FALSE;
+      }
+      if (count($node->subdomains) > 2) {
+        $set = FALSE;
+      }
+      if (!$set) {
+        break;
+      }
+    }
+    $this->assertTrue(!empty($set), t('All nodes return proper subdomain string.'));
+    // Now, delete half the node information.
+    $delete_ids = array_chunk($node_ids, 5);
+    db_delete('domain_access')
+      ->condition('nid', $delete_ids[0], 'IN')
+      ->execute();
+    // By design, there should be 5 nodes left with default domain assignment.
+    $count = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE realm = 'domain_id'")->fetchField();
+    $this->assertTrue($count == 5, t('Five nodes are assigned to the default domain.'));
+    $count = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE realm = 'domain_site'")->fetchField();
+    $this->assertTrue($count == 5, t('Five nodes are assigned to all affiliates.'));
+  }
 }
