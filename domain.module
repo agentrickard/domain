@@ -1467,7 +1467,9 @@ function domain_node_load($nodes, $types) {
     }
     if (!empty($nodes[$node->nid]->domains)) {
       foreach ($nodes[$node->nid]->domains as $gid) {
-        $domain = domain_lookup($gid);
+        // Domain 0 is loaded as -1 for use in forms.
+        ($gid == -1) ? $key = 0 : $key = $gid;
+        $domain = domain_lookup($key);
         $nodes[$node->nid]->subdomains[] = $domain['sitename'];
       }
     }
@@ -1641,7 +1643,9 @@ function domain_get_node_domains($nodes, $reset = FALSE) {
   // While this should return records for every node, we cannot guarantee success.
   foreach ($result as $data) {
     if ($data->realm == 'domain_id') {
-      $records[$data->nid]['domain_id'][$data->gid] = $data->gid;
+      // Transform the 0 to -1, since we use -1 in forms.
+      ($data->gid == 0) ? $gid = -1 : $gid = $data->gid; 
+      $records[$data->nid]['domain_id'][$gid] = $gid;
     }
     elseif ($data->realm == 'domain_site') {
       $records[$data->nid]['domain_site'] = TRUE;

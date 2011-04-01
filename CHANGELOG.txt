@@ -5,6 +5,7 @@
 
 31-MAR-2011
 -- Patch #1109486 by bancek. Fix errors in domain_get_node_domains().
+-- Followup to #1109486 to prevent breaking forms.
 
 11-MAR-2011
 -- Issue #1080840 by gineta. Fixes bad index in domain_node_load().
