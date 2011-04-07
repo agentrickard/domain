@@ -206,8 +206,9 @@ class DomainHookTest extends DomainTestCase {
   }
 
   // On setup, install our test module.
-  function setUp() {
-    parent::setUp(array('domain_test'));
+  function setUp($list = array()) {
+    $list[] = 'domain_test';
+    parent::setUp($list);
   }
 
   function testDomainHooks() {
@@ -243,7 +244,7 @@ class DomainHookTest extends DomainTestCase {
     $this->assertTrue($value == 'delete', t('hook_domain_delete() fired correctly.'));
     $deleted_domain = domain_lookup($updated_domain['domain_id'], NULL, TRUE);
     $this->assertTrue($deleted_domain == -1, t('Domain deleted successfully.'));
- 
+
     // hook_domain_validate_alter() allows any domain to be valid.
     $return = domain_validate('thisshouldfail');
     $this->assertTrue(empty($return), t('hook_domain_validate_alter() fired correctly.'));
@@ -299,8 +300,8 @@ class DomainSwitchingTest extends DomainTestCase {
   }
 
   // On setup, install our test module.
-  function setUp() {
-    parent::setUp();
+  function setUp($list = array()) {
+    parent::setUp($list);
   }
 
   // Test domain creation and switching.
@@ -340,8 +341,8 @@ class DomainUnitTest extends DomainTestCase {
   }
 
   // On setup, install our test module.
-  function setUp() {
-    parent::setUp();
+  function setUp($list = array()) {
+    parent::setUp($list);
   }
 
   // Test that domain_node_load() and domain_get_node_domains() functions properly.
