@@ -3,6 +3,10 @@
  * Changelog file for Domain Access HEAD.
  */
 
+11-APR-2011
+-- Patch #1075616 by omercioglu. Changes hook_domain_conf to do
+    a recursive array merge.
+
 07-APR-2011
 -- Patch #1120158 by Dave Reid. Fixes E_STRICT errors in domain.test.
 

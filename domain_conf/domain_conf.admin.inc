@@ -103,7 +103,7 @@ function domain_conf_form($form, $form_state, $domain) {
   // Grab any extra elements defined by other modules.
   $extra = domain_conf_api(TRUE, $settings);
   // Merge the $extra and $form arrays.
-  $form = array_merge($form, $extra);
+  $form = array_merge_recursive($form, $extra);
 
   $form['submit'] = array(
     '#type' => 'submit',

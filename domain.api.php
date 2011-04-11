@@ -262,7 +262,9 @@ function hook_domain_source_path_alter(&$source, $path) {
 
 /**
  * Allows modules to add additional form elements for saving as domain-specific
- * settings.
+ * settings. Note that this is a "convenience function" to use in place of 
+ * hook_form_alter(), so you may use either. Versions prior to 7.x.3 are not
+ * complete replacements for hook_form_alter().
  *
  * When naming your form arrays, remember that the final key is the name of
  * the variable that you wish to alter.  The example below changes the default
