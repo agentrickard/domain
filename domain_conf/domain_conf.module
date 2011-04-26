@@ -402,7 +402,7 @@ function domain_conf_domainbatch() {
       '#permission' => 'administer menu',
       '#domain_action' => 'domain_conf',
       '#system_default' => $main,
-      '#variable' => 'menu_primary_links_source',
+      '#variable' => 'menu_main_links_source',
       '#meta_description' => t('Select what should be displayed as the Main links (typically at the top of the page).'),
       '#data_type' => 'string',
       '#weight' => 2,
