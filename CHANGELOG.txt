@@ -5,6 +5,7 @@
 
 26-APR-2011
 -- Issue #1093864. Fixes bad menu variable call.
+-- Issue #1125520 by wrburgess. Fixes bad API call with batch theme editing.
 
 31-MAR-2011
 -- Patch #1109486 by bancek. Fix errors in domain_get_node_domains().
