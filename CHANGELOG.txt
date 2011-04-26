@@ -3,6 +3,9 @@
  * Changelog file for Domain Access HEAD.
  */
 
+26-APR-2011
+-- Issue #1093864. Fixes bad menu variable call.
+
 11-APR-2011
 -- Patch #1075616 by omercioglu. Changes hook_domain_conf to do
     a recursive array merge.
