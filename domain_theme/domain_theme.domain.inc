@@ -44,7 +44,7 @@ function domain_theme_domain_batch() {
     ),
     '#permission' => 'administer themes',
     '#domain_action' => 'custom',
-    '#lookup' => 'domain_theme_lookup',
+    '#lookup' => 'domain_theme_batch_lookup',
     '#submit' => 'domain_theme_batch',
     '#system_default' => variable_get('theme_default', 'garland'),
     '#variable' => 'theme_default',
@@ -73,4 +73,16 @@ function domain_theme_domain_warning() {
     $return[$form] =  'admin/structure/domain/theme/%domain_id';
   }
   return $return;
+}
+
+/**
+ * Return a theme setting for batch processing.
+ *
+ * @param $domain
+ *   The domain being processed.
+ * @return
+ *   A valid domain id.
+ */
+function domain_theme_batch_lookup($domain) {
+  return domain_theme_lookup($domain['domain_id']);
 }
