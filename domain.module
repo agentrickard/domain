@@ -1380,7 +1380,8 @@ function domain_get_domain() {
  */
 function domain_check_primary($msg = 'default') {
   $_domain = domain_get_domain();
-  if ($_domain['domain_id'] != domain_default_id()) {
+  $default = domain_default();
+  if ($_domain['domain_id'] != $default['domain_id']) {
     if ($msg == 'default') {
       drupal_set_message(t('You have been redirected: This page must be accessed from the primary domain.'));
     }

@@ -3,6 +3,9 @@
  * Changelog file for Domain Access HEAD.
  */
 
+27-APR-2011
+-- Issue #1140020. Fixes domain_check_primary().
+
 26-APR-2011
 -- Issue #1093864. Fixes bad menu variable call.
 -- Issue #1125520 by wrburgess. Fixes bad API call with batch theme editing.
