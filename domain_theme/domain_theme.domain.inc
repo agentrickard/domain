@@ -45,7 +45,7 @@ function domain_theme_domain_batch() {
     '#permission' => 'administer themes',
     '#domain_action' => 'custom',
     '#lookup' => 'domain_theme_batch_lookup',
-    '#submit' => 'domain_theme_batch',
+    '#submit' => 'domain_theme_batch_submit',
     '#system_default' => variable_get('theme_default', 'garland'),
     '#variable' => 'theme_default',
     '#meta_description' => t('Change the themes for all domains.'),

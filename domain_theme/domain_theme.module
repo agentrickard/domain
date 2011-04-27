@@ -177,17 +177,30 @@ function domain_theme_domain_form(&$form) {
  * @param $values
  * The form values passed by the FormsAPI.
  */
-function domain_theme_batch($values) {
+function domain_theme_batch_submit($values) {
   foreach ($values['domain_batch'] as $key => $value) {
-    if ($key > 0) {
+    if ((int) $key != domain_default_id()) {
       // Clear out the old theme.
-      db_query("UPDATE {domain_theme} SET status = 0 WHERE domain_id = %d", $key);
-      $data = db_fetch_array(db_query("SELECT theme FROM {domain_theme} WHERE theme = '%s' AND domain_id = %d", $value, $key));
-      if (isset($data['theme'])) {
-        db_query("UPDATE {domain_theme} SET status = 1 WHERE theme = '%s' AND domain_id = %d", $value, $key);
+      db_update('domain_theme')
+        ->fields(array('status' => 0))
+        ->condition('domain_id', $key)
+        ->execute();
+      $data = db_query("SELECT theme FROM {domain_theme} WHERE theme = :theme AND domain_id = :domain_id",
+        array(':theme' => $value, ':domain_id' => $key))->fetchField();
+      if (!empty($data) && $data == $value) {
+        db_update('domain_theme')
+          ->fields(array('status' => 1))
+          ->condition('domain_id', $key)
+          ->condition('theme', $value)
+          ->execute();
       }
       else {
-        db_query("INSERT INTO {domain_theme} (domain_id, theme, status) VALUES (%d, '%s', 1)", $key, $value);
+        db_insert('domain_theme')
+          ->fields(array(
+            'domain_id' => $key,
+            'theme' => $value,
+            'status' => 1,
+        ))->execute();
       }
     }
     else {

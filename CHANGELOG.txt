@@ -5,6 +5,7 @@
 
 27-APR-2011
 -- Issue #1140020. Fixes domain_check_primary().
+-- Issue #1139288. Fixes batch domain_theme processing.
 
 26-APR-2011
 -- Issue #1093864. Fixes bad menu variable call.
