@@ -2783,8 +2783,11 @@ function _domain_path_modules() {
  * Implements hook_domain_ignore().
  */
 function domain_domain_ignore() {
-  // In Drupal 6, the update script behaves differently than D5, so we ignore it.
-  return array('update_script_selection_form');
+  // We cannot interfere with update processes.
+  return array(
+    'update_script_selection_form',
+    'authorize_filetransfer_form',
+  );
 }
 
 /**

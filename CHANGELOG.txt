@@ -3,6 +3,9 @@
  * Changelog file for Domain Access HEAD.
  */
 
+28-APR-2011
+-- Issue #1139706 by omercioglu. Do not fire hook_form_alter() for authorize.php.
+
 27-APR-2011
 -- Issue #1140020. Fixes domain_check_primary().
 -- Issue #1139288. Fixes batch domain_theme processing.
