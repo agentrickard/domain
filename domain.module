@@ -1708,8 +1708,10 @@ function domain_get_node_domains($nodes, $reset = FALSE) {
   // Run through the nodes and ensure they have proper data.
   foreach ($node_ids as $nid => $value) {
     $lookup[$nid] = $domains;
-    if (isset($records[$nid])) {
-      $lookup[$nid] = $records[$nid];
+    foreach (array('domain_id', 'domain_site') as $key) {
+      if (isset($records[$nid][$key])) {
+        $lookup[$nid][$key] = $records[$nid][$key];
+      }
     }
   }
   // Return all data or just a single node?
