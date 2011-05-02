@@ -35,7 +35,7 @@ domain_bootstrap();
  * TRUE if settings.inc was included correctly in settings.php, else FALSE
  */
 function domain_settings_setup_ok() {
-  static $state = NULL;
+  $state = &drupal_static(__FUNCTION__, NULL);
   if ($state === NULL) {
     $state = !function_exists('cache_get');
   }

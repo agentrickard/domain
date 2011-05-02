@@ -230,9 +230,9 @@ function domain_settings_domain_form(&$form) {
  */
 function domain_settings_add_element($form_id) {
   // Cache results.
-  static $forms_visibility;
+  $forms_visibility = &drupal_static(__FUNCTION__);
   if (isset($forms_visibility[$form_id])) {
-   # return $forms_visibility[$form_id];
+    return $forms_visibility[$form_id];
   }
 
   // These forms are known to be problematic, so omit them.

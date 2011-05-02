@@ -16,7 +16,7 @@
  * Implements hook_domain_bootstrap_full().
  */
 function domain_conf_domain_bootstrap_full($domain) {
-  static $check;
+  $check = &drupal_static(__FUNCTION__);
   // If running domain_set_domain(), we have issues with the variables
   // from the primary domain, which need to be loaded from cache.
   // @link http://drupal.org/node/412156
@@ -234,8 +234,9 @@ function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
  *   or an array of variables, in the case of $all.
  */
 function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $reset = FALSE) {
-  global $_domain;
-  static $settings, $base;
+  $_domain = domain_get_domain();
+  $settings = &drupal_static(__FUNCTION__ . '_settings');
+  $base = &drupal_static(__FUNCTION__ . '_base');
   if (empty($base)) {
     $base = _domain_conf_load_primary(FALSE);
   }
@@ -287,7 +288,7 @@ function domain_conf_language_options() {
  *   Otherwise, return the settings data for the primary domain.
  */
 function _domain_conf_load_primary($unset = FALSE) {
-  static $settings;
+  $settings = &drupal_static(__FUNCTION__);
 
   if (!isset($settings)) {
     // Account for table prefixing.

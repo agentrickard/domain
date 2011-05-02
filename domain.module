@@ -964,7 +964,8 @@ function domain_delete($domain, $values = array()) {
  *   elements added by hook_domain_load().  Returns -1 on failure.
  */
 function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
-  static $domains, $result;
+  $domains = &drupal_static(__FUNCTION__ . '_domains');
+  $result = &drupal_static(__FUNCTION__ . '_result');  
   // Create a unique key so we can static cache all requests.
   $key = $domain_id . $subdomain;
   // Shortcut if we know the data.
@@ -1025,7 +1026,7 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
  *   The domain array for the default domain.
  */
 function domain_default($reset = FALSE, $alter = TRUE) {
-  static $default;
+  $default = &drupal_static(__FUNCTION__);
   if (empty($default) || $reset) {
     $default = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE is_default = 1")->fetchAssoc();
     // Let submodules overwrite the defaults, if they wish.
@@ -1057,7 +1058,7 @@ function domain_default($reset = FALSE, $alter = TRUE) {
  *   The domain_id of the default domain.
  */
 function domain_default_id() {
-  static $id;
+  $id = &drupal_static(__FUNCTION__);
   if (!isset($id)) {
     $default = domain_default();
     $id = $default['domain_id'];
@@ -1105,7 +1106,7 @@ function domain_set_primary_domain() {
  *   An array of all active domains, with the domain_id as the key.
  */
 function domain_domains($reset = FALSE) {
-  static $domains;
+  $domains = &drupal_static(__FUNCTION__);
   if (empty($domains) || $reset) {
     $domains = array();
     // Query the db for active domain records.
@@ -1239,7 +1240,7 @@ function domain_unique_domain($subdomain) {
  *   array($domain_id => $domain_id).
  */
 function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
-  static $domains = array();
+  $domains = &drupal_static(__FUNCTION__, array());
   if (empty($account)) {
     // This may happen when creating a new user.
     return array();
@@ -1287,7 +1288,7 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
  *   The $domain array, modified by reference by hook_domain_load() implementations.
  */
 function domain_api($domain, $reset = FALSE) {
-  static $_modules;
+  $_modules = &drupal_static(__FUNCTION__);
   if (!isset($_modules) || $reset) {
     $_modules = module_implements('domain_load');
   }
@@ -1623,7 +1624,7 @@ function domain_node_presave($node) {
  *   The domain array for the best matching domain for links to this node.
  */
 function domain_get_node_match($nid) {
-  static $domain = array();
+  $domain = &drupal_static(__FUNCTION__, array());
   if (isset($domain[$nid])) {
     return $domain[$nid];
   }
@@ -1919,7 +1920,7 @@ function _domain_store_grants($nid, $grants = array()) {
  *   A boolean flag indicating whether to reset the static variable or not.
  */
 function domain_set_default_grant($reset = FALSE) {
-  static $check = NULL;
+  $check = &drupal_static(__FUNCTION__, NULL);
   if (is_null($check) || $reset) {
     $check = (bool) db_query_range("SELECT 1 FROM {node_access} WHERE realm = :realm AND gid = :gid", 0, 1,
       array(
@@ -2340,7 +2341,7 @@ function domain_form_devel_generate_content_form_alter(&$form, &$form_state) {
  *   page.
  */
 function domain_grant_all($reset= FALSE) {
-  static $grant;
+  $grant = &drupal_static(__FUNCTION__);
   $options = array();
   if (!isset($grant) || $reset) {
     $grant = FALSE;
@@ -2577,7 +2578,7 @@ function domain_node_save_redirect() {
  *   An array containing a domain_id from {domain} matching the given domainname
  */
 function domain_lookup_simple($name, $reset = FALSE) {
-  static $cache = array();
+  $cache = &drupal_static(__FUNCTION__, array());
 
   if (empty($name)) {
     return array();
@@ -2712,7 +2713,7 @@ function domain_domain_batch() {
  * on admin pages when we don't want them to be.
  */
 function domain_warning_check($form_id) {
-  static $_warning;
+  $_warning = &drupal_static(__FUNCTION__);
   // If $_POST is set, we are submitting the form and should not set a message.
   if (empty($_POST) && empty($_warning)) {
     global $_domain;
@@ -2774,7 +2775,7 @@ function domain_path($domain_id, &$path, &$options, $original_path) {
  * Helper function for domain_path() checks.
  */
 function _domain_path_modules() {
-  static $modules;
+  $modules = &drupal_static(__FUNCTION__);
   if (!isset($modules)) {
     $modules = module_implements('domain_path');
   }

@@ -163,7 +163,7 @@ function domain_alias_block($op = 'list', $delta = 0, $edit = array()) {
  *   Returns -1 on failure.
  */
 function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE ) {
-  static $aliases;
+  $aliases = &drupal_static(__FUNCTION__);
   // If both are NULL, no lookup can be run.
   if (is_null($subdomain) && is_null($alias_id)) {
     return -1;
@@ -284,7 +284,8 @@ function _domain_alias_placeholders_from_sql($subdomain) {
  *   An array of all aliases defined for given domain_id, indexed by alias_id
  */
 function domain_alias_list($domain_id, $reset = FALSE) {
-  static $aliases, $result;
+  $aliases = &drupal_static(__FUNCTION__ . '_aliases');
+  $result = &drupal_static(__FUNCTION__ . '_result');
   // Query the db for aliases.
   if (!isset($result) || $reset) {
     $result = db_query("SELECT domain_id, alias_id, pattern, redirect FROM {domain_alias}", array(), array('fetch' => PDO::FETCH_ASSOC))->FetchAll();

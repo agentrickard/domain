@@ -262,8 +262,8 @@ function domain_source_node_view($node, $view_mode) {
  *   The data array is the active source domain to use, as returned by domain_lookup().
  */
 function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, $reset = FALSE) {
-  global $_domain;
-  static $lookups;
+  $_domain = domain_get_domain();
+  $lookups = &drupal_static(__FUNCTION__);
   // Reset?
   if ($reset) {
     $lookups = array();

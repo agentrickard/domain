@@ -163,7 +163,7 @@ function _domain_bootstrap($phase) {
  *   An array of module names.
  */
 function _domain_bootstrap_modules($reset = FALSE) {
-  static $modules = NULL;
+  $modules = &drupal_static(__FUNCTION__, NULL);
   if ($reset || is_null($modules)) {
     $modules = _domain_bootstrap_modules_get();
     if (!is_array($modules)) {
