@@ -291,12 +291,16 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
 
   foreach ($result as $data) {
     $source = $data->domain_id;
-
     // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
     if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
       $source = $_domain['domain_id'];
     }
-    // When called from url_rewrite_outbound(), we have no data.
+    // When called from url_rewrite_outbound(), we might have no data,
+    // but if $nodes is populated, then we have run domain_node_load().
+    if (is_array($nodes) && isset($nodes[$data->nid]->domains)) {
+      $domains = $nodes[$data->nid]->domains;
+      $domain_site = $nodes[$data->nid]->domain_site;
+    }
     if (empty($domains)) {
       $lookup = domain_get_node_domains($data->nid);
       $domain_site = $lookup['domain_site'];

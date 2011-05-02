@@ -3,6 +3,9 @@
  * Changelog file for Domain Access 7.x-2.x branch
  */
 
+02-MAY-2011
+-- Issue #1139572 by MrPhilbert and cgross. Check domain values in domain_source_lookup().
+
 28-APR-2011
 -- Issue #1139706 by omercioglu. Do not fire hook_form_alter() for authorize.php.
 
