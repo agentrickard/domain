@@ -25,9 +25,17 @@ class DomainTestCase extends DrupalWebTestCase {
     if (empty($_SERVER['HTTP_HOST']) || $_SERVER['HTTP_HOST'] == 'default') {
       $_SERVER['HTTP_HOST'] = 'example.com';
     }
+    // Build teh {domain} table for this test run.
     db_query("TRUNCATE {domain}");
     domain_set_primary_domain();
     db_query("UPDATE {domain} SET sitename = 'TestDomainSitename' WHERE is_default = 1");
+
+    // Set the primary domain to active. This step should let us run
+    // tests from any valid domain. See http://drupal.org/node/1144632.
+    $GLOBALS['_domain'] = domain_default(TRUE);
+    drupal_static_reset('domain_initial_domain');
+    domain_initial_domain($GLOBALS['_domain']);
+
     // Create some nodes and users.
     for ($i = 0; $i < 10; $i++) {
       $settings = array(
@@ -254,7 +262,6 @@ class DomainHookTest extends DomainTestCase {
     // Here we read the domain 'local.test' as an alias for the default domain.
     // However, this function can't really be registered, so we have to fake it a bit.
     $new_domain = $this->domainCreateDomains(array('newtest'));
-
     $test_domain = 'local.test';
     $modules = _domain_bootstrap_modules();
     $modules[] = 'domain_test';
@@ -306,10 +313,9 @@ class DomainSwitchingTest extends DomainTestCase {
 
   // Test domain creation and switching.
   function testDomainSwtiching() {
-    $_domain = domain_get_domain();
-
     // Create some domains.
     $result = $this->domainCreateDomains();
+    $_domain = domain_get_domain();
 
     // Are we currently on the primary domain?
     $default_id = domain_default_id();
@@ -327,7 +333,6 @@ class DomainSwitchingTest extends DomainTestCase {
     domain_reset_domain(TRUE);
     $active = domain_get_domain();
     $this->assertTrue($active['domain_id'] == $_domain['domain_id'], t('Switched back to initial domain.'));
-
   }
 }
 
@@ -370,6 +375,7 @@ class DomainUnitTest extends DomainTestCase {
     $nodes = node_load_multiple($node_ids);
     // Check domains.
     $set = TRUE;
+    // TODO: This could be more elegant.
     foreach ($nodes as $node) {
       if (!isset($node->domains)) {
         $set = FALSE;

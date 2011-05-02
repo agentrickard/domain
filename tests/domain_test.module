@@ -106,7 +106,8 @@ function domain_test_domain_bootstrap_lookup($domain) {
   if ($domain != 'local.test') {
     return;
   }
-  $domain = domain_lookup(NULL, 'newtest.example.com', TRUE);
+  $default = domain_default();
+  $domain = domain_lookup(NULL, 'newtest.' . $default['subdomain'], TRUE);
   return $domain;
 }
 

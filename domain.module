@@ -137,7 +137,7 @@ function domain_init() {
  * @see domain_init()
  */
 function domain_initial_domain($domain = array()) {
-  static $initial;
+  $initial = &drupal_static(__FUNCTION__);
   if (!isset($initial) && !empty($domain)) {
     $initial = $domain;
   }
