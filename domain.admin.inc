@@ -611,7 +611,7 @@ function domain_advanced_form($form, $form_state) {
     '#title' => t('Domain node types'),
     '#collapsible' => TRUE
   );
-  $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.</p>'));
+  $form['domain_node']['intro'] = array('#markup' => t('<p>Check the content types that should be published to all affiliates when new content is created.</p>'));
   foreach ($node_types as $key => $value) {
     $form['domain_node']['domain_node_' . $key] = array(
       '#type' => 'checkbox',
@@ -626,7 +626,7 @@ function domain_advanced_form($form, $form_state) {
     '#title' => t('Domain node editing'),
     '#collapsible' => TRUE
   );
-  $form['domain_form']['intro'] = array('#value' => t('<p>When editors view domain-access restricted nodes, which form elements should be exposed?</p>'));
+  $form['domain_form']['intro'] = array('#markup' => t('<p>When editors view domain-access restricted nodes, which form elements should be exposed?</p>'));
   $options = array(
     'log' => t('Log messages'),
     'options' => t('Publishing options'),
