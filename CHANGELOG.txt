@@ -3,6 +3,10 @@
  * Changelog file for Domain Access HEAD.
  */
 
+05-JUN-201
+-- Fixes default id bug in drush generate domains.
+-- Issue #1172054 by wuffers. Change ambiguous text in Domain Settings.
+
 02-MAY-2011
 -- Issue #1139572 by MrPhilbert and cgross. Check domain values in domain_source_lookup().
 -- Issue #1144632. Run tests from any domain.
