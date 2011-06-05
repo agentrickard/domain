@@ -378,6 +378,26 @@ function domain_conf_domainbatch() {
     '#update_all' => TRUE,
     '#group' => t('Performance'),
   );
+  //Add support of Pressflow external cache if available
+  if (defined('CACHE_EXTERNAL')){
+    $batch['cache']['#form']['#options'][CACHE_EXTERNAL] = t('External (experts only, possible side effects)');
+    $batch['page_cache_max_age'] = array(
+      '#form' => array(
+        '#type' => 'select',
+        '#title' => t('Page cache maximum age'),
+        '#options' => $period,
+        '#description' => t('Internal and external page caches will not deliver cached paged older than this setting.')
+       ),
+     '#domain_action' => 'domain_conf',
+     '#system_default' => variable_get('page_cache_max_age', 0),
+     '#variable' => 'cache_lifetime',
+     '#meta_description' => t('Set the page cache maximum age for all domains.'),
+     '#data_type' => 'integer',
+     '#weight' => -4,
+     '#update_all' => TRUE,
+     '#group' => t('Performance'),
+   );
+  }
   // Change the page compression settings.
   $batch['page_compression'] = array(
     '#form' => array(
