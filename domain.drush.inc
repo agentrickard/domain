@@ -181,10 +181,9 @@ function drush_domain_generate_domains($primary = 'example.com') {
     $created = domain_save($record, $record);
     drush_print(dt('Created !domain.', array('!domain' => $record['sitename'])));
   }
-  // For now, we have to reset this to id 0. Later, this will go away.
   db_update('domain')
     ->condition('subdomain', $primary)
-    ->fields(array('domain_id' => 0, 'is_default' => 1))
+    ->fields(array('is_default' => 1))
     ->execute();
   if (empty($new)) {
     drush_print(dt('No new domains were created.'));
