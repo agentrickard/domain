@@ -47,7 +47,7 @@ function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
 
   if ($count[$domain_id] > 0) {
     if (!isset($map[$domain_id][$path_language][$path])) {
-      $alias = db_result(db_query("SELECT dst FROM {%s} WHERE src = '%s'", $tablename[$domain_id], $path));
+      $alias = db_result(db_query("SELECT dst FROM {%s} WHERE src = '%s' AND language IN('%s', '') ORDER BY language DESC, pid DESC", $tablename[$domain_id], $path, $path_language));
       $map[$domain_id][$path_language][$path] = $alias ? $alias : $path;
     }
     $path = $map[$domain_id][$path_language][$path];
