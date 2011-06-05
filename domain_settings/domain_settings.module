@@ -165,14 +165,20 @@ function domain_settings_form_submit($form, &$form_state) {
     }
   }
   // Set a message about the affected domains.
+  $extra = '';
   if ($domain_id > 0) {
     $domain = domain_lookup($domain_id);
     $affected = $domain['sitename'];
   }
+  elseif ($domain_id == -1) {
+    $default = domain_default();
+    $affected = $default['sitename'];
+    $extra = t('These settings will be inherited unless overridden per domain.');
+  }
   else {
     $affected = t('all domains');
   }
-  drupal_set_message(t('The configuration options have been saved for %domains.', array('%domains' => $affected)));
+  drupal_set_message(t('The configuration options have been saved for %domains. !extra', array('%domains' => $affected, '!extra' => $extra)));
 
   module_invoke_all('domain_settings', $domain_id, $form_state['values']);
   cache_clear_all();
