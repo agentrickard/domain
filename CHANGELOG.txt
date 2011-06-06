@@ -11,6 +11,8 @@
 -- Patch #1134240 by dalin. Optimize COUNT queries to SELECT 1.
 -- Patch #867868 by mikeytown2, sukr_s. Prevent redirecting when not needed on node/add.
 -- Patch #1170608 by gdud, croryx. Optimize domain_domains().
+-- Issue #1100732 by gease. Ensure we fire the internal url alter hook.
+-- Issue #1142762. Do not run path aliases through url().
 
 11-MAR-2011
 -- Patch #1083916 by TidalWave. Fixes empty array in user form.
