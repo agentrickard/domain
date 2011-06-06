@@ -8,6 +8,7 @@
 -- Issue #1156120 by petednz. Restore help text to node settings form.
 -- Issue #1134240 by dalin. Optimize COUNT queries to SELECT 1.
 -- Patch #867868 by mikeytown2, sukr_s. Prevent redirecting when not needed on node/add.
+-- Issue #1179160 by andros. Remove bad checks for empty values in Domain Conf.
 
 02-MAY-2011
 -- Issue #1139572 by MrPhilbert and cgross. Check domain values in domain_source_lookup().

@@ -162,7 +162,7 @@ function domain_conf_form_submit($form, &$form_state) {
   // Throw away what we don't need.
   $ignore = array('form_token', 'form_id', 'form_build_id', 'op', 'submit', 'domain_id');
   foreach ($form_state['values'] as $key => $value) {
-    if (in_array($key, $ignore) || (empty($value) && $value === 0)) {
+    if (in_array($key, $ignore)) {
       continue;
     }
     $new_settings[$key] = $value;
