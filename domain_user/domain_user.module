@@ -313,7 +313,7 @@ function domain_user_domainupdate($op, $domain, $form_state = array()) {
       // Delete from {domain_user}
       db_query("DELETE FROM {domain_user} WHERE domain_id = %d", $domain['domain_id']);
       // Move from user domain to default domain for {domain_editor}
-      $check = db_result(db_query("SELECT COUNT(uid) FROM {domain_editor} WHERE uid = %d AND domain_id = 0", $domain['uid']));
+      $check = db_result(db_query("SELECT 1 FROM {domain_editor} WHERE uid = %d AND domain_id = 0", $domain['uid']));
       if (empty($check)) {
         db_query("INSERT INTO {domain_editor} (domain_id, uid) VALUES (0, %d)", $domain['uid'], $domain['domain_id']);
       }

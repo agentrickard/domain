@@ -1003,7 +1003,7 @@ function domain_valid_domain($subdomain) {
  *   TRUE if unique; FALSE if duplicate.
  */
 function domain_unique_domain($subdomain) {
-  $count = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s'", $subdomain));
+  $count = db_result(db_query("SELECT 1 FROM {domain} WHERE subdomain = '%s'", $subdomain));
   return !(bool) $count;
 }
 
@@ -1677,7 +1677,7 @@ function _domain_store_grants($nid, $grants = array()) {
 function domain_set_default_grant() {
   static $check = NULL;
   if (is_null($check)) {
-    $check = db_result(db_query("SELECT COUNT(nid) FROM {node_access} WHERE realm = '%s' AND gid = %d", 'domain_all', 0));
+    $check = db_result(db_query("SELECT 1 FROM {node_access} WHERE realm = '%s' AND gid = %d", 'domain_all', 0));
     if ($check == 0) {
       db_query("INSERT INTO {node_access} (nid, gid, realm, grant_view, grant_update, grant_delete) VALUES (%d, %d, '%s', %d, %d, %d)", 0, 0, 'domain_all', 1, 0, 0);
     }
@@ -1694,7 +1694,7 @@ function domain_enable() {
   domain_set_default_grant();
   // Thanks to the new way that batch processing of node grants is handled, we have to
   // manually define our records if none are present.
-  $count = (bool) db_result(db_query("SELECT COUNT(*) FROM {domain_access}"));
+  $count = (bool) db_result(db_query("SELECT 1 FROM {domain_access}"));
   if (empty($count)) {
     $rule = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
     $site = DOMAIN_SITE_GRANT;
@@ -1715,7 +1715,7 @@ function domain_enable() {
   }
   $result = db_query("SELECT uid FROM {users} WHERE uid > 0");
   while ($data = db_fetch_object($result)) {
-    $check = (bool) db_result(db_query("SELECT COUNT(*) FROM {domain_editor} WHERE uid = %d", $data->uid));
+    $check = (bool) db_result(db_query("SELECT 1 FROM {domain_editor} WHERE uid = %d", $data->uid));
     if (empty($check)) {
       db_query("INSERT INTO {domain_editor} VALUES (%d, %d)", $data->uid, 0);
     }
@@ -2434,8 +2434,8 @@ function domain_batch_validate($values) {
       $errors = array();
       foreach ($batch as $key => $value) {
         $subdomain = strtolower(urlencode($value));
-        $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = '%s' AND domain_id <> %d", $value, $key));
-        if ($check > 0 || ($key > 0 && $value == variable_get('domain_root', ''))) {
+        $check = db_result(db_query("SELECT 1 FROM {domain} WHERE subdomain = '%s' AND domain_id <> %d", $value, $key));
+        if ($check || ($key > 0 && $value == variable_get('domain_root', ''))) {
           form_set_error('domain_batch]['. $key, t('Each domain value must be unique.'));
         }
         else {
@@ -2448,8 +2448,8 @@ function domain_batch_validate($values) {
       break;
     case 'domain_sitename':
       foreach ($batch as $key => $value) {
-        $check = db_result(db_query("SELECT COUNT(domain_id) FROM {domain} WHERE sitename = '%s' AND domain_id <> %d", $value, $key));
-        if ($check > 0 || ($key > 0 && $value == variable_get('domain_sitename', 'Drupal'))) {
+        $check = db_result(db_query("SELECT 1 FROM {domain} WHERE sitename = '%s' AND domain_id <> %d", $value, $key));
+        if ($check || ($key > 0 && $value == variable_get('domain_sitename', 'Drupal'))) {
           form_set_error('domain_batch]['. $key, t('Each site name value must be unique.'));
         }
       }

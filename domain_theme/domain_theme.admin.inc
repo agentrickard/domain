@@ -329,8 +329,8 @@ function domain_theme_settings_submit($form, &$form_state) {
   $domain_id = $values['domain_id'];
   $theme = $values['theme'];
   // If no record exists, we behave differently.
-  $check = db_result(db_query("SELECT COUNT(*) FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme));
-  if ($values['op'] == $values['reset'] && $check > 0) {
+  $check = db_result(db_query("SELECT 1 FROM {domain_theme} WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme));
+  if ($values['op'] == $values['reset'] && $check) {
     db_query("UPDATE {domain_theme} SET settings = NULL, filepath = NULL WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
     drupal_set_message(t('The configuration options have been reset to their default values.'));
   }
@@ -347,7 +347,7 @@ function domain_theme_settings_submit($form, &$form_state) {
     drupal_set_message(t('The configuration options have been saved.'));
   }
   // If nothing is active, then we make this one active.
-  $active = db_result(db_query("SELECT COUNT(*) FROM {domain_theme} WHERE domain_id = %d AND status = 1", $domain_id));
+  $active = db_result(db_query("SELECT 1 FROM {domain_theme} WHERE domain_id = %d AND status = 1", $domain_id));
   if (empty($active)) {
     db_query("UPDATE {domain_theme} SET status = 1 WHERE domain_id = %d AND theme = '%s'", $domain_id, $theme);
     drupal_set_message(t('%theme has been set as the default theme for %domain', array('%theme' => $theme, '%domain' => $domain['sitename'])));

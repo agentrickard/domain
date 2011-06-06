@@ -42,10 +42,10 @@ function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
 
   // Use $count[$domain_id] to avoid looking up paths in subsequent calls if there are no aliases
   if (!isset($count[$domain_id])) {
-    $count[$domain_id] = db_result(db_query('SELECT COUNT(pid) FROM {%s}', $tablename[$domain_id]));
+    $count[$domain_id] = db_result(db_query('SELECT 1 FROM {%s}', $tablename[$domain_id]));
   }
 
-  if ($count[$domain_id] > 0) {
+  if ($count[$domain_id]) {
     if (!isset($map[$domain_id][$path_language][$path])) {
       $alias = db_result(db_query("SELECT dst FROM {%s} WHERE src = '%s' AND language IN('%s', '') ORDER BY language DESC, pid DESC", $tablename[$domain_id], $path, $path_language));
       $map[$domain_id][$path_language][$path] = $alias ? $alias : $path;

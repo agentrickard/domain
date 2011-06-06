@@ -193,8 +193,8 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
   // 5) Check that the alias is not a direct match for a registered domain.
   $check = preg_match('/[a-z0-9\.\+\-:]*$/', $alias);
   if ($check == 1) {
-    $test = db_result(db_query("SELECT COUNT(*) FROM {domain} WHERE subdomain = '%s'", $alias));
-    if ($test > 0) {
+    $count = db_result(db_query("SELECT 1 FROM {domain} WHERE subdomain = '%s'", $alias));
+    if ($count > 0) {
       form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record. ', array('%name' => $alias)));
     }
   }
