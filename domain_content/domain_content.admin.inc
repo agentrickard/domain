@@ -234,7 +234,7 @@ function domain_content_form() {
 
   // Enable language column if translation module is enabled
   // or if we have any node with language.
-  $multilanguage = (module_exists('translation') || db_query("SELECT COUNT(*) FROM {node} WHERE language <> :language", array(':language' => LANGUAGE_NONE))->fetchField());
+  $multilanguage = (module_exists('translation') || db_query("SELECT 1 FROM {node} WHERE language <> :language", array(':language' => LANGUAGE_NONE))->fetchField());
 
   // Build the sortable table header.
   $header = array(
