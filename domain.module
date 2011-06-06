@@ -853,10 +853,10 @@ function domain_domains($reset = FALSE) {
   if (empty($domains) || $reset) {
     $domains = array();
     // Query the db for active domain records.
-    $result = db_query("SELECT domain_id FROM {domain}");
-    while ($data = db_fetch_array($result)) {
-      $domain = domain_lookup($data['domain_id'], NULL, TRUE);
-      $domains[$domain['domain_id']] = $domain;
+    $result = db_query("SELECT domain_id, subdomain, sitename, scheme, valid FROM {domain}");
+    while ($domain = db_fetch_array($result)) {
+      $domains[$domain['domain_id']] = domain_api($domain, $reset);
+      $domains[0] = domain_default();
     }
   }
   $sort = variable_get('domain_sort', 'id');
