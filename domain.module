@@ -2073,7 +2073,14 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             $user_domains[] = $value;
           }
         }
-        $first_domain = current($user_domains);
+        // Set the best match for the user's primary domain.
+        // If they are a member of the current domain, use that one.
+        if (in_array($_domain['domain_id'], $user_domains)) {
+          $first_domain = $_domain['domain_id'];
+        }
+        else {
+          $first_domain = current($user_domains);
+        }
         foreach ($options as $key => $value) {
           if (in_array($key, $user_domains)) {
             $user_options[$key] = $value;
