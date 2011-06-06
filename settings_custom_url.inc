@@ -50,11 +50,11 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
   if (!isset($root)) {
     $root = domain_lookup(variable_get('domain_default_source', 0));
   }
-
+  // Set the target domain for this url.
+  $target_domain_id = $_domain['domain_id'];
   // Now run the path rewrite sequence, if necessary.
   if ($check_nodes || $path_alter) {
     $nid = FALSE;
-    $target_domain_id = $_domain['domain_id'];
     if ($check_nodes) {
       // Check to see if this is a node or comment link and set $nid accordingly.
       // We static the $nid results to make this more efficient.
@@ -126,13 +126,13 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
         // TODO: merge this code with the above for cleanup.
       }
     }
-    // We may have to refactor this for D7.
-    if (!isset($path_rewrite)) {
-      $path_rewrite = count(_domain_path_modules());
-    }
-    // Allow path changes, if needed. This changed significantly in D7.
-    if ($path_rewrite > 0 && $path != '') {
-      domain_path($target_domain_id, $path, $options, $original_path);
-    }
+  }
+  // We may have to refactor this for D7.
+  if (!isset($path_rewrite)) {
+    $path_rewrite = count(_domain_path_modules());
+  }
+  // Allow path changes, if needed. This changed significantly in D7.
+  if ($path_rewrite > 0 && $path != '') {
+    domain_path($target_domain_id, $path, $options, $original_path);
   }
 }
