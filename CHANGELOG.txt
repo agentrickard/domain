@@ -13,6 +13,7 @@
 -- Patch #1170608 by gdud, croryx. Optimize domain_domains().
 -- Issue #1100732 by gease. Ensure we fire the internal url alter hook.
 -- Issue #1142762. Do not run path aliases through url().
+-- Issue #1179160 by andros. Remove bad checks for empty values in Domain Conf.
 
 11-MAR-2011
 -- Patch #1083916 by TidalWave. Fixes empty array in user form.
