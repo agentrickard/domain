@@ -1,7 +1,10 @@
 /**
  * @file
- * Changelog file for Domain Access HEAD.
+ * Changelog file for Domain Access 7.x-3.x.
  */
+
+09-JUN-2011
+-- Issue #1096566. Allow multiple domain lookup responses during bootstrap.
 
 05-JUN-2011
 -- Fixes default id bug in drush generate domains.
