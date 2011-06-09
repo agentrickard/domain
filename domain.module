@@ -1445,12 +1445,10 @@ function domain_get_path($domain) {
 function domain_get_uri($domain) {
   global $base_path;
   $modules = _domain_path_modules();
-  dsm($modules);
   if (!empty($modules) && !drupal_is_front_page()) {
     // request_path() does not include base_path, which will be added by the
     // call to url() below.
     $request_uri = request_path();
-dsm($request_uri);
     $options = array();
     // If needed, let modules modify the path alias.
     // We cannot use URL here because we need the domain_id data.
@@ -1462,7 +1460,6 @@ dsm($request_uri);
   else {
     $request_uri = request_uri();
   }
-dsm($request_uri);
   $path = domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'] . $request_uri;
   return $path;
 }
