@@ -21,7 +21,7 @@ function domain_drush_command() {
     'aliases' => array('domains'),
   );
   $items['domain-add'] = array(
-    'description' => 'List active domains for the site.',
+    'description' => 'Add a new domain to the site.',
     'examples' => array(
       'drush domain-add example.com \'My Test Site\'',
       'drush domain-add example.com \'My Test Site\' --inactive=1 --https==1',
