@@ -161,7 +161,6 @@ function domain_content_node_operations() {
       'domain' => array(
         'label' => t('Change affiliate publishing options'),
         'callback' => 'domain_content_node_operations_process',
-        'configurable' => TRUE,
       ),
     );
     return $operations;
