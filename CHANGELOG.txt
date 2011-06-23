@@ -3,6 +3,10 @@
  * Changelog file for Domain Access 7.x-3.x.
  */
 
+23-JUN-2011
+-- Issue #1189916 by torrance123 and andros. Fix the load procedure to account
+    for $cookie_domain not being set.
+
 09-JUN-2011
 -- Issue #1096566. Allow multiple domain lookup responses during bootstrap.
 
