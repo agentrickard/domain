@@ -6,6 +6,7 @@
 23-JUN-2011
 -- Issue #1189916 by torrance123 and andros. Fix the load procedure to account
     for $cookie_domain not being set.
+-- Patch #1186580 by heyrocker. hook_node_operations() does not allow configurable flag.
 
 09-JUN-2011
 -- Issue #1096566. Allow multiple domain lookup responses during bootstrap.
