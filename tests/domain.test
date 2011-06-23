@@ -91,6 +91,26 @@ class DomainTestCase extends DrupalWebTestCase {
     return $domains;
   }
 
+  /**
+   * Set the global $base_url to a domain.
+   *
+   * Required so that POST and other url() requests can be routed properly.
+   *
+   * @param $domain
+   *  The domain to use as the base url.
+   */
+  protected function domainSetBaseUrl($domain) {
+    $GLOBALS['base_url'] = trim($domain['path'], '/');
+  }
+
+  /**
+   * Resets $base_url to the initial domain.
+   */
+  protected function domainResetBaseUrl() {
+    $domain = domain_initial_domain();
+    $GLOBALS['base_url'] = $domain['path'];
+  }
+
   public function tearDown() {
     parent::tearDown();
   }
@@ -444,5 +464,93 @@ class DomainUnitTest extends DomainTestCase {
     $this->assertTrue($count == 5, t('Five nodes are assigned to the default domain.'));
     $count = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE realm = 'domain_site'")->fetchField();
     $this->assertTrue($count == 5, t('Five nodes are assigned to all affiliates.'));
+  }
+}
+  
+class DomainCacheTest extends DomainTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Domain caching tests',
+      'description' => 'Tests for proper page caching.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  // On setup, install our test module.
+  function setUp($list = array()) {
+    parent::setUp($list);
+    variable_set('cache', 1);
+  }
+  
+  // Check that cache works and ids are set properly.
+  function testDomainPageCache() {
+    $cache = variable_get('cache');
+    $this->assertTrue(!empty($cache), t('Page caching enabled.'));
+
+    // This section borrowed from bootstrap.test.
+    // Fill the cache.
+    $this->drupalGet('');
+
+    $this->drupalHead('');
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', t('Page was cached on primary domain.'));
+    $etag = $this->drupalGetHeader('ETag');
+    $last_modified = $this->drupalGetHeader('Last-Modified');
+
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
+    $this->drupalGet('', array(), array('If-Modified-Since: ' . $last_modified, 'If-None-Match: ' . $etag));
+    $this->assertResponse(200, t('Conditional request returned 200 OK for authenticated user.'));
+    $this->assertFalse($this->drupalGetHeader('X-Drupal-Cache'), t('Primary domain was not cached for logged in user.'));
+    
+    // Try cache on a secondary domain.
+    $domains = $this->domainCreateDomains(array('one'));
+    $this->assertTrue(isset($domains['one']), t('Created test domain %domain', array('%domain' => $domains['one']['subdomain'])));
+
+    // Test to see if this install supports the subdomain. If it does, test against it.
+    $url = $domains['one']['path'] . drupal_get_path('module', 'domain') . '/tests/200.png';
+    $response = drupal_http_request($url, array('method' => 'HEAD'));
+    // If the check above fails, we cannot do further testing.
+    if ($response->code != 200) {
+      $this->assertTrue(TRUE, t('The server cannot connect to %domain. Test complete.', array('%domain' => $domains['one']['subdomain'])));
+      return;
+    }
+    $this->assertTrue(TRUE, t('The server connected to %domain.', array('%domain' => $domains['one']['subdomain'])));
+    // Logout the user and try again.
+    $this->drupalLogout($user);
+    // Assert that page caching applies.
+    $this->drupalHead('');
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', t('Page was cached on primary domain.'));
+
+    $options = array('absolute' => TRUE);
+    $new_user = $this->drupalCreateUser();
+    // Fill the cache.
+    $this->drupalGet($domains['one']['path'], $options);
+
+    $this->drupalHead($domains['one']['path'], $options);
+    $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', t('Page was cached on %domain.', array('%domain' => $domains['one']['subdomain'])));
+    $etag = $this->drupalGetHeader('ETag');
+    $last_modified = $this->drupalGetHeader('Last-Modified');
+
+    // Try to login the user from the subdomain.
+    // To do so, we must force $base_url to use the new domain for paths.
+    $this->domainSetBaseUrl($domains['one']);
+
+    $this->drupalLogin($new_user);
+    $this->drupalGet('', array(), array('If-Modified-Since: ' . $last_modified, 'If-None-Match: ' . $etag));
+    $this->assertResponse(200, t('Conditional request returned 200 OK for authenticated user.'));
+
+    $this->drupalGet($domains['one']['path'], $options, array('If-Modified-Since: ' . $last_modified, 'If-None-Match: ' . $etag));
+    $this->assertResponse(200, t('Conditional request returned 200 OK for authenticated user.'));
+    $this->assertFalse($this->drupalGetHeader('X-Drupal-Cache'), t('%domain was not cached for logged in user.', array('%domain' => $domains['one']['path'])));
+
+    // Check that both pages were cached properly.
+    $default = domain_default();
+    $result = db_query("SELECT 1 FROM {cache_page} WHERE cid = :cid", array(':cid' => $default['path']))->fetchField();
+    $this->assertTrue(!empty($result), t('Primary domain cached correctly to {cache_page}.'));
+    $result = db_query("SELECT 1 FROM {cache_page} WHERE cid = :cid", array(':cid' => $domains['one']['path']))->fetchField();
+    $this->assertTrue(!empty($result), t('%domain cached correctly to {cache_page}.', array('%domain' => $domains['one']['path'])));
+
+    // Reset $base_url.
+    $this->domainResetBaseUrl();
   }
 }

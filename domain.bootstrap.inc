@@ -58,15 +58,9 @@ function domain_bootstrap() {
   $_domain = array();
 
   // Ensure that core globals are loaded so that we don't break page caching.
-  // See http://drupal.org/node/1046844
+  // See http://drupal.org/node/1046844 and http://drupal.org/node/1189916.
   if (!isset($GLOBALS['base_root'])) {
-    // $conf is set before settings.php is invoked. Do not let $conf get reset to an array().
-    // See http://drupal.org/node/1056152
-    $settings_conf = $GLOBALS['conf'] ;
-    // Sadly, we have to call this function from within itself.
-    // Thankfully, include_once prevents us from making major errors.
-    drupal_settings_initialize();
-    $GLOBALS['conf'] = $settings_conf;
+    domain_settings_initialize();
   }
 
   $phases = array(DOMAIN_BOOTSTRAP_INIT, DOMAIN_BOOTSTRAP_NAME_RESOLVE, DOMAIN_BOOTSTRAP_FULL);
@@ -274,3 +268,101 @@ function domain_get_primary_table($table) {
   return db_escape_table($table);
 }
 
+/**
+ * Replaces the logic from drupal_settings_initialize() so caching works.
+ *
+ * Problem: we cannot run drupal_settings_initialize() twice, so this logic
+ * has to be cloned here, otherwise, user logins get corrupted. Without this
+ * code, core page caching breaks because the url path isn't set properly
+ * for use as a cache id.
+ *
+ * Further, calling drupal_settings_initialize() will reset $conf to an array
+ * which destroys caching settings.
+ *
+ * @see drupal_settings_initialize()
+ *
+ * @link http://drupal.org/node/1046844
+ * @link http://drupal.org/node/1189916
+ */
+function domain_settings_initialize() {
+  global $base_url, $base_path, $base_root, $cookie_domain;
+  
+  $is_https = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
+
+  if (isset($base_url)) {
+    // Parse fixed base URL from settings.php.
+    $parts = parse_url($base_url);
+    $http_protocol = $parts['scheme'];
+    if (!isset($parts['path'])) {
+      $parts['path'] = '';
+    }
+    $base_path = $parts['path'] . '/';
+    // Build $base_root (everything until first slash after "scheme://").
+    $base_root = substr($base_url, 0, strlen($base_url) - strlen($parts['path']));
+  }
+  else {
+    // Create base URL
+    $http_protocol = $is_https ? 'https' : 'http';
+    $base_root = $http_protocol . '://' . $_SERVER['HTTP_HOST'];
+    $base_url = $base_root;
+
+    // $_SERVER['SCRIPT_NAME'] can, in contrast to $_SERVER['PHP_SELF'], not
+    // be modified by a visitor.
+    if ($dir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '\/')) {
+      $base_path = $dir;
+      $base_url .= $base_path;
+      $base_path .= '/';
+    }
+    else {
+      $base_path = '/';
+    }
+  }
+  $base_secure_url = str_replace('http://', 'https://', $base_url);
+  $base_insecure_url = str_replace('https://', 'http://', $base_url);
+
+  if ($cookie_domain) {
+    // If the user specifies the cookie domain, also use it for session name.
+    $session_name = $cookie_domain;
+  }
+  else {
+    // Otherwise use $base_url as session name, without the protocol
+    // to use the same session identifiers across http and https.
+    list( , $session_name) = explode('://', $base_url, 2);
+    // HTTP_HOST can be modified by a visitor, but we already sanitized it
+    // in drupal_settings_initialize().
+    if (!empty($_SERVER['HTTP_HOST'])) {
+      $cookie_domain = $_SERVER['HTTP_HOST'];
+      // Strip leading periods, www., and port numbers from cookie domain.
+      $cookie_domain = ltrim($cookie_domain, '.');
+      if (strpos($cookie_domain, 'www.') === 0) {
+        $cookie_domain = substr($cookie_domain, 4);
+      }
+      $cookie_domain = explode(':', $cookie_domain);
+      $cookie_domain = '.' . $cookie_domain[0];
+    }
+  }
+  // Per RFC 2109, cookie domains must contain at least one dot other than the
+  // first. For hosts such as 'localhost' or IP Addresses we don't set a cookie domain.
+  if (count(explode('.', $cookie_domain)) > 2 && !is_numeric(str_replace('.', '', $cookie_domain))) {
+    ini_set('session.cookie_domain', $cookie_domain);
+  }
+  // To prevent session cookies from being hijacked, a user can configure the
+  // SSL version of their website to only transfer session cookies via SSL by
+  // using PHP's session.cookie_secure setting. The browser will then use two
+  // separate session cookies for the HTTPS and HTTP versions of the site. So we
+  // must use different session identifiers for HTTPS and HTTP to prevent a
+  // cookie collision.
+  if ($is_https) {
+    ini_set('session.cookie_secure', TRUE);
+  }
+
+  // We have set $cookie_domain, so we must match $session_name to it, since
+  // that's what will happen inside drupal_settings_initialize() after we run.
+  // Essentially, we short-circuit the IF routine when this copied code runs
+  // after our routine.
+  $session_name = $cookie_domain;
+
+  // Now set the session token correctly.
+  $prefix = ini_get('session.cookie_secure') ? 'SSESS' : 'SESS';
+  session_name($prefix . substr(hash('sha256', $session_name), 0, 32));
+}
