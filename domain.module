@@ -1060,7 +1060,9 @@ function domain_default($reset = FALSE, $alter = TRUE) {
 function domain_default_id() {
   $id = &drupal_static(__FUNCTION__);
   if (!isset($id)) {
-    $default = domain_default();
+    // Do not allow domain_api() to run here, else we break the registry.
+    // See http://drupal.org/node/1140898.
+    $default = domain_default(FALSE, FALSE);
     $id = $default['domain_id'];
   }
   return $id;
