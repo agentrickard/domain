@@ -37,6 +37,41 @@ function domain_drush_command() {
       'weight' => 'Set the order (weight) of the domain.',
     ),
   );
+  $items['domain-delete'] = array(
+    'description' => 'Delete a domain from the site.',
+    'examples' => array(
+      'drush domain-delete example.com',
+      'drush domain-delete 1',
+    ),
+    'arguments' => array(
+      'domain' => 'The domain to register (e.g. example.com or the domain_id).',
+    ),
+  );
+  $items['domain-test'] = array(
+    'description' => 'Tests domains for proper response. If run from a subfolder, you must specify the --uri.',
+    'examples' => array(
+      'drush domain-test',
+      'drush domain-test example.com',
+      'drush domain-test 1',
+    ),
+    'arguments' => array(
+      'domain' => 'The domain to register (e.g. example.com or the domain_id). If no value is passed, all domains are tested.',
+    ),
+  );
+  $items['domain-default'] = array(
+    'description' => 'Sets the default domain. If run from a subfolder, you must specify the --uri.',
+    'examples' => array(
+      'drush domain-default example.com',
+      'drush domain-default 1',
+      'drush domain-default 1 --skip_check=1',
+    ),
+    'arguments' => array(
+      'domain' => 'The domain to make default (e.g. example.com or the domain_id).',
+    ),
+    'options' => array(
+      'skip_check' => 'Bypass the domain response test.'
+    ),
+  );
   $items['generate-domains'] = array(
     'description' => 'Generate domains for testing.',
     'arguments' => array(
@@ -81,7 +116,7 @@ function drush_domain_list() {
     'subdomain' => dt('domain'),
     'scheme' => dt('scheme'),
     'valid' => dt('active'),
-    'is_default' => dt('primary'),
+    'is_default' => dt('is_default'),
     'domain_id' => dt('domain_id'),
   );
   $rows = array(array_values($header));
@@ -218,16 +253,21 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
  *   The domain created or an error message.
  */
 function drush_domain_add($subdomain, $sitename) {
-  // In the future, we have to check for 'primary' status, too.
   $start_weight = (int) db_query("SELECT weight FROM {domain} ORDER BY weight DESC")->fetchField();
   $record = array(
     'subdomain' => strtolower($subdomain),
     'sitename' => $sitename,
     'valid' => (!drush_get_option('invalid')) ? 1 : 0,
     'scheme' => (!drush_get_option('https')) ? 'http' : 'https',
-    'weight' => ($weight = drush_get_option('invalid')) ? $weight : $start_weight + 1,
-    #'primary' => (drush_get_option('primary')) ? 1 : 0,
+    'weight' => ($weight = drush_get_option('weight')) ? $weight : $start_weight + 1,
+    'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
   );
+  if (!empty($record['is_default'])) {
+    $error = domain_check_response($record, TRUE);
+    if ($error) {
+      return drush_set_error('domain', $error);
+    }
+  }
   $domain = domain_save($record, $record);
   if (isset($domain['domain_id'])) {
     drush_print(dt('Created @domain for @sitename.', array('@domain' => $domain['subdomain'], '@sitename' => $domain['sitename'])));
@@ -270,4 +310,95 @@ function domain_drush_validate_domain($subdomain) {
     $output .= $msg;
   }
   return $output;
+}
+
+/**
+ * Delete a domain record.
+ */
+function drush_domain_delete($argument = NULL) {
+  if (is_null($argument)) {
+    drush_set_error('domain', dt('You must specify a domain to delete.'));
+  }
+  // Resolve the domain.
+  if ($domain = drush_domain_get_from_argument($argument)) {
+    $domains = array($domain);
+  }
+  else {
+    return;
+  }
+  if (!empty($domain['is_default'])) {
+    return drush_set_error('domain', dt('The primary domain may not be deleted.'));
+  }
+  domain_delete($domain);
+  drush_print(dt('Domain record deleted.'));
+}
+
+
+/**
+ * Test a domain record.
+ */
+function drush_domain_test($argument = NULL) {
+  if (is_null($argument)) {
+    $domains = domain_domains();
+  }
+  else {
+    if ($domain = drush_domain_get_from_argument($argument)) {
+      $domains = array($domain);
+    }
+    else {
+      return;
+    }
+  }
+  foreach ($domains as $domain) {
+    $error = domain_check_response($domain, TRUE);
+    if ($error) {
+      drush_print(dt('Fail: !error' , array('!error' => $error)));
+    }
+    else {
+      drush_print(dt('Success: !url tested successfully.', array('!url' => domain_get_path($domain))));
+    }
+  }
+}
+
+/**
+ * Set the default domain id.
+ */
+function drush_domain_default($argument) {
+  // Resolve the domain.
+  if ($domain = drush_domain_get_from_argument($argument)) {
+    $domains = array($domain);
+  }
+  else {
+    return;
+  }
+  // Check for domain response.
+  $check = drush_get_option('skip_check');
+  if (empty($check)) {
+    $error = domain_check_response($domain, TRUE);
+    if ($error) {
+      drush_set_error($error);
+      drush_print(dt('You may disable this error by passing --skip_check=1.'));
+      return;
+    }
+  }
+  $domain['is_default'] = 1;
+  domain_save($domain, $domain);
+  drush_print(dt('!domain set to primary domain.', array('!domain' => $domain['subdomain'])));
+}
+
+/**
+ * Converts a domain string or domain_id to a $domain array.
+ *
+ * On failure, throws a drush error.
+ */
+function drush_domain_get_from_argument($argument) {
+  $domain = domain_lookup($argument);
+  if ($domain == -1) {
+    $domain = domain_lookup(NULL, $argument);
+  }
+  if ($domain == -1) {
+    drush_set_error('domain', dt('Domain record not found.'));
+    return FALSE;
+  }
+  return $domain;
 }

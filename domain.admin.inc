@@ -113,10 +113,27 @@ function domain_overview_form($form, &$form_state) {
 }
 
 /**
+ * Validate handler for the domain overview form.
+ */
+function domain_overview_form_validate($form, &$form_state) {
+  $values = $form_state['values']['domain'];
+  $default = $form_state['values']['default_domain'];
+  if (isset($values[$default])) {
+    $domain = (array) $values[$default]['values'];
+    $error = domain_check_response($domain);
+    if ($error) {
+      $error = t('%domain may not be set as your primary domain.', array('%domain' => domain_get_path($domain))) . '<br />' . $error;
+      form_set_error('default_domain', $error);
+    }
+  }
+}
+
+/**
  * Submit handler for the domain overview form.
  */
 function domain_overview_form_submit($form, &$form_state) {
   $values = $form_state['values']['domain'];
+
   foreach ($values as $domain_id => $value) {
     $default = 0;
     $valid = $value['valid'];
@@ -124,7 +141,9 @@ function domain_overview_form_submit($form, &$form_state) {
     if ($form_state['values']['default_domain'] == $domain_id) {
       $default = 1;
       $valid = 1;
-      drupal_set_message(t('The primary domain has been enabled.'));
+      if ($domain_id != $form_state['complete form']['default_domain']['#default_value']) {
+        drupal_set_message(t('The primary domain has been set to %domain.', array('%domain' => domain_get_path((array) $value['values']))));
+      }
     }
     db_update('domain')
       ->fields(array('weight' => $value['weight'], 'is_default' => $default, 'valid' => $valid))
@@ -350,6 +369,7 @@ function domain_values_from_form_state($form_state) {
     'valid'     => $form_state['values']['valid'],
     'domain_id' => $form_state['values']['domain_id'],
     'weight' => $form_state['values']['weight'],
+    'is_default' => $form_state['values']['is_default'],
   );
 }
 
@@ -373,10 +393,14 @@ function domain_values_from_form_state($form_state) {
 function domain_form($form, $form_state, $domain = array(), $arguments = array()) {
   $_domain = domain_get_domain();
   // This action should be performed from the primary domain unless overridden.
+  $error = FALSE;
   if (!isset($arguments['ignore_domain_status_check'])) {
     domain_check_primary();
-    if (empty($_POST) && !empty($domain)) {
-      domain_check_response($domain);
+    if (!empty($domain)) {
+      $error = domain_check_response($domain);
+      if ($error && empty($_POST)) {
+        drupal_set_message($error, 'warning', FALSE);
+      }
     }
   }
   // Ensure indexes are set.
@@ -434,14 +458,36 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#default_value' => isset($domain['valid']) ? $domain['valid'] : 1,
     '#description' => t('Must be set to "Active" for users to navigate to this domain.')
   );
+  $next_weight = 0;
+  foreach (domain_domains() as $record) {
+    if ($record['weight'] > $next_weight) {
+      $next_weight = $record['weight'];
+    }
+  }
   $form['domain']['weight'] = array(
     '#type' => 'weight',
     '#title' => t('Weight'),
     '#required' => TRUE,
-    '#delta' => count(domain_domains()),
-    '#default_value' => isset($domain['weight']) ? $domain['weight'] : 0,
+    '#delta' => count(domain_domains()) + 1,
+    '#default_value' => isset($domain['weight']) ? $domain['weight'] : $next_weight,
   );
-  $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'));
+  $form['domain']['is_default'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Default domain'),
+    '#default_value' => isset($domain['is_default']) ? $domain['is_default'] : 0,
+    '#description' => t('If a URL request fails to match a domain record, the settings for this domain will be used.'),
+  );
+  // If the server did not respond properly, do not allow this record to be set
+  // as the default domain.
+  if ($error) {
+    $form['domain']['is_default']['#description'] .= '<br />' . t('<strong>This domain did not respond correctly. It cannot be set as your primary domain unless you select <em>Ignore server response warning</em></strong>.');
+    $form['domain']['ignore'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Ignore server response warning'),
+      '#default_value' => 0,
+    );
+  }
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save domain record'), '#prefix' => '<br />');
   $form['#validate'][] = 'domain_form_validate';
   $form['#redirect'] = array('admin/structure/domain/view');
   return $form;
@@ -464,6 +510,13 @@ function domain_form_validate($form, &$form_state) {
   foreach ($error_list as $error) {
     form_set_error('subdomain', $error);
   }
+  if (!empty($form_state['values']['is_default']) && empty($form_state['values']['ignore'])) {
+    $error = domain_check_response($form_state['values']);
+    if ($error) {
+      $error = t('This domain may not be set as your primary domain.') . '<br />' . $error;
+      form_set_error('is_default', $error);
+    }
+  }
 }
 
 /**
@@ -478,6 +531,11 @@ function domain_form_submit($form, &$form_state) {
   else {
     $message = t('Domain record created.');
   }
+
+  if (!empty($values['is_default'])) {
+    $message .= t(' Set as primary domain.');
+  }
+
   // Run the save routine.
   $domain = domain_save($values, $form_state);
 
@@ -513,12 +571,17 @@ function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
   domain_check_primary();
   drupal_set_title(t('Delete !domain', array('!domain' => $domain['sitename'])));
   $form = array();
-  // The $arguments arrray allows other modules to pass values to change the bahavior
+  // The $arguments arrray allows other modules to pass values to change the behavior
   // of submit and validate functions.
   if (!empty($arguments)) {
     $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
   }
   $form['domain'] = array('#type' => 'value', '#value' => $domain);
+
+  if (!empty($domain['is_default'])) {
+    drupal_set_message(t('The primary domain may not be deleted. <a href="!url">Select a new primary domain</a> before deleting this record.', array('!url' => url('admin/structure/domain'))), 'warning');
+    return $form;
+  }
 
   return confirm_form(
     $form,
@@ -596,23 +659,6 @@ function domain_advanced_form($form, $form_state) {
     '#description' => t('Some elements may not be editable for all users due to permission restrictions.'),
   );
   return system_settings_form($form);
-}
-
-/**
- * Checks to see if the webserver returns a valid response
- * for a request to a domain.
- *
- * @param $domain
- * An array containing the record from the {domain} table
- */
-function domain_check_response($domain) {
-  $url = domain_get_path($domain) . drupal_get_path('module', 'domain') . '/tests/200.png';
-  $response = drupal_http_request($url);
-  if ($response->code != 200) {
-    drupal_set_message(t('%server is not responding as expected and may not be configured correctly at the server level.
-      Server code !code was returned.',
-    array('%server' => $url, '!code' => $response->code)), 'warning');
-  }
 }
 
 /**

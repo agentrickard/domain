@@ -1388,6 +1388,8 @@ Type 'drush help' for more information.
       Set the domain to use https instead of http by passing 1. Default is 0.
       --weight=X
       Set the weight of the domain to an integer value. Default is 0.
+      --is_default=1/0
+      Set the domain as the default domain.
 
     Sample command:
 
@@ -1399,6 +1401,7 @@ Type 'drush help' for more information.
       valid: yes
       scheme: https://
       weight: 0
+      is_default: 0
       
   'drush generate-domains BASE_DOMAIN --count=15'
     Autogenerate a set of domains for testing. Aliased to 'drush gend'. Will use
@@ -1423,6 +1426,44 @@ Type 'drush help' for more information.
     altered.
   
     Sample command:
-    
+
       drush gend example.com --count=20
   
+  'drush domain-delete DOMAIN|DOMAIN_ID'
+    Deletes a domain record, unless it is set as the primary domain.
+    You may pass either the domain string (e.g. example.com) or the domain_id
+    as an argument.
+    
+    Sample command:
+
+      drush domain-delete 3
+      drush domain-delete three.example.com
+
+  'drush domain-test DOMAIN|DOMAIN_ID'
+    Checks for a valid HTTP response from the sepcified domain. This test is
+    used when trying to set default domains, since the default domain must
+    always resolve.
+    
+    If you do not pass a domain string or domain_id, all domains will be
+    tested. Note that if you run Drupal in a subdirectory, you must pass a
+    --uri value with this command.
+    
+    Sample command:
+
+      drush domain-test 3
+      drush domain-test three.example.com
+      drush domain-test three.example.com --uri=http://example.com/subdir/
+
+  'drush domain-default DOMAIN|DOMAIN_ID'
+    Sets the specified domain as the default domain. By design, this command
+    will test the requested domain for a valid HTTP response. You may disable
+    this check by passing --skip_check=1 to the command.
+    
+    Note that if you run Drupal in a subdirectory, you must pass a
+    --uri value with this command in order to test the HTTP response.
+
+    Sample command:
+
+      drush domain-default 3
+      drush domain-default three.example.com
+      drush domain-default three.example.com --uri=http://example.com/subdir/

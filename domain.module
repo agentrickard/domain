@@ -899,7 +899,7 @@ function domain_load($domain_id = NULL) {
  * @return
  *   $domain array on success or -1 on failure.
  */
-function domain_save($values, $form_values) {
+function domain_save($values, $form_values = array()) {
   // Must this be the default domain?
   // Used in cases where there are no domains present.
   $count = (bool) db_query("SELECT COUNT(domain_id) FROM {domain} WHERE is_default = 1")->fetchField();
@@ -914,6 +914,13 @@ function domain_save($values, $form_values) {
   }
   else {
     $action = 'domain_insert';
+  }
+
+  // If this is the default domain, reset other domains.
+  if (!empty($values['is_default'])) {
+    db_update('domain')
+      ->fields(array('is_default' => 0))
+      ->execute();
   }
 
   drupal_write_record('domain', $values, $update);
@@ -2952,4 +2959,35 @@ function domain_alter_node_query(QueryAlterableInterface $query, $all_affiliates
       $query->distinct();
     }
   }
+}
+
+/**
+ * Checks to see if the webserver returns a valid response
+ * for a request to a domain.
+ *
+ * @param $domain
+ *   An array containing the record from the {domain} table.
+ * @param $drush
+ *   Boolean value indicating a drush command.
+ *
+ * @return
+ *   A translated string indicating the error message or FALSE if the response
+ *   is 200 "found".
+ */
+function domain_check_response($domain, $drush = FALSE) {
+  $url = domain_get_path($domain) . drupal_get_path('module', 'domain') . '/tests/200.png';
+  $response = drupal_http_request($url, array('method' => 'HEAD', 'absolute' => TRUE));
+  if ($response->code != 200) {
+    if (empty($drush)) {
+      return t('%server is not responding as expected and may not be configured correctly at the server level. Server code !code was returned.',
+        array('%server' => $url, '!code' => $response->code)
+      );
+    }
+    else {
+      return dt('!server is not responding as expected and may not be configured correctly at the server level. Server code !code was returned.',
+        array('!server' => $url, '!code' => $response->code)
+      );
+    }
+  }
+  return FALSE;
 }
