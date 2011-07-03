@@ -469,7 +469,8 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#title' => t('Weight'),
     '#required' => TRUE,
     '#delta' => count(domain_domains()) + 1,
-    '#default_value' => isset($domain['weight']) ? $domain['weight'] : $next_weight,
+    '#default_value' => isset($domain['weight']) ? $domain['weight'] : $next_weight + 1,
+    '#description' => t('The sort order for this record. Lower values display first.'),
   );
   $form['domain']['is_default'] = array(
     '#type' => 'checkbox',
