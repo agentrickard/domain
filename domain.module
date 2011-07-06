@@ -958,6 +958,13 @@ function domain_default($reset = FALSE, $alter = TRUE) {
 }
 
 /**
+ * Helper function for 7.x.3 compatibility.
+ */
+function domain_default_id() {
+  return 0;
+}
+
+/**
  * Set the primary domain properly, if necessary.
  */
 function domain_set_primary_domain() {
