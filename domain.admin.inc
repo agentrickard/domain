@@ -584,6 +584,29 @@ function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
     return $form;
   }
 
+  // Allow for data resets.
+  $domains = domain_domains();
+  $options = array('none' => t('Do not reassign'));
+  foreach ($domains as $record) {
+    if ($record['domain_id'] != $domain['domain_id']) {
+      $options[$record['domain_id']] = $record['sitename'];
+    }
+  }
+  $form['domain_access'] = array(
+    '#title' => t('Reassign content'),
+    '#type' => 'select',
+    '#options' => $options,
+    '#default_value' => domain_default_id(),
+    '#description' => t('All content assigned to %domain will be re-assigned to your selection.', array('%domain' => $domain['sitename'])),
+  );
+  $form['domain_editor'] = array(
+    '#title' => t('Reassign editors'),
+    '#type' => 'select',
+    '#options' => $options,
+    '#default_value' => domain_default_id(),
+    '#description' => t('All users assigned to %domain will be re-assigned to your selection.', array('%domain' => $domain['sitename'])),
+  );
+
   return confirm_form(
     $form,
     t('Are you sure you wish to delete the domain record for <strong>%domain</strong>?', array('%domain' => $domain['subdomain'])),

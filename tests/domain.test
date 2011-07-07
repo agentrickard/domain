@@ -266,6 +266,21 @@ class DomainHookTest extends DomainTestCase {
     // Reset the active domain.
     domain_reset_domain(TRUE);
 
+    // hook_domain_reassign() sets a static value to 'domain_editor' and changes
+    // editors from domain 1 to domain 2.
+    $old_domain = domain_lookup(1);
+    $new_domain = domain_lookup(2);
+    $count = db_query("SELECT COUNT(domain_id) FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $old_domain['domain_id']))->fetchField();
+    $count2 = db_query("SELECT COUNT(domain_id) FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $new_domain['domain_id']))->fetchField();
+    $total = $count + $count2;
+    module_invoke_all('domain_reassign', $old_domain, $new_domain, 'domain_editor');
+    $value = domain_test_get();
+    $this->assertTrue($value == 'domain_editor', t('hook_domain_reassign() fired correctly.'));
+    $count = db_query("SELECT COUNT(domain_id) FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $old_domain['domain_id']))->fetchField();
+    $count2 = db_query("SELECT COUNT(domain_id) FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $new_domain['domain_id']))->fetchField();
+    $this->assertTrue($count == 0, t('No editors remain on domain 1.'));
+    $this->assertTrue($total > 0 && $count2 == $total, t('Editors reassigned to domain 2.'));
+
     // hook_domain_delete() sets a static value to 'delete' and removes the domain.
     domain_delete($updated_domain);
     $value = domain_test_get();

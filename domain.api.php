@@ -772,3 +772,29 @@ function hook_domain_grant_all_alter(&$grant, $options) {
     $grant = TRUE;
   }
 }
+
+/**
+ * Allows content or users to be reassigned to a new domain.
+ *
+ * @param $old_domain
+ *   The curent domain record, most commonly passed during a domain deletion.
+ * @param $new_domain
+ *   The target domain record.
+ * @param $table
+ *   The database table being affected. This value indicates the type of update
+ *   being performed. Core module values are 'domain_access' (indicating that
+ *   node records are being affected, and 'domain_editor' (indicating user
+ *   records).
+ *
+ * @return
+ *   No return value.
+ */
+function hook_domain_reassign($old_domain, $new_domain, $table) {
+  // On node changes, update {domain_source}.
+  if ($table == 'domain_access') {
+    db_update('domain_source')
+      ->fields(array('domain_id' => $new_domain['domain_id']))
+      ->condition('domain_id', $old_domain['domain_id'])
+      ->execute();
+  }
+}

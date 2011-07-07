@@ -119,3 +119,10 @@ function domain_test_domain_bootstrap_lookup($domain) {
 function domain_test_domain_bootstrap_full($domain) {
   $GLOBALS['_domain']['test_full'] = TRUE;
 }
+
+/**
+ * Implements hook_domain_reassign().
+ */
+function domain_test_domain_reassign($old_domain, $new_domain, $table) {
+  domain_test_set($table);
+}

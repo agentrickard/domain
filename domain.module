@@ -373,6 +373,9 @@ function domain_hook_info() {
   $hooks['domain_delete'] = array(
     'group' => 'domain',
   );
+  $hooks['domain_reassign'] = array(
+    'group' => 'domain',
+  );
   $hooks['domain_cron'] = array(
     'group' => 'domain',
   );
@@ -939,15 +942,23 @@ function domain_save($values, $form_values = array()) {
  * @param $domain
  *   The domain record being deleted.
  * @param $values
- *   An array of values passed by a form submit, if any.
+ *   An array of values passed by a form submit, if any. When reassigning
+ *   content from a domain, look for the 'domain_access' and 'domain_editor'
+ *   keys, which are the domains ids for re-assignment.
  */
 function domain_delete($domain, $values = array()) {
-  // Delete the record.
-  db_delete('domain')
-    ->condition('domain_id', $domain['domain_id'])
-    ->execute();
-  // Let other modules act.
+  // Let other modules act to reassign data.
+  foreach (array('domain_access', 'domain_editor') as $table) {
+    if (isset($values[$table]) && $values[$table] != 'none') {
+      $new_domain = domain_lookup($values[$table]);
+      if ($new_domain != -1) {
+        module_invoke_all('domain_reassign', $domain, $new_domain, $table);
+      }
+    }
+  }
+
   module_invoke_all('domain_delete', $domain, $values);
+
   // Notify that node access needs to be rebuilt.
   node_access_needs_rebuild(TRUE);
 }
@@ -2658,6 +2669,11 @@ function domain_domain_delete($domain, $form_values = array()) {
     db_delete('domain_editor')
       ->condition('domain_id', $domain['domain_id'])
       ->execute();
+
+    // Delete the records.
+    db_delete('domain')
+      ->condition('domain_id', $domain['domain_id'])
+      ->execute();
   }
   // In all cases, we need to force a menu rebuild, which also clears the cache.
   menu_rebuild();
@@ -2990,4 +3006,38 @@ function domain_check_response($domain, $drush = FALSE) {
     }
   }
   return FALSE;
+}
+
+/**
+ * Implements hook_domain_reassign().
+ *
+ * We do this as a hook in case other functions make this call.
+ */
+function domain_domain_reassign($old_domain, $new_domain, $table) {
+  // Re-assign content and users, if specified.
+  $old_id = $old_domain['domain_id'];
+  $new_id = $new_domain['domain_id'];
+  if ($table == 'domain_access') {
+    $nids = db_query("SELECT nid FROM {domain_access} WHERE realm = 'domain_id' AND gid = :domain_id", array(':domain_id' => $new_id))->fetchAllAssoc('nid');
+    $query = db_update('domain_access')
+      ->condition('gid', $old_id)
+      ->condition('realm', 'domain_id')
+      ->fields(array('gid' => $new_id));
+    // We cannot update using a subquery, so be sure to exclude duplicates.
+    if (!empty($nids)) {
+      $query->condition('nid', array_keys($nids), 'NOT IN');
+    }
+      $query->execute();
+  }
+  elseif ($table == 'domain_editor') {
+    $uids = db_query("SELECT uid FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $new_id))->fetchAllAssoc('uid');
+    $query = db_update('domain_editor')
+      ->condition('domain_id', $old_id)
+      ->fields(array('domain_id' => $new_id));
+    // We cannot update using a subquery, so be sure to exclude duplicates.
+    if (!empty($uids)) {
+      $query->condition('uid', array_keys($uids), 'NOT IN');
+    }
+    $query->execute();
+  }
 }

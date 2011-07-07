@@ -25,3 +25,16 @@ function domain_source_domain_delete($domain, $form_values = array()) {
     ->condition('domain_id', $domain['domain_id'])
     ->execute();
 }
+
+/**
+ * Implements hook_domain_reassign().
+ */
+function domain_source_domain_reassign($old_domain, $new_domain, $table) {
+  // On node changes, update {domain_source}.
+  if ($table == 'domain_access') {
+    db_update('domain_source')
+      ->fields(array('domain_id' => $new_domain['domain_id']))
+      ->condition('domain_id', $old_domain['domain_id'])
+      ->execute();
+  }
+}

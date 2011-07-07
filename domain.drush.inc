@@ -329,7 +329,27 @@ function drush_domain_delete($argument = NULL) {
   if (!empty($domain['is_default'])) {
     return drush_set_error('domain', dt('The primary domain may not be deleted.'));
   }
-  domain_delete($domain);
+  // Set options for re-assigning content.
+  $list = domain_domains();
+  $options = array('0' => t('Do not reassign'));
+  foreach ($list as $data) {
+    if ($data['domain_id'] != $domain['domain_id']) {
+      $options[$data['domain_id']] = $data['subdomain'];
+    }
+  }
+  $content = drush_choice($options, t('Reassign content to:'), '!value');
+  if (empty($content)) {
+    return;
+  }
+  $users = drush_choice($options, t('Reassign users to:'), '!value');
+  if (empty($users)) {
+    return;
+  }
+  $values['domain_access'] = (!empty($content)) ? $content : 'none';
+  $values['domain_editor'] = (!empty($content)) ? $users : 'none';
+  
+  domain_delete($domain, $values);
+
   drush_print(dt('Domain record deleted.'));
 }
 
