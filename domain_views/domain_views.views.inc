@@ -212,6 +212,10 @@ function domain_views_views_data() {
   // Define the {domain_editor} table.
   $data['domain_editor']['table']['group'] = t('Domain Editor');
   // Define the joins.
+  $data['domain_editor']['table']['join']['domain'] = array(
+    'left_field' => 'domain_id',
+    'field' => 'domain_id',
+  );
   $data['domain_editor']['table']['join']['users'] = array(
     'left_field' => 'uid',
     'field' => 'uid',
