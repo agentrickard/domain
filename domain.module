@@ -952,12 +952,29 @@ function domain_delete($domain, $values = array()) {
     if (isset($values[$table]) && $values[$table] != 'none') {
       $new_domain = domain_lookup($values[$table]);
       if ($new_domain != -1) {
-        module_invoke_all('domain_reassign', $domain, $new_domain, $table);
+        domain_reassign($domain, $new_domain, $table);
       }
     }
   }
 
+  // Inform other modules of the deletion.
   module_invoke_all('domain_delete', $domain, $values);
+
+  // Remove domain-specific entries from tables and clear the cache.
+  db_delete('domain_access')
+    ->condition('gid', $domain['domain_id'])
+    ->condition('realm', 'domain_id')
+    ->execute();
+  db_delete('domain_editor')
+    ->condition('domain_id', $domain['domain_id'])
+    ->execute();
+  // Delete the domain.
+  db_delete('domain')
+    ->condition('domain_id', $domain['domain_id'])
+    ->execute();
+
+  // In all cases, we need to force a menu rebuild, which also clears the cache.
+  menu_rebuild();
 
   // Notify that node access needs to be rebuilt.
   node_access_needs_rebuild(TRUE);
@@ -2655,31 +2672,6 @@ function domain_domain_install() {
 }
 
 /**
- * Implements hook_domain_delete().
- *
- * @TODO: reassign orphans?
- */
-function domain_domain_delete($domain, $form_values = array()) {
-  if ($domain != -1) {
-    // Remove domain-specific entries from tables and clear the cache.
-    db_delete('domain_access')
-      ->condition('gid', $domain['domain_id'])
-      ->condition('realm', 'domain_id')
-      ->execute();
-    db_delete('domain_editor')
-      ->condition('domain_id', $domain['domain_id'])
-      ->execute();
-
-    // Delete the records.
-    db_delete('domain')
-      ->condition('domain_id', $domain['domain_id'])
-      ->execute();
-  }
-  // In all cases, we need to force a menu rebuild, which also clears the cache.
-  menu_rebuild();
-}
-
-/**
  * Implements hook_domain_batch().
  */
 function domain_domain_batch() {
@@ -3013,11 +3005,19 @@ function domain_check_response($domain, $drush = FALSE) {
 }
 
 /**
- * Implements hook_domain_reassign().
+ * Reassign domain data to a new domain.
  *
- * We do this as a hook in case other functions make this call.
+ * @param $old_domain
+ *   The curent domain record, most commonly passed during a domain deletion.
+ * @param $new_domain
+ *   The target domain record.
+ * @param $table
+ *   The database table being affected. This value indicates the type of update
+ *   being performed. Core module values are 'domain_access' (indicating that
+ *   node records are being affected, and 'domain_editor' (indicating user
+ *   records).
  */
-function domain_domain_reassign($old_domain, $new_domain, $table) {
+function domain_reassign($old_domain, $new_domain, $table) {
   // Re-assign content and users, if specified.
   $old_id = $old_domain['domain_id'];
   $new_id = $new_domain['domain_id'];
@@ -3031,7 +3031,7 @@ function domain_domain_reassign($old_domain, $new_domain, $table) {
     if (!empty($nids)) {
       $query->condition('nid', array_keys($nids), 'NOT IN');
     }
-      $query->execute();
+    $query->execute();
   }
   elseif ($table == 'domain_editor') {
     $uids = db_query("SELECT uid FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $new_id))->fetchAllAssoc('uid');
@@ -3044,4 +3044,13 @@ function domain_domain_reassign($old_domain, $new_domain, $table) {
     }
     $query->execute();
   }
+  
+  // Let other modules act.
+  module_invoke_all('domain_reassign', $old_domain, $new_domain, $table);
+
+  // In all cases, we need to force a menu rebuild, which also clears the cache.
+  menu_rebuild();
+
+  // Notify that node access needs to be rebuilt.
+  node_access_needs_rebuild(TRUE);
 }

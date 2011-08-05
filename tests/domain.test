@@ -266,14 +266,15 @@ class DomainHookTest extends DomainTestCase {
     // Reset the active domain.
     domain_reset_domain(TRUE);
 
-    // hook_domain_reassign() sets a static value to 'domain_editor' and changes
-    // editors from domain 1 to domain 2.
+    // domain_reassign() sets a static value to 'domain_editor' and changes
+    // editors from domain 1 to domain 2. It also calls a hook that our
+    // test module uses to set a variable to 'domain_editor'.
     $old_domain = domain_lookup(1);
     $new_domain = domain_lookup(2);
     $count = db_query("SELECT COUNT(domain_id) FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $old_domain['domain_id']))->fetchField();
     $count2 = db_query("SELECT COUNT(domain_id) FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $new_domain['domain_id']))->fetchField();
     $total = $count + $count2;
-    module_invoke_all('domain_reassign', $old_domain, $new_domain, 'domain_editor');
+    domain_reassign($old_domain, $new_domain, 'domain_editor');
     $value = domain_test_get();
     $this->assertTrue($value == 'domain_editor', t('hook_domain_reassign() fired correctly.'));
     $count = db_query("SELECT COUNT(domain_id) FROM {domain_editor} WHERE domain_id = :domain_id", array(':domain_id' => $old_domain['domain_id']))->fetchField();
