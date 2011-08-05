@@ -2880,7 +2880,7 @@ function domain_node_access_acknowledge($grant) {
 }
 
 /**
- * Implements hook_field_extra_fields().
+ * Implements hook_field_extra_fields()
  *
  * Field hook to allow sorting of the domain settings field.
  */
@@ -2892,11 +2892,15 @@ function domain_field_extra_fields() {
       'weight' => 1,
     ),
   );
+  // Node settings.
   $extra = array();
   foreach (node_type_get_names() as $name => $value) {
     $extra['node'][$name]['form'] = $base;
     $extra['node'][$name]['display'] = $base;
   }
+  // User settings.
+  $extra['user']['user']['form'] = $base;
+  $extra['user']['user']['display'] = $base;
   return $extra;
 }
 
