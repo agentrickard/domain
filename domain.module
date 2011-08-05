@@ -2858,7 +2858,7 @@ function domain_field_extra_fields() {
       'weight' => 1,
     ),
   );
-  // Seriously FieldAPI? I have to do this?!?
+  $extra = array();
   foreach (node_type_get_names() as $name => $value) {
     $extra['node'][$name]['form'] = $base;
     $extra['node'][$name]['display'] = $base;
