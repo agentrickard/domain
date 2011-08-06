@@ -2317,6 +2317,21 @@ function domain_lookup_simple($name, $reset = FALSE) {
     // Invoke hook_domain_bootstrap_lookup()
     $domain_new = _domain_bootstrap_invoke_all('lookup', $domain);
     if (is_array($domain_new)) {
+      if (isset($domain_new['domain_id']) && is_array($domain_new['domain_id'])) {
+        foreach ($domain_new as $key => $value) {
+          if (is_array($value)) {
+            $domain_new[$key] = $value[0];
+          }
+        }
+        $modules = array();
+        foreach (_domain_bootstrap_modules() as $module) {
+          if (function_exists($module . '_domain_bootstrap_lookup')) {
+            $modules[] = $module;
+          }
+        }
+        $lookup = domain_lookup($domain_new['domain_id']);
+        $domain_new['error'] = t('domain lookup. More than one registered domain was returned. Defaulting to %domain. The likely cause is a conflict between %modules', array('%domain' => $lookup['sitename'], '%modules' => implode(', ', $modules)));
+      }
       $domain = array_merge($domain, $domain_new);
     }
     $cache[$name] = $domain;
