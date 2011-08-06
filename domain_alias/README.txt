@@ -118,14 +118,14 @@ now see an "Aliases" column in your domain list.
 To create a new alias, go to the Domain List at Admin > Build > Domains > Domain
 List.  You should see an "Aliases" column in your domain list.
 
-Click on the 'add alias' link.  You will be presented with a form devided into
+Click on the 'add alias' link.  You will be presented with a form divided into
 two parts.  The top section, 'Registered aliases for *' will be empty initially.
 
 Under 'Add new aliases,' you may add up to five (5) aliases at a time. (If you
 need to add more, enter the first five and save the form.)
 
 Check the 'redirect' box only if you wish to redirect requests made to the alias
-to go to the regsitered domain for that alias.
+to go to the registered domain for that alias.
 
 Enter the pattern(s) that you wish to match and click 'Save aliases.'
 
@@ -226,7 +226,7 @@ the following links:
 If your server is not configured to handle all of the above DNS requests, you
 may get a server error when you click on a link.
 
-NOTE: that this only works with the * wildcard, and assumes that the * reprsents
+NOTE: that this only works with the * wildcard, and assumes that the * represents
 an entire node of the host string.
 
 WARNING: The Domain Alias Switcher block should not be used as a navigation tool

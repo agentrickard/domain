@@ -3,8 +3,8 @@
 /**
  * @defgroup domain_content Domain Content : administer nodes for affiliate sites
  *
- * Allows for the batch editing of select node settings.  Refactors the default content
- * editng screen to show content only from selected domains.
+ * Allows for the batch editing of select node settings.  Re-factors the default content
+ * editing screen to show content only from selected domains.
  */
 
 /**

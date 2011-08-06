@@ -353,7 +353,7 @@ function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
  * Return an array of values suitable for both create and update sql statements
  *
  * The last element on this array is ignored by the create sql because it has
- * one fewer placeholder argument as it doesnt require a WHERE clause.
+ * one fewer placeholder argument as it doesn't require a WHERE clause.
  *
  * @param $form_state
  *   From state from the submit_hook
@@ -412,7 +412,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
   $form = array();
   drupal_set_title(t('Edit !domain', array('!domain' => $domain['subdomain'])));
   $form['#domain'] = $domain;
-  // The $arguments arrray allows other modules to pass values to change the bahavior
+  // The $arguments array allows other modules to pass values to change the behavior
   // of submit and validate functions.
   if (!empty($arguments)) {
     $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);
@@ -572,7 +572,7 @@ function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
   domain_check_primary();
   drupal_set_title(t('Delete !domain', array('!domain' => $domain['sitename'])));
   $form = array();
-  // The $arguments arrray allows other modules to pass values to change the behavior
+  // The $arguments array allows other modules to pass values to change the behavior
   // of submit and validate functions.
   if (!empty($arguments)) {
     $form['domain_arguments'] = array('#type' => 'value', '#value' => $arguments);

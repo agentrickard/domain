@@ -30,7 +30,7 @@ changes for Domain Access do not interfere with Drupal's update process.
      * Add the domain module setup routine.
      */
     include './sites/all/modules/domain/settings.inc';
-  
+
   See INSTALL.txt for more information about this code.
 
   -- Update Drupal, following the process described in the core UPGRADE.txt.
@@ -49,12 +49,12 @@ changes for Domain Access do not interfere with Drupal's update process.
   include these lines _below_ the database configuration information. (The
   Drupal update may place the new $databases array at the bottom of
   settings.php.)
-  
+
     /**
      * Add the domain module setup routine.
      */
     include DRUPAL_ROOT . './sites/all/modules/domain/settings.inc';
-  
+
   Refer to the Domain Access INSTALL.txt for information about the new syntax
   for the Domain Access include.
 
@@ -116,7 +116,7 @@ See INSTALL.txt for additional information.
 
 STEP  3:  Remove old code from settings.php
 
-If you have any of the following code in settings.php from eariler
+If you have any of the following code in settings.php from earlier
 versions, you should remove it:
 
 /**

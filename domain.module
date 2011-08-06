@@ -55,7 +55,7 @@ function domain_boot() {
 /**
  * Implements hook_init().
  *
- * Inititalizes a global $_domain variable if necessary (usually that's done in
+ * Initializes a global $_domain variable if necessary (usually that's done in
  * domain_bootstrap.inc) and loads information on current domain.
  *
  * Also handles www stripping, checks the validity of user domains and updates
@@ -147,7 +147,7 @@ function domain_initial_domain($domain = array()) {
 /**
  * Unserialize an object stored in {domain_*} tables.
  *
- * PostGRES has issues with bytea fields, and while this is
+ * PostgreSQL has issues with bytea fields, and while this is
  * handled cleanly in cache_get(), we have our own functions
  * for retrieving similar data objects. So we must be sure to
  * unserialize these safely.
@@ -754,7 +754,7 @@ function domain_form_user_admin_account_alter(&$form, $form_state) {
     '#title' => t('Assign to'),
     '#options' => $options,
     '#required' => FALSE,
-    '#description' => t('Select which affiliates these users should belong to. <em>Note: this will erase any current assignment for the selsected users.</em>'),
+    '#description' => t('Select which affiliates these users should belong to. <em>Note: this will erase any current assignment for the selected users.</em>'),
     '#default_value' => array($_domain['domain_id']),
   );
   if ($format) {
@@ -1000,7 +1000,7 @@ function domain_delete($domain, $values = array()) {
  */
 function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   $domains = &drupal_static(__FUNCTION__ . '_domains');
-  $result = &drupal_static(__FUNCTION__ . '_result');  
+  $result = &drupal_static(__FUNCTION__ . '_result');
   // Create a unique key so we can static cache all requests.
   $key = $domain_id . $subdomain;
   // Shortcut if we know the data.
@@ -1342,7 +1342,7 @@ function domain_api($domain, $reset = FALSE) {
 /**
  * Set the active domain to something other than the HTTP request.
  *
- * This function is used in cases where you wish to similuate the loading
+ * This function is used in cases where you wish to simulate the loading
  * of a domain while on another domain.
  *
  * @param $domain_id
@@ -1682,7 +1682,7 @@ function domain_get_node_match($nid) {
 /**
  * Allow the lookup of path rewrites.
  *
- * Note that unlinke domain_get_node_match(), this function assumes
+ * Note that unlike domain_get_node_match(), this function assumes
  * that all links will be written to the current domain.
  *
  * @param $path
@@ -1850,7 +1850,7 @@ function domain_node_access_records($node) {
 
   // If the form is hidden, we are passed the 'domains_raw' variable.
   // We need to append unique values from this variable to the existing
-  // stored values.  See the logic for 'view domain publshing' in domain_form_alter().
+  // stored values.  See the logic for 'view domain publishing' in domain_form_alter().
   if (!empty($node->domains_raw)) {
     if (!isset($node->domains)) {
       $node->domains = array();
@@ -2577,7 +2577,7 @@ function domain_invalid_domain_requested() {
  * form's redirect values.
  *
  * For extra checking, we also store the source domain_id and
- * try to redirect to that domain if we acidentally moved. However,
+ * try to redirect to that domain if we accidentally moved. However,
  * the node must be visible on that domain.
  *
  * @return
@@ -2618,7 +2618,7 @@ function domain_node_save_redirect() {
  *   Set TRUE to ignore cached versions and look the name up again. Optional.
  *
  * @return
- *   An array containing a domain_id from {domain} matching the given domainname
+ *   An array containing a domain_id from {domain} matching the given domain name
  */
 function domain_lookup_simple($name, $reset = FALSE) {
   $cache = &drupal_static(__FUNCTION__, array());
@@ -2692,7 +2692,7 @@ function domain_domain_batch() {
     '#update_all' => FALSE,
     '#weight' => -10,
   );
-  //Change all the sitenames at once.
+  //Change all the site names at once.
   $batch['sitename'] = array(
     '#form' => array(
       '#title' => t('Site names'),
@@ -2863,7 +2863,7 @@ function domain_node_access_explain($row) {
 }
 
 /**
- * Implements hook_node_access_acknowlegde().
+ * Implements hook_node_access_acknowledge().
  */
 function domain_node_access_acknowledge($grant) {
   if ($grant['realm'] == 'domain_all') {

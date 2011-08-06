@@ -86,7 +86,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
         $domain_site[$nid] = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE nid = :nid AND gid = 0 AND realm = :realm", array(':nid' => $nid, ':realm' => 'domain_site'))->fetchField();
       }
       if (!$domain_site[$nid] || $use_source) {
-        // Remove rendundancy from the domain_id check.
+        // Remove redundancy from the domain_id check.
         if (!isset($domain[$nid])) {
           $domain[$nid] = domain_get_node_match($nid);
         }

@@ -24,7 +24,7 @@ CONTENTS
 2.4   Setting DOMAIN_INSTALL_RULE
 2.5   Setting DOMAIN_SITE_GRANT
 2.6   Setting DOMAIN_ASSIGN_USERS
-3.  Permissons
+3.  Permissions
 3.1   Module Permissions
 3.2   Normal Usage
 3.3   Advanced Usage
@@ -41,7 +41,7 @@ CONTENTS
 4.3.1   New Content Settings
 4.3.1.1   Send to All Affiliates
 4.3.2   Debugging Status
-4.3.3   Enforce Rules on Adminstrators
+4.3.3   Enforce Rules on Administrators
 4.3.4   Domain List Size
 4.3.5   Display in Vertical Tabs
 4.3.6   Domain Selection Format
@@ -163,7 +163,7 @@ Sites using Domain Access include:
 
 Node Access is a complex issue in Drupal.  Typically, sites will only use
 one node access module at a time.  In some cases, you may require
-more advances acceess control rules.
+more advances access control rules.
 
 Two important issues to understand are:
 
@@ -199,7 +199,7 @@ users cannot be logged through a single sign in.
   thisexample.com
 
 While example.com and one.example.com can share a login cookie, the
-other two domains cannot read that cookie.  This is an internet standard,
+other two domains cannot read that cookie.  This is an Internet standard,
 not a bug.
 
 Note: See the INSTALL.txt for instructions regarding Drupal's default
@@ -455,7 +455,7 @@ The Domain Access module has the following permissions:
   Warning: If this option is selected and the user has no domain publishing
   options, the user will not be allowed to post or edit!
 
-  NOTE: Users who are assgined _none_ of these permissions and cannot
+  NOTE: Users who are assigned _none_ of these permissions and cannot
   'Set domain access status for all content' will have the default form values
   passed as hidden fields. This setting is the default option.  It will assign
   all content to the domain from which the form is entered.
@@ -485,7 +485,7 @@ access,' that can be given to any user you trust to use the UI properly.
 In the event that you wish to segregate which content certain editors can
 control, you should not use the normal 'edit any TYPE nodes' and 'delete any
 TYPE nodes' permissions provided by Drupal's core Node module.
-These permissons grant the ability for a user to edit and delete all nodes of a
+These permissions grant the ability for a user to edit and delete all nodes of a
 given type.
 
 In the Domain Access model, these permissions are not used in favor of the
@@ -559,7 +559,7 @@ example.com and example.com:8080 are two separate domains.
 4.1.2   Site Name
 
 This value is taken from your system settings and need not be changed.  It is
-provided to allow readbility in the domain list.
+provided to allow readability in the domain list.
 
 ----
 4.1.3   Domain URL Scheme
@@ -631,7 +631,7 @@ redirected to the primary domain automatically.
 4.2.1  Restricted Characters in Domains
 
 When creating a domain record, you are restricted to the valid character set
-for Internet domain names.  By design, this includes only the ASCII 
+for Internet domain names.  By design, this includes only the ASCII
 alphanumeric character set (a-z 0-9) plus the special characters dot (.)
 dash (-) and colon (:). A colon may only be followed by a port number.
 
@@ -676,7 +676,7 @@ If this value is set to 'Show on all sites,' then all new content will be
 assigned to all sites _in addition to_ the active domain.
 
 If you set this value to 'Only show on selected sites,' you will be shown
-configuration options per node type, as descbied in 4.3.1.1.
+configuration options per node type, as described in 4.3.1.1.
 
 ----
 4.3.1.1   Send to All Affiliates
@@ -693,7 +693,7 @@ show on selected sites."
 
 If enabled, this will append node access information to the bottom of each
 node.  This data is only viewable by uses with the 'Set domain access status for
-all content' privilege.  It is provided for debugging, since 'adminiseter nodes'
+all content' privilege.  It is provided for debugging, since 'administer nodes'
 will make all nodes viewable to some users.
 
 ----
@@ -704,7 +704,7 @@ the 'Bypass content access control' permission are not subject to node access
 rules. This is a design feature of Drupal, and it can lead to confusion when
 viewing your site as an administrator.
 
-To help with this confusion, the 'Enfore rules on adminstrators' setting can
+To help with this confusion, the 'Enforce rules on administrators' setting can
 be enabled. This setting forces Domain Access rules to be applied _even to
 users who can Bypass content access control_.
 
@@ -867,7 +867,7 @@ In most use cases, you will want Domain Access to allow access to all nodes
 during cron runs.  For modules such as Subscriptions, this behavior is
 required unless all your content is assigned to "all affiliates."
 
-To reflect this, Domain Access provides a configuration option labelled:
+To reflect this, Domain Access provides a configuration option labeled:
 
   [x] Treat cron.php as a special page request
 
@@ -953,7 +953,7 @@ box before submitting the form.
 4.9  Assigning Users to Domains
 
 New in 6.x.2 is the concept of 'user defaults.' These settings are used to
-assign users to domains basd on the user's site roles.
+assign users to domains based on the user's site roles.
 
 Click on the 'User defaults' tab to see the settings available.
 
@@ -966,7 +966,7 @@ This setting is most useful under the following conditions:
 
   -- If you let anonymous users post content on your site. In this case, you
   should assign at least one domain to the anonymous user role, so that
-  the module will assign anonymous posts to the appropirate domain(s).
+  the module will assign anonymous posts to the appropriate domain(s).
 
   -- If you use Domain Strict, you can use this setting to assign default
   access to specific roles.
@@ -1007,7 +1007,7 @@ become domain editors.
 To use this feature, navigate to Administer > User management > Users.
 Look for the 'Assign users to domains' option in the 'Update options' select
 form. Choose this operation and then use the 'Affiliate editor options'
-fieldset to select the domains you wish to assgin users to.
+fieldset to select the domains you wish to assign users to.
 
 Select the desired users and hit the Update button.
 
@@ -1066,7 +1066,7 @@ module for user accounts that do not have the 'Set domain access status for all 
 
 NOTE: By design, this block is viewable by all users.  However, its content
 should only be shown to site developers or during debugging.  You should use
-the normal block visiblity settings as appropriate to your site.
+the normal block visibility settings as appropriate to your site.
 
 ----
 6.  Node Access
@@ -1140,7 +1140,7 @@ In Domain Access, the following realms are defined:
   and gid for this grant are zero (0).
 
   - domain_site
-  Indicates whether a node is assigned to all affliaites.  The only valid
+  Indicates whether a node is assigned to all affiliates.  The only valid
   grant id for this realm is zero (0).
 
   - domain_id
@@ -1161,7 +1161,7 @@ follows.
   - domain_site
   By design, all site users, including anonymous users, are granted access to
   the gid '0' for realm 'domain_site'.  This grant allows all users to see
-  content assigned to 'all affliates'.  This grants 'grant_view' to all users.
+  content assigned to 'all affiliates'.  This grants 'grant_view' to all users.
   Users who belong to the current domain and are assigned the
   'Edit any content on assigned domains' or 'Delete any content on assigned
   domains' permissions will be given 'update' and 'delete' grants, respectively.
@@ -1170,7 +1170,7 @@ follows.
   When a user, including anonymous users, views a page, the active domain is
   identified by the registered domain_id.  For that page view, the user is
   granted gid of the active domain_id for the realm 'domain_id'.  This allows
-  content to be partitioned to one or many affilaites.  This grants only
+  content to be partitioned to one or many affiliates.  This grants only
   'grant_view', since 'grant_edit' would allow content to appear to some users
   regardless of the active domain.
 
@@ -1272,7 +1272,7 @@ Some uses for this global variable might include:
 
 The 'error' element is new in 6.x.2 and is used to signal installation problems.
 Normally the 'error' element should not be set. See the API documentation of
-hook_domain_bootstrap_ful() for details.
+hook_domain_bootstrap_full() for details.
 
 ----
 7.3 Database Schema
@@ -1353,20 +1353,20 @@ The module provides the following replacement tokens.
   'current-domain:id'
     The current domain ID.
   'current-domain:name'
-    The current domain name, lowercased and with only alphanumeric characters.
+    The current domain name, lower-cased and with only alphanumeric characters.
   'current-domain:url'
-    The current domain's URL, lowercased and with only alphanumeric characters.
+    The current domain's URL, lower-cased and with only alphanumeric characters.
   'current-domain:subdomain'
-    The current subdomain, lowercased and with only alphanumeric characters.
+    The current subdomain, lower-cased and with only alphanumeric characters.
     Only works with *.example.com formats
   'default-domain:id'
     The default domain ID.
   'default-domain:name'
-    The default domain name, lowercased and with only alphanumeric characters.
+    The default domain name, lower-cased and with only alphanumeric characters.
   'default-domain:url'
-    The default domain\'s URL, lowercased and with only alphanumeric characters.
+    The default domain\'s URL, lower-cased and with only alphanumeric characters.
   'default-domain:subdomain'
-    The default subdomain, lowercased and with only alphanumeric characters.
+    The default subdomain, lower-cased and with only alphanumeric characters.
     Only works with *.example.com formats
 
 ----
@@ -1402,52 +1402,52 @@ Type 'drush help' for more information.
       scheme: https://
       weight: 0
       is_default: 0
-      
+
   'drush generate-domains BASE_DOMAIN --count=15'
-    Autogenerate a set of domains for testing. Aliased to 'drush gend'. Will use
+    Auto-generate a set of domains for testing. Aliased to 'drush gend'. Will use
     the provided BASE_DOMAIN as the primary domain, defaulting to 'example.com'.
-  
+
     This command creates domains in the format *.BASE_DOMAIN. The BASE_DOMAIN
     must be properly formed. By default, the command will create 15 new domains,
     but you may specify the number using --count=X.
-  
+
     The domains created are the words one through ten (1-10), foo, bar, baz, and
     the non-matching domain 'myBASE_DOMAIN', which is used for cookie testing.
     Site names are simple uppercase versions of the 3rd-level domain element.
     All domains are set to use http:// and are set as valid. Weighting is
     auto-incremented by creation order.
-  
+
     Creating more than 15 domains will begin incrementing domains with numeric
     3rd-level elements, such as 20.BASE_DOMAIN.
-  
+
     The purpose of this command is to help me in UX testing, since many aspects
-    of the user interface must change to accomodate large numbers of domains.
+    of the user interface must change to accommodate large numbers of domains.
     The defaults are optimized for my development environment, and will not be
     altered.
-  
+
     Sample command:
 
       drush gend example.com --count=20
-  
+
   'drush domain-delete DOMAIN|DOMAIN_ID'
     Deletes a domain record, unless it is set as the primary domain.
     You may pass either the domain string (e.g. example.com) or the domain_id
     as an argument.
-    
+
     Sample command:
 
       drush domain-delete 3
       drush domain-delete three.example.com
 
   'drush domain-test DOMAIN|DOMAIN_ID'
-    Checks for a valid HTTP response from the sepcified domain. This test is
+    Checks for a valid HTTP response from the specified domain. This test is
     used when trying to set default domains, since the default domain must
     always resolve.
-    
+
     If you do not pass a domain string or domain_id, all domains will be
     tested. Note that if you run Drupal in a subdirectory, you must pass a
     --uri value with this command.
-    
+
     Sample command:
 
       drush domain-test 3
@@ -1458,7 +1458,7 @@ Type 'drush help' for more information.
     Sets the specified domain as the default domain. By design, this command
     will test the requested domain for a valid HTTP response. You may disable
     this check by passing --skip_check=1 to the command.
-    
+
     Note that if you run Drupal in a subdirectory, you must pass a
     --uri value with this command in order to test the HTTP response.
 

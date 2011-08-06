@@ -25,7 +25,7 @@ class DomainTestCase extends DrupalWebTestCase {
     if (empty($_SERVER['HTTP_HOST']) || $_SERVER['HTTP_HOST'] == 'default') {
       $_SERVER['HTTP_HOST'] = 'example.com';
     }
-    // Build teh {domain} table for this test run.
+    // Build the {domain} table for this test run.
     db_query("TRUNCATE {domain}");
     domain_set_primary_domain();
     db_query("UPDATE {domain} SET sitename = 'TestDomainSitename' WHERE is_default = 1");
@@ -249,7 +249,7 @@ class DomainHookTest extends DomainTestCase {
     $new_domain = $result['testfoo'];
     $this->assertTrue($new_domain['sitename'] == 'foobar', t('hook_domain_insert() fired correctly.'));
 
-    // hook_domain_update() resaves that domain and set it's sitename back to 'testfoo'.
+    // hook_domain_update() re-saves that domain and set it's sitename back to 'testfoo'.
     $updated_domain = domain_save($new_domain, $new_domain);
     $this->assertTrue($updated_domain['sitename'] == 'testfoo', t('hook_domain_update() fired correctly.'));
 
@@ -482,7 +482,7 @@ class DomainUnitTest extends DomainTestCase {
     $this->assertTrue($count == 5, t('Five nodes are assigned to all affiliates.'));
   }
 }
-  
+
 class DomainCacheTest extends DomainTestCase {
   public static function getInfo() {
     return array(
@@ -497,7 +497,7 @@ class DomainCacheTest extends DomainTestCase {
     parent::setUp($list);
     variable_set('cache', 1);
   }
-  
+
   // Check that cache works and ids are set properly.
   function testDomainPageCache() {
     $cache = variable_get('cache');
@@ -517,7 +517,7 @@ class DomainCacheTest extends DomainTestCase {
     $this->drupalGet('', array(), array('If-Modified-Since: ' . $last_modified, 'If-None-Match: ' . $etag));
     $this->assertResponse(200, t('Conditional request returned 200 OK for authenticated user.'));
     $this->assertFalse($this->drupalGetHeader('X-Drupal-Cache'), t('Primary domain was not cached for logged in user.'));
-    
+
     // Try cache on a secondary domain.
     $domains = $this->domainCreateDomains(array('one'));
     $this->assertTrue(isset($domains['one']), t('Created test domain %domain', array('%domain' => $domains['one']['subdomain'])));

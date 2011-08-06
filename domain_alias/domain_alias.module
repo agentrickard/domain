@@ -219,7 +219,7 @@ function domain_alias_lookup($subdomain = NULL, $alias_id = NULL, $reset = FALSE
  * @param $subdomain
  *   The requested subdomain string.
  * @param $patterns
- *   An array of patterns  and aliase data that match the given subdomain string.
+ *   An array of patterns and alias data that match the given subdomain string.
  *
  * @return
  *   The best match, as an $alias array.

@@ -37,11 +37,11 @@ function domain_token_info() {
   );
   $info['tokens']['domain']['url'] = array(
     'name' => t('Domain URL'),
-    'description' => t('The domain\'s URL, lowercased and with only alphanumeric characters.'),
+    'description' => t('The domain\'s URL, lower-cased and with only alphanumeric characters.'),
   );
   $info['tokens']['domain']['subdomain'] = array(
     'name' => t('Subdomain'),
-    'description' => t('The subdomain, lowercased and with only alphanumeric characters. Only works with *.example.com formats'),
+    'description' => t('The subdomain, lower-cased and with only alphanumeric characters. Only works with *.example.com formats'),
   );
 
   return $info;

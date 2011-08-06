@@ -72,7 +72,7 @@ function domain_conf_form($form, $form_state, $domain) {
     }
     $form[$group][$key] = $action['#form'];
     $form[$group][$key]['#default_value'] = isset($settings[$key]) ? $settings[$key] : $action['#system_default'];
-    // Change the path for the frontpage.
+    // Change the path for the front page.
     if ($key == 'site_frontpage') {
       global $base_url;
       $prefix = $base_url . '/';

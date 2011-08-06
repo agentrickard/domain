@@ -246,7 +246,7 @@ function hook_domain_source_alter(&$source, $nid) {
  * @param &$source
  *   The domain array from domain_get_node_match(), passed by reference.
  * @param $nid
- *   The identifier of the obect being rewritten. For nodes, this is the node
+ *   The identifier of the object being rewritten. For nodes, this is the node
  *   id. In other instances, we may pass a $path string or other variable.
  *
  * @return
@@ -262,7 +262,7 @@ function hook_domain_source_path_alter(&$source, $path) {
 
 /**
  * Allows modules to add additional form elements for saving as domain-specific
- * settings. Note that this is a "convenience function" to use in place of 
+ * settings. Note that this is a "convenience function" to use in place of
  * hook_form_alter(), so you may use either. Versions prior to 7.x.3 are not
  * complete replacements for hook_form_alter().
  *
@@ -577,7 +577,7 @@ function hook_domain_bootstrap_full($domain) {
  * @param $options
  *   The path options.
  * @param $original_path
- *   The raw path request from the URL. 
+ *   The raw path request from the URL.
  *
  * @ingroup domain_hooks
  */
@@ -629,7 +629,7 @@ function mymodule_form_submit($form_state) {
  * to introduce additional access controls on those links.
  *
  * Note that "inactive" domains are already filtered before this
- * hook is called, so you would have to explcitly add them again.
+ * hook is called, so you would have to explicitly add them again.
  *
  * @see drupal_alter()
  * @see theme_domain_nav_default()
@@ -709,7 +709,7 @@ function hook_domain_settings($domain_id, $values) {
  * NOTE: This does not apply to Domain Alias records.
  *
  * @param &$error_list
- *   The list of current vaidation errors. Modify this value by reference.
+ *   The list of current validation errors. Modify this value by reference.
  *   If you return an empty array or NULL, the domain is considered valid.
  * @param $subdomain
  *   The HTTP_HOST string value being validated, such as one.example.com.
@@ -734,7 +734,7 @@ function hook_domain_validate_alter(&$error_list, $subdomain) {
  * hook_domain_grant_all_alter() fires _after_ Domain Access has
  * determined if a page should ignore Domain Access rules or not. It
  * can be used to extend the core functionality. For a use-case see the
- * discussion about autocomplete callbacks.
+ * discussion about auto-complete callbacks.
  *
  * @link http://drupal.org/node/842338
  *
@@ -777,7 +777,7 @@ function hook_domain_grant_all_alter(&$grant, $options) {
  * Allows content or users to be reassigned to a new domain.
  *
  * @param $old_domain
- *   The curent domain record, most commonly passed during a domain deletion.
+ *   The current domain record, most commonly passed during a domain deletion.
  * @param $new_domain
  *   The target domain record.
  * @param $table

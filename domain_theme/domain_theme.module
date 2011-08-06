@@ -225,7 +225,7 @@ function domain_theme_get_color_path($path) {
  * Implements hook_form_alter().
  *
  * This function is a helper to a normal hook_form_alter implementation,
- * where we add additonal form elemtns if we are dealing with domain-specific
+ * where we add additional form elements if we are dealing with domain-specific
  * form settings.
  */
 function domain_theme_form_alter(&$form, &$form_state, $form_id) {

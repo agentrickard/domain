@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Include file to handle theme configration screen
+ * Include file to handle theme configuration screen
  *
  * @ingroup domain_theme
  */
@@ -165,7 +165,7 @@ function theme_domain_theme_form($variables) {
  *
  * @param $domain
  *   The $domain object created by domain_lookup().
- * 
+ *
  * @return
  *   A confirmation form.
  */
@@ -181,7 +181,7 @@ function domain_theme_reset($domain) {
  *
  * @param $domain
  *   The $domain object for the selected domain.
- * 
+ *
  * @return
  *   A themed HTML form.
  */
@@ -209,7 +209,7 @@ function domain_theme_reset_form_submit($form, &$form_state) {
  *
  * @param $domain
  *   The $domain object for the selected domain.
- * 
+ *
  * @return
  *   Themed HTML messages.
  */

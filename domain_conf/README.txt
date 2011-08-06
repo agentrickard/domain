@@ -71,7 +71,7 @@ Domain Conf requires the Domain Access module be installed and active.
 2.2   Configuration Options
 
 When active, the Domain Conf module provides a 'settings' link next to each
-entry in your Domain Acccess list (found at path 'admin/build/domain/list').
+entry in your Domain Access list (found at path 'admin/structure/domain').
 
 For each registered domain, you have the option of saving settings that will
 replace the system settings for your root site.  The currently available
@@ -133,7 +133,7 @@ Be sure to check the values in this form before saving.
 ----
 4.  Developer Notes
 
-The Domain Conf module is the model for extending Domain Acccess.
+The Domain Conf module is the model for extending Domain Access.
 
 The following form elements were removed during beta testing:
 
@@ -146,7 +146,7 @@ See http://drupal.org/node/197692 for the reasons.
 4.1   Extending Options with hook_domain_conf()
 
 The module works by applying hook_form_alter() to the form:
-'system_settings_form' and then adding addiitonal fields from other forms.
+'system_settings_form' and then adding additional fields from other forms.
 
 hook_domain_conf() allows developers to add additional form elements.
 

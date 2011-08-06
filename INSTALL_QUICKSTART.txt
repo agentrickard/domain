@@ -40,8 +40,8 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
 
 4. Go to Admin > Modules.  There you will see the Domain module group.
 
-    Only enable the Domain Acccess module.
-    
+    Only enable the Domain Access module.
+
     Submit the configuration changes to your modules.
 
 5. Rebuild content access permissions as instructed.
@@ -60,7 +60,7 @@ include DRUPAL_ROOT . '/sites/all/modules/domain/settings.inc';
 
     For more information see README.txt.
 
-    NOTE: Some of these permissions may be preconfigured for the
+    NOTE: Some of these permissions may be pre-configured for the
     site's administrative role.
 
 7. Read the main README.txt file for the Domain Access module.

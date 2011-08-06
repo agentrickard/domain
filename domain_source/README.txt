@@ -10,7 +10,7 @@ CONTENTS
 --------
 
 1.  Introduction
-1.1  Sponsos
+1.1  Sponsors
 2.  Installation
 2.1   Dependencies
 2.2   Warning
@@ -25,7 +25,7 @@ CONTENTS
 1.  Introduction
 
 The Domain Source module is a small module that extends Domain Access
-by allowing site and affilaite editors to select a primary "source" domain for
+by allowing site and affiliate editors to select a primary "source" domain for
 all content.
 
 When links are written to content from another domain using the SEO strict
@@ -141,7 +141,7 @@ editors who can use the default Content administration form.
 However, this feature is currently only available to users with the 'set domain
 access' permission.
 
-When using this form, you may select to ingore Domain Source by selecting
+When using this form, you may select to ignore Domain Source by selecting
 'Do not change' in the form element.  When using this feature, you will not
 be allowed to remove the source domain from any content being updated.
 
@@ -161,7 +161,7 @@ Installing the module creates a {domain_source} table that contains:
 
   - nid
   Integer, unique, primary key
-  The node id for this record, foreign key to the {node} tabl.
+  The node id for this record, foreign key to the {node} table.
 
   - domain_id
   Integer, unique

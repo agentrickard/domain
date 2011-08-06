@@ -71,7 +71,7 @@ When the module is installed, a new top-level Administration menu is created.
 This menu is titled 'Affiliated Content'.
 
 If your site has fewer domains than set in the Domain List Size setting
-of the main module, then each affilite will be given its own menu entry.
+of the main module, then each affiliate will be given its own menu entry.
 The default size of this variable is 25.
 
 See http://drupal.org/node/367752 for the rationale.
@@ -127,7 +127,7 @@ default Drupal 'administer content' screen.
 ----
 4.1 Affiliates
 
-On the batch editing form is an additional column labelled 'Affiliates.'
+On the batch editing form is an additional column labeled 'Affiliates.'
 
 This column shows the Domain Access rules for each node.  Remember that content
 that is assigned to more than one domain can be edited by multiple users, so

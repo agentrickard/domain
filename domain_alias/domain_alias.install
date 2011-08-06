@@ -31,7 +31,7 @@ function domain_alias_schema() {
         'default' => '',
         ),
       'redirect' => array('type' => 'int',
-        'description' => 'Boolean flag indicating whether the alias should be redireced to the main domain.',
+        'description' => 'Boolean flag indicating whether the alias should be redirected to the main domain.',
         'size' => 'tiny',
         'unsigned' => TRUE,
         'not null' => TRUE,

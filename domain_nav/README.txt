@@ -81,7 +81,7 @@ current url.
 
 If set to 'Link to active url,' all links will go to the equivalent url on the
 selected domain.  That is, if the user is at http://example.com/?q=node, then
-lnks will be written to http://one.example.com/?q=node.
+links will be written to http://one.example.com/?q=node.
 
 NOTE: Linking to the active url may cause Access Denied messages if users link
 from a node page, since Domain Access restricts node views to specific domains.

@@ -117,7 +117,7 @@ function domain_content_list() {
  * Content administration for a specific domain.
  *
  * This callback puts the user on the current domain and then
- * fetches the appropirate content for batch editing.
+ * fetches the appropriate content for batch editing.
  *
  * @param $domain_id
  *   The unique identifier for the currently active domain.

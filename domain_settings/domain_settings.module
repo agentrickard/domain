@@ -58,7 +58,7 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
     return;
   }
 
-  // Set our drop down's weight to be one lighter than the submit button's,
+  // Set our drop-down's weight to be one lighter than the submit button's,
   // ensuring that it always appears right above it (assuming nobody else
   // form_alters us out.)
   drupal_set_message(t('This form is domain-sensitive, be sure you select the proper domain before saving.'), 'warning', FALSE);
@@ -72,7 +72,7 @@ function domain_settings_form_alter(&$form, $form_state, $form_id) {
   foreach (domain_domains() as $data) {
     // The domain must be valid.
     if ($data['valid'] || user_access('access inactive domains')) {
-      // Checkboxes must be filtered, select listts should not.
+      // Checkboxes must be filtered, select lists should not.
       $options[$data['domain_id']] = empty($format) ? check_plain($data['sitename']) : $data['sitename'];
     }
   }

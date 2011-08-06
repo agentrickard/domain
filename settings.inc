@@ -9,7 +9,7 @@
  * include '/sites/all/modules/domain/settings.inc';
  * ?>
  * If you have installed the domain module into a different folder than
- * /sites/all/modules/domain please adjust the path approriately.
+ * /sites/all/modules/domain please adjust the path appropriately.
  *
  * @ingroup domain
  */

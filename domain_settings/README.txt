@@ -37,7 +37,7 @@ particular domain are revealed by opening the form from that domain.
 ----
 1.1 Use-Case
 
-It is often desireable for affiliates to have domain specific settings. This
+It is often desirable for affiliates to have domain specific settings. This
 was originally addressed using the Domain Configuration module to expose
 certain settings through a single UI, but other settings and especially those
 from contributed modules could only be included by adding exceptions in
@@ -120,7 +120,7 @@ There are three options:
   Defaults the form to submit the values to the primary domain and to erase
   custom values set for other domains. This option is included if you want
   this default behavior, but if this is what you selected, you should probably
-  disable the entiure module.
+  disable the entire module.
 
 ----
 3.2  Form Visibility
@@ -132,11 +132,11 @@ setting allows you to specify the behavior you want.
   -- Show on every system settings form, except those listed below.
   This option will display Domain Settings on all eligible forms except those
   which are listed here.
-  
+
   -- Show only on system settings forms listed below.
   This option will display Domain Settings only on eligible forms which are
   listed here.
-  
+
 Note that the following forms cannot be used in either case, due to known
 conflicts.
 
@@ -161,7 +161,7 @@ For example, the Site Information form at admin/settings/site-information
 creates this HTML:
 
   <form action="/admin/settings/site-information"
-    accept-charset="UTF-8" method="post" 
+    accept-charset="UTF-8" method="post"
     id="system-site-information-settings">
 
 The form_id is therefore 'system_site_information_settings', which may be

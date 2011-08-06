@@ -87,7 +87,7 @@ function domain_conf_domain_batch() {
     '#update_all' => TRUE,
     '#group' => t('Site configuration'),
   );
-  // Change the site frontpage.
+  // Change the site front page.
   $batch['site_frontpage'] = array(
     '#form' => array(
       '#title' => t('Site frontpage'),
