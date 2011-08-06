@@ -123,20 +123,16 @@ function _domain_bootstrap($phase) {
       // Get the domain_id of the request.
       $_domain = domain_resolve_host();
       // If we don't have a valid domain id now, we can't really go on, bootstrap fails.
-      if (empty($_domain) || !is_numeric($_domain['domain_id'])) {
+      if (empty($_domain['domain_id']) || !is_numeric($_domain['domain_id'])) {
         return FALSE;
       }
       break;
 
     case DOMAIN_BOOTSTRAP_FULL:
-      // Make sure the load process worked correctly before invoking the hook.
-      if (!domain_settings_setup_ok()) {
-        return FALSE;
-      }
-
       // Grant access to all affiliates. See http://drupal.org/node/770650
       $_domain['site_grant'] = DOMAIN_SITE_GRANT;
 
+      // Load all bootstrap processes registered with the module.
       _domain_bootstrap_invoke_all('full', $_domain);
       break;
   }
