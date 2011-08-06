@@ -129,14 +129,10 @@ function _domain_bootstrap($phase) {
       break;
 
     case DOMAIN_BOOTSTRAP_FULL:
-      // Make sure the load process worked correctly before invoking the hook.
-      if (!domain_settings_setup_ok()) {
-        return FALSE;
-      }
-
       // Grant access to all affiliates. See http://drupal.org/node/770650
       $_domain['site_grant'] = DOMAIN_SITE_GRANT;
 
+      // Load all bootstrap processes registered with the module.
       _domain_bootstrap_invoke_all('full', $_domain);
       break;
   }
@@ -157,7 +153,7 @@ function _domain_bootstrap($phase) {
  *   An array of module names.
  */
 function _domain_bootstrap_modules($reset = FALSE) {
-  static $modules = NULL;
+  $modules = &drupal_static(__FUNCTION__, NULL);
   if ($reset || is_null($modules)) {
     $modules = _domain_bootstrap_modules_get();
     if (!is_array($modules)) {
