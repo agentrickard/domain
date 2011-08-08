@@ -314,6 +314,9 @@ function domain_permission() {
     'delete domain content' => array(
       'title' => t('Delete any content on assigned domains'),
     ),
+    'view unpublished domain content' => array(
+      'title' => t('View unpublished content on assigned domains'),
+    ),
     'set domain access' => array(
       'title' => t('Set domain access status for all content'),
     ),
@@ -1977,6 +1980,31 @@ function domain_set_default_grant($reset = FALSE) {
         ->execute();
     }
   }
+}
+
+/**
+ * Implements hook_node_access().
+ *
+ * Only used to check if a user can view unpublished nodes assigned to her
+ * domain(s).
+ */
+function domain_node_access($node, $op, $account) {
+  if ($op != 'view' || !empty($node->status)) {
+    return NODE_ACCESS_IGNORE;
+  }
+  if (empty($node->domains) || empty($account->domain_user)) {
+    return NODE_ACCESS_IGNORE;
+  }
+  if (!user_access('view unpublished domain content', $account)) {
+    return NODE_ACCESS_IGNORE;
+  }
+  // The actual access check.
+  foreach ($node->domains as $key => $value) {
+    if (!empty($account->domain_user[$key])) {
+      return NODE_ACCESS_ALLOW;
+    }
+  }
+  return NODE_ACCESS_IGNORE;
 }
 
 /**

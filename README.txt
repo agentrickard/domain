@@ -400,6 +400,11 @@ The Domain Access module has the following permissions:
   'Bypass content access control' permission for sites that give restricted
   administrative privileges.  See section 3.3 for more information.
 
+  - 'View unpublished content on assigned domains'
+  This permission allows editors to view unpublished content assigned to
+  their domain(s). This permission only applies to viewing a single content
+  page; it does not affect list views.
+
   - 'Set domain access status for all content'
   This permission is key.  Users with this permission will be given a user
   interface for assigning users and nodes to specific domains.  Users without

@@ -53,6 +53,7 @@ class DomainTestCase extends DrupalWebTestCase {
       );
       user_save(NULL, $edit);
     }
+
   }
 
   /**
@@ -480,7 +481,97 @@ class DomainUnitTest extends DomainTestCase {
     $this->assertTrue($count == 5, t('Five nodes are assigned to the default domain.'));
     $count = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE realm = 'domain_site'")->fetchField();
     $this->assertTrue($count == 5, t('Five nodes are assigned to all affiliates.'));
+
+    // Test editor permissions.
+    // Add an editor role.
+    $this->permissions = array(
+      'access content',
+      'create page content',
+    );
+
+    $this->editor_role = $this->drupalCreateRole($this->permissions);
+    // Using drupalCreateUser runs tests we don't want.
+    $edit = array(
+      'name' => $this->randomName(32),
+      'mail' => $this->randomName(32) . '@example.com',
+      'roles' => drupal_map_assoc(array(DRUPAL_AUTHENTICATED_RID, $this->editor_role)),
+      'status' => 1,
+      'pass' => 'fubar',
+      'domain_user' => array(domain_default_id() => domain_default_id()),
+    );
+    $test_user = user_save(NULL, $edit);
+    // Check that a normal user can view the nodes from the primary domain.
+    $this->assertTrue(TRUE, '<strong>' . t('No special permissions. User should have view access to all nodes.' . '</strong>'));
+    foreach ($nodes as $node) {
+      foreach (array('view', 'update', 'delete') as $op) {
+        $access = node_access($op, $node, $test_user);
+        if ($op == 'view') {
+          $this->assertTrue($access, t('User has proper access to %op domain content.', array('%op' => $op)));
+        }
+        else {
+          $this->assertFalse($access, t('User denied access to %op domain content.', array('%op' => $op)));
+        }
+      }
+    }
+
+    // Test editor permissions.
+    $perms = array(
+      'edit domain content',
+      'delete domain content',
+      'view unpublished domain content',
+    );
+    user_role_grant_permissions($this->editor_role, $perms);
+    $test_user = user_load($test_user->uid, TRUE);
+    drupal_static_reset('node_access');
+    $count = 0;
+    $this->assertTrue(TRUE, '<strong>' . t('All nodes assigned to user domain. User can edit, delete and view unpublished. User should have access to all nodes.' . '</strong>'));
+    foreach ($nodes as $node) {
+      foreach (array('view', 'update', 'delete') as $op) {
+        $node->status = 0;
+        $access = node_access($op, $node, $test_user);
+        $this->assertTrue($access, t('User has proper access to %op domain content.', array('%op' => $op)));
+      }
+      $count++;
+      // This save routine removes the 'domain_site' grant and assigns some
+      // content to a domain the user cannot access.
+      if ($count > 5) {
+        $node->domains = array(4 => 4);
+      }
+      else {
+        $node->domains = array(domain_default_id() => domain_default_id());
+      }
+      node_save($node);
+    }
+    drupal_static_reset('node_access');
+    $count = 0;
+    $this->assertTrue(TRUE, '<strong>' . t('Some nodes assigned to user domain. User can edit, delete and view unpublished.User should have access to domain nodes.' . '</strong>'));
+    foreach ($nodes as $node) {
+      $count++;
+      foreach (array('view', 'update', 'delete') as $op) {
+        $node->status = 0;
+        $access = node_access($op, $node, $test_user);
+        if ($count <= 5) {
+          $this->assertTrue($access, t('User has proper access to %op domain content.', array('%op' => $op)));
+        }
+        else {
+          $this->assertFalse($access, t('User denied access to %op non-domain content.', array('%op' => $op)));
+        }
+      }
+    }
+    // Now take away the domain permissions to content.
+    user_role_revoke_permissions($this->editor_role, $perms);
+    $test_user = user_load($test_user->uid, TRUE);
+    drupal_static_reset('node_access');
+    $this->assertTrue(TRUE, '<strong>' . t('User has no editing permissions. User should have access to no nodes.' . '</strong>'));
+    foreach ($nodes as $node) {
+      foreach (array('view', 'update', 'delete') as $op) {
+        $node->status = 0;
+        $access = node_access($op, $node, $test_user);
+        $this->assertFalse($access, t('User denied access to %op all domain content.', array('%op' => $op)));
+      }
+    }
   }
+
 }
 
 class DomainCacheTest extends DomainTestCase {
