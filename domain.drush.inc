@@ -118,6 +118,7 @@ function drush_domain_list() {
     'valid' => dt('active'),
     'is_default' => dt('is_default'),
     'domain_id' => dt('domain_id'),
+    'machine_name' => dt('machine_name'),
   );
   $rows = array(array_values($header));
   foreach ($domains as $domain) {

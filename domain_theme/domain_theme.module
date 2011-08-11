@@ -306,3 +306,20 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   }
   $form['domain_color_defaults'] = array('#type' => 'value', '#value' => $color_settings);
 }
+
+/**
+ * Implements hook_features_api().
+ */
+function domain_theme_features_api() {
+  $components = array(
+    'domain_theme' => array(
+      'name' => t('Domain themes'),
+      'default_hook' => 'domain_theme_default_themes',
+      'default_file' => FEATURES_DEFAULTS_CUSTOM,
+      'default_filename' => 'domains',
+      'features_source' => TRUE,
+      'file' => drupal_get_path('module', 'domain_theme') .'/domain_theme.features.inc',
+    ),
+  );
+  return $components;
+}

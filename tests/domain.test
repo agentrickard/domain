@@ -27,6 +27,7 @@ class DomainTestCase extends DrupalWebTestCase {
     }
     // Build the {domain} table for this test run.
     db_query("TRUNCATE {domain}");
+    db_query("TRUNCATE {domain_export}");
     domain_set_primary_domain();
     db_query("UPDATE {domain} SET sitename = 'TestDomainSitename' WHERE is_default = 1");
 
@@ -130,8 +131,18 @@ class DomainInstallTest extends DomainTestCase {
 
   // If the default domain is not in the database, the sitename will be default sitename.
   public function testDomainInstall() {
-    $domain = db_query("SELECT sitename FROM {domain} WHERE is_default = 1")->fetch();
-    $this->assertTrue($domain->sitename == 'TestDomainSitename', t('Default domain created successfully'));
+    $domain = domain_default(TRUE, FALSE);
+    $this->assertTrue($domain['sitename'] == 'TestDomainSitename', t('Default domain created successfully'));
+    $records = db_query("SELECT COUNT(domain_id) FROM {domain_export}")->fetchField();
+    $this->assertTrue($records == 1, t('{domain_export} has one record.'));
+    $domains = db_query("SELECT COUNT(domain_id) FROM {domain}")->fetchField();
+    $this->assertTrue($domains == 1, t('{domain} has one record.'));
+    $join = db_query("SELECT COUNT(d.domain_id) FROM {domain} d INNER JOIN {domain_export} de ON d.domain_id = de.domain_id")->fetchField();
+    $this->assertTrue($join == 1, t('Database counts match.'));
+    $join2 = db_query("SELECT COUNT(d.domain_id) FROM {domain} d INNER JOIN {domain_export} de ON d.domain_id = de.domain_id WHERE d.domain_id = 1")->fetchField();
+    $this->assertTrue($join2 == 1, t('Database records match.'));
+    $join = db_query("SELECT COUNT(d.domain_id) FROM {domain} d INNER JOIN {domain_export} de ON d.machine_name = de.machine_name")->fetchField();
+    $this->assertTrue($join == 1, t('Machine names match.'));
   }
 
   // Check the existence of our default grant.
@@ -182,7 +193,7 @@ class DomainCreateTest extends DomainTestCase {
   function testDomainCreate() {
     $setup = $this->domainCreateDomains();
     $result = db_query("SELECT sitename, subdomain FROM {domain} WHERE is_default = 0 ORDER BY weight");
-
+    $domains = array();
     foreach ($result as $record) {
       $domains[$record->sitename] = array('sitename' => $record->sitename, 'subdomain' => $record->subdomain);
     }

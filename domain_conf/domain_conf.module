@@ -372,3 +372,20 @@ function domain_conf_variable_save($domain_id, $variable, $value = NULL) {
       ->execute();
   }
 }
+
+/**
+ * Implements hook_features_api().
+ */
+function domain_conf_features_api() {
+  $components = array(
+    'domain_conf' => array(
+      'name' => t('Domain variables'),
+      'default_hook' => 'domain_conf_default_variables',
+      'default_file' => FEATURES_DEFAULTS_CUSTOM,
+      'default_filename' => 'domains',
+      'features_source' => TRUE,
+      'file' => drupal_get_path('module', 'domain_conf') .'/domain_conf.features.inc',
+    ),
+  );
+  return $components;
+}

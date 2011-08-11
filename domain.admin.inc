@@ -370,6 +370,7 @@ function domain_values_from_form_state($form_state) {
     'domain_id' => $form_state['values']['domain_id'],
     'weight' => $form_state['values']['weight'],
     'is_default' => $form_state['values']['is_default'],
+    'machine_name' => $form_state['values']['machine_name'],
   );
 }
 
@@ -424,7 +425,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
   else {
     $description = t('Can contain lowercase alphanumeric and ASCII characters, dashes and a colon (if using alternative ports).');
   }
-  $form['domain']['subdomain'] = array(
+  $form['subdomain'] = array(
     '#type' => 'textfield',
     '#title' => t('Domain'),
     '#size' => 40,
@@ -433,7 +434,16 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#default_value' => $domain['subdomain'],
     '#description' => t('The allowed domain, using the full <em>path.example.com</em> format. Leave off the http:// and the trailing slash and do not include any paths.') . ' ' . $description
   );
-  $form['domain']['sitename'] = array(
+  $form['machine_name'] = array(
+    '#type' => 'machine_name',
+    '#machine_name' => array(
+      'source' => array('subdomain'),
+      'exists' => 'domain_check_machine_name',
+    ),
+    '#default_value' => $domain['machine_name'],
+    '#disabled' => !empty($domain['machine_name']),
+  );
+  $form['sitename'] = array(
     '#type' => 'textfield',
     '#title' => t('Site name'),
     '#size' => 40,
@@ -442,7 +452,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#default_value' => $domain['sitename'],
     '#description' => t('The human-readable name of this domain.')
   );
-  $form['domain']['scheme'] = array(
+  $form['scheme'] = array(
     '#type' => 'radios',
     '#title' => t('Domain URL scheme'),
     '#required' => TRUE,
@@ -450,7 +460,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#default_value' => !empty($domain['scheme']) ? $domain['scheme'] : 'http',
     '#description' => t('The URL scheme for accessing this domain.')
   );
-  $form['domain']['valid'] = array(
+  $form['valid'] = array(
     '#type' => 'radios',
     '#title' => t('Domain status'),
     '#required' => TRUE,
@@ -464,7 +474,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
       $next_weight = $record['weight'];
     }
   }
-  $form['domain']['weight'] = array(
+  $form['weight'] = array(
     '#type' => 'weight',
     '#title' => t('Weight'),
     '#required' => TRUE,
@@ -472,7 +482,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
     '#default_value' => isset($domain['weight']) ? $domain['weight'] : $next_weight + 1,
     '#description' => t('The sort order for this record. Lower values display first.'),
   );
-  $form['domain']['is_default'] = array(
+  $form['is_default'] = array(
     '#type' => 'checkbox',
     '#title' => t('Default domain'),
     '#default_value' => isset($domain['is_default']) ? $domain['is_default'] : 0,
@@ -481,8 +491,8 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
   // If the server did not respond properly, do not allow this record to be set
   // as the default domain.
   if ($error) {
-    $form['domain']['is_default']['#description'] .= '<br />' . t('<strong>This domain did not respond correctly. It cannot be set as your primary domain unless you select <em>Ignore server response warning</em></strong>.');
-    $form['domain']['ignore'] = array(
+    $form['is_default']['#description'] .= '<br />' . t('<strong>This domain did not respond correctly. It cannot be set as your primary domain unless you select <em>Ignore server response warning</em></strong>.');
+    $form['ignore'] = array(
       '#type' => 'checkbox',
       '#title' => t('Ignore server response warning'),
       '#default_value' => 0,
@@ -500,7 +510,7 @@ function domain_form($form, $form_state, $domain = array(), $arguments = array()
 function domain_form_validate($form, &$form_state) {
   $subdomain = $form_state['values']['subdomain'];
   $error_list = array();
-  $domain_changed = (bool) strcmp($form_state['values']['subdomain'], $form['domain']['subdomain']['#default_value']);
+  $domain_changed = (bool) strcmp($form_state['values']['subdomain'], $form['subdomain']['#default_value']);
   if ($domain_changed && !domain_unique_domain($subdomain)) {
     $error_list[] = t('The domain value must be unique.');
   }

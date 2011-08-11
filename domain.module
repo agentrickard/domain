@@ -36,6 +36,12 @@ define('DOMAIN_ASSIGN_USERS', TRUE);
 define('DOMAIN_LIST_SIZE', 25);
 
 /**
+ * Defines the export statuses for a domain.
+ */
+define('DOMAIN_EXPORT_STATUS_DATABASE', 0);
+define('DOMAIN_EXPORT_STATUS_CODE', 1);
+
+/**
  * Module setup tasks.
  *
  * 1. Adds the domain user data to the $user object.
@@ -50,6 +56,13 @@ function domain_boot() {
   $user->domain_user = domain_get_user_domains($user);
   // Properly load custom_url_rewrite_outbound().
   include_once('settings_custom_url.inc');
+}
+
+/**
+ * Notify other modules of our API version.
+ */
+function domain_api_version() {
+  return 3;
 }
 
 /**
@@ -380,6 +393,9 @@ function domain_hook_info() {
     'group' => 'domain',
   );
   $hooks['domain_cron'] = array(
+    'group' => 'domain',
+  );
+  $hooks['domain_features_rebuild'] = array(
     'group' => 'domain',
   );
   $hooks['domain_install'] = array(
@@ -912,14 +928,22 @@ function domain_save($values, $form_values = array()) {
   if (!$count) {
     $values['is_default'] = 1;
   }
-  // Update or insert a record?
-  $update = (isset($values['domain_id']) && is_numeric($values['domain_id'])) ? array('domain_id') : array();
 
-  if (!empty($update)) {
+  // Ensure we have a machine name.
+  if (!isset($values['machine_name'])) {
+    $values['machine_name'] = domain_machine_name($values['subdomain']);
+  }
+  // Update or insert a record?
+  $check = domain_check_machine_name($values['machine_name']);
+  if ($check) {
     $action = 'domain_update';
+    $update = array('machine_name');
+    $update_id = array('domain_id');
   }
   else {
     $action = 'domain_insert';
+    $update = array();
+    $update_id = array();
   }
 
   // If this is the default domain, reset other domains.
@@ -929,7 +953,10 @@ function domain_save($values, $form_values = array()) {
       ->execute();
   }
 
-  drupal_write_record('domain', $values, $update);
+  // Store the data, using the machine_name to generate a numeric id.
+  // Note that we _must_ have a numeric key for {node_access}.
+  drupal_write_record('domain_export', $values, $update);
+  drupal_write_record('domain', $values, $update_id);
 
   // Let other modules act on a proper copy of the domain.
   $domain = domain_lookup(NULL, $values['subdomain'], TRUE);
@@ -975,6 +1002,9 @@ function domain_delete($domain, $values = array()) {
   db_delete('domain')
     ->condition('domain_id', $domain['domain_id'])
     ->execute();
+  db_delete('domain_export')
+    ->condition('domain_id', $domain['domain_id'])
+    ->execute();
 
   // In all cases, we need to force a menu rebuild, which also clears the cache.
   menu_rebuild();
@@ -1012,7 +1042,13 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
   }
   // Get the data from the database. Doing this prevents extra queries.
   if (!isset($result) || $reset) {
-    $result = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain}", array(), array('fetch' => PDO::FETCH_ASSOC))->fetchAllAssoc('domain_id');
+    // Temporary hack for update to 7.x.3.
+    if (db_table_exists('domain_export')) {
+      $result = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default, machine_name FROM {domain}", array(), array('fetch' => PDO::FETCH_ASSOC))->fetchAllAssoc('domain_id');
+    }
+    else {
+      $result = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain}", array(), array('fetch' => PDO::FETCH_ASSOC))->fetchAllAssoc('domain_id');
+    }
   }
   // If both are NULL, no lookup can be run.
   if ((is_null($domain_id) && is_null($subdomain)) || $domain_id < 0) {
@@ -1121,18 +1157,19 @@ function domain_set_primary_domain() {
   }
   $check = (bool) db_query("SELECT COUNT(domain_id) FROM {domain} WHERE is_default = 1")->fetchField();
   if (empty($check)) {
-    db_insert('domain')
-      ->fields(array(
-          'subdomain' => $root,
-          'sitename' => $site,
-          'scheme' => $scheme,
-          'weight' => -1,
-          'valid' => 1,
-          'is_default' => 1,
-      ))
-      ->execute();
-    // Allow other modules to respond to changes.
-    module_invoke_all('domain_update', domain_default(TRUE));
+    $domain = array(
+      'subdomain' => $root,
+      'sitename' => $site,
+      'scheme' => $scheme,
+      'weight' => -1,
+      'valid' => 1,
+      'is_default' => 1,
+      'machine_name' => domain_machine_name($root),
+      'export_status' => DOMAIN_EXPORT_STATUS_DATABASE,
+    );
+    drupal_write_record('domain_export', $domain);
+    drupal_write_record('domain', $domain);
+    module_invoke_all('domain_insert', $domain, array());
   }
 }
 
@@ -3082,3 +3119,153 @@ function domain_reassign($old_domain, $new_domain, $table) {
   // Notify that node access needs to be rebuilt.
   node_access_needs_rebuild(TRUE);
 }
+
+/**
+ * Implements hook_features_api().
+ */
+function domain_features_api() {
+  $components = array(
+    'domain' => array(
+      'name' => t('Domains'),
+      'default_hook' => 'domain_default_domains',
+      'default_file' => FEATURES_DEFAULTS_CUSTOM,
+      'default_filename' => 'domains',
+      'features_source' => TRUE,
+      'file' => drupal_get_path('module', 'domain') .'/domain.features.inc',
+    ),
+  );
+  return $components;
+}
+
+/**
+ * Loads a domain from it's machine name.
+ *
+ * @param $machine_name
+ *  The machine name (subdomain) of the domain record.
+ * @param $full
+ *  Boolean indicator to run hook_domain_load() or not.
+ *
+ * @return
+ *  A Domain array or -1 on failure.
+ */
+function domain_machine_name_load($machine_name, $full = FALSE) {
+  if ($full) {
+    return domain_lookup(NULL, $machine_name);
+  }
+  return db_query('SELECT * FROM {domain} WHERE machine_name = :machine_name', array(':machine_name' => $machine_name))->fetchAssoc();
+}
+
+/**
+ * Create a machine name for a domain record.
+ *
+ * @param $subdomain
+ *  The subdomain string of the record, which should be unique.
+ *
+ * @return
+ *  A string with dot and colon transformed to underscore.
+ */
+function domain_machine_name($subdomain) {
+  return preg_replace('/[^a-z0-9_]+/', '_', $subdomain);
+}
+
+/**
+ * Checks for unique value of the machine name.
+ *
+ * @param $machine_name
+ *  The machine name (subdomain) of the domain record.
+ *
+ * @return
+ *  Boolean TRUE or FALSE.
+ */
+function domain_check_machine_name($machine_name) {
+  return (bool) db_query("SELECT COUNT(1) FROM {domain} WHERE machine_name = :machine_name", 
+    array(':machine_name' => $machine_name)
+    )->fetchField();
+}
+
+/**
+ * Loads a domain from its machine name.
+ *
+ * @param $machine_name
+ *  The machine name (subdomain) of the domain record.
+ *
+ * @return
+ *  A Domain id key.
+ */
+function domain_load_domain_id($machine_name) {
+  return db_query('SELECT domain_id FROM {domain_export} WHERE machine_name = :machine_name', array(':machine_name' => $machine_name))->fetchField();
+}
+
+
+/**
+ * Loads a machine name from its domain id.
+ *
+ * @param $domain_id
+ *  The id of the domain record.
+ *
+ * @return
+ *  A Domain machine name.
+ */
+function domain_load_machine_name($domain_id) {
+  return db_query('SELECT machine_name FROM {domain_export} WHERE domain_id = :domain_id', array(':domain_id' => $domain_id))->fetchField();
+}
+
+/**
+ * Features doesn't know how to load custom includes.
+ *
+ * @param $module
+ *  The name of the feature to load.
+ * @param $hook
+ *  The name of the domain hook.
+ * @param $return
+ *  Boolean indicator to return the results of the function.
+ *
+ * @return
+ *  The results of the $hook implemenation, if requested.
+ */
+function domain_features_load($module, $hook, $return = TRUE) {
+  // Features does not handle module loading of custom files.
+  module_load_include('inc', $module, $module . '.domains');
+  $function = $module . '_' . $hook;
+  if ($return && function_exists($function)) {
+    return $function();
+  }
+}
+
+/**
+ * Sets domain export options consistently.
+ *
+ * @return
+ *  An array of form options. Not that we cannot use _ in keys.
+ */
+function domain_features_get_options() {
+  $options = array('all-domains' => t('Export all domains'));
+  foreach (domain_domains() as $domain) {
+    $options[$domain['subdomain']] = $domain['subdomain'];
+  }
+  return $options;
+}
+
+/**
+ * Processes export data selections consistently.
+ *
+ * @param $data
+ *  Array of selections from the features component form.
+ *
+ * @return
+ *  An array of domains, keyed by domain_id.
+ */
+function domain_features_selection($data) {
+  $list = array();
+  if (!empty($data['all-domains'])) {
+    $list = domain_domains();
+  }
+  else {
+    foreach ($data as $subdomain) {
+      $record = domain_lookup(NULL, $subdomain);
+      $list[$record['domain_id']] = $record;
+    }
+  }
+  return $list;
+}
+

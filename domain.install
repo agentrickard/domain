@@ -19,18 +19,23 @@ function domain_schema() {
   $schema['domain'] = array(
     'description' => 'The base table for domain records',
     'fields' => array(
-      'domain_id' => array('type' => 'serial', 'not null' => TRUE, 'description' => 'Primary key'),
+      'domain_id' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Domain numeric id.'),
       'subdomain' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'Registered DNS entry, will match HTTP_HOST requests'),
       'sitename' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'Site display name'),
       'scheme' => array('type' => 'varchar', 'length' => '8', 'not null' => TRUE, 'default' => 'http', 'description' => 'Protocol'),
       'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1', 'description' => 'Active status'),
       'weight' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0, 'description' => 'Sort order'),
-      'is_default' => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Indicates primary domain')),
+      'is_default' => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Indicates primary domain'),
+      'machine_name' => array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
     'primary key' => array('domain_id'),
     'indexes' => array(
       'subdomain' => array('subdomain'),
       'weight' => array('weight'),
       'is_default' => array('is_default'),
+    ),
+    'foreign_keys' => array(
+      'domain_id' => array('domain_export' => 'domain_id'),
+      'machine_name' => array('domain_export' => 'machine_name'),
     ),
   );
   $schema['domain_access'] = array(
@@ -56,6 +61,16 @@ function domain_schema() {
     'foreign_keys' => array(
       'uid' => array('user' => 'uid'),
       'domain_id' => array('domain' => 'domain_id'),
+    ),
+  );
+  $schema['domain_export'] = array(
+    'description' => 'Stores canonical machine names for domains.',
+    'fields' => array(
+      'domain_id' => array('type' => 'serial', 'description' => 'Domain id. Automatic master key.'),
+      'machine_name' => array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
+    'primary key' => array('machine_name'),
+    'indexes' => array(
+      'domain_id' => array('domain_id')
     ),
   );
   return $schema;
@@ -105,7 +120,7 @@ function domain_uninstall() {
 /**
  * Update block deltas to Drupal 7.
  */
-function domain_update_7000() {
+function domain_update_7000(&$sandbox) {
   // Get an array of the renamed block deltas, organized by module.
   $renamed_deltas = array(
     'domain' => array(
@@ -120,7 +135,7 @@ function domain_update_7000() {
 /**
  * Change the edit and delete permissions.
  */
-function domain_update_7001() {
+function domain_update_7001(&$sandbox) {
   db_update('role_permission')
     ->condition('permission', 'edit domain nodes')
     ->fields(array('permission' => 'edit domain content'))
@@ -135,7 +150,7 @@ function domain_update_7001() {
 /**
  * Add sorting to domains.
  */
-function domain_update_7300() {
+function domain_update_7300(&$sandbox) {
   if (db_field_exists('domain', 'weight')) {
     return('No update required');
   }
@@ -148,7 +163,7 @@ function domain_update_7300() {
 /**
  * Add default domain flag and weight the default higher.
  */
-function domain_update_7301() {
+function domain_update_7301(&$sandbox) {
   if (db_field_exists('domain', 'is_default')) {
     return('No update required');
   }
@@ -164,7 +179,7 @@ function domain_update_7301() {
 /**
  * Add an index on {domain}.is_default.
  */
-function domain_update_7302() {
+function domain_update_7302(&$sandbox) {
   if (!db_index_exists('domain', 'is_default')) {
     db_add_index('domain', 'is_default', array('is_default'));
   }
@@ -173,7 +188,7 @@ function domain_update_7302() {
 /**
  * Remove the zero record from the database.
  */
-function domain_update_7303() {
+function domain_update_7303(&$sandbox) {
   // We grab the default domain, remove it from the database, and
   // then re-save it into the table, using the new value as the default domain.
   $default = db_query("SELECT * FROM {domain} WHERE domain_id = 0")->fetchAssoc();
@@ -213,4 +228,69 @@ function domain_update_7303() {
   variable_del('domain_scheme');
   // Update message.
   return t('Domain Access updated successfully');
+}
+
+/**
+ * Allow domains to be made exportable.
+ */
+function domain_update_7304(&$sandbox) {
+  if (db_table_exists('domain_export')) {
+    return t('{domain_export} table exists.');
+  }
+  $schema = array(
+    'description' => 'Stores canonical machine names for domains.',
+    'fields' => array(
+      'domain_id' => array('type' => 'serial', 'description' => 'Domain id. Automatic master key.'),
+      'machine_name' => array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
+    'primary key' => array('machine_name'),
+    'indexes' => array(
+      'domain_id' => array('domain_id')
+    ),
+  );
+  db_create_table('domain_export', $schema);
+  return t('{domain_export} table created.');
+}
+
+/**
+ * Rebuild the {domain} table.
+ */
+function domain_update_7305(&$sandbox) {
+  // Reset the domain_id field as a plain integer.
+  db_drop_primary_key('domain');
+  $spec = array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Domain numeric id.');
+  db_change_field('domain', 'domain_id', 'domain_id', $spec);
+
+  // Add the machine name column.
+  if (!db_field_exists('domain', 'machine_name')) {
+    $spec = array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.');
+    db_add_field('domain', 'machine_name', $spec);
+  }
+
+  // Now we can safely add the new primary key.
+  db_add_primary_key('domain', array('domain_id'));
+
+  return t('{domain} table updated.');
+}
+
+/**
+ * Insert existing domain records into {domain_export} and {domain}.
+ */
+function domain_update_7306(&$sandbox) {
+  $domains = db_query("SELECT domain_id, subdomain FROM {domain} ORDER BY domain_id")->fetchAll();
+  foreach ($domains as $domain) {
+    $query = db_insert('domain_export')
+      ->fields(array(
+        'domain_id' => $domain->domain_id,
+        'machine_name' => domain_machine_name($domain->subdomain),
+      ));
+    $query->execute();
+    $query = db_update('domain')
+      ->condition('domain_id', $domain->domain_id)
+      ->fields(array(
+        'machine_name' => domain_machine_name($domain->subdomain),
+      ));
+    $query->execute();
+  }
+
+  return t('{domain_export} table populated.');
 }
