@@ -3241,7 +3241,7 @@ function domain_features_load($module, $hook, $return = TRUE) {
 function domain_features_get_options() {
   $options = array('all-domains' => t('Export all domains'));
   foreach (domain_domains() as $domain) {
-    $options[$domain['subdomain']] = $domain['subdomain'];
+    $options[$domain['machine_name']] = $domain['subdomain'];
   }
   return $options;
 }
