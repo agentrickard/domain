@@ -3263,9 +3263,10 @@ function domain_features_selection($data) {
   }
   else {
     foreach ($data as $machine_name) {
-      $record = domain_load_machine_name($machine_name);
-      $record['domain_id'] = domain_load_domain_id($machine_name);
-      $list[$record['domain_id']] = $record;
+      $record = domain_machine_name_load($machine_name);
+      if (!empty($record)) {
+        $list[$record['domain_id']] = $record['machine_name'];
+      }
     }
   }
   return $list;
