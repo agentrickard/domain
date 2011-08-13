@@ -3141,7 +3141,7 @@ function domain_features_api() {
  * Loads a domain from it's machine name.
  *
  * @param $machine_name
- *  The machine name (subdomain) of the domain record.
+ *  The machine name of the domain record.
  * @param $full
  *  Boolean indicator to run hook_domain_load() or not.
  *
@@ -3149,10 +3149,11 @@ function domain_features_api() {
  *  A Domain array or -1 on failure.
  */
 function domain_machine_name_load($machine_name, $full = FALSE) {
+  $domain = db_query('SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default, machine_name FROM {domain} WHERE machine_name = :machine_name', array(':machine_name' => $machine_name))->fetchAssoc();
   if ($full) {
-    return domain_lookup(NULL, $machine_name);
+    domain_api($domain, TRUE);
   }
-  return db_query('SELECT * FROM {domain} WHERE machine_name = :machine_name', array(':machine_name' => $machine_name))->fetchAssoc();
+  return $domain;
 }
 
 /**
