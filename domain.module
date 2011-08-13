@@ -3150,7 +3150,7 @@ function domain_features_api() {
  */
 function domain_machine_name_load($machine_name, $full = FALSE) {
   $domain = db_query('SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default, machine_name FROM {domain} WHERE machine_name = :machine_name', array(':machine_name' => $machine_name))->fetchAssoc();
-  if ($full) {
+  if ($full && !empty($domain)) {
     domain_api($domain, TRUE);
   }
   return $domain;
