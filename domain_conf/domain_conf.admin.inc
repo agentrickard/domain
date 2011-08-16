@@ -43,7 +43,7 @@ function domain_conf_page($domain) {
  * @param $domain
  *   The domain currently being updated.
  */
-function domain_conf_form($form, $form_state, $domain) {
+function domain_conf_form($form, &$form_state, $domain) {
   $form = array();
   $batch = module_invoke_all('domain_batch');
   $settings = array();
@@ -179,7 +179,7 @@ function domain_conf_reset($domain) {
  *   Themed HTML form.
  */
 
-function domain_conf_reset_form($form, $form_state, $domain) {
+function domain_conf_reset_form($form, &$form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   $form = confirm_form($extra, t('Are you sure you wish to reset the settings for %name?', array('%name' => $domain['sitename'])), 'admin/structure/domain/view/' . $domain['domain_id'] . '/config', t('Submitting this form will restore default settings for this domain.'));
   return $form;
