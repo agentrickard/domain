@@ -180,7 +180,7 @@ function domain_theme_reset($domain) {
  * @return
  *   A themed HTML form.
  */
-function domain_theme_reset_form($form, $form_state, $domain) {
+function domain_theme_reset_form($form, &$form_state, $domain) {
   $extra['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   $form = confirm_form($extra, t('Are you sure you wish to reset the theme for %name?', array('%name' => $domain['sitename'])), 'admin/structure/domain/theme/' . $domain['domain_id'], t('Submitting this form will restore default theme for this domain.'));
   return $form;
