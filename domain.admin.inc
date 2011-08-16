@@ -169,7 +169,7 @@ function domain_configure() {
 /**
  * FormsAPI for configuring the domain module.
  */
-function domain_configure_form($form, $form_state, $user_submitted = FALSE) {
+function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
   $form['domain_behavior'] = array(
     '#type' => 'radios',
     '#title' => t('New content settings'),
@@ -391,7 +391,7 @@ function domain_values_from_form_state($form_state) {
  *    Indicates that a form should not process administrative messages and paths
  *    upon form submit.  Used by the Domain User module.
  */
-function domain_form($form, $form_state, $domain = array(), $arguments = array()) {
+function domain_form($form, &$form_state, $domain = array(), $arguments = array()) {
   $_domain = domain_get_domain();
   // This action should be performed from the primary domain unless overridden.
   $error = FALSE;
@@ -577,7 +577,7 @@ function domain_form_submit($form, &$form_state) {
  *     Indicates that a form should not process administrative messages and paths
  *     upon form submit.  Used by the Domain User module.
  */
-function domain_delete_form($form, $form_state, $domain, $arguments = array()) {
+function domain_delete_form($form, &$form_state, $domain, $arguments = array()) {
   // This action should be performed from the primary domain.
   domain_check_primary();
   drupal_set_title(t('Delete !domain', array('!domain' => $domain['sitename'])));
@@ -649,7 +649,7 @@ function domain_delete_form_submit($form, &$form_state) {
  * @param $form_state
  *   The current form state, passed by FormsAPI.
  */
-function domain_advanced_form($form, $form_state) {
+function domain_advanced_form($form, &$form_state) {
   $form = array();
   $node_types = node_type_get_names();
   // In D7, type handling is strict, so make this value 0 or 1.
@@ -1032,7 +1032,7 @@ function domain_batch_form_submit($form, &$form_state) {
  *
  * @see domain_get_user_domains()
  */
-function domain_roles_form($form, $form_state) {
+function domain_roles_form($form, &$form_state) {
   $form = array();
   $form['domain_add_roles'] = array(
     '#type' => 'radios',
