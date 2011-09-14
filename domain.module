@@ -963,6 +963,10 @@ function domain_save($values, $form_values = array()) {
   module_invoke_all($action, $domain, $form_values);
   // Lookup the modified record and return it.
   $domain = domain_lookup(NULL, $values['subdomain'], TRUE);
+
+  // In all cases, we need to force a menu rebuild, which also clears the cache.
+  menu_rebuild();
+
   return $domain;
 }
 
