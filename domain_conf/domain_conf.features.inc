@@ -90,7 +90,7 @@ function domain_conf_features_rebuild($module) {
         ->condition('domain_id', $domain_id)
         ->execute();
       // Save the new records.
-      if (empty($list)) {
+      if (empty($variables)) {
         continue;
       }
       $record = array(
