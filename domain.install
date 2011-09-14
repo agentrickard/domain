@@ -26,7 +26,7 @@ function domain_schema() {
       'valid' => array('type' => 'varchar', 'length' => '1', 'not null' => TRUE, 'default' => '1', 'description' => 'Active status'),
       'weight' => array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0, 'description' => 'Sort order'),
       'is_default' => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Indicates primary domain'),
-      'machine_name' => array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
+      'machine_name' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
     'primary key' => array('domain_id'),
     'indexes' => array(
       'subdomain' => array('subdomain'),
@@ -67,7 +67,7 @@ function domain_schema() {
     'description' => 'Stores canonical machine names for domains.',
     'fields' => array(
       'domain_id' => array('type' => 'serial', 'description' => 'Domain id. Automatic master key.'),
-      'machine_name' => array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
+      'machine_name' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
     'primary key' => array('machine_name'),
     'indexes' => array(
       'domain_id' => array('domain_id')
@@ -241,7 +241,7 @@ function domain_update_7304(&$sandbox) {
     'description' => 'Stores canonical machine names for domains.',
     'fields' => array(
       'domain_id' => array('type' => 'serial', 'description' => 'Domain id. Automatic master key.'),
-      'machine_name' => array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
+      'machine_name' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
     'primary key' => array('machine_name'),
     'indexes' => array(
       'domain_id' => array('domain_id')
@@ -262,7 +262,7 @@ function domain_update_7305(&$sandbox) {
 
   // Add the machine name column.
   if (!db_field_exists('domain', 'machine_name')) {
-    $spec = array('type' => 'varchar', 'length' => '40', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.');
+    $spec = array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.');
     db_add_field('domain', 'machine_name', $spec);
   }
 
