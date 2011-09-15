@@ -168,12 +168,13 @@ function domain_update_7301(&$sandbox) {
     return('No update required');
   }
   db_add_field('domain', 'is_default', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0), array());
-  $default = variable_get('domain_default', 0);
   db_update('domain')
     ->fields(array('is_default' => 1, 'weight' => -1))
-    ->condition('domain_id', $default)
+    ->condition('domain_id', 0)
     ->execute();
   variable_del('domain_default');
+
+  return t('Default domain updated.');
 }
 
 /**
@@ -183,6 +184,7 @@ function domain_update_7302(&$sandbox) {
   if (!db_index_exists('domain', 'is_default')) {
     db_add_index('domain', 'is_default', array('is_default'));
   }
+  return t('Domain default indexed properly.');
 }
 
 /**
@@ -195,30 +197,38 @@ function domain_update_7303(&$sandbox) {
   if (empty($default)) {
     return t('Domain Access did not find an existing domain 0. No updates required.');
   }
+  // We have to do a delete and re-insert here to properly increment the id.
+  // Since the module might be disabled, we can't use drupal_write_record();
   db_delete('domain')
     ->condition('domain_id', 0)
     ->execute();
-  unset($default['domain_id']);
-  drupal_write_record('domain', $default);
 
-  // Write to other tables using our foreign key.
-  $schema = drupal_get_schema();
-  foreach ($schema as $table => $data) {
-    if (isset($data['fields']['domain_id']) && $data['fields']['domain_id']['type'] == 'int') {
-      db_update($table)
-        ->fields(array('domain_id' => $default['domain_id']))
-        ->condition('domain_id', 0)
-        ->execute();
-    }
-  }
-  // Update other tables that use a domain_id realm.
+  db_insert('domain')
+    ->fields(array(
+      'subdomain' => $default['subdomain'],
+      'sitename' => $default['sitename'],
+      'scheme' => $default['scheme'],
+      'valid' => $default['valid'],
+      'weight' => $default['weight'],
+      'is_default' => $default['is_default'],
+      
+    ))
+    ->execute();
+
+  // Update tables that use a domain_id and we control directly.
+  $default_id = db_query("SELECT domain_id FROM {domain} WHERE is_default = 1")->fetchField();
+
+  db_update('domain_editor')
+    ->fields(array('domain_id' => $default_id))
+    ->condition('domain_id', 0)
+    ->execute();
   db_update('domain_access')
-    ->fields(array('gid' => $default['domain_id']))
+    ->fields(array('gid' => $default_id))
     ->condition('gid', 0)
     ->condition('realm', 'domain_id')
     ->execute();
   db_update('node_access')
-    ->fields(array('gid' => $default['domain_id']))
+    ->fields(array('gid' => $default_id))
     ->condition('gid', 0)
     ->condition('realm', 'domain_id')
     ->execute();
@@ -227,13 +237,34 @@ function domain_update_7303(&$sandbox) {
   variable_del('domain_sitename');
   variable_del('domain_scheme');
   // Update message.
-  return t('Domain Access updated successfully');
+  return t('Domain Access updated domain 0 successfully');
+}
+
+/**
+ * Rebuild the {domain} table.
+ */
+function domain_update_7304(&$sandbox) {
+  // Reset the domain_id field as a plain integer.
+  $spec = array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Domain numeric id.');
+  db_change_field('domain', 'domain_id', 'domain_id', $spec);
+  db_drop_primary_key('domain');
+
+  // Add the machine name column.
+  if (!db_field_exists('domain', 'machine_name')) {
+    $spec = array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.');
+    db_add_field('domain', 'machine_name', $spec);
+  }
+
+  // Now we can safely add the new primary key.
+  db_add_primary_key('domain', array('domain_id'));
+
+  return t('{domain} table updated with machine_name column.');
 }
 
 /**
  * Allow domains to be made exportable.
  */
-function domain_update_7304(&$sandbox) {
+function domain_update_7305(&$sandbox) {
   if (db_table_exists('domain_export')) {
     return t('{domain_export} table exists.');
   }
@@ -251,26 +282,6 @@ function domain_update_7304(&$sandbox) {
   return t('{domain_export} table created.');
 }
 
-/**
- * Rebuild the {domain} table.
- */
-function domain_update_7305(&$sandbox) {
-  // Reset the domain_id field as a plain integer.
-  db_drop_primary_key('domain');
-  $spec = array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0, 'description' => 'Domain numeric id.');
-  db_change_field('domain', 'domain_id', 'domain_id', $spec);
-
-  // Add the machine name column.
-  if (!db_field_exists('domain', 'machine_name')) {
-    $spec = array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.');
-    db_add_field('domain', 'machine_name', $spec);
-  }
-
-  // Now we can safely add the new primary key.
-  db_add_primary_key('domain', array('domain_id'));
-
-  return t('{domain} table updated.');
-}
 
 /**
  * Insert existing domain records into {domain_export} and {domain}.
@@ -281,16 +292,29 @@ function domain_update_7306(&$sandbox) {
     $query = db_insert('domain_export')
       ->fields(array(
         'domain_id' => $domain->domain_id,
-        'machine_name' => domain_machine_name($domain->subdomain),
+        'machine_name' => domain_update_machine_name($domain->subdomain),
       ));
     $query->execute();
     $query = db_update('domain')
       ->condition('domain_id', $domain->domain_id)
       ->fields(array(
-        'machine_name' => domain_machine_name($domain->subdomain),
+        'machine_name' => domain_update_machine_name($domain->subdomain),
       ));
     $query->execute();
   }
 
   return t('{domain_export} table populated.');
+}
+
+/**
+ * Generates a machine name during the update process.
+ *
+ * @param $subdomain
+ *  The subdomain string of the record, which should be unique.
+ *
+ * @return
+ *  A string with dot and colon transformed to underscore.
+ */
+function domain_update_machine_name($subdomain) {
+  return preg_replace('/[^a-z0-9_]+/', '_', $subdomain);
 }
