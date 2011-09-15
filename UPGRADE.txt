@@ -70,7 +70,7 @@ You should now be ready to use your Drupal 7 site.
 2. Upgrading from Domain Access 7.x.2 to 7.x.3.
 
 If you are using Domain Access 7.x.2, you must upgrade to 7.x.3 using the
-Drupal update script. T odo so, follow the steps below.
+Drupal update script. To do so, follow the steps below.
 
   -- Disable Domain Access 7.x.2 and its dependent modules.
   -- Download Domain Access 7.x.3 and replace the existing 'domain' files
@@ -80,9 +80,9 @@ Drupal update script. T odo so, follow the steps below.
 
 If you do not disable the module before upgrading, fatal errors will occur.
 These errors are temporary but look pretty scary. Your site will not be
-damaged.
+damaged, so Don't Panic.
 
-After you upgrade, you may be promted to perform additional actions. Simply
+After you upgrade, you may be prompted to perform additional actions. Simply
 follow the on-screen instructions. These additional updates may not be
 accessible via drush.
 
