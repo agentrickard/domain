@@ -16,9 +16,13 @@ function domain_overview_form($form, &$form_state) {
   if (empty($check)) {
     domain_set_primary_domain();
   }
+  // Check for the 7.x.3 update.
+  domain_check_for_update();
+  // Set the form.
   $default = domain_default();
   $active_domain = domain_get_domain();
   $form = array();
+
   $form['top'] = array(
     '#markup' => t('<p>The following domains have been created for your site.  The currently active domain <strong>is shown in boldface</strong>.  You
                     may click on a domain to change the currently active domain.  Your default domain is %name, which will be used for all requests that fail to resolve to a registered domain.</p>', array('%name' => $default['subdomain'])),
@@ -1144,4 +1148,52 @@ function theme_domain_overview_form($variables) {
   $output .= theme('table', array('header' => $header, 'rows' => $rows, 'attributes' => $attributes));
   $output .= drupal_render_children($form);
   return $output;
+}
+
+/**
+ * Repairs and updates instances of domain_id 0 after the update to 7.x.3.
+ */
+function domain_repair_form($form, &$form_state) {
+  $list = domain_update_module_check();
+  if (empty($list)) {
+    $form['list'] = array(
+      '#markup' => '<p>' . t('No updates are required. <a href="!url">return to domain administration</a>.', array('!url' => url('admin/structure/domain'))) . '</p>',
+    );
+  }
+  else {
+    $form['intro'] = array(
+      '#markup' => '<p>' . t('The following modules have data that references domain_id 0 and will be updated:') . '</p>',
+    );
+    $modules = array();
+    foreach ($list as $item) {
+      $modules[] = check_plain($item['name']);
+    }
+    $form['list'] = array(
+      '#markup' => theme('item_list', array('items' => $modules)),
+    );
+    $form['outro'] = array(
+      '#markup' => '<p>' . t('All records marked with domain_id 0 will be assigned to the default domain.') .'</p>',
+    );
+    $form['tables'] = array(
+      '#type' => 'value',
+      '#value' => domain_update_tables($list),
+    );
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Update database tables'),
+    );
+  }
+  return $form;
+}
+
+/**
+ * Repairs references to domain_id 0.
+ */
+function domain_repair_form_submit($form, &$form_state) {
+  $tables = $form_state['values']['tables'];
+  $success = domain_update_zero_records($tables);
+  if ($success) {
+    drupal_set_message(t('!count database table(s) were updated.', array('!count' => count($form_state['values']['tables']))));
+  }
+  $form_state['redirect'] = 'admin/structure/domain';
 }

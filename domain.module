@@ -289,6 +289,14 @@ function domain_menu() {
     'file' => 'domain.admin.inc',
     'weight' => 50,
   );
+  $items['admin/structure/domain/repair'] = array(
+    'title' => 'Domain update database',
+    'access arguments' => array('administer domains'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_repair_form'),
+    'type' => MENU_CALLBACK,
+    'file' => 'domain.admin.inc',
+  );
   return $items;
 }
 
@@ -1169,7 +1177,6 @@ function domain_set_primary_domain() {
       'valid' => 1,
       'is_default' => 1,
       'machine_name' => domain_machine_name($root),
-      'export_status' => DOMAIN_EXPORT_STATUS_DATABASE,
     );
     drupal_write_record('domain_export', $domain);
     drupal_write_record('domain', $domain);
@@ -2510,6 +2517,7 @@ function domain_grant_all($reset= FALSE) {
  */
 function domain_modules_enabled() {
   domain_bootstrap_register();
+  domain_check_for_update();
 }
 
 /**
@@ -3276,3 +3284,146 @@ function domain_features_selection($data) {
   return $list;
 }
 
+/**
+ * Checks to see if any dependent modules have a domain_id 0 record left.
+ *
+ * @return
+ *  An array of matching modules, with the human readable name and an array of
+ *  tables that require an update as values for each entry, keyed by module
+ *  name.
+ */
+function domain_update_module_check() {
+  $list = array();
+  $modules = system_rebuild_module_data();
+  $dependencies = $modules['domain']->required_by;
+  $enabled_dependencies = array_intersect_key($dependencies, module_list());
+  if (empty($enabled_dependencies)) {
+    return $list;
+  }
+  foreach($enabled_dependencies as $module => $data) {
+    module_load_install($module);
+    if ($schema = module_invoke($module, 'schema')) {
+      if ($tables = domain_test_schema($schema)) {
+        $list[$module]['name'] = $modules[$module]->info['name'];
+        $list[$module]['tables'] = $tables;
+      }
+    }
+  }
+  return $list;
+}
+
+/**
+ * Checks a dependent module's tables for a domain_id of 0.
+ *
+ * @param $schema
+ *  An array of table schemas, using the SchemaAPI.
+ *
+ * @return $tables
+ *  An array of matching tables.
+ */
+function domain_test_schema($schema = array()) {
+  $tables = array();
+  foreach ($schema as $name => $table) {
+    if (isset($table['fields']['domain_id']['type']) && $table['fields']['domain_id']['type'] == 'int') {
+      $query = db_select($name)
+        ->condition('domain_id', 0);
+      $check = $query->countQuery()->execute()->fetchField();
+      if ($check) {
+        $tables[] = $name;
+      }
+    }
+  }
+  return $tables;
+}
+
+/**
+ * Creates an array of tables to pass to the update script.
+ *
+ * @param $list
+ *  The modules array returned by domain_update_module_check().
+ *
+ * @return $tables
+ *  An array of tables to modify.
+ */
+function domain_update_tables($list) {
+  $tables = array();
+  foreach ($list as $module) {
+    $tables = array_merge($tables, $module['tables']);
+  }
+  return $tables;
+}
+
+/**
+ * Turns a domain_id of 0 into the default domain.
+ *
+ * @param $tables
+ *  An array of database tables to update.
+ *
+ * @return
+ *  TRUE on success or FALSE on failure.
+ */
+function domain_update_zero_records($tables) {
+  $default_id = domain_default_id();
+  $success = TRUE;
+  foreach ($tables as $table) {
+    $transaction = db_transaction();
+    try {
+      db_update($table)
+        ->fields(array('domain_id' => $default_id))
+        ->condition('domain_id', 0)
+        ->execute();
+    }
+    catch (Exception $e) {
+      $transaction->rollback();
+      watchdog_exception('domain_repair', $e);
+      drupal_set_message(t('The update failed due to a duplicate record. You must manually correct the {@table} table in your database.', array('@table' => $table)), 'error');
+      $success = FALSE;
+    }
+  }
+  return $success;
+}
+
+/**
+ * Generates messages about required table updates for 7.x.3.
+ *
+ * This function may be called during module installation, so we use $t to
+ * ensure that we use the correct translation function.
+ *
+ * @see domain_requirements()
+ *
+ * @param &$messages
+ *  An array of translated status messages, passed by reference.
+ * @param $list
+ *  An array of modules that require updates.
+ */
+function domain_update_messages(&$messages, $list) {
+  $t = get_t();
+  foreach($list as $module => $data) {
+    $updated = $t('updated by an administrator');
+    if (user_access('administer domains')) {
+      $updated = l($t('updated for compatibility'), 'admin/structure/domain/repair');
+    }
+    $messages[] = $t('@module has a domain_id of 0 and needs to be !updated.', array('@module' => $data['name'], '!updated' => $updated));
+  }
+}
+
+/**
+ * Checks for tables not compatible with 7.x.3 and provides standard messages.
+ */
+function domain_check_for_update() {
+  $list = domain_update_module_check();
+
+  if (!empty($list)) {
+    $messages = array();
+    domain_update_messages(&$messages, $list);
+    if (!drupal_is_cli()) {
+      drupal_set_message(theme('item_list', array('items' => $messages)), 'error', FALSE);
+    }
+    elseif (function_exists('drush_print')) {
+      foreach ($messages as $message) {
+        drush_print(" * $message");
+      }
+      drush_print(dt(" ** Run 'drush domain-repair' to update these tables."));
+    }
+  }
+}

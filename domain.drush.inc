@@ -91,6 +91,12 @@ function domain_drush_command() {
     ),
     'aliases' => array('gend'),
   );
+  $items['domain-repair'] = array(
+    'description' => 'Updates domain_id 0 records in dependent tables.',
+    'examples' => array(
+      'drush domain-repair',
+    ),
+  );
   return $items;
 }
 
@@ -422,4 +428,29 @@ function drush_domain_get_from_argument($argument) {
     return FALSE;
   }
   return $domain;
+}
+
+/**
+ * Replaces domain_id 0 records with the default domain.
+ */
+function drush_domain_repair() {
+  $list = domain_update_module_check();
+  if (empty($list)) {
+    drush_print(dt('All tables are up-to-date.'));
+    return;
+  }
+  $modules = array();
+  drush_print(dt('The following modules require a data update:'));
+  drush_print();
+  foreach ($list as $item) {
+    drush_print(' * ' . $item['name']);
+  }
+  drush_print();
+  $choice = drush_choice(array(1 => dt('Update')), dt('Update database?'), '!value');
+  if ($choice) {
+    $success = domain_update_zero_records(domain_update_tables($list));
+    if ($success) {
+      drush_print(dt('!count table(s) updated successfully.', array('!count' => count($list))));
+    }
+  }
 }

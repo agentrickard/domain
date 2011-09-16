@@ -318,3 +318,41 @@ function domain_update_7306(&$sandbox) {
 function domain_update_machine_name($subdomain) {
   return preg_replace('/[^a-z0-9_]+/', '_', $subdomain);
 }
+
+/**
+ * Checks module requirements.
+ */
+function domain_requirements($phase) {
+  if ($phase != 'runtime') {
+    return;
+  }
+
+  $messages = array();
+  $severity = REQUIREMENT_ERROR;
+  // Ensure we have a primary domain.
+  $check = domain_default();
+  if ($check['domain_id'] == 0) {
+    $updated = t('set by an administrator');
+    if (user_access('administer domains')) {
+      $updated = l(t('set properly'), 'admin/structure/domain');
+    }
+    $messages[] = t('The site has no primary domain and needs to be !updated.', array('!updated' => $updated));
+  }
+  // Check for domain_id 0.
+  $list = domain_update_module_check();
+  domain_update_messages($messages, $list);
+
+  // Now report.
+  $t = get_t();
+  if (empty($message)) {
+    $severity = REQUIREMENT_OK;
+    $messages[] = t('Module installed correctly.');
+  }
+  $requirements['domain'] = array(
+    'title' => $t('Domain Access'),
+    'value' => theme('item_list', array('items' => $messages)),
+    'severity' => $severity,
+  );
+
+  return $requirements;
+}

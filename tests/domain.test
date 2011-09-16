@@ -672,3 +672,37 @@ class DomainCacheTest extends DomainTestCase {
     $this->domainResetBaseUrl();
   }
 }
+
+class DomainUpdateTest extends DomainTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Domain update tests',
+      'description' => 'Tests for the update to 7.x.3.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  // On setup, install our test module.
+  function setUp($list = array()) {
+    if (!in_array('domain_conf', $list)) {
+      $list[] = 'domain_conf';
+    }
+    parent::setUp($list);
+    db_insert('domain_conf')
+      ->fields(array(
+        'domain_id' => 0,
+        'settings' => '',
+      ))
+      ->execute();
+  }
+
+  function testDomainUpdate() {
+    $count = db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = 0")->fetchField();
+    $this->assertTrue($count == 1, t('Domain id of 0 inserted in {domain_conf}.'));
+    $list = domain_update_module_check();
+    $this->assertTrue(count($list) > 0, t('domain_update_module_check() returned correctly.'));
+    domain_update_zero_records(domain_update_tables($list));
+    $list = domain_update_module_check();
+    $this->assertTrue(count($list) == 0, t('domain_update_zero_records fired correctly.'));
+  }
+}
