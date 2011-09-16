@@ -22,3 +22,25 @@ function domain_source_schema() {
   );
   return $schema;
 }
+
+/**
+ * Implements hook_dependencies().
+ */
+function domain_source_update_dependencies() {
+  $dependencies['domain_source'][7300] = array(
+    'domain' => 7303,
+  );
+  return $dependencies;
+}
+
+/**
+ * Remove references to row 0.
+ */
+function domain_source_update_7300(&$sandbox) {
+  $default_id = domain_default_id();
+  db_update('domain_source')
+    ->fields(array('domain_id' => $default_id))
+    ->condition('domain_id', 0)
+    ->execute();
+  return t('Domain Source zero records removed.');
+}

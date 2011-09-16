@@ -48,3 +48,25 @@ function domain_alias_schema() {
 
   return $schema;
 }
+
+/**
+ * Implements hook_dependencies().
+ */
+function domain_alias_update_dependencies() {
+  $dependencies['domain_alias'][7300] = array(
+    'domain' => 7303,
+  );
+  return $dependencies;
+}
+
+/**
+ * Remove references to row 0.
+ */
+function domain_alias_update_7300(&$sandbox) {
+  $default_id = domain_default_id();
+  db_update('domain_alias')
+    ->fields(array('domain_id' => $default_id))
+    ->condition('domain_id', 0)
+    ->execute();
+  return t('Domain Alias zero records removed.');
+}
