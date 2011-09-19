@@ -3415,7 +3415,7 @@ function domain_check_for_update() {
 
   if (!empty($list)) {
     $messages = array();
-    domain_update_messages(&$messages, $list);
+    domain_update_messages($messages, $list);
     if (!drupal_is_cli()) {
       drupal_set_message(theme('item_list', array('items' => $messages)), 'error', FALSE);
     }
