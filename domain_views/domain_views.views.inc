@@ -198,7 +198,7 @@ function domain_views_views_data() {
    // Define available on current domain field
   $data['domain_access']['current_all'] = array(
     'title' => t('Available on current domain'),
-    'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates'),
+    'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates)'),
     'field' => array(
       'handler' => 'views_handler_field_boolean',
       'click sortable' => TRUE,
