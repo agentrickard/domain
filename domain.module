@@ -1605,7 +1605,12 @@ function domain_get_node_match($nid) {
  *   The domain array for the best matching domain for links to this node.
  */
 function domain_get_path_match($path) {
-  global $_domain;
+  $_domain = domain_get_domain();
+  // When using modules that alter the path, this can be called before the
+  // domain path is loaded. See http://drupal.org/node/1193338.
+  if (!isset($_domain['path'])) {
+    $_domain = domain_lookup($_domain['domain_id'], NULL, TRUE);
+  }
   $source = $_domain;
   drupal_alter('domain_source_path', $source, $path);
   return $source;
