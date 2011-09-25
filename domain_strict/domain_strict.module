@@ -21,7 +21,7 @@
  *
  * @ingroup strict
  */
-function domain_strict_domaingrants(&$grants, $account, $op) {
+function domain_strict_node_grants_alter(&$grants, $account, $op) {
   global $_domain;
   // We only act on the 'view' operation.
   if ($op != 'view') {
