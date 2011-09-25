@@ -1,10 +1,10 @@
 <?php
 
-
 /**
  * @file
- * Simpletest for Domain Access
+ * Simpletest for Domain Access.
  */
+
 class DomainTestCase extends DrupalWebTestCase {
 
   /**

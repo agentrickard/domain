@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Simpletest for Domain Strict.
+ */
+
+class DomainStrictTestCase extends DomainTestCase {
+
+  public function setUp($list = array()) {
+    $modules = array('domain_strict');
+    parent::setUp($modules);
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Check grants alteration',
+      'description' => 'Esure that grants are only assigned to domains the user belongs to.',
+      'group' => 'Domain Strict',
+    );
+  }
+
+  public function testDomainStrict() {
+    $account = user_load(1);
+    $grants = node_access_grants('view', $account);
+    // User 1 is a member of the primary domain. Confirm this.
+    $this->assertTrue(!empty($grants['domain_id']), t('User is assigned to the default domain properly.'));
+    // Clear and reset the {domain_editor} table.
+    db_delete('domain_editor')
+      ->condition('uid', $account->uid)
+      ->execute();
+    $count = db_query("SELECT 1 FROM {domain_editor} WHERE uid = 1")->fetchField();
+    $this->assertTrue(empty($count), t('User removed from the primary domain.'));
+    // Reload the user data to remove caching.
+    drupal_static_reset('domain_get_user_domains');
+    $grants = node_access_grants('view', $account);
+    $this->assertTrue(empty($grants['domain_id']), t('Domain strict revoked rights to the user.'));
+  }
+
+}

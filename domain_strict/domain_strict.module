@@ -13,7 +13,7 @@
  */
 
 /**
- * Implements hook_domaingrants()
+ * Implements hook_node_access_grants_alter().
  *
  * In Domain Strict, we only let users see content on domains that
  * they are registered with.  So we check the $user object in order
@@ -22,7 +22,7 @@
  * @ingroup strict
  */
 function domain_strict_node_grants_alter(&$grants, $account, $op) {
-  global $_domain;
+  $_domain = domain_get_domain();
   // We only act on the 'view' operation.
   if ($op != 'view') {
     return;

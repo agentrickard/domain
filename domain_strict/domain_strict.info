@@ -4,3 +4,4 @@ package = Domain Access
 dependencies[] = domain
 core = 7.x
 files[] = domain_strict.module
+files[] = domain_strict.test
