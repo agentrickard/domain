@@ -126,3 +126,41 @@ function domain_test_domain_bootstrap_full($domain) {
 function domain_test_domain_reassign($old_domain, $new_domain, $table) {
   domain_test_set($table);
 }
+
+/**
+ * Implements hook_domain_batch().
+ */
+function domain_test_domain_batch() {
+  // A simple function to rename my setting in Domain Configuration.
+  $batch = array();
+  $batch['domain_test'] = array(
+    '#form' => array(
+      '#title' => t('My Settings'),
+      '#type' => 'textfield',
+      '#size' => 40,
+      '#maxlength' => 80,
+      '#description' => t('A description for the form'),
+      '#required' => TRUE,
+    ),
+    '#permission' => 'administer domains',
+    '#domain_action' => 'domain_conf',
+    '#meta_description' => t('Edit my setting value.'),
+    '#variable' => 'domain_mysetting',
+    '#validate' => 'domain_mysetting_validate',
+    '#data_type' => 'string',
+    '#weight' => 0,
+    '#group' => t('My settings'),
+    '#collapsed' => FALSE,
+    '#update_all' => TRUE,
+    '#module' => t('Domain Access'),
+  );
+  return $batch;
+}
+
+/**
+ * Implements hook_domain_batch_alter().
+ */
+function domain_test_domain_batch_alter(&$batch) {
+  // Rename 'Put site into maintenance mode'.
+  $batch['maintenance_mode']['#form']['#title'] = t('Test reset value');
+}

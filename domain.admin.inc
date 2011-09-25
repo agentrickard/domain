@@ -715,8 +715,8 @@ function domain_batch($action = NULL) {
   if (empty($domains)) {
     return t('There are no domains configured for this site.');
   }
-
-  $batch = module_invoke_all('domain_batch');
+  
+  $batch = domain_batch_actions();
   // We must have some actions, otherwise, no point.
   if (empty($batch)) {
     return t('There are no batch actions configured.');

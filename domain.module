@@ -428,6 +428,9 @@ function domain_hook_info() {
   $hooks['domain_batch'] = array(
     'group' => 'domain',
   );
+  $hooks['domain_batch_alter'] = array(
+    'group' => 'domain',
+  );
   // Test that these work.
   $hooks['domain_bootstrap_lookup'] = array(
     'group' => 'domain',
@@ -3431,4 +3434,22 @@ function domain_check_for_update() {
       drush_print(dt(" ** Run 'drush domain-repair' to update these tables."));
     }
   }
+}
+
+/**
+ * Defines batch operations for domain settings.
+ *
+ * @return
+ *  An array of elements defined by hook_domain_batch().
+ */
+function domain_batch_actions() {
+  $batch = &drupal_static(__FUNCTION__);
+  if (!empty($batch)) {
+    return $batch;
+  }
+  // Get all implementations.
+  $batch = module_invoke_all('domain_batch');
+  // Allow modules to alter the list.
+  drupal_alter('domain_batch', $batch);
+  return $batch;
 }

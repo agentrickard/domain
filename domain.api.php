@@ -452,6 +452,21 @@ function hook_domain_batch() {
 }
 
 /**
+ * Allow modules to modify the batch editing functions.
+ *
+ * @see drupal_alter()
+ *
+ * @param &$batch
+ *   An array of batch editing functions, passed by reference.
+ * @return
+ *   No return value. Modify $batch by reference.
+ */
+function hook_domain_batch_alter(&$batch) {
+  // Rename 'Put site into maintenance mode'.
+  $batch['maintenance_mode']['#form']['#title'] = t('Take site offline');
+}
+
+/**
  * Return an array of forms for which we cannot run hook_form_alter().
  *
  * @return

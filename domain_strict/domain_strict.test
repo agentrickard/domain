@@ -8,8 +8,8 @@
 class DomainStrictTestCase extends DomainTestCase {
 
   public function setUp($list = array()) {
-    $modules = array('domain_strict');
-    parent::setUp($modules);
+    $list[] = 'domain_strict';
+    parent::setUp($list);
   }
 
   public static function getInfo() {

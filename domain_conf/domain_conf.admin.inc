@@ -45,7 +45,7 @@ function domain_conf_page($domain) {
  */
 function domain_conf_form($form, &$form_state, $domain) {
   $form = array();
-  $batch = module_invoke_all('domain_batch');
+  $batch = domain_batch_actions();
   $settings = array();
   $data = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
   if (!empty($data)) {

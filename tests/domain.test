@@ -340,6 +340,13 @@ class DomainHookTest extends DomainTestCase {
     }
     $return = domain_get_domain();
     $this->assertTrue(!empty($return['test_full']), t('hook_domain_bootstrap_full() fired correctly.'));
+
+    // hook_domain_batch() should add a 'domain_test' array element.
+    $batch = domain_batch_actions();
+    $this->assertTrue(isset($batch['domain_test']), t('hook_domain_batch() fired correctly.'));
+    // hook_domain_batch_alter() changes values in the batch options.
+    $this->assertTrue($batch['maintenance_mode']['#form']['#title'] == t('Test reset value'), t('hook_domain_batch_alter() fired correctly.'));
+
   }
 
 }
