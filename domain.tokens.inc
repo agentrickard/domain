@@ -31,6 +31,10 @@ function domain_token_info() {
     'name' => t('Domain id'),
     'description' => t('The domain ID.'),
   );
+  $info['tokens']['domain']['machine_name'] = array(
+    'name' => t('Domain machine name'),
+    'description' => t('The domain machine identifier.'),
+  );
   $info['tokens']['domain']['name'] = array(
     'name' => t('Domain name'),
     'description' => t('The domain name.'),
@@ -61,6 +65,9 @@ function domain_tokens($type, $tokens, array $data = array(), array $options = a
       switch ($name) {
         case 'id':
           $replacements[$original] = $domain['domain_id'];
+          break;
+        case 'machine_name':
+          $replacements[$original] = $domain['machine_name'];
           break;
         case 'name':
           $replacements[$original] = $sanitize ? check_plain($domain['sitename']) : $domain['sitename'];

@@ -342,6 +342,29 @@ function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
       Enter one path per line.  See the README for more details.')
   );
 
+  $form['domain_classes'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Domain-specific CSS classes'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE
+  );
+  // Get the available tokens.
+  $prefixes = array('current-domain', 'default-domain');
+  module_load_include('inc', 'domain', 'domain.tokens');
+  $info = domain_token_info();
+  foreach($prefixes as $prefix) {
+    foreach($info['tokens']['domain'] as $token => $data) {
+      $tokens[] = t('!token : !description', array('!token' => "[$prefix:$token]", '!description' => $data['description']));
+    }
+  }
+  $form['domain_classes']['domain_classes'] = array(
+    '#type' => 'textarea',
+    '#rows' => 5,
+    '#cols' => 40,
+    '#default_value' => variable_get('domain_classes', 'domain-[current-domain:machine_name]'),
+    '#description' => t('Add the following classes to the <em>body</em> tag of every page. Enter one class per line. The following token replacements are allowed: !tokens', array('!tokens' => theme('item_list', array('items' => $tokens)))),
+  );
+
   // Allow submodules to add elements to the form.
   $modules = module_implements('domain_form');
   if (!empty($modules)) {

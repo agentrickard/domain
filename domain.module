@@ -1117,7 +1117,13 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
 function domain_default($reset = FALSE, $alter = TRUE) {
   $default = &drupal_static(__FUNCTION__);
   if (empty($default) || $reset) {
-    $default = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE is_default = 1")->fetchAssoc();
+    // Temporary hack for update to 7.x.3.
+    if (db_table_exists('domain_export')) {
+      $default = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default, machine_name FROM {domain} WHERE is_default = 1")->fetchAssoc();
+    }
+    else {
+      $default = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default FROM {domain} WHERE is_default = 1")->fetchAssoc();
+    }
     // Let submodules overwrite the defaults, if they wish.
     if (empty($default)) {
       $default = array(
@@ -1126,7 +1132,8 @@ function domain_default($reset = FALSE, $alter = TRUE) {
         'sitename' => variable_get('site_name', 'Drupal'),
         'scheme' => empty($_SERVER['HTTPS']) ? 'http' : 'https',
         'valid' => 1,
-        'is_default' => 1
+        'is_default' => 1,
+        'machine_name' => domain_machine_name($default['subdomain']),
       );
     }
     if ($alter) {
@@ -3452,4 +3459,34 @@ function domain_batch_actions() {
   // Allow modules to alter the list.
   drupal_alter('domain_batch', $batch);
   return $batch;
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function domain_preprocess_html(&$variables) {
+  $classes = domain_page_classes();
+  foreach ($classes as $class) {
+    $variables['classes_array'][] = $class;
+  }
+}
+
+/**
+ * Determine the page classes to apply to the current domain.
+ *
+ * @return
+ *  An array of domain-specific HTML-safe class names.
+ */
+function domain_page_classes() {
+  $classes = array();
+  $settings = variable_get('domain_classes', 'domain-[current-domain:machine_name]');
+  if (!empty($settings)) {
+    $vars = check_plain(token_replace($settings));
+    $vars = preg_replace('/(\r\n|\n)/', "\r\n", $vars);
+    $vars = explode("\r\n", token_replace($vars));
+    foreach($vars as $var) {
+      $classes[] = drupal_clean_css_identifier(trim($var));
+    }
+  }
+  return $classes;
 }

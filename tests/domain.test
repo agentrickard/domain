@@ -596,7 +596,7 @@ class DomainCacheTest extends DomainTestCase {
   public static function getInfo() {
     return array(
       'name' => 'Domain caching tests',
-      'description' => 'Tests for proper page caching.',
+      'description' => 'Tests for proper page caching and markup.',
       'group' => 'Domain Access',
     );
   }
@@ -615,6 +615,11 @@ class DomainCacheTest extends DomainTestCase {
     // This section borrowed from bootstrap.test.
     // Fill the cache.
     $this->drupalGet('');
+
+    // Check the output for our body classes.
+    $domain_classes = domain_page_classes();
+    $this->assertRaw('domain-', t('Domain text found in body classes.'));
+    $this->assertRaw($domain_classes[0], t('Domain-specific body class rendered correctly: !class.', array('!class' => $domain_classes[0])));
 
     $this->drupalHead('');
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', t('Page was cached on primary domain.'));
@@ -650,6 +655,15 @@ class DomainCacheTest extends DomainTestCase {
     $new_user = $this->drupalCreateUser();
     // Fill the cache.
     $this->drupalGet($domains['one']['path'], $options);
+
+    // Check the output for our body classes. 
+    // Note that we set the domain to get the right variables.
+    domain_set_domain($domains['one']['domain_id'], TRUE);
+    $domain_classes2 = domain_page_classes();
+    domain_reset_domain(TRUE);
+    $this->assertRaw('domain-', t('Domain text found in body classes.'));
+    $this->assertTrue($domain_classes[0] != $domain_classes2[0], t('Body class is different for secondary domain.'));
+    $this->assertRaw($domain_classes2[0], t('Domain-specific body class rendered correctly: !class.', array('!class' => $domain_classes2[0])));
 
     $this->drupalHead($domains['one']['path'], $options);
     $this->assertEqual($this->drupalGetHeader('X-Drupal-Cache'), 'HIT', t('Page was cached on %domain.', array('%domain' => $domains['one']['subdomain'])));
