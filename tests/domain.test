@@ -367,7 +367,7 @@ class DomainSwitchingTest extends DomainTestCase {
   }
 
   // Test domain creation and switching.
-  function testDomainSwtiching() {
+  function testDomainSwitching() {
     // Create some domains.
     $result = $this->domainCreateDomains();
     $_domain = domain_get_domain();
