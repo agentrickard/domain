@@ -35,6 +35,10 @@ function domain_token_info() {
     'name' => t('Domain machine name'),
     'description' => t('The domain machine identifier.'),
   );
+  $info['tokens']['domain']['path'] = array(
+    'name' => t('Domain path'),
+    'description' => t('The base url path for the domain.'),
+  );
   $info['tokens']['domain']['name'] = array(
     'name' => t('Domain name'),
     'description' => t('The domain name.'),
@@ -71,6 +75,9 @@ function domain_tokens($type, $tokens, array $data = array(), array $options = a
           break;
         case 'name':
           $replacements[$original] = $sanitize ? check_plain($domain['sitename']) : $domain['sitename'];
+          break;
+        case 'path':
+          $replacements[$original] = $domain['path'];
           break;
         case 'url':
           $url = domain_url_encode($domain['subdomain']);

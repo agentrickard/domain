@@ -349,14 +349,7 @@ function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
     '#collapsed' => TRUE
   );
   // Get the available tokens.
-  $prefixes = array('current-domain', 'default-domain');
-  module_load_include('inc', 'domain', 'domain.tokens');
-  $info = domain_token_info();
-  foreach($prefixes as $prefix) {
-    foreach($info['tokens']['domain'] as $token => $data) {
-      $tokens[] = t('!token : !description', array('!token' => "[$prefix:$token]", '!description' => $data['description']));
-    }
-  }
+  $tokens = domain_get_tokens();
   $form['domain_classes']['domain_classes'] = array(
     '#type' => 'textarea',
     '#rows' => 5,
