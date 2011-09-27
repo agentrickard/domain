@@ -727,3 +727,88 @@ class DomainUpdateTest extends DomainTestCase {
     $this->assertTrue(count($list) == 0, t('domain_update_zero_records fired correctly.'));
   }
 }
+
+class DomainFilterTest extends DomainTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Domain filter tests',
+      'description' => 'Tests for domain-based text filters.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  // On setup, install our test module.
+  function setUp($list = array()) {
+    parent::setUp($list);
+  }
+
+  function testDomainFilters() {
+    // Create domains.
+    $domains = $this->domainCreateDomains();
+    // Check tokens.
+    $tokens = domain_get_tokens();
+    $this->assertTrue(!empty($tokens), t('Domain tokens exist.'));
+    // Check a token on all domains.
+    // TODO: Loop through and check all tokens.
+    foreach (domain_domains(TRUE) as $key => $domain) {
+      domain_set_domain($key);
+      $text = $this->randomString(255);
+      $filtertext = '---[current-domain:id]---';
+      $text .= $filtertext;
+      $text .= $this->randomString(255);
+      $this->assertTrue(substr_count($text, $filtertext) > 0, t('Sample text contains domain token: @token.', array('@token' => $filtertext)));
+      $newtext = domain_filter_process($text, NULL, NULL, NULL, NULL, NULL);
+      $this->assertTrue(substr_count($newtext, $filtertext) == 0, t('Sample text does not contain domain token: @token.', array('@token' => $filtertext)));
+      $_domain = domain_get_domain();
+      $this->assertTrue(substr_count($newtext, '---' . $_domain['domain_id'] . '---') > 0, t('Sample text contains domain value: @value.', array('@value' => $_domain['domain_id'])));
+    }
+    // Now test the default domain filter while still on another domain.
+    // TODO: This code is crufty and needs to be simplified.
+    $text = $this->randomString(255);
+    $filtertext = '---[default-domain:id]---';
+    $text .= $filtertext;
+    $text .= $this->randomString(255);
+    $this->assertTrue(substr_count($text, $filtertext) > 0, t('Sample text contains domain token: @token.', array('@token' => $filtertext)));
+    $newtext = domain_filter_process($text, NULL, NULL, NULL, NULL, NULL);
+    $this->assertTrue(substr_count($newtext, $filtertext) == 0, t('Sample text does not contain domain token: @token.', array('@token' => $filtertext)));
+    $_domain = domain_default();
+    $this->assertTrue(substr_count($newtext, '---' . $_domain['domain_id'] . '---') > 0, t('Sample text contains domain value: @value.', array('@value' => $_domain['domain_id'])));
+    // Reset to main domain.
+    domain_reset_domain();
+  }
+
+  function testDomainURLFilters() {
+    // Create domains.
+    $domains = $this->domainCreateDomains();
+    // Remove nodes from 'all affiliates'.
+    db_delete('domain_access')
+      ->condition('realm', 'domain_site')
+      ->execute();
+    // Fetch the existing node ids.
+    $node_ids = array_keys(db_query("SELECT nid FROM {node}")->FetchAllAssoc('nid'));
+    // On node load, these should all be assigned to domain_id = 1.
+    $nodes = node_load_multiple($node_ids);
+    // Cycle through the domains and test a new node for each one, since
+    // the url rewrites are cached.
+    foreach (domain_domains(TRUE) as $key => $domain) {
+      $node = $nodes[$key];
+      $path = "node/$node->nid";
+      $this->assertTrue($path != "node/", t('Fetched a node path.'));
+      domain_set_domain($key);
+      $_domain = domain_get_domain();
+      // Set the $base_url value to the current domain.
+      $this->domainSetBaseUrl($domain);
+      $text = $this->randomString(255);
+      $filtertext = "---[domain:$path]---";
+      $text .= $filtertext;
+      $text .= $this->randomString(255);
+      $this->assertTrue(substr_count($text, $filtertext) > 0, t('Sample text contains domain url: @url.', array('@url' => $filtertext)));
+      $newtext = domain_url_filter_process($text, NULL, NULL, NULL, NULL, NULL);
+      $this->assertTrue(substr_count($newtext, $filtertext) == 0, t('Sample text does not contain domain url: @url.', array('@url' => $filtertext)));
+      // These should be returning absolute URLs for all domains but the first.
+      $url = url($path);
+      $this->assertTrue(substr_count($newtext, $url) > 0, t('Sample text contains proper url: @url.', array('@url' => $url)));
+    }
+  }
+
+}
