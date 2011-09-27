@@ -211,7 +211,7 @@ function domain_update_7303(&$sandbox) {
       'valid' => $default['valid'],
       'weight' => $default['weight'],
       'is_default' => $default['is_default'],
-      
+
     ))
     ->execute();
 
@@ -323,36 +323,47 @@ function domain_update_machine_name($subdomain) {
  * Checks module requirements.
  */
 function domain_requirements($phase) {
-  if ($phase != 'runtime') {
-    return;
-  }
+  $requirements = array();
+  switch ($phase) {
+    case 'install':
+      module_load_include('module', 'domain');
+      $root = strtolower(rtrim($_SERVER['HTTP_HOST']));
+      if ($error = domain_valid_domain($root)) {
+        $requirements['domain'] = array(
+          'title' => t('Domain Access'),
+          'value' => $error . t('If you are using drush, please ensure to provide the --uri option.'),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
+    case 'runtime':
+      $messages = array();
+      $severity = REQUIREMENT_ERROR;
+      // Ensure we have a primary domain.
+      $check = domain_default();
+      if ($check['domain_id'] == 0) {
+        $updated = t('set by an administrator');
+        if (user_access('administer domains')) {
+          $updated = l(t('set properly'), 'admin/structure/domain');
+        }
+        $messages[] = t('The site has no primary domain and needs to be !updated.', array('!updated' => $updated));
+      }
+      // Check for domain_id 0.
+      $list = domain_update_module_check();
+      domain_update_messages($messages, $list);
 
-  $messages = array();
-  $severity = REQUIREMENT_ERROR;
-  // Ensure we have a primary domain.
-  $check = domain_default();
-  if ($check['domain_id'] == 0) {
-    $updated = t('set by an administrator');
-    if (user_access('administer domains')) {
-      $updated = l(t('set properly'), 'admin/structure/domain');
-    }
-    $messages[] = t('The site has no primary domain and needs to be !updated.', array('!updated' => $updated));
+      // Now report.
+      $t = get_t();
+      if (empty($message)) {
+        $severity = REQUIREMENT_OK;
+        $messages[] = t('Module installed correctly.');
+      }
+      $requirements['domain'] = array(
+        'title' => $t('Domain Access'),
+        'value' => theme('item_list', array('items' => $messages)),
+        'severity' => $severity,
+      );
+      break;
   }
-  // Check for domain_id 0.
-  $list = domain_update_module_check();
-  domain_update_messages($messages, $list);
-
-  // Now report.
-  $t = get_t();
-  if (empty($message)) {
-    $severity = REQUIREMENT_OK;
-    $messages[] = t('Module installed correctly.');
-  }
-  $requirements['domain'] = array(
-    'title' => $t('Domain Access'),
-    'value' => theme('item_list', array('items' => $messages)),
-    'severity' => $severity,
-  );
-
   return $requirements;
 }
