@@ -152,10 +152,10 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
 
   // Check for the presence of color.module.
   $color_info = NULL;
-  if (module_exists('color')) {
-    $color_info = color_get_info($theme);
+  if (module_exists('color') && $color_info = color_get_info($theme)) {
+    // This just sets the proper $color_info variable.
   }
-  if (empty($color_info)) {
+  else {
     return;
   }
 
