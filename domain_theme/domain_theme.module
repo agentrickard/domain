@@ -359,8 +359,7 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   // for it and run a check to ensure we don't delete the main site's theme
   // folder if we set a domain theme to the default scheme.
   $color_info = NULL;
-  if (module_exists('color')) {
-    $color_info = color_get_info($theme);
+  if (module_exists('color') && $color_info = color_get_info($theme)) {
     $form['#submit'][-100] = 'domain_theme_color_submit';
   }
 
