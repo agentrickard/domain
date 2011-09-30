@@ -67,7 +67,10 @@ function domain_overview_form($form, &$form_state) {
   $options = array();
   $i = -1;
   foreach ($domains as $domain) {
+    // TODO: The object/array bit here is ugly.
     $domain_array = (array) $domain;
+    $domain_array = domain_api($domain_array);
+    $domain = (object) $domain_array;
     $options[$domain->domain_id] = '';
     $form['domain'][$domain->domain_id]['values'] = array(
       '#type' => 'value',
