@@ -3,6 +3,14 @@
  * Changelog file for Domain Access 6.x-2.x.
  */
 
+30-SEP-2011
+-- Creates the 6.x.2.12 release.
+-- Bug #1294776 reported by n8tron. Color module handling bug.
+-- Bug #1252972. Missing ) in output text.
+-- Issue #1096566. Arbitrate between multiple alias matches.
+-- Patch #1210398 by Dalin. Fixes access plugin exports for Views.
+-- Feature #1215778. Join {domain_editor} to {domain}.
+
 05-JUN-2011
 -- Issue #1172054 by wuffers. Change ambiguous text in Domain Settings.
 -- Patch #1101854 by kasperg and Ypshi. Support external cache settings.
