@@ -105,7 +105,7 @@ function domain_theme_features_rebuild($module) {
           'theme' => $theme['theme'],
           'settings' => serialize($theme['settings']),
           'status' => $theme['status'],
-          'filename' => $theme['filename'],
+          'filepath' => $theme['filepath'],
         );
         drupal_write_record('domain_theme', $record);
       }
