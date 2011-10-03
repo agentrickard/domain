@@ -577,7 +577,12 @@ function domain_form_submit($form, &$form_state) {
   if ($domain == -1) {
     $message = t('Domain record failed.');
   }
-
+  else {
+    // Update the domain_id in $form_state for any submit handlers that need it.
+    if (empty($form_state['values']['domain_id'])) {
+      $form_state['values']['domain_id'] =  $domain['domain_id'];
+    }
+  }
   // Hide the message for the Domain User module.
   if (empty($form_state['values']['domain_arguments']['user_submitted'])) {
     drupal_set_message($message);
