@@ -86,6 +86,7 @@ function domain_uninstall() {
     'domain_cron_rule',
     'domain_debug',
     'domain_default_source',
+    'domain_edit_on_primary',
     'domain_force_admin',
     'domain_form_elements',
     'domain_grant_all',

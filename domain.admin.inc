@@ -282,6 +282,15 @@ function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
       option reduces the chance that search engines will recognize duplicate content.')
   );
 
+  $form['domain_advanced']['domain_edit_on_primary'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Force domain editing from the primary domain'),
+    '#default_value' => variable_get('domain_edit_on_primary', 1),
+    '#description' => t('When editing a domain, you will be redirected to the primary domain. Doing so ensures that
+      the server can handle changes to the domain record. <br /><em>Disabling this feature may make development environments
+      easier to support. Use at your own risk.</em>'),
+  );
+
   $options = array('-1' => t('Do not change domain'));
   foreach (domain_domains() as $data) {
     // The domain must be valid.
@@ -419,7 +428,9 @@ function domain_form($form, &$form_state, $domain = array(), $arguments = array(
   // This action should be performed from the primary domain unless overridden.
   $error = FALSE;
   if (!isset($arguments['ignore_domain_status_check'])) {
-    domain_check_primary();
+    if (variable_get('domain_edit_on_primary', 1)) {
+      domain_check_primary();
+    }
     if (!empty($domain)) {
       $error = domain_check_response($domain);
       if ($error && empty($_POST)) {
