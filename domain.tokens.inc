@@ -77,6 +77,9 @@ function domain_tokens($type, $tokens, array $data = array(), array $options = a
           $replacements[$original] = $sanitize ? check_plain($domain['sitename']) : $domain['sitename'];
           break;
         case 'path':
+          if (!isset($domain['path'])) {
+            $domain['path'] = domain_get_path($domain);
+          }
           $replacements[$original] = $domain['path'];
           break;
         case 'url':
