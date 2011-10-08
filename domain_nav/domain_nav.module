@@ -26,7 +26,7 @@ function domain_nav_menu() {
   $items = array();
   // The exists check is needed on uninstall. See http://drupal.org/node/995342
   if (DOMAIN_NAV_MENU == TRUE && module_exists('domain')) {
-    $root = domain_default();
+    $root = domain_default(TRUE, TRUE);
     $items['domain'] = array(
       'title' => 'Domain',
       'type' => MENU_SUGGESTED_ITEM,
