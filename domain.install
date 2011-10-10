@@ -83,6 +83,7 @@ function domain_uninstall() {
   $variables = array(
     'domain_behavior',
     'domain_bootstrap_modules',
+    'domain_classes',
     'domain_cron_rule',
     'domain_debug',
     'domain_default_source',

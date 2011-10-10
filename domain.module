@@ -3136,7 +3136,7 @@ function domain_reassign($old_domain, $new_domain, $table) {
     }
     $query->execute();
   }
-  
+
   // Let other modules act.
   module_invoke_all('domain_reassign', $old_domain, $new_domain, $table);
 
@@ -3206,7 +3206,7 @@ function domain_machine_name($subdomain) {
  *  Boolean TRUE or FALSE.
  */
 function domain_check_machine_name($machine_name) {
-  return (bool) db_query("SELECT COUNT(1) FROM {domain} WHERE machine_name = :machine_name", 
+  return (bool) db_query("SELECT COUNT(1) FROM {domain} WHERE machine_name = :machine_name",
     array(':machine_name' => $machine_name)
     )->fetchField();
 }
@@ -3495,16 +3495,9 @@ function domain_page_classes() {
  * Implements hook_filter_info().
  */
 function domain_filter_info() {
-  $filters['domain'] = array(
-    'title' => t('Insert domain-specific placeholders'), 
-    'description' => t('Allows you to add domain-sensitive variables to content.'), 
-    'process callback' => 'domain_filter_process',
-    'tips callback' => 'domain_filter_tips',
-    'cache' => FALSE, // These cannot be cached.
-    'weight' => 0,
-  );
   $filters['domain_url'] = array(
-    'title' => t('Insert domain-sensitive URLs'), 
+    'title' => t('Insert domain-sensitive URLs'),
+    'description' => t('Transforms relative URLs in the format <em>[canonical-url:path/to/item]</em> to canonical URLs.'),
     'process callback' => 'domain_url_filter_process',
     'tips callback' => 'domain_url_filter_tips',
     'cache' => FALSE, // These cannot be cached.
@@ -3514,65 +3507,10 @@ function domain_filter_info() {
 }
 
 /**
- * Implements hook_filter_FILTER_tips() magic callback.
- */
-function domain_filter_tips($filter, $format, $long) {
-  $tokens = domain_get_tokens();
-  if ($long) {
-    return t('The following site-specific token replacements are allowed: !tokens', array('!tokens' => theme('item_list', array('items' => $tokens))));
-  }
-  else {
-    $fieldset = array(
-      '#collapsed' => TRUE,
-      '#collapsible' => TRUE,
-      '#title' => t('Domain tokens'),
-      '#children' => theme('item_list', array('items' => $tokens)),
-    );
-    return t('The following site-specific token replacements are allowed: !tokens', array('!tokens' => theme('fieldset', array('element' => $fieldset))));
-  }
-}
-
-/**
- * Implements hook_filter_FILTER_process() magic callback.
- */
-function domain_filter_process($text, $filter, $format, $langcode, $cache, $cache_id) {
-  $tokens = domain_get_tokens();
-  $patterns = array_keys($tokens);
-  foreach ($patterns as $pattern) {
-    $match = "[$pattern]";
-    $text = preg_replace(preg_quote("/$match/"), token_replace($match), $text);
-  }
-  return $text;
-}
-
-/**
- * Returns all domain module tokens in a human-readable array.
- *
- * The array key is the token string (without brackets) and the value is the
- * token string : description.
- *
- * @return
- *  An array of token data formatted as explained above.
- */
-function domain_get_tokens($prefixes = array()) {
-  if (empty($prefixes)) {
-    $prefixes = array('current-domain', 'default-domain');
-  }
-  module_load_include('inc', 'domain', 'domain.tokens');
-  $info = domain_token_info();
-  foreach($prefixes as $prefix) {
-    foreach($info['tokens']['domain'] as $token => $data) {
-      $tokens["$prefix:$token"] = t('!token : !description', array('!token' => "[$prefix:$token]", '!description' => $data['description']));
-    }
-  }
-  return $tokens;
-}
-
-/**
  * Implements hook_filter_FILTER_process() magic callback.
  */
 function domain_url_filter_process($text, $filter, $format, $langcode, $cache, $cache_id) {
-  $pattern = '/\[domain:(.+?)\]/';
+  $pattern = '/\[canonical-url:(.+?)\]/';
   $text = preg_replace_callback($pattern, 'domain_url_replace', $text);
   return $text;
 }
@@ -3596,5 +3534,28 @@ function domain_url_replace($matches) {
  * Implements hook_filter_FILTER_tips() magic callback.
  */
 function domain_url_filter_tips($filter, $format, $long) {
-  return t('Enter a relative URL in the format <em>[domain:path/to/item]</em> to make the URL point to the canonical path.');
+  return t('Enter a relative URL in the format <em>[canonical-url:path/to/item]</em> to make the URL point to the canonical path.');
+}
+
+/**
+ * Returns all domain module tokens in a human-readable array.
+ *
+ * The array key is the token string (without brackets) and the value is the
+ * token string : description.
+ *
+ * @return
+ *  An array of token data formatted as explained above.
+ */
+function domain_get_tokens($prefixes = array()) {
+  if (empty($prefixes)) {
+    $prefixes = array('current-domain', 'default-domain');
+  }
+  module_load_include('inc', 'domain', 'domain.tokens');
+  $info = domain_token_info();
+  foreach($prefixes as $prefix) {
+    foreach($info['tokens']['domain'] as $token => $data) {
+      $tokens["$prefix:$token"] = t('!token : !description', array('!token' => "[$prefix:$token]", '!description' => $data['description']));
+    }
+  }
+  return $tokens;
 }

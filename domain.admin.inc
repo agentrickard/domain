@@ -360,15 +360,24 @@ function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE
   );
-  // Get the available tokens.
-  $tokens = domain_get_tokens();
   $form['domain_classes']['domain_classes'] = array(
     '#type' => 'textarea',
     '#rows' => 5,
     '#cols' => 40,
     '#default_value' => variable_get('domain_classes', 'domain-[current-domain:machine_name]'),
-    '#description' => t('Add the following classes to the <em>body</em> tag of every page. Enter one class per line. The following token replacements are allowed: !tokens', array('!tokens' => theme('item_list', array('items' => $tokens)))),
   );
+  if (module_exists('token')) {
+    $form['domain_classes']['domain_classes']['#description'] = t('Add the following classes to the <em>body</em> tag of every page. Enter one class per line. This field supports tokens.');
+    $form['domain_classes']['token_help'] = array(
+      '#theme' => 'token_tree',
+      '#token_types' => array('current-domain'),
+      '#global_types' => FALSE,
+    );
+  }
+  else {
+    $tokens = domain_get_tokens(array('current-domain'));
+    $form['domain_classes']['domain_classes']['#description'] = t('Add the following classes to the <em>body</em> tag of every page. Enter one class per line. The following token replacements are allowed: !tokens', array('!tokens' => theme('item_list', array('items' => $tokens))));
+  }
 
   // Allow submodules to add elements to the form.
   $modules = module_implements('domain_form');
@@ -750,7 +759,7 @@ function domain_batch($action = NULL) {
   if (empty($domains)) {
     return t('There are no domains configured for this site.');
   }
-  
+
   $batch = domain_batch_actions();
   // We must have some actions, otherwise, no point.
   if (empty($batch)) {

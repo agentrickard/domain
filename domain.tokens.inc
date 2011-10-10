@@ -72,9 +72,15 @@ function domain_tokens($type, $tokens, array $data = array(), array $options = a
   $sanitize = !empty($options['sanitize']);
   $replacements = array();
   // Base token handling.
-  if ($type == 'domain' && !empty($data['domain'])) {
-    $domain = $data['domain'];
-
+  if ($type == 'domain') {
+    // Get the active domain context.
+    if (!empty($data['domain'])) {
+      $domain = $data['domain'];
+    }
+    else {
+      $domain = domain_get_domain();
+    }
+    // Loop through the tokens and replace the elements.
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'id':

@@ -656,7 +656,7 @@ class DomainCacheTest extends DomainTestCase {
     // Fill the cache.
     $this->drupalGet($domains['one']['path'], $options);
 
-    // Check the output for our body classes. 
+    // Check the output for our body classes.
     // Note that we set the domain to get the right variables.
     domain_set_domain($domains['one']['domain_id'], TRUE);
     $domain_classes2 = domain_page_classes();
@@ -742,41 +742,6 @@ class DomainFilterTest extends DomainTestCase {
     parent::setUp($list);
   }
 
-  function testDomainFilters() {
-    // Create domains.
-    $domains = $this->domainCreateDomains();
-    // Check tokens.
-    $tokens = domain_get_tokens();
-    $this->assertTrue(!empty($tokens), t('Domain tokens exist.'));
-    // Check a token on all domains.
-    // TODO: Loop through and check all tokens.
-    foreach (domain_domains(TRUE) as $key => $domain) {
-      domain_set_domain($key);
-      $text = $this->randomString(255);
-      $filtertext = '---[current-domain:id]---';
-      $text .= $filtertext;
-      $text .= $this->randomString(255);
-      $this->assertTrue(substr_count($text, $filtertext) > 0, t('Sample text contains domain token: @token.', array('@token' => $filtertext)));
-      $newtext = domain_filter_process($text, NULL, NULL, NULL, NULL, NULL);
-      $this->assertTrue(substr_count($newtext, $filtertext) == 0, t('Sample text does not contain domain token: @token.', array('@token' => $filtertext)));
-      $_domain = domain_get_domain();
-      $this->assertTrue(substr_count($newtext, '---' . $_domain['domain_id'] . '---') > 0, t('Sample text contains domain value: @value.', array('@value' => $_domain['domain_id'])));
-    }
-    // Now test the default domain filter while still on another domain.
-    // TODO: This code is crufty and needs to be simplified.
-    $text = $this->randomString(255);
-    $filtertext = '---[default-domain:id]---';
-    $text .= $filtertext;
-    $text .= $this->randomString(255);
-    $this->assertTrue(substr_count($text, $filtertext) > 0, t('Sample text contains domain token: @token.', array('@token' => $filtertext)));
-    $newtext = domain_filter_process($text, NULL, NULL, NULL, NULL, NULL);
-    $this->assertTrue(substr_count($newtext, $filtertext) == 0, t('Sample text does not contain domain token: @token.', array('@token' => $filtertext)));
-    $_domain = domain_default();
-    $this->assertTrue(substr_count($newtext, '---' . $_domain['domain_id'] . '---') > 0, t('Sample text contains domain value: @value.', array('@value' => $_domain['domain_id'])));
-    // Reset to main domain.
-    domain_reset_domain();
-  }
-
   function testDomainURLFilters() {
     // Create domains.
     $domains = $this->domainCreateDomains();
@@ -799,7 +764,7 @@ class DomainFilterTest extends DomainTestCase {
       // Set the $base_url value to the current domain.
       $this->domainSetBaseUrl($domain);
       $text = $this->randomString(255);
-      $filtertext = "---[domain:$path]---";
+      $filtertext = "---[canonical-url:$path]---";
       $text .= $filtertext;
       $text .= $this->randomString(255);
       $this->assertTrue(substr_count($text, $filtertext) > 0, t('Sample text contains domain url: @url.', array('@url' => $filtertext)));
