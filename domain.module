@@ -1338,7 +1338,6 @@ function domain_unique_domain($subdomain) {
  *   array($domain_id => $domain_id).
  */
 function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
-  $domains = &drupal_static(__FUNCTION__, array());
   if (empty($account)) {
     // This may happen when creating a new user.
     return array();
