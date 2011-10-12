@@ -11,10 +11,8 @@
 function domain_features_export($data, &$export, $module_name) {
   $export['dependencies']['domain'] = 'domain';
   $list = domain_features_selection($data);
-  foreach ($list as $domain_id => $domain) {
-    $record = domain_machine_name_load($domain['machine_name']);
-    unset($record['domain_id']);
-    $export['features']['domain'][$domain['machine_name']] = $record;
+  foreach ($list as $machine_name) {
+    $export['features']['domain'][$machine_name] = $machine_name;
   }
   return array();
 }
@@ -33,17 +31,14 @@ function domain_features_export_render($module_name, $data, $export = NULL) {
   domain_features_load($module_name, 'domain_default_domains', FALSE);
   $code = array();
   $code[] = '$domains = array();';
-  foreach ($data as $name => $value) {
-    // When features runs a check for normal / overridden, it passes only
-    // array keys, so we account for that.
-    if (is_array($value)) {
-      $code[] = "  \$domains['{$name}'] = " . features_var_export($value) .";";
-    }
-    else {
-      $record = domain_machine_name_load($value);
-      unset($record['domain_id']);
-      $code[] = "  \$domains['" . $record['machine_name'] . "'] = " . features_var_export($record) .";";
-    }
+  // Check for changes against the target database.
+  if (!$export) {
+    $data = domain_machine_names();
+  }
+  foreach ($data as $name) {
+    $record = domain_machine_name_load($name);
+    unset($record['domain_id']);
+    $code[] = "  \$domains['" . $record['machine_name'] . "'] = " . features_var_export($record) .";";
   }
   $code[] = "\nreturn \$domains;";
   $output = implode("\n", $code);
@@ -62,17 +57,22 @@ function domain_features_revert($module) {
  */
 function domain_features_rebuild($module) {
   if ($defaults = domain_features_load($module, 'domain_default_domains', TRUE)) {
+    // Remove domains that are not in the feature.
+    $machine_names = array_keys($defaults);
+    // If nothing is set, do not execute this routine.
+    if (empty($machine_names)) {
+      return;
+    }
+    $domains = domain_domains(TRUE);
+    foreach ($domains as $domain) {
+      if (!in_array($domain['machine_name'], $machine_names)) {
+        domain_delete($domain);
+      }
+    }
+    // Save the domains in this feature.
     foreach ($defaults as $domain) {
       $domain['domain_id'] = domain_load_domain_id($domain['machine_name']);
-      // This may not be needed.
-      if ($domain['domain_id']) {
-        $domain['last_id'] = $domain['domain_id'];
-      }
-      else {
-        $domain['last_id'] = 0;
-      }
       domain_save($domain, $domain);
-      module_invoke_all('domain_features_rebuild', $module, $domain);
     }
   }
 }

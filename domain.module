@@ -3165,7 +3165,7 @@ function domain_features_api() {
 }
 
 /**
- * Loads a domain from it's machine name.
+ * Loads a domain from its machine name.
  *
  * @param $machine_name
  *  The machine name of the domain record.
@@ -3224,6 +3224,20 @@ function domain_load_domain_id($machine_name) {
   return db_query('SELECT domain_id FROM {domain_export} WHERE machine_name = :machine_name', array(':machine_name' => $machine_name))->fetchField();
 }
 
+/**
+ * Loads an array of all active machine names.
+ */
+function domain_machine_names() {
+  $list = &drupal_static(__FUNCTION__);
+  if (isset($list)) {
+    return $list;
+  }
+  $machine_names = db_query("SELECT machine_name FROM {domain_export}")->fetchAll();
+  foreach ($machine_names as $machine_name) {
+    $list[] = $machine_name->machine_name;
+  }
+  return $list;
+}
 
 /**
  * Loads a machine name from its domain id.
@@ -3281,19 +3295,21 @@ function domain_features_get_options() {
  *  Array of selections from the features component form.
  *
  * @return
- *  An array of domains, keyed by domain_id.
+ *  An array of domains, keyed by machine_name.
  */
 function domain_features_selection($data) {
   $list = array();
   if (!empty($data['all-domains'])) {
-    $list = domain_domains();
+    $data = array();
+    $domains = domain_domains(TRUE);
+    foreach ($domains as $domain) {
+      $data[] = $domain['machine_name'];
+    }
   }
-  else {
-    foreach ($data as $machine_name) {
-      $record = domain_machine_name_load($machine_name);
-      if (!empty($record)) {
-        $list[$record['domain_id']] = $record['machine_name'];
-      }
+  foreach ($data as $machine_name) {
+    $record = domain_machine_name_load($machine_name);
+    if (!empty($record)) {
+      $list[$record['machine_name']] = $record['machine_name'];
     }
   }
   return $list;

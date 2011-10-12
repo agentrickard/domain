@@ -18,10 +18,8 @@ function domain_conf_features_export_options() {
 function domain_conf_features_export($data, &$export, $module_name) {
   $export['dependencies']['domain_conf'] = 'domain_conf';
   $list = domain_features_selection($data);
-  foreach ($list as $domain_id => $domain) {
-    $key = domain_load_machine_name($domain_id);
-    $record = domain_conf_prepare_export($domain_id);
-    $export['features']['domain_conf'][$key] = $record;
+  foreach ($list as $machine_name) {
+    $export['features']['domain_conf'][$machine_name] = $machine_name;
   }
   return array();
 }
@@ -33,17 +31,13 @@ function domain_conf_features_export_render($module_name, $data, $export = NULL)
   domain_features_load($module_name, 'domain_conf_default_variables', FALSE);
   $code = array();
   $code[] = '$domain_variables = array();';
-  foreach ($data as $name => $value) {
-    // When features runs a check for normal / overridden, it passes only
-    // array keys, so we account for that.
-    if (is_array($value)) {
-      $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($value) .";";
-    }
-    else {
-      $domain_id = domain_load_domain_id($value);
-      $variables = domain_conf_prepare_export($domain_id);
-      $code[] = "  \$domain_variables['{$value}'] = " . features_var_export($variables) .";";
-    }
+  // Check for changes against the target database.
+  if (!$export) {
+    $data = domain_machine_names();
+  }
+  foreach ($data as $name) {
+    $variables = domain_conf_prepare_export($name);
+    $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($variables) .";";
   }
   $code[] = "\nreturn \$domain_variables;";
   $output = implode("\n", $code);
@@ -53,13 +47,14 @@ function domain_conf_features_export_render($module_name, $data, $export = NULL)
 /**
  * Prepares alias lists to an array based on machine_name.
  *
- * @param $domain_id
- *  The source domain id.
+ * @param $machine_name
+ *  The source domain machine name.
  *
  * @return
  *  An array of alias records.
  */
-function domain_conf_prepare_export($domain_id) {
+function domain_conf_prepare_export($machine_name) {
+  $domain_id = domain_load_domain_id($machine_name);
   $variables = array();
   $data = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField();
   if (!empty($data)) {
@@ -80,15 +75,14 @@ function domain_conf_features_revert($module) {
  */
 function domain_conf_features_rebuild($module) {
   if ($defaults = domain_features_load($module, 'domain_conf_default_variables', TRUE)) {
+    // Wipe the old alias records.
+    db_delete('domain_conf')
+      ->execute();
     foreach ($defaults as $key => $variables) {
       $domain_id = domain_load_domain_id($key);
       if (!$domain_id) {
         continue;
       }
-      // Wipe the old alias records.
-      db_delete('domain_conf')
-        ->condition('domain_id', $domain_id)
-        ->execute();
       // Save the new records.
       if (empty($variables)) {
         continue;
