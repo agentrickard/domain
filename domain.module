@@ -76,7 +76,7 @@ function domain_api_version() {
  */
 function domain_init() {
   global $_domain, $conf;
-
+ 
   if (!is_array($_domain)) {
     $_domain = array();
   }
@@ -1362,9 +1362,21 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
           $filter = array_filter($defaults[$rid]);
         }
         if (!empty($filter)) {
-          foreach ($filter as $domain_id => $status) {
-            if ($status) {
+          // If this role is assigned to "All domains"
+          if ($filter['all']) {
+            // Add all active domains to the user
+            foreach (domain_domains() as $domain_id => $domain) {
               $domains[$uid][$domain_id] = $domain_id;
+            }
+            // We don't need to loop anymore, as all roles have already been added.
+            break;
+          }
+          // Else: add to user domains assigned to this role
+          else {
+            foreach ($filter as $domain_id => $status) {
+              if ($status) {
+                $domains[$uid][$domain_id] = $domain_id;
+              }
             }
           }
         }

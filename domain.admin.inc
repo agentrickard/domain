@@ -1108,11 +1108,24 @@ function domain_roles_form($form, &$form_state) {
   }
   foreach ($roles as $rid => $role) {
     $form['domain_roles'][$rid]['#tree'] = TRUE;
+    $title = t('All domains');
+    $form['#domain_roles']['all'] = $title;
+    $form['domain_roles'][$rid]['all'] = array(
+      '#title' => $title,
+      '#type' => 'checkbox',
+      '#default_value' => (isset($defaults[$rid]['all'])) ? $defaults[$rid]['all'] : 0,
+    );
     foreach ($domains as $domain_id => $domain) {
+      $form['#domain_roles'][$domain_id] = $domain_id;
       $form['domain_roles'][$rid][$domain_id] = array(
         '#title' => filter_xss_admin($domain),
         '#type' => 'checkbox',
         '#default_value' => (isset($defaults[$rid][$domain_id])) ? $defaults[$rid][$domain_id] : 0,
+        '#states' => array(
+          'disabled' => array(
+            'input[name="domain_roles[' . $rid . '][all]"]' => array('checked' => TRUE),
+          ),
+        ),
       );
     }
   }
@@ -1138,9 +1151,9 @@ function theme_domain_roles_form($variables) {
   foreach ($roles as $rid => $role) {
     $header[] = $role;
   }
-  foreach ($domains as $domain_id => $domain) {
+  foreach ($form['#domain_roles'] as $domain_id => $title) {
     $row = array();
-    $row[] = filter_xss_admin($domain['sitename']);
+    $row[] = isset($domains[$domain_id]) ? filter_xss_admin($domains[$domain_id]['sitename']) : $title;
     foreach ($roles as $rid => $role) {
       $form['domain_roles'][$rid][$domain_id]['#title'] = '';
       $row[] = drupal_render($form['domain_roles'][$rid][$domain_id]);

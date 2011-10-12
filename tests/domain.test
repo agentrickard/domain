@@ -588,6 +588,34 @@ class DomainUnitTest extends DomainTestCase {
         $this->assertFalse($access, t('User denied access to %op all domain content.', array('%op' => $op)));
       }
     }
+    // Test the dynamic extension of permissions via user settings.
+    $roles = variable_get('domain_roles', array());
+    // Reset the domains.
+    $domains = domain_domains(TRUE);
+    // Delete the user's domains.
+    db_delete('domain_editor')
+      ->condition('uid', $test_user->uid)
+      ->execute();
+    // User load doesn't pass reset information?
+    drupal_static_reset('domain_get_user_domains');
+    $test_user = user_load($test_user->uid, TRUE);
+    // Check that user has no domains.
+    $this->assertTrue(empty($test_user->domain_user), t('User is not assigned to any domains.'));
+    // Give all users dynamic access to the default domain.
+    $roles = array(
+      DRUPAL_AUTHENTICATED_RID => array(
+        'all' => domain_default_id(),
+      ),
+    );
+    variable_set('domain_roles', $roles);
+    variable_set('domain_add_roles', 0);
+    // Now reset the user and test again.
+    // User load doesn't pass reset information?
+    drupal_static_reset('domain_get_user_domains');
+    $test_user = user_load($test_user->uid, TRUE);
+    $this->assertTrue(!empty($test_user->domain_user), t('User is assigned to domains.'));
+    $this->assertTrue(!empty($test_user->domain_user[domain_default_id()]), t('User is dynamically assigned to the default domain.'));
+    // TODO: Expand this testing logic.
   }
 
 }
