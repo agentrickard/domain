@@ -1362,7 +1362,7 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
         }
         if (!empty($filter)) {
           // If this role is assigned to "All domains"
-          if ($filter['all']) {
+          if (!empty($filter['all'])) {
             // Add all active domains to the user
             foreach (domain_domains() as $domain_id => $domain) {
               $domains[$uid][$domain_id] = $domain_id;
