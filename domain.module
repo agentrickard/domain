@@ -319,6 +319,7 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
       // This block was added after D7 was released, so uses a string delta.
       $blocks['server'] = array(
        'info' => t('Domain access server information'),
+       'cache' => BLOCK_NO_CACHE,
       );
       return $blocks;
       break;
