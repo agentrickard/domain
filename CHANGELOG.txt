@@ -3,6 +3,9 @@
  * Changelog file for Domain Access 6.x-2.x.
  */
 
+06-NOV-2011
+-- Feature #1333544. Adds a server information block.
+
 30-SEP-2011
 -- Creates the 6.x.2.12 release.
 -- Bug #1294776 reported by n8tron. Color module handling bug.
