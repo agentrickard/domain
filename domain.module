@@ -316,11 +316,16 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
       $blocks[1] = array(
        'info' => t('Domain access information'),
       );
+      // This block was added after D7 was released, so uses a string delta.
+      $blocks['server'] = array(
+       'info' => t('Domain access server information'),
+      );
       return $blocks;
       break;
     case 'view':
+      // The use of mixed-type deltas means these must be checked as strings.
       switch ($delta) {
-        case 0:
+        case '0':
           $block['subject'] = t('Domain switcher');
           $items = array();
           $domains = domain_domains();
@@ -347,7 +352,7 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
             $block['content'] .= t('<em>* Inactive domain.</em>');
           }
           break;
-        case 1:
+        case '1':
           $block['content'] = '';
           if (arg(0) == 'node' && is_numeric(arg(1))) {
             $block['subject'] = t('Domain access information');
@@ -367,12 +372,87 @@ function domain_block($op = 'list', $delta = 0, $edit = array()) {
             }
             $block['content'] = '<p>'. t('%node is published with the following Domain Access rules:', array('%node' => $this_node->title)) .'</p>'. $output;
           }
-          return $block;
+          break;
+        case 'server':
+          $output = '';
+          $header = array(t('Property'), t('Value'));
+          $rows = array();
+          $rows[] = array(
+            t('HTTP_HOST request'),
+            check_plain($_SERVER['HTTP_HOST']),
+          );
+          $check = domain_lookup(NULL, $_SERVER['HTTP_HOST']);
+          $match = t('TRUE');
+          if ($check == -1) {
+            // Specific check for Domain Alias.
+            if (isset($_domain['active_alias_id'])) {
+              $match = t('ALIAS: Using alias %id', array('%id' => $_domain['active_alias_id']));
+            }
+            else {
+              $match = t('FALSE: Using default domain.');
+            }
+          }
+          $rows[] = array(
+            t('Domain match'),
+            $match,
+          );
+          $rows[] = array(
+            t('is_default'),
+            $_domain['domain_id'] < 1,
+          );
+          foreach ($_domain as $key => $value) {
+            if (is_null($value)) {
+              $value = t('NULL');
+            }
+            elseif ($value === TRUE) {
+              $value = t('TRUE');
+            }
+            elseif ($value === FALSE) {
+              $value = t('FALSE');
+            }
+            $rows[] = array(
+              check_plain($key),
+              !is_array($value) ? check_plain($value) : _domain_block_print_array($value),
+            );
+          }
+          $output = theme('table', $header, $rows);
+          $block = array(
+            'subject' => t('Domain server information'),
+            'content' => $output,
+          );
           break;
       }
       return $block;
       break;
   }
+}
+
+/**
+ * Prints array data for the server block.
+ *
+ * @param $array
+ *  An array of data. Note that we support two levels of nesting.
+ *
+ * @return
+ *  A suitable output string.
+ */
+function _domain_block_print_array($array) {
+  $items = array();
+  foreach ($array as $key => $val) {
+    $value = 'array';
+    if (!is_array($val)) {
+      $value = check_plain($val);
+    }
+    else {
+      $list = array();
+      foreach ($val as $k => $v) {
+        $list[] = t('@key : @value', array('@key' => $k, '@value' => $v));
+      }
+      $value = implode('<br />', $list);
+    }
+    $items[] = t('@key : !value', array('@key' => $key, '!value' => $value));
+  }
+  return theme('item_list', $items);
 }
 
 /**
