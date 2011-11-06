@@ -64,6 +64,7 @@ CONTENTS
 5.  Blocks
 5.1   Block -- Domain Switcher
 5.2   Block -- Domain Access Information
+5.3   Block -- Domain Access Server Information
 6.  Node Access
 6.1   Assigning Domain Access
 6.2.  Editor Access
@@ -1079,6 +1080,41 @@ The Domain Access Information block lets you view node access rules for any
 node when you are viewing that node.  This block can help you debug the
 module for user accounts that do not have the 'Set domain access status for all
 content' permission.
+
+NOTE: By design, this block is viewable by all users.  However, its content
+should only be shown to site developers or during debugging.  You should use
+the normal block visiblity settings as appropriate to your site.
+
+----
+5.3 Block -- Domain Access Server Information
+
+Provides a block of information related to the current page request. Use this
+block to help determine how a server request is being handled by Domain Access.
+
+If you are having trouble with domains not resolving correctly, this block can
+help you pinpoint the problem. In particular, note the first two lines of the
+output:
+
+  HTTP_HOST request     example.com
+  Domain match          TRUE
+
+The first line tells you what HTTP_HOST (i.e. the domain string) was passed by
+the server to Drupal. The second line indicates how Domain Access reads that
+value.
+
+Possible replies for the 'Domain match' value are:
+
+  TRUE
+    Indicates a matching domain record.
+  FALSE: Using default domain
+    Indicates a non-matching domain, and that Domain Access is using the
+    default domain as a fallback.
+  ALIAS: Active id #
+    Used when Domain Alias is installed. Indicates that the request matched a
+    known alias of the active domain.
+
+Below the Domain match line, you will see additional information about the
+current $_domain global object.
 
 NOTE: By design, this block is viewable by all users.  However, its content
 should only be shown to site developers or during debugging.  You should use
