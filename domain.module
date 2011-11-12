@@ -1455,30 +1455,37 @@ function domain_domain_load(&$domain) {
 }
 
 /**
- * Determine an absolute path for a domain.
+ * Determine an absolute path for a domain
  *
  * @param $domain
  *   The currently active $domain array, provided by domain_lookup().
- *
  * @return
  *   The base url of the requested domain.
  */
 function domain_get_path($domain) {
   global $base_url;
   if (empty($base_url)) {
-    return domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'];
+    return domain_check_scheme($domain['scheme']) .'://'. $domain['subdomain'];
   }
-  $_url = parse_url($base_url);
+  // Badly malfored HTTP_HOST values can cause problems with PHP < 5.3.3,
+  // so we have to suppress error warnings for parse_url here.
+  // See php.net/manual/en/function.parse-url.php.
+  // See http://drupal.org/node/848856.
+  // With PHP > 5.1.2 we can pass a component parameter, too, but Drupal 6
+  // still supports PHP 4 and this code was originally tested there.
+  $url = array();
+  if ($_url = @parse_url($base_url)) {
+    $url = $_url;
+  }
   // PHP 5 does not return an empty path element.
-  if (!isset($_url['path'])) {
-    $_url['path'] = '/';
+  if (!isset($url['path'])) {
+    $url['path'] = '/';
   }
   // We need a trailing slash at the end of the path
-  if (substr($_url['path'], -1) != '/') {
-    $_url['path'] .= '/';
+  if (substr($url['path'], -1) != '/') {
+    $url['path'] .= '/';
   }
-
-  $path = domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'] . $_url['path'];
+  $path = domain_check_scheme($domain['scheme']) .'://'. $domain['subdomain'] . $url['path'];
   return $path;
 }
 
@@ -2535,18 +2542,19 @@ function domain_resolve_host($name = '') {
  * @see conf_init()
  *
  * @return
- *   The current (host) domain name as a string.
+ * The current (host) domain name as a String.
  */
 function domain_request_name() {
-  // Drush may set this value to 'default' if it is empty.
-  if (!empty($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] != 'default') {
-    // We lower case this, since EXAMPLE.com == example.com.
-    return strtolower(rtrim($_SERVER['HTTP_HOST']));
-  }
-  else {
+  // An empty host (provided by some bots) always fails, so don't bother
+  // trying to resolve it.
+  if (empty($_SERVER['HTTP_HOST'])) {
     $domain = domain_default(FALSE, FALSE);
     return $domain['subdomain'];
   }
+  // Otherwise, trim and return the HTTP_HOST value for checking against
+  // registered domains. Note that we lower case this, since the RFC states
+  // that EXAMPLE.com == example.com.
+  return strtolower(rtrim($_SERVER['HTTP_HOST']));
 }
 
 /**
