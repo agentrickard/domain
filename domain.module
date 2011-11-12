@@ -2432,7 +2432,7 @@ function domain_invalid_domain_requested() {
     $extra = '.';
   }
   // Log the access attempt.
-  watchdog('domain', 'Invalid domain requested by %user on %domain, redirected to %redirect', array('%user' => $user->name, '%domain' => $_domain['sitename'], '%redirect' => $redirect['sitename'] . $extra), WATCHDOG_WARNING);
+  watchdog('domain', 'Invalid domain requested by %user on %domain, redirected to %redirect', array('%user' => isset($user->name) ? $user->name : variable_get('anonymous', t('Anonymous')), '%domain' => $_domain['sitename'], '%redirect' => $redirect['sitename'] . $extra), WATCHDOG_WARNING);
   drupal_goto($redirect['path'] . drupal_get_path_alias($path));
 }
 
