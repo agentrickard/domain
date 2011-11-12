@@ -161,8 +161,8 @@ function domain_source_node_validate($node, $form) {
   if (!empty($node->domains_raw)) {
     $allowed = array_merge($allowed, $node->domains_raw);
   }
-  if ($node->domain_site && $key == $default) {
-    // This case is acceptable, so we let it pass.
+  if ($node->domain_site) {
+    // Any assignment is acceptable if sent to all affiliates.
     // I find this code easier to read than a compound IF statement.
   }
   // Here we account for both the 'domains_raw' and 'domains' options.
