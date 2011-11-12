@@ -296,6 +296,7 @@ function domain_content_form() {
           '#suffix' => ' ' . theme('mark', array('type' => node_mark($node->nid, $node->changed))),
         ),
       ),
+      'domains' => domain_content_view_domains($node), // set the assigned domains
       'type' => check_plain(node_type_get_name($node)),
       'author' => theme('username', array('account' => $node)),
       'status' => $node->status ? t('published') : t('not published'),
@@ -343,8 +344,6 @@ function domain_content_form() {
         ),
       );
     }
-    // Set the assigned domains.
-    $options[$node->nid]['domains'] = domain_content_view_domains($node);
   }
   // Only use a tableselect when the current user is able to perform any
   // operations.
