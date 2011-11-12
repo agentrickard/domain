@@ -97,7 +97,7 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
   function render_link($data, $values) {
     // Determine the node path, if any.
     $nid = NULL;
-    if (isset($values->{$this->aliases['nid']})) {
+    if (isset($this->aliases['nid']) && isset($values->{$this->aliases['nid']})) {
       $nid = $values->{$this->aliases['nid']};
     }
     else if (isset($values->nid)) {
@@ -131,7 +131,7 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
 
     // Determine the node path, if any.
     $nid = NULL;
-    if (isset($values->{$this->aliases['nid']})) {
+    if (isset($this->aliases['nid']) && isset($values->{$this->aliases['nid']})) {
       $nid = $values->{$this->aliases['nid']};
     }
     else if (isset($values->nid)) {
@@ -147,7 +147,7 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
     }
     $link_options = array('absolute' => TRUE);
     // Now write the links.
-    if (is_array($this->field_values[$values->nid])) {
+    if (isset($values->nid) && isset($this->field_values[$values->nid]) && is_array($this->field_values[$values->nid])) {
       $field = $this->content_field;
       $options = $this->options;
       $items = array();
