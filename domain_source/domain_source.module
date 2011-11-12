@@ -61,7 +61,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
         if ($domain['domain_id'] == 0) {
           $key = -1;
         }
-        if ($user->domain_user[$key] != 0 && ($domain['valid'] || user_access('access inactive domains'))) {
+        if (!empty($user->domain_user[$key]) && ($domain['valid'] || user_access('access inactive domains'))) {
           $options[$key] = $domain['sitename'];
         }
       }
@@ -243,12 +243,12 @@ function domain_source_nodeapi(&$node, $op, $a3, $a4) {
 function domain_source_lookup($nid, $domains = array(), $domain_site = FALSE, $reset = FALSE) {
   global $_domain;
   static $lookups;
-  
+
   // Static cache.
   if (!$reset && isset($lookups[$nid])) {
     return $lookups[$nid];
   }
-  
+
   $source = db_result(db_query("SELECT domain_id FROM {domain_source} WHERE nid = %d", $nid));
 
   // Default source for nodes with no setting.
