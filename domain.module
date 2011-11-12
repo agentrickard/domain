@@ -1487,6 +1487,9 @@ function domain_node_presave($node) {
   // Build $domains array based on domains checked in the generate form
   // and shuffle for randomization
   $checked = array_filter($node->devel_generate['domains']);
+  if (empty($checked)) {
+    return;
+  }
   shuffle($checked);
   $domains = array_combine(array_values($checked), array_values($checked));
   // Add the domains and supporting data to the node
