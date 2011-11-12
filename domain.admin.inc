@@ -446,10 +446,10 @@ function domain_form($form, &$form_state, $domain = array(), $arguments = array(
   );
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   if (!variable_get('domain_allow_non_ascii', FALSE)) {
-    $description = t('Can only contain lowercase alphanumeric characters, dashes and a colon (if using alternative ports).');
+    $description = t('Must contain only dots, lowercase alphanumeric characters, dashes and a colon (if using alternative ports).');
   }
   else {
-    $description = t('Can contain lowercase alphanumeric and ASCII characters, dashes and a colon (if using alternative ports).');
+    $description = t('Must contain only dots, lowercase alphanumeric and ASCII characters, dashes and a colon (if using alternative ports).');
   }
   $form['domain']['subdomain'] = array(
     '#type' => 'textfield',
@@ -458,7 +458,7 @@ function domain_form($form, &$form_state, $domain = array(), $arguments = array(
     '#maxlength' => 80,
     '#required' => TRUE,
     '#default_value' => $domain['subdomain'],
-    '#description' => t('The allowed domain, using the full <em>path.example.com</em> format. Leave off the http:// and the trailing slash and do not include any paths.') . ' ' . $description
+    '#description' => t('The allowed domain, using the full <em>path.example.com</em> format.') . '<br />' . t('Leave off the http:// and the trailing slash and do not include any paths.') . '<br />' . $description
   );
   $form['domain']['sitename'] = array(
     '#type' => 'textfield',
