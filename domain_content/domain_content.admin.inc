@@ -419,7 +419,7 @@ function domain_content_filter_operations(&$operations) {
   if (user_access('administer nodes')) {
     return;
   }
-  // You must be able to edit to view this page, so check for the new delete perm.
+  // Check for the delete perm.
   if (!user_access('delete domain content')) {
     unset($operations['delete']);
   }
