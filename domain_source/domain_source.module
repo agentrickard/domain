@@ -30,7 +30,19 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
     $default_source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $form['#node']->nid))->fetchField();
   }
   if (!isset($default_source)) {
-    $default_source = $_domain['domain_id'];
+    $source = variable_get('domain_default_source', -1);
+    if ($source == -1) {
+      $default_source = DOMAIN_SOURCE_USE_ACTIVE;
+    }
+    else {
+      $source_domain = domain_lookup($source);
+      if ($source_domain == -1) {
+        $default_source = $_domain['domain_id'];
+      }
+      else {
+        $default_source = $source_domain['domain_id'];
+      }
+    }
   }
   // Prevent invalid domains from being used.
   $lookup = domain_lookup($default_source);
