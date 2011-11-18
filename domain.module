@@ -3003,8 +3003,10 @@ function domain_query_node_access_alter(QueryAlterableInterface $query) {
  *   A dynamic node query.
  * @param $all_affiliates
  *   Boolean value indicating whether to grant the 'domain_site' grant.
+ * @param $current_domain
+ *   Boolean value indicating whether to grant the 'domain_id' grant.
  */
-function domain_alter_node_query(QueryAlterableInterface $query, $all_affiliates = TRUE) {
+function domain_alter_node_query(QueryAlterableInterface $query, $all_affiliates = TRUE, $current_domain = TRUE) {
   $_domain = domain_get_domain();
   $domain_id = (int) $_domain['domain_id'];
   $tables = $query->getTables();
@@ -3019,10 +3021,12 @@ function domain_alter_node_query(QueryAlterableInterface $query, $all_affiliates
           ->condition("{$access_alias}.realm", 'domain_site')
         );
       }
-      $or->condition(db_and()
-        ->condition("{$access_alias}.gid", $domain_id)
-        ->condition("{$access_alias}.realm", 'domain_id')
-      );
+      if ($current_domain) {
+        $or->condition(db_and()
+          ->condition("{$access_alias}.gid", $domain_id)
+          ->condition("{$access_alias}.realm", 'domain_id')
+        );
+      }
       $query->condition($or);
       // Node module will not have run, so add the distinct.
       $query->distinct();

@@ -263,8 +263,17 @@ function domain_content_form() {
       $query->condition('n.status', 1);
     }
   }
-  // Restrict the query to the active domain.
-  domain_alter_node_query($query, FALSE);
+
+  // Write the proper query.
+  $arg = arg(3);
+  // If 'all', only show content assigned to all affiliates.
+  if ($arg == 'all') {
+    domain_alter_node_query($query, TRUE, FALSE);
+  }
+  else {
+    // Restrict the query to the active domain.
+    domain_alter_node_query($query, FALSE);
+  }
 
   $nids = $query
     ->fields('n', array('nid'))
