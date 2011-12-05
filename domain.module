@@ -329,15 +329,6 @@ function domain_permission() {
     'assign domain editors' => array(
       'title' => t('Assign editors to domains'),
     ),
-    'edit domain content' => array(
-      'title' => t('Edit any content on assigned domains'),
-    ),
-    'delete domain content' => array(
-      'title' => t('Delete any content on assigned domains'),
-    ),
-    'view unpublished domain content' => array(
-      'title' => t('View unpublished content on assigned domains'),
-    ),
     'set domain access' => array(
       'title' => t('Set domain access status for all content'),
     ),
@@ -350,8 +341,53 @@ function domain_permission() {
     'publish from default domain' => array(
       'title' => t('Publish content only from the default domain'),
     ),
+    'edit domain content' => array(
+      'title' => t('Edit any content on assigned domains'),
+    ),
+    'delete domain content' => array(
+      'title' => t('Delete any content on assigned domains'),
+    ),
+    'view unpublished domain content' => array(
+      'title' => t('View unpublished content on assigned domains'),
+    ),
   );
+
+  // Generate standard node permissions for all applicable node types.
+  foreach (node_permissions_get_configured_types() as $type) {
+    $permissions += domain_editor_list_permissions($type);
+  }
+
   return $permissions;
+}
+
+/**
+ * Helper function to generate standard node permission list for a given type.
+ *
+ * Shamelessly lifted from node_list_permissions().
+ *
+ * @param $type
+ *   The machine-readable name of the node type.
+ * @return array
+ *   An array of permission names and descriptions.
+ */
+function domain_editor_list_permissions($type) {
+  $info = node_type_get_type($type);
+  $type = check_plain($info->type);
+
+  // Build standard list of node permissions for this type.
+  $perms = array(
+    "create $type content on assigned domains" => array(
+      'title' => t('%type_name: Create new content on assigned domains', array('%type_name' => $info->name)),
+    ),
+    "update $type content on assigned domains" => array(
+      'title' => t('%type_name: Edit any content on assigned domains', array('%type_name' => $info->name)),
+    ),
+    "delete $type content on assigned domains" => array(
+      'title' => t('%type_name: Delete any content on assigned domains', array('%type_name' => $info->name)),
+    ),
+  );
+
+  return $perms;
 }
 
 /**
@@ -2009,11 +2045,26 @@ function domain_set_default_grant($reset = FALSE) {
 /**
  * Implements hook_node_access().
  *
- * Only used to check if a user can view unpublished nodes assigned to her
- * domain(s).
+ * Splits the access checks by operation.
  */
 function domain_node_access($node, $op, $account) {
-  if ($op != 'view' || !empty($node->status)) {
+  if (empty($account->domain_user)) {
+    return NODE_ACCESS_IGNORE;
+  }
+  $function = "domain_node_access_$op";
+  if (function_exists($function)) {
+    return $function($node, $op, $account);
+  }
+  return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Checks if a user can view unpublished nodes assigned to her domain(s).
+ *
+ * @see domain_node_access().
+ */
+function domain_node_access_view($node, $op, $account) {
+  if (!empty($node->status)) {
     return NODE_ACCESS_IGNORE;
   }
   if (empty($node->domains) || empty($account->domain_user)) {
@@ -2029,6 +2080,73 @@ function domain_node_access($node, $op, $account) {
     }
   }
   return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Checks if a user can create content of a specific type on the current domain.
+ *
+ * @see domain_node_access().
+ */
+function domain_node_access_create($node, $op, $account) {
+  $_domain = domain_get_domain();
+  if (!isset($account->domain_user[$_domain['domain_id']])) {
+    return NODE_ACCESS_IGNORE;
+  }
+  // Build the permission string.
+  $permission = "$op $node content on assigned domains";
+
+  // Run the access check.
+  if (user_access($permission, $account)) {
+    return NODE_ACCESS_ALLOW;
+  }
+  return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Checks if a user can edit content of a specific type based on domain.
+ *
+ * @see domain_node_access().
+ */
+function domain_node_access_update($node, $op, $account) {
+  // The node must be assigned to a domain to continue.
+  if (empty($node->domains)) {
+    return NODE_ACCESS_IGNORE;
+  }
+  // If the node falls outside this user's assigned domains, do nothing.
+  else {
+    $ignore = TRUE;
+    foreach ($node->domains as $domain_id) {
+      if (isset($account->domain_user[$domain_id])) {
+        $ignore = FALSE;
+        break;
+      }
+    }
+    if ($ignore) {
+      return NODE_ACCESS_IGNORE;
+    }
+  }
+
+  // Build the permission string.
+  $permission = "$op $node->type content on assigned domains";
+
+  // Run the access check.
+  if (user_access($permission, $account)) {
+    return NODE_ACCESS_ALLOW;
+  }
+
+  // If the check fails, do nothing.
+  return NODE_ACCESS_IGNORE;
+}
+
+/**
+ * Checks if a user can delete content of a specific type based on domain.
+ *
+ * This is just a wrapper around the update function, which uses the same logic.
+ *
+ * @see domain_node_access().
+ */
+function domain_node_access_delete($node, $op, $account) {
+  return domain_node_access_update($node, $op, $account);
 }
 
 /**
