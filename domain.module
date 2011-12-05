@@ -1637,7 +1637,7 @@ function domain_node_delete($node) {
  * Allows devel generate to add domains.
  */
 function domain_node_presave($node) {
-  if (empty($node->devel_generate)) {
+  if (empty($node->devel_generate['domains'])) {
     return;
   }
   // Build $domains array based on domains checked in the generate form
