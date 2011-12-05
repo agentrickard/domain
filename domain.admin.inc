@@ -49,8 +49,8 @@ function domain_overview_form($form, &$form_state) {
     ->limit($limit);
   // Get the domains.
   $result = $query->execute();
-  foreach ($result as $data) {
-    $domains[] = $data;
+  while ($domain = $result->fetchAssoc()) {
+    $domains[$domain['domain_id']] = domain_api($domain);
   }
   if (empty($domains)) {
     $form['error'] = array(
@@ -58,6 +58,7 @@ function domain_overview_form($form, &$form_state) {
     );
     return $form;
   }
+  // Get the count of all domains, which may be paginated.
   $delta = count(domain_domains());
   $form['domain']['#tree'] = TRUE;
   $form['header'] = array(
@@ -66,42 +67,39 @@ function domain_overview_form($form, &$form_state) {
   );
   $options = array();
   $i = -1;
-  foreach ($domains as $domain) {
-    // TODO: The object/array bit here is ugly.
-    $domain_array = (array) $domain;
-    $domain_array = domain_api($domain_array);
-    $domain = (object) $domain_array;
-    $options[$domain->domain_id] = '';
-    $form['domain'][$domain->domain_id]['values'] = array(
+  // Now build the form elements.
+  foreach ($domains as $domain_id => $domain) {
+    $options[$domain_id] = '';
+    $form['domain'][$domain_id]['values'] = array(
       '#type' => 'value',
       '#value' => $domain,
     );
-    $form['domain'][$domain->domain_id]['weight'] = array(
+    $form['domain'][$domain_id]['weight'] = array(
       '#type' => 'weight',
       '#default_value' => ($page * $limit) + $i++,
       '#delta' => $delta,
       '#attributes' => array('class' => array('domain-weight')),
     );
-    $form['domain'][$domain->domain_id]['sitename'] = array(
+    $form['domain'][$domain_id]['sitename'] = array(
       '#type' => 'markup',
-      '#markup' => ($active_domain['domain_id'] == $domain->domain_id) ? '<strong>' . check_plain($domain->sitename) . '</strong>' : check_plain($domain->sitename),
+      '#markup' => ($active_domain['domain_id'] == $domain_id) ? '<strong>' . check_plain($domain['sitename']) . '</strong>' : check_plain($domain['sitename']),
     );
-    $form['domain'][$domain->domain_id]['subdomain'] = array(
+    $form['domain'][$domain_id]['subdomain'] = array(
       '#type' => 'markup',
-      '#markup' => ($active_domain['domain_id'] == $domain->domain_id) ? '<strong>' . l($domain->subdomain, domain_get_uri($domain_array)) . '</strong>' : l($domain->subdomain, domain_get_uri($domain_array)),
+      '#markup' => ($active_domain['domain_id'] == $domain_id) ? '<strong>' . l($domain['subdomain'], domain_get_uri($domain)) . '</strong>' : l($domain['subdomain'], domain_get_uri($domain)),
     );
-    $form['domain'][$domain->domain_id]['domain_id'] = array(
+    $form['domain'][$domain_id]['domain_id'] = array(
       '#type' => 'markup',
-      '#markup' => check_plain($domain->domain_id),
+      '#markup' => check_plain($domain_id),
     );
-    $form['domain'][$domain->domain_id]['valid'] = array(
+    $form['domain'][$domain_id]['valid'] = array(
       '#type' => 'checkbox',
-      // '#title' => !empty($domain->valid) ? t('Active') : t('Inactive'),
-      '#default_value' => !empty($domain->valid),
+      // '#title' => !empty($domain['valid']) ? t('Active') : t('Inactive'),
+      '#default_value' => !empty($domain['valid']),
     );
-    $form['domain_actions'][$domain->domain_id] = array(
+    $form['domain_actions'][$domain_id] = array(
       '#type' => 'markup',
-      '#markup' => l(t('edit domain'), 'admin/structure/domain/view/' . $domain->domain_id . '/edit'),
+      '#markup' => l(t('edit domain'), 'admin/structure/domain/view/' . $domain_id . '/edit'),
     );
   }
   $form['default_domain'] = array(
@@ -126,7 +124,7 @@ function domain_overview_form_validate($form, &$form_state) {
   $values = $form_state['values']['domain'];
   $default = $form_state['values']['default_domain'];
   if (isset($values[$default])) {
-    $domain = (array) $values[$default]['values'];
+    $domain = $values[$default]['values'];
     $error = domain_check_response($domain);
     if ($error) {
       $error = t('%domain may not be set as your primary domain.', array('%domain' => domain_get_path($domain))) . '<br />' . $error;
@@ -149,7 +147,7 @@ function domain_overview_form_submit($form, &$form_state) {
       $default = 1;
       $valid = 1;
       if ($domain_id != $form_state['complete form']['default_domain']['#default_value']) {
-        drupal_set_message(t('The primary domain has been set to %domain.', array('%domain' => domain_get_path((array) $value['values']))));
+        drupal_set_message(t('The primary domain has been set to %domain.', array('%domain' => domain_get_path($value['values']))));
       }
     }
     db_update('domain')
