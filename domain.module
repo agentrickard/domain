@@ -2875,44 +2875,186 @@ function domain_simpletest() {
  * If enabled, force admins to use Domain Access rules.
  */
 function domain_query_node_access_alter(QueryAlterableInterface $query) {
-  $admin_force = variable_get('domain_force_admin', FALSE);
-  // In any of the following cases, do not enforce any rules.
-  if (empty($admin_force) || !user_access('bypass node access') || domain_grant_all()) {
-    return;
+  if (domain_admin_filter()) {
+    domain_alter_node_query($query, 'node');
   }
-  domain_alter_node_query($query);
+}
+
+/**
+ * Determines if node lists should be filtered for admins.
+ *
+ * @return
+ *   Boolean TRUE or FALSE.
+ */
+function domain_admin_filter() {
+  static $return, $i;
+  if (!isset($return)) {
+    $admin_force = variable_get('domain_force_admin', FALSE);
+    // In any of the following cases, do not enforce any rules.
+    if (empty($admin_force) || !user_access('bypass node access') || domain_grant_all()) {
+     $return = FALSE;
+    }
+    $return = TRUE;
+  }
+  return $return;
 }
 
 /**
  * Abstraction to allow query alters outside of node access.
  *
+ * This entire function is stolen from node.module. We should fix this in core.
+ *
+ * @link http://drupal.org/node/1363062
+ *
  * @param $query
  *   A dynamic node query.
- * @param $all_affiliates
- *   Boolean value indicating whether to grant the 'domain_site' grant.
+ * @param $type
+ *   Either 'node' or 'entity' depending on what sort of query it is. See
+ *   node_query_node_access_alter() and node_query_entity_field_access_alter()
+ *   for more. Currently, we only support 'node'.
  */
-function domain_alter_node_query(QueryAlterableInterface $query, $all_affiliates = TRUE) {
-  $_domain = domain_get_domain();
-  $domain_id = (int) $_domain['domain_id'];
+function domain_alter_node_query(QueryAlterableInterface $query, $type) {
+  global $user;
+  // Read meta-data from query, if provided.
+  if (!$account = $query->getMetaData('account')) {
+    $account = $user;
+  }
+  if (!$op = $query->getMetaData('op')) {
+    $op = 'view';
+  }
+  // Only act on view.
+  if ($op != 'view') {
+    return;
+  }
   $tables = $query->getTables();
+  $base_table = $query->getMetaData('base_table');
+  // If no base table is specified explicitly, search for one.
+  if (!$base_table) {
+    $fallback = '';
+    foreach ($tables as $alias => $table_info) {
+      if (!($table_info instanceof SelectQueryInterface)) {
+        $table = $table_info['table'];
+        // If the node table is in the query, it wins immediately.
+        if ($table == 'node') {
+          $base_table = $table;
+          break;
+        }
+        // Check whether the table has a foreign key to node.nid. If it does,
+        // do not run this check again as we found a base table and only node
+        // can triumph that.
+        if (!$base_table) {
+          // The schema is cached.
+          $schema = drupal_get_schema($table);
+          if (isset($schema['fields']['nid'])) {
+            if (isset($schema['foreign keys'])) {
+              foreach ($schema['foreign keys'] as $relation) {
+                if ($relation['table'] === 'node' && $relation['columns'] === array('nid' => 'nid')) {
+                  $base_table = $table;
+                }
+              }
+            }
+            else {
+              // At least it's a nid. A table with a field called nid is very
+              // very likely to be a node.nid in a node access query.
+              $fallback = $table;
+            }
+          }
+        }
+      }
+    }
+    // If there is nothing else, use the fallback.
+    if (!$base_table) {
+      if ($fallback) {
+        watchdog('security', 'Your node listing query is using @fallback as a base table in a query tagged for node access. This might not be secure and might not even work. Specify foreign keys in your schema to node.nid ', array('@fallback' => $fallback), WATCHDOG_WARNING);
+        $base_table = $fallback;
+      }
+      else {
+        throw new Exception(t('Query tagged for node access but there is no nid. Add foreign keys to node.nid in schema to fix.'));
+      }
+    }
+  }
+
+  // Prevent duplicate records.
+  $query->distinct();
+
+  // Find all instances of the base table being joined -- could appear
+  // more than once in the query, and could be aliased. Join each one to
+  // the node_access table.
+
+  $grants = node_access_grants($op, $account);
+  if ($type == 'entity') {
+    // The original query looked something like:
+    // @code
+    //  SELECT nid FROM sometable s
+    //  INNER JOIN node_access na ON na.nid = s.nid
+    //  WHERE ($node_access_conditions)
+    // @endcode
+    //
+    // Our query will look like:
+    // @code
+    //  SELECT entity_type, entity_id
+    //  FROM field_data_something s
+    //  LEFT JOIN node_access na ON s.entity_id = na.nid
+    //  WHERE (entity_type = 'node' AND $node_access_conditions) OR (entity_type <> 'node')
+    // @endcode
+    //
+    // So instead of directly adding to the query object, we need to collect
+    // in a separate db_and() object and then at the end add it to the query.
+    $entity_conditions = db_and();
+  }
   foreach ($tables as $nalias => $tableinfo) {
     $table = $tableinfo['table'];
-    if (!($table instanceof SelectQueryInterface) && $table == 'node') {
-      $access_alias = $query->join('domain_access', 'da_admin', "da_admin.nid = {$nalias}.nid");
-      $or = db_or();
-      if ($all_affiliates) {
-        $or->condition(db_and()
-          ->condition("{$access_alias}.gid", 0)
-          ->condition("{$access_alias}.realm", 'domain_site')
-        );
+    if (!($table instanceof SelectQueryInterface) && $table == $base_table) {
+
+      // The node_access table has the access grants for any given node so JOIN
+      // it to the table containing the nid which can be either the node
+      // table or a field value table.
+      if ($type == 'node') {
+        $access_alias = $query->join('node_access', 'na', '%alias.nid = ' . $nalias . '.nid');
       }
-      $or->condition(db_and()
-        ->condition("{$access_alias}.gid", $domain_id)
-        ->condition("{$access_alias}.realm", 'domain_id')
-      );
-      $query->condition($or);
-      // Node module will not have run, so add the distinct.
-      $query->distinct();
+      else {
+        $access_alias = $query->leftJoin('node_access', 'na', '%alias.nid = ' . $nalias . '.entity_id');
+        $base_alias = $nalias;
+      }
+
+      $grant_conditions = db_or();
+      // If any grant exists for the specified user, then user has access
+      // to the node for the specified operation.
+      foreach ($grants as $realm => $gids) {
+        foreach ($gids as $gid) {
+          $grant_conditions->condition(db_and()
+            ->condition($access_alias . '.gid', $gid)
+            ->condition($access_alias . '.realm', $realm)
+          );
+        }
+      }
+
+      $count = count($grant_conditions->conditions());
+      if ($type == 'node') {
+        if ($count) {
+          $query->condition($grant_conditions);
+        }
+        $query->condition($access_alias . '.grant_' . $op, 1, '>=');
+      }
+      else {
+        if ($count) {
+          $entity_conditions->condition($grant_conditions);
+        }
+        $entity_conditions->condition($access_alias . '.grant_' . $op, 1, '>=');
+      }
     }
+  }
+
+  if ($type == 'entity' && count($entity_conditions->conditions())) {
+    // All the node access conditions are only for field values belonging to
+    // nodes.
+    $entity_conditions->condition("$base_alias.entity_type", 'node');
+    $or = db_or();
+    $or->condition($entity_conditions);
+    // If the field value belongs to a non-node entity type then this function
+    // does not do anything with it.
+    $or->condition("$base_alias.entity_type", 'node', '<>');
+    // Add the compiled set of rules to the query.
+    $query->condition($or);
   }
 }
