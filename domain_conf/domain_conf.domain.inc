@@ -324,10 +324,8 @@ function domain_conf_domain_batch() {
     drupal_add_js(drupal_get_path('module', 'menu') . '/menu.admin.js'));
     */
     // To avoid an 'illegal option' error after saving the form we have to load
-    // all available menu items.
-    // Otherwise it is not possible to dynamically add options to the list.
-    // @todo Convert menu_parent_options() into a #process callback.
-    $options = menu_parent_options(menu_get_menus(), array('mlid' => 0));
+    // all available menu items. Otherwise it is not possible to dynamically add
+    // options to the list.
     foreach ($types as $type) {
       $form['menu']['menu_options'] = array(
         '#type' => 'checkboxes',
@@ -337,8 +335,9 @@ function domain_conf_domain_batch() {
       $form['menu']['menu_parent'] = array(
         '#type' => 'select',
         '#title' => t('@type: Default parent item', array('@type' => $type->name)),
-        '#options' => $options,
+        '#options' => array(),
         '#attributes' => array('class' => array('menu-title-select')),
+        '#process' => array('domain_conf_get_menu_parents'),
       );
       $batch['menu_options_' . $type->type] = array(
         '#form' => $form['menu']['menu_options'],
@@ -387,4 +386,22 @@ function domain_conf_domain_delete($domain, $form_values = array()) {
     ->condition('domain_id', $domain['domain_id'])
     ->execute();
   cache_clear_all('variables', 'cache_bootstrap');
+}
+
+/**
+ * Form process function to load available menus.
+ *
+ * If we try to load the menus in the batch hook, it can create a race
+ * condition with menu_rebuild() that leads to a fatal call stack error.
+ *
+ * So we use this process callback to populate the menus safely, after they
+ * have been rebuilt.
+ */
+function domain_conf_get_menu_parents($element, &$form_state) {
+  static $options;
+  if (!isset($options)) {
+    $options = menu_parent_options(menu_get_menus(), array('mlid' => 0));
+  }
+  $element['#options'] += $options;
+  return $element;
 }
