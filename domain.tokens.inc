@@ -71,15 +71,11 @@ function domain_token_info() {
 function domain_tokens($type, $tokens, array $data = array(), array $options = array()) {
   $sanitize = !empty($options['sanitize']);
   $replacements = array();
+
   // Base token handling.
-  if ($type == 'domain') {
-    // Get the active domain context.
-    if (!empty($data['domain'])) {
-      $domain = $data['domain'];
-    }
-    else {
-      $domain = domain_get_domain();
-    }
+  if ($type == 'domain' && !empty($data['domain'])) {
+    $domain = $data['domain'];
+
     // Loop through the tokens and replace the elements.
     foreach ($tokens as $name => $original) {
       switch ($name) {
@@ -120,30 +116,31 @@ function domain_tokens($type, $tokens, array $data = array(), array $options = a
       }
     }
   }
+
   // Node tokens.
   if ($type == 'node' && !empty($data['node'])) {
-    $domain = domain_get_node_match($data['node']->nid);
     $node = $data['node'];
-    // Check for valid domain data.
     $domain = domain_get_node_match($node->nid);
-    if ($domain == -1) {
-      return;
+    if (empty($domain) || $domain == -1) {
+      return $replacements;
     }
     // Loop through the tokens to not waste cycles.
     foreach ($tokens as $name => $original) {
       if ($name == 'domain') {
-        $replacements[$original] = $sanitize ? check_plain($domain['subdomain']) : $domain['subdomain'];
+        $replacements[$original] = $sanitize ? check_plain($domain['sitename']) : $domain['sitename'];
       }
     }
     if ($domain_tokens = token_find_with_prefix($tokens, 'domain')) {
       $replacements += token_generate('domain', $domain_tokens, array('domain' => $domain), $options);
     }
   }
+
   // Current domain tokens.
   elseif ($type == 'current-domain') {
     $current_domain = domain_get_domain();
     $replacements += token_generate('domain', $tokens, array('domain' => $current_domain), $options);
   }
+
   // Default domain tokens.
   elseif ($type == 'default-domain') {
     $default_domain = domain_default(FALSE);

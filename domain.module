@@ -76,7 +76,7 @@ function domain_api_version() {
  */
 function domain_init() {
   global $_domain, $conf;
- 
+
   if (!is_array($_domain)) {
     $_domain = array();
   }
@@ -1709,6 +1709,22 @@ function domain_node_presave($node) {
 }
 
 /**
+ * Implements hook_node_insert().
+ */
+function domain_node_insert($node) {
+  // Any function that tries to call domain_get_node_domains() or
+  // domain_get_node_match() needs this data.
+  domain_node_access_records($node);
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function domain_node_update($node) {
+  domain_node_access_records($node);
+}
+
+/**
  * Get the best matching domain for a node link.
  *
  * @param $nid
@@ -1730,9 +1746,14 @@ function domain_get_node_match($nid) {
   $source = NULL;
   if ($id !== FALSE) {
     $source = domain_lookup($id);
-    drupal_alter('domain_source', $source, $nid);
-    $domain[$nid] = $source;
   }
+  else {
+    $source = domain_get_domain();
+  }
+
+  // Allow other modules to intervene.
+  drupal_alter('domain_source', $source, $nid);
+  $domain[$nid] = $source;
 
   return $source;
 }
@@ -1766,19 +1787,14 @@ function domain_get_path_match($path) {
  *
  * @param $nodes
  *   An array of nodes, keyed by node id, or a single node id.
- * @param $reset
- *   A boolean flag indicating the need to reset the static variable for the node.
  *
  * @return
  *   An array of data, keyed by node id, or a single array for a single node.
  *   The data array, consists of two parts. 'domain_id' is an array of active domain ids.
  *   'domain_site' is a TRUE/FALSE boolean indicating affiliate status.
  */
-function domain_get_node_domains($nodes, $reset = FALSE) {
-  $lookup = &drupal_static(__FUNCTION__);
-  if (!isset($lookup) || $reset) {
-    $lookup = array();
-  }
+function domain_get_node_domains($nodes) {
+  $lookup = &drupal_static(__FUNCTION__, array());
   // Ensure we form our data properly.
   if (!is_array($nodes)) {
     $node_ids[$nodes] = $nodes;
@@ -2005,8 +2021,9 @@ function _domain_store_grants($nid, $grants = array()) {
     $query->execute();
   }
 
-  // Reset the static lookup for this node.
-  domain_get_node_domains($nid, TRUE);
+  // Reset the node-related domain static variables.
+  drupal_static_reset('domain_get_node_domains');
+  drupal_static_reset('domain_get_node_match');
 
   // Ensure that our default grant is present.
   domain_set_default_grant();
