@@ -6,6 +6,17 @@
 Domain Access
 A domain-based access control system.
 
+===============================================================================
+This document is out of date. Current documentation is online at:
+
+http://drupal.org/documentation/modules/domain
+
+If you find errors or omissions, please help fix them. Anyone can create
+documentation pages.
+
+===============================================================================
+
+
 CONTENTS
 --------
 
