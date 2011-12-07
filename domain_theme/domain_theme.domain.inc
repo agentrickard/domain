@@ -65,12 +65,15 @@ function domain_theme_domain_batch() {
  */
 function domain_theme_domain_warning() {
   $forms =  array(
-    'system_themes_form',
     'system_theme_settings',
   );
   $return = array();
+  $theme = arg(3);
+  if (empty($theme)) {
+    return array();
+  }
   foreach ($forms as $form) {
-    $return[$form] =  'admin/structure/domain/theme/%domain_id';
+    $return[$form] =  'admin/structure/domain/view/%domain_id/theme/' . $theme . '/theme-settings';
   }
   return $return;
 }

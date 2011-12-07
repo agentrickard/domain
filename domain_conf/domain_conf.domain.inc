@@ -23,7 +23,7 @@ function domain_conf_domain_warning() {
   );
   $return = array();
   foreach ($forms as $form) {
-    $return[$form] = 'admin/structure/domain/conf/%domain_id';
+    $return[$form] = 'admin/structure/domain/view/%domain_id/config';
   }
   return $return;
 }
