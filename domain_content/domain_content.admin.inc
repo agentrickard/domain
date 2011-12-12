@@ -279,11 +279,11 @@ function domain_content_form() {
   $arg = arg(3);
   // If 'all', only show content assigned to all affiliates.
   if ($arg == 'all') {
-    domain_alter_node_query($query, TRUE, FALSE);
+    domain_content_alter_node_query($query, TRUE, FALSE);
   }
   else {
     // Restrict the query to the active domain.
-    domain_alter_node_query($query, FALSE);
+    domain_content_alter_node_query($query, FALSE);
   }
 
   $nids = $query
@@ -442,5 +442,43 @@ function domain_content_filter_operations(&$operations) {
     unset($operations['demote']);
     unset($operations['sticky']);
     unset($operations['unsticky']);
+  }
+}
+
+/**
+ * Abstraction to allow query alters outside of node access.
+ *
+ * @param $query
+ *   A dynamic node query.
+ * @param $all_affiliates
+ *   Boolean value indicating whether to grant the 'domain_site' grant.
+ * @param $current_domain
+ *   Boolean value indicating whether to grant the 'domain_id' grant.
+ */
+function domain_content_alter_node_query(QueryAlterableInterface $query, $all_affiliates = TRUE, $current_domain = TRUE) {
+  $_domain = domain_get_domain();
+  $domain_id = (int) $_domain['domain_id'];
+  $tables = $query->getTables();
+  foreach ($tables as $nalias => $tableinfo) {
+    $table = $tableinfo['table'];
+    if (!($table instanceof SelectQueryInterface) && $table == 'node') {
+      $access_alias = $query->join('domain_access', 'da_admin', "da_admin.nid = {$nalias}.nid");
+      $or = db_or();
+      if ($all_affiliates) {
+        $or->condition(db_and()
+          ->condition("{$access_alias}.gid", 0)
+          ->condition("{$access_alias}.realm", 'domain_site')
+        );
+      }
+      if ($current_domain) {
+        $or->condition(db_and()
+          ->condition("{$access_alias}.gid", $domain_id)
+          ->condition("{$access_alias}.realm", 'domain_id')
+        );
+      }
+      $query->condition($or);
+      // Node module will not have run, so add the distinct.
+      $query->distinct();
+    }
   }
 }
