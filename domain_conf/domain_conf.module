@@ -49,6 +49,13 @@ function domain_conf_domain_bootstrap_full($domain) {
             $GLOBALS['language'] = $temp;
             $conf[$key] = $value;
           }
+          // Ensure we store the default language in case of reset.
+          // See domain_conf_js_maintain().
+          $table = domain_get_primary_table('variable');
+          $result = db_query("SELECT value FROM $table WHERE name = :name", array(':name' => $key))->fetchField();
+          if (!empty($result)) {
+            domain_conf_default_language(unserialize($result));
+          }
         }
       }
       else {
@@ -388,4 +395,77 @@ function domain_conf_features_api() {
     ),
   );
   return $components;
+}
+
+/**
+ * Ensure that language changes do not affect default settings.
+ *
+ * When using multiple languages with JavaScript translations, the invocation
+ * of _locale_rebuild_js() can force the default domain setting to be assigned
+ * to the active domain. Hilarity foes not ensue.
+ *
+ * We try to account for this issue by ensuring that the default setting is not
+ * changed when this function is invoked, which can happen in two places:
+ * locale_js_alter() and locale_languages_delete_form_submit(). Fortunately,
+ * both function are tied to hook that we can monitor in order to ensure that
+ * the settings are preserved properly.
+ 
+ * @link http://drupal.org/node/1271810
+ * @see _locale_rebuild_js()
+ * @see locale_languages_delete_form_submit()
+ * @see hook_multilingual_settings_changed()
+ * @see domain_conf_js_alter()
+ * @see domain_conf_multilingual_settings_changed()
+ */
+function domain_conf_js_maintain() {
+  // Only a factor if using the Locale module.
+  if (!module_exists('locale')) {
+    return;
+  }
+  if ($default_language = domain_conf_default_language()) {
+    drupal_register_shutdown_function('domain_conf_set_default_language', $default_language);
+  }
+}
+
+/**
+ * Implements hook_js_alter().
+ */
+function domain_conf_js_alter(&$javascript) {
+  domain_conf_js_maintain();
+}
+
+/**
+ * Implements hook_multilingual_settings_changed().
+ */
+function domain_conf_multilingual_settings_changed() {
+  domain_conf_js_maintain();
+}
+
+/**
+ * Store the default language setting for later use.
+ *
+ * @param $value
+ *  If set, the $langauage object to store.
+ *
+ * @return
+ *  The language object or FALSE if not set.
+ */
+function domain_conf_default_language($value = NULL) {
+  $language = &drupal_static(__FUNCTION__);
+  if (!is_null($value)) {
+    $language = $value;
+  }
+  return (isset($language)) ? $language : FALSE;
+}
+
+/**
+ * Shutdown function to reset the default language variable.
+ *
+ * @param $default_language
+ *  A language object, stored by domain_conf_default_language().
+ */
+function domain_conf_set_default_language($default_language) {
+  if (!empty($default_language) && is_object($default_language)) {
+    variable_set('language_default', $default_language);
+  }
 }
