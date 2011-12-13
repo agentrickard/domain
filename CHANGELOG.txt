@@ -1,0 +1,36 @@
+/**
+ * @file
+ * Changelog file for Domain Access 7.x-2.x.
+ */
+
+Documentation has moved online. Important changes are noted below.
+
+Differences between 7.x.2 and 7.x.3
+  - http://drupal.org/node/1120384
+
+Upgrading to Drupal 7 using Domain Access 
+  - http://drupal.org/node/1074092
+
+Upgrading to Domain Access 7.x.3 (from 7.x.2)
+  - http://drupal.org/node/1280656
+
+===============
+Version history
+===============
+
+7.x-2.15 13-DEC-2011
+7.x-2.14 17-AUG-2011
+7.x-2.13 06-JUN-2011
+7.x-2.12 11-MAR-2011
+7.x-2.11 27-JAN-2011
+7.x-2.10 27-FEB-2011
+7.x-2.9 31-JAN-2011
+7.x-2.8 23-JAN-2011
+7.x-2.7 16-JAN-2011
+7.x-2.6 10-DEC-2010
+7.x-2.5 28-SEP-2010
+7.x-2.4 22-SEP-2010
+7.x-2.3 09-JUN-2010
+7.x-2.2 09-JUN-2010
+7.x-2.1 09-JUN-2010
+7.x-2.0 06-JUN-2010
