@@ -96,9 +96,13 @@ function _domain_bootstrap($phase) {
     case DOMAIN_BOOTSTRAP_INIT:
       // Make sure database is loaded.
       // The new update handler causes problems here, so we account for it.
-      // Same with drush or other CLI resources.
+      // Same with drush or other CLI resources. It turns out that the
+      // drupal_is_cli() function is not consistent for php and drush scripts,
+      // so instead, we check to see if the database driver has been loaded.
+      // See http://drupal.org/node/1342740 for the latest background.
       $new_phase = FALSE;
-      if (function_exists('update_prepare_d7_bootstrap') || drupal_is_cli()) {
+      // If running from drush or update.php, we act differently.
+      if (function_exists('drush_verify_cli') || function_exists('update_prepare_d7_bootstrap')) {
         $new_phase = TRUE;
       }
       drupal_bootstrap(DRUPAL_BOOTSTRAP_DATABASE, $new_phase);
@@ -240,7 +244,7 @@ function _domain_bootstrap_invoke_all() {
  * must ensure that we are querying the correct table.
  *
  * When using this function, you should insert the $table result directly
- * into your query string, or use token replacement '%s' syntax. Do not
+ * into your query string, or use token replacement syntax. Do not
  * enclose the table name in brackets {}, as that defeats the purpose of
  * this function.
  *
@@ -261,7 +265,9 @@ function domain_get_primary_table($table) {
   elseif (is_array($db_prefix)) {
     $table = $db_prefix['default'] . $table;
   }
-  return db_escape_table($table);
+  // db_escape_table() relies on a database connection, so we mirror that public
+  // method here. See DatabaseConnection::escapeTable.
+  return preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
 }
 
 /**
