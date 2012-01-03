@@ -204,7 +204,7 @@ function domain_prefix_domainlinks($domain) {
  */
 function domain_prefix_domainupdate($op, $domain, $form_state = array()) {
   // Include the extra functions.
-  include drupal_get_path('module', 'domain_prefix') .'/domain_prefix.admin.inc';
+  module_load_include('inc', 'domain_prefix', 'domain_prefix.admin');
   switch ($op) {
     case 'create':
       $rule = variable_get('domain_prefix_options', 1);
