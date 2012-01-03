@@ -59,7 +59,7 @@ function domain_theme_prepare_export($machine_name) {
   $theme = array();
   $machine_name = domain_load_machine_name($domain_id);
   foreach ($data as $item) {
-    $theme[$machine_name][$item->theme] = array(
+    $theme[$item->theme] = array(
       'theme' => $item->theme,
       'settings' => domain_unserialize($item->settings),
       'status' => $item->status,
