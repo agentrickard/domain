@@ -2070,7 +2070,8 @@ function domain_node_access($node, $op, $account) {
   }
   $function = "domain_node_access_$op";
   if (function_exists($function)) {
-    return $function($node, $op, $account);
+    $type = is_string($node) ? $node : $node->type;
+    return $function($type, $node, $op, $account);
   }
   return NODE_ACCESS_IGNORE;
 }
@@ -2080,7 +2081,7 @@ function domain_node_access($node, $op, $account) {
  *
  * @see domain_node_access().
  */
-function domain_node_access_view($node, $op, $account) {
+function domain_node_access_view($type, $node, $op, $account) {
   if (!empty($node->status)) {
     return NODE_ACCESS_IGNORE;
   }
@@ -2104,13 +2105,13 @@ function domain_node_access_view($node, $op, $account) {
  *
  * @see domain_node_access().
  */
-function domain_node_access_create($node, $op, $account) {
+function domain_node_access_create($type, $node, $op, $account) {
   $_domain = domain_get_domain();
   if (!isset($account->domain_user[$_domain['domain_id']])) {
     return NODE_ACCESS_IGNORE;
   }
   // Build the permission string.
-  $permission = "$op $node content on assigned domains";
+  $permission = "$op $type content on assigned domains";
 
   // Run the access check.
   if (user_access($permission, $account)) {
@@ -2124,7 +2125,7 @@ function domain_node_access_create($node, $op, $account) {
  *
  * @see domain_node_access().
  */
-function domain_node_access_update($node, $op, $account) {
+function domain_node_access_update($type, $node, $op, $account) {
   // The node must be assigned to a domain to continue.
   if (empty($node->domains)) {
     return NODE_ACCESS_IGNORE;
@@ -2144,7 +2145,7 @@ function domain_node_access_update($node, $op, $account) {
   }
 
   // Build the permission string.
-  $permission = "$op $node->type content on assigned domains";
+  $permission = "$op $type content on assigned domains";
 
   // Run the access check.
   if (user_access($permission, $account)) {
@@ -2162,8 +2163,8 @@ function domain_node_access_update($node, $op, $account) {
  *
  * @see domain_node_access().
  */
-function domain_node_access_delete($node, $op, $account) {
-  return domain_node_access_update($node, $op, $account);
+function domain_node_access_delete($type, $node, $op, $account) {
+  return domain_node_access_update($type, $node, $op, $account);
 }
 
 /**
