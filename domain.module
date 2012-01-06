@@ -2887,14 +2887,16 @@ function domain_query_node_access_alter(QueryAlterableInterface $query) {
  *   Boolean TRUE or FALSE.
  */
 function domain_admin_filter() {
-  static $return, $i;
+  static $return;
   if (!isset($return)) {
     $admin_force = variable_get('domain_force_admin', FALSE);
     // In any of the following cases, do not enforce any rules.
     if (empty($admin_force) || !user_access('bypass node access') || domain_grant_all()) {
-     $return = FALSE;
+      $return = FALSE;
     }
-    $return = TRUE;
+    else {
+      $return = TRUE;
+    }
   }
   return $return;
 }
