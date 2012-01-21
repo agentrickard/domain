@@ -742,6 +742,23 @@ class DomainUpdateTest extends DomainTestCase {
   }
 
   function testDomainUpdate() {
+    // Test a false positive $schema missing table.
+    $schema = array('foo' => array('fields' => array('domain_id' => array('type' => 'int'))));
+    $tables = domain_test_schema($schema);
+    $this->assertTrue(empty($tables), t('domain_test_schema() returned correctly for missing table.'));
+    // Test a false positive $schema type mismatch.
+    $schema = array('foo' => array('fields' => array('domain_id' => array('type' => 'serial'))));
+    $tables = domain_test_schema($schema);
+    $this->assertTrue(empty($tables), t('domain_test_schema() returned correctly for type mismatch.'));
+    // Test a false positive $schema missing column.
+    $schema = array('domain_conf' => array('fields' => array('field_id' => array('type' => 'int'))));
+    $tables = domain_test_schema($schema);
+    $this->assertTrue(empty($tables), t('domain_test_schema() returned correctly for missing column.'));
+    // Test a proper match.
+    $schema = array('domain_conf' => drupal_get_schema('domain_conf'));
+    $tables = domain_test_schema($schema);
+    $this->assertTrue(!empty($tables), t('domain_test_schema() returned correctly for database table.'));
+    // Test the update functionality.
     $count = db_query("SELECT COUNT(domain_id) FROM {domain_conf} WHERE domain_id = 0")->fetchField();
     $this->assertTrue($count == 1, t('Domain id of 0 inserted in {domain_conf}.'));
     $list = domain_update_module_check();

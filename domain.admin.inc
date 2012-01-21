@@ -1212,7 +1212,7 @@ function domain_repair_form($form, &$form_state) {
   $list = domain_update_module_check();
   if (empty($list)) {
     $form['list'] = array(
-      '#markup' => '<p>' . t('No updates are required. <a href="!url">return to domain administration</a>.', array('!url' => url('admin/structure/domain'))) . '</p>',
+      '#markup' => '<p>' . t('No updates are required. <a href="!url">Return to domain administration</a>.', array('!url' => url('admin/structure/domain'))) . '</p>',
     );
   }
   else {

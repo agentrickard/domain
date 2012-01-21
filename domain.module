@@ -3608,7 +3608,7 @@ function domain_update_module_check() {
 function domain_test_schema($schema = array()) {
   $tables = array();
   foreach ($schema as $name => $table) {
-    if (isset($table['fields']['domain_id']['type']) && $table['fields']['domain_id']['type'] == 'int') {
+    if (db_table_exists($name) && isset($table['fields']['domain_id']['type']) && $table['fields']['domain_id']['type'] == 'int') {
       $query = db_select($name)
         ->condition('domain_id', 0);
       $check = $query->countQuery()->execute()->fetchField();
