@@ -23,11 +23,11 @@ function domain_install() {
         'valid' => 1,
     ))
     ->execute();
-  // MySQL won't let us insert row 0 into an autoincrement table.
-  // Similar to the {users} table, this leaves us with no row 1.
+  // MySQL won't let us insert row 0 into an autoincrement table. Deducting
+  // the value itself like this also handles auto_increment_offset settings.
+  // Similar to the {users} tablein Drupal 6, this leaves us with no row 1.
   db_update('domain')
-    ->fields(array('domain_id' => 0))
-    ->condition('domain_id', 1)
+    ->expression('domain_id', 'domain_id - domain_id')
     ->execute();
 
   // Set the default domain variables.
