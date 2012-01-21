@@ -19,9 +19,10 @@ function domain_install() {
   db_query("UPDATE {domain} SET subdomain = '%s', sitename = '%s', scheme = '%s', valid = 1 WHERE domain_id = 0", $root, $site, $scheme);
   if (!db_affected_rows()) {
     db_query("INSERT INTO {domain} (subdomain, sitename, scheme, valid) VALUES ('%s', '%s', '%s', %d)", $root, $site, $scheme, 1);
-    // MySQL won't let us insert row 0 into an autoincrement table.
+    // MySQL won't let us insert row 0 into an autoincrement table. Deducting
+    // the value itself like this also handles auto_increment_offset settings.
     // Similar to the {users} table, this leaves us with no row 1.
-    db_query("UPDATE {domain} SET domain_id = domain_id - 1");
+    db_query("UPDATE {domain} SET domain_id = domain_id - domain_id");
   }
   // Set the default domain variables.
   variable_set('domain_root', $root);
