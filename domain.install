@@ -333,7 +333,7 @@ function domain_requirements($phase) {
       if ($error = domain_valid_domain($root)) {
         $requirements['domain'] = array(
           'title' => t('Domain Access'),
-          'value' => $error . t('If you are using drush, please ensure to provide the --uri option.'),
+          'value' => $error . t('If you are using drush, please provide the --uri option (e.g. drush en domain --uri="http://example.com/optional_subdirectory").'),
           'severity' => REQUIREMENT_ERROR,
         );
       }

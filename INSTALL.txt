@@ -238,8 +238,8 @@ other Drupal module.
 ----
 3.1   Using Drush
 
-When installing from drush, it is proper to pass the URI value for your
-site. Include the full path to the installation, as below:
+When installing from drush, you must pass the URI value for your site. Include
+the full path to the installation, as below:
 
   drush pm-enable domain --uri=http://example.com/optional_subdirectory
 
@@ -256,7 +256,7 @@ command:
 
   drush cache-clear
 
-When prompted, select either option [1] or option [5] to rebuild node access.
+When prompted, select either option [1] or option [9] to rebuild node access.
 
 ----
 3.2   After Installation
