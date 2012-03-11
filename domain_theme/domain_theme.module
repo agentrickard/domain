@@ -282,3 +282,11 @@ function domain_theme_get_color_path($path) {
   return current(array_slice(array_reverse(explode('/', $path)), 1, 1));
 }
 
+/**
+ * Implements hook_domainupdate().
+ */
+function domain_theme_domainupdate($op, $domain, $form_values = array()) {
+  if ($op == 'delete') {
+    db_query("DELETE FROM {domain_theme} WHERE domain_id = %d", $domain['domain_id']);
+  }
+}
