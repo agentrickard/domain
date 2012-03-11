@@ -79,6 +79,15 @@ function domain_theme_domain_warning() {
 }
 
 /**
+ * Implements hook_domain_delete().
+ */
+function domain_theme_domain_delete($domain, $form_values = array()) {
+  db_delete('domain_theme')
+    ->condition('domain_id', $domain['domain_id'])
+    ->execute();
+}
+
+/**
  * Return a theme setting for batch processing.
  *
  * @param $domain

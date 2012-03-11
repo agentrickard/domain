@@ -52,7 +52,12 @@ function hook_domain_load(&$domain) {
  * @ingroup domain_hooks
  */
 function hook_domain_insert($domain, $form_values = array()) {
-  db_query("INSERT INTO {mytable} (subdomain, sitename) VALUES ('%s', '%s')", $domain['subdomain'], $domain['sitename']);
+  db_insert('mytable')
+    ->fields(array(
+      'domain_id' => $domain['domain_id'],
+      'myvar' => 1,
+    ))
+    ->execute();
 }
 
 /**
@@ -68,7 +73,12 @@ function hook_domain_insert($domain, $form_values = array()) {
  * @ingroup domain_hooks
  */
 function hook_domain_update($domain, $form_values = array()) {
-  db_query("UPDATE {mytable} SET subdomain = '%s', sitename = '%s' WHERE domain_id = %d", $domain['subdomain'], $domain['sitename'], $domain['domain_id']);
+  db_update('mytable')
+    ->fields(array(
+      'status' => 1,
+    ))
+    ->condition('domain_id', $domain['domain_id'])
+    ->execute();
 }
 
 /**
@@ -84,8 +94,9 @@ function hook_domain_update($domain, $form_values = array()) {
  * @ingroup domain_hooks
  */
 function hook_domain_delete($domain, $form_values = array()) {
-  db_query("DELETE FROM {mytable} WHERE subdomain = '%s'", $domain['subdomain']);
-}
+  db_delete('mytable')
+    ->condition('domain_id', $domain['domain_id'])
+    ->execute();}
 
 /**
  * Enables modules to add additional parameters to the $domain array
@@ -135,10 +146,21 @@ function hook_domain_nav($domain) {
  */
 function hook_domain_cron($domain) {
   // Run a node query.
-  $result = db_query_range(db_rewrite_sql("SELECT n.nid FROM {node} n ORDER BY n.changed"), 0, 1);
-  $node = db_fetch_object($result);
-  // Set a variable for each domain containing the last node updated.
-  variable_set('domain_' . $domain['domain_id'] . '_lastnode', $node->nid);
+  $select = db_select('node', 'n')
+    ->fields('n', array('nid'))
+    ->condition('status', 1)
+    ->orderBy('created', 'DESC')
+    ->extend('PagerDefault')
+    ->limit(1);
+  // Note that we don't tag this query with 'node_access' because it is an
+  // administrative query and we want to return all nodes for a specific domain.
+  $select->join('domain_access', 'da', 'n.nid = da.nid AND da.domain_id = :domain_id',
+    array(':domain_id' => $domain['domain_id']));
+  $nid = $select->execute()->fetchCol();
+  if ($node = node_load($nid)) {
+    // Set a variable for each domain containing the last node updated.
+    variable_set('domain_' . $domain['domain_id'] . '_lastnode', $node->nid);
+  }
 }
 
 /**
