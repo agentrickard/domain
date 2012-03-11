@@ -96,7 +96,8 @@ function hook_domain_update($domain, $form_values = array()) {
 function hook_domain_delete($domain, $form_values = array()) {
   db_delete('mytable')
     ->condition('domain_id', $domain['domain_id'])
-    ->execute();}
+    ->execute();
+}
 
 /**
  * Enables modules to add additional parameters to the $domain array
