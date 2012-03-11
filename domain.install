@@ -68,7 +68,7 @@ function domain_schema() {
     'fields' => array(
       'domain_id' => array('type' => 'serial', 'not null' => TRUE, 'description' => 'Domain id. Automatic master key.'),
       'machine_name' => array('type' => 'varchar', 'length' => '255', 'not null' => TRUE, 'default' => '', 'description' => 'The machine name for this domain.')),
-    'primary key' => array('machine_name'),
+    'unique keys' => array('machine_name' => array('machine_name')),
     'indexes' => array(
       'domain_id' => array('domain_id')
     ),
