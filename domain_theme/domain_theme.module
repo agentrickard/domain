@@ -398,3 +398,14 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   }
   $form['domain_color_defaults'] = array('#type' => 'value', '#value' => $color_settings);
 }
+
+/**
+ * Implements hook_domainupdate().
+ */
+function domain_theme_domainupdate($op, $domain, $form_values = array()) {
+  if ($op == 'delete') {
+    db_delete('domain_theme')
+      ->condition('domain_id', $domain['domain_id'])
+      ->execute();
+  }
+}
