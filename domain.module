@@ -3353,6 +3353,9 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
  *   is 200 "found".
  */
 function domain_check_response($domain, $drush = FALSE) {
+  if (variable_get('domain_skip_domain_check', 0)) {
+    return t('Domain response checks have been disabled. Saving an incorrect domain may affect your site.');
+  }
   $url = domain_get_path($domain) . drupal_get_path('module', 'domain') . '/tests/200.png';
   $response = drupal_http_request($url, array('method' => 'HEAD', 'absolute' => TRUE));
   if ($response->code != 200) {
