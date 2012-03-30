@@ -248,7 +248,7 @@ function domain_menu() {
         'page arguments' => array($key),
         'file' => 'domain.admin.inc',
         'description' => isset($value['#description']) ? $value['#description'] : '',
-        'weight' => $value['#weight']
+        'weight' => isset($value['#weight']) ? $value['#weight'] : 0,
       );
     }
   }
