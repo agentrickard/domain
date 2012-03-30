@@ -225,7 +225,7 @@ function domain_menu() {
         'page callback' => 'domain_batch',
         'page arguments' => array($key),
         'file' => 'domain.admin.inc',
-        'weight' => $value['#weight']
+        'weight' => isset($value['#weight']) ? $value['#weight'] : 0,
       );
     }
   }
