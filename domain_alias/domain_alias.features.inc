@@ -95,8 +95,7 @@ function domain_alias_features_rebuild($module) {
       }
       foreach ($list as $alias) {
         $alias['domain_id'] = $domain_id;
-        // Note that we don't have to use placeholder_sql functions because
-        // these records came straight from the db.
+        $alias['pattern'] = _domain_alias_placeholders_to_sql($alias['pattern']);
         drupal_write_record('domain_alias', $alias);
       }
     }
