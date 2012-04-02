@@ -17,11 +17,12 @@ function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
 
   // If the alias is for the current domain, do nothing.
   if ($domain_id == $_domain['domain_id']) {
-    $path = drupal_get_path_alias($path);
+    $path = drupal_get_path_alias($path, $path_language);
     return;
   }
 
-  $path_language = (!empty($path_language)) ? $path_language : $language->language;
+  // Get a string for mapping the language lookup.
+  $language_map = (!empty($path_language)) ? $path_language : $language->language;
 
   // The default domain does not use a prefix.
   if ($domain_id == 0 && !isset($status[0])) {
@@ -46,10 +47,10 @@ function domain_prefix_domainpath($domain_id, &$path, $path_language = NULL) {
   }
 
   if ($count[$domain_id]) {
-    if (!isset($map[$domain_id][$path_language][$path])) {
+    if (!isset($map[$domain_id][$language_map][$path])) {
       $alias = db_result(db_query("SELECT dst FROM {%s} WHERE src = '%s' AND language IN('%s', '') ORDER BY language DESC, pid DESC", $tablename[$domain_id], $path, $path_language));
-      $map[$domain_id][$path_language][$path] = $alias ? $alias : $path;
+      $map[$domain_id][$language_map][$path] = $alias ? $alias : $path;
     }
-    $path = $map[$domain_id][$path_language][$path];
+    $path = $map[$domain_id][$language_map][$path];
   }
 }
