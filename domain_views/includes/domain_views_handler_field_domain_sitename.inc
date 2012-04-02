@@ -78,9 +78,9 @@ class domain_views_handler_field_domain_sitename extends views_handler_field {
       }
       $this->field_values = array();
       $query = "SELECT node.nid AS nid, domain.sitename AS domain_sitename, domain.domain_id AS domain_domain_id
-      FROM node node  LEFT JOIN domain_access domain_access ON node.nid = domain_access.nid
-      INNER JOIN domain domain ON domain_access.gid = domain.domain_id AND (domain_access.realm = 'domain_id')
-      WHERE node.nid  IN (". implode(',', $nids) .")";
+        FROM {node} node LEFT JOIN {domain_access} domain_access ON node.nid = domain_access.nid
+        INNER JOIN {domain} domain ON domain_access.gid = domain.domain_id AND (domain_access.realm = 'domain_id')
+        WHERE node.nid IN (". implode(',', $nids) .")";
       $result = db_query($query);
       while ($item = db_fetch_array($result)) {
         $this->field_values[$item['nid']][$item['domain_domain_id']] = $item['domain_sitename'];

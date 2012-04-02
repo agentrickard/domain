@@ -3,6 +3,30 @@
  * Changelog file for Domain Access 6.x-2.x.
  */
 
+02-APR-2012
+-- Bug #1355530 reported by lufecir. Domain Prefix path handling ignores language.
+-- Patch #1512616 by monotago. Wraps missing {} around a Views query.
+
+30-MAR-2012
+-- Bug #1509108 patched by mstrelan. Set weight of batch menu items properly.
+
+11-MAR-2012
+-- Bug #1459742 patched by Rory. Domain Theme does not implement hook_domain_delete. Also cleans up some D7 api syntax.
+
+21-JAN-2012
+-- Bug #1407606 patched by tobiassjosten. Fixes a logic error when resetting the default domain to zero.
+
+03-JAN-2012
+-- Bug #1343352 patched by gdud. Fixes bad include call in Domain Prefix.
+
+12-NOV-2011
+-- Bug #1317138 patched by joachim. Note that you can have dots in domain names.
+-- Bug #1325460 patched by mikeytown2. PHP notice in views sitename handler.
+-- Patch #771454 by mikeytown2. Fixes php notice in domain_form_alter().
+-- Patch #1316506 by mikeytown2. Bad empty check in domain_source_form_alter().
+-- Bug #1322652 reported and tested by Yuri. Devel settings cna be empty and we need to account for that.
+-- Bug #848856 report and testing by othermachines. Fixes parse_url() when bad http-host values are passed.
+
 06-NOV-2011
 -- Feature #1333544. Adds a server information block.
 
@@ -59,7 +83,7 @@
 -- Creates the 6.x.2.9 release.
 
 15-JAN-2011
--- #1015954 by ayeshrajans. Restore configuration save message with Domain Settings. 
+-- #1015954 by ayeshrajans. Restore configuration save message with Domain Settings.
 
 30-DEC-2010
 -- Pass $reset from domain_default() to domain_api().
