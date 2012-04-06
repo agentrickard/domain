@@ -16,15 +16,10 @@
  */
 
 /**
- * Implements hook_init()
+ * Implements hook_custom_theme().
  */
 function domain_theme_custom_theme() {
   $_domain = domain_get_domain();
-  // Allow the admin theme and other custom themes to be retained.
-  $item = menu_get_item();
-  if (!empty($item['theme_callback'])) {
-    return;
-  }
   // Assign the theme selected, based on the active domain.
   $theme = domain_theme_lookup($_domain['domain_id']);
   // The above returns -1 on failure.
