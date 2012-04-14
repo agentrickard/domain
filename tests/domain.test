@@ -231,6 +231,14 @@ class DomainCreateTest extends DomainTestCase {
     $conf['domain_allow_non_ascii'] = TRUE;
     $return = domain_validate('$%#!.com');
     $this->assertTrue(empty($return), t('ASCII character override value allowed.'));
+    // Test for the www. prefix when 'WWW prefix handling' is disabled.
+    $conf['domain_www'] = 0;
+    $return = domain_validate('www.example.com');
+    $this->assertTrue(empty($return), t('<em>WWW prefix handling</em> disabled: Domains can be registered with the www. prefix.'));
+    // Test for the www. prefix when 'WWW prefix handling' is enabled.
+    $conf['domain_www'] = 1;
+    $return = domain_validate('www.example.com');
+    $this->assertTrue(!empty($return), t('<em>WWW prefix handling</em> enabled: Domains must be registered without the www. prefix.'));
   }
 
 }
