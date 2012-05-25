@@ -32,7 +32,7 @@ function domain_overview_form($form, &$form_state) {
   $header = array(
     array('data' => t('Order')),
     array('data' => t('Weight')),
-    array('data' => t('Site name')),
+    array('data' => t('Name')),
     array('data' => t('Domain')),
     array('data' => t('Id')),
     array('data' => t('Active')),
@@ -204,6 +204,12 @@ function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
   }
   $form['domain_node']['message'] = array(
     '#markup' => t('If new content is set to "Show on all affiliate sites," these settings will be ignored.'),
+  );
+  $form['domain_sitename_override'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Override site name with name of domain.'),
+    '#default_value' => variable_get('domain_sitename_override', 1),
+    '#description' => t('When enabled, the site name is overridden with the domain name set on the domain edit page.'),
   );
   $form['domain_debug'] = array(
     '#type' => 'radios',
@@ -486,7 +492,7 @@ function domain_form($form, &$form_state, $domain = array(), $arguments = array(
   );
   $form['sitename'] = array(
     '#type' => 'textfield',
-    '#title' => t('Site name'),
+    '#title' => t('Name'),
     '#size' => 40,
     '#maxlength' => 80,
     '#required' => TRUE,
@@ -970,7 +976,7 @@ function theme_domain_batch_form($variables) {
   if (isset($form['domain_batch_all'])) {
     $output .= drupal_render($form['domain_batch_all']);
   }
-  $header = array(t('Id'), t('Site name'), t('Setting'));
+  $header = array(t('Id'), t('Domain'), t('Setting'));
   $rows = array();
   foreach (element_children($form['domain_batch']) as $key) {
     $temp = $form['domain_batch'][$key]['#title'];

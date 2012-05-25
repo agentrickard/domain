@@ -135,7 +135,9 @@ function domain_init() {
   }
 
   // Set the site name to the domain-specific name.
-  $conf['site_name'] = $_domain['sitename'];
+  if (variable_get('domain_sitename_override', 1)) {
+    $conf['site_name'] = $_domain['sitename'];
+  }
 }
 
 /**
@@ -2500,7 +2502,9 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
  * Update the default domain's sitename.
  */
 function domain_form_system_site_information_settings_alter(&$form, &$form_state) {
-  $form['#submit'][] = 'domain_form_sitename_submit';
+  if (variable_get('domain_sitename_override', 1)) {
+    $form['#submit'][] = 'domain_form_sitename_submit';
+  }
 }
 
 /**
@@ -2910,15 +2914,15 @@ function domain_domain_batch() {
   //Change all the site names at once.
   $batch['sitename'] = array(
     '#form' => array(
-      '#title' => t('Site names'),
+      '#title' => t('Names'),
       '#type' => 'textfield',
       '#size' => 40,
       '#maxlength' => 80,
-      '#description' => t('The site name to display for this domain.'),
+      '#description' => t('The human-readable name for this domain.'),
       '#required' => TRUE,
     ),
     '#domain_action' => 'domain',
-    '#meta_description' => t('Edit all domain site names.'),
+    '#meta_description' => t('Edit all domain names.'),
     '#data_type' => 'string',
     '#update_all' => FALSE,
     '#weight' => -10,

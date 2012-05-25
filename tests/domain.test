@@ -962,3 +962,85 @@ class DomainTokenTest extends DomainTestCase {
     return $return;
   }
 }
+
+class DomainSitenameTest extends DomainTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Sitename override',
+      'description' => 'Tests behavior of sitenames and domain names.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  function setUp($list = array()) {
+    // install domain_conf module
+    if (!in_array('domain_conf', $list)) {
+      $list[] = 'domain_conf';
+    }
+    parent::setUp($list);
+
+    $admin_account = $this->drupalCreateUser(array('administer domains', 'administer site configuration'));
+    $this->drupalLogin($admin_account);
+  }
+
+  // Test that domain name overrides sitename if override is enabled (=default)
+  function testOverrideEnabled() {
+    $domain = domain_default();
+
+    // Assume that override is enabled (default behavior)
+    // $this->drupalPost('admin/structure/domain/settings', array('domain_sitename_override' => TRUE), t('Save configuration'));
+
+    // Update domain name on domain edit form
+    $domainname_new = $this->randomName(32);
+    $this->drupalPost('admin/structure/domain/view/' . $domain['domain_id'] . '/edit', array('sitename' => $domainname_new), t('Save domain record'));
+
+    // Check that new domain name is displayed on frontpage
+    $this->drupalGet('');
+    $this->assertText($domainname_new, 'Frontpage shows updated domain name.');
+
+    // Check that site-information form also shows updated domain name
+    $this->drupalGet('admin/config/system/site-information');
+    $this->assertFieldByName('site_name', $domainname_new, 'Site information form shows domain name.');
+
+    // Try to update site name on system form
+    $sitename_new = $this->randomName(32);
+    $this->drupalPost('admin/config/system/site-information', array('site_name' => $sitename_new), t('Save configuration'));
+
+    // Check that domain name has not changed
+    $domainname = db_query("SELECT sitename FROM {domain} WHERE is_default = 1")->fetchField();
+    $this->assertTrue($domainname == $domainname_new, 'Domain name not updated to new site name.');
+
+    // Check that frontpage still shows domainname_new
+    $this->drupalGet('');
+    $this->assertText($domainname_new, 'Frontpage still shows domain name, new site name ignored.');
+  }
+
+  // Test that sitename is independent of domain name if override is disabled
+  function testOverrideDisabled() {
+    $domain = domain_default();
+
+    // disable override
+    $this->drupalPost('admin/structure/domain/settings', array('domain_sitename_override' => FALSE), t('Save configuration'));
+
+    // Update sitename on system form
+    $sitename_new = $this->randomName(32);
+    $this->drupalPost('admin/config/system/site-information', array('site_name' => $sitename_new), t('Save configuration'));
+
+    // Check that new sitename is displayed on frontpage
+    $this->drupalGet('');
+    $this->assertText($sitename_new, 'Frontpage shows new site name.');
+
+    // Check that name of default domain has NOT been updated
+    $domainname = db_query("SELECT sitename FROM {domain} WHERE is_default = 1")->fetchField();
+    $this->assertFalse($domainname == $sitename_new, 'Domain name not updated to new site name.');
+
+    // Update domain name on domain edit form
+    $domainname_new = $this->randomName(32);
+    $this->drupalPost('admin/structure/domain/view/' . $domain['domain_id'] . '/edit', array('sitename' => $domainname_new), t('Save domain record'));
+
+    // Check that frontpage still shows sitename_new instead of domainname_new
+    $this->drupalGet('');
+    $this->assertText($sitename_new, 'Frontpage shows site name instead of domain name.');
+  }
+}

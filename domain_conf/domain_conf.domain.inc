@@ -49,6 +49,25 @@ function domain_conf_domain_batch() {
     '#table' => 'domain_conf',
     '#weight' => -10,
   );
+  // Change the site name.
+  $batch['site_name'] = array(
+    '#form' => array(
+      '#title' => t('Site name'),
+      '#type' => 'textfield',
+      '#size' => 60,
+      '#maxlength' => 255,
+      '#description' => t('The site name for this domain. Usually overridden by the domain name.'),
+    ),
+    '#permission' => 'administer site configuration',
+    '#domain_action' => 'domain_conf',
+    '#system_default' => variable_get('site_name', ''),
+    '#variable' => 'site_name',
+    '#meta_description' => t('Set the site name for all domains.'),
+    '#data_type' => 'string',
+    '#weight' => -8,
+    '#update_all' => TRUE,
+    '#group' => t('Site configuration'),
+  );
   // Change the email address.
   $batch['site_mail'] = array(
     '#form' => array(

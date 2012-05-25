@@ -84,14 +84,14 @@ function domain_conf_form($form, &$form_state, $domain) {
   }
   $form['domain_id'] = array('#type' => 'value', '#value' => $domain['domain_id']);
   // Site name must be edited at the domain creation screen.
-  if (isset($form[$default_group]['site_name'])) {
+  if (variable_get('domain_sitename_override', 1) && isset($form[$default_group]['site_name'])) {
+    $sitename = domain_conf_variable_get($domain['domain_id'], 'site_name');
     $form[$default_group]['site_name'] = array(
       '#disabled' => TRUE,
       '#title' => t('Site name'),
       '#description' => t('The name of this web site, as entered in the <a href="!url">domain-specific settings</a>.', array('!url' => url('admin/structure/domain/edit/' . $domain['domain_id']))),
       '#type' => 'textfield',
-      '#default_value' => $domain['sitename'],
-      '#weight' => -100,
+      '#default_value' => !empty($sitename) ? $sitename : $domain['sitename'],
     );
   }
   // Locale module is a little tricky, so handle it properly.
@@ -110,7 +110,6 @@ function domain_conf_form($form, &$form_state, $domain) {
     '#value' => t('Save domain settings'),
     '#weight' => 10
   );
-
   return $form;
 }
 

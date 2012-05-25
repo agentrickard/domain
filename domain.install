@@ -95,6 +95,7 @@ function domain_uninstall() {
     'domain_paths',
     'domain_search',
     'domain_select_format',
+    'domain_sitename_override',
     'domain_seo',
     'domain_vertical_tab',
     'domain_www',
