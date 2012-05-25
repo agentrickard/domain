@@ -213,6 +213,8 @@ function domain_prefix_domainupdate($op, $domain, $form_state = array()) {
         $settings = variable_get('domain_prefix', NULL);
         if (!empty($settings)) {
           $settings['domain_id'] = $domain['domain_id'];
+          $form_state['values']['op'] = t('Generate domain tables');
+          $form_state['values']['execute'] = TRUE;
           drupal_execute('domain_prefix_form', $form_state, $domain, $settings);
         }
       }
