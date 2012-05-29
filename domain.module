@@ -1067,6 +1067,10 @@ function domain_valid_domain($subdomain) {
   if ($subdomain != drupal_strtolower($subdomain)) {
     $error_list[] = t('Only lower-case characters are allowed.');
   }
+  // Check for 'www' prefix if redirection / handling is enabled under global domain settings.
+  if (variable_get('domain_www', 1) && (substr($subdomain, 0, strpos($subdomain, '.')) == 'www')) {
+    $error_list[] = t('WWW prefix handling: Domains must be registered without the www. prefix.');
+  }
   // Allow modules to alter this behavior.
   drupal_alter('domain_validate', $error_list, $subdomain);
   // Return the errors, if any.
