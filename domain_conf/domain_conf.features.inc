@@ -21,6 +21,7 @@ function domain_conf_features_export($data, &$export, $module_name) {
   foreach ($list as $machine_name) {
     $export['features']['domain_conf'][$machine_name] = $machine_name;
   }
+  domain_features_export_set_wipe_tables($export, $data, 'domain_conf');
   return array();
 }
 
@@ -31,13 +32,16 @@ function domain_conf_features_export_render($module_name, $data, $export = NULL)
   domain_features_load($module_name, 'domain_conf_default_variables', FALSE);
   $code = array();
   $code[] = '$domain_variables = array();';
-  // Check for changes against the target database.
-  if (!$export) {
+  // Set the wipe tables item.
+  if ($wipe = domain_features_export_wipe_tables_code($data, $code, $export, 'domain_variables') && empty($export)) {
+    // Check for changes against the target database.
     $data = domain_machine_names();
   }
   foreach ($data as $name) {
-    $variables = domain_conf_prepare_export($name);
-    $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($variables) .";";
+    if ($name != 'wipe-domain-tables') {
+      $variables = domain_conf_prepare_export($name);
+      $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($variables) .";";
+    }
   }
   $code[] = "\nreturn \$domain_variables;";
   $output = implode("\n", $code);
@@ -45,13 +49,13 @@ function domain_conf_features_export_render($module_name, $data, $export = NULL)
 }
 
 /**
- * Prepares alias lists to an array based on machine_name.
+ * Prepares domain-specific settings arrays for export.
  *
  * @param $machine_name
  *  The source domain machine name.
  *
  * @return
- *  An array of alias records.
+ *  An array of configuration records.
  */
 function domain_conf_prepare_export($machine_name) {
   $domain_id = domain_load_domain_id($machine_name);
@@ -75,23 +79,28 @@ function domain_conf_features_revert($module) {
  */
 function domain_conf_features_rebuild($module) {
   if ($defaults = domain_features_load($module, 'domain_conf_default_variables', TRUE)) {
-    // Wipe the old alias records.
-    db_delete('domain_conf')
-      ->execute();
+    // Check for hard rebuild/revert.
+    if ($wipe = domain_features_wipe_tables($defaults)) {
+      db_delete('domain_conf')
+        ->execute();
+    }
     foreach ($defaults as $key => $variables) {
       $domain_id = domain_load_domain_id($key);
       if (!$domain_id) {
         continue;
       }
+      // Delete existing conf records.
+      db_delete('domain_conf')
+        ->condition('domain_id', $domain_id)
+        ->execute();
       // Save the new records.
-      if (empty($variables)) {
-        continue;
+      if (!empty($variables)) {
+        $record = array(
+          'domain_id' => $domain_id,
+          'settings' => serialize($variables),
+        );
+        drupal_write_record('domain_conf', $record);
       }
-      $record = array(
-        'domain_id' => $domain_id,
-        'settings' => serialize($variables),
-      );
-      drupal_write_record('domain_conf', $record);
     }
   }
 }

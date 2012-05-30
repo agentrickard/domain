@@ -3566,7 +3566,10 @@ function domain_features_load($module, $hook, $return = TRUE) {
  *  An array of form options. Not that we cannot use _ in keys.
  */
 function domain_features_get_options() {
-  $options = array('all-domains' => t('Export all domains'));
+  $options = array(
+    'wipe-domain-tables' => t('Wipe tables on revert/rebuild'),
+    'all-domains' => t('Export all domains'),
+  );
   foreach (domain_domains() as $domain) {
     $options[$domain['machine_name']] = $domain['subdomain'];
   }
@@ -3598,6 +3601,59 @@ function domain_features_selection($data) {
     }
   }
   return $list;
+}
+
+/**
+ * Tells Features revert whether to perform a wipe/rebuild.
+ *
+ * @param &$defaults
+ *  The default values from the feature, passed by reference.
+ *
+ * @return boolean
+ */
+function domain_features_wipe_tables(&$defaults) {
+  if (!empty($defaults['wipe-domain-tables'])) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Tells Features export how to process a wipe/rebuild statement to code.
+ *
+ * @param &$data
+ *  The data for the feature, passed by reference.
+ * @param $code
+ *  The code array to export, passed by reference.
+ * @param $export
+ *  Boolean indicator that we are generator (exporting) or testing code.
+ * @param $type
+ *  A string indicating the type of domain data to export.
+ *
+ * @return boolean
+ */
+function domain_features_export_wipe_tables_code(&$data, &$code, $export, $type) {
+  if ((!empty($export) && !empty($data['wipe-domain-tables'])) || in_array('wipe-domain-tables', $data)) {
+    $code[] = "  \${$type}['wipe-domain-tables'] = 'wipe-domain-tables';";
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Tells Features export how to set a wipe/rebuild statement in the $data.
+ *
+ * @param &$export
+ *  The feature component $export array, passed by reference.
+ * @param $data
+ *  The data for the feature.
+ * @param $type
+ *  A string indicating the type of domain data to export.
+ */
+function domain_features_export_set_wipe_tables(&$export, $data, $type) {
+  if (in_array('wipe-domain-tables', $data)) {
+    $export['features'][$type]['wipe-domain-tables'] = 'wipe-domain-tables';
+  }
 }
 
 /**

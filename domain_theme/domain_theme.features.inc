@@ -21,6 +21,7 @@ function domain_theme_features_export($data, &$export, $module_name) {
   foreach ($list as $machine_name) {
     $export['features']['domain_theme'][$machine_name] = $machine_name;
   }
+  domain_features_export_set_wipe_tables($export, $data, 'domain_theme');
   return array();
 }
 
@@ -31,13 +32,16 @@ function domain_theme_features_export_render($module_name, $data, $export = NULL
   domain_features_load($module_name, 'domain_theme_default_themes', FALSE);
   $code = array();
   $code[] = '$domain_themes = array();';
-  // Check for changes against the target database.
-  if (!$export) {
+  // Set the wipe tables item.
+  if ($wipe = domain_features_export_wipe_tables_code($data, $code, $export, 'domain_themes') && empty($export)) {
+    // Check for changes against the target database.
     $data = domain_machine_names();
   }
   foreach ($data as $name) {
-    $themes = domain_theme_prepare_export($name);
-    $code[] = "  \$domain_themes['{$name}'] = " . features_var_export($themes) .";";
+    if ($name != 'wipe-domain-tables') {
+      $themes = domain_theme_prepare_export($name);
+      $code[] = "  \$domain_themes['{$name}'] = " . features_var_export($themes) .";";
+    }
   }
   $code[] = "\nreturn \$domain_themes;";
   $output = implode("\n", $code);
@@ -45,13 +49,13 @@ function domain_theme_features_export_render($module_name, $data, $export = NULL
 }
 
 /**
- * Prepares alias lists to an array based on machine_name.
+ * Prepares theme data as an export array.
  *
  * @param $machine_name
  *  The source domain machine name.
  *
  * @return
- *  An array of alias records.
+ *  An array of theme records.
  */
 function domain_theme_prepare_export($machine_name) {
   $domain_id = domain_load_domain_id($machine_name);
@@ -81,27 +85,32 @@ function domain_theme_features_revert($module) {
  */
 function domain_theme_features_rebuild($module) {
   if ($defaults = domain_features_load($module, 'domain_theme_default_themes', TRUE)) {
-    // Wipe the old records.
-    db_delete('domain_theme')
-      ->execute();
+    // Check for hard rebuild/revert.
+    if ($wipe = domain_features_wipe_tables($defaults)) {
+      db_delete('domain_theme')
+        ->execute();
+    }
     foreach ($defaults as $key => $themes) {
       $domain_id = domain_load_domain_id($key);
       if (!$domain_id) {
         continue;
       }
-      // Save the new records.
-      if (empty($themes)) {
-        continue;
-      }
-      foreach ($themes as $theme) {
-        $record = array(
-          'domain_id' => $domain_id,
-          'theme' => $theme['theme'],
-          'settings' => serialize($theme['settings']),
-          'status' => $theme['status'],
-          'filepath' => $theme['filepath'],
-        );
-        drupal_write_record('domain_theme', $record);
+      // Delete existing theme settings.
+      db_delete('domain_theme')
+        ->condition('domain_id', $domain_id)
+        ->execute();
+      // Save the new theme settings.
+      if (!empty($themes)) {
+        foreach ($themes as $theme) {
+          $record = array(
+            'domain_id' => $domain_id,
+            'theme' => $theme['theme'],
+            'settings' => serialize($theme['settings']),
+            'status' => $theme['status'],
+            'filepath' => $theme['filepath'],
+          );
+          drupal_write_record('domain_theme', $record);
+        }
       }
     }
   }

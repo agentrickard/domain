@@ -21,6 +21,7 @@ function domain_alias_features_export($data, &$export, $module_name) {
   foreach ($list as $machine_name) {
     $export['features']['domain_alias'][$machine_name] = $machine_name;
   }
+  domain_features_export_set_wipe_tables($export, $data, 'domain_alias');
   return array();
 }
 
@@ -31,13 +32,16 @@ function domain_alias_features_export_render($module_name, $data, $export = NULL
   domain_features_load($module_name, 'domain_alias_default_aliases', FALSE);
   $code = array();
   $code[] = '$domain_aliases = array();';
-  // Check for changes against the target database.
-  if (!$export) {
+  // Set the wipe tables item.
+  if ($wipe = domain_features_export_wipe_tables_code($data, $code, $export, 'domain_aliases') && empty($export)) {
+    // Check for changes against the target database.
     $data = domain_machine_names();
   }
   foreach ($data as $name) {
-    $list = domain_alias_prepare_export($name);
-    $code[] = "  \$domain_aliases['{$name}'] = " . features_var_export($list) .";";
+    if ($name != 'wipe-domain-tables') {
+      $list = domain_alias_prepare_export($name);
+      $code[] = "  \$domain_aliases['{$name}'] = " . features_var_export($list) .";";
+    }
   }
   $code[] = "\nreturn \$domain_aliases;";
   $output = implode("\n", $code);
@@ -81,22 +85,27 @@ function domain_alias_features_revert($module) {
  */
 function domain_alias_features_rebuild($module) {
   if ($defaults = domain_features_load($module, 'domain_alias_default_aliases', TRUE)) {
-    // Wipe the old alias records.
-    db_delete('domain_alias')
-      ->execute();
+    // Check for hard rebuild/revert.
+    if ($wipe = domain_features_wipe_tables($defaults)) {
+      db_delete('domain_alias')
+        ->execute();
+    }
     foreach ($defaults as $key => $list) {
       $domain_id = domain_load_domain_id($key);
       if (!$domain_id) {
         continue;
       }
+      // Delete existing alias records.
+      db_delete('domain_alias')
+        ->condition('domain_id', $domain_id)
+        ->execute();
       // Save the new alias records.
-      if (empty($list)) {
-        continue;
-      }
-      foreach ($list as $alias) {
-        $alias['domain_id'] = $domain_id;
-        $alias['pattern'] = _domain_alias_placeholders_to_sql($alias['pattern']);
-        drupal_write_record('domain_alias', $alias);
+      if (!empty($list)) {
+        foreach ($list as $alias) {
+          $alias['domain_id'] = $domain_id;
+          $alias['pattern'] = _domain_alias_placeholders_to_sql($alias['pattern']);
+          drupal_write_record('domain_alias', $alias);
+        }
       }
     }
   }
