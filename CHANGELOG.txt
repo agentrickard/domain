@@ -3,6 +3,16 @@
  * Changelog file for Domain Access 6.x-2.x.
  */
 
+30-MAY-2012
+-- Bug #1602214 by sphet. Allow valid use of localhost:80 as a domain.
+-- Rolls the 6.x-2.14 release.
+
+29-MAY-2012
+-- Feature #1529316 patched by Rory. Do not allow www domains if auto-aliasing is enabled.
+
+25-MAY-2012
+-- Bug #1566346 fixed by Deciphered. drupal_execute() not firing for domain_prefix.
+
 02-APR-2012
 -- Bug #1355530 reported by lufecir. Domain Prefix path handling ignores language.
 -- Patch #1512616 by monotago. Wraps missing {} around a Views query.
