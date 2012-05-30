@@ -210,7 +210,8 @@ class DomainCreateTest extends DomainTestCase {
   // Try to create badly formed domains.
   function testDomainValidate() {
     $tests = array(
-      'localhost' => array(),
+      'localhost' => array(), // localhost is allowed.
+      'localhost:80' => array(), // localhost may specify a port.
       'nodotsinstring' => array(t('At least one dot (.) is required, except for <em>localhost</em>.')),
       'example.com:2000:1' => array(t('Only one colon (:) is allowed.')),
       'example.com:foo' => array(t('The port protocol must be an integer.')),
@@ -221,10 +222,11 @@ class DomainCreateTest extends DomainTestCase {
     );
     foreach ($tests as $subdomain => $error) {
       $return = domain_validate($subdomain);
-      if ($subdomain == 'localhost' && empty($return)) {
+      // Special handling for localhost. This test needs refactoring.
+      if (substr_count($subdomain, 'localhost') > 0 && empty($return)) {
         $return = TRUE;
       }
-      $this->assertTrue(!empty($return), t('!message', array('!message' => !empty($error) ? $error[0] : t('<em>localhost</em> is an allowed domain string.'))));
+      $this->assertTrue(!empty($return), t('!message', array('!message' => !empty($error) ? $error[0] : t('%subdomain is an allowed domain string.', array('%subdomain' => $subdomain)))));
     }
     // Test for the non-alphanumeric character override.
     global $conf;

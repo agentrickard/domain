@@ -1264,9 +1264,11 @@ function domain_validate($subdomain) {
  */
 function domain_valid_domain($subdomain) {
   $error_list = array();
-  // Check for at least one dot.
-  if (substr_count($subdomain, '.') == 0 && $subdomain != 'localhost') {
-    $error_list[] = t('At least one dot (.) is required, except for <em>localhost</em>.');
+  // Check for at least one dot or the use of 'localhost'.
+  // Note that localhost can specify a port.
+  $localhost_check = explode(':', $subdomain);
+  if (substr_count($subdomain, '.') == 0 && $localhost_check[0] != 'localhost') {
+    $error_list[] = t('At least one dot (.) is required, except when using <em>localhost</em>.');
   }
   // Check for one colon only.
   if (substr_count($subdomain, ':') > 1) {
