@@ -52,6 +52,10 @@ function domain_source_views_data() {
     'filter' => array(
       'handler' => 'domain_views_handler_filter_domain_domain_id',
     ),
+    // Information for accepting a domain_id as an argument
+    'argument' => array(
+      'handler' => 'views_handler_argument_numeric',
+    ),    
     // Information for sorting on a domain_id.
     'sort' => array(
       'handler' => 'views_handler_sort',
