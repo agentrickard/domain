@@ -310,6 +310,15 @@ function domain_update_7306(&$sandbox) {
 }
 
 /**
+ * Updates the {domain_export} table for new key handling.
+ */
+function domain_update_7307(&$sandbox) {
+  db_drop_primary_key('domain_export');
+  db_add_unique_key('domain_export', 'machine_name', array('machine_name'));
+  return t('{domain_export} table keys updated.');
+}
+
+/**
  * Generates a machine name during the update process.
  *
  * @param $subdomain
