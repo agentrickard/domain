@@ -72,8 +72,8 @@ function domain_features_rebuild($module) {
       }
     }
     // Save the domains in this feature.
-    foreach ($defaults as $domain) {
-      if ($id = domain_load_domain_id($domain['machine_name'])) {
+    foreach ($defaults as $key => $domain) {
+      if ($id = domain_load_domain_id($key)) {
         $domain['domain_id'] = $id;
       }
       domain_save($domain, $domain);
