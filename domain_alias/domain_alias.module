@@ -47,8 +47,8 @@ function domain_alias_domain_bootstrap_lookup($domain) {
     $domain['domain_id'] = $alias['domain_id'];
     $domain['active_alias_id'] = $alias['alias_id'];
     $domain['redirect'] = (boolean) $alias['redirect'];
+    return $domain;
   }
-  return $domain;
 }
 
 /**
