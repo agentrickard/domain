@@ -31,7 +31,7 @@ function domain_conf_features_export($data, &$export, $module_name) {
 function domain_conf_features_export_render($module_name, $data, $export = NULL) {
   domain_features_load($module_name, 'domain_conf_default_variables', FALSE);
   $code = array();
-  $code[] = '$domain_variables = array();';
+  $code[] = '  $domain_variables = array();';
   // Set the wipe tables item.
   if ($wipe = domain_features_export_wipe_tables_code($data, $code, $export, 'domain_variables') && empty($export)) {
     // Check for changes against the target database.
@@ -40,10 +40,10 @@ function domain_conf_features_export_render($module_name, $data, $export = NULL)
   foreach ($data as $name) {
     if ($name != 'wipe-domain-tables') {
       $variables = domain_conf_prepare_export($name);
-      $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($variables) .";";
+      $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($variables, '  ') .";";
     }
   }
-  $code[] = "\nreturn \$domain_variables;";
+  $code[] = "\n  return \$domain_variables;";
   $output = implode("\n", $code);
   return array('domain_conf_default_variables' => $output);
 }

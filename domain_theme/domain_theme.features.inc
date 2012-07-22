@@ -31,7 +31,7 @@ function domain_theme_features_export($data, &$export, $module_name) {
 function domain_theme_features_export_render($module_name, $data, $export = NULL) {
   domain_features_load($module_name, 'domain_theme_default_themes', FALSE);
   $code = array();
-  $code[] = '$domain_themes = array();';
+  $code[] = '  $domain_themes = array();';
   // Set the wipe tables item.
   if ($wipe = domain_features_export_wipe_tables_code($data, $code, $export, 'domain_themes') && empty($export)) {
     // Check for changes against the target database.
@@ -40,10 +40,10 @@ function domain_theme_features_export_render($module_name, $data, $export = NULL
   foreach ($data as $name) {
     if ($name != 'wipe-domain-tables') {
       $themes = domain_theme_prepare_export($name);
-      $code[] = "  \$domain_themes['{$name}'] = " . features_var_export($themes) .";";
+      $code[] = "  \$domain_themes['{$name}'] = " . features_var_export($themes, '  ') .";";
     }
   }
-  $code[] = "\nreturn \$domain_themes;";
+  $code[] = "\n  return \$domain_themes;";
   $output = implode("\n", $code);
   return array('domain_theme_default_themes' => $output);
 }
