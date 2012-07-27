@@ -939,6 +939,7 @@ function domain_save($values, $form_values = array()) {
   if (!empty($values['is_default'])) {
     db_update('domain')
       ->fields(array('is_default' => 0))
+      ->condition('machine_name', $values['machine_name'], '<>')
       ->execute();
   }
 
@@ -3917,4 +3918,14 @@ function domain_get_tokens($prefixes = array()) {
     }
   }
   return $tokens;
+}
+
+/*
+ * Implements hook_migrate_api().
+ */
+function domain_migrate_api() {
+  $api = array(
+    'api' => 2,
+  );
+  return $api;
 }

@@ -354,7 +354,7 @@ function drush_domain_delete($argument = NULL) {
   }
   $values['domain_access'] = (!empty($content)) ? $content : 'none';
   $values['domain_editor'] = (!empty($content)) ? $users : 'none';
-  
+
   domain_delete($domain, $values);
 
   drush_print(dt('Domain record deleted.'));

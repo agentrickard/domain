@@ -6,6 +6,7 @@ configure = admin/structure/domain/settings
 files[] = domain.admin.inc
 files[] = domain.install
 files[] = domain.bootstrap.inc
+files[] = domain.migrate.inc
 files[] = domain.module
 files[] = settings_custom_url.inc
 files[] = settings.inc
