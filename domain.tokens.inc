@@ -119,7 +119,7 @@ function domain_tokens($type, $tokens, array $data = array(), array $options = a
   }
 
   // Node tokens.
-  if ($type == 'node' && !empty($data['node'])) {
+  if ($type == 'node' && !empty($data['node']->nid)) {
     $node = $data['node'];
     $domain = domain_get_node_match($node->nid);
     if (empty($domain) || $domain == -1) {
