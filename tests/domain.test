@@ -861,12 +861,14 @@ class DomainTokenTest extends DomainTestCase {
     // Test the [domain:*] base tokens with a valid domain provided as data.
     $tokens = array(
       'id' => (string) $this->domains['one']['domain_id'],
-      'machine_name' => 'one_example_com',
+      'machine-name' => 'one_example_com',
       'name' => 'one',
       'path' => domain_get_path($this->domains['one']),
       'url' => 'oneexamplecom',
       'hostname' => 'one.example.com',
       'subdomain' => 'one',
+      // Deprecated tokens
+      'machine_name' => 'one_example_com',
     );
     $data['domain'] = $this->domains['one'];
     $replacements = $this->assertTokens('domain', $data, $tokens);
@@ -882,12 +884,14 @@ class DomainTokenTest extends DomainTestCase {
     // Test the [current-domain:*] tokens.
     $tokens = array(
       'id' => (string) $this->domains['three']['domain_id'],
-      'machine_name' => 'three_example_com',
+      'machine-name' => 'three_example_com',
       'name' => 'three',
       'path' => domain_get_path($this->domains['three']),
       'url' => 'threeexamplecom',
       'hostname' => 'three.example.com',
       'subdomain' => 'three',
+      // Deprecated tokens
+      'machine_name' => 'three_example_com',
     );
     $replacements = $this->assertTokens('current-domain', array(), $tokens);
 

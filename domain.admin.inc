@@ -488,7 +488,6 @@ function domain_form($form, &$form_state, $domain = array(), $arguments = array(
       'exists' => 'domain_check_machine_name',
     ),
     '#default_value' => $domain['machine_name'],
-    '#disabled' => !empty($domain['machine_name']),
   );
   $form['sitename'] = array(
     '#type' => 'textfield',

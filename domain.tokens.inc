@@ -31,7 +31,7 @@ function domain_token_info() {
     'name' => t('Domain id'),
     'description' => t('The domain ID.'),
   );
-  $info['tokens']['domain']['machine_name'] = array(
+  $info['tokens']['domain']['machine-name'] = array(
     'name' => t('Domain machine name'),
     'description' => t('The domain machine identifier.'),
   );
@@ -82,7 +82,8 @@ function domain_tokens($type, $tokens, array $data = array(), array $options = a
         case 'id':
           $replacements[$original] = $domain['domain_id'];
           break;
-        case 'machine_name':
+        case 'machine-name':
+        case 'machine_name': // Deprecated and renamed to 'machine-name'.
           $replacements[$original] = $domain['machine_name'];
           break;
         case 'name':
