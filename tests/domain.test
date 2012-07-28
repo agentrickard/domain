@@ -94,6 +94,16 @@ class DomainTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Helper function for form introspection.
+   */
+  public function domainNodeForm($uid, $type) {
+    $user = user_load($uid);
+    $node = (object) array('uid' => $user->uid, 'name' => (isset($user->name) ? $user->name : ''), 'type' => $type, 'language' => LANGUAGE_NONE);
+    module_load_include('inc', 'node', 'node.pages');
+    return drupal_get_form($type . '_node_form', $node);
+  }
+
+  /**
    * Set the global $base_url to a domain.
    *
    * Required so that POST and other url() requests can be routed properly.
@@ -1048,5 +1058,71 @@ class DomainSitenameTest extends DomainTestCase {
     // Check that frontpage still shows sitename_new instead of domainname_new
     $this->drupalGet('');
     $this->assertText($sitename_new, 'Frontpage shows site name instead of domain name.');
+  }
+}
+
+class DomainSettingsTest extends DomainTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Module settings',
+      'description' => 'Tests configuration options for the module.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  function setUp($list = array()) {
+    parent::setUp($list);
+    $this->domainCreateDomains();
+  }
+
+  // Test the settings for adding content.
+  function testDomainContentSettings() {
+    $domains = domain_domains(TRUE);
+    $this->assertTrue(count($domains) == 4, 'Four test domains created.');
+    // Check that no values are set.
+    $value = variable_get('domain_node_article', NULL);
+    $this->assertNull($value, 'No settings for creating articles.');
+    // The default values should be present for 'article'.
+    $defaults = domain_default_node_access_settings('article');
+    $this->assertTrue(count($defaults) == 2, 'Two options set for articles.');
+    $this->assertTrue(in_array(DOMAIN_ALL, $defaults), 'All domains selected by default');
+    $this->assertTrue(in_array(DOMAIN_ACTIVE, $defaults), 'Active domain selected by default');
+
+    // Test the node edit form.
+    $type = 'article';
+    $uid = 1;
+    $form = $this->domainNodeForm($uid, $type);
+    // Are the default values set as expected?
+    $this->assertTrue(!empty($form['domain']['domain_site']['#default_value']), 'All affiliates selected when editing.');
+    $_domain = domain_get_domain();
+    $expected = array($_domain['domain_id'] => $_domain['domain_id']);
+    $this->assertEqual($form['domain']['domains']['#default_value'], $expected, 'Active domain selected when editing.');
+
+    // Now let's change the settings and test again.
+    $settings = array();
+    foreach ($domains as $domain) {
+      if (!$domain['is_default']) {
+        $settings[] = $domain['machine_name'];
+      }
+    }
+    variable_set('domain_node_article', $settings);
+    $defaults = variable_get('domain_node_article', NULL);
+    $this->assertTrue(count($defaults) == 3, 'Three options set for articles.');
+    $this->assertFalse(in_array(DOMAIN_ALL, $defaults), 'All domains not selected by default');
+    $this->assertFalse(in_array(DOMAIN_ACTIVE, $defaults), 'Active domain not selected by default');
+
+    // Test the node edit form again.
+    $type = 'article';
+    $uid = 1;
+    $form = $this->domainNodeForm($uid, $type);
+    // Are the default values set as expected?
+    $this->assertTrue(empty($form['domain']['domain_site']['#default_value']), 'All affiliates not selected when editing.');
+    $_domain = domain_get_domain();
+    $this->assertFalse(in_array($_domain['domain_id'], $form['domain']['domains']['#default_value']), 'Active domain not selected when editing.');
+    foreach ($defaults as $machine_name) {
+      $id = domain_load_domain_id($machine_name);
+      $this->assertTrue(in_array($id, $form['domain']['domains']['#default_value']), t('Domain %id set properly as a default.', array('%id' => $id)));
+    }
+
   }
 }

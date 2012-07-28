@@ -81,7 +81,6 @@ function domain_schema() {
  */
 function domain_uninstall() {
   $variables = array(
-    'domain_behavior',
     'domain_bootstrap_modules',
     'domain_classes',
     'domain_cron_rule',
@@ -110,6 +109,55 @@ function domain_uninstall() {
   foreach ($variables as $variable) {
     variable_del($variable);
   }
+}
+
+/**
+ * Checks module requirements.
+ */
+function domain_requirements($phase) {
+  $requirements = array();
+  switch ($phase) {
+    case 'install':
+      module_load_include('module', 'domain');
+      $root = strtolower(rtrim($_SERVER['HTTP_HOST']));
+      if ($error = domain_valid_domain($root)) {
+        $requirements['domain'] = array(
+          'title' => t('Domain Access'),
+          'value' => $error . t('If you are using drush, please provide the --uri option (e.g. drush en domain --uri="http://example.com/optional_subdirectory").'),
+          'severity' => REQUIREMENT_ERROR,
+        );
+      }
+      break;
+    case 'runtime':
+      $messages = array();
+      $severity = REQUIREMENT_ERROR;
+      // Ensure we have a primary domain.
+      $check = domain_default();
+      if ($check['domain_id'] == 0) {
+        $updated = t('set by an administrator');
+        if (user_access('administer domains')) {
+          $updated = l(t('set properly'), 'admin/structure/domain');
+        }
+        $messages[] = t('The site has no primary domain and needs to be !updated.', array('!updated' => $updated));
+      }
+      // Check for domain_id 0.
+      $list = domain_update_module_check();
+      domain_update_messages($messages, $list);
+
+      // Now report.
+      $t = get_t();
+      if (empty($message)) {
+        $severity = REQUIREMENT_OK;
+        $messages[] = t('Module installed correctly.');
+      }
+      $requirements['domain'] = array(
+        'title' => $t('Domain Access'),
+        'value' => theme('item_list', array('items' => $messages)),
+        'severity' => $severity,
+      );
+      break;
+  }
+  return $requirements;
 }
 
 /**
@@ -332,50 +380,23 @@ function domain_update_machine_name($subdomain) {
 }
 
 /**
- * Checks module requirements.
+ * Replace domain_behavior with default node access settings.
  */
-function domain_requirements($phase) {
-  $requirements = array();
-  switch ($phase) {
-    case 'install':
-      module_load_include('module', 'domain');
-      $root = strtolower(rtrim($_SERVER['HTTP_HOST']));
-      if ($error = domain_valid_domain($root)) {
-        $requirements['domain'] = array(
-          'title' => t('Domain Access'),
-          'value' => $error . t('If you are using drush, please provide the --uri option (e.g. drush en domain --uri="http://example.com/optional_subdirectory").'),
-          'severity' => REQUIREMENT_ERROR,
-        );
+function domain_update_7308(&$sandbox) {
+  $behavior = variable_get('domain_behavior', 0);
+  if (function_exists('node_type_get_types')) {
+    $types = node_type_get_types();
+    foreach ($types as $key => $type) {
+      $node_access_values = array('DOMAIN_ACTIVE');
+      $all_sites = variable_get('domain_node_' . $key, 0);
+      if ($behavior == 1 || $all_sites == 1) {
+        $node_access_values[] = 'DOMAIN_ALL';
       }
-      break;
-    case 'runtime':
-      $messages = array();
-      $severity = REQUIREMENT_ERROR;
-      // Ensure we have a primary domain.
-      $check = domain_default();
-      if ($check['domain_id'] == 0) {
-        $updated = t('set by an administrator');
-        if (user_access('administer domains')) {
-          $updated = l(t('set properly'), 'admin/structure/domain');
-        }
-        $messages[] = t('The site has no primary domain and needs to be !updated.', array('!updated' => $updated));
-      }
-      // Check for domain_id 0.
-      $list = domain_update_module_check();
-      domain_update_messages($messages, $list);
-
-      // Now report.
-      $t = get_t();
-      if (empty($message)) {
-        $severity = REQUIREMENT_OK;
-        $messages[] = t('Module installed correctly.');
-      }
-      $requirements['domain'] = array(
-        'title' => $t('Domain Access'),
-        'value' => theme('item_list', array('items' => $messages)),
-        'severity' => $severity,
-      );
-      break;
+      variable_set('domain_node_' . $key, $node_access_values);
+    }
   }
-  return $requirements;
+  variable_del('domain_behavior');
+
+  return t('Ported domain behavior to default node access settings.');
 }
+

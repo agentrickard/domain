@@ -235,7 +235,7 @@ function domain_content_add_form_widget(&$form) {
     '#title' => t('Send to all affiliates'),
     '#required' => FALSE,
     '#description' => t('Select if this content can be shown to all affiliates.  This setting will override the options below.'),
-    '#default_value' => variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
+    '#default_value' => DOMAIN_INSTALL_RULE,
   );
   $form['domain']['domains'] = array(
     '#type' => empty($format) ? 'checkboxes' : 'select',

@@ -42,6 +42,12 @@ define('DOMAIN_EXPORT_STATUS_DATABASE', 0);
 define('DOMAIN_EXPORT_STATUS_CODE', 1);
 
 /**
+ * Defines constants for content settings.
+ */
+define('DOMAIN_ALL','DOMAIN_ALL');
+define('DOMAIN_ACTIVE', 'DOMAIN_ACTIVE');
+
+/**
  * Module setup tasks.
  *
  * 1. Adds the domain user data to the $user object.
@@ -207,7 +213,7 @@ function domain_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'file' => 'domain.admin.inc',
     'description' => 'View domains for the site.',
-    'weight' => -12
+    'weight' => -50,
   );
   $items['admin/structure/domain/settings'] = array(
     'title' => 'Settings',
@@ -216,7 +222,7 @@ function domain_menu() {
     'page callback' => 'domain_configure',
     'file' => 'domain.admin.inc',
     'description' => 'Configure Domain Access settings.',
-    'weight' => -8
+    'weight' => -20,
   );
   $items['admin/structure/domain/create'] = array(
     'title' => 'Create domain',
@@ -226,7 +232,6 @@ function domain_menu() {
     'page arguments' => array('domain_form'),
     'file' => 'domain.admin.inc',
     'description' => 'Create new domain record.',
-    'weight' => -7
   );
   // Register the batch actions as menu callbacks
   $batch = module_invoke_all('domain_batch');
@@ -238,7 +243,7 @@ function domain_menu() {
       'page callback' => 'domain_batch',
       'file' => 'domain.admin.inc',
       'description' => 'Batch update domain settings.',
-      'weight' => -5
+      'weight' => -15,
     );
     // Get the submenu items
     foreach ($batch as $key => $value) {
@@ -254,6 +259,16 @@ function domain_menu() {
       );
     }
   }
+  $items['admin/structure/domain/nodes'] = array(
+    'title' => 'Content defaults',
+    'access arguments' => array('administer domains'),
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('domain_nodes_form'),
+    'file' => 'domain.admin.inc',
+    'description' => 'Default domain settings for content.',
+    'weight' => -10,
+  );
   $items['admin/structure/domain/roles'] = array(
     'title' => 'User defaults',
     'access arguments' => array('administer domains'),
@@ -262,7 +277,7 @@ function domain_menu() {
     'page arguments' => array('domain_roles_form'),
     'file' => 'domain.admin.inc',
     'description' => 'Default domain settings for users.',
-    'weight' => -4
+    'weight' => -5,
   );
   $items['admin/structure/domain/view/%domain'] = array(
     'title' => 'View',
@@ -403,6 +418,10 @@ function domain_theme($existing, $type, $theme, $path) {
     ),
     'domain_batch_title' => array(
       'variables' => array('batch' => array()),
+      'file' => 'domain.admin.inc',
+    ),
+    'domain_nodes_form' => array(
+      'render element' => 'form',
       'file' => 'domain.admin.inc',
     ),
     'domain_roles_form' => array(
@@ -1634,11 +1653,12 @@ function domain_node_load($nodes, $types) {
     if (!isset($node->nid)) {
       continue;
     }
-    // Append the domain grants to the node for editing.
+    // Get default settings.
+    $defaults = domain_get_node_defaults($node->type);
     // Append the domain grants to the node for editing.
     $nodes[$node->nid]->domains = isset($domains[$node->nid]['domain_id']) ? $domains[$node->nid]['domain_id'] : array();
     // If the node is not assigned, grant to all domains to prevent errors.
-    $nodes[$node->nid]->domain_site = isset($domains[$node->nid]['domain_site']) ? $domains[$node->nid]['domain_site'] : variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+    $nodes[$node->nid]->domain_site = isset($domains[$node->nid]['domain_site']) ? $domains[$node->nid]['domain_site'] : $defaults['domain_site'];
     $nodes[$node->nid]->subdomains = array();
     if (!empty($nodes[$node->nid]->domain_site)) {
       $nodes[$node->nid]->subdomains[] = t('All affiliates');
@@ -1943,8 +1963,6 @@ function domain_node_grants($account, $op) {
  *
  */
 function domain_node_access_records($node) {
-  $_domain = domain_get_domain();
-
   // Define the $grants array.
   $grants = array();
   // Check to see if the node domains were set properly.
@@ -1952,9 +1970,9 @@ function domain_node_access_records($node) {
   // means we have to add the logic from hook_form_alter() here.
   if (!isset($node->domain_site)) {
     // We came from a separate source, so let's set the proper defaults.
-    $node->domain_site = variable_get('domain_node_' . $node->type, variable_get('domain_behavior', DOMAIN_INSTALL_RULE));
-    // And the currently active domain.
-    $node->domains = array($_domain['domain_id'] => $_domain['domain_id']);
+    $defaults = domain_get_node_defaults($node->type, array(domain_get_domain()));
+    $node->domain_site = $defaults['domain_site'];
+    $node->domains = $defaults['domain_id'];
   }
 
   // If the form is hidden, we are passed the 'domains_raw' variable.
@@ -2213,7 +2231,7 @@ function domain_enable() {
   // manually define our records if none are present.
   $count = (bool) db_query_range("SELECT 1 FROM {domain_access}", 0, 1)->fetchField();
   if (empty($count)) {
-    $rule = variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
+    $rule = DOMAIN_INSTALL_RULE;
     $site = DOMAIN_SITE_GRANT;
     $values = array();
     $result = db_query("SELECT nid FROM {node}");
@@ -2307,25 +2325,19 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   global $user;
   $_domain = domain_get_domain();
 
-  // By default, the requesting domain is assigned.
-  $default = array($_domain['domain_id']);
+  // Get the default assigned domains.
+  $defaults = domain_get_node_defaults($form['#node']->type);
   // How is core content handled for this site?
   // In D7, type handling is strict, so make this value 0 or 1.
   // @TODO: clean up DOMAIN_INSTALL handling.
-  $all_sites = (int) variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
-  if ($all_sites == 1) {
-    $behavior = 1;
-  }
-  else {
-    $behavior = variable_get('domain_node_' . $form['#node']->type, 0);
-  }
+  $default_domain_site = (int) $defaults['domain_site'];
 
   // Some options will be passed as hidden values, we need to run some checks on those.
   if (isset($form['#node']->nid)) {
     $raw = $form['#node']->domains;
   }
   else {
-    $raw = $default;
+    $raw = $defaults['domain_id'];
   }
 
   $options = array();
@@ -2354,7 +2366,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#title' => t('Send to all affiliates'),
       '#required' => FALSE,
       '#description' => t('Select if this content can be shown to all affiliates. This setting will override the options below, but you must still select a domain that "owns" this content.'),
-      '#default_value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : $behavior,
+      '#default_value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : $default_domain_site,
     );
     $form['domain']['domains'] = array(
       '#type' => empty($format) ? 'checkboxes' : 'select',
@@ -2362,7 +2374,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#options' => $options,
       '#required' => TRUE,
       '#description' => t('Select which affiliates can access this content.'),
-      '#default_value' => (isset($form['#node']->domains)) ? $form['#node']->domains : $default,
+      '#default_value' => (isset($form['#node']->domains)) ? $form['#node']->domains : $defaults['domain_id'],
     );
     if ($format) {
       $form['domain']['domains']['#multiple'] = TRUE;
@@ -2491,7 +2503,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     // These form elements are hidden from non-privileged users, by design.
     $form['domain_site'] = array(
       '#type' => 'value',
-      '#value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : $behavior,
+      '#value' => (isset($form['#node']->domain_site)) ? $form['#node']->domain_site : $default_domain_site,
     );
     // Domains that have been assigned and cannot be changed.
     $form['domains_raw'] = array(
@@ -2499,6 +2511,36 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#value' => $raw,
     );
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds configurable default settings to the node type edit form.
+ *
+ */
+function domain_form_node_type_form_alter(&$form, &$form_state, $form_id) {
+  $options = array(DOMAIN_ALL => t('All domains'), DOMAIN_ACTIVE => t('Author\'s currently active domain'));
+  foreach (domain_domains() as $key => $value) {
+    $options[$value['machine_name']] = $value['sitename'];
+  }
+  $default_values = domain_default_node_access_settings($form['#node_type']->type);
+  $form['domain'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Domain access settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+    '#access' => user_access('set domain access'),
+  );
+  $form['domain']['domain_node'] = array(
+    '#title' => t('Publish to'),
+    '#description' => t('You may set default domain publishing options when new content of this type will be created. When you publish to <em>All domains</em>, you can additionally define domain memberships.'),
+    '#type' => 'checkboxes',
+    '#tree' => TRUE,
+    '#options' => $options,
+    '#default_value' => $default_values,
+  );
 }
 
 /**
@@ -3928,4 +3970,101 @@ function domain_migrate_api() {
     'api' => 2,
   );
   return $api;
+}
+
+/**
+ * Returns default node access settings, ready for a node object.
+ *
+ * Use domain_default_node_access_settings() when you need those settings in
+ * forms, or when you look for default access settings in general.
+ *
+ * First level keys are
+ *  - 'domain_site' (publish to all affiliates) with value TRUE or FALSE.
+ *  - 'domain_id' contains the assigned affiliates, where both keys and values
+ *    are the domain id.
+ *
+ * Array of assigned domains can be empty, but only if an admin explicitly
+ * defined this. Use $fallback_domains to prevent zero assignments.
+ * See domain_default() as an example for a possible fallback domain.
+ *
+ * @see domain_default_node_access_settings()
+ * @see domain_default()
+ *
+ * @param $type
+ *  The type of the node (like 'article').
+ * @param $fallback_domains (optional)
+ *  An array of domains which are used if no default domain is assigned.
+ *
+ * @return
+ *  An array of default settings, formatted as explained above.
+ */
+function domain_get_node_defaults($type, $fallback_domains = array()) {
+  $_domain = domain_get_domain();
+  $defaults = array('domain_id' => array());
+  // We use array_flip for compatibility with node_type_form_submit().
+  $settings = array_flip(domain_default_node_access_settings($type));
+  $domains = domain_domains();
+
+  $defaults['domain_site'] = isset($settings['DOMAIN_ALL']) ? TRUE : FALSE;
+  // Assign the currently active domain, if not disabled by user.
+  if (isset($settings['DOMAIN_ACTIVE'])) {
+    $defaults['domain_id'][$_domain['domain_id']] = $_domain['domain_id'];
+  }
+  // Assign the default affiliates.
+  foreach ($domains as $domain) {
+    if (isset($settings[$domain['machine_name']])) {
+      $defaults['domain_id'][$domain['domain_id']] = $domain['domain_id'];
+    }
+  }
+  // Use fallback domains when no default affiliate exists.
+  if (empty($defaults['domain_id']) && !empty($fallback_domains)) {
+    foreach ($fallback_domains as $domain) {
+      $defaults['domain_id'][$domain['domain_id']] = $domain['domain_id'];
+    }
+  }
+  return $defaults;
+}
+
+/**
+ * Returns default node access settings for new content.
+ *
+ * Usually, you may use this function in forms, and when you look for default
+ * access settings in general.
+ * Use domain_get_node_defaults() when you need an array for a node object.
+ *
+ * @see domain_get_node_defaults()
+ *
+ * @param $type
+ *  The node type (like 'article').
+ *
+ * @return
+ *  An array of default settings.
+ */
+function domain_default_node_access_settings($type) {
+  // We need to know if there are user-defined settings.
+  // If so, we get an array, though it could be empty.
+  $settings = variable_get('domain_node_' . $type, NULL);
+  // Append default behavior, if there are no user-defined settings.
+  if (is_null($settings)) {
+    // Assign the currently active domain.
+    $settings = array(0 => 'DOMAIN_ACTIVE');
+    // And publish to all domains when rule allows it.
+    if (DOMAIN_INSTALL_RULE) {
+      $settings[] = 'DOMAIN_ALL';
+    }
+  }
+  // When configured on domain nodes form,
+  // keep the structure equal to the node type pattern.
+  elseif (isset($settings['DOMAIN_ALL'])) {
+    $old_settings = $settings;
+    // Reset settings array and fill it with correct pattern.
+    $settings = array();
+    foreach ($old_settings as $key => $value) {
+      // Machine_name could be of value 0. The second condition covers this special case.
+      if ($value !== 0 || ($key === 0 && $value === 0)) {
+        $settings[] = $value;
+      }
+    }
+  }
+  return $settings;
 }

@@ -175,36 +175,6 @@ function domain_configure() {
  * FormsAPI for configuring the domain module.
  */
 function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
-  $form['domain_behavior'] = array(
-    '#type' => 'radios',
-    '#title' => t('New content settings'),
-    '#required' => TRUE,
-    '#default_value' => (int) variable_get('domain_behavior', DOMAIN_INSTALL_RULE),
-    '#options' => array(1 => t('Show on all affiliate sites'), 2 => t('Only show on selected sites')),
-    '#description' => t('If set to <em>Show on all affiliate sites</em>, this value will automatically assign new content to all affiliates.')
-  );
-  $node_types = node_type_get_names();
-  $form['domain_node'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Send to all affiliates'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#states' => array(
-      'visible' => array(
-        ':input[name=domain_behavior]' => array('value' => '2'),
-      ),
-    ),
-  );
-  foreach ($node_types as $key => $value) {
-    $form['domain_node']['domain_node_' . $key] = array(
-      '#type' => 'checkbox',
-      '#title' => check_plain($value),
-      '#default_value' => variable_get('domain_node_' . $key, 0),
-    );
-  }
-  $form['domain_node']['message'] = array(
-    '#markup' => t('If new content is set to "Show on all affiliate sites," these settings will be ignored.'),
-  );
   $form['domain_sitename_override'] = array(
     '#type' => 'checkbox',
     '#title' => t('Override site name with name of domain.'),
@@ -702,26 +672,6 @@ function domain_delete_form_submit($form, &$form_state) {
  */
 function domain_advanced_form($form, &$form_state) {
   $form = array();
-  $node_types = node_type_get_names();
-  // In D7, type handling is strict, so make this value 0 or 1.
-  // @TODO: clean up DOMAIN_INSTALL handling.
-  $default = (int) variable_get('domain_behavior', DOMAIN_INSTALL_RULE);
-  if ($default == 2) {
-    $default = 0;
-  }
-  $form['domain_node'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Domain node types'),
-    '#collapsible' => TRUE
-  );
-  $form['domain_node']['intro'] = array('#value' => t('<p>Check the content types that should be published to all affiliates when new content is created.</p>'));
-  foreach ($node_types as $key => $value) {
-    $form['domain_node']['domain_node_' . $key] = array(
-      '#type' => 'checkbox',
-      '#title' => check_plain($value),
-      '#default_value' => variable_get('domain_node_' . $key, $default),
-    );
-  }
   // Some editors will not have full node editing permissions.  This allows us
   // to give selected permissions for nodes within the editor's domain.
   $form['domain_form'] = array(
@@ -1074,6 +1024,78 @@ function domain_batch_form_submit($form, &$form_state) {
       break;
   }
   drupal_set_message(t('Settings have been updated successfully.'), 'status', FALSE);
+}
+
+/**
+ * FormAPI to set default domain settings per content type.
+ */
+function domain_nodes_form($form, &$form_state) {
+  $form = array();
+
+  $node_types = node_type_get_names();
+  $options = array(DOMAIN_ALL => t('All domains'), DOMAIN_ACTIVE => t('Author\'s currently active domain'));
+  foreach (domain_domains() as $key => $value) {
+    $options[$value['machine_name']] = $value['sitename'];
+  }
+
+  foreach ($options as $key => $value) {
+    $form['#domain_node'][$key] = $value;
+  }
+
+  foreach ($node_types as $type => $name) {
+    $default_values = domain_default_node_access_settings($type);
+    $form['domain_node']['domain_node_' . $type] = array(
+      '#type' => 'checkboxes',
+      '#tree' => TRUE,
+      '#options' => $options,
+      '#default_value' => $default_values,
+    );
+  }
+
+  $form = system_settings_form($form);
+  // System settings form adds a theme we cannot use.
+  unset($form['#theme']);
+  return $form;
+}
+
+/**
+ * FormsAPI theming.
+ */
+function theme_domain_nodes_form($variables) {
+  $form = $variables['form'];
+  $output = '<p>' . t('You may set default domain publishing options to the content types when new content will be created. When you publish to <em>All domains</em>, you can additionally define domain memberships.') . '</p>';
+  $num_columns = 15;
+  $node_types = node_type_get_names();
+  $num_node_types = count($node_types);
+
+  for ($i = 0; $i < $num_node_types; $i += $num_columns) {
+    $header = array(t('Domains'));
+    $rows = array();
+    $count = 0;
+    $used_node_types = array();
+    foreach ($node_types as $type => $name) {
+      if($count == $num_columns) {
+        break;
+      }
+      $header[] = $name;
+      $used_node_types[$type] = $name;
+      array_shift($node_types);
+      $count++;
+    }
+    foreach ($form['#domain_node'] as $key => $sitename) {
+      $row = array();
+      $row[] = filter_xss_admin($sitename);
+      foreach ($used_node_types as $type => $name) {
+        $form['domain_node']['domain_node_' . $type][$key]['#title'] = '';
+        $row[] = drupal_render($form['domain_node']['domain_node_' . $type][$key]);
+      }
+      $rows[] = $row;
+    }
+    $output .= theme('table', array('header' => $header, 'rows' => $rows));
+  }
+
+  $output .= drupal_render_children($form);
+  return $output;
 }
 
 /**
