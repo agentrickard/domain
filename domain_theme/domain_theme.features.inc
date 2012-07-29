@@ -40,7 +40,7 @@ function domain_theme_features_export_render($module_name, $data, $export = NULL
   foreach ($data as $name) {
     if ($name != 'wipe-domain-tables') {
       $themes = domain_theme_prepare_export($name);
-      $code[] = "  \$domain_themes['{$name}'] = " . features_var_export($themes, '  ') .";";
+      $code[] = "  \$domain_themes['{$name}'] = " . features_var_export($themes, '  ') . ";";
     }
   }
   $code[] = "\n  return \$domain_themes;";

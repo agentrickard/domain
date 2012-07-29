@@ -44,7 +44,7 @@ define('DOMAIN_EXPORT_STATUS_CODE', 1);
 /**
  * Defines constants for content settings.
  */
-define('DOMAIN_ALL','DOMAIN_ALL');
+define('DOMAIN_ALL', 'DOMAIN_ALL');
 define('DOMAIN_ACTIVE', 'DOMAIN_ACTIVE');
 
 /**
@@ -1550,7 +1550,7 @@ function domain_domain_load(&$domain) {
 function domain_get_path($domain) {
   global $base_url;
   if (empty($base_url)) {
-    return domain_check_scheme($domain['scheme']) .'://'. $domain['subdomain'];
+    return domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'];
   }
   // Badly malfored HTTP_HOST values can cause problems with PHP < 5.3.3,
   // so we have to suppress error warnings for parse_url here.
@@ -1570,7 +1570,7 @@ function domain_get_path($domain) {
   if (substr($url['path'], -1) != '/') {
     $url['path'] .= '/';
   }
-  $path = domain_check_scheme($domain['scheme']) .'://'. $domain['subdomain'] . $url['path'];
+  $path = domain_check_scheme($domain['scheme']) . '://' . $domain['subdomain'] . $url['path'];
   return $path;
 }
 
@@ -3048,7 +3048,7 @@ function domain_warning_check($form_id) {
       $_path = domain_get_uri($default);
       $message = '';
       if ($_domain['domain_id'] != $default['domain_id']) {
-        $message = t(' and <a href="!url">may need to be entered from !domain</a>', array('!url' => $_path, '!domain' => $default['subdomain']));
+        $message = ' ' . t('and <a href="!url">may need to be entered from !domain</a>', array('!url' => $_path, '!domain' => $default['subdomain']));
       }
       drupal_set_message(t('This form submits changes to your default
       configuration!message. !link', array('!message' => $message, '!link' => $link_text)), 'warning', FALSE);
@@ -3488,7 +3488,7 @@ function domain_features_api() {
       'default_file' => FEATURES_DEFAULTS_CUSTOM,
       'default_filename' => 'domains',
       'features_source' => TRUE,
-      'file' => drupal_get_path('module', 'domain') .'/domain.features.inc',
+      'file' => drupal_get_path('module', 'domain') . '/domain.features.inc',
     ),
   );
   return $components;
@@ -3717,7 +3717,7 @@ function domain_update_module_check() {
   if (empty($enabled_dependencies)) {
     return $list;
   }
-  foreach($enabled_dependencies as $module => $data) {
+  foreach ($enabled_dependencies as $module => $data) {
     module_load_install($module);
     if ($schema = module_invoke($module, 'schema')) {
       if ($tables = domain_test_schema($schema)) {
@@ -3815,7 +3815,7 @@ function domain_update_zero_records($tables) {
  */
 function domain_update_messages(&$messages, $list) {
   $t = get_t();
-  foreach($list as $module => $data) {
+  foreach ($list as $module => $data) {
     $updated = $t('updated by an administrator');
     if (user_access('administer domains')) {
       $updated = l($t('updated for compatibility'), 'admin/structure/domain/repair');
@@ -3886,7 +3886,7 @@ function domain_page_classes() {
     $vars = check_plain(token_replace($settings));
     $vars = preg_replace('/(\r\n|\n)/', "\r\n", $vars);
     $vars = explode("\r\n", token_replace($vars));
-    foreach($vars as $var) {
+    foreach ($vars as $var) {
       $classes[] = drupal_clean_css_identifier(trim($var));
     }
   }
@@ -3954,8 +3954,8 @@ function domain_get_tokens($prefixes = array()) {
   }
   module_load_include('inc', 'domain', 'domain.tokens');
   $info = domain_token_info();
-  foreach($prefixes as $prefix) {
-    foreach($info['tokens']['domain'] as $token => $data) {
+  foreach ($prefixes as $prefix) {
+    foreach ($info['tokens']['domain'] as $token => $data) {
       $tokens["$prefix:$token"] = t('!token : !description', array('!token' => "[$prefix:$token]", '!description' => $data['description']));
     }
   }

@@ -304,7 +304,7 @@ function domain_content_form() {
       'title' => array(
         'data' => array(
           '#type' => 'link',
-          '#title' => $node->title,
+          '#title' => check_plain($node->title),
           '#href' => 'node/' . $node->nid,
           '#options' => $l_options,
           '#suffix' => ' ' . theme('mark', array('type' => node_mark($node->nid, $node->changed))),
@@ -352,7 +352,7 @@ function domain_content_form() {
       $options[$node->nid]['operations'] = array(
         'data' => array(
           '#type' => 'link',
-          '#title' => $link['title'],
+          '#title' => check_plain($link['title']),
           '#href' => $link['href'],
           '#options' => array('query' => $link['query']),
         ),

@@ -40,7 +40,7 @@ function domain_conf_features_export_render($module_name, $data, $export = NULL)
   foreach ($data as $name) {
     if ($name != 'wipe-domain-tables') {
       $variables = domain_conf_prepare_export($name);
-      $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($variables, '  ') .";";
+      $code[] = "  \$domain_variables['{$name}'] = " . features_var_export($variables, '  ') . ";";
     }
   }
   $code[] = "\n  return \$domain_variables;";

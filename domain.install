@@ -203,7 +203,7 @@ function domain_update_7001(&$sandbox) {
  */
 function domain_update_7300(&$sandbox) {
   if (db_field_exists('domain', 'weight')) {
-    return('No update required');
+    return t('No update required');
   }
   db_add_field('domain', 'weight', array('type' => 'int', 'unsigned' => FALSE, 'not null' => TRUE, 'default' => 0), array());
   db_add_index('domain', 'weight', array('weight'));
@@ -216,7 +216,7 @@ function domain_update_7300(&$sandbox) {
  */
 function domain_update_7301(&$sandbox) {
   if (db_field_exists('domain', 'is_default')) {
-    return('No update required');
+    return t('No update required');
   }
   db_add_field('domain', 'is_default', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0), array());
   db_update('domain')

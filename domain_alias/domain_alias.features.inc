@@ -40,7 +40,7 @@ function domain_alias_features_export_render($module_name, $data, $export = NULL
   foreach ($data as $name) {
     if ($name != 'wipe-domain-tables') {
       $list = domain_alias_prepare_export($name);
-      $code[] = "  \$domain_aliases['{$name}'] = " . features_var_export($list, '  ') .";";
+      $code[] = "  \$domain_aliases['{$name}'] = " . features_var_export($list, '  ') . ";";
     }
   }
   $code[] = "\n  return \$domain_aliases;";

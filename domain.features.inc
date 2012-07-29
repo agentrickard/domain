@@ -41,7 +41,7 @@ function domain_features_export_render($module_name, $data, $export = NULL) {
     $record = domain_machine_name_load($name);
     if (!empty($record)) {
       unset($record['domain_id']);
-      $code[] = "  \$domains['" . $record['machine_name'] . "'] = " . features_var_export($record, '  ') .";";
+      $code[] = "  \$domains['" . $record['machine_name'] . "'] = " . features_var_export($record, '  ') . ";";
     }
   }
   $code[] = "\n  return \$domains;";

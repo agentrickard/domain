@@ -560,7 +560,7 @@ function domain_form_submit($form, &$form_state) {
   }
 
   if (!empty($values['is_default'])) {
-    $message .= t(' Set as primary domain.');
+    $message .= ' ' . t('Set as primary domain.');
   }
 
   // Run the save routine.
@@ -930,7 +930,7 @@ function theme_domain_batch_form($variables) {
   foreach (element_children($form['domain_batch']) as $key) {
     $temp = $form['domain_batch'][$key]['#title'];
     unset($form['domain_batch'][$key]['#title']);
-    $row = array($key, $form['domain_batch'][$key]['#sitename'] .'<div class="description">'. $form['domain_batch'][$key]['#subdomain'] .'</div>', drupal_render($form['domain_batch'][$key]));
+    $row = array($key, $form['domain_batch'][$key]['#sitename'] . '<div class="description">' . $form['domain_batch'][$key]['#subdomain'] . '</div>', drupal_render($form['domain_batch'][$key]));
     $rows[] = $row;
     $form['domain_batch'][$key]['#title'] = $temp;
   }
@@ -1074,7 +1074,7 @@ function theme_domain_nodes_form($variables) {
     $count = 0;
     $used_node_types = array();
     foreach ($node_types as $type => $name) {
-      if($count == $num_columns) {
+      if ($count == $num_columns) {
         break;
       }
       $header[] = $name;
@@ -1254,7 +1254,7 @@ function domain_repair_form($form, &$form_state) {
       '#markup' => theme('item_list', array('items' => $modules)),
     );
     $form['outro'] = array(
-      '#markup' => '<p>' . t('All records marked with domain_id 0 will be assigned to the default domain.') .'</p>',
+      '#markup' => '<p>' . t('All records marked with domain_id 0 will be assigned to the default domain.') . '</p>',
     );
     $form['tables'] = array(
       '#type' => 'value',
