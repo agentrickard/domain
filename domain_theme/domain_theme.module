@@ -19,9 +19,16 @@
  * Implements hook_custom_theme().
  */
 function domain_theme_custom_theme() {
+  global $conf;
   $_domain = domain_get_domain();
-  // Assign the theme selected, based on the active domain.
-  $theme = domain_theme_lookup($_domain['domain_id']);
+  // Check for a custom admin theme.
+  if (isset($conf['admin_theme']) && path_is_admin(current_path())) {
+    $theme = domain_theme_lookup($_domain['domain_id'], $conf['admin_theme']);
+  }
+  else {
+    // Assign the theme selected, based on the active domain.
+    $theme = domain_theme_lookup($_domain['domain_id']);
+  }
   // The above returns -1 on failure.
   if ($theme != -1) {
     domain_theme_set_variables($theme);
