@@ -259,8 +259,8 @@ class DomainNodeHandler extends MigrateDestinationHandler {
   public function prepare($node, stdClass $row) {
     // If set, ensure domains exist.
     $domains = array();
-    if (isset($object->domains)) {
-      foreach ($object->domains as $id) {
+    if (isset($node->domains)) {
+      foreach ($node->domains as $id) {
         if ($domain = domain_load($id)) {
           $domains[$domain['domain_id']] = $domain['domain_id'];
         }
@@ -303,8 +303,8 @@ class DomainUserHandler extends MigrateDestinationHandler {
   public function prepare($user, stdClass $row) {
     // If set, ensure domains exist.
     $domains = array();
-    if (isset($object->domain_user)) {
-      foreach ($object->domain_user as $id) {
+    if (isset($user->domain_user)) {
+      foreach ($user->domain_user as $id) {
         if ($domain = domain_load($id)) {
           $domains[$domain['domain_id']] = $domain['domain_id'];
         }
