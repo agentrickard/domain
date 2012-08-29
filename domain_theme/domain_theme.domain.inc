@@ -96,5 +96,9 @@ function domain_theme_domain_delete($domain, $form_values = array()) {
  *   A valid domain id.
  */
 function domain_theme_batch_lookup($domain) {
-  return domain_theme_lookup($domain['domain_id']);
+  $theme = domain_theme_lookup($domain['domain_id']);
+  if (isset($theme['theme'])) {
+    return $theme['theme'];
+  }
+  return -1;
 }
