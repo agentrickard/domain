@@ -122,9 +122,10 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
  */
 function domain_source_form_domain_content_admin_alter(&$form, &$form_state) {
   $_domain = domain_get_domain();
-  if (!user_access('set domain access')) {
+  if (!user_access('set domain access') || isset($form['operation']['#value'])) {
     return;
   }
+
   $options = array();
   $domains = domain_domains();
   // Options.

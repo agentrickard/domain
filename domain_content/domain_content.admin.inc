@@ -7,6 +7,9 @@
  * @ingroup domain_content
  */
 
+// Ensure that the node admin page functions are loaded.
+module_load_include('inc', 'node', 'node.admin');
+
 /**
  * The domain content page of menu callbacks.
  *
@@ -170,14 +173,15 @@ function domain_content_view($domain_id = NULL, $all_affiliates = FALSE) {
  * @return
  *   A themed HTML batch content editing form.
  */
-function domain_content_admin() {
-  // Load the form basics for administering nodes.
-  include_once drupal_get_path('module', 'node') . '/node.admin.inc';
-  $form = array();
+function domain_content_admin($form, &$form_state) {
   $form['#attached']['css'] = array(drupal_get_path('module', 'domain_content') . '/domain_content.css');
 
   if (isset($form_state['values']['operation']) && $form_state['values']['operation'] == 'delete') {
-    return node_multiple_delete_confirm($form, $form_state, array_filter($form_state['values']['nodes']));
+    $form = node_multiple_delete_confirm($form, $form_state, array_filter($form_state['values']['nodes']));
+    // Set the proper path for form actions.
+    $form['actions']['cancel']['#href'] = $form['actions']['cancel']['#options']['path'] = request_path();
+    $form['#submit'][] = 'domain_content_delete_multiple_submit';
+    return $form;
   }
   $form['filter'] = node_filter_form();
   $form['#submit'][] = 'node_filter_form_submit';
@@ -196,13 +200,19 @@ function domain_content_admin() {
 }
 
 /**
+ * On delete confirmation, redirect properly.
+ */
+function domain_content_delete_multiple_submit($form, &$form_state) {
+  $form_state['redirect'] = $form['actions']['cancel']['#href'];
+}
+
+/**
  * Rewrites node_admin_nodes() to use db_rewrite_sql().
  *
  * @return
  *   A form array according to the FormsAPI.
  */
 function domain_content_form() {
-  module_load_include('inc', 'node', 'node.admin');
   $_domain = domain_get_domain();
   $admin_access = user_access('administer nodes');
 
