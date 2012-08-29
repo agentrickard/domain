@@ -93,7 +93,7 @@ function domain_theme_domain_delete($domain, $form_values = array()) {
  * @param $domain
  *   The domain being processed.
  * @return
- *   A valid domain id.
+ *   A valid theme name or -1 on failure.
  */
 function domain_theme_batch_lookup($domain) {
   $theme = domain_theme_lookup($domain['domain_id']);
