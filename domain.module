@@ -2333,7 +2333,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
   $default_domain_site = (int) $defaults['domain_site'];
 
   // Some options will be passed as hidden values, we need to run some checks on those.
-  if (isset($form['#node']->nid)) {
+  if (isset($form['#node']->nid) && !empty($form['#node']->domains)) {
     $raw = $form['#node']->domains;
   }
   else {
