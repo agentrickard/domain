@@ -231,13 +231,13 @@ class MigrateDestinationDomain extends MigrateDestination {
 /**
  * Migration class for importing Drupal nodes.
  *
- * In your migration class, there are two field mappingss you may set.
+ * In your migration class, there are two field mappings you may set.
  *
  *   - domain_site is a binary flag indicating that a node is assigned to
  *     "all affiliates" in your installation.
- *   - domains is a simple array of domain ids (either numeric or machine_name,
- *     and you may mix the two) that indicate the domain(s) the content should
- *     be published to.
+ *   - domains is a domain_id string or array of domain ids (either numeric or
+ *     machine_name, and you may mix the two) that indicate the domain(s) the
+ *     content should be published to.
  *
  * Note that failure to set these values explicitly will mean they are set
  * automatically. The domain_site value is configurable per content type. The
@@ -260,6 +260,7 @@ class DomainNodeHandler extends MigrateDestinationHandler {
     // If set, ensure domains exist.
     $domains = array();
     if (isset($node->domains)) {
+      $node->domains = (array) $node->domains;
       foreach ($node->domains as $id) {
         if ($domain = domain_load($id)) {
           $domains[$domain['domain_id']] = $domain['domain_id'];
@@ -282,8 +283,8 @@ class DomainNodeHandler extends MigrateDestinationHandler {
  * Migration class for supporting Drupal user accounts.
  *
  * In our migration class, you may add a domain_user field mapping. This field
- * may contain a simple array of domain ids (either numeric or machine_name,
- * and you may mix the two).
+ * may contain a domain_id string or array of domain ids (either numeric or
+ * machine_name, and you may mix the two).
  *
  * If you fail to set domain_user, the user will be assigned to the default
  * domain, if it exists.
@@ -304,6 +305,7 @@ class DomainUserHandler extends MigrateDestinationHandler {
     // If set, ensure domains exist.
     $domains = array();
     if (isset($user->domain_user)) {
+      $user->domain_user = (array) $user->domain_user;
       foreach ($user->domain_user as $id) {
         if ($domain = domain_load($id)) {
           $domains[$domain['domain_id']] = $domain['domain_id'];
