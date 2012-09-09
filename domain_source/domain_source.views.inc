@@ -50,7 +50,7 @@ function domain_source_views_data() {
     ),
     // Information for accepting a domain_id as a filter
     'filter' => array(
-      'handler' => 'domain_views_handler_filter_domain_domain_id',
+      'handler' => 'domain_source_handler_filter_domain_id',
     ),
     // Information for accepting a domain_id as an argument
     'argument' => array(
@@ -63,4 +63,16 @@ function domain_source_views_data() {
   );
 
   return $data;
+}
+
+/**
+ * Implements hook_views_query_substitutions().
+ *
+ * @see class domain_source_handler_filter_domain_id.
+ * @see http://drupal.org/node/1685658
+ */
+function domain_source_views_query_substitutions($view) {
+  return array(
+    '***CURRENT_DOMAIN_SOURCE***' => DOMAIN_SOURCE_USE_ACTIVE,
+  );
 }
