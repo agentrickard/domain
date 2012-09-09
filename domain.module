@@ -2454,6 +2454,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             '#title' => t('Affiliate publishing options'),
             '#collapsible' => TRUE,
             '#collapsed' => FALSE,
+            '#group' => variable_get('domain_vertical_tab', 0) ? 'additional_settings' : '',
           );
           // We must preserve publishing options that the user cannot access, but only for
           // existing nodes.
