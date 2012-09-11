@@ -684,8 +684,8 @@ function domain_form_user_form_alter(&$form, &$form_state) {
   }
   $account = $form['#user'];
   $account->domain_user = domain_get_user_domains($account, $add_roles, TRUE);
-  // By default, the requesting domain is assigned.
-  if (empty($account->domain_user)) {
+  // By default, the requesting domain is assigned on registration.
+  if (empty($account->uid)) {
     $default = array($_domain['domain_id'] => $_domain['domain_id']);
   }
   else {
