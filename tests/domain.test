@@ -253,6 +253,18 @@ class DomainCreateTest extends DomainTestCase {
     $this->assertTrue(!empty($return), t('<em>WWW prefix handling</em> enabled: Domains must be registered without the www. prefix.'));
   }
 
+  // Test the domain_save() function.
+  function testDomainSave() {
+    // See https://drupal.org/node/1786570
+    $domain = domain_default();
+    $this->assertTrue(!empty($domain['machine_name']), t('Default domain has proper machine name.'));
+    $temp = $domain['machine_name'];
+    $domain['machine_name'] .= 'foo';
+    domain_save($domain);
+    $domain = domain_default(TRUE);
+    $this->assertTrue($domain['machine_name'] == $temp . 'foo', t('Updated domain has proper machine name.'));
+  }
+
 }
 
 class DomainHookTest extends DomainTestCase {

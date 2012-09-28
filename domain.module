@@ -942,15 +942,12 @@ function domain_save($values, $form_values = array()) {
     $values['machine_name'] = domain_machine_name($values['subdomain']);
   }
   // Update or insert a record?
-  $check = domain_check_machine_name($values['machine_name']);
-  if ($check) {
+  if (!empty($values['domain_id'])) {
     $action = 'domain_update';
-    $update = array('machine_name');
     $update_id = array('domain_id');
   }
   else {
     $action = 'domain_insert';
-    $update = array();
     $update_id = array();
   }
 
@@ -964,7 +961,7 @@ function domain_save($values, $form_values = array()) {
 
   // Store the data, using the machine_name to generate a numeric id.
   // Note that we _must_ have a numeric key for {node_access}.
-  drupal_write_record('domain_export', $values, $update);
+  drupal_write_record('domain_export', $values, $update_id);
   drupal_write_record('domain', $values, $update_id);
 
   // Let other modules act on a proper copy of the domain.
