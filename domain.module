@@ -1319,7 +1319,9 @@ function domain_valid_domain($subdomain) {
     $error_list[] = t('Only lower-case characters are allowed.');
   }
   // Check for 'www' prefix if redirection / handling is enabled under global domain settings.
-  if (variable_get('domain_www', 1) && (substr($subdomain, 0, strpos($subdomain, '.')) == 'www')) {
+  // Note that www prefix handling must be set explicitly in the UI.
+  // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
+  if (variable_get('domain_www', 0) && (substr($subdomain, 0, strpos($subdomain, '.')) == 'www')) {
     $error_list[] = t('WWW prefix handling: Domains must be registered without the www. prefix.');
   }
   // Allow modules to alter this behavior.
