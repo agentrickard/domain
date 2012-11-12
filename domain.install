@@ -401,4 +401,3 @@ function domain_update_7308(&$sandbox) {
 
   return t('Ported domain behavior to default node access settings.');
 }
-
