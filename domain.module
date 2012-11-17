@@ -2360,8 +2360,6 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
     );
     $form['domain']['domain_site'] = array(
       '#type' => 'checkbox',
-      '#prefix' => t('<p><b>Publishing options:</b>'),
-      '#suffix' => '</p>',
       '#title' => t('Send to all affiliates'),
       '#required' => FALSE,
       '#description' => t('Select if this content can be shown to all affiliates. This setting will override the options below, but you must still select a domain that "owns" this content.'),
