@@ -3115,7 +3115,12 @@ function domain_node_access_explain($row) {
         $return .= t('True: Allows content from all domains to be shown.');
       }
       else {
-        $return .= t('False: Only allows content from the active domain (%domain) or from all affiliates.', array('%domain' => $active));
+        if (!empty($_domain['site_grant'])) {
+          $return .= t('False: Only allows content from the active domain (%domain) or from all affiliates.', array('%domain' => $active));
+        }
+        else {
+          $return .= t('False: Only allows content from the active domain (%domain).', array('%domain' => $active));
+        }
       }
       break;
     case 'domain_site':
