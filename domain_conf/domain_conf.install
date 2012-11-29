@@ -32,7 +32,8 @@ function domain_conf_update_7000() {
       'domain-primary-links' => 'domain-main-links',
     ),
   );
-  update_fix_d7_block_deltas($sandbox, $renamed_deltas);
+  $moved_deltas = array();
+  update_fix_d7_block_deltas($sandbox, $renamed_deltas, $moved_deltas);
   return t('Domain Conf blocks updated.');
 }
 

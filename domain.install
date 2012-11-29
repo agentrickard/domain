@@ -179,7 +179,8 @@ function domain_update_7000(&$sandbox) {
       '1' => 'information',
     ),
   );
-  update_fix_d7_block_deltas($sandbox, $renamed_deltas);
+  $moved_deltas = array();
+  update_fix_d7_block_deltas($sandbox, $renamed_deltas, $moved_deltas);
   return t('Domain Access blocks updated.');
 }
 

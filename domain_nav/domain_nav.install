@@ -24,6 +24,7 @@ function domain_nav_update_7000() {
       '0' => 'default',
     ),
   );
-  update_fix_d7_block_deltas($sandbox, $renamed_deltas);
+  $moved_deltas = array();
+  update_fix_d7_block_deltas($sandbox, $renamed_deltas, $moved_deltas);
   return t('Domain Access blocks updated.');
 }
