@@ -12,6 +12,10 @@
  */
 function domain_source_domain_source_alter(&$source, $nid) {
   $source = domain_source_lookup($nid);
+  // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
+  if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
+    $source = domain_get_domain();
+  }
 }
 
 /**

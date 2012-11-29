@@ -194,7 +194,7 @@ function domain_source_node_load($nodes, $types) {
     if (!isset($node->nid)) {
       continue;
     }
-    $nodes[$node->nid]->domain_source = $source[$node->nid]['domain_id'];
+    $nodes[$node->nid]->domain_source = $source[$node->nid];
   }
 }
 
@@ -301,10 +301,6 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
   foreach ($result as $data) {
     $source = $data->domain_id;
 
-    // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
-    if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
-      $source = $_domain['domain_id'];
-    }
     // When called from url_rewrite_outbound(), we might have no data,
     // but if $nodes is populated, then we have run domain_node_load().
     if (is_array($nodes) && isset($nodes[$data->nid]->domains)) {
@@ -320,8 +316,17 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
     if (empty($domain_site) && !empty($domains) && !in_array($source, $domains)) {
       $source = current($domains);
     }
-    // Lookup the source domain.
-    $lookups[$data->nid] = domain_lookup($source);
+    // If set to 'Use active domain', return that status flag.
+    if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
+      $lookups[$data->nid] = $source;
+    }
+    // Otherwise, lookup the source domain.
+    else {
+      $domain = domain_lookup($source);
+      if (isset($domain['domain_id'])) {
+        $lookups[$data->nid] = $domain['domain_id'];
+      }
+    }
   }
   // Make sure we found something for every requested node.
   $no_records = $node_ids;
@@ -332,10 +337,11 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
     $default_source = variable_get('domain_default_source', 0);
     // Global setting for 'do not change domain.'
     if ($default_source == -1) {
-      $lookups[$nid] = $_domain;
+      $lookups[$nid] = $_domain['domain_id'];
     }
     else {
-      $lookups[$nid] = domain_lookup($default_source);
+      $default = domain_lookup($default_source);
+      $lookups[$nid] = $default['domain_id'];
     }
   }
   if ($array) {
