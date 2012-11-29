@@ -2661,8 +2661,10 @@ function domain_grant_all($reset= FALSE) {
     if (!$grant) {
       $ref = explode('/', request_uri());
       $script = array_pop($ref);
-      if (variable_get('domain_cron_rule', 1) && $script == 'cron.php') {
-        $options['script'] = $script;
+      // Note that cron can be invoked from services other than cron.php,
+      // so we check for that case and set the script variable manually.
+      if (variable_get('domain_cron_rule', 1) && domain_cron_status()) {
+        $options['script'] = 'cron.php';
         $grant = TRUE;
       }
       elseif (variable_get('domain_xmlrpc_rule', 0) && $script == 'xmlrpc.php') {
@@ -2694,6 +2696,35 @@ function domain_grant_all($reset= FALSE) {
   drupal_alter('domain_grant_all', $grant, $options);
 
   return $grant;
+}
+
+/**
+ * Implements hook_domain_cron_queue_info_alter().
+ *
+ * Uses Queue API info hook to detect if cron is running.
+ *
+ * @see https://drupal.org/node/1851400
+ */
+function domain_cron_queue_info_alter(&$queues) {
+  domain_cron_status(TRUE);
+}
+
+/**
+ * Gets the status of cron.
+ *
+ * @param $status
+ *   Pass a value to set status. No value to retrieve status.
+ *
+ * @return
+ *   Boolean TRUE or FALSE.
+ */
+function domain_cron_status($status = NULL) {
+  $return = &drupal_static(__FUNCTION__, FALSE);
+  if (is_null($status)) {
+    return $return;
+  }
+  $return = $status;
+  return $return;
 }
 
 /**
