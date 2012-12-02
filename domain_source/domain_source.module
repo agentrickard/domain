@@ -30,8 +30,8 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
     $default_source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $form['#node']->nid))->fetchField();
   }
   if (!isset($default_source)) {
-    $source = variable_get('domain_default_source', -1);
-    if ($source == -1) {
+    $source = domain_load_domain_id(variable_get('domain_source_' . $form['#node']->type, DOMAIN_SOURCE_USE_ACTIVE));
+    if ($source < 0) {
       $default_source = DOMAIN_SOURCE_USE_ACTIVE;
     }
     else {
@@ -334,9 +334,10 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
     $no_records = array_diff($node_ids, array_keys($lookups));
   }
   foreach ($no_records as $nid) {
-    $default_source = variable_get('domain_default_source', 0);
+    $type = $nodes[$nid]->type;
+    $default_source = domain_load_domain_id(variable_get('domain_source_' . $type, DOMAIN_SOURCE_USE_ACTIVE));
     // Global setting for 'do not change domain.'
-    if ($default_source == -1) {
+    if ($default_source < 0) {
       $lookups[$nid] = $_domain['domain_id'];
     }
     else {
@@ -421,4 +422,93 @@ function domain_source_views_api() {
   if (module_exists('domain_views')) {
     return array('api' => 2.0);
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Allows default settings for domain source when setting the default domain
+ * selection per content type.
+ */
+function domain_source_form_domain_nodes_form_alter(&$form, &$form_state, $form_id) {
+  $options = array();
+  $domains = domain_domains();
+  $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
+  foreach ($domains as $domain) {
+    $options[$domain['machine_name']] = $domain['sitename'];
+  }
+  $form['domain_source'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Default source domains'),
+  );
+  foreach (node_type_get_names() as $type => $name) {
+    $form['domain_source']['domain_source_' . $type] = array(
+      '#type' => 'select',
+      '#title' => t('%name default source domain', array('%name' => $name)),
+      '#options' => $options,
+      '#default_value' => variable_get('domain_source_' . $type, DOMAIN_SOURCE_USE_ACTIVE),
+    );
+  }
+  $form['#validate'][] = 'domain_source_validate_domain_nodes_form';
+}
+
+/**
+ * Validates default source selections.
+ */
+function domain_source_validate_domain_nodes_form($form, &$form_state) {
+  // Handle the differences between our form and the node type form.
+  $source = '';
+  if (isset($form_state['values']['type'])) {
+    $types = array($form_state['values']['type'] => node_type_get_name($form_state['values']['type']));
+    $source = 'node_type_form';
+  }
+  else {
+    $types = node_type_get_names();
+  }
+  foreach ($types as $type => $name) {
+    $item = 'domain_node_' . $type;
+    $key = 'domain_source_' . $type;
+    // Using the content type form requires specific form element names.
+    if ($source == 'node_type_form') {
+     $item = 'domain_node';
+     $key = 'domain_source';
+    }
+    $value = $form_state['values'][$key];
+    // Use active is always valid.
+    if ($value == DOMAIN_SOURCE_USE_ACTIVE) {
+      continue;
+    }
+
+    $parent = $form_state['values'][$item];
+    // Any assignment is acceptable if sent to all affiliates.
+    if (!empty($parent['DOMAIN_ALL'])) {
+      continue;
+    }
+    // Else, we must select the source domain as an option.
+    if (empty($parent[$value])) {
+      form_set_error('domain_source_' . $type, t('The default %name source domain must be selected as a default publishing option.', array('%name' => $name)));
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Allows default settings for domain source when setting the default domain
+ * selection per content type.
+ */
+function domain_source_form_node_type_form_alter(&$form, &$form_state, $form_id) {
+  $options = array();
+  $domains = domain_domains();
+  $options[DOMAIN_SOURCE_USE_ACTIVE] = t('Use active domain');
+  foreach ($domains as $domain) {
+    $options[$domain['machine_name']] = $domain['sitename'];
+  }
+  $form['domain']['domain_source'] = array(
+    '#type' => 'select',
+    '#title' => t('%name default source domain', array('%name' => $form['#node_type']->name)),
+    '#options' => $options,
+    '#default_value' => variable_get('domain_source_' . $form['#node_type']->type, DOMAIN_SOURCE_USE_ACTIVE),
+  );
+  $form['#validate'][] = 'domain_source_validate_domain_nodes_form';
 }
