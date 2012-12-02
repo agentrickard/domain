@@ -892,7 +892,14 @@ function domain_batch_form($form, &$form_state, $action, $batch, $domains) {
     $form['domain_batch'][$domain['domain_id']]['#sitename'] = check_plain($domain['sitename']);
     $form['domain_batch'][$domain['domain_id']]['#subdomain'] = check_plain($domain['subdomain']);
     if (isset($default[$domain['domain_id']])) {
-      $form['domain_batch'][$domain['domain_id']]['#default_value'] = $default[$domain['domain_id']];
+      if (is_array($default[$domain['domain_id']])) {
+        foreach ($default[$domain['domain_id']] as $fieldname => $value) {
+          $form['domain_batch'][$domain['domain_id']][$fieldname]['#default_value'] = $value;
+        }
+      }
+      else {
+        $form['domain_batch'][$domain['domain_id']]['#default_value'] = $default[$domain['domain_id']];
+      }
     }
   }
   $api_keys = array('variable', 'table', 'data_type');
