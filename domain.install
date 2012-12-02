@@ -402,3 +402,21 @@ function domain_update_7308(&$sandbox) {
 
   return t('Ported domain behavior to default node access settings.');
 }
+
+/**
+ * Updates domain_roles variable to use machine names.
+ */
+function domain_update_7309(&$sandbox) {
+  $defaults = variable_get('domain_roles', array());
+  $new = array();
+  foreach ($defaults as $rid => $domains) {
+    $new[$rid][DOMAIN_ALL] = $domains['all'];
+    foreach ($domains as $domain_id => $check) {
+      $domain = domain_lookup($domain_id);
+      if ($domain != -1) {
+        $new[$rid][$domain['machine_name']] = $check;
+      }
+    }
+  }
+  variable_set('domain_roles', $new);
+}

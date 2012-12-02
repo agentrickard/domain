@@ -1120,6 +1120,7 @@ function domain_roles_form($form, &$form_state) {
 
   $roles = user_roles();
   $defaults = variable_get('domain_roles', array());
+
   $roles[0] = t('new user');
   ksort($roles);
 
@@ -1129,26 +1130,26 @@ function domain_roles_form($form, &$form_state) {
   );
   $domains = array();
   foreach (domain_domains() as $key => $value) {
-    $domains[$key] = $value['sitename'];
+    $domains[$value['machine_name']] = $value['sitename'];
   }
   foreach ($roles as $rid => $role) {
     $form['domain_roles'][$rid]['#tree'] = TRUE;
     $title = t('All domains');
-    $form['#domain_roles']['all'] = $title;
-    $form['domain_roles'][$rid]['all'] = array(
+    $form['#domain_roles'][DOMAIN_ALL] = $title;
+    $form['domain_roles'][$rid][DOMAIN_ALL] = array(
       '#title' => $title,
       '#type' => 'checkbox',
       '#default_value' => (isset($defaults[$rid]['all'])) ? $defaults[$rid]['all'] : 0,
     );
-    foreach ($domains as $domain_id => $domain) {
-      $form['#domain_roles'][$domain_id] = $domain_id;
-      $form['domain_roles'][$rid][$domain_id] = array(
+    foreach ($domains as $machine_name => $domain) {
+      $form['#domain_roles'][$machine_name] = $domain;
+      $form['domain_roles'][$rid][$machine_name] = array(
         '#title' => filter_xss_admin($domain),
         '#type' => 'checkbox',
-        '#default_value' => (isset($defaults[$rid][$domain_id])) ? $defaults[$rid][$domain_id] : 0,
+        '#default_value' => (isset($defaults[$rid][$machine_name])) ? $defaults[$rid][$machine_name] : 0,
         '#states' => array(
           'disabled' => array(
-            'input[name="domain_roles[' . $rid . '][all]"]' => array('checked' => TRUE),
+            'input[name="domain_roles[' . $rid . '][' . DOMAIN_ALL . ']"]' => array('checked' => TRUE),
           ),
         ),
       );
@@ -1176,12 +1177,12 @@ function theme_domain_roles_form($variables) {
   foreach ($roles as $rid => $role) {
     $header[] = $role;
   }
-  foreach ($form['#domain_roles'] as $domain_id => $title) {
+  foreach ($form['#domain_roles'] as $machine_name => $title) {
     $row = array();
-    $row[] = isset($domains[$domain_id]) ? filter_xss_admin($domains[$domain_id]['sitename']) : $title;
+    $row[] = isset($domains[$machine_name]) ? filter_xss_admin($domains[$machine_name]['sitename']) : $title;
     foreach ($roles as $rid => $role) {
-      $form['domain_roles'][$rid][$domain_id]['#title'] = '';
-      $row[] = drupal_render($form['domain_roles'][$rid][$domain_id]);
+      $form['domain_roles'][$rid][$machine_name]['#title'] = '';
+      $row[] = drupal_render($form['domain_roles'][$rid][$machine_name]);
     }
     $rows[] = $row;
   }

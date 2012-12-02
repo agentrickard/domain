@@ -1160,6 +1160,23 @@ function domain_default_id() {
 }
 
 /**
+ * Return the machine_name of the default domain.
+ *
+ * @return
+ *   The machine_name of the default domain.
+ */
+function domain_default_machine_name() {
+  $id = &drupal_static(__FUNCTION__);
+  if (!isset($id)) {
+    // Do not allow domain_api() to run here, else we break the registry.
+    // See http://drupal.org/node/1140898.
+    $default = domain_default(FALSE, FALSE);
+    $machine_name = $default['machine_name'];
+  }
+  return $machine_name;
+}
+
+/**
  * Set the primary domain properly, if necessary.
  */
 function domain_set_primary_domain() {
@@ -1386,7 +1403,7 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
         }
         if (!empty($filter)) {
           // If this role is assigned to "All domains"
-          if (!empty($filter['all'])) {
+          if (!empty($filter[DOMAIN_ALL])) {
             // Add all active domains to the user
             foreach (domain_id_list() as $domain_id) {
               $domains[$uid][$domain_id] = $domain_id;
@@ -1394,10 +1411,11 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
             // We don't need to loop anymore, as all roles have already been added.
             break;
           }
-          // Else: add to user domains assigned to this role
+          // Else: add to user domains assigned to this role, which are stored
+          // as machine_names but used as domain_ids.
           else {
-            foreach ($filter as $domain_id => $status) {
-              if ($status) {
+            foreach ($filter as $machine_name => $status) {
+              if ($status && $domain_id = domain_load_domain_id($machine_name)) {
                 $domains[$uid][$domain_id] = $domain_id;
               }
             }
@@ -3576,7 +3594,7 @@ function domain_check_machine_name($machine_name) {
 }
 
 /**
- * Loads a domain from its machine name.
+ * Loads a domain_id from its machine name.
  *
  * @param $machine_name
  *  The machine name (subdomain) of the domain record.
@@ -3585,7 +3603,28 @@ function domain_check_machine_name($machine_name) {
  *  A Domain id key.
  */
 function domain_load_domain_id($machine_name) {
-  return db_query('SELECT domain_id FROM {domain_export} WHERE machine_name = :machine_name', array(':machine_name' => $machine_name))->fetchField();
+  $domains = domain_list_by_machine_name();
+  if (isset($domains[$machine_name])) {
+    return $domains[$machine_name]['domain_id'];
+  }
+  return FALSE;
+}
+
+/**
+ * Returns a map of domains by machine name.
+ *
+ * @return
+ *  An array keyed by domain machine_name whose values are domain records.
+ */
+function domain_list_by_machine_name() {
+  $domains = &drupal_static(__FUNCTION__);
+  if (!isset($domains)) {
+    $list = domain_domains();
+    foreach ($list as $record) {
+      $domains[$record['machine_name']] = $record;
+    }
+  }
+  return $domains;
 }
 
 /**

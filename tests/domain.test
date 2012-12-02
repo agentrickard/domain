@@ -634,7 +634,7 @@ class DomainUnitTest extends DomainTestCase {
     // Give all users dynamic access to the default domain.
     $roles = array(
       DRUPAL_AUTHENTICATED_RID => array(
-        'all' => domain_default_id(),
+        DOMAIN_ALL => domain_default_machine_name(),
       ),
     );
     variable_set('domain_roles', $roles);
