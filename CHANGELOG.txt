@@ -19,6 +19,7 @@ Upgrading to Domain Access 7.x.3 (from 7.x.2)
 Version history
 ===============
 
+7.x-3.5 02-DEC-2012
 7.x-3.4 30-MAY-2012
 7.x-3.3 11-JAN-2012
 7.x-3.2 04-JAN-2012
