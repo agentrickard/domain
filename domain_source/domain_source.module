@@ -334,10 +334,16 @@ function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, 
     $no_records = array_diff($node_ids, array_keys($lookups));
   }
   foreach ($no_records as $nid) {
-    $type = $nodes[$nid]->type;
-    $default_source = domain_load_domain_id(variable_get('domain_source_' . $type, DOMAIN_SOURCE_USE_ACTIVE));
+    $type = '';
+    if (isset($nodes[$nid]->type)) {
+      $type = $nodes[$nid]->type;
+    }
+    elseif ($node = node_load($nid)) {
+      $type = $node->type;
+    }
     // Global setting for 'do not change domain.'
-    if ($default_source < 0) {
+    $default_source = domain_load_domain_id(variable_get('domain_source_' . $type, DOMAIN_SOURCE_USE_ACTIVE));
+    if ($default_source < 0 || empty($default_source)) {
       $lookups[$nid] = $_domain['domain_id'];
     }
     else {
