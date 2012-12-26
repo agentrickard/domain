@@ -288,7 +288,7 @@ function domain_get_primary_table($table) {
  */
 function domain_settings_initialize() {
   global $base_url, $base_path, $base_root, $cookie_domain;
-  
+
   $is_https = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on';
 
   if (isset($base_url)) {

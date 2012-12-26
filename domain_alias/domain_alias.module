@@ -421,3 +421,4 @@ function domain_alias_features_api() {
   );
   return $components;
 }
+
