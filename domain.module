@@ -908,7 +908,7 @@ function domain_cron() {
  *   $domain array on success or FALSE on failure.
  */
 function domain_load($domain_id = NULL) {
-  $domain = domain_lookup($domain_id);
+  $domain = domain_lookup($domain_id, NULL, TRUE);
   if ($domain == -1) {
     return FALSE;
   }
@@ -1441,6 +1441,8 @@ function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
 function domain_api($domain, $reset = FALSE) {
   $_modules = &drupal_static(__FUNCTION__);
   if (!isset($_modules) || $reset) {
+    // Clear the cache. See https://drupal.org/node/1140898.
+    module_implements('domain_load', TRUE, TRUE);
     $_modules = module_implements('domain_load');
   }
   if (!empty($_modules)) {
