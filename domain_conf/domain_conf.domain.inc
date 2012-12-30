@@ -20,6 +20,7 @@ function domain_conf_domain_warning() {
     'system_site_maintenance_mode',
     'locale_languages_overview_form',
     'menu_configure',
+    'node_type_form',
   );
   $return = array();
   foreach ($forms as $form) {
