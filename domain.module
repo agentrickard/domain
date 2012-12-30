@@ -970,10 +970,22 @@ function domain_save($values, $form_values = array()) {
   // Lookup the modified record and return it.
   $domain = domain_lookup(NULL, $values['subdomain'], TRUE);
 
+  // Clear static caches.
+  domain_static_reset();
+
   // In all cases, we need to force a menu rebuild, which also clears the cache.
   menu_rebuild();
 
   return $domain;
+}
+
+/**
+ * Clear static caches used for domain listings.
+ */
+function domain_static_reset() {
+  drupal_static_reset('domain_id_list');
+  drupal_static_reset('domain_domains');
+  drupal_static_reset('domain_list_by_machine_name');
 }
 
 /**

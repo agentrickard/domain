@@ -31,7 +31,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
   }
   if (!isset($default_source)) {
     $source = domain_load_domain_id(variable_get('domain_source_' . $form['#node']->type, DOMAIN_SOURCE_USE_ACTIVE));
-    if ($source < 0) {
+    if ($source <= 0) {
       $default_source = DOMAIN_SOURCE_USE_ACTIVE;
     }
     else {
@@ -188,13 +188,17 @@ function domain_source_node_validate($node, $form) {
  * Implements hook_node_load().
  */
 function domain_source_node_load($nodes, $types) {
-  $source = domain_source_lookup($nodes);
-  foreach ($nodes as $node) {
+  $results = db_query("SELECT nid, domain_id FROM {domain_source} WHERE nid IN (:nid)",
+    array(':nid' => array_keys($nodes)))->fetchAllAssoc('nid');
+
+  foreach ($nodes as $nid => $node) {
     // Cannot load if the node has not been created yet.
-    if (!isset($node->nid)) {
-      continue;
+    if (!isset($results[$nid])) {
+      $nodes[$node->nid]->domain_source = NULL;
     }
-    $nodes[$node->nid]->domain_source = $source[$node->nid];
+    else {
+      $nodes[$node->nid]->domain_source = $results[$node->nid]->domain_id;
+    }
   }
 }
 
@@ -213,8 +217,6 @@ function domain_source_node_insert($node) {
       'domain_id' => $node->domain_source,
     ))
     ->execute();
-  // Clear the cache.
-  domain_source_lookup($node->nid, array(), NULL, TRUE);
 }
 
 /**
@@ -239,122 +241,42 @@ function domain_source_node_delete($node) {
  * Display debugging information for a node.
  */
 function domain_source_node_view($node, $view_mode) {
-  if (empty($node->nid) || !in_array($view_mode, array('full', 'teaser'))) {
+  if (empty($node->nid) || !in_array($view_mode, array('full', 'teaser')) || !variable_get('domain_debug', 0) || !user_access('set domain access')) {
     return;
   }
-  if (variable_get('domain_debug', 0) && user_access('set domain access') && isset($node->domain_source)) {
-    $source = domain_get_node_match($node->nid);
-    $extra = ' ';
-    $use_active = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $node->nid))->fetchField();
-    if ($use_active === FALSE) {
-      $extra .= t('(determined automatically)');
-    }
-    elseif ($use_active == DOMAIN_SOURCE_USE_ACTIVE) {
-      $extra .= t('(using active domain)');
-    }
-    if (!isset($node->content['domain']['#markup'])) {
-      $node->content['domain']['#markup'] = '';
-    }
-    $node->content['domain']['#markup'] .= '<p>' . t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . $extra . '</p>';
+  $_domain = domain_get_domain();
+  $source = domain_get_node_match($node->nid);
+  if (is_null($node->domain_source)) {
+    $node->content['domain']['#markup'] .= '<p>' . t('<strong>Source domain</strong>: %source (determined automatically)', array('%source' => $source['sitename'])) . '</p>';
+  }
+  elseif ($node->domain_source == DOMAIN_SOURCE_USE_ACTIVE) {
+    $node->content['domain']['#markup'] .= '<p>' . t('<strong>Source domain</strong>: %source (using active domain)', array('%source' => $_domain['sitename'])) . '</p>';
+  }
+  else {
+    $node->content['domain']['#markup'] .= '<p>' . t('<strong>Source domain</strong>: %source', array('%source' => $source['sitename'])) . '</p>';
   }
 }
 
 /**
  * Get the source domains for multiple matches, mimicking node_load().
  *
- * @param $nodes
- *   An array of nodes, keyed by node id, or a single node id.
- * @param $domains
- *   An optional array of domain ids; can only be used for a single node.
- * @param $domain_site
- *   Optional flag indicating that the node is assigned to all domains.
- * @param $reset
- *   Force a reset of the static data lookup.
+ * @param $nid
+ *  A node id.
+ *
  * @return
- *   An associative array of data, keyed by node id, or a single array.
- *   The data array is the active source domain to use, as returned by domain_lookup().
+ *  The domain_id of the canonical source domain or FALSE if not set.
  */
-function domain_source_lookup($nodes, $domains = array(), $domain_site = FALSE, $reset = FALSE) {
+function domain_source_lookup($nid) {
   $_domain = domain_get_domain();
-  $lookups = &drupal_static(__FUNCTION__);
-  // Reset?
-  if ($reset) {
-    $lookups = array();
+  $source = FALSE;
+  $node = node_load($nid);
+  if ($node->domain_source == DOMAIN_SOURCE_USE_ACTIVE) {
+    $source = $node->domain_source;
   }
-  // Ensure we format the lookup correctly.
-  if (!is_array($nodes)) {
-    $nid = $nodes;
-    $node_ids = array($nid);
-    $array = FALSE;
+  elseif ($domain = domain_load($node->domain_source)) {
+    $source = $domain['domain_id'];
   }
-  else {
-    $node_ids = array_keys($nodes);
-    $array = TRUE;
-  }
-  // Static cache.
-  if (!$reset && isset($nid) && isset($lookups[$nid])) {
-    return $lookups[$nid];
-  }
-
-  $result = db_query("SELECT nid, domain_id FROM {domain_source} WHERE nid IN (:nid)", array(':nid' => $node_ids))->fetchAll();
-
-  foreach ($result as $data) {
-    $source = $data->domain_id;
-
-    // When called from url_rewrite_outbound(), we might have no data,
-    // but if $nodes is populated, then we have run domain_node_load().
-    if (is_array($nodes) && isset($nodes[$data->nid]->domains)) {
-      $domains = $nodes[$data->nid]->domains;
-      $domain_site = $nodes[$data->nid]->domain_site;
-    }
-    if (empty($domains)) {
-      $lookup = domain_get_node_domains($data->nid);
-      $domain_site = $lookup['domain_site'];
-      $domains = $lookup['domain_id'];
-    }
-    // If no valid source is found, take the first match from the $domains array.
-    if (empty($domain_site) && !empty($domains) && !in_array($source, $domains)) {
-      $source = current($domains);
-    }
-    // If set to 'Use active domain', return that status flag.
-    if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
-      $lookups[$data->nid] = $source;
-    }
-    // Otherwise, lookup the source domain.
-    else {
-      $domain = domain_lookup($source);
-      if (isset($domain['domain_id'])) {
-        $lookups[$data->nid] = $domain['domain_id'];
-      }
-    }
-  }
-  // Make sure we found something for every requested node.
-  $no_records = $node_ids;
-  if (!empty($lookups)) {
-    $no_records = array_diff($node_ids, array_keys($lookups));
-  }
-  foreach ($no_records as $nid) {
-    $type = '';
-    if (isset($nodes[$nid]->type)) {
-      $type = $nodes[$nid]->type;
-    }
-    elseif ($node = node_load($nid)) {
-      $type = $node->type;
-    }
-    // Global setting for 'do not change domain.'
-    $default_source = domain_load_domain_id(variable_get('domain_source_' . $type, DOMAIN_SOURCE_USE_ACTIVE));
-    if ($default_source < 0 || empty($default_source)) {
-      $lookups[$nid] = $_domain['domain_id'];
-    }
-    else {
-      $default = domain_lookup($default_source);
-      $lookups[$nid] = $default['domain_id'];
-    }
-  }
-  if ($array) {
-    return $lookups;
-  }
-  return $lookups[$nid];
+  return $source;
 }
 
 /**
@@ -389,7 +311,7 @@ function domain_source_validate($form, &$form_state) {
   if ($form_state['values']['operation'] == 'domain') {
     $default = domain_default_id();
     $key = $form_state['values']['domain_source'];
-    if ($form_state['values']['domain_site'] && $key == $default || $key == DOMAIN_SOURCE_USE_ACTIVE) {
+    if (!empty($form_state['values']['domain_site']) || $key == DOMAIN_SOURCE_USE_ACTIVE) {
       // These cases are acceptable, so we let them pass.
       // I find this code easier to read than a compound negative IF statement.
     }
@@ -397,8 +319,7 @@ function domain_source_validate($form, &$form_state) {
       // In this case, we need to check all the selected nodes, which is resource intensive.
       $nodes = array_filter($form_state['values']['nodes']);
       foreach ($nodes as $nid) {
-        $source = domain_source_lookup($nid, array(), $form_state['values']['domain_site'], TRUE);
-        $key = $source['domain_id'];
+        $key = domain_source_lookup($nid);
         // Test for the first two behaviors, which add domains to the node.
         $behavior = $form_state['values']['behavior'];
         if ($behavior < 2) {

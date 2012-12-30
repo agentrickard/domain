@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * Simpletest for Domain Source.
+ */
+
+class DomainSourceTest extends DomainTestCase {
+
+  public function setUp($list = array()) {
+    $modules = array_merge(array('domain_source'), $list);
+    parent::setUp($modules);
+    // Create some test domains.
+    $this->domainCreateDomains();
+  }
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Domain Source tests',
+      'description' => 'Test the functionality provided by Domain Source to assign canonical domains to content.',
+      'group' => 'Domain Source',
+    );
+  }
+
+  // Test that content is not initially assigned.
+  public function testDomainSourceInstall() {
+    // Check that nodes were created.
+    $node_count = db_query("SELECT COUNT(nid) FROM {node}")->fetchField();
+    $this->assertTrue($node_count == 10, t('Ten nodes were created on installation.'));
+    // Check that no source records appear.
+    $records = db_query("SELECT COUNT(n.nid) FROM {node} n INNER JOIN {domain_source} ds ON n.nid = ds.nid")->fetchField();
+    $this->assertTrue(empty($records), t('Initial nodes have no domain source data.'));
+  }
+
+  // Test simple saving and loading of node data.
+  public function testDomainSourceSave() {
+    // These nodes should all be assigned to the primary domain.
+    $node = node_load(1);
+    // $node->domain_source should be NULL.
+    $this->assertTrue(is_null($node->domain_source), t('Source domain for initial content returns NULL.'));
+
+    // Save the node with an assigned source. Then load and check.
+    $node->domain_source = domain_default_id();
+    node_save($node);
+
+    // Check that a source record appears.
+    $records = db_query("SELECT COUNT(n.nid) FROM {node} n INNER JOIN {domain_source} ds ON n.nid = ds.nid")->fetchField();
+    $this->assertTrue($records == 1, t('Saved node has domain source data.'));
+
+    // Check that the data is loaded cleanly.
+    $node = node_load(1);
+    $this->assertTrue($node->domain_source == domain_default_id(), t('Source domain for initial content loaded correctly.'));
+
+    // Save the node with no assigned source. Then load and check.
+    $node->domain_source = DOMAIN_SOURCE_USE_ACTIVE;
+    node_save($node);
+
+    // Check that the data is loaded cleanly.
+    $node = node_load(1);
+    $this->assertTrue($node->domain_source == DOMAIN_SOURCE_USE_ACTIVE, t('Source domain for initial content loaded correctly as "use active domain".'));
+  }
+
+  // Test the node form.
+  public function testDomainSourceForm() {
+    // Test the node edit form.
+    $type = 'article';
+    $admin_account = $this->drupalCreateUser(array('administer nodes', 'bypass node access', 'set domain access'));
+    $this->drupalLogin($admin_account);
+    $form = $this->domainNodeForm($admin_account->uid, $type);
+    // Check the form element.
+    $this->assertTrue(isset($form['domain']['domain_source']), t('Domain Source node form element appears.'));
+    $domains = domain_domains();
+    // There should be four domains, plus the use current domain option.
+    $this->assertTrue(count($form['domain']['domain_source']['#options']) == (count($domains) + 1), t('Domain source options list correctly.'));
+    // The default domain option should be use active.
+    $this->assertTrue($form['domain']['domain_source']['#default_value'] == DOMAIN_SOURCE_USE_ACTIVE, t('The default form value is "use active".'));
+
+    // Set the default value for this node type and check again. Note that the
+    // variable is stored as a machine_name and transforms to an id by the form.
+    variable_set('domain_source_article', domain_default_machine_name());
+    $form = $this->domainNodeForm($admin_account->uid, $type);
+    // The default domain option should be default.
+    $this->assertTrue($form['domain']['domain_source']['#default_value'] == domain_default_id(), t('The default form value is the node type default.'));
+
+    // TODO: There are more advanced form use-cases. They can wait.
+
+  }
+
+  // Test source URL settings.
+  public function testDomainSourceDefaults() {
+    $_domain = domain_get_domain();
+    $node = node_load(1);
+    // By default, this node is not assigned, so it should be set to use
+    // the active domain.
+    $source = domain_source_lookup($node->nid);
+    $this->assertTrue($source === FALSE, t('Unassigned node defaults to current domain.'));
+
+    // Save the node with an assigned source. Then load and check.
+    $domain = domain_load(2);
+    $node->domain_source = $domain['domain_id'];
+    node_save($node);
+    $source = domain_source_lookup($node->nid);
+    $this->assertTrue($source == $domain['domain_id'], t('Assigned node set to proper domain.'));
+    $url = url('node/1');
+    $parts = parse_url($url);
+    $this->assertTrue($parts['host'] == $domain['subdomain'], t('URL rewrite returned correct domain.'));
+  }
+
+}

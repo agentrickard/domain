@@ -95,12 +95,24 @@ class DomainTestCase extends DrupalWebTestCase {
 
   /**
    * Helper function for form introspection.
+   *
+   * Forms are sensitive to the global user account, so we must reset it when
+   * using this technique.
+   *
+   * @param $uid
+   *   A user id representing the account to test.
+   * @param $type
+   *   The node type of the form.
    */
   public function domainNodeForm($uid, $type) {
-    $user = user_load($uid);
+    $temp = $GLOBALS['user'];
+    $user = user_load($uid, TRUE);
+    $GLOBALS['user'] = $user;
     $node = (object) array('uid' => $user->uid, 'name' => (isset($user->name) ? $user->name : ''), 'type' => $type, 'language' => LANGUAGE_NONE);
     module_load_include('inc', 'node', 'node.pages');
-    return drupal_get_form($type . '_node_form', $node);
+    $form = drupal_get_form($type . '_node_form', $node);
+    $GLOBALS['user'] = $temp;
+    return $form;
   }
 
   /**
