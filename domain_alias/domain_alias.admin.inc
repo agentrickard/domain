@@ -199,17 +199,7 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
       form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record.', array('%name' => $alias)));
     }
   }
-  // 6) Check that the alias doesn't match another alias defined for this domain.
-  $replace = array('.' => '\.', '+' => '\+', '-' => '\-', '*' => '[a-z0-9\.\+\-]*', '?' => '[a-z0-9\.\+\-]?');
-  $_pattern = str_replace(array_keys($replace), $replace, $alias);
-  foreach ($aliases as $_alias) {
-    $_alias_pattern = str_replace(array_keys($replace), $replace, $_alias);
-    if (preg_match('@' . $_pattern . '@i', $_alias) || preg_match('@' . $_alias_pattern . '@i', $alias)) {
-      form_error($form[$type][$id]['pattern'], t('%name matches %existing. You must use unique values.', array('%name' => $alias, '%existing' => $_alias)));
-      break;
-    }
-  }
-  // 7) Check that the alias or a pattern matching the same domain name does not exist.
+  // 6) Check that the alias or a pattern matching the same domain name does not exist.
   $_pattern = _domain_alias_placeholders_to_sql($alias);
   if (isset($form_state['values']['domain_id']) && $_pattern != $form_state['values']['domain_id']) {
     $_alias = db_query("SELECT alias_id, domain_id, pattern FROM {domain_alias} WHERE pattern = :pattern1 OR pattern  = :pattern2", array(':pattern1' => $_pattern, ':pattern2' => $form_state['values']['domain_id']))->fetchAssoc();
