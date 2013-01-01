@@ -2851,6 +2851,12 @@ function domain_invalid_domain_requested() {
     return;
   }
 
+  $path = drupal_get_normal_path($_GET['q']);
+  $allow = array_filter(module_invoke_all('domain_invalid_request', $path, $_domain, $user));
+  if (!empty($allow)) {
+    return;
+  }
+
   // Check to see if this is a node page. These are redirected to a visible page, if possible.
   $node = menu_get_object();
   if (empty($node->nid)) {
@@ -2891,6 +2897,16 @@ function domain_invalid_domain_requested() {
   // Log the access attempt.
   watchdog('domain', 'Invalid domain requested by %user on %domain, redirected to %redirect', array('%user' => isset($user->name) ? $user->name : variable_get('anonymous', t('Anonymous')), '%domain' => $_domain['sitename'], '%redirect' => $redirect['sitename'] . $extra), WATCHDOG_WARNING);
   drupal_goto($redirect['path'] . drupal_get_path_alias($path));
+}
+
+/**
+ * Implements hook_domain_invalid_request().
+ */
+function domain_domain_invalid_request($path, $_domain, $account) {
+  if ($path == 'user/login') {
+    return TRUE;
+  }
+  return FALSE;
 }
 
 /**

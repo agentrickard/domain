@@ -863,6 +863,70 @@ class DomainFilterTest extends DomainTestCase {
 
 }
 
+class DomainInvalidTest extends DomainTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'Invalid domain tests',
+      'description' => 'Tests for inactive / invalid domains.',
+      'group' => 'Domain Access',
+    );
+  }
+
+  // On setup, install our test module.
+  function setUp($list = array()) {
+    $list[] = 'domain_test';
+    parent::setUp($list);
+  }
+
+  function testDomainInvalid() {
+    // Create domains.
+    $this->domainCreateDomains();
+    $default = domain_default();
+    // Set one domain as invalid.
+    $domain = domain_load(2);
+    $domain['valid'] = 0;
+    domain_save($domain, $domain);
+    $domain = domain_load(2);
+
+    // Test that we set that domain properly.
+    $this->assertTrue(empty($domain['valid']), t('Domain %domain set to invalid.', array('%domain' => $domain['subdomain'])));
+
+    // Check to see that users with no permission is redirected.
+    $this->drupalGet($domain['path']);
+    $this->assertTrue(TRUE, t('Request sent to invalid domain.'));
+    $this->assertRaw('Welcome to '. $default['sitename'], t('Request redirected to primary domain.'));
+
+    // Check that redirection does not occur on allowed paths.
+    $this->drupalGet($domain['path'] . 'user/login');
+    $this->assertTrue(TRUE, t('Request sent to user/login on invalid domain.'));
+    $this->assertRaw('<link rel="shortcut icon" href="' . $domain['path'] . 'misc/favicon.ico" type="image/vnd.microsoft.icon" />', t('Request allowed on invalid domain.'));
+
+    // Check that redirection does not occur on hook matches.
+    $this->drupalGet($domain['path'] . 'admin');
+    $this->assertTrue(TRUE, t('Request sent to hook match on invalid domain.'));
+    $this->assertRaw('<link rel="shortcut icon" href="' . $domain['path'] . 'misc/favicon.ico" type="image/vnd.microsoft.icon" />', t('Request allowed on invalid domain.'));
+
+    // Check that privileged user is not redirected.
+    $user = $this->drupalCreateUser(array('access inactive domains'));
+    $this->drupalLogin($user);
+    $this->drupalGet($domain['path']);
+    $this->assertTrue(TRUE, t('Request sent to invalid domain as privileged user.'));
+    $this->assertRaw('Welcome to '. $domain['sitename'], t('Request granted access to invalid domain.'));
+
+    // Check that unprivileged user is redirected.
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
+    $this->drupalGet($domain['path']);
+    $this->assertTrue(TRUE, t('Request sent to invalid domain as unprivileged user.'));
+    $this->assertRaw('Welcome to '. $default['sitename'], t('Unprivileged user redirected to primary domain.'));
+
+    // Check that redirection does not occur on hook matches.
+    $this->drupalGet($domain['path'] . 'admin');
+    $this->assertTrue(TRUE, t('Request sent to hook match on invalid domain.'));
+    $this->assertRaw('<link rel="shortcut icon" href="' . $domain['path'] . 'misc/favicon.ico" type="image/vnd.microsoft.icon" />', t('Request allowed on invalid domain.'));
+  }
+}
+
 class DomainTokenTest extends DomainTestCase {
   public static function getInfo() {
     return array(

@@ -836,3 +836,26 @@ function hook_domain_reassign($old_domain, $new_domain, $table) {
       ->execute();
   }
 }
+
+/**
+ * Notifies modules that an inactive domain has been requested.
+ *
+ * Modules may choose to allow access to specific paths for purposes such as
+ * login.
+ *
+ * @param $path
+ *   The path requested.
+ * @param $_domain
+ *   The active domain request. Identical to domain_get_domain().
+ * @param $account
+ *   The user account making the request.
+ *
+ * @return
+ *   TRUE if access should be allowed. FALSE in all other cases.
+ */
+function hook_domain_invalid_request($path, $_domain, $account) {
+  if ($path == 'user/login') {
+    return TRUE;
+  }
+  return FALSE;
+}
