@@ -485,6 +485,12 @@ function domain_content_alter_node_query(QueryAlterableInterface $query, $all_af
           ->condition("{$access_alias}.gid", $domain_id)
           ->condition("{$access_alias}.realm", 'domain_id')
         );
+        if (user_access('view unpublished domain content')) {
+          $or->condition(db_and()
+            ->condition("{$access_alias}.gid", $domain_id)
+            ->condition("{$access_alias}.realm", 'domain_unpublished')
+          );
+        }
       }
       $query->condition($or);
       // Node module will not have run, so add the distinct.

@@ -462,6 +462,10 @@ class DomainUnitTest extends DomainTestCase {
     $this->assertTrue($count == 10, t('Initial nodes are assigned to the default domain.'));
     $count = db_query("SELECT COUNT(nid) FROM {domain_access} WHERE realm = 'domain_site'")->fetchField();
     $this->assertTrue($count == 10, t('Initial nodes are assigned to all affiliates.'));
+
+    // Reset the {node_access} table.
+    node_access_rebuild();
+
     // Create three more domains.
     $this->domainCreateDomains();
     $count = db_query("SELECT COUNT(domain_id) FROM {domain}")->fetchField();
@@ -576,6 +580,16 @@ class DomainUnitTest extends DomainTestCase {
       }
     }
 
+    // Test queries for node access.
+    $result = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('n.status', 1)
+      ->addTag('node_access')
+      ->addMetaData('account', $test_user)
+      ->execute()
+      ->fetchCol();
+    $this->assertTrue(count($result) == 10, t('Node access query returns correctly.'));
+
     // Test editor permissions.
     $perms = array(
       'edit domain content',
@@ -602,6 +616,7 @@ class DomainUnitTest extends DomainTestCase {
       else {
         $node->domains = array(domain_default_id() => domain_default_id());
       }
+      $node->domain_site = 0;
       node_save($node);
     }
     drupal_static_reset('node_access');
@@ -610,7 +625,6 @@ class DomainUnitTest extends DomainTestCase {
     foreach ($nodes as $node) {
       $count++;
       foreach (array('view', 'update', 'delete') as $op) {
-        $node->status = 0;
         $access = node_access($op, $node, $test_user);
         if ($count <= 5) {
           $this->assertTrue($access, t('User has proper access to %op domain content.', array('%op' => $op)));
@@ -620,6 +634,28 @@ class DomainUnitTest extends DomainTestCase {
         }
       }
     }
+
+    // Test queries for node access.
+    $result = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('n.status', 1)
+      ->addTag('node_access')
+      ->addMetaData('account', $test_user)
+      ->execute()
+      ->fetchCol();
+    $this->assertTrue(count($result) == 0, t('Node access query returns correctly.'));
+
+
+    // Test queries for node access.
+    $result = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('n.status', 0)
+      ->addTag('node_access')
+      ->addMetaData('account', $test_user)
+      ->execute()
+      ->fetchCol();
+    $this->assertTrue(count($result) == 5, t('Node access query returns correctly.'));
+
     // Now take away the domain permissions to content.
     user_role_revoke_permissions($this->editor_role, $perms);
     $test_user = user_load($test_user->uid, TRUE);
@@ -627,11 +663,31 @@ class DomainUnitTest extends DomainTestCase {
     $this->assertTrue(TRUE, '<strong>' . t('User has no editing permissions. User should have access to no nodes.' . '</strong>'));
     foreach ($nodes as $node) {
       foreach (array('view', 'update', 'delete') as $op) {
-        $node->status = 0;
         $access = node_access($op, $node, $test_user);
         $this->assertFalse($access, t('User denied access to %op all domain content.', array('%op' => $op)));
       }
     }
+
+    // Test queries for node access.
+    $result = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('n.status', 1)
+      ->addTag('node_access')
+      ->addMetaData('account', $test_user)
+      ->execute()
+      ->fetchCol();
+    $this->assertTrue(count($result) == 0, t('Node access query returns correctly.'));
+
+    // Test queries for node access.
+    $result = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('n.status', 0)
+      ->addTag('node_access')
+      ->addMetaData('account', $test_user)
+      ->execute()
+      ->fetchCol();
+    $this->assertTrue(count($result) == 0, t('Node access query returns correctly.'));
+
     // Test the dynamic extension of permissions via user settings.
     $roles = variable_get('domain_roles', array());
     // Reset the domains.

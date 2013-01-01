@@ -1956,7 +1956,7 @@ function domain_node_grants($account, $op) {
   }
   else {
     // The $account may not have domain information loaded, so get it.
-    $domains = domain_get_user_domains($account);
+    $domains = $account->domain_user;
     $perm = 'delete domain content';
     if ($op == 'update') {
       $perm = 'edit domain content';
@@ -1973,6 +1973,15 @@ function domain_node_grants($account, $op) {
             }
           }
         }
+      }
+    }
+  }
+  // If the user may view unpublished content, then add those grants.
+  if (!empty($grants['domain_id']) && user_access('view unpublished domain content', $account)) {
+    foreach ($grants['domain_id'] as $id) {
+      $domains = $account->domain_user;
+      if (!empty($domains[$id])) {
+        $grants['domain_unpublished'][] = $id;
       }
     }
   }
@@ -2037,12 +2046,20 @@ function domain_node_access_records($node) {
   if (!empty($node->domains)) {
     $domains = array_filter($node->domains);
   }
+
+  // Set the proper realm, for use with unpublished nodes.
+  $realm = 'domain_id';
+  if (!$node->status) {
+    $realm = 'domain_unpublished';
+  }
+
+  // Set the specified domains.
   if (!empty($domains)) {
     foreach (array_filter($node->domains) as $key => $value) {
       $grants[] = array(
-        'realm' => 'domain_id',
+        'realm' => $realm,
         'gid' => $key,
-        'grant_view' => $node->status,
+        'grant_view' => 1,
         'grant_update' => 1,
         'grant_delete' => 1,
         'priority' => 0,
@@ -2056,9 +2073,9 @@ function domain_node_access_records($node) {
   else {
     $default = domain_default();
     $grants[] = array(
-      'realm' => 'domain_id',
+      'realm' => $realm,
       'gid' => $default['domain_id'],
-      'grant_view' => $node->status,
+      'grant_view' => 1,
       'grant_update' => 1,
       'grant_delete' => 1,
       'priority' => 0,
@@ -2087,6 +2104,10 @@ function _domain_store_grants($nid, $grants = array()) {
       ->execute();
     $values = array();
     foreach ($grants as $grant) {
+      // Always store unpublished nodes under domain_id.
+      if ($grant['realm'] == 'domain_unpublished') {
+        $grant['realm'] = 'domain_id';
+      }
       $values[] = array(
         'nid' => $nid,
         'gid' => $grant['gid'],
@@ -3210,6 +3231,9 @@ function domain_node_access_explain($row) {
       break;
     case 'domain_id':
       $return .= t('Viewable on %domain<br />%domain privileged editors may edit and delete', array('%domain' => $domain['subdomain']));
+      break;
+    case 'domain_unpublished':
+      $return .= t('Unpublished node. Viewable on %domain<br />%domain privileged editors may edit and delete', array('%domain' => $domain['subdomain']));
       break;
     default:
       // This is not our grant, do not return anything.

@@ -420,3 +420,10 @@ function domain_update_7309(&$sandbox) {
   }
   variable_set('domain_roles', $new);
 }
+
+/**
+ * Updates node grants for unpublished content.
+ */
+function domain_update_7310(&$sandbox) {
+  node_access_rebuild(TRUE);
+}
