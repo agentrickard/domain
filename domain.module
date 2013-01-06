@@ -1255,6 +1255,7 @@ function domain_id_list($reset = FALSE) {
   if (isset($list) && empty($reset)) {
     return $list;
   }
+  $list = array();
   $result = db_query("SELECT domain_id, machine_name FROM {domain} ORDER BY weight");
   foreach ($result as $data) {
     $list[$data->machine_name] = $data->domain_id;
