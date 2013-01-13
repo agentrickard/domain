@@ -1146,7 +1146,7 @@ function domain_roles_form($form, &$form_state) {
     $form['domain_roles'][$rid][DOMAIN_ALL] = array(
       '#title' => $title,
       '#type' => 'checkbox',
-      '#default_value' => (isset($defaults[$rid]['all'])) ? $defaults[$rid]['all'] : 0,
+      '#default_value' => (isset($defaults[$rid][DOMAIN_ALL])) ? $defaults[$rid][DOMAIN_ALL] : 0,
     );
     foreach ($domains as $machine_name => $domain) {
       $form['#domain_roles'][$machine_name] = $domain;
