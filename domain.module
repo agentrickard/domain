@@ -3995,7 +3995,7 @@ function domain_batch_actions() {
 }
 
 /**
- * Implements hook_preprocess_page().
+ * Implements template_preprocess_html().
  */
 function domain_preprocess_html(&$variables) {
   $classes = domain_page_classes();
