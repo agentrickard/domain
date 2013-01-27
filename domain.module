@@ -1804,6 +1804,13 @@ function domain_node_update($node) {
 }
 
 /**
+ * Implements hook_node_type_delete().
+ */
+function domain_node_type_delete($info) {
+  variable_del('domain_node_' . $info->type);
+}
+
+/**
  * Get the best matching domain for a node link.
  *
  * @param $nid

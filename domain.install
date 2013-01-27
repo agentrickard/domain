@@ -427,3 +427,19 @@ function domain_update_7309(&$sandbox) {
 function domain_update_7310(&$sandbox) {
   node_access_rebuild(TRUE);
 }
+
+/**
+ * Remove stale domain_node_{bundle} variables.
+ */
+function domain_update_7311(&$sandbox) {
+  if (function_exists('node_type_get_types')) {
+    $variable_names = array();
+    foreach (node_type_get_types() as $key => $type) {
+      $variable_names[] = 'domain_node_' . $key;
+    }
+    db_delete('variable')
+      ->condition('name', 'domain_node_%', 'LIKE')
+      ->condition('name', $variable_names, 'NOT IN')
+      ->execute();
+  }
+}
