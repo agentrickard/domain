@@ -83,6 +83,7 @@ function domain_conf_features_rebuild($module) {
     if ($wipe = domain_features_wipe_tables($defaults)) {
       db_delete('domain_conf')
         ->execute();
+      unset($defaults['wipe-domain-tables']);
     }
     foreach ($defaults as $key => $variables) {
       $domain_id = domain_load_domain_id($key);
