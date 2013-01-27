@@ -88,7 +88,6 @@ function domain_uninstall() {
     'domain_default_source',
     'domain_edit_on_primary',
     'domain_force_admin',
-    'domain_form_elements',
     'domain_grant_all',
     'domain_list_size',
     'domain_paths',
@@ -442,4 +441,11 @@ function domain_update_7311(&$sandbox) {
       ->condition('name', $variable_names, 'NOT IN')
       ->execute();
   }
+}
+
+/**
+ * Removes deprecated setting 'domain_form_elements'.
+ */
+function domain_update_7312(&$sandbox) {
+  variable_del('domain_form_elements');
 }

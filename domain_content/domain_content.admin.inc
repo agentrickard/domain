@@ -221,11 +221,24 @@ function domain_content_form() {
     '#type' => 'fieldset',
     '#title' => t('Update options'),
     '#attributes' => array('class' => array('container-inline')),
-    '#access' => $admin_access,
   );
   $options = array();
-  foreach (module_invoke_all('node_operations') as $operation => $array) {
-    $options[$operation] = $array['label'];
+  // Get the actions the user may perform.
+  if ($admin_access) {
+    foreach (module_invoke_all('node_operations') as $operation => $array) {
+      $options[$operation] = $array['label'];
+    }
+  }
+  // Otherwise, only allow domain content module operations.
+  else {
+    $list = domain_content_node_operations();
+    foreach ($list as $key => $value) {
+      $options[$key] = $value['label'];
+    }
+  }
+  // No options? No form access.
+  if (empty($options)) {
+    $form['options']['#access'] = FALSE;
   }
   $form['options']['operation'] = array(
     '#type' => 'select',
@@ -435,7 +448,6 @@ function domain_content_view_domains($node) {
  *   No return value. Modify by reference.
  */
 function domain_content_filter_operations(&$operations) {
-  $settings = variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path'));
   // Administer nodes can do anything.
   if (user_access('administer nodes')) {
     return;
@@ -443,15 +455,6 @@ function domain_content_filter_operations(&$operations) {
   // Check for the delete perm.
   if (!user_access('delete domain content')) {
     unset($operations['delete']);
-  }
-  // The publish, promote and sticky operations all depend on having $settings['options'].
-  if (!in_array('options', array_filter($settings))) {
-    unset($operations['publish']);
-    unset($operations['unpublish']);
-    unset($operations['promote']);
-    unset($operations['demote']);
-    unset($operations['sticky']);
-    unset($operations['unsticky']);
   }
 }
 

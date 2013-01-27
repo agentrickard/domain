@@ -155,6 +155,7 @@ function domain_content_node_operations() {
     );
     return $operations;
   }
+  return array();
 }
 
 /**

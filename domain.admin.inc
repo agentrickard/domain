@@ -663,40 +663,6 @@ function domain_delete_form_submit($form, &$form_state) {
 }
 
 /**
- * Implement domain_advanced_form.
- *
- * @param $form
- *   The current form, passed by FormsAPI.
- * @param $form_state
- *   The current form state, passed by FormsAPI.
- */
-function domain_advanced_form($form, &$form_state) {
-  $form = array();
-  // Some editors will not have full node editing permissions.  This allows us
-  // to give selected permissions for nodes within the editor's domain.
-  $form['domain_form'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Domain node editing'),
-    '#collapsible' => TRUE
-  );
-  $form['domain_form']['intro'] = array('#value' => t('<p>When editors view domain-access restricted nodes, which form elements should be exposed?</p>'));
-  $options = array(
-    'log' => t('Log messages'),
-    'options' => t('Publishing options'),
-    'comment_settings' => t('Comment settings'),
-    'path' => t('Path aliasing'),
-  );
-  ksort($options);
-  $form['domain_form']['domain_form_elements'] = array(
-    '#type' => 'checkboxes',
-    '#default_value' => variable_get('domain_form_elements', array('options', 'delete', 'comment_settings', 'path')),
-    '#options' => $options,
-    '#description' => t('Some elements may not be editable for all users due to permission restrictions.'),
-  );
-  return system_settings_form($form);
-}
-
-/**
  * Allows for the batch update of certain elements.
  *
  * @param $action
