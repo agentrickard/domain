@@ -3355,6 +3355,7 @@ function domain_admin_filter() {
  */
 function domain_alter_node_query(QueryAlterableInterface $query, $type) {
   global $user;
+
   // Read meta-data from query, if provided.
   if (!$account = $query->getMetaData('account')) {
     $account = $user;
@@ -3362,10 +3363,12 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
   if (!$op = $query->getMetaData('op')) {
     $op = 'view';
   }
+
   // Only act on view.
   if ($op != 'view') {
     return;
   }
+
   $tables = $query->getTables();
   $base_table = $query->getMetaData('base_table');
   // If no base table is specified explicitly, search for one.
@@ -3414,9 +3417,6 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
     }
   }
 
-  // Prevent duplicate records.
-  $query->distinct();
-
   // Find all instances of the base table being joined -- could appear
   // more than once in the query, and could be aliased. Join each one to
   // the node_access table.
@@ -3425,37 +3425,30 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
   if ($type == 'entity') {
     // The original query looked something like:
     // @code
-    //  SELECT nid FROM sometable s
-    //  INNER JOIN node_access na ON na.nid = s.nid
-    //  WHERE ($node_access_conditions)
+//  SELECT nid FROM sometable s
+//  INNER JOIN node_access na ON na.nid = s.nid
+//  WHERE ($node_access_conditions)
     // @endcode
     //
     // Our query will look like:
     // @code
-    //  SELECT entity_type, entity_id
-    //  FROM field_data_something s
-    //  LEFT JOIN node_access na ON s.entity_id = na.nid
-    //  WHERE (entity_type = 'node' AND $node_access_conditions) OR (entity_type <> 'node')
+//  SELECT entity_type, entity_id
+//  FROM field_data_something s
+//  LEFT JOIN node_access na ON s.entity_id = na.nid
+//  WHERE (entity_type = 'node' AND $node_access_conditions) OR (entity_type <> 'node')
     // @endcode
     //
     // So instead of directly adding to the query object, we need to collect
-    // in a separate db_and() object and then at the end add it to the query.
-    $entity_conditions = db_and();
+    // all of the node access conditions in a separate db_and() object and
+    // then add it to the query at the end.
+    $node_conditions = db_and();
   }
   foreach ($tables as $nalias => $tableinfo) {
     $table = $tableinfo['table'];
     if (!($table instanceof SelectQueryInterface) && $table == $base_table) {
-
-      // The node_access table has the access grants for any given node so JOIN
-      // it to the table containing the nid which can be either the node
-      // table or a field value table.
-      if ($type == 'node') {
-        $access_alias = $query->join('node_access', 'na', '%alias.nid = ' . $nalias . '.nid');
-      }
-      else {
-        $access_alias = $query->leftJoin('node_access', 'na', '%alias.nid = ' . $nalias . '.entity_id');
-        $base_alias = $nalias;
-      }
+      // Set the subquery.
+      $subquery = db_select('node_access', 'na')
+       ->fields('na', array('nid'));
 
       $grant_conditions = db_or();
       // If any grant exists for the specified user, then user has access
@@ -3463,34 +3456,43 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
       foreach ($grants as $realm => $gids) {
         foreach ($gids as $gid) {
           $grant_conditions->condition(db_and()
-            ->condition($access_alias . '.gid', $gid)
-            ->condition($access_alias . '.realm', $realm)
+            ->condition('na.gid', $gid)
+            ->condition('na.realm', $realm)
           );
         }
       }
 
-      $count = count($grant_conditions->conditions());
-      if ($type == 'node') {
-        if ($count) {
-          $query->condition($grant_conditions);
-        }
-        $query->condition($access_alias . '.grant_' . $op, 1, '>=');
+      // Attach conditions to the subquery for nodes.
+      if (count($grant_conditions->conditions())) {
+        $subquery->condition($grant_conditions);
       }
+      $subquery->condition('na.grant_' . $op, 1, '>=');
+      $field = 'nid';
+      // Now handle entities.
+      if ($type == 'entity') {
+        // Set a common alias for entities.
+        $base_alias = $nalias;
+        $field = 'entity_id';
+      }
+      $subquery->where("$nalias.$field = na.nid");
+
+      // For an entity query, attach the subquery to entity conditions.
+      if ($type == 'entity') {
+        $node_conditions->exists($subquery);
+      }
+      // Otherwise attach it to the node query itself.
       else {
-        if ($count) {
-          $entity_conditions->condition($grant_conditions);
-        }
-        $entity_conditions->condition($access_alias . '.grant_' . $op, 1, '>=');
+        $query->exists($subquery);
       }
     }
   }
 
-  if ($type == 'entity' && count($entity_conditions->conditions())) {
+  if ($type == 'entity' && count($subquery->conditions())) {
     // All the node access conditions are only for field values belonging to
     // nodes.
-    $entity_conditions->condition("$base_alias.entity_type", 'node');
+    $node_conditions->condition("$base_alias.entity_type", 'node');
     $or = db_or();
-    $or->condition($entity_conditions);
+    $or->condition($node_conditions);
     // If the field value belongs to a non-node entity type then this function
     // does not do anything with it.
     $or->condition("$base_alias.entity_type", 'node', '<>');
