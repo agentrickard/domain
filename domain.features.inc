@@ -70,6 +70,7 @@ function domain_features_rebuild($module) {
           domain_delete($domain);
         }
       }
+      unset($defaults['wipe-domain-tables']);
     }
     // Save the domains in this feature.
     foreach ($defaults as $key => $domain) {
