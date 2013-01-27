@@ -683,7 +683,7 @@ function domain_form_user_form_alter(&$form, &$form_state) {
     $add_roles = TRUE;
   }
   $account = $form['#user'];
-  $account->domain_user = domain_get_user_domains($account, $add_roles, TRUE);
+  $account->domain_user = domain_get_user_domains($account, $add_roles);
   // By default, the requesting domain is assigned on registration.
   if (empty($account->uid)) {
     $default = array($_domain['domain_id'] => $_domain['domain_id']);
@@ -845,7 +845,7 @@ function domain_update_users($form, &$form_state) {
     if (!empty($form_state['values']['behavior'])) {
       $account = new stdClass();
       $account->uid = $uid;
-      $current = domain_get_user_domains($account, $add_roles, TRUE);
+      $current = domain_get_user_domains($account, $add_roles);
       // Behavior 1: add new domains.
       if ($form_state['values']['behavior'] == 1) {
         $domains += $current;
@@ -1384,60 +1384,57 @@ function domain_unique_domain($subdomain) {
  * @param $add_roles
  *   A boolean flag indicating whether to add the default role settings to the
  *   user's domains.
- * @param $reset
- *   A boolean flag indicating whether to reset the static array or not.
  *
  * @return
  *   An array of domains to which the user is assigned, in the format
  *   array($domain_id => $domain_id).
  */
-function domain_get_user_domains($account, $add_roles = TRUE, $reset = FALSE) {
+function domain_get_user_domains($account, $add_roles = TRUE) {
   if (empty($account)) {
     // This may happen when creating a new user.
     return array();
   }
   $uid = (int) $account->uid;
-  if (!isset($domains[$uid]) || $reset) {
-    $domains[$uid] = array();
-    $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = :uid", array(':uid' => $uid));
-    foreach ($result as $data) {
-      $domains[$uid][$data->domain_id] = $data->domain_id;
+  $user_domains = array();
+  $result = db_query("SELECT domain_id FROM {domain_editor} WHERE uid = :uid", array(':uid' => $uid));
+  foreach ($result as $data) {
+    $user_domains[$data->domain_id] = $data->domain_id;
+  }
+  if ($add_roles) {
+    if (empty($account->roles)) {
+      $account->roles = array(0 => 'new user');
     }
-    if ($add_roles) {
-      if (empty($account->roles)) {
-        $account->roles = array(0 => 'new user');
+    // Add the role-based additions.
+    $defaults = variable_get('domain_roles', array());
+    foreach ($account->roles as $rid => $role) {
+      $filter = array();
+      if (isset($defaults[$rid])) {
+        $filter = array_filter($defaults[$rid]);
       }
-      // Add the role-based additions.
-      $defaults = variable_get('domain_roles', array());
-      foreach ($account->roles as $rid => $role) {
-        $filter = array();
-        if (isset($defaults[$rid])) {
-          $filter = array_filter($defaults[$rid]);
-        }
-        if (!empty($filter)) {
-          // If this role is assigned to "All domains"
-          if (!empty($filter[DOMAIN_ALL])) {
-            // Add all active domains to the user
-            foreach (domain_id_list() as $domain_id) {
-              $domains[$uid][$domain_id] = $domain_id;
-            }
-            // We don't need to loop anymore, as all roles have already been added.
-            break;
+      if (!empty($filter)) {
+        // If this role is assigned to "All domains"
+        if (!empty($filter[DOMAIN_ALL])) {
+          // Add all active domains to the user
+          foreach (domain_id_list() as $domain_id) {
+            $user_domains[$domain_id] = $domain_id;
           }
-          // Else: add to user domains assigned to this role, which are stored
-          // as machine_names but used as domain_ids.
-          else {
-            foreach ($filter as $machine_name => $status) {
-              if ($status && $domain_id = domain_load_domain_id($machine_name)) {
-                $domains[$uid][$domain_id] = $domain_id;
-              }
+          // We don't need to loop anymore, as all roles have already been added.
+          break;
+        }
+        // Else: add to user domains assigned to this role, which are stored
+        // as machine_names but used as domain_ids.
+        else {
+          foreach ($filter as $machine_name => $status) {
+            if ($status && $domain_id = domain_load_domain_id($machine_name)) {
+              $user_domains[$domain_id] = $domain_id;
             }
           }
         }
       }
     }
   }
-  return $domains[$uid];
+
+  return $user_domains;
 }
 
 /**

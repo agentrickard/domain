@@ -31,8 +31,7 @@ class DomainStrictTestCase extends DomainTestCase {
       ->execute();
     $count = db_query("SELECT 1 FROM {domain_editor} WHERE uid = 1")->fetchField();
     $this->assertTrue(empty($count), t('User removed from the primary domain.'));
-    // Reload the user data to remove caching.
-    drupal_static_reset('domain_get_user_domains');
+    // No caching: no need to reload the user data to remove it.
     $grants = node_access_grants('view', $account);
     $this->assertTrue(empty($grants['domain_id']), t('Domain strict revoked rights to the user.'));
   }
