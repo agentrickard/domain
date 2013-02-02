@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the domain module.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function domain_schema() {
+  $schema['domain'] = array(
+    'description' => 'Stores domain records.',
+    'fields' => array(
+      'domain_id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Domain numeric id.'
+      ),
+      'hostname' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Registered DNS entry, will match HTTP_HOST requests'
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Site display name'
+      ),
+      'scheme' => array(
+        'type' => 'varchar',
+        'length' => '8',
+        'not null' => TRUE,
+        'default' => 'http',
+        'description' => 'Default protocol'
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => '1',
+        'not null' => TRUE,
+        'default' => '1',
+        'description' => 'Active status'
+      ),
+      'weight' => array(
+        'type' => 'int',
+        'unsigned' => FALSE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Sort order'
+      ),
+      'is_default' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Indicates primary domain'
+      ),
+      'machine_name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The machine name for this domain.'
+      ),
+    ),
+    'primary key' => array('domain_id'),
+    'indexes' => array(
+      'hostname' => array('hostname'),
+      'weight' => array('weight'),
+      'is_default' => array('is_default'),
+    ),
+    'unique keys' => array(
+      'machine_name' => array('machine_name'),
+    ),
+    'foreign_keys' => array(),
+  );
+  return $schema;
+}
