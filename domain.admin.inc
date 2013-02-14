@@ -37,7 +37,7 @@ function domain_overview_form($form, &$form_state, $domains) {
     '#type' => 'table',
     '#header' => $header,
     '#tree' => TRUE,
-    '#empty' => t('There are no items yet. <a href="@add-url">Add an item.</a>', array(
+    '#empty' => t('There are no domains yet. <a href="@add-url">Add a domain.</a>', array(
       '@add-url' => url('admin/structure/domain/add'),
     )),
     '#tabledrag' => array(

@@ -31,10 +31,10 @@ class DomainCreate extends DomainTestBase {
     // Create a new domain programmatically.
     $domain = domain_create();
     foreach (array('domain_id', 'hostname', 'name', 'machine_name') as $key) {
-      $this->assertTrue(is_null($domain->{$key}), 'New $domain->' . $key . ' property is set to NULL.');
+      $this->assertTrue(is_null($domain->{$key}), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
     }
     foreach (array('scheme', 'status', 'weight' , 'is_default') as $key) {
-      $this->assertTrue(isset($domain->{$key}), 'New $domain->' . $key . ' property is set to default value: ' . $domain->{$key});
+      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to default value: @value.', array('!key' => $key, '!value' => $domain->{$key})));
     }
     // Now add the additional fields and save.
     $domain->hostname = $_SERVER['HTTP_HOST'];
@@ -44,7 +44,7 @@ class DomainCreate extends DomainTestBase {
 
     // Did it save correctly?
     $default_id = domain_default_id();
-    $this->assertTrue(!empty($default_id), t('Default domain has been set.'));
+    $this->assertTrue(!empty($default_id), 'Default domain has been set.');
 
     // Does it load correctly?
     $new_domain = domain_load($default_id);
@@ -52,6 +52,8 @@ class DomainCreate extends DomainTestBase {
 
     // Delete the domain.
     $domain->delete();
+    $domain = domain_load($default_id, TRUE);
+    $this->assertTrue(empty($domain), 'Domain record deleted.');
 
     // No domains should exist.
     $this->domainTableIsEmpty();
@@ -59,10 +61,10 @@ class DomainCreate extends DomainTestBase {
     // Try the create function with server inheritance.
     $domain = domain_create(TRUE);
     foreach (array('domain_id') as $key) {
-      $this->assertTrue(is_null($domain->{$key}), 'New $domain->' . $key . ' property is set to NULL.');
+      $this->assertTrue(is_null($domain->{$key}), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
     }
     foreach (array('hostname', 'name', 'machine_name', 'scheme', 'status', 'weight' , 'is_default') as $key) {
-      $this->assertTrue(isset($domain->{$key}), 'New $domain->' . $key . ' property is set to a default value: ' . $domain->{$key});
+      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to a default value: @value.', array('!key' => $key, '!value' => $domain->{$key})));
     }
   }
 

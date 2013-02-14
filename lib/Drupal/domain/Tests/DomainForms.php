@@ -28,18 +28,24 @@ class DomainForms extends DomainTestBase {
     $this->admin_user = $this->drupalCreateUser(array('administer domains'));
     $this->drupalLogin($this->admin_user);
 
+    // No domains should exist.
+    $this->domainTableIsEmpty();
+
     // Visit the main domain administration page.
     $this->drupalGet('admin/structure/domain');
+
+    // Check for the add message.
+    $this->assertText('There are no domains yet.', 'Text for no domains found.');
     // Visit the add domain administration page.
     $this->drupalGet('admin/structure/domain/add');
 
     // Make a POST request on admin/structure/domain/add.
     $edit = $this->domainPostValues();
-    $this->drupalPost('admin/structure/domain/add', $edit, t('Save'));
+    $this->drupalPost('admin/structure/domain/add', $edit, 'Save');
 
     // Did it save correctly?
     $default_id = domain_default_id();
-    $this->assertTrue(!empty($default_id), t('Domain record saved via form.'));
+    $this->assertTrue(!empty($default_id), 'Domain record saved via form.');
 
     // Does it load correctly?
     $new_domain = domain_load($default_id);
@@ -59,6 +65,9 @@ class DomainForms extends DomainTestBase {
 
     // Delete the record.
     $this->drupalPost($postUrl, $edit, t('Delete'));
+    $domain = domain_load($default_id, TRUE);
+    $this->assertTrue(empty($domain), 'Domain record deleted.');
+
 
     // No domains should exist.
     $this->domainTableIsEmpty();
