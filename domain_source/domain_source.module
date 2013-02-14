@@ -269,12 +269,14 @@ function domain_source_node_view($node, $view_mode) {
 function domain_source_lookup($nid) {
   $_domain = domain_get_domain();
   $source = FALSE;
-  $node = node_load($nid);
-  if ($node->domain_source == DOMAIN_SOURCE_USE_ACTIVE) {
-    $source = $node->domain_source;
-  }
-  elseif ($domain = domain_load($node->domain_source)) {
-    $source = $domain['domain_id'];
+  // Ensure that the $node is valid.
+  if ($node = node_load($nid)) {
+    if ($node->domain_source == DOMAIN_SOURCE_USE_ACTIVE) {
+      $source = $node->domain_source;
+    }
+    elseif ($domain = domain_load($node->domain_source)) {
+      $source = $domain['domain_id'];
+    }
   }
   return $source;
 }
