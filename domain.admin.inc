@@ -32,16 +32,16 @@ function domain_overview_form($form, &$form_state, $domains) {
     array('data' => t('Operations')),
   );
 
+  $form['#tree'] = TRUE;
   // @TODO: re-order this form structure.
   $form['domains'] = array(
     '#type' => 'table',
     '#header' => $header,
-    '#tree' => TRUE,
     '#empty' => t('There are no domains yet. <a href="@add-url">Add a domain.</a>', array(
       '@add-url' => url('admin/structure/domain/add'),
     )),
     '#tabledrag' => array(
-      array('domains', 'order', 'sibling', 'domain-weight'),
+      array('order', 'sibling', 'domain-weight'),
     ),
   );
 
@@ -148,7 +148,6 @@ function domain_overview_form($form, &$form_state, $domains) {
  */
 function domain_overview_form_submit($form, &$form_state) {
   $values = $form_state['values']['domains'];
-dpm($form_state['values']);
   foreach ($values as $machine_name => $value) {
     db_update('domain')
       ->fields(array('weight' => $value['weight']))
