@@ -6,6 +6,7 @@
  */
 
 use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Set all affiliates as a default value for forms.
