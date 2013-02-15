@@ -82,3 +82,23 @@ function domain_schema() {
   );
   return $schema;
 }
+
+/**
+ * Implements hook_field_schema().
+ */
+function domain_field_schema($field) {
+  $columns = array(
+    'realm' => array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+    ),
+    'gid' => array(
+      'type' => 'int',
+      'not null' => FALSE,
+    ),
+  );
+  return array(
+    'columns' => $columns,
+  );
+}

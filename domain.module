@@ -8,6 +8,16 @@
 use Drupal\domain\Plugin\Core\Entity\Domain;
 
 /**
+ * Set all affiliates as a default value for forms.
+ */
+const DOMAIN_ALL_AFFILIATES = 'DOMAIN_ALL_AFFILIATES';
+
+/**
+ * Set the current domain as a default value for forms.
+ */
+const DOMAIN_CURRENT_DOMAIN = 'DOMAIN_CURRENT_DOMAIN';
+
+/**
  * Implements hook_permission().
  */
 function domain_permission() {
@@ -185,6 +195,76 @@ function domain_field_extra_fields() {
 }
 
 /**
+ * Implements hook_field_info().
+ */
+function domain_field_info() {
+  return array(
+    'domain' => array(
+      'label' => t('Domain'),
+      'description' => t('This field stores a domain reference for an entity.'),
+      'instance_settings' => array('all_affiliates' => TRUE),
+      'default_widget' => 'domain',
+      'default_formatter' => 'domain',
+      'field item class' => '\Drupal\domain\Type\DomainItem',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_settings_form().
+ */
+function domain_field_settings_form($field, $instance, $has_data) {
+  $settings = $field['settings'];
+  $form = array();
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_instance_settings_form().
+ */
+function domain_field_instance_settings_form($field, $instance) {
+  $settings = $instance['settings'];
+  $form = array();
+  return $form;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function domain_field_is_empty($item, $field) {
+  if (empty($item) && (string) $item !== '0') {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_field_presave().
+ *
+ * @TODO: Should this logic move to setValue() in the Type class?
+ */
+function domain_field_presave(EntityInterface $entity, $field, $instance, $langcode, &$items) {
+  $data = $items[0];
+  $result = array();
+  $i = 0;
+  if (!empty($data[DOMAIN_ALL_AFFILIATES])) {
+    $result[$i]['realm'] = 'domain_site';
+    $result[$i]['gid'] = 0;
+    unset($data[DOMAIN_ALL_AFFILIATES]);
+    $i++;
+  }
+  foreach (array_filter($data) as $key => $value) {
+    if ($domain = domain_machine_name_load($key)) {
+      $result[$i]['realm'] = 'domain_id';
+      $result[$i]['gid'] = $domain->domain_id;
+      $i++;
+    }
+  }
+  $items = $result;
+}
+
+/**
  * Returns the id of the default domain.
  *
  * @return
@@ -327,11 +407,68 @@ function domain_required_fields() {
   return array('hostname', 'name', 'machine_name', 'scheme', 'status', 'weight');
 }
 
+/**
+ * @TODO: move to a method.
+ */
 function domain_get_uri(Domain $domain) {
   return 'foo';
 }
 
+/**
+ * Returns the current domain record.
+ *
+ * @TODO: this is a placeholder for testing.
+ */
 function domain_get_domain() {
   $active = domain_create(TRUE);
   return $active;
+}
+
+/**
+ * Returns an array of domains for use in a form.
+ *
+ * @param boolean $filter
+ *   Indicates whether the list should be filtered based on user permissions.
+ *
+ * @return array
+ *   An array of domain values keyed by machine_name.
+ */
+function domain_options_list($filter = TRUE) {
+  $list = array();
+  $domains = domain_load_multiple();
+  foreach ($domains as $domain) {
+    // @TODO: filter this list.
+    $list[$domain->machine_name] = $domain->name;
+  }
+  return $list;
+}
+
+/**
+ * Reads an array of field items to domain records.
+ *
+ * @param array $items
+ *   An $items array returned from a field element.
+ * @param $keys
+ *   Boolean indicator that only the matching keys should be returned.
+ *   If set to FALSE, a $domain entity is returned for each record except for
+ *   the DOMAIN_ALL_AFFILIATES constant.
+ *
+ * @return array
+ *   An array of domains matching the values from the form element. Note that
+ *   we are translating from machine_name to numeric gid for entity access.
+ */
+function domain_extract_items(array $items, $keys = FALSE) {
+  $values = array();
+  foreach ($items as $key => $value) {
+    if ($value['realm'] == 'domain_site') {
+      $values[DOMAIN_ALL_AFFILIATES] = DOMAIN_ALL_AFFILIATES;
+    }
+    elseif ($domain = domain_load($value['gid'])) {
+      $values[$domain->machine_name] = $domain;
+    }
+  }
+  if ($keys) {
+    return array_keys($values);
+  }
+  return $values;
 }
