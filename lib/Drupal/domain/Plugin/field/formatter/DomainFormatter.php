@@ -41,8 +41,10 @@ class DomainFormatter extends FormatterBase {
         $list[] = check_plain($domain->name);
       }
     }
-    $elements[] = array('#markup' => theme('item_list', array('items' => $list)));
-    return $elements;
+    if (!empty($list)) {
+      $elements[] = array('#markup' => theme('item_list', array('items' => $list)));
+      return $elements;
+    }
   }
 
 }

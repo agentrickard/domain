@@ -246,7 +246,17 @@ function domain_field_is_empty($item, $field) {
  * @TODO: Should this logic move to setValue() in the Type class?
  */
 function domain_field_presave(EntityInterface $entity, $field, $instance, $langcode, &$items) {
-  $data = $items[0];
+  if (isset($items[0]['realm'])) {
+    $values = domain_extract_items($items, TRUE);
+    if (!empty($values)) {
+      foreach ($values as  $value) {
+        $data[$value] = $value;
+      }
+    }
+  }
+  else {
+    $data = $items[0];
+  }
   $result = array();
   $i = 0;
   if (!empty($data[DOMAIN_ALL_AFFILIATES])) {
