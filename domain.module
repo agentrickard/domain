@@ -125,6 +125,64 @@ function domain_edit_access() {
   return FALSE;
 }
 
+/**
+ * Implements hook_entity_bundle_info().
+ */
+function domain_entity_bundle_info() {
+  $bundles['domain']['domain'] = array(
+    'label' => t('Domain record'),
+    'admin' => array(
+      'path' => 'admin/structure/domain',
+    ),
+  );
+  return $bundles;
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function domain_field_extra_fields() {
+  $fields = array(
+    'hostname' => array(
+      'label' => t('Domain'),
+      'description' => t('The domain hostname.'),
+      'weight' => -12,
+    ),
+    'name' => array(
+      'label' => t('Name'),
+      'description' => t('Human-readable name.'),
+      'weight' => -10,
+    ),
+    'scheme' => array(
+      'label' => t('Scheme'),
+      'description' => t('The host scheme.'),
+      'weight' => -8,
+    ),
+    'status' => array(
+      'label' => t('Status'),
+      'description' => t('Record status.'),
+      'weight' => -6,
+    ),
+    'weight' => array(
+      'label' => t('Weight'),
+      'description' => t('Sort weight.'),
+      'weight' => -4,
+    ),
+    'is_default' => array(
+      'label' => t('Default domain'),
+      'description' => t('Indicates the default domain.'),
+      'weight' => -2,
+    ),
+  );
+  $extra['domain']['domain']['form'] = $fields;
+  $extra['domain']['domain']['display'] = $fields;
+  $extra['domain']['domain']['display']['domain_id'] = array(
+    'label' => t('Id'),
+    'description' => t('The domain record id.'),
+    'weight' => -14,
+  );
+  return $extra;
+}
 
 /**
  * Returns the id of the default domain.

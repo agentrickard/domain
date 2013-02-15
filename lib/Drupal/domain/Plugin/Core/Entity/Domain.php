@@ -19,13 +19,15 @@ use Drupal\Core\Annotation\Translation;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   controller_class = "Drupal\domain\DomainStorageController",
+ *   render_controller_class = FALSE,
  *   form_controller_class = {
  *     "default" = "Drupal\domain\DomainFormController"
  *   },
  *   base_table = "domain",
+ *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "domain_id",
- *     "label" = "sitename"
+ *     "label" = "name"
  *   },
  *   view_modes = {
  *     "full" = {
