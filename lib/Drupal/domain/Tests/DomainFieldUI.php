@@ -82,7 +82,6 @@ class DomainFieldUI extends DomainTestBase {
 
     // Check the new field.
     $this->assertText('Test field', 'Added a test field display instance.');
-
   }
 
 }
