@@ -212,25 +212,6 @@ function domain_field_info() {
 }
 
 /**
- * Implements hook_field_settings_form().
- */
-function domain_field_settings_form($field, $instance, $has_data) {
-  $settings = $field['settings'];
-  $form = array();
-
-  return $form;
-}
-
-/**
- * Implements hook_field_instance_settings_form().
- */
-function domain_field_instance_settings_form($field, $instance) {
-  $settings = $instance['settings'];
-  $form = array();
-  return $form;
-}
-
-/**
  * Implements hook_field_is_empty().
  */
 function domain_field_is_empty($item, $field) {
@@ -246,6 +227,7 @@ function domain_field_is_empty($item, $field) {
  * @TODO: Should this logic move to setValue() in the Type class?
  */
 function domain_field_presave(EntityInterface $entity, $field, $instance, $langcode, &$items) {
+  // Handle field saves from an entity_load().
   if (isset($items[0]['realm'])) {
     $values = domain_extract_field_items($items, TRUE);
     if (!empty($values)) {
@@ -254,6 +236,7 @@ function domain_field_presave(EntityInterface $entity, $field, $instance, $langc
       }
     }
   }
+  // Handles saves from a form checkbox set.
   else {
     $data = $items[0];
   }
@@ -266,13 +249,17 @@ function domain_field_presave(EntityInterface $entity, $field, $instance, $langc
     $i++;
   }
   foreach (array_filter($data) as $key => $value) {
-    if ($domain = domain_machine_name_load($key)) {
+    if ($domain = domain_machine_name_load($key, TRUE)) {
       $result[$i]['realm'] = 'domain_id';
       $result[$i]['gid'] = $domain->domain_id;
       $i++;
     }
   }
+  // Prepare items for saving.
   $items = $result;
+  // Add domain information to the entity for storage, if required.
+  // This approach is much simpler than trying to find the field instance.
+  $entity->domain[$field['field_name']] = $result;
 }
 
 /**

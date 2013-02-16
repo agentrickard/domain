@@ -55,4 +55,39 @@ abstract class DomainTestBase extends WebTestBase {
     return $edit;
   }
 
+  public function domainCreateTestDomains($count = 1, $basename = NULL) {
+    $original_domains = domain_load_multiple(NULL, TRUE);
+    if (empty($basename)) {
+      $basename = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    }
+    $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
+    for ($i = 0; $i < $count; $i++) {
+      // Note: these domains are rigged to work on my test server.
+      if (!empty($list[$i])) {
+        if ($i < 11) {
+          $hostname = $list[$i] . '.' . $basename;
+          $name = ucfirst($list[$i]);
+        }
+        // These domains are not.
+        else {
+          $hostname = 'test' . $i . '.' . $basename;
+          $name = 'Test ' . $i;
+        }
+      }
+      else {
+        $hostname = $basename;
+        $name = 'Example';
+      }
+      // Create a new domain programmatically.
+      $domain = domain_create();
+      // Now add the additional fields and save.
+      $domain->hostname = $hostname;
+      $domain->machine_name = domain_machine_name($domain->hostname);
+      $domain->name = $name;
+      $domain->save();
+    }
+    $domains = domain_load_multiple(NULL, TRUE);
+    $this->assertTrue((count($domains) - count($original_domains)) == $count, format_string('Created %count new domains.', array('%count' => $count)));
+  }
+
 }

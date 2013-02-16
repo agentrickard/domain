@@ -37,6 +37,7 @@ class DomainFieldUI extends DomainTestBase {
 
     // Visit the domain field administration page.
     $this->drupalGet('admin/structure/domain/fields');
+    $this->assertResponse(200);
 
     // Check for the extra fields.
     $fields = domain_field_extra_fields();
@@ -47,6 +48,7 @@ class DomainFieldUI extends DomainTestBase {
 
     // Visit the domain field display administration page.
     $this->drupalGet('admin/structure/domain/display');
+    $this->assertResponse(200);
 
     // Check for the extra fields.
     $items = $fields['domain']['domain']['display'];
