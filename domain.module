@@ -247,7 +247,7 @@ function domain_field_is_empty($item, $field) {
  */
 function domain_field_presave(EntityInterface $entity, $field, $instance, $langcode, &$items) {
   if (isset($items[0]['realm'])) {
-    $values = domain_extract_items($items, TRUE);
+    $values = domain_extract_field_items($items, TRUE);
     if (!empty($values)) {
       foreach ($values as  $value) {
         $data[$value] = $value;
@@ -468,7 +468,7 @@ function domain_options_list($filter = TRUE) {
  *   An array of domains matching the values from the form element. Note that
  *   we are translating from machine_name to numeric gid for entity access.
  */
-function domain_extract_items(array $items, $keys = FALSE) {
+function domain_extract_field_items(array $items, $keys = FALSE) {
   $values = array();
   foreach ($items as $key => $value) {
     if ($value['realm'] == 'domain_site') {

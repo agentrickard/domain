@@ -76,7 +76,7 @@ class DomainWidget extends WidgetBase {
       }
       // We are loading entity data. Read it now.
       else {
-        $default_value = domain_extract_items($items, TRUE);
+        $default_value = domain_extract_field_items($items, TRUE);
       }
       if (!empty($instance->definition['widget']['settings']['all_affiliates'])) {
         $options[DOMAIN_ALL_AFFILIATES] = t('Send to all affiliates');

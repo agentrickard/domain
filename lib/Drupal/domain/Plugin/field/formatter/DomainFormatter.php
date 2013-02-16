@@ -31,7 +31,7 @@ class DomainFormatter extends FormatterBase {
    */
   public function viewElements(EntityInterface $entity, $langcode, array $items) {
     $elements = array();
-    $data = domain_extract_items($items);
+    $data = domain_extract_field_items($items);
     $list = array();
     foreach ($data as $machine_name => $domain) {
       if ($machine_name == DOMAIN_ALL_AFFILIATES) {
