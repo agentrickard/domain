@@ -17,8 +17,6 @@ class DomainItem extends FieldItemBase {
   /**
    * Definitions of the contained properties.
    *
-   * @see TextItem::getPropertyDefinitions()
-   *
    * @var array
    */
   static $propertyDefinitions;
@@ -27,7 +25,6 @@ class DomainItem extends FieldItemBase {
    * Implements ComplexDataInterface::getPropertyDefinitions().
    */
   public function getPropertyDefinitions() {
-
     if (!isset(static::$propertyDefinitions)) {
       static::$propertyDefinitions['realm'] = array(
         'type' => 'varchar',
@@ -40,4 +37,5 @@ class DomainItem extends FieldItemBase {
     }
     return static::$propertyDefinitions;
   }
+
 }
