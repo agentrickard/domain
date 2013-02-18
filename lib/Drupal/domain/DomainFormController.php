@@ -24,7 +24,7 @@ class DomainFormController extends EntityFormController {
     );
     $form['hostname'] = array(
       '#type' => 'textfield',
-      '#title' => t('Domain'),
+      '#title' => t('Hostname'),
       '#size' => 40,
       '#maxlength' => 80,
       '#default_value' => $domain->hostname,
