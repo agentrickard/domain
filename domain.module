@@ -228,7 +228,6 @@ function domain_field_extra_fields() {
     'description' => t('The domain record id.'),
     'weight' => -14,
   );
-  dpm($extra);
   return $extra;
 }
 
