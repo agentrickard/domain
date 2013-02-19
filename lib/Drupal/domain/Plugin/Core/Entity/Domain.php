@@ -19,7 +19,7 @@ use Drupal\Core\Annotation\Translation;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   controller_class = "Drupal\domain\DomainStorageController",
- *   render_controller_class = FALSE,
+ *   render_controller_class = "Drupal\domain\DomainRenderController",
  *   form_controller_class = {
  *     "default" = "Drupal\domain\DomainFormController"
  *   },

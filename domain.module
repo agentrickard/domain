@@ -111,7 +111,22 @@ function domain_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'domain.admin.inc',
   );
-
+  $items['domain'] = array(
+    'title' => 'Domains',
+    'page callback' => 'domain_page',
+    'access callback' => 'domain_create_access',
+    'file' => 'domain.pages.inc',
+  );
+  $items['domain/%domain_machine_name'] = array(
+    'title' => 'Domain',
+    'title callback' => 'domain_page_title',
+    'title arguments' => array(1),
+    'page callback' => 'domain_page_view',
+    'page arguments' => array(1),
+    'access callback' => 'domain_view_access',
+    'access arguments' => array(1),
+    'file' => 'domain.pages.inc',
+  );
   return $items;
 }
 
@@ -134,6 +149,27 @@ function domain_edit_access() {
     return TRUE;
   }
   return FALSE;
+}
+
+/**
+ * Checks to see if a user may view an existing domain record.
+ */
+function domain_view_access() {
+  // @TODO conditional check in the second permission.
+  if (user_access('administer domains') || user_access('edit assigned domains')) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Returns the page title for a domain record.
+ *
+ * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ *   A domain entity.
+ */
+function domain_page_title(Domain $domain) {
+  return check_plain($domain->name);
 }
 
 /**
@@ -192,6 +228,7 @@ function domain_field_extra_fields() {
     'description' => t('The domain record id.'),
     'weight' => -14,
   );
+  dpm($extra);
   return $extra;
 }
 
@@ -349,6 +386,9 @@ function domain_machine_name_load_multiple(array $machine_names = NULL, $reset =
 
 /**
  * Saves a domain record.
+ *
+ * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ *   A domain entity.
  */
 function domain_save(Domain $domain) {
   $domain->save();
@@ -469,4 +509,40 @@ function domain_extract_field_items(array $items, $keys = FALSE) {
     return array_keys($values);
   }
   return $values;
+}
+
+/**
+ * Generates an array for rendering the given node.
+ *
+ * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ *   A domain entity.
+ * @param $view_mode
+ *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'full.'
+ * @param $langcode
+ *   (optional) A language code to use for rendering. Defaults to NULL which is
+ *   the global content language of the current request.
+ *
+ * @return
+ *   An array as expected by drupal_render().
+ */
+function domain_view(Domain $domain, $view_mode = 'full', $langcode = NULL) {
+  return entity_view($domain, $view_mode, $langcode);
+}
+
+/**
+ * Constructs a drupal_render() style array from an array of loaded domains.
+ *
+ * @param $domains
+ *   An array of domains as returned by domain_load_multiple().
+ * @param $view_mode
+ *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'teaser.'
+ * @param $langcode
+ *   (optional) A language code to use for rendering. Defaults to the global
+ *   content language of the current request.
+ *
+ * @return
+ *   An array in the format expected by drupal_render().
+ */
+function domain_view_multiple($domains, $view_mode = 'teaser', $langcode = NULL) {
+  return entity_view_multiple($domains, $view_mode, $langcode);
 }
