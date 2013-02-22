@@ -422,12 +422,28 @@ function domain_create($inherit = FALSE) {
     'is_default' => (int) empty($default),
   );
   if ($inherit) {
-    $values['hostname'] = $_SERVER['HTTP_HOST'];
+    $values['hostname'] = domain_hostname();
     $values['name'] = variable_get('sitename', 'Drupal');
     $values['machine_name'] = domain_machine_name($values['hostname']);
   }
   $domain = entity_create('domain', $values);
   return $domain;
+}
+
+/**
+ * Creates a base hostname for the current request.
+ *
+ * This function is used extensively in testing and domain creation, as it
+ * ensures that our code is agnostic of the current server.
+ *
+ * @TODO: This may be replaced be Request objects at a later point.
+ *
+ * @return string
+ *   The hostname portion of the current HTTP request, or 'localhost' if one is
+ *   not set.
+ */
+function domain_hostname() {
+  return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
 }
 
 /**

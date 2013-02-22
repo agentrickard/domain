@@ -38,7 +38,7 @@ abstract class DomainTestBase extends WebTestBase {
     }
 
     // Set the base hostname for domains.
-    $this->base_hostname = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    $this->base_hostname = domain_hostname();
   }
 
   /**
