@@ -173,6 +173,15 @@ function domain_page_title(Domain $domain) {
 }
 
 /**
+ * Entity URI callback.
+ */
+function domain_uri(Domain $domain) {
+  return array(
+    'path' => 'domain/' . $domain->machine_name,
+  );
+}
+
+/**
  * Implements hook_entity_bundle_info().
  */
 function domain_entity_bundle_info() {
@@ -236,13 +245,13 @@ function domain_field_extra_fields() {
  */
 function domain_field_info() {
   return array(
-    'domain' => array(
-      'label' => t('Domain'),
-      'description' => t('This field stores a domain reference for an entity.'),
-      'instance_settings' => array('all_affiliates' => TRUE),
-      'default_widget' => 'domain',
-      'default_formatter' => 'domain',
-      'field item class' => '\Drupal\domain\Type\DomainItem',
+    'domain_all' => array(
+      'label' => t('Domain all affiliates'),
+      'description' => t('This field stores a domain all affiliates entry for an entity.'),
+      'instance_settings' => array(),
+      'default_widget' => 'options_buttons',
+      'default_formatter' => 'list_default',
+      'field item class' => '\Drupal\number\Type\IntegerItem',
     ),
   );
 }

@@ -7,6 +7,7 @@
 
 namespace Drupal\domain\Plugin\Core\Entity;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
@@ -34,10 +35,11 @@ use Drupal\Core\Annotation\Translation;
  *       "label" = "Domain record",
  *       "custom_settings" = FALSE
  *     }
- *   }
+ *   },
+ *   menu_base_path = "domain/%domain_machine_name"
  * )
  */
-class Domain extends Entity {
+class Domain extends Entity implements ContentEntityInterface {
 
   /**
    * The domain record id.

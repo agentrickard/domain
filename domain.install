@@ -88,12 +88,7 @@ function domain_schema() {
  */
 function domain_field_schema($field) {
   $columns = array(
-    'realm' => array(
-      'type' => 'varchar',
-      'length' => 255,
-      'not null' => FALSE,
-    ),
-    'gid' => array(
+    'all_affiliates' => array(
       'type' => 'int',
       'not null' => FALSE,
     ),

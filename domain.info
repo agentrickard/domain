@@ -4,4 +4,5 @@ package = Domain
 version = VERSION
 core = 8.x
 dependencies[] = options
+dependencies[] = entity_reference
 configure = admin/structure/domain

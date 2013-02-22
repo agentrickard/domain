@@ -85,18 +85,17 @@ class DomainField extends DomainTestBase {
     // Check the new field exists on the page.
     $this->assertText('Domain test field', 'Found the domain field instance.');
 
-    // We expect to find 6 domain options, including 'Send to all affiliates.'
+    // We expect to find 5 domain options.
     $domains = domain_load_multiple();
-    $this->assertRaw('value="DOMAIN_ALL_AFFILIATES"', 'Found the <em>Send to all affiliates</em> option.');
     foreach ($domains as $domain) {
-      $string = 'value="' . $domain->machine_name . '"';
+      $string = 'value="' . $domain->domain_id . '"';
       $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->name)));
     }
 
     // Try to post a node.
     $edit['title'] = 'Test node';
-    $edit["field_domain[und][value][example_com]"] = TRUE;
-    $edit["field_domain[und][value][one_example_com]"] = TRUE;
+    $edit["field_domain[und][1]"] = TRUE;
+    $edit["field_domain[und][2]"] = TRUE;
     $this->drupalPost('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
     $node = node_load(1);
@@ -106,14 +105,19 @@ class DomainField extends DomainTestBase {
 
   /**
    * Creates a simple field for testing on the article content type.
+   *
+   * @TODO: This code is a model for auto-creation of fields.
    */
   function domainCreateTestField() {
     $label = 'domain';
 
     $field = array(
       'field_name' => 'field_' . $label,
-      'type' => 'domain',
+      'type' => 'entity_reference',
       'cardinality' => -1,
+      'settings' => array(
+        'target_type' => 'domain',
+      ),
     );
     field_create_field($field);
 
@@ -122,6 +126,15 @@ class DomainField extends DomainTestBase {
       'entity_type' => 'node',
       'label' => 'Domain test field',
       'bundle' => 'article',
+      'widget' => array(
+        'type' => 'options_buttons',
+        'module' => 'options',
+      ),
+      'settings' => array(
+        'handler_settings' => array(
+          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+        ),
+      ),
     );
     field_create_instance($instance);
   }
