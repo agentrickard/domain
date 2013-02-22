@@ -97,3 +97,11 @@ function domain_field_schema($field) {
     'columns' => $columns,
   );
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function domain_uninstall() {
+  // Remove actions.
+  db_delete('actions')->condition('type', 'domain')->execute();
+}
