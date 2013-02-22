@@ -15,6 +15,14 @@ use Drupal\domain\Plugin\Core\Entity\Domain;
 abstract class DomainTestBase extends WebTestBase {
 
   /**
+   * Sets a base hostname for running tests.
+   *
+   * When creating test domains, try to use $this->base_hostname or the
+   * domainCreateTestDomains() method.
+   */
+  public $base_hostname;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -28,6 +36,9 @@ abstract class DomainTestBase extends WebTestBase {
     if ($this->profile != 'standard') {
       $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
     }
+
+    // Set the base hostname for domains.
+    $this->base_hostname = !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
   }
 
   /**
@@ -55,27 +66,28 @@ abstract class DomainTestBase extends WebTestBase {
     return $edit;
   }
 
-  public function domainCreateTestDomains($count = 1, $basename = NULL) {
+  public function domainCreateTestDomains($count = 1, $base_hostname = NULL) {
     $original_domains = domain_load_multiple(NULL, TRUE);
-    if (empty($basename)) {
-      $basename = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    if (empty($base_hostname)) {
+      $base_hostname = $this->base_hostname;
     }
+    // Note: these domains are rigged to work on my test server.
+    // For proper testing, yours should be set up similarly.
     $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
     for ($i = 0; $i < $count; $i++) {
-      // Note: these domains are rigged to work on my test server.
       if (!empty($list[$i])) {
         if ($i < 11) {
-          $hostname = $list[$i] . '.' . $basename;
+          $hostname = $list[$i] . '.' . $base_hostname;
           $name = ucfirst($list[$i]);
         }
-        // These domains are not.
+        // These domains are not setup and are just for UX testing.
         else {
-          $hostname = 'test' . $i . '.' . $basename;
+          $hostname = 'test' . $i . '.' . $base_hostname;
           $name = 'Test ' . $i;
         }
       }
       else {
-        $hostname = $basename;
+        $hostname = $base_hostname;
         $name = 'Example';
       }
       // Create a new domain programmatically.

@@ -92,7 +92,7 @@ class DomainField extends DomainTestBase {
       $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->name)));
     }
 
-    // Try to post a node.
+    // Try to post a node, assigned to the first two domains.
     $edit['title'] = 'Test node';
     $edit["field_domain[und][1]"] = TRUE;
     $edit["field_domain[und][2]"] = TRUE;

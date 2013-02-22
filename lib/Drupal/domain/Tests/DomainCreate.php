@@ -37,7 +37,7 @@ class DomainCreate extends DomainTestBase {
       $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to default value: %value.', array('!key' => $key, '!value' => $domain->{$key})));
     }
     // Now add the additional fields and save.
-    $domain->hostname = $_SERVER['HTTP_HOST'];
+    $domain->hostname = $this->base_hostname;
     $domain->machine_name = domain_machine_name($domain->hostname);
     $domain->name = 'Default';
     $domain->save();
@@ -69,11 +69,3 @@ class DomainCreate extends DomainTestBase {
   }
 
 }
-
-  /**
-   * Validate a domain hostname.
-
-  function testDomainValidate() {
-
-  }
-   */
