@@ -18,6 +18,12 @@ function domain_schema() {
         'not null' => TRUE,
         'description' => 'Domain numeric id.'
       ),
+      'uuid' => array(
+        'description' => 'Unique Key: Universally unique identifier for this entity.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => FALSE,
+      ),
       'hostname' => array(
         'type' => 'varchar',
         'length' => '255',
@@ -77,6 +83,7 @@ function domain_schema() {
     ),
     'unique keys' => array(
       'machine_name' => array('machine_name'),
+      'uuid' => array('uuid'),
     ),
     'foreign_keys' => array(),
   );
@@ -103,5 +110,7 @@ function domain_field_schema($field) {
  */
 function domain_uninstall() {
   // Remove actions.
-  db_delete('actions')->condition('type', 'domain')->execute();
+  if (db_table_exists('actions')) {
+    db_delete('actions')->condition('type', 'domain')->execute();
+  }
 }

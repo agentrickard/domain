@@ -50,6 +50,9 @@ class DomainCreate extends DomainTestBase {
     $new_domain = domain_load($default_id);
     $this->assertTrue($new_domain->machine_name == $domain->machine_name, 'Domain loaded properly.');
 
+    // Has a UUID been set?
+    $this->assertTrue(!empty($new_domain->uuid), 'Entity UUID set properly.');
+
     // Delete the domain.
     $domain->delete();
     $domain = domain_load($default_id, TRUE);

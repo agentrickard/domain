@@ -28,7 +28,8 @@ use Drupal\Core\Annotation\Translation;
  *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "domain_id",
- *     "label" = "name"
+ *     "label" = "name",
+ *     "uuid" = "uuid"
  *   },
  *   view_modes = {
  *     "full" = {
@@ -47,6 +48,13 @@ class Domain extends Entity implements ContentEntityInterface {
    * @var integer
    */
   public $domain_id;
+
+  /**
+   * The domain UUID.
+   *
+   * @var string
+   */
+  public $uuid;
 
   /**
    * Canonical hostname.
