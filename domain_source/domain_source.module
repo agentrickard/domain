@@ -261,20 +261,18 @@ function domain_source_node_view($node, $view_mode) {
  * Get the source domains for multiple matches, mimicking node_load().
  *
  * @param $nid
- *  A node id.
+ *   A node id.
  *
  * @return
- *  The domain_id of the canonical source domain or FALSE if not set.
+ *   The domain_id of the canonical source domain or FALSE if not set.
  */
 function domain_source_lookup($nid) {
-  $_domain = domain_get_domain();
   $source = FALSE;
-  // Ensure that the $node is valid.
-  if ($node = node_load($nid)) {
-    if ($node->domain_source == DOMAIN_SOURCE_USE_ACTIVE) {
-      $source = $node->domain_source;
+  if ($domain_source = db_query("SELECT domain_id FROM {domain_source} WHERE nid = :nid", array(':nid' => $nid))->fetchField()) {
+    if ($domain_source == DOMAIN_SOURCE_USE_ACTIVE) {
+      $source = $domain_source;
     }
-    elseif ($domain = domain_load($node->domain_source)) {
+    elseif ($domain = domain_load($domain_source)) {
       $source = $domain['domain_id'];
     }
   }
