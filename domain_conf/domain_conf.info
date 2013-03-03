@@ -3,7 +3,3 @@ description = Advanced site configuration options for Domain Access.
 package = Domain Access
 dependencies[] = domain
 core = 7.x
-files[] = domain_conf.admin.inc
-files[] = domain_conf.domain.inc
-files[] = domain_conf.install
-files[] = domain_conf.module

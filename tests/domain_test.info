@@ -5,4 +5,4 @@ core = 7.x
 hidden = TRUE
 
 dependencies[] = domain
-files[] = domain_test.domain.inc
+files[] = domain.test

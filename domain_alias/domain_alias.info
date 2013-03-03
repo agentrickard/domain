@@ -3,7 +3,3 @@ description = "Advanced domain matching methods for Domain Access."
 core = 7.x
 package = Domain Access
 dependencies[] = domain
-files[] = domain_alias.admin.inc
-files[] = domain_alias.domain.inc
-files[] = domain_alias.install
-files[] = domain_alias.module

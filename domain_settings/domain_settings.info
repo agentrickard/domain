@@ -4,4 +4,3 @@ package = Domain Access
 dependencies[] = domain
 dependencies[] = domain_conf
 core = 7.x
-files[] = domain_settings.module
