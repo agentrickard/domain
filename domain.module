@@ -1961,6 +1961,9 @@ function domain_node_grants($account, $op) {
   }
   else {
     // The $account may not have domain information loaded, so get it.
+    if (!isset($account->domain_user)) {
+      $account->domain_user = domain_get_user_domains($account);
+    }
     $domains = $account->domain_user;
     $perm = 'delete domain content';
     if ($op == 'update') {
