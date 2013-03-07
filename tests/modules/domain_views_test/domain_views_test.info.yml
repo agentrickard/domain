@@ -1,0 +1,10 @@
+name: "Domain module views tests"
+description: "Support module for domain views testing."
+package: Testing
+version: VERSION
+core: 8.x
+hidden: TRUE
+
+dependencies:
+  - domain
+  - views
