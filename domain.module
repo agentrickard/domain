@@ -353,6 +353,24 @@ function domain_load($domain_id = NULL, $reset = FALSE) {
 }
 
 /**
+ * Return the domain entity matching a hostname.
+ *
+ * @param $hostname
+ *   The domain hostname.
+ *
+ * @return Drupal\domain\Plugin\Core\Entity\Domain|FALSE
+ *   The domain entity, if exists, FALSE otherwise. Results are
+ *   statically cached.
+ */
+function domain_load_hostname($hostname) {
+  $domains = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
+  if (empty($domains)) {
+    return FALSE;
+  }
+  return current($domains);
+}
+
+/**
  * Return the domain entity matching a domain machine name.
  *
  * @param $machine_name
