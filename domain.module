@@ -684,3 +684,10 @@ function domain_delete_action(Domain $domain) {
 function domain_set_default_action(Domain $domain) {
   $domain->saveDefault();
 }
+
+// TODO: move to test module.
+function domain_domain_load(array $domains) {
+  foreach ($domains as $domain) {
+    $domain->foo = 'bar';
+  }
+}

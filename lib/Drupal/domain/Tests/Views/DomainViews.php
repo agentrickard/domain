@@ -39,7 +39,7 @@ class DomainViews extends DomainTestBase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Domain Views',
+      'name' => 'Domain views',
       'description' => 'Tests the domain Views user interface.',
       'group' => 'Domain',
     );

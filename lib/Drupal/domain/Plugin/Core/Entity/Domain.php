@@ -106,6 +106,11 @@ class Domain extends Entity implements ContentEntityInterface {
   public $machine_name;
 
   /**
+   * The base URL for a domain. Derived.
+   */
+  public $path;
+
+  /**
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
