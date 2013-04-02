@@ -92,6 +92,38 @@ function domain_drush_command() {
       'domain_id' => 'The numeric id or hostname of the domain to make default.',
     ),
   );
+  $items['domain-name'] = array(
+    'description' => 'Changes a domain name.',
+    'examples' => array(
+      'drush domain-name example.com Foo',
+      'drush domain-name 1 Foo',
+    ),
+    'arguments' => array(
+      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+      'name' => 'The name to use for the domain.',
+    ),
+  );
+  $items['domain-machine-name'] = array(
+    'description' => 'Changes a domain name.',
+    'examples' => array(
+      'drush domain-name example.com Foo',
+      'drush domain-name 1 Foo',
+    ),
+    'arguments' => array(
+      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+      'name' => 'The name to use for the domain.',
+    ),
+  );
+  $items['domain-scheme'] = array(
+    'description' => 'Changes a domain scheme.',
+    'examples' => array(
+      'drush domain-scheme example.com',
+      'drush domain-scheme 1 Foo',
+    ),
+    'arguments' => array(
+      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+    ),
+  );
   $items['generate-domains'] = array(
     'description' => 'Generate domains for testing.',
     'arguments' => array(
@@ -471,7 +503,7 @@ function drush_domain_default($argument) {
         return;
       }
     }*/
-    $domain->setDefault();
+    $domain->saveDefault();
     drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->hostname)));
   }
 }
@@ -505,6 +537,52 @@ function drush_domain_enable($argument) {
     else {
       drush_print(dt('!domain is already enabled.', array('!domain' => $domain->hostname)));
     }
+  }
+}
+
+/**
+ * Changes a domain name.
+ */
+function drush_domain_name($argument, $name) {
+  // Resolve the domain.
+  if ($domain = drush_domain_get_from_argument($argument)) {
+    $domain->saveAttribute('name', $name);
+  }
+}
+
+/**
+ * Changes a domain machine_name.
+ */
+function drush_domain_machine_name($argument, $machine_name) {
+  $machine_name = domain_machine_name($machine_name);
+  // Resolve the domain.
+  if ($domain = drush_domain_get_from_argument($argument)) {
+    $results = entity_load_multiple_by_properties('domain', array('machine_name' => $machine_name));
+    foreach ($results as $result) {
+      if ($result->machine_name == $machine_name) {
+        drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', array('@machine_name' => $machine_name, '@hostname' => $result->hostname)));
+        return;
+      }
+    }
+    $domain->saveAttribute('machine_name', $machine_name);
+  }
+}
+
+/**
+ * Changes a domain scheme.
+ */
+function drush_domain_scheme($argument) {
+  // Resolve the domain.
+  if ($domain = drush_domain_get_from_argument($argument)) {
+    $content = drush_choice(array(1 => dt('http'), 2 => dt('https')), dt('Select the default http scheme:'), '!value');
+    if (empty($content)) {
+      return;
+    }
+    $scheme = 'http';
+    if ($content == 2) {
+      $scheme = 'https';
+    }
+    $domain->saveAttribute('scheme', $scheme);
   }
 }
 

@@ -322,6 +322,20 @@ function domain_default_id() {
 }
 
 /**
+ * Returns the default domain.
+ *
+ * @return Domain
+ *   The default domain or FALSE if none is set.
+ */
+function domain_default() {
+  $result = entity_load_multiple_by_properties('domain', array('is_default' => 1));
+  if (!empty($result)) {
+    return current($result);
+  }
+  return FALSE;
+}
+
+/**
  * Loads multiple domain records.
  *
  * @param array $domain_ids
@@ -668,5 +682,5 @@ function domain_delete_action(Domain $domain) {
  * @ingroup actions
  */
 function domain_set_default_action(Domain $domain) {
-  $domain->setDefault();
+  $domain->saveDefault();
 }

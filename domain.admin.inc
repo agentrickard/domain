@@ -200,7 +200,7 @@ function domain_admin_callback(Domain $domain, $action) {
   $success = FALSE;
   switch($action) {
     case 'default':
-      $domain->setDefault();
+      $domain->saveDefault();
       $verb = t('set as default');
       if ($domain->isDefault()) {
         $success = TRUE;

@@ -138,17 +138,16 @@ class Domain extends Entity implements ContentEntityInterface {
   /**
    * Makes a domain record the default.
    */
-  public function setDefault() {
+  public function saveDefault() {
     if (!$this->isDefault()) {
-      db_update('domain')
-        ->fields(array('is_default' => 1))
-        ->condition('machine_name', $this->machine_name)
-        ->execute();
-      db_update('domain')
-        ->fields(array('is_default' => 0))
-        ->condition('machine_name', $this->machine_name, '<>')
-        ->execute();
+      // Swap the current default.
+      if ($default = domain_default()) {
+        $default->is_default = 0;
+        $default->save();
+      }
+      // Save the new default.
       $this->is_default = 1;
+      $this->save();
     }
     else {
       drupal_set_message(t('The selected domain is already the default.'), 'warning');
@@ -159,11 +158,8 @@ class Domain extends Entity implements ContentEntityInterface {
    * Enables a domain record.
    */
   public function enable() {
-    db_update('domain')
-      ->fields(array('status' => 1))
-      ->condition('machine_name', $this->machine_name)
-      ->execute();
     $this->status = 1;
+    $this->save();
   }
 
   /**
@@ -171,14 +167,25 @@ class Domain extends Entity implements ContentEntityInterface {
    */
   public function disable() {
     if (!$this->isDefault()) {
-      db_update('domain')
-        ->fields(array('status' => 0))
-        ->condition('machine_name', $this->machine_name)
-        ->execute();
       $this->status = 0;
+      $this->save();
     }
     else {
       drupal_set_message(t('The default domain cannot be disabled.'), 'warning');
+    }
+  }
+
+  /**
+   * Saves a specific domain attribute.
+   */
+  public function saveAttribute($key, $value) {
+    if (isset($this->{$key})) {
+      $this->{$key} = $value;
+      $this->save();
+      drupal_set_message(t('The @key attribute was set to @value for domain @hostname.', array('@key' => $key, '@value' => $value, '@hostname' => $this->hostname)));
+    }
+    else {
+      drupal_set_message(t('The @key attribute does not exist.', array('@key' => $key)));
     }
   }
 
