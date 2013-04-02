@@ -72,6 +72,26 @@ function domain_drush_command() {
       'skip_check' => 'Bypass the domain response test.'
     ),
   );
+  $items['domain-disable'] = array(
+    'description' => 'Sets a domain status to off.',
+    'examples' => array(
+      'drush domain-disable example.com',
+      'drush domain-disable 1',
+    ),
+    'arguments' => array(
+      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+    ),
+  );
+  $items['domain-enable'] = array(
+    'description' => 'Sets a domain status to on.',
+    'examples' => array(
+      'drush domain-disable example.com',
+      'drush domain-disable 1',
+    ),
+    'arguments' => array(
+      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+    ),
+  );
   $items['generate-domains'] = array(
     'description' => 'Generate domains for testing.',
     'arguments' => array(
@@ -440,24 +460,52 @@ function drush_domain_test($argument = NULL) {
 function drush_domain_default($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    $domains = array($domain);
+    // TODO: Check for domain response.
+    /*
+    $check = drush_get_option('skip_check');
+    if (empty($check)) {
+      $error = domain_check_response($domain, TRUE);
+      if ($error) {
+        drush_set_error($error);
+        drush_print(dt('You may disable this error by passing --skip_check=1.'));
+        return;
+      }
+    }*/
+    $domain->setDefault();
+    drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->hostname)));
   }
-  else {
-    return;
-  }
-  // TODO: Check for domain response.
-  /*
-  $check = drush_get_option('skip_check');
-  if (empty($check)) {
-    $error = domain_check_response($domain, TRUE);
-    if ($error) {
-      drush_set_error($error);
-      drush_print(dt('You may disable this error by passing --skip_check=1.'));
-      return;
+}
+
+/**
+ * Disables a domain.
+ */
+function drush_domain_disable($argument) {
+  // Resolve the domain.
+  if ($domain = drush_domain_get_from_argument($argument)) {
+    if ($domain->status) {
+      $domain->disable();
+      drush_print(dt('!domain has been disabled.', array('!domain' => $domain->hostname)));
     }
-  }*/
-  $domain->setDefault();
-  drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->hostname)));
+    else {
+      drush_print(dt('!domain is already disabled.', array('!domain' => $domain->hostname)));
+    }
+  }
+}
+
+/**
+ * Enables a domain.
+ */
+function drush_domain_enable($argument) {
+  // Resolve the domain.
+  if ($domain = drush_domain_get_from_argument($argument)) {
+    if (!$domain->status) {
+      $domain->enable();
+      drush_print(dt('!domain has been enabled.', array('!domain' => $domain->hostname)));
+    }
+    else {
+      drush_print(dt('!domain is already enabled.', array('!domain' => $domain->hostname)));
+    }
+  }
 }
 
 /**
