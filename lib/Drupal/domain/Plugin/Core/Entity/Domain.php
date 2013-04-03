@@ -194,4 +194,18 @@ class Domain extends Entity implements ContentEntityInterface {
     }
   }
 
+  /**
+   * Sets the base path to this domain.
+   */
+  public function setPath() {
+    $this->path = domain_scheme($this->scheme) . $this->hostname . base_path();
+  }
+
+  /**
+   * Sets the domain-specific link to the current URL.
+   */
+  public function setUrl() {
+    $this->url = domain_scheme($this->scheme) . $this->hostname . request_uri();
+  }
+
 }

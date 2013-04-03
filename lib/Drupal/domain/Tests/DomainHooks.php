@@ -13,6 +13,14 @@ use Drupal\domain\Plugin\Core\Entity\Domain;
  */
 class DomainHooks extends DomainTestBase {
 
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('domain', 'domain_test');
+
+
   public static function getInfo() {
     return array(
       'name' => 'Domain module hooks',
@@ -33,7 +41,12 @@ class DomainHooks extends DomainTestBase {
 
     $domain = domain_load(1);
 
-    $this->assertTrue(isset($domain->foo), 'The foo value was set by hook_domain_load.');
+    // Internal hooks.
+    $this->assertTrue(isset($domain->path), format_string('The path property was set to %path by hook_entity_load.', array('%path' => $domain->path)));
+    $this->assertTrue(isset($domain->url), format_string('The url property was set to %url by hook_entity_load.', array('%url' => $domain->url)));
+
+    // External hooks.
+    $this->assertTrue($domain->foo == 'bar', 'The foo property was set to <em>bar</em> by hook_domain_load.');
   }
 
 }

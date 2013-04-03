@@ -685,9 +685,62 @@ function domain_set_default_action(Domain $domain) {
   $domain->saveDefault();
 }
 
-// TODO: move to test module.
-function domain_domain_load(array $domains) {
-  foreach ($domains as $domain) {
-    $domain->foo = 'bar';
+/**
+ * Implements hook_entity_load().
+ *
+ * The $domain->path and $domain->uri properties are derived from data in the
+ * {domain} table. We use the hook system to load that data to indicate that
+ * the data is not native to the object.
+ *
+ * This action is performed in hook_entity_load(), which precedes the running
+ * of hook_domain_load() and ensures that our data is present for other modules.
+ */
+function domain_entity_load(array $entities, $entity_type) {
+  if ($entity_type == 'domain') {
+    foreach ($entities as $domain) {
+      $domain->setPath();
+      $domain->setUrl();
+    }
   }
+}
+
+/**
+ * Ensure that the scheme value has not been hacked.
+ *
+ * Note that Domain Access only supports HTTP and HTTPS. Other protocols will
+ * be removed.
+ *
+ * @param $scheme
+ *   The request protocol for the requested domain.
+ * @param $add_suffix
+ *   Boolean indicator to add the :// string or not.
+ *
+ * @return
+ *  Either 'http' or 'https'.
+ */
+function domain_check_scheme($scheme, $add_suffix = FALSE) {
+  if ($scheme != 'https') {
+    $scheme = 'http';
+  }
+  $scheme .= ($add_suffix) ? '://' : '';
+
+  return $scheme;
+}
+
+/**
+ * Returns the proper scheme value for a domain, including the ://.
+ *
+ * Note that this function is largely a wrapper so that the signature of
+ * domain_check_scheme() doesn't change from Drupal 7.
+ *
+ * @see domain_check_scheme().
+ *
+ * @param $scheme
+ *   The request protocol for the requested domain.
+ *
+ * @return
+ *   Either http:// or https://.
+ */
+function domain_scheme($scheme) {
+  return domain_check_scheme($scheme, TRUE);
 }
