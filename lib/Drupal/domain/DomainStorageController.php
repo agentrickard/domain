@@ -15,4 +15,17 @@ use Drupal\Core\Entity\DatabaseStorageController;
  */
 class DomainStorageController extends DatabaseStorageController {
 
+  /**
+   * Sets the default domain properly.
+   */
+  protected function preSave(EntityInterface $entity) {
+    if (!empty($entity->is_default)) {
+      // Swap the current default.
+      if ($default = domain_default()) {
+        $default->is_default = 0;
+        $default->save();
+      }
+    }
+  }
+
 }

@@ -5,6 +5,9 @@
  * Drush commands for Domain Access.
  */
 
+use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * Implements hook_drush_command().
  */
@@ -34,6 +37,7 @@ function domain_drush_command() {
       'inactive' => 'Set the domain to inactive status if set.',
       'https' => 'Use https protocol for this domain if set.',
       'weight' => 'Set the order (weight) of the domain.',
+      'is_default' => 'Set this domain as the default domain.'
     ),
   );
   $items['domain-delete'] = array(
@@ -46,7 +50,6 @@ function domain_drush_command() {
       'domain' => 'The numeric id or hostname of the domain to delete.',
     ),
   );
-  /*
   $items['domain-test'] = array(
     'description' => 'Tests domains for proper response. If run from a subfolder, you must specify the --uri.',
     'examples' => array(
@@ -57,7 +60,10 @@ function domain_drush_command() {
     'arguments' => array(
       'domain_id' => 'The numeric id or hostname of the domain to test. If no value is passed, all domains are tested.',
     ),
-  );*/
+    'options' => array(
+      'base_path' => 'The subdirectory name if Drupal is installed in a folder other than server root.',
+    ),
+  );
   $items['domain-default'] = array(
     'description' => 'Sets the default domain. If run from a subfolder, you must specify the --uri.',
     'examples' => array(
@@ -275,7 +281,8 @@ function drush_domain_generate_domains($primary = 'example.com') {
       'is_default' => 0,
       'machine_name' => domain_machine_name($hostname),
     );
-    domain_drush_create($values);
+    $domain = domain_create(FALSE, $values);
+    domain_drush_create($domain);
   }
   // If this is the first pass, set the default domain.
   if (empty($domains)) {
@@ -331,15 +338,14 @@ function drush_domain_add($hostname, $name) {
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
     'machine_name' => domain_machine_name($hostname),
   );
-  // TODO: restore this error check.
-  /*
-  if (!empty($record['is_default'])) {
-    $error = domain_check_response($record, TRUE);
-    if ($error) {
-      return drush_set_error('domain', $error);
-    }
-  }*/
-  domain_drush_create($values);
+  $domain = domain_create(FALSE, $values);
+  /* TODO: Fix this check.
+  if (!empty($domain->is_default)) {
+    $domain->checkResponse();
+    drush_print($domain->response);
+  }
+  */
+  domain_drush_create($domain);
 }
 
 /**
@@ -360,11 +366,10 @@ function drush_domain_add_validate($hostname, $name) {
 /**
  * Creates a domain record.
  *
- * @param $values
- *   An array of domain values to use for the record.
+ * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ *   A domain entity..
  */
-function domain_drush_create(array $values) {
-  $domain = entity_create('domain', $values);
+function domain_drush_create(Domain $domain) {
   $domain->save();
   if (isset($domain->domain_id)) {
     drush_print(dt('Created @name at @domain.', array('@name' => $domain->name, '@domain' => $domain->hostname)));
@@ -457,13 +462,17 @@ function drush_domain_delete($argument = NULL) {
   drush_print(dt('Domain record deleted.'));
 }
 
-
 /**
  * Test a domain record.
  *
- * @TODO: Update this function.
+ * @param $argument
+ *   The domain_id to test. Passing no value tests all records.
  */
 function drush_domain_test($argument = NULL) {
+  // TODO: This won't work in a subdirectory without a parameter.
+  if ($base_path = drush_get_option('base_path')) {
+    $GLOBALS['base_path'] = '/' . $base_path . '/';
+  }
   if (is_null($argument)) {
     $domains = domain_load_multiple(NULL, TRUE);
   }
@@ -476,12 +485,12 @@ function drush_domain_test($argument = NULL) {
     }
   }
   foreach ($domains as $domain) {
-    #$error = domain_check_response($domain, TRUE);
-    if ($error) {
-      drush_print(dt('Fail: !error' , array('!error' => $error)));
+    $domain->checkResponse();
+    if ($domain->response != 200) {
+      drush_print(dt('Fail: !error. Please pass a --uri parameter or a --base_path to retest.' , array('!error' => $domain->response)));
     }
     else {
-      drush_print(dt('Success: !url tested successfully.', array('!url' => domain_get_path($domain))));
+      drush_print(dt('Success: !url tested successfully.', array('!url' => $domain->path)));
     }
   }
 }

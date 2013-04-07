@@ -441,13 +441,17 @@ function domain_save(Domain $domain) {
  *   Boolean flag indicating that the new domain should inherit values from the
  *   current $_SERVER request. Useful for creating domain records on install.
  *
+ * @param $values
+ *  An array of values to be set when the domain object is created. If the
+ *  $inherit property is set to TRUE, some values may be overridden.
+ *
  * @return Drupal\domain\Plugin\Core\Entity\Domain
  *   A domain entity, with preset values for the current environment.
  */
-function domain_create($inherit = FALSE) {
+function domain_create($inherit = FALSE, array $values = array()) {
   $default = domain_default_id();
   $domains = domain_load_multiple();
-  $values = array(
+  $values += array(
     'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
     'status' => 1,
     'weight' => count($domains) + 1,

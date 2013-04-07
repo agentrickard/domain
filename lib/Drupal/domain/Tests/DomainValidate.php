@@ -35,10 +35,12 @@ class DomainValidate extends DomainTestBase {
     $this->assertTrue($domain->response == 200, format_string('Server test for @url passed.', array('@url' => $domain->path)));
 
     // Now create a bad domain.
-    $domain = domain_create();
-    $domain->hostname = 'foo.bar';
-    $domain->machine_name = 'foo_bar';
-    $domain->name = 'Foo';
+    $values = array(
+      'hostname' => 'foo.bar',
+      'machine_name' => 'foo_bar',
+      'name' => 'Foo',
+    );
+    $domain = domain_create(FALSE, $values);
 
     $domain->save();
     $domain = domain_load(2);
