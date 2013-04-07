@@ -7,10 +7,12 @@
 
 namespace Drupal\domain\Plugin\Core\Entity;
 
+use Drupal;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Entity;
 use Drupal\Component\Annotation\Plugin;
 use Drupal\Core\Annotation\Translation;
+use Guzzle\Http\Exception\HttpException;
 
 /**
  * Defines the domain entity.
@@ -125,6 +127,37 @@ class Domain extends Entity implements ContentEntityInterface {
   }
 
   /**
+   * Tests that a domain responds correctly.
+   *
+   * This is a server-level configuration test. The requested image should be
+   * returned properly.
+   */
+  public function checkResponse() {
+    $url = $this->getPath() . drupal_get_path('module', 'domain') . '/tests/200.png';
+    $request = $this->getHttpClient()->get($url);
+    try {
+      $response = $request->send();
+      // Expected result.
+      $this->response = $response->getStatusCode();
+    }
+    // We cannot know which Guzzle Exception class will be returned; be generic.
+    catch (HttpException $e) {
+      watchdog_exception('domain', $e);
+      // File a general server failure.
+      $this->response = 500;
+    }
+  }
+
+  /**
+   * Sets the HTTP Client dependency.
+   *
+   * @TODO: Move to a proper service?
+   */
+  protected function getHttpClient() {
+    return Drupal::httpClient();
+  }
+
+  /**
    * Detects if the current domain is the active domain.
    */
   public function isActive() {
@@ -206,6 +239,26 @@ class Domain extends Entity implements ContentEntityInterface {
    */
   public function setUrl() {
     $this->url = domain_scheme($this->scheme) . $this->hostname . request_uri();
+  }
+
+  /**
+   * Gets the path for a domain.
+   */
+  public function getPath() {
+    if (!isset($this->path)) {
+      $this->setPath();
+    }
+    return $this->path;
+  }
+
+  /**
+   * Gets the url for a domain.
+   */
+  public function getUrl() {
+    if (!isset($this->url)) {
+      $this->setUrl();
+    }
+    return $this->url;
   }
 
 }
