@@ -10,14 +10,14 @@ namespace Drupal\domain\Plugin\Core\Entity;
 use Drupal;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Entity;
-use Drupal\Component\Annotation\Plugin;
+use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Guzzle\Http\Exception\HttpException;
 
 /**
  * Defines the domain entity.
  *
- * @Plugin(
+ * @EntityType(
  *   id = "domain",
  *   label = @Translation("Domain record"),
  *   module = "domain",
