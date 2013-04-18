@@ -4110,6 +4110,10 @@ function domain_get_tokens($prefixes = array()) {
 function domain_migrate_api() {
   $api = array(
     'api' => 2,
+    'destination handlers' => array(
+      'DomainNodeHandler',
+      'DomainUserHandler',
+    ),
   );
   return $api;
 }
