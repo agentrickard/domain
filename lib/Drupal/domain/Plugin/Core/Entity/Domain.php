@@ -44,7 +44,8 @@ use Guzzle\Http\Exception\HttpException;
  *       "custom_settings" = FALSE
  *     }
  *   },
- *   menu_base_path = "domain/%domain_machine_name"
+ *   menu_base_path = "domain/%domain_machine_name",
+ *   route_base_path = "admin/structure/domain"
  * )
  */
 class Domain extends Entity implements DomainInterface {
