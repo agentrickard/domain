@@ -7,12 +7,15 @@
 
 namespace Drupal\domain\Plugin\Core\Entity;
 
+use Drupal\domain\DomainInterface;
+
 use Drupal;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Guzzle\Http\Exception\HttpException;
+
 
 /**
  * Defines the domain entity.
@@ -44,7 +47,7 @@ use Guzzle\Http\Exception\HttpException;
  *   menu_base_path = "domain/%domain_machine_name"
  * )
  */
-class Domain extends Entity implements ContentEntityInterface {
+class Domain extends Entity implements DomainInterface {
 
   /**
    * The domain record id.
@@ -203,7 +206,7 @@ class Domain extends Entity implements ContentEntityInterface {
   }
 
   /**
-   * Enables a domain record.
+   * Disables a domain record.
    */
   public function disable() {
     if (!$this->isDefault()) {
