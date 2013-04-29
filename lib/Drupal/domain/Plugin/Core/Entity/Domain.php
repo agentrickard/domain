@@ -21,10 +21,12 @@ use Guzzle\Http\Exception\HttpException;
  *   id = "domain",
  *   label = @Translation("Domain record"),
  *   module = "domain",
- *   controller_class = "Drupal\domain\DomainStorageController",
- *   render_controller_class = "Drupal\domain\DomainRenderController",
- *   form_controller_class = {
- *     "default" = "Drupal\domain\DomainFormController"
+ *   controllers = {
+ *     "storage" = "Drupal\domain\DomainStorageController",
+ *     "render" = "Drupal\domain\DomainRenderController",
+ *     "form" = {
+ *       "default" = "Drupal\domain\DomainFormController"
+ *     }
  *   },
  *   base_table = "domain",
  *   fieldable = TRUE,
