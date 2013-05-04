@@ -1,0 +1,3 @@
+services:
+  domain.subscriber:
+    class: Drupal\domain\DomainSubscriber
