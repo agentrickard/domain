@@ -24,7 +24,7 @@ use Drupal\field\Plugin\Type\Widget\WidgetBase;
  *   settings = {
  *     "all_affiliates" = TRUE
  *   },
- *   multiple_values = TRUE
+ *   multiple_values = FALSE
  * )
  */
 class DomainWidget extends WidgetBase {
