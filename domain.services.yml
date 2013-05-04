@@ -1,3 +1,5 @@
 services:
   domain.subscriber:
-    class: Drupal\domain\DomainSubscriber
+    class: Drupal\domain\EventSubscriber\DomainSubscriber
+    tags:
+      - { name: event_subscriber }

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainSubscriber.
+ * Definition of Drupal\domain\EventSubscriber\DomainSubscriber.
  */
 
-namespace Drupal\domain;
+namespace Drupal\domain\EventSubscriber;
 
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event;
@@ -23,7 +23,7 @@ class DomainSubscriber implements EventSubscriberInterface {
    * @param Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The Event to process.
    */
-  public function DomainLoad(GetResponseEvent $event) {
+  public function onKernelRequestDomain(GetResponseEvent $event) {
     // @TODO remove this debug code
     drupal_set_message('Domain: subscribed');
   }
@@ -32,7 +32,7 @@ class DomainSubscriber implements EventSubscriberInterface {
    * Implements EventSubscriberInterface::getSubscribedEvents().
    */
   static function getSubscribedEvents() {
-    $events[KernelEvents::REQUEST][] = array('DomainLoad', 9999);
+    $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 9999);
     return $events;
   }
 
