@@ -17,7 +17,9 @@ class DomainFormController extends EntityFormController {
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
-  public function form(array $form, array &$form_state, EntityInterface $domain) {
+  public function form(array $form, array &$form_state) {
+    $domain = $this->entity;
+
     $form['domain_id'] = array(
       '#type' => 'value',
       '#value' => $domain->domain_id,
