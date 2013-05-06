@@ -514,12 +514,10 @@ function domain_get_uri(Domain $domain) {
 
 /**
  * Returns the current domain record.
- *
- * @TODO: this is a placeholder for testing.
  */
 function domain_get_domain() {
-  $active = domain_create(TRUE);
-  return $active;
+  $domain = Drupal::service('domain.manager');
+  return isset($domain->domain) ? $domain->domain : FALSE;
 }
 
 /**

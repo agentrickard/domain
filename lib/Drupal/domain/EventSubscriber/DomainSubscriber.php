@@ -7,6 +7,7 @@
 
 namespace Drupal\domain\EventSubscriber;
 
+use Drupal;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -24,14 +25,19 @@ class DomainSubscriber implements EventSubscriberInterface {
    *   The Event to process.
    */
   public function onKernelRequestDomain(GetResponseEvent $event) {
-    // @TODO remove this debug code
-    drupal_set_message('Domain: subscribed');
+    $request = $event->getRequest();
+    // TODO: Pass $url string or the entire Request?
+    $httpHost = $request->getHttpHost();
+    $uri = $request->getRequestUri();
+    $domain = Drupal::service('domain.manager');
+    $domain->requestDomain($httpHost);
   }
 
   /**
    * Implements EventSubscriberInterface::getSubscribedEvents().
    */
   static function getSubscribedEvents() {
+    // Returns multiple times. Should be CONTROLLER?
     $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 9999);
     return $events;
   }

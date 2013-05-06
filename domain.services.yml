@@ -3,3 +3,5 @@ services:
     class: Drupal\domain\EventSubscriber\DomainSubscriber
     tags:
       - { name: event_subscriber }
+  domain.manager:
+    class: Drupal\domain\DomainManager

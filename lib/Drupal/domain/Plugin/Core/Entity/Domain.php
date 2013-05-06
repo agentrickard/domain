@@ -167,9 +167,8 @@ class Domain extends Entity implements DomainInterface {
    * Detects if the current domain is the active domain.
    */
   public function isActive() {
-    // @TODO: Is this logic sound?
-    $active_domain = domain_create(TRUE);
-    return ($this->machine_name == $active_domain->machine_name);
+    $domain = domain_get_domain();
+    return ($this->machine_name == $domain->machine_name);
   }
 
   /**

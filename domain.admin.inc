@@ -17,6 +17,8 @@ function domain_overview() {
 
 /**
  * Form builder to list domain records.
+ *
+ * @TODO: move to a formController.
  */
 function domain_overview_form($form, &$form_state, $domains) {
   $active_domain = domain_get_domain();
@@ -83,7 +85,7 @@ function domain_overview_form($form, &$form_state, $domains) {
     );
     $form['domains'][$domain->machine_name]['hostname'] = array(
       '#type' => 'markup',
-      '#markup' => ($domain->isActive()) ? '<strong>' . l($domain->hostname, domain_get_uri($domain)) . '</strong>' : l($domain->hostname, domain_get_uri($domain)),
+      '#markup' => ($domain->isActive()) ? '<strong>' . l($domain->hostname, $domain->url) . '</strong>' : l($domain->hostname, $domain->url),
     );
     $form['domains'][$domain->machine_name]['status'] = array(
       '#type' => 'markup',
