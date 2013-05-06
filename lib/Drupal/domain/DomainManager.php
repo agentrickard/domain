@@ -15,7 +15,7 @@ use Drupal\domain\Plugin\Core\Entity\Domain;
 
 class DomainManager implements DomainManagerInterface {
 
-  protected $request;
+  public $httpHost;
 
   public $domain;
 

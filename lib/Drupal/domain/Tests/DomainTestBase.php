@@ -66,14 +66,17 @@ abstract class DomainTestBase extends WebTestBase {
     return $edit;
   }
 
-  public function domainCreateTestDomains($count = 1, $base_hostname = NULL) {
+  public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
     $original_domains = domain_load_multiple(NULL, TRUE);
     if (empty($base_hostname)) {
       $base_hostname = $this->base_hostname;
     }
     // Note: these domains are rigged to work on my test server.
-    // For proper testing, yours should be set up similarly.
-    $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
+    // For proper testing, yours should be set up similarly, but you can pass a
+    // $list array to change the default.
+    if (empty($list)) {
+      $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
+    }
     for ($i = 0; $i < $count; $i++) {
       if (!empty($list[$i])) {
         if ($i < 11) {
