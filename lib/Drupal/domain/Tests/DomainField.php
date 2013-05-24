@@ -126,10 +126,6 @@ class DomainField extends DomainTestBase {
       'entity_type' => 'node',
       'label' => 'Domain test field',
       'bundle' => 'article',
-      'widget' => array(
-        'type' => 'options_buttons',
-        'module' => 'options',
-      ),
       'settings' => array(
         'handler_settings' => array(
           'sort' => array('field' => 'weight', 'direction' => 'ASC'),
@@ -137,6 +133,12 @@ class DomainField extends DomainTestBase {
       ),
     );
     field_create_instance($instance);
+    // Tell the form system how to behave.
+    entity_get_form_display('node', 'article', 'default')
+      ->setComponent($field['field_name'], array(
+        'type' => 'options_buttons',
+    ))
+    ->save();
   }
 
 }
