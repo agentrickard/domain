@@ -43,13 +43,11 @@ function domain_menu() {
   $items['admin/structure/domain'] = array(
     'title' => 'Domains',
     'description' => 'Manage domain records for your installation.',
-    'page callback' => 'domain_overview',
-    // @TODO custom callback for per-domain access.
-    'access arguments' => array('administer domains'),
-    'file' => 'domain.admin.inc',
+    'route_name' => 'domain_admin',
   );
   $items['admin/structure/domain/list'] = array(
     'title' => 'List',
+    'route_name' => 'domain_admin',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );

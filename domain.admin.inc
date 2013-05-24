@@ -8,14 +8,6 @@
 use Drupal\domain\Plugin\Core\Entity\Domain;
 
 /**
- * Domain overview page.
- */
-function domain_overview() {
-  $domains = domain_load_multiple();
-  return drupal_get_form('domain_overview_form', $domains);
-}
-
-/**
  * Form builder to list domain records.
  *
  * @TODO: move to a formController.
