@@ -8,6 +8,7 @@ namespace Drupal\domain\Controller;
 
 use Drupal\Core\ControllerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\domain\DomainManager;
 
 /**
  * Controller routines for domain routes.
