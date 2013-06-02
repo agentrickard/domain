@@ -3458,17 +3458,17 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
   if ($type == 'entity') {
     // The original query looked something like:
     // @code
-//  SELECT nid FROM sometable s
-//  INNER JOIN node_access na ON na.nid = s.nid
-//  WHERE ($node_access_conditions)
+    //  SELECT nid FROM sometable s
+    //  INNER JOIN node_access na ON na.nid = s.nid
+    //  WHERE ($node_access_conditions)
     // @endcode
     //
     // Our query will look like:
     // @code
-//  SELECT entity_type, entity_id
-//  FROM field_data_something s
-//  LEFT JOIN node_access na ON s.entity_id = na.nid
-//  WHERE (entity_type = 'node' AND $node_access_conditions) OR (entity_type <> 'node')
+    //  SELECT entity_type, entity_id
+    //  FROM field_data_something s
+    //  LEFT JOIN node_access na ON s.entity_id = na.nid
+    //  WHERE (entity_type = 'node' AND $node_access_conditions) OR (entity_type <> 'node')
     // @endcode
     //
     // So instead of directly adding to the query object, we need to collect
