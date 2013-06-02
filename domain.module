@@ -898,23 +898,26 @@ function domain_cron() {
 /**
  * Menu loader function.
  *
+ * Note that this function should only be used as a menu callback,
+ * since the results are not cached. Use domain_lookup() instead.
+ *
  * The passed parameter will be checked against the {domain} table for
  * valid records.
  *
  * @param $domain_id
  *   The id request for a specific domain.
+ * @param $reset
+ *   A boolean flag to clear the static variable if necessary.
  *
  * @return
  *   $domain array on success or FALSE on failure.
  */
-function domain_load($domain_id = NULL) {
-  $domain = domain_lookup($domain_id, NULL, TRUE);
+function domain_load($domain_id = NULL, $reset = FALSE) {
+  $domain = domain_lookup($domain_id, NULL, $reset);
   if ($domain == -1) {
     return FALSE;
   }
-  else {
-    return $domain;
-  }
+  return $domain;
 }
 
 /**
@@ -983,6 +986,8 @@ function domain_save($values, $form_values = array()) {
  * Clear static caches used for domain listings.
  */
 function domain_static_reset() {
+  drupal_static_reset('domain_lookup_domains');
+  drupal_static_reset('domain_lookup_result');
   drupal_static_reset('domain_id_list');
   drupal_static_reset('domain_domains');
   drupal_static_reset('domain_list_by_machine_name');
@@ -1040,6 +1045,9 @@ function domain_delete($domain, $values = array()) {
  *
  * This function also calls hook_domain_load(), which lets module developers
  * overwrite or add to the $domain array.
+ *
+ * Note that this function should not be called prior to hook_init(). Lookups
+ * run too early in the bootstrap process can cause registry issues.
  *
  * @param $domain_id
  *   The domain_id taken from {domain}. Optional, but one of the two values must
@@ -1443,25 +1451,38 @@ function domain_get_user_domains($account, $add_roles = TRUE) {
  * @param $domain
  *   The domain array defined by domain_lookup().
  * @param $reset
- *    A boolean flag to clear the static variable if necessary.
+ *   A boolean flag indicating whether to reset the static array or not.
  *
  * @return
  *   The $domain array, modified by reference by hook_domain_load() implementations.
  */
 function domain_api($domain, $reset = FALSE) {
-  $_modules = &drupal_static(__FUNCTION__);
-  if (!isset($_modules) || $reset) {
-    // Clear the cache. See https://drupal.org/node/1140898.
-    module_implements('domain_load', TRUE, TRUE);
-    $_modules = module_implements('domain_load');
+  $modules = &drupal_static(__FUNCTION__);
+
+  // There are rare cases where the module_implements() cache is built too early.
+  // In these cases, it is the pre-loaded bootstrap modules that can cause
+  // issues, so let's be certain to load those.
+  if (!isset($modules) || $reset) {
+    $modules = module_implements('domain_load');
+    $bootstrap = _domain_bootstrap_modules();
+    $modules = array_unique(array_merge($modules, $bootstrap));
   }
-  if (!empty($_modules)) {
-    foreach ($_modules as $module) {
-      // Cannot use module_invoke_all() since these are passed by reference.
-      $function = $module . '_domain_load';
-      $function($domain);
+
+  // Now, call the hook invocations.
+  if (!empty($modules)) {
+    foreach ($modules as $module) {
+      // Do not, however, call disabled modules ;-).
+      if (module_exists($module)) {
+        // Cannot use module_invoke_all() since these are passed by reference.
+        $function = $module . '_domain_load';
+        module_load_include('inc', $module, $module . '.domain');
+        if (function_exists($function)) {
+          $function($domain);
+        }
+      }
     }
   }
+
   return $domain;
 }
 
@@ -1544,7 +1565,7 @@ function domain_get_domain() {
  */
 function domain_check_primary($msg = 'default') {
   $_domain = domain_get_domain();
-  $default = domain_default(TRUE, TRUE);
+  $default = domain_default();
   if ($_domain['domain_id'] != $default['domain_id']) {
     if ($msg == 'default') {
       drupal_set_message(t('You have been redirected: This page must be accessed from the primary domain.'));
@@ -4149,7 +4170,6 @@ function domain_get_node_defaults($type, $fallback_domains = array()) {
   $defaults = array('domain_id' => array());
   // We use array_flip for compatibility with node_type_form_submit().
   $settings = array_flip(domain_default_node_access_settings($type));
-  $domains = domain_domains();
 
   $defaults['domain_site'] = isset($settings['DOMAIN_ALL']) ? TRUE : FALSE;
   // Assign the currently active domain, if not disabled by user.
@@ -4157,9 +4177,11 @@ function domain_get_node_defaults($type, $fallback_domains = array()) {
     $defaults['domain_id'][$_domain['domain_id']] = $_domain['domain_id'];
   }
   // Assign the default affiliates.
-  foreach ($domains as $domain) {
-    if (isset($settings[$domain['machine_name']])) {
-      $defaults['domain_id'][$domain['domain_id']] = $domain['domain_id'];
+  foreach ($settings as $key => $value) {
+    if ($key != 'DOMAIN_ACTIVE' && $key != 'DOMAIN_ALL') {
+      if ($domain = domain_machine_name_load($key)) {
+        $defaults['domain_id'][$domain['domain_id']] = $domain['domain_id'];
+      }
     }
   }
   // Use fallback domains when no default affiliate exists.
@@ -4168,6 +4190,7 @@ function domain_get_node_defaults($type, $fallback_domains = array()) {
       $defaults['domain_id'][$domain['domain_id']] = $domain['domain_id'];
     }
   }
+
   return $defaults;
 }
 

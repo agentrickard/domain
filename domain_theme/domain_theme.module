@@ -245,7 +245,7 @@ function domain_theme_form_alter(&$form, &$form_state, $form_id) {
   $domain_id = arg(4);
   $themes = list_themes();
 
-  $domain = domain_load($domain_id);
+  $domain = domain_lookup($domain_id);
   if ($domain == -1 || !array_key_exists($theme, $themes)) {
     return drupal_access_denied();
   }

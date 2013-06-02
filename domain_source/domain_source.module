@@ -272,7 +272,7 @@ function domain_source_lookup($nid) {
     if ($domain_source == DOMAIN_SOURCE_USE_ACTIVE) {
       $source = $domain_source;
     }
-    elseif ($domain = domain_load($domain_source)) {
+    elseif ($domain = domain_lookup($domain_source)) {
       $source = $domain['domain_id'];
     }
   }

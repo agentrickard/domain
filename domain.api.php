@@ -523,7 +523,7 @@ function hook_domain_ignore() {
  * Bootstrap Process. To register, you must:
  *
  * 1) Implement either or both of the following hooks:
- *  -- hook_domain_bootstrap_load().
+ *  -- hook_domain_bootstrap_loookup().
  *  -- hook_domain_bootstrap_full().
  * 2) Run domain_bootstrap_register() in mymodule_enable().
  * 3) Run domain_bootstrap_unregister('mymodule') in mymodule_disable().
@@ -549,6 +549,9 @@ function hook_domain_bootstrap() {
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
  *
+ * Warning: do _not_ call domain_lookup() or domain_load() from within this
+ * function. Doing so may cause critical errors.
+ *
  * @param $domain
  *   An array containing current domain (host) name (used during bootstrap) and
  *   the results of lookup against {domain} table.
@@ -571,6 +574,9 @@ function hook_domain_bootstrap_lookup($domain) {
  *
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
+ *
+ * Warning: do _not_ call domain_lookup() or domain_load() from within this
+ * function. Doing so may cause critical errors.
  *
  * @param $domain
  *   An array containing current domain and domain_id and any other values

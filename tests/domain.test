@@ -15,9 +15,8 @@ class DomainTestCase extends DrupalWebTestCase {
    */
   public function setUp($list = array()) {
     // Prevent simpletest from vomiting on bootstrap if there
-    // are required submodules.
+    // are required submodules in use.
     $modules = _domain_bootstrap_modules();
-    module_enable($modules);
     $modules = array_merge($modules, $list);
     parent::setUp($modules);
 
@@ -939,10 +938,10 @@ class DomainInvalidTest extends DomainTestCase {
     $this->domainCreateDomains();
     $default = domain_default();
     // Set one domain as invalid.
-    $domain = domain_load(2);
+    $domain = domain_lookup(2);
     $domain['valid'] = 0;
     domain_save($domain, $domain);
-    $domain = domain_load(2);
+    $domain = domain_lookup(2);
 
     // Test that we set that domain properly.
     $this->assertTrue(empty($domain['valid']), t('Domain %domain set to invalid.', array('%domain' => $domain['subdomain'])));
