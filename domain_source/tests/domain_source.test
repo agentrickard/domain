@@ -98,12 +98,32 @@ class DomainSourceTest extends DomainTestCase {
     // Save the node with an assigned source. Then load and check.
     $domain = domain_load(2);
     $node->domain_source = $domain['domain_id'];
+    // Promote the node so we can check links.
+    $node->promote = 1;
     node_save($node);
     $source = domain_source_lookup($node->nid);
     $this->assertTrue($source == $domain['domain_id'], t('Assigned node set to proper domain.'));
-    $url = url('node/1');
-    $parts = parse_url($url);
-    $this->assertTrue($parts['host'] == $domain['subdomain'], t('URL rewrite returned correct domain.'));
+
+    // Get the site homepage. The node should link to the domain.
+    $this->drupalGet('');
+    $this->assertRaw('<a href="' . $domain['path'], t('URL rewrite returned correct domain.'));
+
+    // Save the node with DOMAIN_SOURCE_USE_ACTIVE.
+    $node->domain_source = DOMAIN_SOURCE_USE_ACTIVE;
+    node_save($node);
+    $source = domain_source_lookup($node->nid);
+    $this->assertTrue($source == DOMAIN_SOURCE_USE_ACTIVE, t('Use current domain set correctly.'));
+
+    // Get the site homepage. The node should link to a relative path.
+    // @TODO: This could be a better test.
+    $this->drupalGet('');
+    $this->assertNoRaw('<a href="' . $domain['path'], t('URL rewrite returned correct domain.'));
+
+    // Get the site homepage on another domain. The node should link to a
+    // relative path.
+    // @TODO: This could be a better test.
+    $this->drupalGet($domain['path']);
+    $this->assertNoRaw('<a href="' . $domain['path'], t('URL rewrite returned correct domain.'));
   }
 
 }

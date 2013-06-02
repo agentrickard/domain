@@ -16,11 +16,13 @@ function domain_source_domain_source_alter(&$source, $nid) {
   if (!$source_id) {
     return;
   }
-  // The source_id always returns a valid domain.
-  $source = domain_lookup($source_id);
   // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
-  if ($source == DOMAIN_SOURCE_USE_ACTIVE) {
+  if ($source_id == DOMAIN_SOURCE_USE_ACTIVE) {
     $source = domain_get_domain();
+  }
+  // The source_id always returns a valid domain.
+  else {
+    $source = domain_lookup($source_id);
   }
 }
 
