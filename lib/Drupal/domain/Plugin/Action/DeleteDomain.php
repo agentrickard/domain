@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\domain\Plugin\Action\DeleteDomain.
+ */
+
+namespace Drupal\domain\Plugin\Action;
+
+use Drupal\Core\Annotation\Action;
+use Drupal\Core\Annotation\Translation;
+use Drupal\Core\Action\ActionBase;
+use Drupal\domain\Plugin\Core\Entity\Domain;
+
+/**
+ * Deletes a domain record.
+ *
+ * @Action(
+ *   id = "domain_delete_action",
+ *   label = @Translation("Delete domain record"),
+ *   type = "domain"
+ * )
+ */
+class DeleteDomain extends ActionBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function execute(Domain $domain = NULL) {
+    $domain->delete();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function executeMultiple(array $objects) {
+    foreach ($objects as $object) {
+      if ($object instanceOf Domain) {
+        $object->delete();
+      }
+    }
+  }
+
+}

@@ -78,9 +78,9 @@ class DomainViews extends DomainTestBase {
       $this->assertText($domain->machine_name, format_string('@machine_name found on views page.', array('@machine_name' => $domain->machine_name)));
     }
     // @TODO: Test the list of actions.
-    $actions = domain_action_info();
-    foreach ($actions as $key => $action) {
-      $this->assertRaw("<option value=\"{$key}\">", format_string('@action action found.', array('@action' => $action['label'])));
+    $actions = array('domain_delete_action', 'domain_enable_action', 'domain_disable_action', 'domain_default_action');
+    foreach ($actions as $action) {
+      $this->assertRaw("<option value=\"{$action}\">", format_string('@action action found.', array('@action' => $action)));
     }
 
     // Testing domain_delete_action.
@@ -90,19 +90,19 @@ class DomainViews extends DomainTestBase {
     );
 
     $this->drupalPost($path, $edit, t('Apply'));
-    $this->assertText('Delete domain was applied to 1 item.');
+    $this->assertText('Delete domain record was applied to 1 item.');
 
     // Check that one domain was removed.
     $domains = domain_load_multiple(NULL, TRUE);
     $this->assertTrue(count($domains) == 3, 'One domain deleted.');
 
-    // Testing domain_set_default_action.
+    // Testing domain_default_action.
     $edit = array(
       'action_bulk_form[1]' => TRUE,
-      'action' => 'domain_set_default_action',
+      'action' => 'domain_default_action',
     );
     $this->drupalPost($path, $edit, t('Apply'));
-    $this->assertText('Set default domain was applied to 1 item.');
+    $this->assertText('Set default domain record was applied to 1 item.');
 
     // Test the default domain, which should now be id 3.
     $default = domain_default_id();
@@ -117,7 +117,7 @@ class DomainViews extends DomainTestBase {
     );
     $this->drupalPost($path, $edit, t('Apply'));
     $this->assertText('The default domain cannot be disabled.');
-    $this->assertText('Disable domain was applied to 2 items.');
+    $this->assertText('Disable domain record was applied to 2 items.');
 
     // @TODO: Test the count of disabled domains.
 
@@ -127,7 +127,7 @@ class DomainViews extends DomainTestBase {
       'action' => 'domain_enable_action',
     );
     $this->drupalPost($path, $edit, t('Apply'));
-    $this->assertText('Enable domain was applied to 1 item.');
+    $this->assertText('Enable domain record was applied to 1 item.');
 
     // @TODO: Test the count of disabled domains.
 

@@ -1,0 +1,6 @@
+id: domain_default_action
+label: 'Set default domain record'
+status: '1'
+langcode: en
+type: domain
+plugin: domain_default_action
