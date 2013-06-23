@@ -59,11 +59,12 @@ class DomainFieldUI extends DomainTestBase {
     // Create random field name.
     $label = strtolower($this->randomName(8));
 
-    $field = array(
+    $settings = array(
       'field_name' => 'field_' . $label,
       'type' => 'text',
     );
-    field_create_field($field);
+    $field = entity_create('field_entity', $settings);
+    $field->save();
 
     $instance = array(
       'field_name' => 'field_' . $label,
@@ -71,7 +72,8 @@ class DomainFieldUI extends DomainTestBase {
       'label' => 'Test field',
       'bundle' => 'domain',
     );
-    field_create_instance($instance);
+    $field_instance = entity_create('field_instance', $instance);
+    $field_instance->save();
 
     // Visit the domain field administration page.
     $this->drupalGet('admin/structure/domain/fields');

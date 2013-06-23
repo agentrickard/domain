@@ -111,7 +111,7 @@ class DomainField extends DomainTestBase {
   function domainCreateTestField() {
     $label = 'domain';
 
-    $field = array(
+    $settings = array(
       'field_name' => 'field_' . $label,
       'type' => 'entity_reference',
       'cardinality' => -1,
@@ -119,7 +119,8 @@ class DomainField extends DomainTestBase {
         'target_type' => 'domain',
       ),
     );
-    field_create_field($field);
+    $field = entity_create('field_entity', $settings);
+    $field->save();
 
     $instance = array(
       'field_name' => 'field_' . $label,
@@ -132,7 +133,9 @@ class DomainField extends DomainTestBase {
         ),
       ),
     );
-    field_create_instance($instance);
+    $field_instance = entity_create('field_instance', $instance);
+    $field_instance->save();
+
     // Tell the form system how to behave.
     entity_get_form_display('node', 'article', 'default')
       ->setComponent($field['field_name'], array(
