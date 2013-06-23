@@ -26,7 +26,7 @@ use Guzzle\Http\Exception\HttpException;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   controllers = {
- *     "storage" = "Drupal\domain\DomainStorageController",
+ *     "storage" = "Drupal\Core\Entity\DatabaseStorageController",
  *     "render" = "Drupal\domain\DomainRenderController",
  *     "form" = {
  *       "default" = "Drupal\domain\DomainFormController"
@@ -270,8 +270,8 @@ class Domain extends Entity implements DomainInterface {
   /**
    * Sets the default domain properly.
    */
-  protected function preSave(EntityInterface $entity) {
-    if (!empty($entity->is_default)) {
+  public function preSave(EntityStorageControllerInterface $storage_controller) {
+    if (!empty($this->is_default)) {
       // Swap the current default.
       if ($default = domain_default()) {
         $default->is_default = 0;
@@ -279,6 +279,5 @@ class Domain extends Entity implements DomainInterface {
       }
     }
   }
-
 
 }
