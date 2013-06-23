@@ -13,6 +13,7 @@ use Drupal;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\Annotation\EntityType;
+use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Drupal\Core\Annotation\Translation;
 use Guzzle\Http\Exception\HttpException;
 
@@ -265,5 +266,19 @@ class Domain extends Entity implements DomainInterface {
     }
     return $this->url;
   }
+
+  /**
+   * Sets the default domain properly.
+   */
+  protected function preSave(EntityInterface $entity) {
+    if (!empty($entity->is_default)) {
+      // Swap the current default.
+      if ($default = domain_default()) {
+        $default->is_default = 0;
+        $default->save();
+      }
+    }
+  }
+
 
 }
