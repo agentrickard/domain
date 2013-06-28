@@ -1,0 +1,6 @@
+services:
+  domain_config.subscriber:
+    class: Drupal\domain_config\EventSubscriber\DomainConfigSubscriber
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@domain.manager', '@config.context']

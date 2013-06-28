@@ -1,0 +1,8 @@
+name: Domain Configuration
+description: 'Allows domain specific configuration.'
+type: module
+package: Domain
+version: VERSION
+core: 8.x
+dependencies:
+  - domain
