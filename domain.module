@@ -47,7 +47,6 @@ function domain_menu() {
   );
   $items['admin/structure/domain/list'] = array(
     'title' => 'List',
-    'route_name' => 'domain_admin',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
