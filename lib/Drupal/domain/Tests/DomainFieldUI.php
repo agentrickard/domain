@@ -32,11 +32,11 @@ class DomainFieldUI extends DomainTestBase {
    * Create, edit and delete a field via the user interface.
    */
   function testDomainFieldUI() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'administer domain fields', 'administer domain display'));
+    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'administer domain fields', 'administer domain display', 'administer domain form display'));
     $this->drupalLogin($this->admin_user);
 
     // Visit the domain field administration page.
-    $this->drupalGet('admin/structure/domain/fields');
+    $this->drupalGet('admin/structure/domain/form-display');
     $this->assertResponse(200);
 
     // Check for the extra fields.
@@ -74,6 +74,11 @@ class DomainFieldUI extends DomainTestBase {
     );
     $field_instance = entity_create('field_instance', $instance);
     $field_instance->save();
+
+    // Tell the form system how to behave.
+    entity_get_form_display('domain', 'domain', 'default')
+      ->setComponent('field_' . $label)
+      ->save();
 
     // Visit the domain field administration page.
     $this->drupalGet('admin/structure/domain/fields');
