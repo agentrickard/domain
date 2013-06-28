@@ -9,7 +9,7 @@ namespace Drupal\domain\Tests;
 use Drupal\domain\Plugin\Core\Entity\Domain;
 
 /**
- * Tests the domain record field type.
+ * Tests the domain record entity reference field type.
  */
 class DomainField extends DomainTestBase {
 
@@ -22,8 +22,8 @@ class DomainField extends DomainTestBase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Domain field type',
-      'description' => 'Tests the Field UI for domain fields.',
+      'name' => 'Domain entity reference field',
+      'description' => 'Tests entity references for domain fields.',
       'group' => 'Domain',
     );
   }
