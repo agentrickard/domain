@@ -24,7 +24,7 @@ class DomainManager implements DomainManagerInterface {
     $this->domain = NULL;
   }
 
-  public function requestDomain($httpHost) {
+  public function setRequestDomain($httpHost) {
     $this->setHttpHost($httpHost);
     $domain = domain_load_hostname($httpHost);
     if (!empty($domain)) {

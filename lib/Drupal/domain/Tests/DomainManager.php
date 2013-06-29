@@ -39,9 +39,10 @@ class DomainManager extends DomainTestBase {
     foreach (domain_load_multiple() as $domain) {
       $this->drupalGet($domain->path);
       // This call doesn't persist, so the tests won't work.
-      $active = domain_get_domain();
-      debug($active);
+      # $active = Drupal::service('domain.manager');
+      # debug($active);
+      // We need to load a block with text instead.
     }
-
   }
+
 }

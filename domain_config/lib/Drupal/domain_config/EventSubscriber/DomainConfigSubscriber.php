@@ -8,7 +8,7 @@ namespace Drupal\domain_config\EventSubscriber;
 
 use Drupal\Core\Config\Context\ContextInterface;
 use Drupal\Core\Config\ConfigEvent;
-use Drupal\domain\DomainManager;
+use Drupal\domain\DomainManagerInterface;
 use Drupal\domain\Plugin\Core\Entity\Domain;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -24,7 +24,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
   /**
    * The domain manager.
    *
-   * @var \Drupal\domain\DomainManager
+   * @var \Drupal\domain\DomainManagerInterface
    */
   protected $domainManager;
 
@@ -38,12 +38,12 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a DomainConfigSubscriber object.
    *
-   * @param \Drupal\domain\DomainManager $domain_manager
+   * @param \Drupal\domain\DomainManagerInterface $domain_manager
    *   The domain manager service.
    * @param \Drupal\Core\Config\Context\ContextInterface $config_context
    *   The config context service.
    */
-  public function __construct(DomainManager $domain_manager, ContextInterface $config_context) {
+  public function __construct(DomainManagerInterface $domain_manager, ContextInterface $config_context) {
     $this->domainManager = $domain_manager;
     $this->defaultConfigContext = $config_context;
   }

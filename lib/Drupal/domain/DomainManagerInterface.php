@@ -14,7 +14,7 @@ interface DomainManagerInterface {
   /**
    * Determines the active domain request.
    */
-  public function requestDomain($httpHost);
+  public function setRequestDomain($httpHost);
 
   /**
    * Sets the active domain.
