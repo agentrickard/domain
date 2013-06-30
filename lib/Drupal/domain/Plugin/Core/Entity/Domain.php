@@ -28,8 +28,10 @@ use Guzzle\Http\Exception\HttpException;
  *   controllers = {
  *     "storage" = "Drupal\Core\Entity\DatabaseStorageController",
  *     "render" = "Drupal\domain\DomainRenderController",
+ *     "access" = "Drupal\domain\DomainAccessController",
  *     "form" = {
- *       "default" = "Drupal\domain\DomainFormController"
+ *       "default" = "Drupal\domain\DomainFormController",
+ *       "edit" = "Drupal\domain\DomainFormController"
  *     }
  *   },
  *   base_table = "domain",

@@ -1,12 +1,12 @@
 domain_admin:
-  pattern: 'admin/structure/domain'
+  pattern: '/admin/structure/domain'
   defaults:
     _content: '\Drupal\domain\Controller\DomainController::adminOverview'
   requirements:
     _permission: 'administer domains'
 domain_add:
-  pattern: 'admin/structure/domain/add'
+  pattern: '/admin/structure/domain/add'
   defaults:
-    _content: '\Drupal\domain\Controller\DomainController::addDomain'
+    _entity_form: 'domain.edit'
   requirements:
     _permission: 'create domains'
