@@ -45,4 +45,12 @@ class DomainController implements ControllerInterface {
     return drupal_get_form('domain_overview_form', $domains);
   }
 
+  /**
+   * Returns the add form.
+   */
+  public function addDomain($inherit = FALSE) {
+    $domain = domain_create($inherit);
+    return entity_get_form($domain);
+  }
+
 }

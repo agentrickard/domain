@@ -4,3 +4,9 @@ domain_admin:
     _content: '\Drupal\domain\Controller\DomainController::adminOverview'
   requirements:
     _permission: 'administer domains'
+domain_add:
+  pattern: 'admin/structure/domain/add'
+  defaults:
+    _content: '\Drupal\domain\Controller\DomainController::addDomain'
+  requirements:
+    _permission: 'create domains'

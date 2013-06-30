@@ -52,11 +52,8 @@ function domain_menu() {
   );
   $items['admin/structure/domain/add'] = array(
     'title' => 'Add domain',
-    'page callback' => 'domain_add',
-    'access callback' => 'domain_create_access',
-    'access arguments' => array(),
-    'type' => MENU_LOCAL_ACTION,
-    'file' => 'domain.admin.inc',
+    'route_name' => 'domain_add',
+    'type' => MENU_SIBLING_LOCAL_TASK,
   );
   $items['admin/structure/domain/%domain_machine_name'] = array(
     'title' => 'Domain',
@@ -125,6 +122,21 @@ function domain_menu() {
     'file' => 'domain.pages.inc',
   );
   return $items;
+}
+
+/**
+ * Implements hook_local_actions().
+ */
+function domain_local_actions() {
+  return array(
+    array(
+      'route_name' => 'domain_add',
+      'title' => t('Add domain record'),
+      'appears_on' => array(
+        'domain_admin',
+      ),
+    ),
+  );
 }
 
 /**
