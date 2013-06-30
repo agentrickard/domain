@@ -15,7 +15,7 @@ class DomainForms extends DomainTestBase {
 
   public static function getInfo() {
     return array(
-      'name' => 'Domain record interface',
+      'name' => 'Domain form interface',
       'description' => 'Tests the domain record user interface.',
       'group' => 'Domain',
     );
@@ -25,7 +25,7 @@ class DomainForms extends DomainTestBase {
    * Create, edit and delete a domain via the user interface.
    */
   function testDomainInterface() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains'));
+    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
     $this->drupalLogin($this->admin_user);
 
     // No domains should exist.

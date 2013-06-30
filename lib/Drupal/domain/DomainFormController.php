@@ -19,7 +19,10 @@ class DomainFormController extends EntityFormController {
    */
   public function form(array $form, array &$form_state) {
     $domain = $this->entity;
-
+    // If creating a new domain, set sensible defaults.
+    if (empty($domain->domain_id)) {
+      $domain = domain_create();
+    }
     $form['domain_id'] = array(
       '#type' => 'value',
       '#value' => $domain->domain_id,
