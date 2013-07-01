@@ -36,6 +36,7 @@ use Guzzle\Http\Exception\HttpException;
  *   },
  *   base_table = "domain",
  *   fieldable = TRUE,
+ *   translatable = FALSE,
  *   entity_keys = {
  *     "id" = "domain_id",
  *     "label" = "name",
@@ -282,4 +283,14 @@ class Domain extends Entity implements DomainInterface {
     }
   }
 
+  /**
+   * Strong indication that we are not translatable.
+   *
+   * Looks like a core bug in /core/lib/Drupal/Core/Entity/EntityStorageControllerBase.php
+   * line 183. May be removed when converted to EntityNG.
+
+  public function getTranslation($langcode = NULL) {
+    return FALSE;
+  }
+  */
 }
