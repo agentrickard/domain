@@ -34,7 +34,7 @@ class DomainCreate extends DomainTestBase {
       $this->assertTrue(is_null($domain->{$key}), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
     }
     foreach (array('scheme', 'status', 'weight' , 'is_default') as $key) {
-      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to default value: %value.', array('!key' => $key, '!value' => $domain->{$key})));
+      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to default value: %value.', array('!key' => $key, '%value' => $domain->{$key})));
     }
     // Now add the additional fields and save.
     $domain->hostname = $this->base_hostname;
@@ -67,7 +67,7 @@ class DomainCreate extends DomainTestBase {
       $this->assertTrue(is_null($domain->{$key}), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
     }
     foreach (array('hostname', 'name', 'machine_name', 'scheme', 'status', 'weight' , 'is_default') as $key) {
-      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to a default value: %value.', array('!key' => $key, '!value' => $domain->{$key})));
+      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to a default value: %value.', array('!key' => $key, '%value' => $domain->{$key})));
     }
   }
 
