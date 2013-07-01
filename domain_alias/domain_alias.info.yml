@@ -1,0 +1,8 @@
+name: Domain Alias
+description: 'Maps multiple host requests to a single domain record.'
+type: module
+package: Domain
+version: VERSION
+core: 8.x
+dependencies:
+  - domain

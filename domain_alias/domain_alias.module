@@ -1,0 +1,6 @@
+<?php
+
+/**
+ * @file
+ * Maps multiple host requests to a single domain record.
+ */
