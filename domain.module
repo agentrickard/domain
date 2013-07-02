@@ -5,7 +5,7 @@
  * Defines a Domain concept for use with Drupal.
  */
 
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -174,17 +174,17 @@ function domain_view_access() {
 /**
  * Returns the page title for a domain record.
  *
- * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
  *   A domain entity.
  */
-function domain_page_title(Domain $domain) {
+function domain_page_title(DomainInterface $domain) {
   return check_plain($domain->name);
 }
 
 /**
  * Entity URI callback.
  */
-function domain_uri(Domain $domain) {
+function domain_uri(DomainInterface $domain) {
   return array(
     'path' => 'domain/' . $domain->machine_name,
   );
@@ -436,10 +436,10 @@ function domain_machine_name_load_multiple(array $machine_names = NULL, $reset =
 /**
  * Saves a domain record.
  *
- * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
  *   A domain entity.
  */
-function domain_save(Domain $domain) {
+function domain_save(DomainInterface $domain) {
   $domain->save();
 }
 
@@ -517,7 +517,7 @@ function domain_required_fields() {
 /**
  * @TODO: move to a method.
  */
-function domain_get_uri(Domain $domain) {
+function domain_get_uri(DomainInterface $domain) {
   return 'foo';
 }
 
@@ -581,7 +581,7 @@ function domain_extract_field_items(array $items, $keys = FALSE) {
 /**
  * Generates an array for rendering the given node.
  *
- * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
  *   A domain entity.
  * @param $view_mode
  *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'full.'
@@ -592,7 +592,7 @@ function domain_extract_field_items(array $items, $keys = FALSE) {
  * @return
  *   An array as expected by drupal_render().
  */
-function domain_view(Domain $domain, $view_mode = 'full', $langcode = NULL) {
+function domain_view(DomainInterface $domain, $view_mode = 'full', $langcode = NULL) {
   return entity_view($domain, $view_mode, $langcode);
 }
 

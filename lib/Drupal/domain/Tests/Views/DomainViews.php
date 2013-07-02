@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\domain\Tests\Views;
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\views\Tests\ViewTestBase;
 use Drupal\views\Tests\ViewTestData;

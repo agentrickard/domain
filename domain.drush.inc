@@ -5,7 +5,7 @@
  * Drush commands for Domain Access.
  */
 
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -366,10 +366,10 @@ function drush_domain_add_validate($hostname, $name) {
 /**
  * Creates a domain record.
  *
- * @param Drupal\domain\Plugin\Core\Entity\Domain $domain
+ * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
  *   A domain entity.
  */
-function domain_drush_create(Domain $domain) {
+function domain_drush_create(DomainInterface $domain) {
   $domain->save();
   if (isset($domain->domain_id)) {
     drush_print(dt('Created @name at @domain.', array('@name' => $domain->name, '@domain' => $domain->hostname)));

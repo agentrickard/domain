@@ -10,7 +10,7 @@ namespace Drupal\domain\Plugin\Action;
 use Drupal\Core\Annotation\Action;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Action\ActionBase;
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 
 /**
  * Deletes a domain record.
@@ -26,7 +26,7 @@ class DeleteDomain extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(Domain $domain = NULL) {
+  public function execute(DomainInterface $domain = NULL) {
     $domain->delete();
   }
 

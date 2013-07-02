@@ -6,7 +6,7 @@
  */
 
 namespace Drupal\domain\Tests;
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain record creation API.

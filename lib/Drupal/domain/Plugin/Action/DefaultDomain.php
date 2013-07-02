@@ -10,7 +10,7 @@ namespace Drupal\domain\Plugin\Action;
 use Drupal\Core\Annotation\Action;
 use Drupal\Core\Annotation\Translation;
 use Drupal\Core\Action\ActionBase;
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 
 /**
  * Sets the domain is_default property to 1.
@@ -26,7 +26,7 @@ class DefaultDomain extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(Domain $domain = NULL) {
+  public function execute(DomainInterface $domain = NULL) {
     $domain->saveDefault();
   }
 

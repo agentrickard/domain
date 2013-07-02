@@ -9,7 +9,7 @@ namespace Drupal\domain_config\EventSubscriber;
 use Drupal\Core\Config\Context\ContextInterface;
 use Drupal\Core\Config\ConfigEvent;
 use Drupal\domain\DomainManagerInterface;
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -99,13 +99,13 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    *
    * @param string $name
    *   The name of the config object.
-   * @param \Drupal\domain\Plugin\Core\Entity\Domain $domain
+   * @param \Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
    *   The domain object.
    *
    * @return string
    *   The domain-specific config name.
    */
-  public function getDomainConfigName($name, Domain $domain) {
+  public function getDomainConfigName($name, DomainInterface $domain) {
     return 'domain.config.' . $domain->machine_name . '.' . $name;
   }
 

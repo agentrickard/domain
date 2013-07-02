@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\ControllerInterface;
 use Drupal\domain\DomainManagerInterface;
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 
 class DomainManager implements DomainManagerInterface {
 
@@ -32,7 +32,7 @@ class DomainManager implements DomainManagerInterface {
     }
   }
 
-  public function setActiveDomain(Domain $domain) {
+  public function setActiveDomain(DomainInterface $domain) {
     $this->domain = $domain;
   }
 

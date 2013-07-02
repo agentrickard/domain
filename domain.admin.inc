@@ -5,7 +5,8 @@
  * Administrative pages for the Domain module.
  */
 
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Form builder to list domain records.
@@ -120,6 +121,7 @@ function domain_overview_form($form, &$form_state, $domains) {
         'query' => array(),
       );
     }
+    Drupal::moduleHandler()->invokeAll('domain_operations', $operations);
     foreach ($operations as $key => $value) {
       $operations[$key]['query'] += $destination;
     }
@@ -180,7 +182,7 @@ function domain_delete($domain) {
   return entity_get_form($domain);
 }
 
-function domain_admin_callback(Domain $domain, $action) {
+function domain_admin_callback(DomainInterface $domain, $action) {
   // @todo CSRF tokens are validated in page callbacks rather than access
   //   callbacks, because access callbacks are also invoked during menu link
   //   generation. Add token support to routing: http://drupal.org/node/755584.
@@ -219,5 +221,6 @@ function domain_admin_callback(Domain $domain, $action) {
     drupal_set_message(t('Domain record !verb.', array('!verb' => $verb)));
   }
   // Return to the invoking page.
-  drupal_goto();
+  $destination = drupal_get_destination();
+  return new RedirectResponse($destination['destination']);
 }

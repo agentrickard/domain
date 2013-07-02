@@ -14,7 +14,7 @@
  *
  * When using this hook, you should invoke the namespace with:
  *
- * use Drupal\domain\Plugin\Core\Entity\Domain;
+ * use Drupal\domain\DomainInterface;
  *
  *
  * @param array $domain
@@ -28,4 +28,21 @@ function hook_domain_load(array $domain) {
     // Modify the site_grant flag, removing access to 'all affiliates.'
     $domain->site_grant = FALSE;
   }
+}
+
+/**
+ * Adds administrative operations for the domain overview form.
+ *
+ * @param &$operations
+ *  An array of links, which uses a unique string key and requires the
+ *  elements 'title' and 'href'; the 'query' value is optional, and used
+ *  for link-actions with tokens.
+ */
+function hook_domain_operations(&$operations) {
+  // Add aliases to the list.
+  $operations['domain_alias'] = array(
+    'title' => t('alias'),
+    'href' => "admin/structure/domain/$domain->machine_name/alias",
+    'query' => array(),
+  );
 }

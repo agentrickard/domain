@@ -7,7 +7,7 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\Plugin\Core\Entity\Domain;
+use Drupal\domain\DomainInterface;
 
 interface DomainManagerInterface {
 
@@ -19,7 +19,7 @@ interface DomainManagerInterface {
   /**
    * Sets the active domain.
    */
-  public function setActiveDomain(Domain $domain);
+  public function setActiveDomain(DomainInterface $domain);
 
   /**
    * Gets the active domain.
