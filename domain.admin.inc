@@ -182,6 +182,15 @@ function domain_delete($domain) {
   return entity_get_form($domain);
 }
 
+/**
+ * Performs click actions on the domain overview form.
+ *
+ * @param Drupal\domain\DomainInterface
+ *   A domain record object.
+ * @param $action
+ *   The name of an action to perform.
+ *   See Drupal\domain\Plugins\Action
+ */
 function domain_admin_callback(DomainInterface $domain, $action) {
   // @todo CSRF tokens are validated in page callbacks rather than access
   //   callbacks, because access callbacks are also invoked during menu link

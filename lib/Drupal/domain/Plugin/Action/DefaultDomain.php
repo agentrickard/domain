@@ -35,7 +35,7 @@ class DefaultDomain extends ActionBase {
    */
   public function executeMultiple(array $objects) {
     foreach ($objects as $object) {
-      if ($object instanceOf Domain) {
+      if ($object instanceOf DomainInterface) {
         $object->saveDefault();
       }
     }
