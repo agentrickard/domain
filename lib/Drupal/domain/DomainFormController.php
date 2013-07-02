@@ -88,6 +88,16 @@ class DomainFormController extends EntityFormController {
   }
 
   /**
+   * Overrides \Drupal\Core\Entity\EntityFormController::validate().
+   */
+  public function validate(array $form, array &$form_state) {
+    $entity = $this->buildEntity($form, $form_state);
+    $errors = $entity->validate();
+    if (!empty($errors)) {
+      form_set_error('hostname', $errors);
+    }
+  }
+  /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {

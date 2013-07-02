@@ -133,7 +133,69 @@ class Domain extends Entity implements DomainInterface {
    * Validates the hostname for a domain.
    */
   public function validate() {
-    return 'foo';
+    $hostname = $this->hostname;
+    $error_list = array();
+    // Check for at least one dot or the use of 'localhost'.
+    // Note that localhost can specify a port.
+    $localhost_check = explode(':', $hostname);
+    if (substr_count($hostname, '.') == 0 && $localhost_check[0] != 'localhost') {
+      $error_list[] = t('At least one dot (.) is required, except when using <em>localhost</em>.');
+    }
+    // Check for one colon only.
+    if (substr_count($hostname, ':') > 1) {
+      $error_list[] = t('Only one colon (:) is allowed.');
+    }
+    // If a colon, make sure it is only followed by numbers.
+    elseif (substr_count($hostname, ':') == 1) {
+      $parts = explode(':', $hostname);
+      $port = (int) $parts[1];
+      if (strcmp($port, $parts[1])) {
+        $error_list[] = t('The port protocol must be an integer.');
+      }
+    }
+    // The domain cannot begin or end with a period.
+    if (substr($hostname, 0, 1) == '.') {
+      $error_list[] = t('The domain must not begin with a dot (.)');
+    }
+    // The domain cannot begin or end with a period.
+    if (substr($hostname, -1) == '.') {
+      $error_list[] = t('The domain must not end with a dot (.)');
+    }
+    // Check for valid characters, unless using non-ASCII domains.
+    if (!variable_get('domain_allow_non_ascii', FALSE)) {
+      $pattern = '/^[a-z0-9\.\-:]*$/i';
+      if (!preg_match($pattern, $hostname)) {
+        $error_list[] = t('Only alphanumeric characters, dashes, and a colon are allowed.');
+      }
+    }
+    // Check for lower case.
+    if ($hostname != drupal_strtolower($hostname)) {
+      $error_list[] = t('Only lower-case characters are allowed.');
+    }
+    // Check for 'www' prefix if redirection / handling is enabled under global domain settings.
+    // Note that www prefix handling must be set explicitly in the UI.
+    // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
+    if (variable_get('domain_www', 0) && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
+      $error_list[] = t('WWW prefix handling: Domains must be registered without the www. prefix.');
+    }
+
+    // Check existing domains.
+    $domains = domain_load_multiple();
+    foreach ($domains as $domain) {
+      if ($domain->hostname == $hostname) {
+        $error_list[] = t('The hostname is already registered.');
+        break;
+      }
+    }
+    // Allow modules to alter this behavior.
+    Drupal::moduleHandler()->invokeAll('domain_validate', $error_list, $hostname);
+
+    // Return the errors, if any.
+    if (!empty($error_list)) {
+      return t('The domain string is invalid for %subdomain:', array('%subdomain' => $hostname)) . theme('item_list', array('items' => $error_list));
+    }
+
+    return array();
   }
 
   /**

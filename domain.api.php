@@ -46,3 +46,32 @@ function hook_domain_operations(&$operations) {
     'query' => array(),
   );
 }
+
+/**
+ * Alter the validation step of a domain record.
+ *
+ * This hook allows modules to change or extend how domain validation
+ * happens. Most useful for international domains or other special cases
+ * where a site wants to restrict domain creation is some manner.
+ *
+ * NOTE: This does not apply to Domain Alias records.
+ *
+ * @param &$error_list
+ *   The list of current validation errors. Modify this value by reference.
+ *   If you return an empty array or NULL, the domain is considered valid.
+ * @param $hostname
+ *   The HTTP_HOST string value being validated, such as one.example.com.
+ *   Note that this is checked for uniqueness separately. This value is not
+ *   modifiable.
+ * @return
+ *   No return value. Modify $error_list by reference. Return an empty array
+ *   or NULL to validate this domain.
+ *
+ * @see domain_valid_domain()
+ */
+function hook_domain_validate_alter(&$error_list, $subdomain) {
+  // Only allow TLDs to be .org for our site.
+  if (substr($subdomain, -4) != '.org') {
+    $error_list[] = t('Only .org domains may be registered.');
+  }
+}
