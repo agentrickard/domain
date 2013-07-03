@@ -180,11 +180,10 @@ class Domain extends Entity implements DomainInterface {
     }
 
     // Check existing domains.
-    $domains = domain_load_multiple();
+    $domains = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
     foreach ($domains as $domain) {
-      if ($domain->hostname == $hostname) {
+      if ($domain->id() != $this->id()) {
         $error_list[] = t('The hostname is already registered.');
-        break;
       }
     }
     // Allow modules to alter this behavior.
