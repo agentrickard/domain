@@ -349,9 +349,8 @@ class Domain extends Entity implements DomainInterface {
    *
    * Looks like a core bug in /core/lib/Drupal/Core/Entity/EntityStorageControllerBase.php
    * line 183. May be removed when converted to EntityNG.
-
-  public function getTranslation($langcode = NULL) {
-    return FALSE;
-  }
   */
+  public function getPropertyDefinitions() {
+    return array();
+  }
 }
