@@ -22,23 +22,46 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  *   module = "domain_alias",
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "access" = "Drupal\Core\Entity\EntityAccessController",
- *     "render" = "Drupal\Core\Entity\EntityRenderController",
  *     "form" = {
  *       "default" = "Drupal\domain_alias\DomainAliasFormController",
- *       "delete" = "Drupal\domain_alias\Form\DomainAliasDeleteForm"
  *     }
  *   },
  *   config_prefix = "domain.alias",
- *   fieldable = FALSE,
  *   entity_keys = {
  *     "id" = "id",
- *     "label" = "label",
- *     "uuid" = "uuid",
- *     "pattern" = "pattern"
+ *     "domain_machine_name" = "domain_machine_name",
+ *     "uuid" = "uuid"
  *   }
  * )
  */
 class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
+
+  /**
+   * The alias ID.
+   *
+   * @var string
+   */
+  public $id;
+
+  /**
+   * The alias UUID.
+   *
+   * @var string
+   */
+  public $uuid;
+
+  /**
+   * The alias pattern.
+   *
+   * @var string
+   */
+  public $pattern;
+
+  /**
+   * The alias redirect status.
+   *
+   * @var boolean
+   */
+  public $redirect;
 
 }

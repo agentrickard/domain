@@ -4,3 +4,23 @@
  * @file
  * Maps multiple host requests to a single domain record.
  */
+
+/**
+ * Implements hook_menu().
+ */
+function domain_alias_menu() {
+  $items['admin/structure/domain/%domain_machine_name/alias'] = array(
+    'title' => 'Aliases',
+    'page callback' => 'domain_alias_form',
+    'page arguments' => array(3),
+    'access callback' => 'domain_edit_access',
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+function domain_alias_form(DomainInterface $domain) {
+  debug($domain);
+  return 'foo';
+}
