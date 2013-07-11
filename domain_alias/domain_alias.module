@@ -33,9 +33,10 @@ function domain_alias_form(DomainInterface $domain) {
  */
 function domain_alias_domain_operations(DomainInterface $domain) {
   // Add aliases to the list.
+  $id = $domain->id();
   $operations['domain_alias'] = array(
     'title' => t('aliases'),
-    'href' => "admin/structure/domain/$domain->machine_name/alias",
+    'href' => "admin/structure/domain/$id/alias",
     'query' => array(),
   );
   return $operations;

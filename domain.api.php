@@ -45,9 +45,10 @@ function hook_domain_load(array $domain) {
  */
 function hook_domain_operations(DomainInterface $domain) {
   // Add aliases to the list.
+  $id = $domain->id();
   $operations['domain_alias'] = array(
     'title' => t('alias'),
-    'href' => "admin/structure/domain/$domain->machine_name/alias",
+    'href' => "admin/structure/domain/$id/alias",
     'query' => array(),
   );
   return $operations;
