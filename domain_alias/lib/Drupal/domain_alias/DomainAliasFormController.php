@@ -8,6 +8,8 @@
 namespace Drupal\domain_alias;
 
 use Drupal\Core\Entity\EntityFormController;
+use Drupal\domain\DomainInterface;
+use Drupal\domain_alias\DomainAliasInterface;
 
 /**
  * Base form controller for domain alias edit forms.
