@@ -20,11 +20,17 @@ function domain_alias_menu() {
   return $items;
 }
 
+/**
+ * Stub form callback for testing.
+ */
 function domain_alias_form(DomainInterface $domain) {
   debug($domain);
   return 'foo';
 }
 
+/**
+ * Implements hook_domain_operations().
+ */
 function domain_alias_domain_operations(DomainInterface $domain) {
   // Add aliases to the list.
   $operations['domain_alias'] = array(

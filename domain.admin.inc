@@ -92,32 +92,32 @@ function domain_overview_form($form, &$form_state, $domains) {
     $operations = array();
     $operations['edit'] = array(
       'title' => t('edit'),
-      'href' => "admin/structure/domain/$domain->machine_name",
+      'href' => "admin/structure/domain/$domain_id",
       'query' => array(),
     );
     if ($domain->status && !$domain->is_default) {
       $operations['disable'] = array(
         'title' => t('disable'),
-        'href' => "admin/structure/domain/$domain->machine_name/disable",
+        'href' => "admin/structure/domain/$domain_id/disable",
         'query' => array('token' => drupal_get_token()),
       );
     }
     elseif (!$domain->is_default) {
       $operations['enable'] = array(
         'title' => t('enable'),
-        'href' => "admin/structure/domain/$domain->machine_name/enable",
+        'href' => "admin/structure/domain/$domain_id/enable",
         'query' => array('token' => drupal_get_token()),
       );
     }
     if (!$domain->is_default) {
       $operations['default'] = array(
         'title' => t('make default'),
-        'href' => "admin/structure/domain/$domain->machine_name/default",
+        'href' => "admin/structure/domain/$domain_id/default",
         'query' => array('token' => drupal_get_token()),
       );
       $operations['delete'] = array(
         'title' => t('delete'),
-        'href' => "admin/structure/domain/$domain->machine_name/delete",
+        'href' => "admin/structure/domain/$domain_id/delete",
         'query' => array(),
       );
     }
@@ -173,13 +173,6 @@ function domain_add($inherit = FALSE) {
  * Page callback to edit a domain record.
  */
 function domain_edit($domain) {
-  return entity_get_form($domain);
-}
-
-/**
- * Page callback to edit a domain record.
- */
-function domain_delete($domain) {
   return entity_get_form($domain);
 }
 

@@ -55,7 +55,7 @@ function domain_menu() {
     'route_name' => 'domain_add',
     'type' => MENU_SIBLING_LOCAL_TASK,
   );
-  $items['admin/structure/domain/%domain_machine_name'] = array(
+  $items['admin/structure/domain/%domain'] = array(
     'title' => 'Domain',
     'page callback' => 'domain_edit',
     'page arguments' => array(3),
@@ -64,46 +64,10 @@ function domain_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'domain.admin.inc',
   );
-  $items['admin/structure/domain/%domain_machine_name/edit'] = array(
+  $items['admin/structure/domain/%domain/edit'] = array(
     'title' => 'Edit',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
-  );
-  $items['admin/structure/domain/%domain_machine_name/delete'] = array(
-    'title' => 'Delete',
-    'page callback' => 'domain_delete',
-    'page arguments' => array(3),
-    'access callback' => 'domain_edit_access',
-    'access arguments' => array(3),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'domain.admin.inc',
-  );
-  $items['admin/structure/domain/%domain_machine_name/default'] = array(
-    'title' => 'Make default',
-    'page callback' => 'domain_admin_callback',
-    'page arguments' => array(3, 4),
-    'access callback' => 'domain_edit_access',
-    'access arguments' => array(3),
-    'type' => MENU_CALLBACK,
-    'file' => 'domain.admin.inc',
-  );
-  $items['admin/structure/domain/%domain_machine_name/enable'] = array(
-    'title' => 'Enable',
-    'page callback' => 'domain_admin_callback',
-    'page arguments' => array(3, 4),
-    'access callback' => 'domain_edit_access',
-    'access arguments' => array(3),
-    'type' => MENU_CALLBACK,
-    'file' => 'domain.admin.inc',
-  );
-  $items['admin/structure/domain/%domain_machine_name/disable'] = array(
-    'title' => 'Disable',
-    'page callback' => 'domain_admin_callback',
-    'page arguments' => array(3, 4),
-    'access callback' => 'domain_edit_access',
-    'access arguments' => array(3),
-    'type' => MENU_CALLBACK,
-    'file' => 'domain.admin.inc',
   );
   $items['domain'] = array(
     'title' => 'Domains',
@@ -111,7 +75,7 @@ function domain_menu() {
     'access callback' => 'domain_create_access',
     'file' => 'domain.pages.inc',
   );
-  $items['domain/%domain_machine_name'] = array(
+  $items['domain/%domain'] = array(
     'title' => 'Domain',
     'title callback' => 'domain_page_title',
     'title arguments' => array(1),
