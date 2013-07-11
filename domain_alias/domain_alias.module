@@ -24,3 +24,13 @@ function domain_alias_form(DomainInterface $domain) {
   debug($domain);
   return 'foo';
 }
+
+function domain_alias_domain_operations(DomainInterface $domain) {
+  // Add aliases to the list.
+  $operations['domain_alias'] = array(
+    'title' => t('aliases'),
+    'href' => "admin/structure/domain/$domain->machine_name/alias",
+    'query' => array(),
+  );
+  return $operations;
+}

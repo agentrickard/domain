@@ -37,14 +37,20 @@ function hook_domain_load(array $domain) {
  *  An array of links, which uses a unique string key and requires the
  *  elements 'title' and 'href'; the 'query' value is optional, and used
  *  for link-actions with tokens.
+ * @param Drupal\domain\DomainInterface
+ *   A domain record object.
+ *
+ * @return array
+ *   An array of operations.
  */
-function hook_domain_operations(&$operations) {
+function hook_domain_operations(DomainInterface $domain) {
   // Add aliases to the list.
   $operations['domain_alias'] = array(
     'title' => t('alias'),
     'href' => "admin/structure/domain/$domain->machine_name/alias",
     'query' => array(),
   );
+  return $operations;
 }
 
 /**

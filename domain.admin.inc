@@ -121,7 +121,8 @@ function domain_overview_form($form, &$form_state, $domains) {
         'query' => array(),
       );
     }
-    Drupal::moduleHandler()->invokeAll('domain_operations', $operations);
+    // @TODO: should this be handled differently?
+    $operations += Drupal::moduleHandler()->invokeAll('domain_operations', array($domain));
     foreach ($operations as $key => $value) {
       $operations[$key]['query'] += $destination;
     }
