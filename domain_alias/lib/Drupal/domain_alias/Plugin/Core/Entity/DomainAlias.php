@@ -12,7 +12,7 @@ use Drupal\Core\Entity\Annotation\EntityType;
 use Drupal\Core\Annotation\Translation;
 use Drupal\domain\DomainInterface;
 use Drupal\domain_alias\DomainAliasInterface;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Config\Entity\ConfigStorageController;
 
 /**
  * Defines a Domain alias configuration entity class.

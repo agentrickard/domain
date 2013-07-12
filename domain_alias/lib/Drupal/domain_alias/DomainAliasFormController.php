@@ -10,6 +10,7 @@ namespace Drupal\domain_alias;
 use Drupal\Core\Form\FormInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain_alias\DomainAliasInterface;
+use Drupal\Core\Config\Entity\ConfigStorageController;
 
 /**
  * Base form controller for domain alias edit forms.
@@ -17,10 +18,9 @@ use Drupal\domain_alias\DomainAliasInterface;
 class DomainAliasFormController implements FormInterface {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::form().
+   * Overrides Drupal\Core\Form\FormInterface::buildForm().
    */
   public function buildForm(array $form, array &$form_state, DomainInterface $domain = NULL) {
-
     $form['domain_help'] = array(
       '#type' => 'markup',
       '#markup' => domain_alias_help_text(),
@@ -46,20 +46,13 @@ class DomainAliasFormController implements FormInterface {
         '#tree' => TRUE,
       );
       foreach ($domain->aliases as $alias_id => $alias) {
-        $form['domain_alias'][$alias_id] = array(
-          '#tree' => TRUE,
-        );
-        $form['domain_alias'][$alias_id]['alias_id'] = array(
-          '#type' => 'value',
-          '#value' => $alias_id,
-        );
         $form['domain_alias'][$alias_id]['redirect'] = array(
           '#type' => 'checkbox',
-          '#default_value' => $alias['redirect'],
+          '#default_value' => $alias->redirect,
         );
         $form['domain_alias'][$alias_id]['pattern'] = array(
           '#type' => 'textfield',
-          '#default_value' => $alias['pattern'],
+          '#default_value' => $alias->pattern,
           '#maxlength' => 255,
           '#width' => 40,
         );
@@ -106,43 +99,37 @@ class DomainAliasFormController implements FormInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::validate().
+   * Overrides Drupal\Core\Form\FormInterface::validateForm().
    */
   public function validateForm(array &$form, array &$form_state) {
-
+    // @TODO validation
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   * Overrides Drupal\Core\Form\FormInterface::submitForm().
    */
   public function submitForm(array &$form, array &$form_state) {
     $values = $form_state['values'];
     $domain = domain_load($values['domain_id']);
     $aliases = isset($values['domain_alias']) ? array_merge($values['domain_alias'], $values['domain_alias_new']) : $values['domain_alias_new'];
-    foreach ($aliases as $values) {
+    foreach ($aliases as $id => $values) {
       if (empty($values['pattern'])) {
         continue;
       }
+      // @TODO abstract this logic?
       $values['domain_machine_name'] = $domain->machine_name;
-      $alias = entity_create('domain_alias', $values);
-      if (empty($alias->id)) {
+      $alias = entity_load('domain_alias', $id);
+      if (empty($alias)) {
+        $alias = entity_create('domain_alias', $values);
         $alias->createID();
       }
-      $alias->save();
+      if (!empty($values['delete'])) {
+        $alias->delete();
+      }
+      else {
+        $alias->save();
+      }
     }
   }
 
-}
-
-/**
- * Help text for the form.
- */
-function domain_alias_help_text() {
-  $output = t('<p>A domain alias is used to register multiple valid domain names to a single record within Domain Access.
-    You may enter as many unique aliases per domain as you wish. </p>
-    <p>You may specify a pattern for your domains by using <strong>*</strong> (asterisk) to match any number of random
-    characters and <strong>?</strong> (question mark) to match exactly one random character.
-    For example: <em>*.example.com</em> would match any HTTP request made to a subdomain of <em>example.com</em>
-    to the domain record for <em>example.com</em>. NOTE: <em>Only one wildcard is allowed per alias.</em></p>');
-  return $output;
 }

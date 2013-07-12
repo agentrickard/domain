@@ -29,3 +29,26 @@ function domain_alias_domain_operations(DomainInterface $domain) {
   );
   return $operations;
 }
+
+/**
+ * Implements hook_domain_load().
+ */
+function domain_alias_domain_load(array $domains) {
+  foreach ($domains as $key => $domain) {
+    $domains[$key]->aliases = entity_load_multiple_by_properties('domain_alias', array('domain_machine_name' => $domain->machine_name));
+    // @TODO: matching to current.
+  }
+}
+
+/**
+ * Help text for the form.
+ */
+function domain_alias_help_text() {
+  $output = t('<p>A domain alias is used to register multiple valid domain names to a single record within Domain Access.
+    You may enter as many unique aliases per domain as you wish. </p>
+    <p>You may specify a pattern for your domains by using <strong>*</strong> (asterisk) to match any number of random
+    characters and <strong>?</strong> (question mark) to match exactly one random character.
+    For example: <em>*.example.com</em> would match any HTTP request made to a subdomain of <em>example.com</em>
+    to the domain record for <em>example.com</em>. NOTE: <em>Only one wildcard is allowed per alias.</em></p>');
+  return $output;
+}

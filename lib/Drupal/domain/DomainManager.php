@@ -48,5 +48,4 @@ class DomainManager implements DomainManagerInterface {
     return $this->httpHost;
   }
 
-
 }

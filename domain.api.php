@@ -21,7 +21,7 @@
  *   An array of $domain record objects.
  *
  */
-function hook_domain_load(array $domain) {
+function hook_domain_load(array $domains) {
   // Add a variable to the $domain.
   foreach ($domains as $domain) {
     $domain->myvar = 'mydomainvar';
