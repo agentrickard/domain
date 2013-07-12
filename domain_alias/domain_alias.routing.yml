@@ -1,0 +1,6 @@
+domain_alias:
+  pattern: '/admin/structure/domain/{domain}/alias'
+  defaults:
+    _form: 'Drupal\domain_alias\DomainAliasFormController'
+  requirements:
+    _permission: 'administer domains'

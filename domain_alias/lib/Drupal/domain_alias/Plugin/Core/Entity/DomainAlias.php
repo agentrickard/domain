@@ -23,9 +23,6 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  *   module = "domain_alias",
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
- *     "form" = {
- *       "default" = "Drupal\domain_alias\DomainAliasFormController",
- *     }
  *   },
  *   config_prefix = "domain.alias",
  *   entity_keys = {
@@ -38,7 +35,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
 class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
 
   /**
-   * The alias ID.
+   * The alias id.
    *
    * @var string
    */
@@ -50,6 +47,13 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
    * @var string
    */
   public $uuid;
+
+  /**
+   * The parent domain machine name.
+   *
+   * @var string
+   */
+  public $domain_machine_name;
 
   /**
    * The alias pattern.
@@ -64,5 +68,19 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
    * @var boolean
    */
   public $redirect;
+
+  /**
+   * Overrides Drupal\Core\Entity\Entity::id().
+   */
+  public function id() {
+    return $this->id;
+  }
+
+  public function createID() {
+    // Be careful with wildcards when writing config files.
+    $search = array('*', '?', '.');
+    $replace = array('+', '-', '_');
+    $this->id = str_replace($search, $replace, $this->pattern);
+  }
 
 }
