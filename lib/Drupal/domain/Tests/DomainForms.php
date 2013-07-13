@@ -55,7 +55,7 @@ class DomainForms extends DomainTestBase {
     $this->assertTrue(!empty($new_domain->uuid), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
-    $postUrl = 'admin/structure/domain/' . $new_domain->machine_name;
+    $postUrl = 'admin/structure/domain/' . $new_domain->id();
     $this->drupalGet($postUrl);
 
     // Update the record.
