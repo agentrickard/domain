@@ -6,6 +6,22 @@
  */
 
 /**
+ * Implements hook_field_info().
+ */
+function domain_alias_field_info() {
+  return array(
+    'domain_alias' => array(
+      'label' => t('Domain alias'),
+      'description' => t('Domain alias patterns.'),
+      'instance_settings' => array('pattern' => NULL, 'redirect' => FALSE),
+      'default_widget' => 'domain_alias',
+      'default_formatter' => 'domain_alias',
+      'class' => '\Drupal\domain_alias\Type\DomainAliasItem',
+    ),
+  );
+}
+
+/**
  * Implements hook_domain_load().
  */
 function domain_alias_domain_load(array $domains) {

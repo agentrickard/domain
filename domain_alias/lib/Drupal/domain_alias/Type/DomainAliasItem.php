@@ -2,17 +2,20 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Type\DomainAliasItem.
+ * Definition of Drupal\domain_alias\Type\DomainAliasItem.
  */
 
 namespace Drupal\domain_alias\Type;
 
-use Drupal\Core\Entity\Field\FieldItemBase;
+use Drupal\Core\Entity\Annotation\FieldType;
+use Drupal\Core\Annotation\Translation;
+use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
+use Drupal\field\Plugin\Core\Entity\Field;
 
 /**
  * Defines the 'domain' entity field items.
  */
-class DomainAliasItem extends FieldItemBase {
+class DomainAliasItem extends ConfigFieldItemBase {
 
   /**
    * Definitions of the contained properties.
@@ -42,30 +45,13 @@ class DomainAliasItem extends FieldItemBase {
     return static::$propertyDefinitions;
   }
 
-  /**
-   * Overrides \Drupal\Core\Entity\Field\FieldItemBase::setValue().
-   */
-  public function setValue($values) {
-    // Treat the values as property value of the entity field, if no array
-    // is given.
-    if (!is_array($values)) {
-      $values = array('entity' => $values);
-    }
-
-    // Entity is computed out of the ID, so we only need to update the ID. Only
-    // set the entity field if no ID is given.
-    if (isset($values['domain_id'])) {
-      $this->properties['domain_id']->setValue($values['domain_id']);
-    }
-    elseif (isset($values['entity'])) {
-      $this->properties['entity']->setValue($values['entity']);
-    }
-    else {
-      $this->properties['entity']->setValue(NULL);
-    }
-    unset($values['entity'], $values['domain_id']);
-    if ($values) {
-      throw new \InvalidArgumentException('Property ' . key($values) . ' is unknown.');
+  public static function schema(Field $field) {
+    $definition = \Drupal::service('plugin.manager.entity.field.field_type')->getDefinition($field->type);
+    $module = $definition['module'];
+    module_load_install($module);
+    $callback = "{$module}_field_schema";
+    if (function_exists($callback)) {
+      return $callback($field);
     }
   }
 

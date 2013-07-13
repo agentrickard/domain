@@ -19,7 +19,7 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
     return array(
       'name' => 'Domain alias manager tests',
       'description' => 'Tests domain alias response management.',
-      'group' => 'Domain Alias',
+      'group' => 'Domain alias',
     );
   }
 

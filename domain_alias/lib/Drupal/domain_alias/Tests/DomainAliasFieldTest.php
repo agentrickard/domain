@@ -18,7 +18,7 @@ class DomainAliasFieldTest extends DomainAliasTestBase {
     return array(
       'name' => 'Domain alias field tests',
       'description' => 'Attach domain alias fields to domains.',
-      'group' => 'Domain Alias',
+      'group' => 'Domain alias',
     );
   }
 

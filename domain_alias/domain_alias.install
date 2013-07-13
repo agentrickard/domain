@@ -27,13 +27,7 @@ function domain_alias_field_schema($field) {
       ),
     ),
     'indexes' => array(
-      'target_id' => array('target_id'),
-    ),
-    'foreign keys' => array(
-      'target_id' => array(
-        'table' => 'file_managed',
-        'columns' => array('target_id' => 'fid'),
-      ),
+      'pattern' => array('pattern'),
     ),
   );
 }
