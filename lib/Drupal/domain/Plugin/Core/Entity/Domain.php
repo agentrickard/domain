@@ -234,6 +234,10 @@ class Domain extends Entity implements DomainInterface {
    */
   public function isActive() {
     $domain = domain_get_domain();
+    if (empty($domain)) {
+      // @TODO: set the default domain in the manager?
+      return FALSE;
+    }
     return ($this->machine_name == $domain->machine_name);
   }
 
