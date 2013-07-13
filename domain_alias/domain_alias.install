@@ -13,12 +13,6 @@ use Drupal\field\Plugin\Core\Entity\Field;
 function domain_alias_field_schema($field) {
   return array(
     'columns' => array(
-      'domain_id' => array(
-        'description' => 'The ID of the parent domain.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-      ),
       'pattern' => array(
         'description' => 'The alias pattern to match.',
         'type' => 'varchar',
