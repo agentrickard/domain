@@ -1,7 +1,0 @@
-name = Domain
-description = Creates domain records within a Drupal installation.
-package = Domain
-version = VERSION
-core = 8.x
-dependencies[] = options
-configure = admin/structure/domain
