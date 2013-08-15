@@ -353,7 +353,7 @@ class DomainHookTest extends DomainTestCase {
     // Here we read the domain 'local.test' as an alias for the default domain.
     // However, this function can't really be registered, so we have to fake it a bit.
     $new_domain = $this->domainCreateDomains(array('newtest'));
-    $test_domain = 'local.test';
+    $test_domain = array('subdomain' => 'local.test');
     $modules = _domain_bootstrap_modules();
     $modules[] = 'domain_test';
     $args[] = $test_domain;

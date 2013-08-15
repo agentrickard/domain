@@ -29,7 +29,8 @@ function domain_test_get() {
  * Match 'local.test' to 'newtest.example.com'.
  */
 function domain_test_domain_bootstrap_lookup($domain) {
-  if ($domain != 'local.test') {
+  $subdomain = $domain['subdomain'];
+  if ($subdomain != 'local.test') {
     return;
   }
   $default = domain_default();
