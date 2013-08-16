@@ -270,9 +270,9 @@ function domain_content_update_nodes($nids, $options) {
   // {node_access} table.  The rest of the process will clear the cache,
   // so this should be a safe operation.
   $domain_site = $options['domain_site'];
-  $domains = $options['domain_id'];
   $behavior = $options['behavior'];
   foreach ($nids as $nid) {
+    $domains = $options['domain_id'];
     // Other modules need to respond, we have to load the full node.
     $node = node_load($nid);
     // Make sure the node is valid.
