@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Plugin\Core\Entity\Domain.
+ * Definition of Drupal\domain\Entity\Domain.
  */
 
-namespace Drupal\domain\Plugin\Core\Entity;
+namespace Drupal\domain\Entity;
 
 use Drupal\domain\DomainInterface;
 

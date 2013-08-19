@@ -99,7 +99,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    *
    * @param string $name
    *   The name of the config object.
-   * @param \Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   The domain object.
    *
    * @return string

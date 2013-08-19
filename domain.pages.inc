@@ -21,7 +21,7 @@ function domain_page() {
 /**
  * Views a domain record as a non-administrator.
  *
- * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
+ * @param Drupal\domain\DomainInterface $domain
  *   A domain entity.
  */
 function domain_page_view(DomainInterface $domain) {

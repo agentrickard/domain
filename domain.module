@@ -138,7 +138,7 @@ function domain_view_access() {
 /**
  * Returns the page title for a domain record.
  *
- * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
+ * @param Drupal\domain\DomainInterface $domain
  *   A domain entity.
  */
 function domain_page_title(DomainInterface $domain) {
@@ -331,7 +331,7 @@ function domain_load_multiple(array $domain_ids = NULL, $reset = FALSE) {
  * @param bool $reset
  *   (optional) Whether to reset the internal cache. Defaults to FALSE.
  *
- * @return Drupal\domain\Plugin\Core\Entity\Domain|FALSE
+ * @return Drupal\domain\Entity\Domain|FALSE
  *   The domain entity, if exists, FALSE otherwise. Results are
  *   statically cached.
  */
@@ -345,7 +345,7 @@ function domain_load($domain_id = NULL, $reset = FALSE) {
  * @param $hostname
  *   The domain hostname.
  *
- * @return Drupal\domain\Plugin\Core\Entity\Domain|FALSE
+ * @return Drupal\domain\Entity\Domain|FALSE
  *   The domain entity, if exists, FALSE otherwise. Results are
  *   statically cached.
  */
@@ -363,7 +363,7 @@ function domain_load_hostname($hostname) {
  * @param $machine_name
  *   The domain's machine name.
  *
- * @return Drupal\domain\Plugin\Core\Entity\Domain|false
+ * @return Drupal\domain\Entity\Domain|false
  *   The domain entity, if exists, FALSE otherwise. Results are
  *   statically cached.
  */
@@ -400,7 +400,7 @@ function domain_machine_name_load_multiple(array $machine_names = NULL, $reset =
 /**
  * Saves a domain record.
  *
- * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
+ * @param Drupal\domain\DomainInterface $domain
  *   A domain entity.
  */
 function domain_save(DomainInterface $domain) {
@@ -418,7 +418,7 @@ function domain_save(DomainInterface $domain) {
  *  An array of values to be set when the domain object is created. If the
  *  $inherit property is set to TRUE, some values may be overridden.
  *
- * @return Drupal\domain\Plugin\Core\Entity\Domain
+ * @return Drupal\domain\Entity\Domain
  *   A domain entity, with preset values for the current environment.
  */
 function domain_create($inherit = FALSE, array $values = array()) {
@@ -545,7 +545,7 @@ function domain_extract_field_items(array $items, $keys = FALSE) {
 /**
  * Generates an array for rendering the given node.
  *
- * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
+ * @param Drupal\domain\DomainInterface $domain
  *   A domain entity.
  * @param $view_mode
  *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'full.'

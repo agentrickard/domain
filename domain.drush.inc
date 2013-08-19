@@ -366,7 +366,7 @@ function drush_domain_add_validate($hostname, $name) {
 /**
  * Creates a domain record.
  *
- * @param Drupal\domain\Plugin\Core\Entity\DomainInterface $domain
+ * @param Drupal\domain\DomainInterface $domain
  *   A domain entity.
  */
 function domain_drush_create(DomainInterface $domain) {
