@@ -8,16 +8,15 @@
 namespace Drupal\domain\Plugin\Block;
 
 use Drupal\block\BlockBase;
-use Drupal\Component\Annotation\Plugin;
+use Drupal\block\Annotation\Block;
 use Drupal\Core\Annotation\Translation;
 
 /**
  * Provides a server information block for a domain request.
  *
- * @Plugin(
+ * @Block(
  *   id = "domain_server_block",
- *   admin_label = @Translation("Domain server information"),
- *   module = "domain"
+ *   admin_label = @Translation("Domain server information")
  * )
  */
 class DomainServerBlock extends BlockBase {

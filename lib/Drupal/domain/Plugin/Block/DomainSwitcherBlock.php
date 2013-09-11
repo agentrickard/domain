@@ -8,16 +8,15 @@
 namespace Drupal\domain\Plugin\Block;
 
 use Drupal\block\BlockBase;
-use Drupal\Component\Annotation\Plugin;
+use Drupal\block\Annotation\Block;
 use Drupal\Core\Annotation\Translation;
 
 /**
  * Provides a block that links to all domains.
  *
- * @Plugin(
+ * @Block(
  *   id = "domain_switcher_block",
- *   admin_label = @Translation("Domain switcher"),
- *   module = "domain"
+ *   admin_label = @Translation("Domain switcher")
  * )
  */
 class DomainSwitcherBlock extends BlockBase {
