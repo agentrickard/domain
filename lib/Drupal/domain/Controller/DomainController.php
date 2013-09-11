@@ -6,7 +6,7 @@
 
 namespace Drupal\domain\Controller;
 
-use Drupal\Core\Controller\ControllerInterface;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\domain\DomainManager;
 use Drupal\domain\DomainInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 /**
  * Controller routines for domain routes.
  */
-class DomainController implements ControllerInterface {
+class DomainController implements ContainerInjectionInterface {
 
   /**
    * Domain Manager Service.
