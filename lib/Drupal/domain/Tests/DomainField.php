@@ -99,7 +99,9 @@ class DomainField extends DomainTestBase {
     $this->drupalPost('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
     $node = node_load(1);
-    $this->assertTrue(count($node->field_domain['und']) == 2, 'Node saved with two domain records.');
+    $values = $node->getPropertyValues();
+    // @TODO watch for changes in core that affect this test.
+    $this->assertTrue(count($values['field_domain']) == 2, 'Node saved with two domain records.');
 
   }
 
@@ -112,7 +114,8 @@ class DomainField extends DomainTestBase {
     $label = 'domain';
 
     $settings = array(
-      'field_name' => 'field_' . $label,
+      'name' => 'field_' . $label,
+      'entity_type' => 'node',
       'type' => 'entity_reference',
       'cardinality' => -1,
       'settings' => array(
@@ -138,7 +141,7 @@ class DomainField extends DomainTestBase {
 
     // Tell the form system how to behave.
     entity_get_form_display('node', 'article', 'default')
-      ->setComponent($field['field_name'], array(
+      ->setComponent($field['name'], array(
         'type' => 'options_buttons',
     ))
     ->save();

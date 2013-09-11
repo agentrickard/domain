@@ -60,7 +60,8 @@ class DomainFieldUI extends DomainTestBase {
     $label = strtolower($this->randomName(8));
 
     $settings = array(
-      'field_name' => 'field_' . $label,
+      'name' => 'field_' . $label,
+      'entity_type' => 'domain',
       'type' => 'text',
     );
     $field = entity_create('field_entity', $settings);
