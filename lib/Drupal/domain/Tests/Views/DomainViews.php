@@ -89,7 +89,7 @@ class DomainViews extends DomainTestBase {
       'action' => 'domain_delete_action',
     );
 
-    $this->drupalPost($path, $edit, t('Apply'));
+    $this->drupalPostForm($path, $edit, t('Apply'));
     $this->assertText('Delete domain record was applied to 1 item.');
 
     // Check that one domain was removed.
@@ -101,7 +101,7 @@ class DomainViews extends DomainTestBase {
       'action_bulk_form[1]' => TRUE,
       'action' => 'domain_default_action',
     );
-    $this->drupalPost($path, $edit, t('Apply'));
+    $this->drupalPostForm($path, $edit, t('Apply'));
     $this->assertText('Set default domain record was applied to 1 item.');
 
     // Test the default domain, which should now be id 3.
@@ -115,7 +115,7 @@ class DomainViews extends DomainTestBase {
       'action_bulk_form[2]' => TRUE,
       'action' => 'domain_disable_action',
     );
-    $this->drupalPost($path, $edit, t('Apply'));
+    $this->drupalPostForm($path, $edit, t('Apply'));
     $this->assertText('The default domain cannot be disabled.');
     $this->assertText('Disable domain record was applied to 2 items.');
 
@@ -126,7 +126,7 @@ class DomainViews extends DomainTestBase {
       'action_bulk_form[2]' => TRUE,
       'action' => 'domain_enable_action',
     );
-    $this->drupalPost($path, $edit, t('Apply'));
+    $this->drupalPostForm($path, $edit, t('Apply'));
     $this->assertText('Enable domain record was applied to 1 item.');
 
     // @TODO: Test the count of disabled domains.

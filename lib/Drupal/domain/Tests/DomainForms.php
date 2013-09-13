@@ -41,7 +41,7 @@ class DomainForms extends DomainTestBase {
 
     // Make a POST request on admin/structure/domain/add.
     $edit = $this->domainPostValues();
-    $this->drupalPost('admin/structure/domain/add', $edit, 'Save');
+    $this->drupalPostForm('admin/structure/domain/add', $edit, 'Save');
 
     // Did it save correctly?
     $default_id = domain_default_id();
@@ -60,14 +60,14 @@ class DomainForms extends DomainTestBase {
 
     // Update the record.
     $edit['name'] = 'Foo';
-    $this->drupalPost($postUrl, $edit, t('Save'));
+    $this->drupalPostForm($postUrl, $edit, t('Save'));
 
     // Check that the update succeeded.
     $domain = domain_load($default_id, TRUE);
     $this->assertTrue($domain->name == 'Foo', 'Domain record updated via form.');
 
     // Delete the record.
-    $this->drupalPost($postUrl, $edit, t('Delete'));
+    $this->drupalPostForm($postUrl, $edit, t('Delete'));
     $domain = domain_load($default_id, TRUE);
     $this->assertTrue(empty($domain), 'Domain record deleted.');
 
