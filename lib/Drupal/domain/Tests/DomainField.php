@@ -94,9 +94,9 @@ class DomainField extends DomainTestBase {
 
     // Try to post a node, assigned to the first two domains.
     $edit['title'] = 'Test node';
-    $edit["field_domain[und][1]"] = TRUE;
-    $edit["field_domain[und][2]"] = TRUE;
-    $this->drupalPost('node/add/article', $edit, 'Save');
+    $edit["field_domain[1]"] = TRUE;
+    $edit["field_domain[2]"] = TRUE;
+    $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
     $node = node_load(1);
     $values = $node->getPropertyValues();
