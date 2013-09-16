@@ -1,26 +1,26 @@
 domain_admin:
-  pattern: '/admin/structure/domain'
+  path: '/admin/structure/domain'
   defaults:
     _content: '\Drupal\domain\Controller\DomainController::adminOverview'
   requirements:
     _permission: 'administer domains'
 
 domain_add:
-  pattern: '/admin/structure/domain/add'
+  path: '/admin/structure/domain/add'
   defaults:
     _entity_form: 'domain.edit'
   requirements:
     _permission: 'create domains'
 
 domain_delete:
-  pattern: '/admin/structure/domain/{domain}/delete'
+  path: '/admin/structure/domain/{domain}/delete'
   defaults:
     _entity_form: 'domain.delete'
   requirements:
     _permission: 'administer domains'
 
 domain_inline_action:
-  pattern: '/admin/structure/domain/{domain}/{op}'
+  path: '/admin/structure/domain/{domain}/{op}'
   defaults:
     _controller: 'Drupal\domain\Controller\DomainController::ajaxOperation'
   requirements:
