@@ -415,7 +415,7 @@ function domain_alias_features_api() {
       'default_hook' => 'domain_alias_default_aliases',
       'default_file' => FEATURES_DEFAULTS_CUSTOM,
       'default_filename' => 'domains',
-      'features_source' => TRUE,
+      'feature_source' => TRUE,
       'file' => drupal_get_path('module', 'domain_alias') .'/domain_alias.features.inc',
     ),
   );

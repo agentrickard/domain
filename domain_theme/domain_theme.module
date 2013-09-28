@@ -323,7 +323,7 @@ function domain_theme_features_api() {
       'default_hook' => 'domain_theme_default_themes',
       'default_file' => FEATURES_DEFAULTS_CUSTOM,
       'default_filename' => 'domains',
-      'features_source' => TRUE,
+      'feature_source' => TRUE,
       'file' => drupal_get_path('module', 'domain_theme') .'/domain_theme.features.inc',
     ),
   );
