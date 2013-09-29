@@ -1471,8 +1471,16 @@ function domain_api($domain, $reset = FALSE) {
   // issues, so let's be certain to load those.
   if (!isset($modules) || $reset) {
     $modules = module_implements('domain_load');
-    $bootstrap = _domain_bootstrap_modules();
-    $modules = array_unique(array_merge($modules, $bootstrap));
+    if (function_exists('_domain_bootstrap_modules')) {
+      $bootstrap = _domain_bootstrap_modules();
+      $modules = array_unique(array_merge($modules, $bootstrap));
+    }
+    // If the function is missing, settings.php is likely not configured.
+    elseif (!variable_get('domain_hide_errors')) {
+      // Not reporting an error during install makes it easier for scripts.
+      $severity = drupal_installation_attempted() ? 'warning' : 'error';
+      drupal_set_message(t('Domain module installation is incomplete. See INSTALL.txt and check your settings.php file.'), $severity, FALSE);
+    }
   }
 
   // Now, call the hook invocations.
