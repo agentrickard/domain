@@ -684,8 +684,10 @@ function mymodule_form_submit($form_state) {
  *   No return value. Modify $options by reference.
  */
 function hook_domain_nav_options_alter(&$options) {
-  // Remove domains that the user is not a member of.
   global $user;
+  domain_user_set($user);
+
+  // Remove domains that the user is not a member of.
   if (empty($user->domain_user)) {
     $options = array();
   }

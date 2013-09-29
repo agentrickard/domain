@@ -50,7 +50,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
     $default_source = NULL;
   }
   $account = $user;
-  domain_get_user_domains($account);
+  domain_user_set($account);
   // Only uses with 'set domain access' can assign content to all affiliates, so they get a new option.
   // This option allows domain source to be ignored on a per-node basis.
   $options = array();

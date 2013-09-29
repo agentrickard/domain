@@ -48,19 +48,12 @@ define('DOMAIN_ALL', 'DOMAIN_ALL');
 define('DOMAIN_ACTIVE', 'DOMAIN_ACTIVE');
 
 /**
- * Module setup tasks.
- *
- * 1. Adds the domain user data to the $user object.
- * 2. Ensures that our custom_url_rewrite_outbound() is loaded.
+ * Ensures that our custom_url_rewrite_outbound() is loaded.
  *
  * @link http://drupal.org/node/529026
  * @link http://drupal.org/node/820062
  */
 function domain_boot() {
-  global $user;
-  // Load domain information to the $user object.
-  $user->domain_user = domain_get_user_domains($user);
-  // Properly load custom_url_rewrite_outbound().
   include_once('settings_custom_url.inc');
 }
 
@@ -562,6 +555,19 @@ function domain_user_load($users) {
 }
 
 /**
+ * Emsures that a user object has been loaded properly.
+ *
+ * @param $account
+ *   An account object.
+ */
+function domain_user_set($account) {
+  if (!isset($user->domain_user)) {
+    $accounts = array($account->uid => $account);
+    domain_user_load($accounts);
+  }
+}
+
+/**
  * Implements hook_user_insert().
  */
 function domain_user_insert(&$edit, $account, $category) {
@@ -618,6 +624,7 @@ function domain_user_delete($account) {
  * Implements hook_user_view().
  */
 function domain_user_view($account, $view_mode) {
+  domain_user_set($account);
   // Only show on full view.
   if ($view_mode != 'full') {
     return;
@@ -1965,9 +1972,7 @@ function domain_node_grants($account, $op) {
 
   // In some edge cases, the $account may not have domain information loaded,
   // so get it.
-  if (!isset($account->domain_user)) {
-    $account->domain_user = domain_get_user_domains($account);
-  }
+  domain_user_set($account);
 
   // By design, all users can see content sent to all affiliates,
   // but the $_domain['site_grant'] can be set to FALSE.
@@ -2196,6 +2201,7 @@ function domain_set_default_grant($reset = FALSE) {
  * Splits the access checks by operation.
  */
 function domain_node_access($node, $op, $account) {
+  domain_user_set($account);
   if (empty($account->domain_user)) {
     return NODE_ACCESS_IGNORE;
   }
@@ -2213,6 +2219,7 @@ function domain_node_access($node, $op, $account) {
  * @see domain_node_access().
  */
 function domain_node_access_view($type, $node, $op, $account) {
+  domain_user_set($account);
   if (!empty($node->status)) {
     return NODE_ACCESS_IGNORE;
   }
@@ -2237,6 +2244,7 @@ function domain_node_access_view($type, $node, $op, $account) {
  * @see domain_node_access().
  */
 function domain_node_access_create($type, $node, $op, $account) {
+  domain_user_set($account);
   $_domain = domain_get_domain();
   if (!isset($account->domain_user[$_domain['domain_id']])) {
     return NODE_ACCESS_IGNORE;
@@ -2257,6 +2265,7 @@ function domain_node_access_create($type, $node, $op, $account) {
  * @see domain_node_access().
  */
 function domain_node_access_update($type, $node, $op, $account) {
+  domain_user_set($account);
   // The node must be assigned to a domain to continue.
   if (empty($node->domains)) {
     return NODE_ACCESS_IGNORE;
@@ -2406,6 +2415,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
 
   // Grab the globals we need.
   global $user;
+  domain_user_set($user);
   $_domain = domain_get_domain();
 
   // Get the default assigned domains.

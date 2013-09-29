@@ -304,6 +304,7 @@ class DomainUserHandler extends MigrateDestinationHandler {
   public function prepare($user, stdClass $row) {
     // If set, ensure domains exist.
     $domains = array();
+    domain_user_set($user);
     if (isset($user->domain_user)) {
       $user->domain_user = (array) $user->domain_user;
       foreach ($user->domain_user as $id) {

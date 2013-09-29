@@ -42,6 +42,8 @@ function domain_content_page() {
  */
 function domain_content_list() {
   global $user;
+  domain_user_set($user);
+
   $build = array();
   $show_all = user_access('bypass node access') || user_access('review content for all domains');
 
