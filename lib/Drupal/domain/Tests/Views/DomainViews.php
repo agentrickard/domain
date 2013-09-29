@@ -34,7 +34,7 @@ class DomainViews extends DomainTestBase {
   public function setUp() {
     parent::setUp();
 
-    ViewTestData::importTestViews(get_class($this), array('domain_views_test'));
+    ViewTestData::createTestViews(get_class($this), array('domain_views_test'));
   }
 
   public static function getInfo() {
