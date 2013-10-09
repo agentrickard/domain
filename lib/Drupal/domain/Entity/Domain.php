@@ -9,14 +9,9 @@ namespace Drupal\domain\Entity;
 
 use Drupal\domain\DomainInterface;
 
-use Drupal;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\Entity;
-use Drupal\Core\Entity\Annotation\EntityType;
+use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
-use Drupal\Core\Annotation\Translation;
 use Guzzle\Http\Exception\HttpException;
-
 
 /**
  * Defines the domain entity.
@@ -53,7 +48,7 @@ use Guzzle\Http\Exception\HttpException;
  *   route_base_path = "admin/structure/domain"
  * )
  */
-class Domain extends Entity implements DomainInterface {
+class Domain extends ContentEntityBase implements DomainInterface {
 
   /**
    * The domain record id.
@@ -131,6 +126,25 @@ class Domain extends Entity implements DomainInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions($entity_type) {
+    $properties['nid'] = array(
+      'label' => t('Node ID'),
+      'description' => t('The node ID.'),
+      'type' => 'integer_field',
+      'read-only' => TRUE,
+    );
+    $properties['uuid'] = array(
+      'label' => t('UUID'),
+      'description' => t('The node UUID.'),
+      'type' => 'uuid_field',
+      'read-only' => TRUE,
+    );
+    return $properties;
+  }
+
+  /**
    * Validates the hostname for a domain.
    */
   public function validate() {
@@ -188,7 +202,7 @@ class Domain extends Entity implements DomainInterface {
       }
     }
     // Allow modules to alter this behavior.
-    Drupal::moduleHandler()->invokeAll('domain_validate', $error_list, $hostname);
+    \Drupal::moduleHandler()->invokeAll('domain_validate', $error_list, $hostname);
 
     // Return the errors, if any.
     if (!empty($error_list)) {
@@ -226,7 +240,7 @@ class Domain extends Entity implements DomainInterface {
    * @TODO: Move to a proper service?
    */
   protected function getHttpClient() {
-    return Drupal::httpClient();
+    return \Drupal::httpClient();
   }
 
   /**
