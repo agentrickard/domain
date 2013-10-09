@@ -128,19 +128,56 @@ class Domain extends ContentEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type) {
-    $properties['nid'] = array(
-      'label' => t('Node ID'),
-      'description' => t('The node ID.'),
+  public static function baseFieldDefinitions($entity_type, $bundle = NULL) {
+    $properties['domain_id'] = array(
+      'label' => t('Domain record ID'),
+      'description' => t('The domain record ID.'),
       'type' => 'integer_field',
       'read-only' => TRUE,
     );
     $properties['uuid'] = array(
       'label' => t('UUID'),
-      'description' => t('The node UUID.'),
+      'description' => t('The domain record UUID.'),
       'type' => 'uuid_field',
       'read-only' => TRUE,
     );
+    $properties['machine_name'] = array(
+      'label' => t('Machine name'),
+      'description' => t('The domain record machine name.'),
+      'type' => 'string_field',
+      'read-only' => TRUE,
+    );
+    $properties['name'] = array(
+      'label' => t('Name'),
+      'description' => t('The domain record name.'),
+      'type' => 'string_field',
+    );
+    $properties['hostname'] = array(
+      'label' => t('Hostname'),
+      'description' => t('The domain record hostname.'),
+      'type' => 'string_field',
+    );
+    $properties['status'] = array(
+      'label' => t('Status'),
+      'description' => t('The domain record status.'),
+      'type' => 'boolean_field',
+    );
+    $properties['weight'] = array(
+      'label' => t('Weight'),
+      'description' => t('The domain record sort weight.'),
+      'type' => 'integer_field',
+    );
+    $properties['is_default'] = array(
+      'label' => t('Default domain'),
+      'description' => t('Indicates that the domain record is the default.'),
+      'type' => 'boolean_field',
+    );
+    $properties['scheme'] = array(
+      'label' => t('Scheme'),
+      'description' => t('The domain record http scheme.'),
+      'type' => 'string_field',
+    );
+
     return $properties;
   }
 
