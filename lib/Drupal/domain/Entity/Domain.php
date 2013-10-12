@@ -21,7 +21,7 @@ use Guzzle\Http\Exception\HttpException;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   controllers = {
- *     "storage" = "Drupal\Core\Entity\DatabaseStorageController",
+ *     "storage" = "Drupal\Core\Entity\DatabaseStorageControllerNG",
  *     "render" = "Drupal\domain\DomainRenderController",
  *     "access" = "Drupal\domain\DomainAccessController",
  *     "form" = {
@@ -53,7 +53,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public static function baseFieldDefinitions($entity_type, $bundle = NULL) {
+  public static function baseFieldDefinitions($entity_type) {
     $properties['domain_id'] = array(
       'label' => t('Domain record ID'),
       'description' => t('The domain record ID.'),
@@ -117,7 +117,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
    * Implements Drupal\Core\Entity\EntityInterface::id().
    */
   public function id() {
-    return $this->domain_id;
+    return $this->get('domain_id')->value;
   }
 
   /**
@@ -296,14 +296,14 @@ class Domain extends ContentEntityBase implements DomainInterface {
    * Sets the base path to this domain.
    */
   public function setPath() {
-    $this->path = domain_scheme($this->scheme) . $this->hostname . base_path();
+    $this->path = domain_scheme($this->scheme->value) . $this->hostname->value . base_path();
   }
 
   /**
    * Sets the domain-specific link to the current URL.
    */
   public function setUrl() {
-    $this->url = domain_scheme($this->scheme) . $this->hostname . request_uri();
+    $this->url = domain_scheme($this->scheme->value) . $this->hostname->value . request_uri();
   }
 
   /**
@@ -339,13 +339,4 @@ class Domain extends ContentEntityBase implements DomainInterface {
     }
   }
 
-  /**
-   * Strong indication that we are not translatable.
-   *
-   * Looks like a core bug in /core/lib/Drupal/Core/Entity/EntityStorageControllerBase.php
-   * line 183. May be removed when converted to EntityNG.
-  */
-  public function getPropertyDefinitions() {
-    return array();
-  }
 }
