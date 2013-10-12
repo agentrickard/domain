@@ -27,7 +27,7 @@ use Guzzle\Http\Exception\HttpException;
  *     "form" = {
  *       "default" = "Drupal\domain\DomainFormController",
  *       "edit" = "Drupal\domain\DomainFormController",
- *       "delete" = "Drupal\domain\Form\DomainDeleteForm"
+ *       "delete" = "Drupal\domain\DomainFormController"
  *     }
  *   },
  *   base_table = "domain",

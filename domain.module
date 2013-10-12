@@ -38,7 +38,7 @@ function domain_permission() {
 
 /**
  * Implements hook_menu().
-
+ */
 function domain_menu() {
   $items['admin/structure/domain'] = array(
     'title' => 'Domains',
@@ -50,40 +50,10 @@ function domain_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  $items['admin/structure/domain/add'] = array(
-    'title' => 'Add domain',
-    'route_name' => 'domain.add',
-    'type' => MENU_SIBLING_LOCAL_TASK,
-  );
-  $items['admin/structure/domain/%domain'] = array(
-    'title' => 'Domain',
-    'route_name' => 'domain.edit',
-    'type' => MENU_LOCAL_TASK,
-  );
-  $items['admin/structure/domain/%domain/edit'] = array(
-    'title' => 'Edit',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-  $items['domain'] = array(
-    'title' => 'Domains',
-    'page callback' => 'domain_page',
-    'access callback' => 'domain_create_access',
-    'file' => 'domain.pages.inc',
-  );
-  $items['domain/%domain'] = array(
-    'title' => 'Domain',
-    'title callback' => 'domain_page_title',
-    'title arguments' => array(1),
-    'page callback' => 'domain_page_view',
-    'page arguments' => array(1),
-    'access callback' => 'domain_view_access',
-    'access arguments' => array(1),
-    'file' => 'domain.pages.inc',
-  );
+
   return $items;
 }
- */
+
 
 /**
  * Implements hook_local_actions().
