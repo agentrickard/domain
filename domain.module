@@ -142,7 +142,7 @@ function domain_view_access() {
  *   A domain entity.
  */
 function domain_page_title(DomainInterface $domain) {
-  return check_plain($domain->name);
+  return check_plain($domain->name->value);
 }
 
 /**
@@ -150,7 +150,7 @@ function domain_page_title(DomainInterface $domain) {
  */
 function domain_uri(DomainInterface $domain) {
   return array(
-    'path' => 'domain/' . $domain->machine_name,
+    'path' => 'domain/' . $domain->machine_name->value,
   );
 }
 
@@ -269,7 +269,7 @@ function domain_field_presave(EntityInterface $entity, $field, $instance, $langc
   foreach (array_filter($data) as $key => $value) {
     if ($domain = domain_machine_name_load($key, TRUE)) {
       $result[$i]['realm'] = 'domain_id';
-      $result[$i]['gid'] = $domain->domain_id;
+      $result[$i]['gid'] = $domain->domain_id->value;
       $i++;
     }
   }
@@ -392,7 +392,7 @@ function domain_machine_name_load_multiple(array $machine_names = NULL, $reset =
     $result = domain_load_multiple();
   }
   foreach ($result as $domain) {
-    $domains[$domain->machine_name] = $domain;
+    $domains[$domain->machine_name->value] = $domain;
   }
   return $domains;
 }
@@ -507,7 +507,7 @@ function domain_options_list($filter = TRUE) {
   $domains = domain_load_multiple();
   foreach ($domains as $domain) {
     // @TODO: filter this list.
-    $list[$domain->machine_name] = $domain->name;
+    $list[$domain->machine_name->value] = $domain->name->value;
   }
   return $list;
 }
@@ -533,7 +533,7 @@ function domain_extract_field_items(array $items, $keys = FALSE) {
       $values[DOMAIN_ALL_AFFILIATES] = DOMAIN_ALL_AFFILIATES;
     }
     elseif ($domain = domain_load($value['gid'])) {
-      $values[$domain->machine_name] = $domain;
+      $values[$domain->machine_name->value] = $domain;
     }
   }
   if ($keys) {

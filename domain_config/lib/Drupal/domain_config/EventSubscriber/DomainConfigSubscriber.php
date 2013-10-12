@@ -106,7 +106,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    return 'domain.config.' . $domain->machine_name . '.' . $name;
+    return 'domain.config.' . $domain->machine_name->value . '.' . $name;
   }
 
   /**

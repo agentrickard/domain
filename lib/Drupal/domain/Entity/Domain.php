@@ -109,7 +109,13 @@ class Domain extends ContentEntityBase implements DomainInterface {
       'read-only' => FALSE,
       'type' => 'string_field',
     );
-
+    $properties['url'] = array(
+      'label' => t('URL'),
+      'description' => t('The base URL for the domain.'),
+      'computed' => TRUE,
+      'read-only' => FALSE,
+      'type' => 'string_field',
+    );
     return $properties;
   }
 
@@ -124,7 +130,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
    * Validates the hostname for a domain.
    */
   public function validate() {
-    $hostname = $this->hostname;
+    $hostname = $this->hostname->value;
     $error_list = array();
     // Check for at least one dot or the use of 'localhost'.
     // Note that localhost can specify a port.
@@ -228,7 +234,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
       // @TODO: set the default domain in the manager?
       return FALSE;
     }
-    return ($this->machine_name == $domain->machine_name);
+    return ($this->machine_name->value == $domain->machine_name->value);
   }
 
   /**
@@ -338,5 +344,6 @@ class Domain extends ContentEntityBase implements DomainInterface {
       }
     }
   }
+
 
 }

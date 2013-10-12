@@ -32,7 +32,7 @@ class DomainValidate extends DomainTestBase {
 
     // Our testing server should be able to acess the test PNG file.
     $domain->checkResponse();
-    $this->assertTrue($domain->response == 200, format_string('Server test for @url passed.', array('@url' => $domain->path)));
+    $this->assertTrue($domain->response->value == 200, format_string('Server test for @url passed.', array('@url' => $domain->path->value)));
 
     // Now create a bad domain.
     $values = array(
@@ -45,6 +45,6 @@ class DomainValidate extends DomainTestBase {
     $domain->save();
     $domain = domain_load(2);
     $domain->checkResponse();
-    $this->assertTrue($domain->response == 500, format_string('Server test for @url failed.', array('@url' => $domain->path)));
+    $this->assertTrue($domain->response->value == 500, format_string('Server test for @url failed.', array('@url' => $domain->path->value)));
   }
 }

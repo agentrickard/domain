@@ -74,8 +74,8 @@ class DomainViews extends DomainTestBase {
 
     // Test some text on the page.
     foreach ($domains as $domain) {
-      $this->assertText($domain->name, format_string('@name found on views page.', array('@name' => $domain->name)));
-      $this->assertText($domain->machine_name, format_string('@machine_name found on views page.', array('@machine_name' => $domain->machine_name)));
+      $this->assertText($domain->name->value, format_string('@name found on views page.', array('@name' => $domain->name->value)));
+      $this->assertText($domain->machine_name->value, format_string('@machine_name found on views page.', array('@machine_name' => $domain->machine_name->value)));
     }
     // @TODO: Test the list of actions.
     $actions = array('domain_delete_action', 'domain_enable_action', 'domain_disable_action', 'domain_default_action');

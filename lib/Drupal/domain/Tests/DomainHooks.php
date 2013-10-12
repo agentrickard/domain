@@ -42,8 +42,8 @@ class DomainHooks extends DomainTestBase {
     $domain = domain_load(1);
 
     // Internal hooks.
-    $this->assertTrue(isset($domain->path), format_string('The path property was set to %path by hook_entity_load.', array('%path' => $domain->path)));
-    $this->assertTrue(isset($domain->url), format_string('The url property was set to %url by hook_entity_load.', array('%url' => $domain->url)));
+    $this->assertTrue(isset($domain->path), format_string('The path property was set to %path by hook_entity_load.', array('%path' => $domain->path->value)));
+    $this->assertTrue(isset($domain->url), format_string('The url property was set to %url by hook_entity_load.', array('%url' => $domain->url->value)));
 
     // External hooks.
     $this->assertTrue($domain->foo == 'bar', 'The foo property was set to <em>bar</em> by hook_domain_load.');

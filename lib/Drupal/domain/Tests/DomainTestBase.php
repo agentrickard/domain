@@ -56,12 +56,10 @@ abstract class DomainTestBase extends WebTestBase {
    */
   public function domainPostValues() {
     $edit = array();
-    $domain = (array) domain_create(TRUE);
+    $domain = domain_create(TRUE);
     $required = domain_required_fields();
-    foreach ($domain as $key => $value) {
-      if (in_array($key, $required)) {
-        $edit[$key] = $value;
-      }
+    foreach ($required as $key) {
+      $edit[$key] = $domain->{$key}->value;
     }
     return $edit;
   }

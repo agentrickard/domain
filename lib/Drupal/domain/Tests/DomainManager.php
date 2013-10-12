@@ -47,8 +47,8 @@ class DomainManager extends DomainTestBase {
 
     // Test the response of the default home page.
     foreach (domain_load_multiple() as $domain) {
-      $this->drupalGet($domain->path);
-      $this->assertRaw($domain->name, 'Loaded the proper domain.');
+      $this->drupalGet($domain->path->value);
+      $this->assertRaw($domain->name->value, 'Loaded the proper domain.');
     }
 
     // Revoke the permission change

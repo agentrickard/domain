@@ -49,10 +49,10 @@ class DomainForms extends DomainTestBase {
 
     // Does it load correctly?
     $new_domain = domain_load($default_id);
-    $this->assertTrue($new_domain->machine_name == $edit['machine_name'], 'Domain loaded properly.');
+    $this->assertTrue($new_domain->machine_name->value == $edit['machine_name'], 'Domain loaded properly.');
 
     // Has a UUID been set?
-    $this->assertTrue(!empty($new_domain->uuid), 'Entity UUID set properly.');
+    $this->assertTrue(!empty($new_domain->uuid->value), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
     $postUrl = 'admin/structure/domain/' . $new_domain->id();
@@ -64,7 +64,7 @@ class DomainForms extends DomainTestBase {
 
     // Check that the update succeeded.
     $domain = domain_load($default_id, TRUE);
-    $this->assertTrue($domain->name == 'Foo', 'Domain record updated via form.');
+    $this->assertTrue($domain->name->value == 'Foo', 'Domain record updated via form.');
 
     // Delete the record.
     $this->drupalPostForm($postUrl, $edit, t('Delete'));

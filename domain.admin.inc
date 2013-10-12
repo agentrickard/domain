@@ -59,34 +59,36 @@ function domain_overview_form($form, &$form_state, $domains) {
   $result = $query->execute();
   $i = 0;
   foreach ($result as $domain) {
+    // Convert the data to an object.
     $domain_id = $domain->domain_id;
     $domain = entity_load('domain', $domain_id, TRUE);
-    $form['domains'][$domain->machine_name]['#attributes']['class'][] = 'draggable';
-    $form['domains'][$domain->machine_name]['values'] = array(
+    $default = $domain->isDefault();
+    $form['domains'][$domain->machine_name->value]['#attributes']['class'][] = 'draggable';
+    $form['domains'][$domain->machine_name->value]['values'] = array(
       '#type' => 'value',
       '#value' => $domain,
     );
-    $form['domains'][$domain->machine_name]['weight'] = array(
+    $form['domains'][$domain->machine_name->value]['weight'] = array(
       '#type' => 'weight',
-      '#default_value' => $domain->get('weight'),
+      '#default_value' => $domain->weight->value,
       '#delta' => $delta,
       '#attributes' => array('class' => array('domain-weight')),
     );
-    $form['domains'][$domain->machine_name]['name'] = array(
+    $form['domains'][$domain->machine_name->value]['name'] = array(
       '#type' => 'markup',
-      '#markup' => ($domain->isActive()) ? '<strong>' . check_plain($domain->name) . '</strong>' : check_plain($domain->name),
+      '#markup' => ($domain->isActive()) ? '<strong>' . check_plain($domain->name->value) . '</strong>' : check_plain($domain->name->value),
     );
-    $form['domains'][$domain->machine_name]['hostname'] = array(
+    $form['domains'][$domain->machine_name->value]['hostname'] = array(
       '#type' => 'markup',
-      '#markup' => ($domain->isActive()) ? '<strong>' . l($domain->hostname, $domain->url) . '</strong>' : l($domain->hostname, $domain->url),
+      '#markup' => ($domain->isActive()) ? '<strong>' . l($domain->hostname->value, $domain->url->value) . '</strong>' : l($domain->hostname->value, $domain->url->value),
     );
-    $form['domains'][$domain->machine_name]['status'] = array(
+    $form['domains'][$domain->machine_name->value]['status'] = array(
       '#type' => 'markup',
-      '#markup' => !empty($domain->status) ? t('Active') : t('Inactive'),
+      '#markup' => !empty($domain->status->value) ? t('Active') : t('Inactive'),
     );
-    $form['domains'][$domain->machine_name]['is_default'] = array(
+    $form['domains'][$domain->machine_name->value]['is_default'] = array(
       '#type' => 'markup',
-      '#markup' => !empty($domain->is_default) ? t('Default') : '',
+      '#markup' => ($default) ? t('Default') : '',
     );
     // @TODO: permissions on these items.
     $operations = array();
@@ -95,21 +97,21 @@ function domain_overview_form($form, &$form_state, $domains) {
       'href' => "admin/structure/domain/$domain_id",
       'query' => array(),
     );
-    if ($domain->status && !$domain->is_default) {
+    if ($domain->status->value && !$domain->is_default->value) {
       $operations['disable'] = array(
         'title' => t('disable'),
         'href' => "admin/structure/domain/$domain_id/disable",
         'query' => array('token' => drupal_get_token()),
       );
     }
-    elseif (!$domain->is_default) {
+    elseif (!$default) {
       $operations['enable'] = array(
         'title' => t('enable'),
         'href' => "admin/structure/domain/$domain_id/enable",
         'query' => array('token' => drupal_get_token()),
       );
     }
-    if (!$domain->is_default) {
+    if (!$default) {
       $operations['default'] = array(
         'title' => t('make default'),
         'href' => "admin/structure/domain/$domain_id/default",
@@ -128,7 +130,7 @@ function domain_overview_form($form, &$form_state, $domains) {
         $operations[$key]['query'] += $destination;
       }
     }
-    $form['domains'][$domain->machine_name]['operations'] = array(
+    $form['domains'][$domain->machine_name->value]['operations'] = array(
       'data' => array(
         '#type' => 'operations',
         '#links' => $operations,

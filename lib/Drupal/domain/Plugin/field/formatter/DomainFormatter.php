@@ -38,7 +38,7 @@ class DomainFormatter extends FormatterBase {
         $list[] = t('All affiliates');
       }
       else {
-        $list[] = check_plain($domain->name);
+        $list[] = check_plain($domain->name->value);
       }
     }
     if (!empty($list)) {
