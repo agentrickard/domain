@@ -101,22 +101,21 @@ class DomainFormController extends ContentEntityFormController {
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */
   public function save(array $form, array &$form_state) {
-    $domain = $this->getEntity($form_state);
-    $new = is_null($domain->domain_id->value);
-    $success = $domain->save();
-    if ($new) {
+    $domain = $this->entity;
+    if ($domain->isNew()) {
       drupal_set_message(t('Domain record created.'));
     }
     else {
       drupal_set_message(t('Domain record updated.'));
     }
+    $domain->save();
   }
 
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::delete().
    */
   public function delete(array $form, array &$form_state) {
-    $domain = $this->getEntity($form_state);
+    $domain = $this->entity;
     $domain->delete();
     $form_state['redirect'] = 'admin/structure/domain';
   }

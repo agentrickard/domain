@@ -333,17 +333,16 @@ class Domain extends ContentEntityBase implements DomainInterface {
   }
 
   /**
-   * Sets the default domain properly.
+   * {@inheritdoc}
    */
   public function preSave(EntityStorageControllerInterface $storage_controller) {
-    if (!empty($this->is_default)) {
+    // Sets the default domain properly.
+    $default = domain_default();
+    if ($default && $default->id() != $this->id()) {
       // Swap the current default.
-      if ($default = domain_default()) {
-        $default->is_default = 0;
-        $default->save();
-      }
+      $default->is_default = 0;
+      $default->save();
     }
   }
-
 
 }

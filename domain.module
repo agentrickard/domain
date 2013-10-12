@@ -38,12 +38,12 @@ function domain_permission() {
 
 /**
  * Implements hook_menu().
- */
+
 function domain_menu() {
   $items['admin/structure/domain'] = array(
     'title' => 'Domains',
     'description' => 'Manage domain records for your installation.',
-    'route_name' => 'domain_admin',
+    'route_name' => 'domain.admin',
   );
   $items['admin/structure/domain/list'] = array(
     'title' => 'List',
@@ -52,17 +52,13 @@ function domain_menu() {
   );
   $items['admin/structure/domain/add'] = array(
     'title' => 'Add domain',
-    'route_name' => 'domain_add',
+    'route_name' => 'domain.add',
     'type' => MENU_SIBLING_LOCAL_TASK,
   );
   $items['admin/structure/domain/%domain'] = array(
     'title' => 'Domain',
-    'page callback' => 'domain_edit',
-    'page arguments' => array(3),
-    'access callback' => 'domain_edit_access',
-    'access arguments' => array(3),
+    'route_name' => 'domain.edit',
     'type' => MENU_LOCAL_TASK,
-    'file' => 'domain.admin.inc',
   );
   $items['admin/structure/domain/%domain/edit'] = array(
     'title' => 'Edit',
@@ -87,6 +83,7 @@ function domain_menu() {
   );
   return $items;
 }
+ */
 
 /**
  * Implements hook_local_actions().
