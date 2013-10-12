@@ -95,7 +95,7 @@ abstract class DomainTestBase extends WebTestBase {
       $domain = domain_create();
       // Now add the additional fields and save.
       $domain->hostname = $hostname;
-      $domain->machine_name = domain_machine_name($domain->hostname);
+      $domain->machine_name = domain_machine_name($domain->hostname->value);
       $domain->name = $name;
       $domain->save();
     }

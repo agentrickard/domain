@@ -88,8 +88,8 @@ class DomainField extends DomainTestBase {
     // We expect to find 5 domain options.
     $domains = domain_load_multiple();
     foreach ($domains as $domain) {
-      $string = 'value="' . $domain->domain_id . '"';
-      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->name)));
+      $string = 'value="' . $domain->id() . '"';
+      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->name->value)));
     }
 
     // Try to post a node, assigned to the first two domains.
@@ -112,9 +112,10 @@ class DomainField extends DomainTestBase {
    */
   function domainCreateTestField() {
     $label = 'domain';
+    $name = 'field_' . $label;
 
     $settings = array(
-      'name' => 'field_' . $label,
+      'name' => $name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
       'cardinality' => -1,
@@ -126,7 +127,7 @@ class DomainField extends DomainTestBase {
     $field->save();
 
     $instance = array(
-      'field_name' => 'field_' . $label,
+      'field_name' => $name,
       'entity_type' => 'node',
       'label' => 'Domain test field',
       'bundle' => 'article',
@@ -141,7 +142,7 @@ class DomainField extends DomainTestBase {
 
     // Tell the form system how to behave.
     entity_get_form_display('node', 'article', 'default')
-      ->setComponent($field['name'], array(
+      ->setComponent($name, array(
         'type' => 'options_buttons',
     ))
     ->save();
