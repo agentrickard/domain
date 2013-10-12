@@ -319,7 +319,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
     if (!isset($this->path)) {
       $this->setPath();
     }
-    return $this->path;
+    return $this->path->value;
   }
 
   /**
@@ -329,7 +329,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
     if (!isset($this->url)) {
       $this->setUrl();
     }
-    return $this->url;
+    return $this->url->value;
   }
 
   /**
