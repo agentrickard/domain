@@ -46,7 +46,8 @@ function domain_schema() {
         'description' => 'Default protocol'
       ),
       'status' => array(
-        'type' => 'varchar',
+        'type' => 'int',
+        'size' => 'tiny',
         'length' => '1',
         'not null' => TRUE,
         'default' => '1',

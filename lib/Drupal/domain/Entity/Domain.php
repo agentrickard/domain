@@ -51,81 +51,6 @@ use Guzzle\Http\Exception\HttpException;
 class Domain extends ContentEntityBase implements DomainInterface {
 
   /**
-   * The domain record id.
-   *
-   * @var integer
-   */
-  public $domain_id;
-
-  /**
-   * The domain UUID.
-   *
-   * @var string
-   */
-  public $uuid;
-
-  /**
-   * Canonical hostname.
-   *
-   * @var string
-   */
-  public $hostname;
-
-  /**
-   * Human-readable site name.
-   *
-   * @var string
-   */
-  public $name;
-
-  /**
-   * Default http scheme.
-   *
-   * @var string
-   */
-  public $scheme;
-
-  /**
-   * Record status.
-   *
-   * @var integer
-   */
-  public $status;
-
-  /**
-   * Sort order.
-   *
-   * @var integer
-   */
-  public $weight;
-
-  /**
-   * Default domain flag.
-   *
-   * @var integer
-   */
-  public $is_default;
-
-  /**
-   * The domain machine name.
-   *
-   * @var string
-   */
-  public $machine_name;
-
-  /**
-   * The base URL for a domain. Derived.
-   */
-  public $path;
-
-  /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
-   */
-  public function id() {
-    return $this->domain_id;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions($entity_type, $bundle = NULL) {
@@ -177,8 +102,22 @@ class Domain extends ContentEntityBase implements DomainInterface {
       'description' => t('The domain record http scheme.'),
       'type' => 'string_field',
     );
+    $properties['path'] = array(
+      'label' => t('Path'),
+      'description' => t('The base URL path for the domain.'),
+      'computed' => TRUE,
+      'read-only' => FALSE,
+      'type' => 'string_field',
+    );
 
     return $properties;
+  }
+
+  /**
+   * Implements Drupal\Core\Entity\EntityInterface::id().
+   */
+  public function id() {
+    return $this->domain_id;
   }
 
   /**
