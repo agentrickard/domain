@@ -108,7 +108,6 @@ class DomainViews extends DomainTestBase {
     $default = domain_default_id();
     $this->assertTrue($default == 3, 'Default domain set correctly.');
 
-
     // Testing domain_disable_action.
     $edit = array(
       'action_bulk_form[1]' => TRUE,
@@ -130,7 +129,6 @@ class DomainViews extends DomainTestBase {
     $this->assertText('Enable domain record was applied to 1 item.');
 
     // @TODO: Test the count of disabled domains.
-
 
   }
 

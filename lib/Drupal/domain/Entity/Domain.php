@@ -241,7 +241,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
    * Detects if the current domain is the default domain.
    */
   public function isDefault() {
-    return (bool) $this->is_default;
+    return (bool) $this->is_default->value;
   }
 
   /**
@@ -338,7 +338,10 @@ class Domain extends ContentEntityBase implements DomainInterface {
   public function preSave(EntityStorageControllerInterface $storage_controller) {
     // Sets the default domain properly.
     $default = domain_default();
-    if ($default && $default->id() != $this->id()) {
+    if (!$default) {
+      $this->is_default = 1;
+    }
+    elseif ($this->is_default->value && $default->id() != $this->id()) {
       // Swap the current default.
       $default->is_default = 0;
       $default->save();
