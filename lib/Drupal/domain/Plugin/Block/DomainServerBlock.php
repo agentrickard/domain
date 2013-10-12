@@ -55,21 +55,9 @@ class DomainServerBlock extends BlockBase {
       t('Domain match'),
       $match,
     );
-    $list = (array) $domain;
-    ksort($list);
-    foreach ($list as $key => $value) {
-      if (is_null($value)) {
-        $value = t('NULL');
-      }
-      elseif ($value === TRUE) {
-        $value = t('TRUE');
-      }
-      elseif ($value === FALSE) {
-        $value = t('FALSE');
-      }
-      elseif ($key == 'status' || $key == 'is_default') {
-        $value = empty($value) ? t('FALSE') : t('TRUE');
-      }
+    $property_definitions = $domain->getPropertyDefinitions();
+    foreach ($property_definitions as $key => $val) {
+      $value = $domain->{$key}->value;
       $rows[] = array(
         check_plain($key),
         !is_array($value) ? check_plain($value) : $this->printArray($value),
@@ -91,7 +79,7 @@ class DomainServerBlock extends BlockBase {
    * @return
    *  A suitable output string.
    */
-  public function printArray(array $value) {
+  public function printArray(array $array) {
     $items = array();
     foreach ($array as $key => $val) {
       $value = 'array';
