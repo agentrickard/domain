@@ -21,7 +21,7 @@ use Guzzle\Http\Exception\HttpException;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   controllers = {
- *     "storage" = "Drupal\Core\Entity\DatabaseStorageController",
+ *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
  *     "render" = "Drupal\domain\DomainRenderController",
  *     "access" = "Drupal\domain\DomainAccessController",
  *     "form" = {
