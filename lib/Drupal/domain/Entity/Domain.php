@@ -116,6 +116,13 @@ class Domain extends ContentEntityBase implements DomainInterface {
       'read-only' => FALSE,
       'type' => 'string_field',
     );
+    $properties['response'] = array(
+      'label' => t('Response'),
+      'description' => t('HTTP response when requesting a known file.'),
+      'computed' => TRUE,
+      'read-only' => FALSE,
+      'type' => 'integer_field',
+    );
     return $properties;
   }
 
