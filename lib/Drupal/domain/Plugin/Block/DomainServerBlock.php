@@ -54,7 +54,6 @@ class DomainServerBlock extends BlockBase {
       $match,
     );
     $property_definitions = $domain->getPropertyDefinitions();
-    dpm($property_definitions);
     $domain->checkResponse();
     foreach ($property_definitions as $key => $val) {
       $value = $domain->{$key}->value;
