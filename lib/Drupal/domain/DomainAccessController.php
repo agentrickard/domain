@@ -10,7 +10,7 @@ namespace Drupal\domain;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityAccessController;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityNG;
+use Drupal\Core\Entity\Entity;
 use Drupal\Core\Session\AccountInterface;
 
 /**
