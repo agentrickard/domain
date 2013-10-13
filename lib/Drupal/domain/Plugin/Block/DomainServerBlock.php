@@ -8,8 +8,6 @@
 namespace Drupal\domain\Plugin\Block;
 
 use Drupal\block\BlockBase;
-use Drupal\block\Annotation\Block;
-use Drupal\Core\Annotation\Translation;
 
 /**
  * Provides a server information block for a domain request.
