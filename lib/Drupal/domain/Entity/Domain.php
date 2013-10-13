@@ -120,7 +120,7 @@ class Domain extends ContentEntityBase implements DomainInterface {
       'label' => t('Response'),
       'description' => t('HTTP response when requesting a known file.'),
       'computed' => TRUE,
-      'read-only' => FALSE,
+      'read-only' => TRUE,
       'type' => 'integer_field',
     );
     return $properties;
