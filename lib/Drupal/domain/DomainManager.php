@@ -7,9 +7,6 @@
 
 namespace Drupal\domain;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\ControllerInterface;
 use Drupal\domain\DomainManagerInterface;
 use Drupal\domain\DomainInterface;
 
