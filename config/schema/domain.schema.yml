@@ -1,0 +1,33 @@
+# Schema for the configuration files of the Domain module.
+
+domain.domain.*:
+  type: mapping
+  label: 'Domain'
+  mapping:
+    domain_id:
+      type: integer
+      label: 'ID'
+    uuid:
+      type: string
+      label: 'UUID'
+    hostname:
+      type: string
+      label: 'Hostname'
+    name:
+      type: string
+      label: 'Name'
+    scheme:
+      type: string
+      label: 'Scheme'
+    status:
+      type: boolean
+      label: 'Status'
+    weight:
+      type: integer
+      label: 'Weight'
+    is_default:
+      type: boolean
+      label: 'Default domain'
+    machine_name:
+      type: string
+      label: 'Machine name'
