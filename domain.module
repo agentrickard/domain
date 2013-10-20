@@ -461,25 +461,6 @@ function domain_get_domain() {
 }
 
 /**
- * Returns an array of domains for use in a form.
- *
- * @param boolean $filter
- *   Indicates whether the list should be filtered based on user permissions.
- *
- * @return array
- *   An array of domain values keyed by machine_name.
- */
-function domain_options_list($filter = TRUE) {
-  $list = array();
-  $domains = domain_load_multiple();
-  foreach ($domains as $domain) {
-    // @TODO: filter this list.
-    $list[$domain->machine_name->value] = $domain->name->value;
-  }
-  return $list;
-}
-
-/**
  * Reads an array of field items to domain records.
  *
  * @param array $items
