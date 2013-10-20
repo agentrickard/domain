@@ -37,7 +37,8 @@ use Guzzle\Http\Exception\HttpException;
  *   entity_keys = {
  *     "id" = "domain_id",
  *     "label" = "name",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "weight" = "weight"
  *   }
  * )
  */
