@@ -4,9 +4,12 @@ domain.domain.*:
   type: mapping
   label: 'Domain'
   mapping:
+    uuid:
+      type: string
+      label: 'ID'
     domain_id:
       type: integer
-      label: 'ID'
+      label: 'Domain ID'
     uuid:
       type: string
       label: 'UUID'

@@ -7,12 +7,12 @@
 
 namespace Drupal\domain;
 
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 
 /**
  * Provides an interface defining a domain entity.
  */
-interface DomainInterface extends ContentEntityInterface {
+interface DomainInterface extends ConfigEntityInterface {
 
   /**
    * Validates the hostname for a domain.

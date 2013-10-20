@@ -21,9 +21,10 @@ use Guzzle\Http\Exception\HttpException;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   controllers = {
- *     "storage" = "Drupal\Core\Entity\FieldableDatabaseStorageController",
+ *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
  *     "render" = "Drupal\domain\DomainRenderController",
  *     "access" = "Drupal\domain\DomainAccessController",
+ *     "list" = "Drupal\domain\DomainListController",
  *     "form" = {
  *       "default" = "Drupal\domain\DomainFormController",
  *       "edit" = "Drupal\domain\DomainFormController",
@@ -43,80 +44,95 @@ use Guzzle\Http\Exception\HttpException;
 class Domain extends ConfigEntityBase implements DomainInterface {
 
   /**
-   * {@inheritdoc}
+   * The ID of the domain entity.
+   *
+   * @var string
    */
-  public static function baseFieldDefinitions($entity_type) {
-    $properties['domain_id'] = array(
-      'label' => t('Domain record ID'),
-      'description' => t('The domain record ID.'),
-      'type' => 'integer_field',
-      'read-only' => TRUE,
-    );
-    $properties['uuid'] = array(
-      'label' => t('UUID'),
-      'description' => t('The domain record UUID.'),
-      'type' => 'uuid_field',
-      'read-only' => TRUE,
-    );
-    $properties['machine_name'] = array(
-      'label' => t('Machine name'),
-      'description' => t('The domain record machine name.'),
-      'type' => 'string_field',
-      'read-only' => TRUE,
-    );
-    $properties['name'] = array(
-      'label' => t('Name'),
-      'description' => t('The domain record name.'),
-      'type' => 'string_field',
-    );
-    $properties['hostname'] = array(
-      'label' => t('Hostname'),
-      'description' => t('The domain record hostname.'),
-      'type' => 'string_field',
-    );
-    $properties['status'] = array(
-      'label' => t('Status'),
-      'description' => t('The domain record status.'),
-      'type' => 'boolean_field',
-    );
-    $properties['weight'] = array(
-      'label' => t('Weight'),
-      'description' => t('The domain record sort weight.'),
-      'type' => 'integer_field',
-    );
-    $properties['is_default'] = array(
-      'label' => t('Default domain'),
-      'description' => t('Indicates that the domain record is the default.'),
-      'type' => 'boolean_field',
-    );
-    $properties['scheme'] = array(
-      'label' => t('Scheme'),
-      'description' => t('The domain record http scheme.'),
-      'type' => 'string_field',
-    );
-    $properties['path'] = array(
-      'label' => t('Path'),
-      'description' => t('The base URL path for the domain.'),
-      'computed' => TRUE,
-      'read-only' => FALSE,
-      'type' => 'string_field',
-    );
-    $properties['url'] = array(
-      'label' => t('URL'),
-      'description' => t('The base URL for the domain.'),
-      'computed' => TRUE,
-      'read-only' => FALSE,
-      'type' => 'string_field',
-    );
-    $properties['response'] = array(
-      'label' => t('Response'),
-      'description' => t('HTTP response when requesting a known file.'),
-      'computed' => TRUE,
-      'read-only' => TRUE,
-      'type' => 'integer_field',
-    );
-    return $properties;
-  }
+  public $id;
+
+  /**
+   * The domain record ID.
+   *
+   * @var integer
+   */
+  public $domain_id;
+
+  /**
+   * The domain record UUID.
+   *
+   * @var string
+   */
+  public $uuid;
+
+  /**
+   * The domain record machine_name.
+   *
+   * @var string
+   */
+  public $machine_name;
+
+  /**
+   * The domain list name (e.g. Drupal).
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * The domain hostname (e.g. example.com).
+   *
+   * @var string
+   */
+  public $hostname;
+
+  /**
+   * The domain status.
+   *
+   * @var boolean
+   */
+  public $status;
+
+  /**
+   * The domain record sort order.
+   *
+   * @var integer
+   */
+  public $weight;
+
+  /**
+   * Indicates the default domain.
+   *
+   * @var boolean
+   */
+  public $is_default;
+
+  /**
+   * The domain record protocol (e.g. http://).
+   *
+   * @var string
+   */
+  public $scheme;
+
+  /**
+   * The domain record base path, a calculated value.
+   *
+   * @var string
+   */
+  public $path;
+
+  /**
+   * The domain record base url, a calculated value.
+   *
+   * @var string
+   */
+  public $url;
+
+  /**
+   * The domain recordd http response test (e.g. 200), a calculated value.
+   *
+   * @var integer
+   */
+  public $response;
 
   /**
    * Implements Drupal\Core\Entity\EntityInterface::id().

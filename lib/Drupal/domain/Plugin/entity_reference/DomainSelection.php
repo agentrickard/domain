@@ -31,7 +31,7 @@ class DomainSelection extends SelectionBase {
     // @TODO: allow users to be assigned to domains.
     $account = Drupal::currentUser();
     if ($account->hasPermission('administer domains')) {
-      return;
+      return $query;
     }
 
     return $query;
