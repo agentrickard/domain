@@ -9,7 +9,7 @@ namespace Drupal\domain\Entity;
 
 use Drupal\domain\DomainInterface;
 
-use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageControllerInterface;
 use Guzzle\Http\Exception\HttpException;
 
@@ -30,25 +30,17 @@ use Guzzle\Http\Exception\HttpException;
  *       "delete" = "Drupal\domain\DomainFormController"
  *     }
  *   },
- *   base_table = "domain",
+ *   config_prefix = "domain.domain",
  *   fieldable = TRUE,
  *   translatable = FALSE,
  *   entity_keys = {
  *     "id" = "domain_id",
  *     "label" = "name",
  *     "uuid" = "uuid"
- *   },
- *   view_modes = {
- *     "full" = {
- *       "label" = "Domain record",
- *       "custom_settings" = FALSE
- *     }
- *   },
- *   menu_base_path = "domain/%domain_machine_name",
- *   route_base_path = "admin/structure/domain"
+ *   }
  * )
  */
-class Domain extends ContentEntityBase implements DomainInterface {
+class Domain extends ConfigEntityBase implements DomainInterface {
 
   /**
    * {@inheritdoc}
