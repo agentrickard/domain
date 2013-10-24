@@ -7,13 +7,13 @@
 
 namespace Drupal\domain;
 
-use Drupal\Core\Entity\ContentEntityFormController;
+use Drupal\Core\Entity\EntityFormController;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Base form controller for domain edit forms.
  */
-class DomainFormController extends ContentEntityFormController {
+class DomainFormController extends EntityFormController {
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
