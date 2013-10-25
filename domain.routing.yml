@@ -28,7 +28,7 @@ domain.delete:
     _permission: 'administer domains'
 
 domain.inline_action:
-  path: '/admin/structure/domain/{domain}/{op}'
+  path: '/admin/structure/domain/{op}/{domain}'
   defaults:
     _controller: 'Drupal\domain\Controller\DomainController::ajaxOperation'
   requirements:

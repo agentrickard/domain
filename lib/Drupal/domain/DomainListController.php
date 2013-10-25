@@ -32,21 +32,52 @@ class DomainListController extends DraggableListController {
    */
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
+    $destination = drupal_get_destination();
+    $default = $entity->is_default;
+    $id = $entity->id();
+    if ($entity->status && !$default) {
+      $operations['disable'] = array(
+        'title' => t('Disable'),
+        'href' => "admin/structure/domain/disable/$id",
+        'query' => array('token' => drupal_get_token()),
+        'weight' => 50,
+      );
+    }
+    elseif (!$default) {
+      $operations['enable'] = array(
+        'title' => t('Enable'),
+        'href' => "admin/structure/domain/enable/$id",
+        'query' => array('token' => drupal_get_token()),
+        'weight' => 40,
+      );
+    }
+    if (!$default) {
+      $operations['default'] = array(
+        'title' => t('Make default'),
+        'href' => "admin/structure/domain/default/$id",
+        'query' => array('token' => drupal_get_token()),
+        'weight' => 30,
+      );
+      $operations['delete'] = array(
+        'title' => t('Delete'),
+        'href' => "admin/structure/domain/delete/$id",
+        'query' => array(),
+        'weight' => 20,
+      );
+    }
+    // @TODO: should this be handled differently?
+    $operations += \Drupal::moduleHandler()->invokeAll('domain_operations', array($entity));
+    foreach ($operations as $key => $value) {
+      if (isset($value['query']['token'])) {
+        $operations[$key]['query'] += $destination;
+      }
+    }
     $default = domain_default();
 
-    $path = 'admin/structure/domain';
-    if (isset($operations['edit'])) {
-      $operations['edit']['href'] = $path . '/edit/' . $entity->id();
-    }
-    if (isset($operations['delete'])) {
-      $operations['delete']['href'] = $path . '/delete/' . $entity->id();
-    }
-
     // Deleting the site default domain is not allowed.
-    if ($entity->id() == $default->id) {
+    if ($id == $default->id) {
       unset($operations['delete']);
     }
-
     return $operations;
   }
 
