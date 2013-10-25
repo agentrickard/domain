@@ -35,10 +35,14 @@ use Guzzle\Http\Exception\HttpException;
  *   fieldable = TRUE,
  *   translatable = FALSE,
  *   entity_keys = {
- *     "id" = "domain_id",
+ *     "id" = "id",
+ *     "domain_id" = "domain_id",
  *     "label" = "name",
  *     "uuid" = "uuid",
  *     "weight" = "weight"
+ *   },
+ *   links = {
+ *     "edit-form" = "admin/structure/domain/edit/{domain}"
  *   }
  * )
  */
@@ -64,13 +68,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * @var string
    */
   public $uuid;
-
-  /**
-   * The domain record machine_name.
-   *
-   * @var string
-   */
-  public $machine_name;
 
   /**
    * The domain list name (e.g. Drupal).
@@ -136,17 +133,30 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public $response;
 
   /**
-   * Implements Drupal\Core\Entity\EntityInterface::id().
+   * {@inheritdoc}
    */
-  public function id() {
-    return $this->get('domain_id')->value;
+  public static function preCreate(EntityStorageControllerInterface $storage_controller, array &$values) {
+    parent::preCreate($storage_controller, $values);
+    $default = domain_default_id();
+    $domains = domain_load_multiple();
+    $values += array(
+      'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
+      'status' => 1,
+      'weight' => count($domains) + 1,
+      'is_default' => (int) empty($default),
+      // {node_access} still requires a numeric id.
+      'domain_id' => count($domains) + 1,
+    );
+    $values['hostname'] = domain_hostname();
+    $values['name'] = variable_get('sitename', 'Drupal');
+    $values['machine_name'] = domain_machine_name($values['hostname']);
   }
 
   /**
    * Validates the hostname for a domain.
    */
   public function validate() {
-    $hostname = $this->hostname->value;
+    $hostname = $this->hostname;
     $error_list = array();
     // Check for at least one dot or the use of 'localhost'.
     // Note that localhost can specify a port.
@@ -250,14 +260,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       // @TODO: set the default domain in the manager?
       return FALSE;
     }
-    return ($this->machine_name->value == $domain->machine_name->value);
+    return ($this->machine_name == $domain->machine_name);
   }
 
   /**
    * Detects if the current domain is the default domain.
    */
   public function isDefault() {
-    return (bool) $this->is_default->value;
+    return (bool) $this->is_default;
   }
 
   /**
@@ -318,14 +328,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * Sets the base path to this domain.
    */
   public function setPath() {
-    $this->path = domain_scheme($this->scheme->value) . $this->hostname->value . base_path();
+    $this->path = domain_scheme($this->scheme) . $this->hostname . base_path();
   }
 
   /**
    * Sets the domain-specific link to the current URL.
    */
   public function setUrl() {
-    $this->url = domain_scheme($this->scheme->value) . $this->hostname->value . request_uri();
+    $this->url = domain_scheme($this->scheme) . $this->hostname . request_uri();
   }
 
   /**
@@ -335,7 +345,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!isset($this->path)) {
       $this->setPath();
     }
-    return $this->path->value;
+    return $this->path;
   }
 
   /**
@@ -345,7 +355,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!isset($this->url)) {
       $this->setUrl();
     }
-    return $this->url->value;
+    return $this->url;
   }
 
   /**
@@ -357,7 +367,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!$default) {
       $this->is_default = 1;
     }
-    elseif ($this->is_default->value && $default->id() != $this->id()) {
+    elseif ($this->is_default && $default->id() != $this->id()) {
       // Swap the current default.
       $default->is_default = 0;
       $default->save();
