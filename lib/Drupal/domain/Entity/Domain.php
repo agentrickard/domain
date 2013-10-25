@@ -147,9 +147,11 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       // {node_access} still requires a numeric id.
       'domain_id' => count($domains) + 1,
     );
-    $values['hostname'] = domain_hostname();
-    $values['name'] = variable_get('sitename', 'Drupal');
-    $values['machine_name'] = domain_machine_name($values['hostname']);
+    if (empty($default)) {
+      $values['hostname'] = domain_hostname();
+      $values['name'] = variable_get('sitename', 'Drupal');
+      $values['machine_name'] = domain_machine_name($values['hostname']);
+    }
   }
 
   /**
