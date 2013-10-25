@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Base form controller for domain edit forms.
  */
 class DomainFormController extends EntityFormController {
+
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::form().
    */
@@ -93,6 +94,7 @@ class DomainFormController extends EntityFormController {
       form_set_error('hostname', $errors);
     }
   }
+
   /**
    * Overrides Drupal\Core\Entity\EntityFormController::save().
    */

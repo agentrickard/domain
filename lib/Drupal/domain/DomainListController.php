@@ -34,8 +34,6 @@ class DomainListController extends DraggableListController {
     $operations = parent::getOperations($entity);
     $default = domain_default();
 
-    // Edit and delete path for Domains entities have a different pattern
-    // than other config entities.
     $path = 'admin/structure/domain';
     if (isset($operations['edit'])) {
       $operations['edit']['href'] = $path . '/edit/' . $entity->id();

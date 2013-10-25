@@ -9,21 +9,21 @@ domain.admin:
 domain.add:
   path: '/admin/structure/domain/add'
   defaults:
-    _entity_form: 'domain.edit'
+    _entity_form: domain.edit
   requirements:
     _permission: 'create domains'
 
 domain.edit:
-  path: '/admin/structure/domain/{domain}'
+  path: '/admin/structure/domain/edit/{domain}'
   defaults:
-    _entity_form: 'domain.edit'
+    _entity_form: domain.edit
   requirements:
     _permission: 'administer domains'
 
 domain.delete:
-  path: '/admin/structure/domain/{domain}/delete'
+  path: '/admin/structure/domain/delete/{domain}'
   defaults:
-    _entity_form: 'domain.delete'
+    _entity_form: domain.delete
   requirements:
     _permission: 'administer domains'
 
