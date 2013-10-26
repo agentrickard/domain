@@ -90,12 +90,19 @@ class DomainField extends DomainTestBase {
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
       $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->name)));
+      if (!isset($one)) {
+        $one = $domain->id();
+        continue;
+      }
+      if (!isset($two)) {
+        $two = $domain->id();
+      }
     }
 
     // Try to post a node, assigned to the first two domains.
     $edit['title'] = 'Test node';
-    $edit["field_domain[1]"] = TRUE;
-    $edit["field_domain[2]"] = TRUE;
+    $edit["field_domain[{$one}]"] = TRUE;
+    $edit["field_domain[{$two}]"] = TRUE;
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
     $node = node_load(1);

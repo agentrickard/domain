@@ -92,10 +92,10 @@ abstract class DomainTestBase extends WebTestBase {
         $name = 'Example';
       }
       // Create a new domain programmatically.
-      $domain = domain_create();
+      $domain = entity_create('domain', array());
       // Now add the additional fields and save.
       $domain->hostname = $hostname;
-      $domain->machine_name = domain_machine_name($domain->hostname);
+      $domain->id = domain_machine_name($domain->hostname);
       $domain->name = $name;
       $domain->save();
     }
