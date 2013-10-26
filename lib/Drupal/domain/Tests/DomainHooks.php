@@ -39,7 +39,10 @@ class DomainHooks extends DomainTestBase {
     // Create a domain.
     $this->domainCreateTestDomains();
 
-    $domain = domain_load(1);
+    // @TODO: We need a new loader?
+    $key = domain_machine_name(domain_hostname());
+
+    $domain = domain_load($key);
 
     // Internal hooks.
     $this->assertTrue(isset($domain->path), format_string('The path property was set to %path by hook_entity_load.', array('%path' => $domain->path)));
