@@ -29,16 +29,17 @@ class DomainCreate extends DomainTestBase {
     $this->domainTableIsEmpty();
 
     // Create a new domain programmatically.
+    // @TODO: This may need a refactor.
     $domain = domain_create();
-    foreach (array('domain_id', 'hostname', 'name', 'machine_name') as $key) {
+    foreach (array('id') as $key) {
       $this->assertTrue(is_null($domain->{$key}), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
     }
-    foreach (array('scheme', 'status', 'weight' , 'is_default') as $key) {
+    foreach (array('name', 'hostname', 'domain_id', 'scheme', 'status', 'weight' , 'is_default') as $key) {
       $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to default value: %value.', array('!key' => $key, '%value' => $domain->{$key})));
     }
     // Now add the additional fields and save.
     $domain->hostname = $this->base_hostname;
-    $domain->machine_name = domain_machine_name($domain->hostname);
+    $domain->id = domain_machine_name($domain->hostname);
     $domain->name = 'Default';
     $domain->save();
 
@@ -48,7 +49,7 @@ class DomainCreate extends DomainTestBase {
 
     // Does it load correctly?
     $new_domain = domain_load($default_id);
-    $this->assertTrue($new_domain->machine_name == $domain->machine_name, 'Domain loaded properly.');
+    $this->assertTrue($new_domain->id() == $domain->id(), 'Domain loaded properly.');
 
     // Has a UUID been set?
     $this->assertTrue($new_domain->uuid(), 'Entity UUID set properly.');
@@ -63,10 +64,8 @@ class DomainCreate extends DomainTestBase {
 
     // Try the create function with server inheritance.
     $domain = domain_create(TRUE);
-    foreach (array('domain_id') as $key) {
-      $this->assertTrue(is_null($domain->{$key}), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
-    }
-    foreach (array('hostname', 'name', 'machine_name', 'scheme', 'status', 'weight' , 'is_default') as $key) {
+    // @TODO: This may need a refactor.
+    foreach (array('domain_id', 'hostname', 'name', 'id', 'scheme', 'status', 'weight' , 'is_default') as $key) {
       $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to a default value: %value.', array('!key' => $key, '%value' => $domain->{$key})));
     }
   }
