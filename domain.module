@@ -400,7 +400,7 @@ function domain_create($inherit = FALSE, array $values = array()) {
   if ($inherit) {
     $values['hostname'] = domain_hostname();
     $values['name'] = variable_get('sitename', 'Drupal');
-    $values['machine_name'] = domain_machine_name($values['hostname']);
+    $values['id'] = domain_machine_name($values['hostname']);
   }
   $domain = entity_create('domain', $values);
   return $domain;
@@ -442,7 +442,7 @@ function domain_machine_name($hostname) {
  *   An array of required field keys.
  */
 function domain_required_fields() {
-  return array('hostname', 'name', 'machine_name', 'scheme', 'status', 'weight');
+  return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
 }
 
 /**

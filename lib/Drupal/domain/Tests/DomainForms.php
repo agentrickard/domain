@@ -35,7 +35,7 @@ class DomainForms extends DomainTestBase {
     $this->drupalGet('admin/structure/domain');
 
     // Check for the add message.
-    $this->assertText('There are no domains yet.', 'Text for no domains found.');
+    $this->assertText('There is no Domain record yet.', 'Text for no domains found.');
     // Visit the add domain administration page.
     $this->drupalGet('admin/structure/domain/add');
 
@@ -49,13 +49,13 @@ class DomainForms extends DomainTestBase {
 
     // Does it load correctly?
     $new_domain = domain_load($default_id);
-    $this->assertTrue($new_domain->machine_name == $edit['machine_name'], 'Domain loaded properly.');
+    $this->assertTrue($new_domain->id() == $edit['id'], 'Domain loaded properly.');
 
     // Has a UUID been set?
     $this->assertTrue(!empty($new_domain->uuid), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
-    $postUrl = 'admin/structure/domain/' . $new_domain->id();
+    $postUrl = 'admin/structure/domain/edit/' . $new_domain->id();
     $this->drupalGet($postUrl);
 
     // Update the record.
