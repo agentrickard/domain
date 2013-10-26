@@ -181,14 +181,14 @@ function drush_domain_list() {
     'scheme' => dt('Scheme'),
     'status' => dt('Status'),
     'is_default' => dt('Default'),
-    'domain_id' => dt('Id'),
-    'machine_name' => dt('Machine name'),
+    'domain_id' => dt('Domain Id'),
+    'id' => dt('Machine name'),
   );
   $rows = array(array_values($header));
   foreach ($domains as $domain) {
     $row = array();
     foreach ($header as $key => $name) {
-      $row[] = check_plain($domain->{$key}->value);
+      $row[] = check_plain($domain->{$key});
     }
     $rows[] = $row;
   }
@@ -223,7 +223,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
   $existing = array();
   if (!empty($domains)) {
     foreach ($domains as $domain) {
-      $existing[] = $domain->hostname->value;
+      $existing[] = $domain->hostname;
     }
   }
   // Set up one.* and so on.
@@ -258,9 +258,8 @@ function drush_domain_generate_domains($primary = 'example.com') {
   }
   // Add any test domains.
   if ($count > 15 || empty($prepared)) {
-    // Find the highest numbered test domain.
-    $start = db_query("SELECT name FROM {domain} WHERE name LIKE 'test%' ORDER BY domain_id DESC")->fetchField();
-    $start = (int) str_ireplace('test', '', $start);
+    // @TODO fix this logic.
+    $start = 1;
     $j = count($prepared);
     for ($i = $start + 1; $j <= $count; $i++) {
       $prepared[] = 'test' . $i . '.' . $primary;
@@ -268,7 +267,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
     }
   }
   // Get the initial item weight for sorting.
-  $start_weight = db_query("SELECT weight FROM {domain} ORDER BY weight DESC")->fetchField();
+  $start_weight = count($domains);
   $prepared = array_slice($prepared, 0, $count);
   foreach ($prepared as $key => $item) {
     $hostname = strtolower($item);
@@ -279,7 +278,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
       'status' => 1,
       'weight' => ($item != $primary) ? $key + $start_weight + 1 : -1,
       'is_default' => 0,
-      'machine_name' => domain_machine_name($hostname),
+      'id' => domain_machine_name($hostname),
     );
     $domain = domain_create(FALSE, $values);
     domain_drush_create($domain);
@@ -327,7 +326,7 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
  *   The domain created or an error message.
  */
 function drush_domain_add($hostname, $name) {
-  $start_weight = (int) db_query("SELECT weight FROM {domain} ORDER BY weight DESC")->fetchField();
+  $start_weight = count(domain_load_multiple()) + 1;
   $hostname = strtolower($hostname);
   $values = array(
     'hostname' => $hostname,
@@ -336,13 +335,13 @@ function drush_domain_add($hostname, $name) {
     'scheme' => (!drush_get_option('https')) ? 'http' : 'https',
     'weight' => ($weight = drush_get_option('weight')) ? $weight : $start_weight + 1,
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
-    'machine_name' => domain_machine_name($hostname),
+    'id' => domain_machine_name($hostname),
   );
   $domain = domain_create(FALSE, $values);
   /* TODO: Fix this check.
   if (!empty($domain->is_default)) {
     $domain->checkResponse();
-    drush_print($domain->response->value);
+    drush_print($domain->response);
   }
   */
   domain_drush_create($domain);
@@ -372,7 +371,7 @@ function drush_domain_add_validate($hostname, $name) {
 function domain_drush_create(DomainInterface $domain) {
   $domain->save();
   if (isset($domain->domain_id)) {
-    drush_print(dt('Created @name at @domain.', array('@name' => $domain->name->value, '@domain' => $domain->hostname->value)));
+    drush_print(dt('Created @name at @domain.', array('@name' => $domain->name, '@domain' => $domain->hostname)));
   }
   else {
     drush_print(dt('The request could not be completed.'));
@@ -433,7 +432,7 @@ function drush_domain_delete($argument = NULL) {
   }
   foreach ($domains as $domain) {
     $domain->delete();
-    drush_print(dt('Domain record @domain deleted.', array('@domain' => $domain->hostname->value)));
+    drush_print(dt('Domain record @domain deleted.', array('@domain' => $domain->hostname)));
   }
 
   return;
@@ -442,7 +441,7 @@ function drush_domain_delete($argument = NULL) {
   $list = domain_load_multiple(NULL, TRUE);
   $options = array('0' => t('Do not reassign'));
   foreach ($list as $data) {
-    if ($data->domain_id != $domain->domain_id->value) {
+    if ($data->domain_id != $domain->domain_id) {
       $options[$data['domain_id']] = $data['hostname'];
     }
   }
@@ -486,11 +485,11 @@ function drush_domain_test($argument = NULL) {
   }
   foreach ($domains as $domain) {
     $domain->checkResponse();
-    if ($domain->response->value != 200) {
-      drush_print(dt('Fail: !error. Please pass a --uri parameter or a --base_path to retest.' , array('!error' => $domain->response->value)));
+    if ($domain->response != 200) {
+      drush_print(dt('Fail: !error. Please pass a --uri parameter or a --base_path to retest.' , array('!error' => $domain->response)));
     }
     else {
-      drush_print(dt('Success: !url tested successfully.', array('!url' => $domain->path->value)));
+      drush_print(dt('Success: !url tested successfully.', array('!url' => $domain->path)));
     }
   }
 }
@@ -513,7 +512,7 @@ function drush_domain_default($argument) {
       }
     }*/
     $domain->saveDefault();
-    drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->hostname->value)));
+    drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->hostname)));
   }
 }
 
@@ -523,12 +522,12 @@ function drush_domain_default($argument) {
 function drush_domain_disable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if ($domain->status->value) {
+    if ($domain->status) {
       $domain->disable();
-      drush_print(dt('!domain has been disabled.', array('!domain' => $domain->hostname->value)));
+      drush_print(dt('!domain has been disabled.', array('!domain' => $domain->hostname)));
     }
     else {
-      drush_print(dt('!domain is already disabled.', array('!domain' => $domain->hostname->value)));
+      drush_print(dt('!domain is already disabled.', array('!domain' => $domain->hostname)));
     }
   }
 }
@@ -539,12 +538,12 @@ function drush_domain_disable($argument) {
 function drush_domain_enable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if (!$domain->status->value) {
+    if (!$domain->status) {
       $domain->enable();
-      drush_print(dt('!domain has been enabled.', array('!domain' => $domain->hostname->value)));
+      drush_print(dt('!domain has been enabled.', array('!domain' => $domain->hostname)));
     }
     else {
-      drush_print(dt('!domain is already enabled.', array('!domain' => $domain->hostname->value)));
+      drush_print(dt('!domain is already enabled.', array('!domain' => $domain->hostname)));
     }
   }
 }
@@ -568,12 +567,12 @@ function drush_domain_machine_name($argument, $machine_name) {
   if ($domain = drush_domain_get_from_argument($argument)) {
     $results = entity_load_multiple_by_properties('domain', array('machine_name' => $machine_name));
     foreach ($results as $result) {
-      if ($result->machine_name == $machine_name) {
+      if ($result->id() == $machine_name) {
         drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', array('@machine_name' => $machine_name, '@hostname' => $result->hostname)));
         return;
       }
     }
-    $domain->saveAttribute('machine_name', $machine_name);
+    $domain->saveAttribute('id', $machine_name);
   }
 }
 
