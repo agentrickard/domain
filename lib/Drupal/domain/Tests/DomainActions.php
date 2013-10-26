@@ -46,65 +46,22 @@ class DomainActions extends DomainTestBase {
 
     // Check the default domain.
     $default = domain_default_id();
-    $this->assertTrue($default == 1, 'Default domain set correctly.');
+    // @TODO: We need a new loader?
+    $key = domain_machine_name(domain_hostname());
+    $this->assertTrue($default == $key, 'Default domain set correctly.');
 
     // Test some text on the page.
     foreach ($domains as $domain) {
-      $this->assertText($domain->name, format_string('@name found on views page.', array('@name' => $domain->name)));
-      $this->assertText($domain->machine_name, format_string('@machine_name found on views page.', array('@machine_name' => $domain->machine_name)));
+      $this->assertText($domain->name, format_string('@name found on overview page.', array('@name' => $domain->name)));
     }
     // @TODO: Test the list of actions.
-    $actions = array('domain_delete_action', 'domain_enable_action', 'domain_disable_action', 'domain_default_action');
+    $actions = array('delete', 'disable', 'default');
     foreach ($actions as $action) {
-      $this->assertRaw("<option value=\"{$action}\">", format_string('@action action found.', array('@action' => $action)));
+      $this->assertRaw("/domain/{$action}/", format_string('@action action found.', array('@action' => $action)));
     }
+    // @TODO Disable a domain and test the enable link.
 
-    // Testing domain_delete_action.
-    $edit = array(
-      'action_bulk_form[1]' => TRUE,
-      'action' => 'domain_delete_action',
-    );
-
-    $this->drupalPostForm($path, $edit, t('Apply'));
-    $this->assertText('Delete domain record was applied to 1 item.');
-
-    // Check that one domain was removed.
-    $domains = domain_load_multiple(NULL, TRUE);
-    $this->assertTrue(count($domains) == 3, 'One domain deleted.');
-
-    // Testing domain_default_action.
-    $edit = array(
-      'action_bulk_form[1]' => TRUE,
-      'action' => 'domain_default_action',
-    );
-    $this->drupalPostForm($path, $edit, t('Apply'));
-    $this->assertText('Set default domain record was applied to 1 item.');
-
-    // Test the default domain, which should now be id 3.
-    $default = domain_default_id();
-    $this->assertTrue($default == 3, 'Default domain set correctly.');
-
-    // Testing domain_disable_action.
-    $edit = array(
-      'action_bulk_form[1]' => TRUE,
-      'action_bulk_form[2]' => TRUE,
-      'action' => 'domain_disable_action',
-    );
-    $this->drupalPostForm($path, $edit, t('Apply'));
-    $this->assertText('The default domain cannot be disabled.');
-    $this->assertText('Disable domain record was applied to 2 items.');
-
-    // @TODO: Test the count of disabled domains.
-
-    // Testing domain_enable_action.
-    $edit = array(
-      'action_bulk_form[2]' => TRUE,
-      'action' => 'domain_enable_action',
-    );
-    $this->drupalPostForm($path, $edit, t('Apply'));
-    $this->assertText('Enable domain record was applied to 1 item.');
-
-    // @TODO: Test the count of disabled domains.
+    // @TODO test the link behaviors.
 
   }
 
