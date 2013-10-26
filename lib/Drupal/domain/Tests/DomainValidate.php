@@ -28,7 +28,9 @@ class DomainValidate extends DomainTestBase {
     // Create a new domain programmatically.
     $this->domainCreateTestDomains();
 
-    $domain = domain_load(1);
+    // @TODO: We need a new loader?
+    $key = domain_machine_name(domain_hostname());
+    $domain = domain_load($key);
 
     // Our testing server should be able to acess the test PNG file.
     $domain->checkResponse();
@@ -37,13 +39,12 @@ class DomainValidate extends DomainTestBase {
     // Now create a bad domain.
     $values = array(
       'hostname' => 'foo.bar',
-      'machine_name' => 'foo_bar',
+      'id' => 'foo_bar',
       'name' => 'Foo',
     );
     $domain = domain_create(FALSE, $values);
 
     $domain->save();
-    $domain = domain_load(2);
     $domain->checkResponse();
     $this->assertTrue($domain->response == 500, format_string('Server test for @url failed.', array('@url' => $domain->path)));
   }
