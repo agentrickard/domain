@@ -89,7 +89,7 @@ class DomainField extends DomainTestBase {
     $domains = domain_load_multiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->name->value)));
+      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->name)));
     }
 
     // Try to post a node, assigned to the first two domains.

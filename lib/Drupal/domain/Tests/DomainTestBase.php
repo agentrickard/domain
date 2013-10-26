@@ -59,7 +59,7 @@ abstract class DomainTestBase extends WebTestBase {
     $domain = domain_create(TRUE);
     $required = domain_required_fields();
     foreach ($required as $key) {
-      $edit[$key] = $domain->{$key}->value;
+      $edit[$key] = $domain->{$key};
     }
     return $edit;
   }
@@ -95,7 +95,7 @@ abstract class DomainTestBase extends WebTestBase {
       $domain = domain_create();
       // Now add the additional fields and save.
       $domain->hostname = $hostname;
-      $domain->machine_name = domain_machine_name($domain->hostname->value);
+      $domain->machine_name = domain_machine_name($domain->hostname);
       $domain->name = $name;
       $domain->save();
     }

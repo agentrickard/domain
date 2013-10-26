@@ -35,11 +35,11 @@ class DomainSwitcherBlock extends BlockBase {
     $active_domain = domain_get_domain();
     $items = array();
     foreach (domain_load_multiple() as $domain) {
-      $string = l($domain->name->value, $domain->url->value, array('external' => TRUE));
-      if (!$domain->status->value) {
+      $string = l($domain->name, $domain->url, array('external' => TRUE));
+      if (!$domain->status) {
         $string .= '*';
       }
-      if ($domain->machine_name->value == $active_domain->machine_name->value) {
+      if ($domain->id() == $active_domain->id()) {
         $string = '<em>' . $string . '</em>';
       }
 
