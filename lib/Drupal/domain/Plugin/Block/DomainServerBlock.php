@@ -53,12 +53,6 @@ class DomainServerBlock extends BlockBase {
       t('Domain match'),
       $match,
     );
-<<<<<<< HEAD
-    $property_definitions = $domain->getPropertyDefinitions();
-    $domain->checkResponse();
-    foreach ($property_definitions as $key => $val) {
-      $value = $domain->{$key};
-=======
     $list = (array) $domain;
     ksort($list);
     foreach ($list as $key => $value) {
@@ -74,7 +68,6 @@ class DomainServerBlock extends BlockBase {
       elseif ($key == 'status' || $key == 'is_default') {
         $value = empty($value) ? t('FALSE') : t('TRUE');
       }
->>>>>>> parent of 9c8379e... Fixes DomainServerBlock.
       $rows[] = array(
         check_plain($key),
         !is_array($value) ? check_plain($value) : $this->printArray($value),
