@@ -145,6 +145,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
       // {node_access} still requires a numeric id.
+      // @TODO: This is not reliable and creates duplicates.
       'domain_id' => count($domains) + 1,
     );
     // Create defaults if this is the first domain.
