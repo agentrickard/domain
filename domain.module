@@ -407,6 +407,22 @@ function domain_create($inherit = FALSE, array $values = array()) {
 }
 
 /**
+ * Generates a unique numeric id.
+ *
+ * @TODO: Move this to Domain Access, which needs it?
+ */
+function domain_next_id() {
+  $domains = domain_load_multiple();
+  $max = 0;
+  foreach ($domains as $domain) {
+    if ($domain->domain_id > $max) {
+      $max = $domain->domain_id;
+    }
+  }
+  return $max + 1;
+}
+
+/**
  * Creates a base hostname for the current request.
  *
  * This function is used extensively in testing and domain creation, as it

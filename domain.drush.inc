@@ -283,13 +283,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
     $domain = domain_create(FALSE, $values);
     domain_drush_create($domain);
   }
-  // If this is the first pass, set the default domain.
-  if (empty($domains)) {
-    db_update('domain')
-      ->condition('hostname', $primary)
-      ->fields(array('is_default' => 1))
-      ->execute();
-  }
+
   // If nothing created, say so.
   if (empty($new)) {
     drush_print(dt('No new domains were created.'));
