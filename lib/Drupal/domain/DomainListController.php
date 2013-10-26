@@ -94,7 +94,9 @@ class DomainListController extends DraggableListController {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $this->getLabel($entity);
-    return $row + parent::buildRow($entity);
+    $row += parent::buildRow($entity);
+    $row['weight']['#delta'] = count(domain_load_multiple()) + 1;
+    return $row;
   }
 
   /**
@@ -112,12 +114,6 @@ class DomainListController extends DraggableListController {
    */
   public function submitForm(array &$form, array &$form_state) {
     parent::submitForm($form, $form_state);
-
-    // Kill the static cache in domain_list().
-    drupal_static_reset('domain_list');
-
-    // Update weight of locked system domains.
-    domain_update_locked_weights();
 
     drupal_set_message(t('Configuration saved.'));
   }
