@@ -95,7 +95,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    * Get configuration name for this hostname.
    *
    * It will be the same name with a prefix depending on domain:
-   * domain.config.DOMAIN.MACHINE_NAME
+   * domain.config.DOMAIN.ID
    *
    * @param string $name
    *   The name of the config object.
@@ -106,7 +106,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    return 'domain.config.' . $domain->machine_name->value . '.' . $name;
+    return 'domain.config.' . $domain->id() . '.' . $name;
   }
 
   /**
