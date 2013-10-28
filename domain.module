@@ -40,25 +40,6 @@ function domain_permission() {
 }
 
 /**
- * Returns the page title for a domain record.
- *
- * @param Drupal\domain\DomainInterface $domain
- *   A domain entity.
- */
-function domain_page_title(DomainInterface $domain) {
-  return check_plain($domain->name->value);
-}
-
-/**
- * Entity URI callback.
- */
-function domain_uri(DomainInterface $domain) {
-  return array(
-    'path' => 'domain/' . $domain->machine_name->value,
-  );
-}
-
-/**
  * Implements hook_entity_bundle_info().
  */
 function domain_entity_bundle_info() {
@@ -69,52 +50,6 @@ function domain_entity_bundle_info() {
     ),
   );
   return $bundles;
-}
-
-/**
- * Implements hook_field_extra_fields().
- */
-function domain_field_extra_fields() {
-  $fields = array(
-    'hostname' => array(
-      'label' => t('Domain'),
-      'description' => t('The domain hostname.'),
-      'weight' => -12,
-    ),
-    'name' => array(
-      'label' => t('Name'),
-      'description' => t('Human-readable name.'),
-      'weight' => -10,
-    ),
-    'scheme' => array(
-      'label' => t('Scheme'),
-      'description' => t('The host scheme.'),
-      'weight' => -8,
-    ),
-    'status' => array(
-      'label' => t('Status'),
-      'description' => t('Record status.'),
-      'weight' => -6,
-    ),
-    'weight' => array(
-      'label' => t('Weight'),
-      'description' => t('Sort weight.'),
-      'weight' => -4,
-    ),
-    'is_default' => array(
-      'label' => t('Default domain'),
-      'description' => t('Indicates the default domain.'),
-      'weight' => -2,
-    ),
-  );
-  $extra['domain']['domain']['form'] = $fields;
-  $extra['domain']['domain']['display'] = $fields;
-  $extra['domain']['domain']['display']['domain_id'] = array(
-    'label' => t('Id'),
-    'description' => t('The domain record id.'),
-    'weight' => -14,
-  );
-  return $extra;
 }
 
 /**
