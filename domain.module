@@ -37,21 +37,6 @@ function domain_permission() {
 }
 
 /**
- * Implements hook_local_actions().
- */
-function domain_local_actions() {
-  return array(
-    array(
-      'route_name' => 'domain_add',
-      'title' => t('Add domain record'),
-      'appears_on' => array(
-        'domain_admin',
-      ),
-    ),
-  );
-}
-
-/**
  * Checks to see if a user may create a new domain record.
  */
 function domain_create_access() {
