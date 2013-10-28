@@ -98,7 +98,7 @@ function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load($id = NULL, $reset = FALSE) {
-  return entity_load('domain', $domain_id, $reset);
+  return entity_load('domain', $id, $reset);
 }
 
 /**
