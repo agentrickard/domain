@@ -37,25 +37,6 @@ function domain_permission() {
 }
 
 /**
- * Implements hook_menu().
- */
-function domain_menu() {
-  $items['admin/structure/domain'] = array(
-    'title' => 'Domains',
-    'description' => 'Manage domain records for your installation.',
-    'route_name' => 'domain.admin',
-  );
-  $items['admin/structure/domain/list'] = array(
-    'title' => 'List',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  );
-
-  return $items;
-}
-
-
-/**
  * Implements hook_local_actions().
  */
 function domain_local_actions() {
