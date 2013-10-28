@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainField
+ * Definition of Drupal\domain\Tests\DomainEntityReference
  */
 
 namespace Drupal\domain\Tests;
@@ -11,7 +11,7 @@ use Drupal\domain\DomainInterface;
 /**
  * Tests the domain record entity reference field type.
  */
-class DomainField extends DomainTestBase {
+class DomainEntityReference extends DomainTestBase {
 
   /**
    * Modules to enable.
@@ -32,7 +32,7 @@ class DomainField extends DomainTestBase {
    * Create, edit and delete a domain field via the user interface.
    */
   function testDomainField() {
-    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains', 'administer domain fields', 'administer domain display'));
+    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -69,7 +69,7 @@ class DomainField extends DomainTestBase {
    * Create content for a domain field.
    */
   function testDomainFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains', 'administer domain fields', 'administer domain display'));
+    $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains'));
     $this->drupalLogin($this->admin_user);
 
     // Create test domain field.
