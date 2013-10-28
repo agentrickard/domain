@@ -33,12 +33,12 @@ class DomainConfigOverride extends DomainConfigTestBase {
 
     // Test the response of the default home page.
     foreach (domain_load_multiple() as $domain) {
-      $this->drupalGet($domain->path->value);
-      if ($domain->id() == 1) {
+      $this->drupalGet($domain->path);
+      if ($domain->is_default) {
         $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
       }
       else {
-        $this->assertRaw('<title>Log in | ' . $domain->name->value . '</title>', 'Loaded the proper site name.');
+        $this->assertRaw('<title>Log in | ' . $domain->name . '</title>', 'Loaded the proper site name.');
       }
     }
 
