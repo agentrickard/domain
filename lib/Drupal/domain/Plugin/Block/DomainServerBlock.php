@@ -8,6 +8,7 @@
 namespace Drupal\domain\Plugin\Block;
 
 use Drupal\block\BlockBase;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Provides a server information block for a domain request.
@@ -22,8 +23,8 @@ class DomainServerBlock extends BlockBase {
   /**
    * Overrides \Drupal\block\BlockBase::access().
    */
-  public function access() {
-    return user_access('administer domains');
+  public function access(AccountInterface $account) {
+    return $account->hasPermission('administer domains');
   }
 
   /**

@@ -43,7 +43,7 @@ class DomainFormController extends EntityFormController {
       '#default_value' => $domain->id(),
       '#machine_name' => array(
         'source' => array('hostname'),
-        'exists' => 'domain_machine_name_load',
+        'exists' => 'domain_load',
       ),
     );
     $form['name'] = array(
