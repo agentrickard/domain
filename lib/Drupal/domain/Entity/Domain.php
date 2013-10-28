@@ -119,14 +119,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public $path;
 
   /**
-   * The domain record base url, a calculated value.
+   * The domain record current url, a calculated value.
    *
    * @var string
    */
   public $url;
 
   /**
-   * The domain recordd http response test (e.g. 200), a calculated value.
+   * The domain record http response test (e.g. 200), a calculated value.
    *
    * @var integer
    */
