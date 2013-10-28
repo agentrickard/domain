@@ -148,15 +148,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       // @TODO: This is not reliable and creates duplicates.
       'domain_id' => domain_next_id(),
     );
-    // Create defaults if this is the first domain.
-    if (empty($domains)) {
-      if (empty($values['hostname'])) {
-        $values['hostname'] = domain_hostname();
-      }
-      if (empty($values['name'])) {
-        $values['name'] = variable_get('sitename', 'Drupal');
-      }
-    }
   }
 
   /**
