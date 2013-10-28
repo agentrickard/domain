@@ -73,7 +73,7 @@ function domain_default() {
 /**
  * Loads multiple domain records.
  *
- * @param array $domain_ids
+ * @param array $ids
  *   (optional) An array of entity IDs. If omitted, all entities are loaded.
  * @param bool $reset
  *   (optional) Whether to reset the internal cache.  Defaults to FALSE.
@@ -81,14 +81,14 @@ function domain_default() {
  * @return array
  *   An array of domain entities indexed by domain_id.
  */
-function domain_load_multiple(array $domain_ids = NULL, $reset = FALSE) {
-  return entity_load_multiple('domain', $domain_ids, $reset);
+function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
+  return entity_load_multiple('domain', $ids, $reset);
 }
 
 /**
  * Return the domain entity matching a domain id.
  *
- * @param $domain_id
+ * @param $id
  *   The domain id.
  * @param bool $reset
  *   (optional) Whether to reset the internal cache. Defaults to FALSE.
@@ -97,7 +97,7 @@ function domain_load_multiple(array $domain_ids = NULL, $reset = FALSE) {
  *   The domain entity, if exists, FALSE otherwise. Results are
  *   statically cached.
  */
-function domain_load($domain_id = NULL, $reset = FALSE) {
+function domain_load($id = NULL, $reset = FALSE) {
   return entity_load('domain', $domain_id, $reset);
 }
 
@@ -117,56 +117,6 @@ function domain_load_hostname($hostname) {
     return FALSE;
   }
   return current($domains);
-}
-
-/**
- * Return the domain entity matching a domain machine name.
- *
- * @param $machine_name
- *   The domain's machine name.
- *
- * @return Drupal\domain\Entity\Domain|false
- *   The domain entity, if exists, FALSE otherwise. Results are
- *   statically cached.
- */
-function domain_machine_name_load($machine_name) {
-  $result = entity_load_multiple_by_properties('domain', array('machine_name' => $machine_name));
-  return reset($result);
-}
-
-/**
- * Loads multiple domain records by machine name.
- *
- * @param array $machine_names
- *   (optional) An array of entity machine names. If omitted, all entities are loaded.
- * @param bool $reset
- *   (optional) Whether to reset the internal cache.  Defaults to FALSE.
- *
- * @return array
- *   An array of domain entities indexed by machine.
- */
-function domain_machine_name_load_multiple(array $machine_names = NULL, $reset = FALSE) {
-  $domains = array();
-  if (!empty($machine_names)) {
-    $result = entity_load_multiple_by_properties('domain', array('machine_name' => $machine_names));
-  }
-  else {
-    $result = domain_load_multiple();
-  }
-  foreach ($result as $domain) {
-    $domains[$domain->machine_name->value] = $domain;
-  }
-  return $domains;
-}
-
-/**
- * Saves a domain record.
- *
- * @param Drupal\domain\DomainInterface $domain
- *   A domain entity.
- */
-function domain_save(DomainInterface $domain) {
-  $domain->save();
 }
 
 /**
@@ -257,48 +207,11 @@ function domain_required_fields() {
 }
 
 /**
- * @TODO: move to a method.
- */
-function domain_get_uri(DomainInterface $domain) {
-  return 'foo';
-}
-
-/**
  * Returns the current domain record.
  */
 function domain_get_domain() {
   $domain = Drupal::service('domain.manager');
   return isset($domain->domain) ? $domain->domain : FALSE;
-}
-
-/**
- * Reads an array of field items to domain records.
- *
- * @param array $items
- *   An $items array returned from a field element.
- * @param $keys
- *   Boolean indicator that only the matching keys should be returned.
- *   If set to FALSE, a $domain entity is returned for each record except for
- *   the DOMAIN_ALL_AFFILIATES constant.
- *
- * @return array
- *   An array of domains matching the values from the form element. Note that
- *   we are translating from machine_name to numeric gid for entity access.
- */
-function domain_extract_field_items(array $items, $keys = FALSE) {
-  $values = array();
-  foreach ($items as $key => $value) {
-    if ($value['realm'] == 'domain_site') {
-      $values[DOMAIN_ALL_AFFILIATES] = DOMAIN_ALL_AFFILIATES;
-    }
-    elseif ($domain = domain_load($value['gid'])) {
-      $values[$domain->machine_name->value] = $domain;
-    }
-  }
-  if ($keys) {
-    return array_keys($values);
-  }
-  return $values;
 }
 
 /**
