@@ -9,16 +9,6 @@ use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Set all affiliates as a default value for forms.
- */
-const DOMAIN_ALL_AFFILIATES = 'DOMAIN_ALL_AFFILIATES';
-
-/**
- * Set the current domain as a default value for forms.
- */
-const DOMAIN_CURRENT_DOMAIN = 'DOMAIN_CURRENT_DOMAIN';
-
-/**
  * Implements hook_permission().
  */
 function domain_permission() {
@@ -50,73 +40,6 @@ function domain_entity_bundle_info() {
     ),
   );
   return $bundles;
-}
-
-/**
- * Implements hook_field_info().
- */
-function domain_field_info() {
-  return array(
-    'domain_all' => array(
-      'label' => t('Domain all affiliates'),
-      'description' => t('This field stores a domain all affiliates entry for an entity.'),
-      'instance_settings' => array(),
-      'default_widget' => 'options_buttons',
-      'default_formatter' => 'list_default',
-      'field item class' => '\Drupal\number\Type\IntegerItem',
-    ),
-  );
-}
-
-/**
- * Implements hook_field_is_empty().
- */
-function domain_field_is_empty($item, $field) {
-  if (empty($item) && (string) $item !== '0') {
-    return TRUE;
-  }
-  return FALSE;
-}
-
-/**
- * Implements hook_field_presave().
- *
- * @TODO: Should this logic move to setValue() in the Type class?
- */
-function domain_field_presave(EntityInterface $entity, $field, $instance, $langcode, &$items) {
-  // Handle field saves from an entity_load().
-  if (isset($items[0]['realm'])) {
-    $values = domain_extract_field_items($items, TRUE);
-    if (!empty($values)) {
-      foreach ($values as  $value) {
-        $data[$value] = $value;
-      }
-    }
-  }
-  // Handles saves from a form checkbox set.
-  else {
-    $data = $items[0];
-  }
-  $result = array();
-  $i = 0;
-  if (!empty($data[DOMAIN_ALL_AFFILIATES])) {
-    $result[$i]['realm'] = 'domain_site';
-    $result[$i]['gid'] = 0;
-    unset($data[DOMAIN_ALL_AFFILIATES]);
-    $i++;
-  }
-  foreach (array_filter($data) as $key => $value) {
-    if ($domain = domain_machine_name_load($key, TRUE)) {
-      $result[$i]['realm'] = 'domain_id';
-      $result[$i]['gid'] = $domain->domain_id->value;
-      $i++;
-    }
-  }
-  // Prepare items for saving.
-  $items = $result;
-  // Add domain information to the entity for storage, if required.
-  // This approach is much simpler than trying to find the field instance.
-  $entity->domain[$field['field_name']] = $result;
 }
 
 /**
