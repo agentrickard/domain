@@ -11,26 +11,26 @@ domain.add:
   defaults:
     _entity_form: domain.edit
   requirements:
-    _permission: 'create domains'
+    _permission: "create domains"
 
 domain.edit:
   path: '/admin/structure/domain/edit/{domain}'
   defaults:
     _entity_form: domain.edit
   requirements:
-    _permission: 'administer domains'
+    _entity_access: domain.update
 
 domain.delete:
   path: '/admin/structure/domain/delete/{domain}'
   defaults:
     _entity_form: domain.delete
   requirements:
-    _permission: 'administer domains'
+    _entity_access: domain.delete
 
 domain.inline_action:
   path: '/admin/structure/domain/{op}/{domain}'
   defaults:
     _controller: 'Drupal\domain\Controller\DomainController::ajaxOperation'
   requirements:
-    _permission: 'administer domains'
+    _entity_access: domain.update
     op: 'enable|disable|default'

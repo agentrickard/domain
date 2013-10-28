@@ -32,40 +32,11 @@ function domain_permission() {
     'edit assigned domains' => array(
       'title' => t('Edit assigned domain records'),
     ),
+    'delete assigned domains' => array(
+      'title' => t('Delete assigned domain records'),
+    ),
   );
   return $permissions;
-}
-
-/**
- * Checks to see if a user may create a new domain record.
- */
-function domain_create_access() {
-  if (user_access('administer domains') || user_access('create domains')) {
-    return TRUE;
-  }
-  return FALSE;
-}
-
-/**
- * Checks to see if a user may edit an existing domain record.
- */
-function domain_edit_access() {
-  // @TODO conditional check in the second permission.
-  if (user_access('administer domains') || user_access('edit assigned domains')) {
-    return TRUE;
-  }
-  return FALSE;
-}
-
-/**
- * Checks to see if a user may view an existing domain record.
- */
-function domain_view_access() {
-  // @TODO conditional check in the second permission.
-  if (user_access('administer domains') || user_access('edit assigned domains')) {
-    return TRUE;
-  }
-  return FALSE;
 }
 
 /**

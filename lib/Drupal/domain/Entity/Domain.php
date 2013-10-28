@@ -32,8 +32,7 @@ use Guzzle\Http\Exception\HttpException;
  *     }
  *   },
  *   config_prefix = "domain.domain",
- *   fieldable = TRUE,
- *   translatable = FALSE,
+ *   admin_permission = "administer domains",
  *   entity_keys = {
  *     "id" = "id",
  *     "domain_id" = "domain_id",

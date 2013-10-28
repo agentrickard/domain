@@ -21,13 +21,20 @@ class DomainAccessController extends EntityAccessController {
   /**
    * {@inheritdoc}
    */
-  public function access(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
-    if (user_access('administer domains', $account)) {
+  public function checkAccess(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
+    if ($account->hasPermission($this->entityInfo['admin_permission'])) {
       return TRUE;
     }
-    if ($operation == 'create' && user_access('create domains', $account)) {
+    if ($operation == 'create' && $account->hasPermission('create domains')) {
       return TRUE;
     }
-    return parent::access($entity, $operation, $langcode, $account);
+    // @TODO: assign users to domains.
+    if ($operation == 'edit' && $account->hasPermission('edit assigned domains')) {
+      return TRUE;
+    }
+    if ($operation == 'delete' && $account->hasPermission('edit assigned domains')) {
+      return TRUE;
+    }
+    return FALSE;
   }
 }

@@ -35,6 +35,7 @@ class DomainListController extends DraggableListController {
     $destination = drupal_get_destination();
     $default = $entity->is_default;
     $id = $entity->id();
+    // @TODO: permission checks.
     if ($entity->status && !$default) {
       $operations['disable'] = array(
         'title' => t('Disable'),
