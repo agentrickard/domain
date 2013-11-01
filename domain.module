@@ -561,7 +561,7 @@ function domain_user_load($users) {
  *   An account object.
  */
 function domain_user_set($account) {
-  if (!isset($user->domain_user)) {
+  if (!isset($account->domain_user)) {
     $accounts = array($account->uid => $account);
     domain_user_load($accounts);
   }
