@@ -9,8 +9,9 @@ namespace Drupal\domain_alias\Type;
 
 use Drupal\Core\Entity\Annotation\FieldType;
 use Drupal\Core\Annotation\Translation;
-use Drupal\field\Plugin\Type\FieldType\ConfigFieldItemBase;
-use Drupal\field\Plugin\Core\Entity\Field;
+use Drupal\Core\Field\ConfigFieldItemBase;
+use Drupal\field\FieldInterface;
+use Drupal\field\Entity\Field;
 
 /**
  * Defines the 'domain' entity field items.
@@ -45,8 +46,8 @@ class DomainAliasItem extends ConfigFieldItemBase {
     return static::$propertyDefinitions;
   }
 
-  public static function schema(Field $field) {
-    $definition = \Drupal::service('plugin.manager.entity.field.field_type')->getDefinition($field->type);
+  public static function schema(FieldInterface $field) {
+    $definition = \Drupal::service('plugin.manager.field.field_type')->getDefinition($field->type);
     $module = $definition['module'];
     module_load_install($module);
     $callback = "{$module}_field_schema";
