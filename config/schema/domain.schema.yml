@@ -10,9 +10,6 @@ domain.domain.*:
     domain_id:
       type: integer
       label: 'Domain ID'
-    uuid:
-      type: string
-      label: 'UUID'
     hostname:
       type: string
       label: 'Hostname'
@@ -31,6 +28,3 @@ domain.domain.*:
     is_default:
       type: boolean
       label: 'Default domain'
-    machine_name:
-      type: string
-      label: 'Machine name'
