@@ -3,6 +3,7 @@ domain.admin:
   defaults:
     _entity_list: 'domain'
     _title: 'Domains'
+    _title_context: 'With modules'
   requirements:
     _permission: 'administer domains'
 

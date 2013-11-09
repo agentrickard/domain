@@ -9,6 +9,19 @@ use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
+ * Implements hook_menu().
+ */
+function domain_menu() {
+  $items['admin/structure/domain'] = array(
+    'title' => 'Domains',
+    'description' => 'Configure the domain settings for your site.',
+    'route_name' => 'domain.admin',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_permission().
  */
 function domain_permission() {
