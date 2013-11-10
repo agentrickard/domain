@@ -17,6 +17,6 @@ domain_alias.edit:
 domain_alias.add:
   path: '/admin/structure/domain/alias/{domain}/add'
   defaults:
-    _entity_form: domain_alias.edit
+    _content: '\Drupal\domain_alias\Controller\DomainAliasController::addAlias'
   requirements:
-    _permission: "create domains"
+    _permission: 'create domains'
