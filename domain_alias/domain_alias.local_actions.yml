@@ -1,0 +1,5 @@
+domain_alias_add:
+  route_name: domain_alias.add
+  title: 'Add domain alias'
+  appears_on:
+    - domain_alias.admin

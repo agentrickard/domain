@@ -1,0 +1,4 @@
+domain.edit:
+  title: 'Edit'
+  route_name: domain.edit
+  tab_root_id: domain.edit

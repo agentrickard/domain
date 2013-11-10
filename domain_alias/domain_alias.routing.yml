@@ -1,0 +1,22 @@
+domain_alias.admin:
+  path: '/admin/structure/domain/alias/{domain}'
+  defaults:
+    _entity_list: 'domain_alias'
+    _title: 'Domain aliases'
+    _title_context: 'With modules'
+  requirements:
+    _entity_access: domain.update
+
+domain_alias.edit:
+  path: '/admin/structure/domain/alias/{domain}/{domain_alias}'
+  defaults:
+    _entity_form: domain_alias.edit
+  requirements:
+    _entity_access: domain.update
+
+domain_alias.add:
+  path: '/admin/structure/domain/alias/{domain}/add'
+  defaults:
+    _entity_form: domain_alias.edit
+  requirements:
+    _permission: "create domains"
