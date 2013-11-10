@@ -68,7 +68,7 @@ class DomainAliasFormController extends EntityFormController {
     $entity = $this->buildEntity($form, $form_state);
     $errors = $entity->validate();
     if (!empty($errors)) {
-      form_set_error('hostname', $errors);
+      form_set_error('pattern', $errors);
     }
   }
 
@@ -77,13 +77,16 @@ class DomainAliasFormController extends EntityFormController {
    */
   public function save(array $form, array &$form_state) {
     $alias = $this->entity;
+
     if ($alias->isNew()) {
       drupal_set_message(t('Domain alias created.'));
     }
     else {
       drupal_set_message(t('Domain alias updated.'));
     }
+
     $alias->save();
+
     $form_state['redirect'] = 'admin/structure/domain/alias/' . $alias->domain_id;
   }
 }
