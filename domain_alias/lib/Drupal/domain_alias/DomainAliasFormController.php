@@ -41,7 +41,6 @@ class DomainAliasFormController extends EntityFormController {
         'source' => array('pattern'),
         'exists' => 'domain_alias_load', // @TODO
       ),
-      '#disabled' => !$alias->isNew(),
     );
     $form['redirect'] = array(
       '#type' => 'select',
