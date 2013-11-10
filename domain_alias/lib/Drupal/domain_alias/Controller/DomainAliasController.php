@@ -55,15 +55,17 @@ class DomainAliasController implements ContainerInjectionInterface {
   }
 
   /**
-   * Provides the menu link submission form.
+   * Provides the domain alias submission form.
    *
-   * @param \Drupal\system\MenuInterface $menu
-   *   An entity representing a custom menu.
+   * @param \Drupal\domain\DomainInterface $domain
+   *   An domain record entity.
    *
    * @return array
-   *   Returns the menu link submission form.
+   *   Returns the domain alias submission form.
    */
   public function addAlias(DomainInterface $domain) {
+    // The entire purpose of this controller is to add the values from
+    // the parent domain entity.
     $values['domain_id'] = $domain->id();
     $alias = entity_create('domain_alias', $values);
     return $this->entityManager->getForm($alias);

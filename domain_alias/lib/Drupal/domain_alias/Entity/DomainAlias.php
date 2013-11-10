@@ -34,7 +34,11 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "domain_id" = "domain_id",
+ *     "label" = "pattern",
  *     "uuid" = "uuid",
+ *   },
+ *   links = {
+ *     "edit-form" = "admin/structure/domain/alias/edit/{domain_alias}"
  *   }
  * )
  */
