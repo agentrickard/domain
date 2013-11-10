@@ -7,9 +7,9 @@ domain_alias.alias.*:
     uuid:
       type: string
       label: 'ID'
-    domain_uuid:
+    domain_id:
       type: string
-      label: 'Domain UUID'
+      label: 'Domain ID'
     pattern:
       type: string
       label: 'Pattern'

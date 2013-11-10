@@ -33,7 +33,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  *   admin_permission = "administer domains",
  *   entity_keys = {
  *     "id" = "id",
- *     "domain_uuid" = "domain_uuid",
+ *     "domain_id" = "domain_id",
  *     "uuid" = "uuid",
  *   },
  * )
