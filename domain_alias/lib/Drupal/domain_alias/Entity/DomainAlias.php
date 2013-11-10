@@ -35,18 +35,45 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  *     "id" = "id",
  *     "domain_id" = "domain_id",
  *     "uuid" = "uuid",
- *   },
+ *   }
  * )
  */
 class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
 
   /**
-   * The ID of the domain entity.
+   * The ID of the domain alias entity.
    *
    * @var string
    */
   public $id;
 
+  /**
+   * The parent domain record ID.
+   *
+   * @var string
+   */
+  public $domain_id;
+
+  /**
+   * The domain alias record UUID.
+   *
+   * @var string
+   */
+  public $uuid;
+
+  /**
+   * The domain alias record pattern.
+   *
+   * @var string
+   */
+  public $pattern;
+
+  /**
+   * The domain alias record redirect value.
+   *
+   * @var integer
+   */
+  public $redirect;
 
   /**
    * Valiadates an alias.
