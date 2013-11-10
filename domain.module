@@ -125,11 +125,11 @@ function domain_load($id = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load_hostname($hostname) {
-  $domains = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
-  if (empty($domains)) {
+  $entities = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
+  if (empty($entities)) {
     return FALSE;
   }
-  return current($domains);
+  return current($entities);
 }
 
 /**
