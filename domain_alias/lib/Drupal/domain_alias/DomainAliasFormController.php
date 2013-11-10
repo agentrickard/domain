@@ -55,9 +55,9 @@ class DomainAliasFormController extends EntityFormController {
 
   public function redirectOptions() {
     return array(
-      0 => 'Do not redirect',
-      301 => '301 redirect',
-      302 => '302 rediret',
+      0 => t('Do not redirect'),
+      301 => t('301 redirect: Moved Permanently'),
+      302 => t('302 redirect: Found'),
     );
   }
 
@@ -77,16 +77,22 @@ class DomainAliasFormController extends EntityFormController {
    */
   public function save(array $form, array &$form_state) {
     $alias = $this->entity;
-
     if ($alias->isNew()) {
       drupal_set_message(t('Domain alias created.'));
     }
     else {
       drupal_set_message(t('Domain alias updated.'));
     }
-
     $alias->save();
+    $form_state['redirect'] = 'admin/structure/domain/alias/' . $alias->domain_id;
+  }
 
+  /**
+   * Overrides Drupal\Core\Entity\EntityFormController::delete().
+   */
+  public function delete(array $form, array &$form_state) {
+    $alias = $this->entity;
+    $alias->delete();
     $form_state['redirect'] = 'admin/structure/domain/alias/' . $alias->domain_id;
   }
 }

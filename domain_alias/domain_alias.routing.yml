@@ -14,6 +14,13 @@ domain_alias.edit:
   requirements:
     _permission: 'create domains'
 
+domain_alias.delete:
+  path: '/admin/structure/domain/alias/delete/{domain_alias}'
+  defaults:
+    _entity_form: domain_alias.delete
+  requirements:
+    _permission: 'create domains'
+
 domain_alias.add:
   path: '/admin/structure/domain/alias/{domain}/add'
   defaults:

@@ -6,19 +6,13 @@
  */
 
 /**
- * Implements hook_field_info().
+ * Implements hook_help().
  */
-function domain_alias_field_info() {
-  return array(
-    'domain_alias' => array(
-      'label' => t('Domain alias'),
-      'description' => t('Domain alias patterns.'),
-      'instance_settings' => array('pattern' => NULL, 'redirect' => FALSE),
-      'default_widget' => 'domain_alias',
-      'default_formatter' => 'domain_alias',
-      'class' => '\Drupal\domain_alias\Type\DomainAliasItem',
-    ),
-  );
+function domain_alias_help($path, $arg) {
+  switch ($path) {
+    case 'admin/structure/domain/alias/%':
+      return 'foo';
+  }
 }
 
 /**
