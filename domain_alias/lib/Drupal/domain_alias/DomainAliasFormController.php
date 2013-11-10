@@ -39,7 +39,7 @@ class DomainAliasFormController extends EntityFormController {
       '#default_value' => $alias->id(),
       '#machine_name' => array(
         'source' => array('pattern'),
-        'exists' => 'domain_load', // @TODO
+        'exists' => 'domain_alias_load', // @TODO
       ),
       '#disabled' => !$alias->isNew(),
     );

@@ -81,7 +81,7 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
   public $redirect;
 
   /**
-   * Valiadates an alias.
+   * Validates an alias.
    */
   public function validate() {
     $pattern = $this->pattern;

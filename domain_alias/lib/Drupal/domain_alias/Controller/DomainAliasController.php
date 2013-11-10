@@ -67,6 +67,7 @@ class DomainAliasController implements ContainerInjectionInterface {
     // The entire purpose of this controller is to add the values from
     // the parent domain entity.
     $values['domain_id'] = $domain->id();
+    // @TODO: ensure that this value is present in all cases.
     $alias = entity_create('domain_alias', $values);
     return $this->entityManager->getForm($alias);
   }
