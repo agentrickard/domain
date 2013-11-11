@@ -42,6 +42,7 @@ class DomainManager implements DomainManagerInterface {
     if (empty($domain)) {
       $domain = entity_create('domain', array('hostname' => $httpHost));
     }
+    // @TODO: Should this be an event instead?
     \Drupal::moduleHandler()->alter('domain_request', $domain);
     if (!empty($domain->id)) {
       $this->setActiveDomain($domain);
