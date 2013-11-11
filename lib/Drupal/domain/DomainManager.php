@@ -9,6 +9,7 @@ namespace Drupal\domain;
 
 use Drupal\domain\DomainManagerInterface;
 use Drupal\domain\DomainInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 class DomainManager implements DomainManagerInterface {
 
@@ -16,15 +17,33 @@ class DomainManager implements DomainManagerInterface {
 
   public $domain;
 
-  public function __construct() {
+  /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * Constructs a DomainManager object.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   */
+  public function __construct(ModuleHandlerInterface $module_handler) {
     $this->httpHost = NULL;
     $this->domain = NULL;
+    $this->moduleHandler = $module_handler;
   }
 
   public function setRequestDomain($httpHost) {
     $this->setHttpHost($httpHost);
     $domain = domain_load_hostname($httpHost);
-    if (!empty($domain)) {
+    if (empty($domain)) {
+      $domain = entity_create('domain', array('hostname' => $httpHost));
+    }
+    \Drupal::moduleHandler()->alter('domain_request', $domain);
+    if (!empty($domain->id)) {
       $this->setActiveDomain($domain);
     }
   }

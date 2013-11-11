@@ -31,6 +31,18 @@ function hook_domain_load(array $domains) {
 }
 
 /**
+ * Allows modules to modify the inbound domain request.
+ *
+ * @param Drupal\domain\DomainInterface
+ *   A domain record object.
+ */
+function hook_domain_request_alter(DomainInterface $domain) {
+  if ($domain->id == 'example_com') {
+    // Do something here.
+  }
+}
+
+/**
  * Adds administrative operations for the domain overview form.
  *
  * @param &$operations

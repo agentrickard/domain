@@ -59,3 +59,10 @@ function domain_alias_domain_load(array $domains) {
     // @TODO: matching to current.
   }
 }
+
+/**
+ * Implements hook_domain_request_alter().
+ */
+function domain_alias_domain_request_alter(DomainInterface $domain) {
+
+}
