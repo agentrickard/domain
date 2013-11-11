@@ -6,9 +6,6 @@
 
 namespace Drupal\domain\Controller;
 
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\domain\DomainManager;
 use Drupal\domain\DomainInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -16,45 +13,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 /**
  * Controller routines for domain routes.
  */
-class DomainController implements ContainerInjectionInterface {
-
-  /**
-   * Domain Manager Service.
-   *
-   * @var \Drupal\domain\DomainManager
-   */
-  protected $domainManager;
-
-   /**
-   * Injects DomainManager Service.
-   */
-  public static function create(ContainerInterface $container) {
-    return new static($container->get('domain.manager'));
-  }
-
-  /**
-   * Constructs a DomainController object.
-   */
-  public function __construct(DomainManager $domainManager) {
-    $this->domainManager = $domainManager;
-  }
-
-  /**
-   * Returns the admin form.
-   */
-  public function adminOverview() {
-    $domains = domain_load_multiple();
-    module_load_include('inc', 'domain', 'domain.admin');
-    return drupal_get_form('domain_overview_form', $domains);
-  }
-
-  /**
-   * Returns the add form.
-   */
-  public function addDomain($inherit = FALSE) {
-    $domain = domain_create($inherit);
-    return entity_get_form($domain);
-  }
+class DomainController {
 
   /**
    * Controller for handling Ajax operations from the overview page.
@@ -100,8 +59,7 @@ class DomainController implements ContainerInjectionInterface {
         break;
     }
 
-    // @TODO: This no longer works in Drupal 8.
-    // See https://drupal.org/node/2023445#comment-7638261
+    // Set a message.
     if ($success) {
       drupal_set_message(t('Domain record !verb.', array('!verb' => $verb)));
     }
