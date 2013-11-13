@@ -43,8 +43,8 @@ class DomainServerBlock extends BlockBase {
     $match = t('TRUE');
     if (!$check) {
       // Specific check for Domain Alias.
-      if (isset($domain['active_alias_id'])) {
-        $match = t('ALIAS: Using alias %id', array('%id' => $domain['active_alias_id']));
+      if (isset($domain->alias)) {
+        $match = t('ALIAS: Using alias %id', array('%id' => $domain->alias));
       }
       else {
         $match = t('FALSE: Using default domain.');

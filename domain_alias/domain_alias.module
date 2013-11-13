@@ -62,24 +62,39 @@ function domain_alias_domain_load(array $domains) {
 
 /**
  * Implements hook_domain_request_alter().
+ *
+ * The logic in this function gives us the following matches for a request to
+ * foo.example.com.
+ *
+ *   'foo.*'
+ *   '*.example.com'
+ *   'foo.*.com'
+ *   'foo.example.*'
+ *   '*.foo.example.com'
+ *   'foo.example.com.*'
+ *
+ * These patterns should be sufficient for most conditions.
  */
-function domain_alias_domain_request_alter(DomainInterface $domain) {
+function domain_alias_domain_request_alter(&$info) {
+  $domain = $info['domain'];
   $hostname = $domain->hostname;
   $parts = explode('.', $hostname);
   $patterns = array();
-  $patterns[] = '*.' . $hostname;
-  $patterns[] = $hostname . '.*';
+  $patterns[] = $parts[0] . '.*';
   $count = count($parts);
   for ($i = 0; $i < $count; $i++) {
     $temp = $parts;
     $temp[$i] = '*';
     $patterns[] = implode('.', $temp);
   }
-
+  $patterns[] = '*.' . $hostname;
+  $patterns[] = $hostname . '.*';
   foreach ($patterns as $pattern) {
     if ($alias = domain_alias_pattern_load($pattern)) {
       if ($domain = domain_load($alias->domain_id)) {
-        $domain->alias = $alias;
+        // @TODO: load more data here?
+        $domain->alias = $alias->pattern;
+        $info['domain'] = $domain;
         break;
       }
     }

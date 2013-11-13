@@ -33,13 +33,18 @@ function hook_domain_load(array $domains) {
 /**
  * Allows modules to modify the inbound domain request.
  *
- * @param Drupal\domain\DomainInterface
- *   A domain record object.
+ * @param array $info
+ *   An array passed by reference to allow for drupal_alter(). This array
+ *   contains one item, the 'domain' key, which contains a $domain object.
+ *   defined by Drupal\domain\DomainInterface.
  */
-function hook_domain_request_alter(DomainInterface $domain) {
+function hook_domain_request_alter(&$info) {
+  $domain = $info['domain'];
   if ($domain->id == 'example_com') {
     // Do something here.
+    $domain->foo = 'Bar';
   }
+  $info['domain'] = $domain;
 }
 
 /**

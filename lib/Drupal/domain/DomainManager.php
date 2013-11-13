@@ -39,11 +39,16 @@ class DomainManager implements DomainManagerInterface {
   public function setRequestDomain($httpHost) {
     $this->setHttpHost($httpHost);
     $domain = domain_load_hostname($httpHost);
+    // If a straight load fails, check with modules (like Domain Alias) that
+    // register alternate paths with the main module.
     if (empty($domain)) {
       $domain = entity_create('domain', array('hostname' => $httpHost));
+      // @TODO: Should this be an event instead?
+      // @TODO: Should this be hook_domain_bootstrap_lookup?
+      $info['domain'] = $domain;
+      \Drupal::moduleHandler()->alter('domain_request', $info);
+      $domain = $info['domain'];
     }
-    // @TODO: Should this be an event instead?
-    \Drupal::moduleHandler()->alter('domain_request', $domain);
     if (!empty($domain->id)) {
       $this->setActiveDomain($domain);
     }
