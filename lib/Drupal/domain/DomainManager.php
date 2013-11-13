@@ -46,7 +46,7 @@ class DomainManager implements DomainManagerInterface {
       // @TODO: Should this be an event instead?
       // @TODO: Should this be hook_domain_bootstrap_lookup?
       $info['domain'] = $domain;
-      \Drupal::moduleHandler()->alter('domain_request', $info);
+      $this->moduleHandler->alter('domain_request', $info);
       $domain = $info['domain'];
     }
     if (!empty($domain->id)) {
