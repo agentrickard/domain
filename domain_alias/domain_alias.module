@@ -64,5 +64,24 @@ function domain_alias_domain_load(array $domains) {
  * Implements hook_domain_request_alter().
  */
 function domain_alias_domain_request_alter(DomainInterface $domain) {
+  $hostname = $domain->hostname;
+  $parts = explode('.', $hostname);
+  $patterns = array();
+  $patterns[] = '*.' . $hostname;
+  $patterns[] = $hostname . '.*';
+  $count = count($parts);
+  for ($i = 0; $i < $count; $i++) {
+    $temp = $parts;
+    $temp[$i] = '*';
+    $patterns[] = implode('.', $temp);
+  }
 
+  foreach ($patterns as $pattern) {
+    if ($alias = domain_alias_pattern_load($pattern)) {
+      if ($domain = domain_load($alias->domain_id)) {
+        $domain->alias = $alias;
+        break;
+      }
+    }
+  }
 }
