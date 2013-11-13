@@ -67,6 +67,7 @@ function hook_domain_operations(DomainInterface $domain) {
     'title' => t('alias'),
     'href' => "admin/structure/domain/$id/alias",
     'query' => array(),
+    'weight' => 100, // Core operations start at 0 and increment by 10.
   );
   return $operations;
 }

@@ -100,3 +100,18 @@ function domain_alias_domain_request_alter(&$info) {
     }
   }
 }
+
+/**
+ * Implements hook_domain_operations.
+ */
+function domain_alias_domain_operations(DomainInterface $domain) {
+  // Add aliases to the list.
+  $id = $domain->id();
+  $operations['domain_alias'] = array(
+    'title' => t('Aliases'),
+    'href' => 'admin/structure/domain/alias/' . $id,
+    'query' => array(),
+    'weight' => 60,
+  );
+  return $operations;
+}
