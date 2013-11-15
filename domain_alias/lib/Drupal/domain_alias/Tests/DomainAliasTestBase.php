@@ -8,6 +8,7 @@
 namespace Drupal\domain_alias\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
+use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain alias interface.
@@ -21,8 +22,20 @@ abstract class DomainAliasTestBase extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_alias');
 
-  function setUp() {
+  public function setUp() {
     parent::setUp();
+  }
+
+  public function domainAliasCreateTestAlias(DomainInterface $domain) {
+    $values = array(
+      'domain_id' => $domain->id(),
+      'pattern' => '*.' . $domain->hostname,
+      'redirect' => 0,
+    );
+    $values['id'] = str_replace(array('*', '.'), '_', $values['pattern']);
+    $alias = entity_create('domain_alias', $values);
+    // @TODO: test this logic.
+    $alias->save();
   }
 
 }
