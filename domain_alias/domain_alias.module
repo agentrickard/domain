@@ -97,6 +97,7 @@ function domain_alias_domain_request_alter(&$info) {
         $info['domain'] = $domain;
         break;
       }
+      // @TODO: error capture?
     }
   }
 }
