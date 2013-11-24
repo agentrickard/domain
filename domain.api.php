@@ -33,6 +33,9 @@ function hook_domain_load(array $domains) {
 /**
  * Allows modules to modify the inbound domain request.
  *
+ * To issue a redirect, as in the case of Domain Alias, set a redirect
+ * property to a valid response code (301 or 302).
+ *
  * @param array $info
  *   An array passed by reference to allow for drupal_alter(). This array
  *   contains one item, the 'domain' key, which contains a $domain object.

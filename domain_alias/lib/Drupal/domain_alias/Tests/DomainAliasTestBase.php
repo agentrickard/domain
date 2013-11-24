@@ -26,16 +26,33 @@ abstract class DomainAliasTestBase extends DomainTestBase {
     parent::setUp();
   }
 
-  public function domainAliasCreateTestAlias(DomainInterface $domain) {
+  /**
+   * Creates an alias for testing.
+   *
+   * @param Drupal\domain\Entity\Domain $domain
+   *   A domain entity.
+   * @param string $pattern
+   *   An optional alias pattern.
+   * @param int $redirect
+   *   An optional redirect (301 or 302).
+   *
+   * @return Drupal\domain_alias\Entity\DomainAlias
+   *   A domain alias entity.
+   */
+  public function domainAliasCreateTestAlias(DomainInterface $domain, $pattern = NULL, $redirect = 0) {
+    if (empty($pattern)) {
+      $pattern = '*.' . $domain->hostname;
+    }
     $values = array(
       'domain_id' => $domain->id(),
-      'pattern' => '*.' . $domain->hostname,
-      'redirect' => 0,
+      'pattern' => $pattern,
+      'redirect' => $redirect,
     );
     $values['id'] = str_replace(array('*', '.'), '_', $values['pattern']);
     $alias = entity_create('domain_alias', $values);
     // @TODO: test this logic.
     $alias->save();
+    return $alias;
   }
 
 }

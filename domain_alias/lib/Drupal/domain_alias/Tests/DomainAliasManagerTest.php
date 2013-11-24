@@ -69,8 +69,18 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
     $this->assertRaw('<td>Domain match</td><td>ALIAS:', 'No direct domain match.');
     $this->assertRaw($alias->pattern, 'Alias match.');
 
-    // @TODO: test redirections.
-
+    // Test redirections.
+    // @TODO: This could be much more elegant.
+    $alias->redirect = 301;
+    $alias->save();
+    $this->drupalGet($url);
+    $this->assertRaw($alias_domain->name, 'Loaded the proper domain.');
+    $this->assertRaw('<td>Domain match</td><td>TRUE</td>', 'Direct domain match.');
+    $alias->redirect = 302;
+    $alias->save();
+    $this->drupalGet($url);
+    $this->assertRaw($alias_domain->name, 'Loaded the proper domain.');
+    $this->assertRaw('<td>Domain match</td><td>TRUE</td>', 'Direct domain match.');
     // Revoke the permission change
     user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
 

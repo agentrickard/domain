@@ -94,6 +94,9 @@ function domain_alias_domain_request_alter(&$info) {
       if ($domain = domain_load($alias->domain_id)) {
         // @TODO: load more data here?
         $domain->alias = $alias->pattern;
+        if (!empty($alias->redirect)) {
+          $domain->redirect = $alias->redirect;
+        }
         $info['domain'] = $domain;
         break;
       }

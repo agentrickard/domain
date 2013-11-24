@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Implements DomainSubscriber
@@ -45,6 +45,12 @@ class DomainSubscriber implements EventSubscriberInterface {
     // TODO: Pass $url string or the entire Request?
     $httpHost = $request->getHttpHost();
     $this->domainManager->setRequestDomain($httpHost);
+    $domain = $this->domainManager->getActiveDomain();
+    // Pass a redirect if necessary.
+    if (!empty($domain->url) && !empty($domain->redirect)) {
+      $response = new RedirectResponse($domain->url, $domain->redirect);
+      $event->setResponse($response);
+    }
   }
 
   /**
