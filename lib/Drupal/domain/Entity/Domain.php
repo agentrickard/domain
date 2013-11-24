@@ -41,7 +41,7 @@ use Guzzle\Http\Exception\HttpException;
  *     "weight" = "weight"
  *   },
  *   links = {
- *     "edit-form" = "admin/structure/domain/edit/{domain}"
+ *     "edit-form" = "domain.edit"
  *   }
  * )
  */
