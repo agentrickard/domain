@@ -1,0 +1,15 @@
+id: node.field_domain
+uuid: 2171310e-2321-4ebc-9c00-d99bf1df8f67
+status: true
+langcode: en
+name: field_domain
+entity_type: node
+type: entity_reference
+settings:
+  target_type: domain
+module: entity_reference
+active: true
+locked: false
+cardinality: '-1'
+translatable: false
+indexes: {  }
