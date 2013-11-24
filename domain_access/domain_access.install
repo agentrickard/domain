@@ -4,3 +4,55 @@
  * @file
  * Install, update and uninstall functions for the Domain Access module.
  */
+
+define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
+
+/**
+ * Implements hook_install().
+ *
+ * Installs the default domain field on nodes.
+ */
+function domain_access_install() {
+  $node_types = entity_load_multiple('node_type');
+  foreach ($node_types as $type => $info) {
+    $instance = array(
+      'field_name' => DOMAIN_ACCESS_FIELD,
+      'entity_type' => 'node',
+      'label' => 'Domain',
+      'bundle' => $type,
+      'required' => TRUE,
+      'description' => 'Select the affiliate domains for this content',
+      'default_value_function' => 'domain_access_default',
+      'settings' => array(
+        'handler_settings' => array(
+          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+        ),
+      ),
+    );
+    $field_instance = entity_create('field_instance', $instance);
+    $field_instance->save();
+
+    // Tell the form system how to behave. Default to radio buttons.
+    entity_get_form_display('node', $type, 'default')
+      ->setComponent(DOMAIN_ACCESS_FIELD, array(
+        'type' => 'options_buttons',
+    ))
+    ->save();
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Removes access control fields on uninstall.
+ */
+function domain_access_uninstall() {
+  $node_types = entity_load_multiple('node_type');
+  foreach ($node_types as $type => $info) {
+    $name = 'node.' . $type . '.' . DOMAIN_ACCESS_FIELD;
+    debug($name);
+    if ($instance = entity_load('field_instance', $name)) {
+      $instance->delete();
+    }
+  }
+}

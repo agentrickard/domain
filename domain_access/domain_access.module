@@ -4,3 +4,7 @@
  * @file
  * Domain-based access control for content.
  */
+
+function domain_access_default($entity, $field, $instance, $langcode) {
+  return array();
+}
