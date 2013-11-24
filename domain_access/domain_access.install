@@ -49,8 +49,7 @@ function domain_access_install() {
 function domain_access_uninstall() {
   $node_types = entity_load_multiple('node_type');
   foreach ($node_types as $type => $info) {
-    $name = 'node.' . $type . '.' . DOMAIN_ACCESS_FIELD;
-    debug($name);
+    $name = 'field.instance.node.' . $type . '.' . DOMAIN_ACCESS_FIELD;
     if ($instance = entity_load('field_instance', $name)) {
       $instance->delete();
     }
