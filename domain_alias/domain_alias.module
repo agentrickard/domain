@@ -79,7 +79,7 @@ function domain_alias_domain_request_alter(&$info) {
   $domain = $info['domain'];
   $hostname = $domain->hostname;
   $parts = explode('.', $hostname);
-  $patterns = array();
+  $patterns = array($hostname);
   $patterns[] = $parts[0] . '.*';
   $count = count($parts);
   for ($i = 0; $i < $count; $i++) {
@@ -89,6 +89,7 @@ function domain_alias_domain_request_alter(&$info) {
   }
   $patterns[] = '*.' . $hostname;
   $patterns[] = $hostname . '.*';
+  uasort($patterns, 'domain_alias_sort');
   foreach ($patterns as $pattern) {
     if ($alias = domain_alias_pattern_load($pattern)) {
       if ($domain = domain_load($alias->domain_id)) {
@@ -103,6 +104,16 @@ function domain_alias_domain_request_alter(&$info) {
       // @TODO: error capture?
     }
   }
+}
+
+/**
+ * Sorts domains by wildcard to float exact matches to the top.
+ */
+function domain_alias_sort($a, $b) {
+  if (substr_count($a, '*') > 0) {
+    return 1;
+  }
+  return 0;
 }
 
 /**
