@@ -40,7 +40,7 @@ function domain_alias_load($id = NULL, $reset = FALSE) {
  *   (optional) Whether to reset the internal cache. Defaults to FALSE.
  *
  * @return Drupal\domain_alias\Entity\DomainAlias|FALSE
- *   The domain alias entity, if exists, FALSE otherwise. Results are
+ *   The domain alias entity, if it exists, FALSE otherwise. Results are
  *   statically cached.
  */
 function domain_alias_pattern_load($pattern) {
@@ -49,15 +49,6 @@ function domain_alias_pattern_load($pattern) {
     return FALSE;
   }
   return current($entities);
-}
-
-/**
- * Implements hook_domain_load().
- */
-function domain_alias_domain_load(array $domains) {
-  foreach ($domains as $key => $domain) {
-    // @TODO: matching to current.
-  }
 }
 
 /**
@@ -78,6 +69,28 @@ function domain_alias_domain_load(array $domains) {
 function domain_alias_domain_request_alter(&$info) {
   $domain = $info['domain'];
   $hostname = $domain->hostname;
+  if ($alias = domain_alias_match_hostname($hostname)) {
+    if ($domain = domain_load($alias->domain_id)) {
+      $domain->alias = $alias->pattern;
+      if (!empty($alias->redirect)) {
+        $domain->redirect = $alias->redirect;
+      }
+      $info['domain'] = $domain;
+    }
+    // @TODO: error capture?
+  }
+}
+
+/**
+ * Tries to match an http hostname to a registered alias.
+ *
+ * @param string $hostname
+ *   The hostname value (generally $_SERVER['HTTP_HOST']).
+ *
+ * @return Drupal\domain_alias\Entity\DomainAlias|FALSE
+ *   A matching domain alias entity, if it exists, FALSE otherwise.
+ */
+function domain_alias_match_hostname($hostname) {
   $parts = explode('.', $hostname);
   $patterns = array($hostname);
   $patterns[] = $parts[0] . '.*';
@@ -92,18 +105,10 @@ function domain_alias_domain_request_alter(&$info) {
   uasort($patterns, 'domain_alias_sort');
   foreach ($patterns as $pattern) {
     if ($alias = domain_alias_pattern_load($pattern)) {
-      if ($domain = domain_load($alias->domain_id)) {
-        // @TODO: load more data here?
-        $domain->alias = $alias->pattern;
-        if (!empty($alias->redirect)) {
-          $domain->redirect = $alias->redirect;
-        }
-        $info['domain'] = $domain;
-        break;
-      }
-      // @TODO: error capture?
+      return $alias;
     }
   }
+  return FALSE;
 }
 
 /**

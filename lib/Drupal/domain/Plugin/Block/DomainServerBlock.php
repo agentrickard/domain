@@ -90,7 +90,7 @@ class DomainServerBlock extends BlockBase {
    * @return
    *  A suitable output string.
    */
-  public function printArray(array $value) {
+  public function printArray(array $array) {
     $items = array();
     foreach ($array as $key => $val) {
       $value = 'array';
