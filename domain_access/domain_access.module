@@ -1,0 +1,6 @@
+<?php
+
+/**
+ * @file
+ * Domain-based access control for content.
+ */
