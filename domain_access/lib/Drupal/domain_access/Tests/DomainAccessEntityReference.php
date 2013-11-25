@@ -6,6 +6,7 @@
  */
 
 namespace Drupal\domain_access\Tests;
+use Drupal\domain\Tests\DomainTestBase;
 use Drupal\domain\DomainInterface;
 
 /**
@@ -28,6 +29,15 @@ class DomainAccessEntityReference extends DomainTestBase {
     );
   }
 
+  function setUp() {
+    parent::setUp();
+
+    // Run the install hook.
+    // @TODO: figure out why this is necessary.
+    module_load_install('domain_access');
+    domain_access_install();
+  }
+
   /**
    * Install the domain access field via hook_install().
    */
@@ -40,26 +50,14 @@ class DomainAccessEntityReference extends DomainTestBase {
     $this->assertResponse(200, 'Manage fields page accessed.');
 
     // Check for a domain field.
-    $this->assertNoText('Domain test field', 'Domain form field not found.');
+    $this->assertText('Domain Access', 'Domain form field found.');
 
     // Visit the article field display administration page.
     $this->drupalGet('admin/structure/types/manage/article/display');
     $this->assertResponse(200, 'Manage field display page accessed.');
 
     // Check for a domain field.
-    $this->assertNoText('Domain test field', 'Domain form field not found.');
-
-    // Visit the article field administration page.
-    $this->drupalGet('admin/structure/types/manage/article/fields');
-
-    // Check the new field.
-    $this->assertText('Domain test field', 'Added a test field instance.');
-
-    // Visit the article field display administration page.
-    $this->drupalGet('admin/structure/types/manage/article/display');
-
-    // Check the new field.
-    $this->assertText('Domain test field', 'Added a test field display instance.');
+    $this->assertText('Domain Access', 'Domain form field found.');
   }
 
   /**
@@ -77,7 +75,7 @@ class DomainAccessEntityReference extends DomainTestBase {
     $this->assertResponse(200);
 
     // Check the new field exists on the page.
-    $this->assertText('Domain test field', 'Found the domain field instance.');
+    $this->assertText('Domain Access', 'Found the domain field instance.');
 
     // We expect to find 5 domain options.
     $domains = domain_load_multiple();
