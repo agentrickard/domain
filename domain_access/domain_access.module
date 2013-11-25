@@ -5,6 +5,24 @@
  * Domain-based access control for content.
  */
 
+use Drupal\domain\DomainManager;
+use Drupal\domain\DomainInterface;
+
+define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
+
 function domain_access_default($entity, $field, $instance, $langcode) {
-  return array();
+  $item = array();
+  if ($active = domain_get_domain()) {
+    $item[0]['target_uuid'] = $active->uuid;
+  }
+  return $item;
+}
+
+function domain_access_get_values($entity) {
+  if ($entity->isNew()) {
+    return array();
+  }
+  $values = $entity->getPropertyValues();
+
+  return $values[DOMAIN_ACCESS_FIELD];
 }
