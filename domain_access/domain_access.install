@@ -47,11 +47,7 @@ function domain_access_install() {
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
-  $node_types = entity_load_multiple('node_type');
-  foreach ($node_types as $type => $info) {
-    $name = 'field.instance.node.' . $type . '.' . DOMAIN_ACCESS_FIELD;
-    if ($instance = entity_load('field_instance', $name)) {
-      $instance->delete();
-    }
+  if ($field = entity_load('field_entity', 'node.' . DOMAIN_ACCESS_FIELD)) {
+    $field->delete();
   }
 }
