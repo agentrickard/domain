@@ -7,9 +7,44 @@
 
 use Drupal\domain\DomainManager;
 use Drupal\domain\DomainInterface;
+use Drupal\node\NodeInterface;
 
 define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
 
+/**
+ * Implements hook_node_grants().
+ */
+function domain_access_node_grants($account, $op) {
+  $grants = array();
+  $active = domain_get_domain();
+  if ($op == 'view') {
+    $grants['domain_id'][] = $active->domain_id;
+  }
+  // @TODO grants for edit/delete.
+  return $grants;
+}
+
+/**
+ * Implements hook_node_access_records().
+ */
+function domain_access_node_access_records(Node $node) {
+  foreach (domain_access_get_values($node) as $value) {
+    if (isset($value['target_id']) && $domain = domain_load($value['target_id'])) {
+      $grants[] = array(
+        'realm' => 'domain_id',
+        'gid' => $domain->domain_id,
+        'grant_view' => 1,
+        'grant_update' => 1,
+        'grant_delete' => 1,
+      );
+    }
+  }
+  return $grants;
+}
+
+/**
+ * Sets the default value for new fields.
+ */
 function domain_access_default($entity, $field, $instance, $langcode) {
   $item = array();
   if ($active = domain_get_domain()) {
@@ -18,11 +53,13 @@ function domain_access_default($entity, $field, $instance, $langcode) {
   return $item;
 }
 
+/**
+ * Pulls the domain access values from an entity.
+ */
 function domain_access_get_values($entity) {
   if ($entity->isNew()) {
     return array();
   }
   $values = $entity->getPropertyValues();
-
   return $values[DOMAIN_ACCESS_FIELD];
 }
