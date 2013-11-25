@@ -18,7 +18,7 @@ class DomainConfigOverride extends DomainConfigTestBase {
     return array(
       'name' => 'Domain configuration overrides',
       'description' => 'Set domain-specific variables.',
-      'group' => 'Domain config',
+      'group' => 'Domain Configuration',
     );
   }
 
