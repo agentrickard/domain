@@ -8,6 +8,7 @@
 use Drupal\domain\DomainManager;
 use Drupal\domain\DomainInterface;
 use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\EntityInterface;
 
 define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
 
@@ -62,4 +63,27 @@ function domain_access_get_values($entity) {
   }
   $values = $entity->getPropertyValues();
   return $values[DOMAIN_ACCESS_FIELD];
+}
+
+/**
+ * Implements hook_node_presave().
+ *
+ * Fires only if Devel Generate module is present, to assign test nodes to
+ * domains.
+ *
+ * @TODO: should we always set default values here?
+ * @TODO: pull values from the Devel Generate form.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface stdClass $node
+ *   The node entity on which the operation is to be performed.
+ */
+function domain_access_node_presave(EntityInterface $node) {
+  $exists = \Drupal::moduleHandler()->moduleExists('devel_generate');
+  if ($exists && isset($node->devel_generate)) {
+    $domains = domain_load_multiple();
+    $values = array(
+      DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(0, count($domains)))),
+    );
+    $node->setPropertyValues($values);
+  }
 }
