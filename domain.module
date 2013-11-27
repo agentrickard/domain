@@ -228,6 +228,14 @@ function domain_get_domain() {
 }
 
 /**
+ * Returns the id of the current domain record.
+ */
+function domain_get_active_id() {
+  $domain = domain_get_domain();
+  return isset($domain->id) ? $domain->id : FALSE;
+}
+
+/**
  * Generates an array for rendering the given node.
  *
  * @param Drupal\domain\DomainInterface $domain
@@ -321,4 +329,29 @@ function domain_check_scheme($scheme, $add_suffix = FALSE) {
  */
 function domain_scheme($scheme) {
   return domain_check_scheme($scheme, TRUE);
+}
+
+/**
+ * Returns a list of all domains, suitable for use in a form.
+ *
+ * @TODO: Access control.
+ *
+ * @return array
+ *   A list of domains, keyed by id.
+ */
+function domain_options_list() {
+  $domains = domain_load_multiple();
+  uasort($domains, 'domain_list_sort');
+  $list = array();
+  foreach ($domains as $id => $domain) {
+    $list[$id] = $domain->name;
+  }
+  return $list;
+}
+
+/**
+ * Sort filter for domain lists.
+ */
+function domain_list_sort($a, $b) {
+  return $a->weight > $b->weight;
 }

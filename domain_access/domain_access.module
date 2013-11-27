@@ -80,10 +80,37 @@ function domain_access_get_values($entity) {
 function domain_access_node_presave(EntityInterface $node) {
   $exists = \Drupal::moduleHandler()->moduleExists('devel_generate');
   if ($exists && isset($node->devel_generate)) {
-    $domains = domain_load_multiple();
-    $values = array(
-      DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(0, count($domains)))),
-    );
+    // If set by the form.
+    if (isset($node->devel_generate['domain_access'])) {
+      $values = array(
+        DOMAIN_ACCESS_FIELD => array_keys($node->devel_generate['domain_access']),
+      );
+    }
+    // Else set randomly.
+    else {
+      $domains = domain_load_multiple();
+      $values = array(
+        DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(0, count($domains)))),
+      );
+    }
     $node->setPropertyValues($values);
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function domain_access_form_devel_generate_content_form_alter(&$form, &$form_state, $form_id) {
+  // Add our element to the devel generate form.
+  $form['submit']['#weight'] = 10;
+  $list = domain_options_list();
+  $form['domain_access'] = array(
+    '#title' => t('Domains'),
+    '#type' => 'select',
+    '#options' => $list,
+    '#weight' => 2,
+    '#multiple' => TRUE,
+    '#size' => count($list) > 5 ? 5 : count($list),
+    '#default_value' => array(domain_get_active_id()),
+  );
 }
