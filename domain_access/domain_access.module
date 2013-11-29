@@ -28,7 +28,7 @@ function domain_access_node_grants($account, $op) {
 /**
  * Implements hook_node_access_records().
  */
-function domain_access_node_access_records(Node $node) {
+function domain_access_node_access_records(NodeInterface $node) {
   foreach (domain_access_get_values($node) as $value) {
     if (isset($value['target_id']) && $domain = domain_load($value['target_id'])) {
       $grants[] = array(
@@ -90,7 +90,7 @@ function domain_access_node_presave(EntityInterface $node) {
     else {
       $domains = domain_load_multiple();
       $values = array(
-        DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(0, count($domains)))),
+        DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
       );
     }
     $node->setPropertyValues($values);
