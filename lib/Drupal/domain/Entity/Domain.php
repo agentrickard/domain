@@ -25,6 +25,7 @@ use Guzzle\Http\Exception\HttpException;
  *     "render" = "Drupal\domain\DomainRenderController",
  *     "access" = "Drupal\domain\DomainAccessController",
  *     "list" = "Drupal\domain\DomainListController",
+ *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\domain\DomainFormController",
  *       "edit" = "Drupal\domain\DomainFormController",
