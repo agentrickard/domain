@@ -14,13 +14,13 @@ function domain_access_install() {
   $node_types = entity_load_multiple('node_type');
   foreach ($node_types as $type => $info) {
     $instance = array(
-      'field_name' => DOMAIN_ACCESS_FIELD,
+      'field_name' => DOMAIN_ACCESS_NODE_FIELD,
       'entity_type' => 'node',
       'label' => 'Domain Access',
       'bundle' => $type,
       'required' => TRUE,
-      'description' => 'Select the affiliate domain(s) for this content',
-      'default_value_function' => 'domain_access_default',
+      'description' => 'Select the affiliate domain(s) for this content.',
+      'default_value_function' => 'domain_access_default_value',
       'settings' => array(
         'handler_settings' => array(
           'sort' => array('field' => 'weight', 'direction' => 'ASC'),
@@ -32,11 +32,26 @@ function domain_access_install() {
 
     // Tell the form system how to behave. Default to radio buttons.
     entity_get_form_display('node', $type, 'default')
-      ->setComponent(DOMAIN_ACCESS_FIELD, array(
+      ->setComponent(DOMAIN_ACCESS_NODE_FIELD, array(
         'type' => 'options_buttons',
     ))
     ->save();
   }
+
+  // Save to the user form.
+  $instance['entity_type'] = 'user';
+  $instance['bundle'] = 'user';
+  $instance['description'] = 'Select the affiliate domain(s) for this user.';
+  $instance['required'] = FALSE;
+  $field_instance = entity_create('field_instance', $instance);
+  $field_instance->save();
+
+  // Tell the form system how to behave. Default to radio buttons.
+  entity_get_form_display('user', 'user', 'default')
+    ->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
+      'type' => 'options_buttons',
+  ))
+  ->save();
 }
 
 /**
@@ -45,7 +60,10 @@ function domain_access_install() {
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
-  if ($field = entity_load('field_entity', 'node.' . DOMAIN_ACCESS_FIELD)) {
+  if ($field = entity_load('field_entity', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
+    $field->delete();
+  }
+  if ($field = entity_load('field_entity', 'node.' . DOMAIN_ACCESS_USER_FIELD)) {
     $field->delete();
   }
 }

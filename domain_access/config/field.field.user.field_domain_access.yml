@@ -1,0 +1,15 @@
+id: user.field_domain_access
+uuid: 4c7f1137-f715-46f7-be02-2af1236ce5b5
+status: true
+langcode: en
+name: field_domain_access
+entity_type: user
+type: entity_reference
+settings:
+  target_type: domain
+module: entity_reference
+active: true
+locked: false
+cardinality: '-1'
+translatable: false
+indexes: {  }

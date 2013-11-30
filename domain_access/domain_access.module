@@ -10,7 +10,15 @@ use Drupal\domain\DomainInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 
-define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
+/**
+ * Defines the name of the node access control field.
+ */
+define('DOMAIN_ACCESS_NODE_FIELD', 'field_domain_access');
+
+/**
+ * Defines the names of the user assignment field.
+ */
+define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
 
 /**
  * Implements hook_node_grants().
@@ -46,7 +54,7 @@ function domain_access_node_access_records(NodeInterface $node) {
 /**
  * Sets the default value for new fields.
  */
-function domain_access_default($entity, $field, $instance, $langcode) {
+function domain_access_default_value($entity, $field, $instance, $langcode) {
   $item = array();
   if ($active = domain_get_domain()) {
     $item[0]['target_uuid'] = $active->uuid;
@@ -62,7 +70,7 @@ function domain_access_get_values($entity) {
     return array();
   }
   $values = $entity->getPropertyValues();
-  return $values[DOMAIN_ACCESS_FIELD];
+  return $values[DOMAIN_ACCESS_NODE_FIELD];
 }
 
 /**
@@ -83,14 +91,14 @@ function domain_access_node_presave(EntityInterface $node) {
     // If set by the form.
     if (isset($node->devel_generate['domain_access'])) {
       $values = array(
-        DOMAIN_ACCESS_FIELD => array_keys($node->devel_generate['domain_access']),
+        DOMAIN_ACCESS_NODE_FIELD => array_keys($node->devel_generate['domain_access']),
       );
     }
     // Else set randomly.
     else {
       $domains = domain_load_multiple();
       $values = array(
-        DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
+        DOMAIN_ACCESS_NODE_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
       );
     }
     $node->setPropertyValues($values);
