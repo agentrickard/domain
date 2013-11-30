@@ -39,10 +39,16 @@ function domain_access_install() {
   }
 
   // Save to the user form.
-  $instance['entity_type'] = 'user';
-  $instance['bundle'] = 'user';
-  $instance['description'] = 'Select the affiliate domain(s) for this user.';
-  $instance['required'] = FALSE;
+  $instance = array(
+    'field_name' => DOMAIN_ACCESS_USER_FIELD,
+    'entity_type' => 'user',
+    'label' => 'Domain Access',
+    'bundle' => 'user',
+    'required' => FALSE,
+    'description' => 'Select the affiliate domain(s) for this user.',
+    'default_value_function' => 'domain_access_default_value',
+    'settings' => array(),
+  );
   $field_instance = entity_create('field_instance', $instance);
   $field_instance->save();
 
@@ -63,7 +69,7 @@ function domain_access_uninstall() {
   if ($field = entity_load('field_entity', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
     $field->delete();
   }
-  if ($field = entity_load('field_entity', 'node.' . DOMAIN_ACCESS_USER_FIELD)) {
+  if ($field = entity_load('field_entity', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
     $field->delete();
   }
 }
