@@ -21,6 +21,76 @@ define('DOMAIN_ACCESS_NODE_FIELD', 'field_domain_access');
 define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
 
 /**
+ * Implements hook_permission().
+ */
+function domain_access_permission() {
+  $permissions = array(
+    'assign domain editors' => array(
+      'title' => t('Assign editors to assigned domains'),
+    ),
+    // @TODO: check how this will work.
+    'set domain access' => array(
+      'title' => t('Set domain access status for all content'),
+    ),
+    'publish to any assigned domain' => array(
+      'title' => t('Publish content to any assigned domain'),
+    ),
+    'publish from assigned domain' => array(
+      'title' => t('Publish content only from assigned domain'),
+    ),
+    'publish from default domain' => array(
+      'title' => t('Publish content only from the default domain'),
+    ),
+    'edit domain content' => array(
+      'title' => t('Edit any content on assigned domains'),
+    ),
+    'delete domain content' => array(
+      'title' => t('Delete any content on assigned domains'),
+    ),
+    'view unpublished domain content' => array(
+      'title' => t('View unpublished content on assigned domains'),
+    ),
+  );
+
+  // Generate standard node permissions for all applicable node types.
+  foreach (node_permissions_get_configured_types() as $type => $info) {
+    $permissions += domain_editor_list_permissions($type);
+  }
+
+  return $permissions;
+}
+
+/**
+ * Helper function to generate standard node permission list for a given type.
+ *
+ * Shamelessly lifted from node_list_permissions().
+ *
+ * @param $type
+ *   The machine-readable name of the node type.
+ * @return array
+ *   An array of permission names and descriptions.
+ */
+function domain_editor_list_permissions($type) {
+  $info = entity_load('node_type', $type);
+  $type = check_plain($info->type);
+
+  // Build standard list of node permissions for this type.
+  $perms = array(
+    "create $type content on assigned domains" => array(
+      'title' => t('%type_name: Create new content on assigned domains', array('%type_name' => $info->name)),
+    ),
+    "update $type content on assigned domains" => array(
+      'title' => t('%type_name: Edit any content on assigned domains', array('%type_name' => $info->name)),
+    ),
+    "delete $type content on assigned domains" => array(
+      'title' => t('%type_name: Delete any content on assigned domains', array('%type_name' => $info->name)),
+    ),
+  );
+
+  return $perms;
+}
+
+/**
  * Implements hook_node_grants().
  */
 function domain_access_node_grants($account, $op) {
@@ -29,6 +99,14 @@ function domain_access_node_grants($account, $op) {
   if ($op == 'view') {
     $grants['domain_id'][] = $active->domain_id;
   }
+  // @TODO: check user domain assignments.
+  if ($op == 'update' && $account->hasPermission('edit domain content')) {
+    $grants['domain_id'][] = $active->domain_id;
+  }
+  if ($op == 'delete' && $account->hasPermission('delete domain content')) {
+    $grants['domain_id'][] = $active->domain_id;
+  }
+
   // @TODO grants for edit/delete.
   return $grants;
 }
@@ -37,7 +115,7 @@ function domain_access_node_grants($account, $op) {
  * Implements hook_node_access_records().
  */
 function domain_access_node_access_records(NodeInterface $node) {
-  foreach (domain_access_get_values($node) as $value) {
+  foreach (domain_access_get_node_values($node) as $value) {
     if (isset($value['target_id']) && $domain = domain_load($value['target_id'])) {
       $grants[] = array(
         'realm' => 'domain_id',
@@ -63,15 +141,27 @@ function domain_access_default_value($entity, $field, $instance, $langcode) {
 }
 
 /**
- * Pulls the domain access values from an entity.
+ * Pulls the domain access values from a node entity.
  */
-function domain_access_get_values($entity) {
+function domain_access_get_node_values($entity) {
   if ($entity->isNew()) {
     return array();
   }
   $values = $entity->getPropertyValues();
   return $values[DOMAIN_ACCESS_NODE_FIELD];
 }
+
+/**
+ * Pulls the domain access values from a user entity.
+ */
+function domain_access_get_user_values($entity) {
+  if ($entity->isNew()) {
+    return array();
+  }
+  $values = $entity->getPropertyValues();
+  return $values[DOMAIN_ACCESS_USER_FIELD];
+}
+
 
 /**
  * Implements hook_node_presave().
