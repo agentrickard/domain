@@ -96,18 +96,20 @@ function domain_editor_list_permissions($type) {
 function domain_access_node_grants($account, $op) {
   $grants = array();
   $active = domain_get_domain();
+  $id = $active->domain_id;
+  // Grants for view are simple. Use the active domain.
   if ($op == 'view') {
-    $grants['domain_id'][] = $active->domain_id;
+    $grants['domain_id'][] = $id;
   }
-  // @TODO: check user domain assignments.
-  if ($op == 'update' && $account->hasPermission('edit domain content')) {
-    $grants['domain_id'][] = $active->domain_id;
+  // Grants for edit/delete require permissions.
+  $user_domains = domain_access_get_user_values($account);
+  if ($op == 'update' && $account->hasPermission('edit domain content') && isset($user_domains[$id])) {
+    $grants['domain_id'][] = $id;
   }
-  if ($op == 'delete' && $account->hasPermission('delete domain content')) {
-    $grants['domain_id'][] = $active->domain_id;
+  if ($op == 'delete' && $account->hasPermission('delete domain content') && isset($user_domains[$id])) {
+    $grants['domain_id'][] = $id;
   }
 
-  // @TODO grants for edit/delete.
   return $grants;
 }
 
@@ -116,7 +118,7 @@ function domain_access_node_grants($account, $op) {
  */
 function domain_access_node_access_records(NodeInterface $node) {
   foreach (domain_access_get_node_values($node) as $value) {
-    if (isset($value['target_id']) && $domain = domain_load($value['target_id'])) {
+    if ($domain = domain_load($value)) {
       $grants[] = array(
         'realm' => 'domain_id',
         'gid' => $domain->domain_id,
@@ -148,7 +150,12 @@ function domain_access_get_node_values($entity) {
     return array();
   }
   $values = $entity->getPropertyValues();
-  return $values[DOMAIN_ACCESS_NODE_FIELD];
+  $list = array();
+  foreach ($values[DOMAIN_ACCESS_NODE_FIELD] as $item) {
+    $target = $item['target_id'];
+    $list[$target] = $target;
+  }
+  return $list;
 }
 
 /**
@@ -159,7 +166,12 @@ function domain_access_get_user_values($entity) {
     return array();
   }
   $values = $entity->getPropertyValues();
-  return $values[DOMAIN_ACCESS_USER_FIELD];
+  $list = array();
+  foreach ($values[DOMAIN_ACCESS_USER_FIELD] as $item) {
+    $target = $item['target_id'];
+    $list[$target] = $target;
+  }
+  return $list;
 }
 
 
