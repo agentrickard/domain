@@ -386,7 +386,7 @@ function domain_content_form() {
   }
   // Only use a tableselect when the current user is able to perform any
   // operations.
-  if ($admin_access) {
+  if (!empty($operations)) {
     $form['nodes'] = array(
       '#type' => 'tableselect',
       '#header' => $header,
