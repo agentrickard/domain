@@ -103,13 +103,13 @@ function domain_access_node_grants($account, $op) {
     return $grants;
   }
   // @TODO: Follow-up on https://drupal.org/node/2147291.
-  $account = entity_load('user', $account->id());
+  $user = entity_load('user', $account->id());
   // Grants for edit/delete require permissions.
-  $user_domains = domain_access_get_user_values($account);
-  if ($op == 'update' && $account->hasPermission('edit domain content') && isset($user_domains[$id])) {
+  $user_domains = domain_access_get_user_values($user);
+  if ($op == 'update' && $user->hasPermission('edit domain content') && isset($user_domains[$id])) {
     $grants['domain_id'][] = $id;
   }
-  if ($op == 'delete' && $account->hasPermission('delete domain content') && isset($user_domains[$id])) {
+  if ($op == 'delete' && $user->hasPermission('delete domain content') && isset($user_domains[$id])) {
     $grants['domain_id'][] = $id;
   }
 
