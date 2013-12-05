@@ -9,3 +9,8 @@ services:
     tags:
       - { name: persist }
     arguments: ['@module_handler']
+  domain.path_processor:
+    class: Drupal\domain\HttpKernel\DomainPathProcessor
+    arguments: ['@domain.manager', '@module_handler']
+    tags:
+      - { name: path_processor_outbound, priority: 200 }

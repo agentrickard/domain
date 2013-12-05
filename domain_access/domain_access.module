@@ -227,3 +227,24 @@ function domain_access_form_devel_generate_content_form_alter(&$form, &$form_sta
     '#default_value' => array(domain_get_active_id()),
   );
 }
+
+/**
+ * Implements hook_domain_source_alter().
+ *
+ * If this node is assigned to a domain other than current, rewrite the url
+ * to point to the highest-weighted domain.
+ *
+ * This code is proof-of-concept and may be deprecated for Domain Source.
+ */
+function domain_access_domain_source_alter(&$source, $path, $options) {
+  $node = $options['entity'];
+  $list = domain_access_get_node_values($node);
+  // @TODO: setting to enable this rewrite, as in older versions?
+  if ($list) {
+    $domains = domain_load_and_sort($list);
+    $first = current($domains);
+    if ($first->id() != $options['active_domain']->id()) {
+      $source = $first;
+    }
+  }
+}

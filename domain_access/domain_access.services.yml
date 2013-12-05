@@ -1,6 +1,0 @@
-services:
-  path_processor_domain_acess:
-    class: Drupal\domain_access\HttpKernel\PathProcessorDomainAccess
-    arguments: ['@domain.manager']
-    tags:
-      - { name: path_processor_outbound, priority: 200 }
