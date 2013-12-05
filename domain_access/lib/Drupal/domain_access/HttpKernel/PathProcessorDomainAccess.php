@@ -45,8 +45,9 @@ class PathProcessorDomainAccess implements OutboundPathProcessorInterface {
     if (!isset($active_domain)) {
       $active_domain = $this->domainManager->getActiveDomain();
     }
-    // TODO: sort these?
-    $domains = domain_access_get_node_values($options['entity']);
+    // Get the list and sort.
+    $list = domain_access_get_node_values($options['entity']);
+    $domains = domain_load_and_sort(array_keys($list));
 
     // TODO: alter the path.
 

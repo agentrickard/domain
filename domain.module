@@ -99,6 +99,24 @@ function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
 }
 
 /**
+ * Loads multiple domain records and sorts by weight.
+ *
+ * @param array $ids
+ *   (optional) An array of entity IDs. If omitted, all entities are loaded.
+ * @param bool $reset
+ *   (optional) Whether to reset the internal cache.  Defaults to FALSE.
+ *
+ * @return array
+ *   An array of domain entities indexed by domain_id and sorted by weight.
+ */
+function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
+  // @TODO: filter for inactive domains?
+  $domains = entity_load_multiple('domain', $ids, $reset);
+  uasort($domains, 'domain_list_sort');
+  return $domains;
+}
+
+/**
  * Return the domain entity matching a domain id.
  *
  * @param $id
