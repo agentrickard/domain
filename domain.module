@@ -62,7 +62,7 @@ function domain_entity_bundle_info() {
  *   The id of the default domain or FALSE if none is set.
  */
 function domain_default_id() {
-  $result = entity_load_multiple_by_properties('domain', array('is_default' => 1));
+  $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
   if (!empty($result)) {
     return key($result);
   }
