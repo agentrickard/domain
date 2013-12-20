@@ -76,7 +76,7 @@ function domain_default_id() {
  *   The default domain or FALSE if none is set.
  */
 function domain_default() {
-  $result = entity_load_multiple_by_properties('domain', array('is_default' => 1));
+  $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
   if (!empty($result)) {
     return current($result);
   }

@@ -74,7 +74,6 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
     if (!empty($source->path)) {
       $options['base_url'] = $source->path;
       $options['absolute'] = TRUE;
-          dpm($source);
       // @TODO: we may need the port-checking code from PathProcessorLanguage.
     }
     return $path;
