@@ -146,37 +146,37 @@ function domain_access_default_value($entity, $field, $instance, $langcode) {
 }
 
 /**
- * Pulls the domain access values from a node entity.
+ * Pulls the domain Access values from an entity.
  */
-function domain_access_get_node_values($entity) {
+function domain_access_get_entity_values($entity, $field_name) {
+  // @TODO: static cache.
   if ($entity->isNew()) {
     return array();
   }
   $values = $entity->getPropertyValues();
   $list = array();
-  foreach ($values[DOMAIN_ACCESS_NODE_FIELD] as $item) {
-    $target = $item['target_id'];
-    $list[$target] = $target;
+  if (isset($values[$field_name])) {
+    foreach ($values[$field_name] as $item) {
+      $target = $item['target_id'];
+      $list[$target] = $target;
+    }
   }
   return $list;
+}
+
+/**
+ * Pulls the domain access values from a node entity.
+ */
+function domain_access_get_node_values($entity) {
+  return domain_access_get_entity_values($entity, DOMAIN_ACCESS_NODE_FIELD);
 }
 
 /**
  * Pulls the domain access values from a user entity.
  */
 function domain_access_get_user_values($entity) {
-  if ($entity->isNew()) {
-    return array();
-  }
-  $values = $entity->getPropertyValues();
-  $list = array();
-  foreach ($values[DOMAIN_ACCESS_USER_FIELD] as $item) {
-    $target = $item['target_id'];
-    $list[$target] = $target;
-  }
-  return $list;
+  return domain_access_get_entity_values($entity, DOMAIN_ACCESS_USER_FIELD);
 }
-
 
 /**
  * Implements hook_node_presave().
