@@ -105,7 +105,7 @@ function domain_access_node_grants($account, $op) {
   // @TODO: Follow-up on https://drupal.org/node/2147291.
   $user = entity_load('user', $account->id());
   // Grants for edit/delete require permissions.
-  $user_domains = domain_access_get_user_values($user);
+  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
   if ($op == 'update' && $user->hasPermission('edit domain content') && isset($user_domains[$id])) {
     $grants['domain_id'][] = $id;
   }
@@ -120,7 +120,7 @@ function domain_access_node_grants($account, $op) {
  * Implements hook_node_access_records().
  */
 function domain_access_node_access_records(NodeInterface $node) {
-  foreach (domain_access_get_node_values($node) as $value) {
+  foreach (domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD) as $value) {
     if ($domain = domain_load($value)) {
       $grants[] = array(
         'realm' => 'domain_id',
@@ -146,7 +146,16 @@ function domain_access_default_value($entity, $field, $instance, $langcode) {
 }
 
 /**
- * Pulls the domain Access values from an entity.
+ * Returnss the domain Access values from an entity.
+ *
+ * @param Drupal\Core\Entity\EntityInterface $entity
+ *   The entity being checked.
+ * @param $field_name
+ *   The name of the field storing domain access values. Default fields are
+ *   defined by this module.
+ *
+ * @return array
+ *   An array of domain id values, where $key == $value.
  */
 function domain_access_get_entity_values($entity, $field_name) {
   // @TODO: static cache.
@@ -162,20 +171,6 @@ function domain_access_get_entity_values($entity, $field_name) {
     }
   }
   return $list;
-}
-
-/**
- * Pulls the domain access values from a node entity.
- */
-function domain_access_get_node_values($entity) {
-  return domain_access_get_entity_values($entity, DOMAIN_ACCESS_NODE_FIELD);
-}
-
-/**
- * Pulls the domain access values from a user entity.
- */
-function domain_access_get_user_values($entity) {
-  return domain_access_get_entity_values($entity, DOMAIN_ACCESS_USER_FIELD);
 }
 
 /**
@@ -238,7 +233,7 @@ function domain_access_form_devel_generate_content_form_alter(&$form, &$form_sta
  */
 function domain_access_domain_source_alter(&$source, $path, $options) {
   $node = $options['entity'];
-  $list = domain_access_get_node_values($node);
+  $list = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
   // @TODO: setting to enable this rewrite, as in older versions?
   if ($list) {
     $domains = domain_load_and_sort($list);
