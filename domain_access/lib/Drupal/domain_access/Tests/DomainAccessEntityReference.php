@@ -92,7 +92,7 @@ class DomainAccessEntityReference extends DomainTestBase {
     }
 
     // Try to post a node, assigned to the first two domains.
-    $edit['title'] = 'Test node';
+    $edit['title[0][value]'] = 'Test node';
     $edit["field_domain_access[{$one}]"] = TRUE;
     $edit["field_domain_access[{$two}]"] = TRUE;
     $this->drupalPostForm('node/add/article', $edit, 'Save');

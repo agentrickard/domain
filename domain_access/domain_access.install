@@ -13,6 +13,9 @@
 function domain_access_install() {
   $node_types = entity_load_multiple('node_type');
   foreach ($node_types as $type => $info) {
+    if ($field = entity_load('field_instance', 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD)) {
+      continue;
+    }
     $instance = array(
       'field_name' => DOMAIN_ACCESS_NODE_FIELD,
       'entity_type' => 'node',
@@ -39,6 +42,10 @@ function domain_access_install() {
   }
 
   // Save to the user form.
+  if ($field = entity_load('field_instance', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
+    return;
+  }
+
   $instance = array(
     'field_name' => DOMAIN_ACCESS_USER_FIELD,
     'entity_type' => 'user',
