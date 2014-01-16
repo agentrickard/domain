@@ -22,13 +22,14 @@ class DomainAccessController extends EntityAccessController {
    * {@inheritdoc}
    */
   public function checkAccess(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
-    if ($account->hasPermission($this->entityInfo['admin_permission'])) {
+    // Check the global permission.
+    if ($account->hasPermission('administer domains')) {
       return TRUE;
     }
     if ($operation == 'create' && $account->hasPermission('create domains')) {
       return TRUE;
     }
-    // @TODO: assign users to domains.
+    // @TODO: assign users to domains and check.
     if ($operation == 'edit' && $account->hasPermission('edit assigned domains')) {
       return TRUE;
     }
