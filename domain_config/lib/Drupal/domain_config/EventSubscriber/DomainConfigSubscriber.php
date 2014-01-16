@@ -6,8 +6,9 @@
 
 namespace Drupal\domain_config\EventSubscriber;
 
-use Drupal\Core\Config\Context\ContextInterface;
-use Drupal\Core\Config\ConfigEvent;
+use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigModuleOverridesEvent;
+use Drupal\Core\Config\StorageInterface;
 use Drupal\domain\DomainManagerInterface;
 use Drupal\domain\DomainInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -19,8 +20,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class DomainConfigSubscriber implements EventSubscriberInterface {
 
-  const CONFIG_CONTEXT = 'domain_config.domain';
-
   /**
    * The domain manager.
    *
@@ -29,66 +28,55 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
   protected $domainManager;
 
   /**
-   * The default configuration context.
+   * The configuration storage service.
    *
-   * @var \Drupal\Core\Config\Context\ConfigContext
+   * @var \Drupal\Core\Config\ConfigFactory
    */
-  protected $defaultConfigContext;
+  protected $configFactory;
+
+  /**
+   * A storage controller instance for reading and writing configuration data.
+   *
+   * @var \Drupal\Core\Config\StorageInterface
+   */
+  protected $storage;
 
   /**
    * Constructs a DomainConfigSubscriber object.
    *
    * @param \Drupal\domain\DomainManagerInterface $domain_manager
    *   The domain manager service.
-   * @param \Drupal\Core\Config\Context\ContextInterface $config_context
-   *   The config context service.
+   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The configuration storage service.
+   * @param \Drupal\Core\Config\StorageInterface $storage
+   *   The configuration storage engine.
    */
-  public function __construct(DomainManagerInterface $domain_manager, ContextInterface $config_context) {
+  public function __construct(DomainManagerInterface $domain_manager, ConfigFactory $config_factory, StorageInterface $storage) {
     $this->domainManager = $domain_manager;
-    $this->defaultConfigContext = $config_context;
-  }
-
-  /**
-   * Initialize configuration context with domain.
-   *
-   * @param \Drupal\Core\Config\ConfigEvent $event
-   *   The Event to process.
-   */
-  public function configContext(ConfigEvent $event) {
-    $context = $event->getContext();
-
-    // Add active domain to default context.
-    $context->set(self::CONFIG_CONTEXT, $this->domainManager->getActiveDomain());
+    $this->configFactory = $config_factory;
+    $this->storage = $storage;
   }
 
   /**
    * Override configuration values with domain-specific data.
    *
-   * @param \Drupal\Core\Config\ConfigEvent $event
+   * @param \Drupal\Core\Config\ConfigModuleOverridesEvent $event
    *   The Event to process.
    */
-  public function configLoad(ConfigEvent $event) {
-    $context = $event->getContext();
-
-    if ($domain = $context->get(self::CONFIG_CONTEXT)) {
-      $config = $event->getConfig();
-      $config_name = $this->getDomainConfigName($config->getName(), $domain);
-      // Check to see if the config storage has an appropriately named file
-      // containing override data.
-      if ($override = $event->getConfig()->getStorage()->read($config_name)) {
-        $config->setOverride($override);
+  public function configLoad(ConfigModuleOverridesEvent $event) {
+    $names = $event->getNames();
+    // @TODO: language handling?
+    // @TODO: caching?
+    if ($domain = $this->domainManager->getActiveDomain()) {
+      foreach ($names as $name) {
+        $config_name = $this->getDomainConfigName($name, $domain);
+        // Check to see if the config storage has an appropriately named file
+        // containing override data.
+        if ($override = $this->configFactory->get($config_name)) {
+          $event->setOverride($name, $override);
+        }
       }
     }
-  }
-
-  /**
-   * Sets the active domain on the default configuration context.
-   *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
-   *   Kernel event to respond to.
-   */
-  public function onKernelRequestDomain(GetResponseEvent $event) {
-    $this->defaultConfigContext->init();
   }
 
   /**
@@ -113,9 +101,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    * Implements EventSubscriberInterface::getSubscribedEvents().
    */
   static function getSubscribedEvents() {
-    $events['config.context'][] = array('configContext', 20);
-    $events['config.load'][] = array('configLoad', 20);
-    $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 20);
+    $events['config.module.overrides'][] = array('configLoad', 100);
     return $events;
   }
 }

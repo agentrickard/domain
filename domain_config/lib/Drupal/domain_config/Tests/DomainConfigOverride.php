@@ -29,7 +29,7 @@ class DomainConfigOverride extends DomainConfigTestBase {
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(4);
 
-    config_install_default_config('module', 'domain_config_test');
+    #config_install_default_config('module', 'domain_config_test');
 
     // Test the response of the default home page.
     foreach (domain_load_multiple() as $domain) {
