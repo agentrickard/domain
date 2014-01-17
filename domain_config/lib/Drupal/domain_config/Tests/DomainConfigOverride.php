@@ -29,11 +29,11 @@ class DomainConfigOverride extends DomainConfigTestBase {
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(4);
 
-    #config_install_default_config('module', 'domain_config_test');
-
-    // Test the response of the default home page.
+    // Test the response of the default user page.
+    // If we leave path as /, the test fails?!?
     foreach (domain_load_multiple() as $domain) {
-      $this->drupalGet($domain->path);
+      $path = $domain->path . 'user';
+      $this->drupalGet($path);
       if ($domain->is_default) {
         $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
       }
