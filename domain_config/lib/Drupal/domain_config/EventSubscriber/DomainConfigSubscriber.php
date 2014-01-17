@@ -11,8 +11,6 @@ use Drupal\Core\Config\ConfigModuleOverridesEvent;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\domain\DomainManagerInterface;
 use Drupal\domain\DomainInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -63,8 +61,9 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigModuleOverridesEvent $event
    *   The Event to process.
    */
-  public function configLoad(ConfigModuleOverridesEvent $event) {
+  public function onConfigModuleOverride(ConfigModuleOverridesEvent $event) {
     $names = $event->getNames();
+
     // @TODO: language handling?
     // @TODO: caching?
     if ($domain = $this->domainManager->getActiveDomain()) {
@@ -72,7 +71,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
         $config_name = $this->getDomainConfigName($name, $domain);
         // Check to see if the config storage has an appropriately named file
         // containing override data.
-        if ($override = $this->configFactory->get($config_name)) {
+        if ($override = $this->storage->read($config_name)) {
           $event->setOverride($name, $override);
         }
       }
@@ -101,7 +100,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    * Implements EventSubscriberInterface::getSubscribedEvents().
    */
   static function getSubscribedEvents() {
-    $events['config.module.overrides'][] = array('configLoad', 100);
+    $events['config.module.overrides'][] = array('onConfigModuleOverride', 400);
     return $events;
   }
 }
