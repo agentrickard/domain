@@ -58,7 +58,7 @@ class DomainSubscriber implements EventSubscriberInterface {
    */
   static function getSubscribedEvents() {
     // Returns multiple times. Should be CONTROLLER?
-    $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 100);
+    $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 400);
     return $events;
   }
 

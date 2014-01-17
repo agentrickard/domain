@@ -61,9 +61,8 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Config\ConfigModuleOverridesEvent $event
    *   The Event to process.
    */
-  public function onConfigModuleOverride(ConfigModuleOverridesEvent $event) {
+  public function onDomainModuleOverride(ConfigModuleOverridesEvent $event) {
     $names = $event->getNames();
-
     // @TODO: language handling?
     // @TODO: caching?
     if ($domain = $this->domainManager->getActiveDomain()) {
@@ -100,7 +99,7 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
    * Implements EventSubscriberInterface::getSubscribedEvents().
    */
   static function getSubscribedEvents() {
-    $events['config.module.overrides'][] = array('onConfigModuleOverride', 400);
+    $events['config.module.overrides'][] = array('onDomainModuleOverride', 400);
     return $events;
   }
 }
