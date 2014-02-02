@@ -183,7 +183,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $error_list[] = t('The domain must not end with a dot (.)');
     }
     // Check for valid characters, unless using non-ASCII domains.
-    $non_ascii = \Drupal::config('domain.settings')->get('domain_allow_non_ascii');
+    $non_ascii = \Drupal::config('domain.settings')->get('allow_non_ascii');
     if (!$non_ascii) {
       $pattern = '/^[a-z0-9\.\-:]*$/i';
       if (!preg_match($pattern, $hostname)) {
