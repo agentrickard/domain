@@ -183,7 +183,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $error_list[] = t('The domain must not end with a dot (.)');
     }
     // Check for valid characters, unless using non-ASCII domains.
-    if (!variable_get('domain_allow_non_ascii', FALSE)) {
+    $non_ascii = \Drupal::config('domain.settings')->get('domain_allow_non_ascii');
+    if (!$non_ascii) {
       $pattern = '/^[a-z0-9\.\-:]*$/i';
       if (!preg_match($pattern, $hostname)) {
         $error_list[] = t('Only alphanumeric characters, dashes, and a colon are allowed.');
@@ -196,7 +197,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     // Check for 'www' prefix if redirection / handling is enabled under global domain settings.
     // Note that www prefix handling must be set explicitly in the UI.
     // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
-    if (variable_get('domain_www', 0) && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
+    if (\Drupal::config('domain.settings')->get('www_prefix') && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
       $error_list[] = t('WWW prefix handling: Domains must be registered without the www. prefix.');
     }
 

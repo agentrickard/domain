@@ -24,7 +24,7 @@ class DomainFormController extends EntityFormController {
     // Create defaults if this is the first domain.
     if (empty($domains)) {
       $domain->hostname = domain_hostname();
-      $domain->name = variable_get('sitename', 'Drupal');
+      $domain->name = \Drupal::config('system.site')->get('name');
     }
     $form['domain_id'] = array(
       '#type' => 'value',

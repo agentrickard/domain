@@ -176,7 +176,7 @@ function domain_create($inherit = FALSE, array $values = array()) {
   );
   if ($inherit) {
     $values['hostname'] = domain_hostname();
-    $values['name'] = variable_get('sitename', 'Drupal');
+    $values['name'] = \Drupal::config('system.site')->get('name');
     $values['id'] = domain_machine_name($values['hostname']);
   }
   $domain = entity_create('domain', $values);

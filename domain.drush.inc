@@ -272,7 +272,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
   foreach ($prepared as $key => $item) {
     $hostname = strtolower($item);
     $values = array(
-      'name' => ($item != $primary) ? ucwords(str_replace(".$primary", '', $item)) : variable_get('site_name', 'Drupal'),
+      'name' => ($item != $primary) ? ucwords(str_replace(".$primary", '', $item)) : \Drupal::config('system.site')->get('name'),
       'hostname' => $hostname,
       'scheme' => 'http',
       'status' => 1,
