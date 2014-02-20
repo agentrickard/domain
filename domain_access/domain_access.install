@@ -13,7 +13,7 @@
 function domain_access_install() {
   $node_types = entity_load_multiple('node_type');
   foreach ($node_types as $type => $info) {
-    if ($field = entity_load('field_instance', 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD)) {
+    if ($field = entity_load('field_instance_config', 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD)) {
       continue;
     }
     $instance = array(
@@ -30,7 +30,7 @@ function domain_access_install() {
         ),
       ),
     );
-    $field_instance = entity_create('field_instance', $instance);
+    $field_instance = entity_create('field_instance_config', $instance);
     $field_instance->save();
 
     // Tell the form system how to behave. Default to radio buttons.
@@ -42,7 +42,7 @@ function domain_access_install() {
   }
 
   // Save to the user form.
-  if ($field = entity_load('field_instance', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  if ($field = entity_load('field_instance_config', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
     return;
   }
 
@@ -56,7 +56,7 @@ function domain_access_install() {
     'default_value_function' => 'domain_access_default_value',
     'settings' => array(),
   );
-  $field_instance = entity_create('field_instance', $instance);
+  $field_instance = entity_create('field_instance_config', $instance);
   $field_instance->save();
 
   // Tell the form system how to behave. Default to radio buttons.
@@ -73,10 +73,10 @@ function domain_access_install() {
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
-  if ($field = entity_load('field_entity', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
+  if ($field = entity_load('field_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
     $field->delete();
   }
-  if ($field = entity_load('field_entity', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  if ($field = entity_load('field_config', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
     $field->delete();
   }
 }

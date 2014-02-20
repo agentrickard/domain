@@ -130,7 +130,7 @@ class DomainEntityReference extends DomainTestBase {
         'target_type' => 'domain',
       ),
     );
-    $field = entity_create('field_entity', $settings);
+    $field = entity_create('field_config', $settings);
     $field->save();
 
     $instance = array(
@@ -144,7 +144,7 @@ class DomainEntityReference extends DomainTestBase {
         ),
       ),
     );
-    $field_instance = entity_create('field_instance', $instance);
+    $field_instance = entity_create('field_instance_config', $instance);
     $field_instance->save();
 
     // Tell the form system how to behave.
