@@ -27,7 +27,7 @@ abstract class DomainTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain');
+  public static $modules = array('domain', 'node');
 
   function setUp() {
     parent::setUp();
