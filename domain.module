@@ -1990,7 +1990,9 @@ function domain_node_grants($account, $op) {
     }
 
     // Grant based on active domain.
-    $grants['domain_id'][] = $_domain['domain_id'];
+    if (isset($_domain['domain_id'])) {
+      $grants['domain_id'][] = $_domain['domain_id'];
+    }
 
     // In special cases, we grant the ability to view all nodes.  That is,
     // we simply get out of the way of other node_access rules.
