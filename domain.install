@@ -406,6 +406,7 @@ function domain_update_7308(&$sandbox) {
  * Updates domain_roles variable to use machine names.
  */
 function domain_update_7309(&$sandbox) {
+  drupal_load('module', 'domain');
   $defaults = variable_get('domain_roles', array());
   $new = array();
   foreach ($defaults as $rid => $domains) {
