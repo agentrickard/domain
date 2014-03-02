@@ -218,6 +218,8 @@ function domain_conf_variable_set($domain_id, $variable, $value = NULL) {
   domain_conf_variable_save($domain_id, $variable, $value);
   // Clear the cache.
   cache_clear_all('variables', 'cache');
+  drupal_static_reset('domain_conf_variable_get_settings');
+  drupal_static_reset('domain_conf_variable_get_base');
   // If we are on the active domain, set the active variable.
   if ($domain_id == $_domain['domain_id']) {
     $conf[$variable] = $value;
@@ -409,7 +411,7 @@ function domain_conf_features_api() {
  * locale_js_alter() and locale_languages_delete_form_submit(). Fortunately,
  * both function are tied to hook that we can monitor in order to ensure that
  * the settings are preserved properly.
- 
+
  * @link http://drupal.org/node/1271810
  * @see _locale_rebuild_js()
  * @see locale_languages_delete_form_submit()
@@ -445,7 +447,7 @@ function domain_conf_multilingual_settings_changed() {
  * Store the default language setting for later use.
  *
  * @param $value
- *  If set, the $langauage object to store.
+ *  If set, the $language object to store.
  *
  * @return
  *  The language object or FALSE if not set.
