@@ -7,28 +7,12 @@
 
 namespace Drupal\domain;
 
-use Drupal\Core\Entity\EntityViewBuilderInterface;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityViewBuilder;
 
 /**
  * Provides a Domain view builder.
  */
-class DomainViewBuilder implements EntityViewBuilderInterface {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
-    return array();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
-    $build = $this->viewMultiple(array($entity), $view_mode, $langcode);
-    return reset($build);
-  }
+class DomainViewBuilder extends EntityViewBuilder {
 
   /**
    * {@inheritdoc}
@@ -47,10 +31,5 @@ class DomainViewBuilder implements EntityViewBuilderInterface {
     }
     return $build;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function resetCache(array $ids = NULL) { }
 
 }
