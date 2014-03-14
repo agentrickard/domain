@@ -5,6 +5,8 @@
  * Maps multiple host requests to a single domain record.
  */
 
+use Drupal\domain\DomainInterface;
+
 /**
  * Implements hook_help().
  */
