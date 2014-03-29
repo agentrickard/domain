@@ -10,7 +10,8 @@ namespace Drupal\domain\Entity;
 use Drupal\domain\DomainInterface;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Guzzle\Http\Exception\HttpException;
 
 /**
@@ -21,10 +22,10 @@ use Guzzle\Http\Exception\HttpException;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
+ *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
  *     "render" = "Drupal\domain\DomainRenderController",
  *     "access" = "Drupal\domain\DomainAccessController",
- *     "list" = "Drupal\domain\DomainListController",
+ *     "list_builder" = "Drupal\domain\DomainListController",
  *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\domain\DomainFormController",
@@ -34,6 +35,7 @@ use Guzzle\Http\Exception\HttpException;
  *   },
  *   config_prefix = "domain.domain",
  *   admin_permission = "administer domains",
+ *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "id",
  *     "domain_id" = "domain_id",
@@ -135,7 +137,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageControllerInterface $storage_controller, array &$values) {
+  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
     $default = domain_default_id();
     $domains = domain_load_multiple();
@@ -360,7 +362,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSave(EntityStorageControllerInterface $storage_controller) {
+  public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
     $default = domain_default();
     if (!$default) {

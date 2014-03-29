@@ -9,8 +9,9 @@ namespace Drupal\domain_alias\Entity;
 
 use Drupal\domain_alias\DomainAliasInterface;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\EntityStorageControllerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the domain alias entity.
@@ -20,7 +21,7 @@ use Drupal\Core\Entity\EntityStorageControllerInterface;
  *   label = @Translation("Domain alias"),
  *   module = "domain_alias",
  *   controllers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigStorageController",
+ *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
  *     "access" = "Drupal\domain\DomainAccessController",
  *     "list" = "Drupal\domain_alias\DomainAliasListController",
  *     "form" = {

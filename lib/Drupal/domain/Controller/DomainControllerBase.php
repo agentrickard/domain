@@ -45,7 +45,7 @@ class DomainControllerBase implements ContainerInjectionInterface {
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    */
-  public function __construct(EntityStorageControllerInterface $entity_storage, EntityManagerInterface $entity_manager) {
+  public function __construct(EntityStorageInterface $entity_storage, EntityManagerInterface $entity_manager) {
     $this->entityStorage = $entity_storage;
     $this->entityManager = $entity_manager;
   }
