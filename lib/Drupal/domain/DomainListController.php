@@ -7,13 +7,13 @@
 
 namespace Drupal\domain;
 
-use Drupal\Core\Config\Entity\DraggableListController;
+use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * User interface for the domain overview screen.
  */
-class DomainListController extends DraggableListController {
+class DomainListController extends DraggableListBuilder {
 
   /**
    * {@inheritdoc}
