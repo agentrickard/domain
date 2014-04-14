@@ -106,7 +106,11 @@ class DomainServerBlock extends BlockBase {
       }
       $items[] = t('@key : !value', array('@key' => $key, '!value' => $value));
     }
-    return theme('item_list', array('items' => $items));
+    $variables['domain_server'] = array(
+      '#theme' => 'item_list',
+      '#items' => $items,
+    );
+    return $variables;
   }
 
 }
