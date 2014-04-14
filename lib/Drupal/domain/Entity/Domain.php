@@ -12,7 +12,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
-use Guzzle\Http\Exception\HttpException;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Defines the domain entity.
@@ -215,7 +215,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
 
     // Return the errors, if any.
     if (!empty($error_list)) {
-      return t('The domain string is invalid for %subdomain:', array('%subdomain' => $hostname)) . theme('item_list', array('items' => $error_list));
+      return t('The domain string is invalid for %subdomain: !errors', array('%subdomain' => $hostname, '!errors' => array('#theme' => 'item_list', '#items' => $error_list)));
     }
 
     return array();
@@ -229,18 +229,19 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function checkResponse() {
     $url = $this->getPath() . drupal_get_path('module', 'domain') . '/tests/200.png';
-    $request = $this->getHttpClient()->get($url);
     try {
-      $response = $request->send();
-      // Expected result.
-      $this->response = $response->getStatusCode();
+      // GuzzleHttp no longer allows for bogus URL calls.
+      $request = $this->getHttpClient()->get($url);
     }
     // We cannot know which Guzzle Exception class will be returned; be generic.
-    catch (HttpException $e) {
+    catch (RequestException $e) {
       watchdog_exception('domain', $e);
       // File a general server failure.
       $this->response = 500;
+      return;
     }
+    // Expected result (i.e. no exception thrown.)
+    $this->response = $request->getStatusCode();
   }
 
   /**
