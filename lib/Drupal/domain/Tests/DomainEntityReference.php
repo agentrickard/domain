@@ -106,9 +106,10 @@ class DomainEntityReference extends DomainTestBase {
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
     $node = node_load(1);
-    $values = $node->getPropertyValues();
+    $values = $node->get('field_domain');
+
     // @TODO watch for changes in core that affect this test.
-    $this->assertTrue(count($values['field_domain']) == 2, 'Node saved with two domain records.');
+    $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
 
   }
 
