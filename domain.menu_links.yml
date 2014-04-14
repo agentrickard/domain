@@ -1,0 +1,5 @@
+domain.admin:
+  title: Domains
+  parent: system.admin_structure
+  description: 'Configure the domain settings for your site.'
+  route_name: domain.admin
