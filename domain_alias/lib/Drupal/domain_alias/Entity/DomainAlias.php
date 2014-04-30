@@ -25,9 +25,9 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "access" = "Drupal\domain\DomainAccessController",
  *     "list" = "Drupal\domain_alias\DomainAliasListController",
  *     "form" = {
- *       "default" = "Drupal\domain_alias\DomainAliasFormController",
- *       "edit" = "Drupal\domain_alias\DomainAliasFormController",
- *       "delete" = "Drupal\domain_alias\DomainAliasFormController"
+ *       "default" = "Drupal\domain_alias\DomainAliasForm",
+ *       "edit" = "Drupal\domain_alias\DomainAliasForm",
+ *       "delete" = "Drupal\domain_alias\DomainAliasForm"
  *     }
  *   },
  *   config_prefix = "domain_alias.alias",

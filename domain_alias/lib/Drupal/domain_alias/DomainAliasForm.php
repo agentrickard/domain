@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Definition of Drupal\domain_alias\DomainAliasFormController.
+ * Definition of Drupal\domain_alias\DomainAliasForm.
  */
 
 namespace Drupal\domain_alias;
 
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
  * Base form controller for domain alias edit forms.
  */
-class DomainAliasFormController extends EntityFormController {
+class DomainAliasForm extends EntityForm {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::form().
+   * Overrides Drupal\Core\Entity\EntityForm::form().
    */
   public function form(array $form, array &$form_state) {
     $alias = $this->entity;
@@ -61,7 +61,7 @@ class DomainAliasFormController extends EntityFormController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::validate().
+   * Overrides \Drupal\Core\Entity\EntityForm::validate().
    */
   public function validate(array $form, array &$form_state) {
     $entity = $this->buildEntity($form, $form_state);
@@ -72,7 +72,7 @@ class DomainAliasFormController extends EntityFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   * Overrides Drupal\Core\Entity\EntityForm::save().
    */
   public function save(array $form, array &$form_state) {
     $alias = $this->entity;
@@ -87,7 +87,7 @@ class DomainAliasFormController extends EntityFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::delete().
+   * Overrides Drupal\Core\Entity\EntityForm::delete().
    */
   public function delete(array $form, array &$form_state) {
     $alias = $this->entity;
