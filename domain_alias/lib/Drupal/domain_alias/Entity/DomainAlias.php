@@ -27,7 +27,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "form" = {
  *       "default" = "Drupal\domain_alias\DomainAliasForm",
  *       "edit" = "Drupal\domain_alias\DomainAliasForm",
- *       "delete" = "Drupal\domain_alias\DomainAliasForm"
+ *       "delete" = "Drupal\domain_alias\Form\DomainAliasDeleteForm"
  *     }
  *   },
  *   config_prefix = "domain_alias.alias",
@@ -39,6 +39,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "uuid" = "uuid",
  *   },
  *   links = {
+ *     "delete-form" = "domain_alias.delete",
  *     "edit-form" = "domain_alias.edit"
  *   }
  * )

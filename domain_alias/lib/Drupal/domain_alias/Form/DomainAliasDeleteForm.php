@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Contains \Drupal\domain\Form\DomainDeleteForm.
+ * Contains \Drupal\domain_alias\Form\DomainAliasDeleteForm.
  */
 
-namespace Drupal\domain\Form;
+namespace Drupal\domain_alias\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
 
 /**
- * Builds the form to delete a domain record.
+ * Builds the form to delete a domain_alias record.
  */
-class DomainDeleteForm extends EntityConfirmFormBase {
+class DomainAliasDeleteForm extends EntityConfirmFormBase {
 
   /**
    * {@inheritdoc}
@@ -26,7 +26,7 @@ class DomainDeleteForm extends EntityConfirmFormBase {
    */
   public function getCancelRoute() {
     return array(
-      'route_name' => 'domain.admin',
+      'route_name' => 'domain_alias.admin',
     );
   }
 
@@ -42,9 +42,9 @@ class DomainDeleteForm extends EntityConfirmFormBase {
    */
   public function submit(array $form, array &$form_state) {
     $this->entity->delete();
-    drupal_set_message(t('Domain %label has been deleted.', array('%label' => $this->entity->label())));
-    watchdog('domain', 'Domain %label has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
-    $form_state['redirect_route']['route_name'] = 'domain.admin';
+    drupal_set_message(t('DomainAlias %label has been deleted.', array('%label' => $this->entity->label())));
+    watchdog('domain_alias', 'DomainAlias %label has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
+    $form_state['redirect_route']['route_name'] = 'domain_alias.admin';
   }
 
 }

@@ -11,6 +11,7 @@ domain_alias.edit:
   path: '/admin/structure/domain/alias/edit/{domain_alias}'
   defaults:
     _entity_form: domain_alias.edit
+    _title: 'Edit domain alias'
   requirements:
     _permission: 'create domains'
 
@@ -18,6 +19,7 @@ domain_alias.delete:
   path: '/admin/structure/domain/alias/delete/{domain_alias}'
   defaults:
     _entity_form: domain_alias.delete
+    _title: 'Delete domain alias'
   requirements:
     _permission: 'create domains'
 
@@ -25,7 +27,7 @@ domain_alias.add:
   path: '/admin/structure/domain/alias/{domain}/add'
   defaults:
     _content: '\Drupal\domain_alias\Controller\DomainAliasController::addAlias'
-    _title: 'Add alias'
+    _title: 'Add domain alias'
     _title_context: 'With modules'
   requirements:
     _permission: 'create domains'
