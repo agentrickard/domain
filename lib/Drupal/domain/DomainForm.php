@@ -2,21 +2,21 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainFormController.
+ * Definition of Drupal\domain\DomainForm.
  */
 
 namespace Drupal\domain;
 
-use Drupal\Core\Entity\EntityFormController;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Base form controller for domain edit forms.
+ * Base form for domain edit forms.
  */
-class DomainFormController extends EntityFormController {
+class DomainForm extends EntityForm {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::form().
+   * Overrides Drupal\Core\Entity\EntityForm::form().
    */
   public function form(array $form, array &$form_state) {
     $domain = $this->entity;
@@ -91,7 +91,7 @@ class DomainFormController extends EntityFormController {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityFormController::validate().
+   * Overrides \Drupal\Core\Entity\EntityForm::validate().
    */
   public function validate(array $form, array &$form_state) {
     $entity = $this->buildEntity($form, $form_state);
@@ -102,7 +102,7 @@ class DomainFormController extends EntityFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::save().
+   * Overrides Drupal\Core\Entity\EntityForm::save().
    */
   public function save(array $form, array &$form_state) {
     $domain = $this->entity;
@@ -116,7 +116,7 @@ class DomainFormController extends EntityFormController {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityFormController::delete().
+   * Overrides Drupal\Core\Entity\EntityForm::delete().
    */
   public function delete(array $form, array &$form_state) {
     $domain = $this->entity;

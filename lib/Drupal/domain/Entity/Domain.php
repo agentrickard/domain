@@ -28,9 +28,9 @@ use GuzzleHttp\Exception\RequestException;
  *     "list_builder" = "Drupal\domain\DomainListController",
  *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "form" = {
- *       "default" = "Drupal\domain\DomainFormController",
- *       "edit" = "Drupal\domain\DomainFormController",
- *       "delete" = "Drupal\domain\DomainFormController"
+ *       "default" = "Drupal\domain\DomainForm",
+ *       "edit" = "Drupal\domain\DomainForm",
+ *       "delete" = "Drupal\domain\DomainForm"
  *     }
  *   },
  *   config_prefix = "domain.domain",
