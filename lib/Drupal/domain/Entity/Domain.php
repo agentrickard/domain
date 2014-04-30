@@ -30,7 +30,7 @@ use GuzzleHttp\Exception\RequestException;
  *     "form" = {
  *       "default" = "Drupal\domain\DomainForm",
  *       "edit" = "Drupal\domain\DomainForm",
- *       "delete" = "Drupal\domain\DomainForm"
+ *       "delete" = "Drupal\domain\Form\DomainDeleteForm"
  *     }
  *   },
  *   config_prefix = "domain.domain",
@@ -44,6 +44,7 @@ use GuzzleHttp\Exception\RequestException;
  *     "weight" = "weight"
  *   },
  *   links = {
+ *     "delete-form" = "domain.delete",
  *     "edit-form" = "domain.edit"
  *   }
  * )

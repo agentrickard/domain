@@ -55,22 +55,25 @@ class DomainForms extends DomainTestBase {
     $this->assertTrue(!empty($new_domain->uuid), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
-    $postUrl = 'admin/structure/domain/edit/' . $new_domain->id();
-    $this->drupalGet($postUrl);
+    $editUrl = 'admin/structure/domain/edit/' . $new_domain->id();
+    $this->drupalGet($editUrl);
 
     // Update the record.
     $edit['name'] = 'Foo';
-    $this->drupalPostForm($postUrl, $edit, t('Save'));
+    $this->drupalPostForm($editUrl, $edit, t('Save'));
 
     // Check that the update succeeded.
     $domain = domain_load($default_id, TRUE);
     $this->assertTrue($domain->name == 'Foo', 'Domain record updated via form.');
 
+    // Visit the delete domain administration page.
+    $deleteUrl = 'admin/structure/domain/delete/' . $new_domain->id();
+    $this->drupalGet($deleteUrl);
+
     // Delete the record.
-    $this->drupalPostForm($postUrl, $edit, t('Delete'));
+    $this->drupalPostForm($deleteUrl, array(), t('Delete'));
     $domain = domain_load($default_id, TRUE);
     $this->assertTrue(empty($domain), 'Domain record deleted.');
-
 
     // No domains should exist.
     $this->domainTableIsEmpty();
