@@ -159,16 +159,18 @@ function domain_access_default_value($entity, $field, $instance, $langcode) {
  */
 function domain_access_get_entity_values($entity, $field_name) {
   // @TODO: static cache.
-  if ($entity->isNew()) {
-    return array();
-  }
-  $values = $entity->getPropertyValues();
   $list = array();
+  if ($entity->isNew()) {
+    return $list;
+  }
+  // Get the values of an entity.
+  $values = $entity->get($field_name);
   // Must be at least one item.
-  if (!empty($values[$field_name][0])) {
-    foreach ($values[$field_name] as $item) {
-      $target = $item['target_id'];
-      $list[$target] = $target;
+  if (!empty($values)) {
+    foreach ($values as $item) {
+      if ($target = $item->getValue()) {
+        $list[$target['target_id']] = $target['target_id'];
+      }
     }
   }
   return $list;
