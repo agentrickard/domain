@@ -146,7 +146,7 @@ function domain_access_default_value($entity, $field, $instance, $langcode) {
 }
 
 /**
- * Returns the domain Access values from an entity.
+ * Returns the Domain Access values from an entity.
  *
  * @param Drupal\Core\Entity\EntityInterface $entity
  *   The entity being checked.
