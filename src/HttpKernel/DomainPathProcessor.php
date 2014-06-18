@@ -45,7 +45,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   }
 
   /**
-   * Implements Drupal\Core\PathProcessor\InboundPathProcessorInterface::processOutbound().
+   * Implements Drupal\Core\PathProcessor\OutboundPathProcessorInterface::processOutbound().
    */
   public function processOutbound($path, &$options = array(), Request $request = NULL) {
     static $active_domain;
