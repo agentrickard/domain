@@ -1,9 +1,8 @@
-id: node.field_domain_access
-uuid: 2171310e-2321-4ebc-9c00-d99bf1df8f67
+id: user.field_domain_user
 status: true
 langcode: en
-name: field_domain_access
-entity_type: node
+name: field_domain_user
+entity_type: user
 type: entity_reference
 settings:
   target_type: domain
