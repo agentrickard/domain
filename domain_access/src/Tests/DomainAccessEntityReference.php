@@ -98,9 +98,9 @@ class DomainAccessEntityReference extends DomainTestBase {
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
     $node = node_load(1);
-    $values = $node->getPropertyValues();
-    // @TODO watch for changes in core that affect this test.
-    $this->assertTrue(count($values['field_domain_access']) == 2, 'Node saved with two domain records.');
+    // Check that two values are set.
+    $values = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
+    $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
 
   }
 
