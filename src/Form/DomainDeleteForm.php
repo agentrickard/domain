@@ -8,6 +8,7 @@
 namespace Drupal\domain\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Url;
 
 /**
  * Builds the form to delete a domain record.
@@ -25,9 +26,7 @@ class DomainDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelRoute() {
-    return array(
-      'route_name' => 'domain.admin',
-    );
+    return new Url('domain.admin');
   }
 
   /**
