@@ -32,7 +32,7 @@ use GuzzleHttp\Exception\RequestException;
  *       "delete" = "Drupal\domain\Form\DomainDeleteForm"
  *     }
  *   },
- *   config_prefix = "domain.domain",
+ *   config_prefix = "record",
  *   admin_permission = "administer domains",
  *   fieldable = TRUE,
  *   entity_keys = {

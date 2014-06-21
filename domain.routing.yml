@@ -12,6 +12,8 @@ domain.add:
   defaults:
     _entity_form: domain.edit
     _title: 'Add domain record'
+  options:
+    _admin_route: TRUE
   requirements:
     _permission: "create domains"
 
@@ -20,6 +22,8 @@ domain.edit:
   defaults:
     _entity_form: domain.edit
     _title: 'Edit domain record'
+  options:
+    _admin_route: TRUE
   requirements:
     _entity_access: domain.update
 
@@ -28,6 +32,8 @@ domain.delete:
   defaults:
     _entity_form: domain.delete
     _title: 'Delete'
+  options:
+    _admin_route: TRUE
   requirements:
     _entity_access: domain.delete
 

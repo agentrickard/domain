@@ -1,6 +1,6 @@
 # Schema for the configuration files of the Domain module.
 
-domain.domain.*:
+domain.record.*:
   type: config_entity
   label: 'Domain record'
   mapping:

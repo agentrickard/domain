@@ -10,6 +10,7 @@ namespace Drupal\domain\Controller;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -54,11 +55,10 @@ class DomainControllerBase implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    // Here we return a simple manager; this may need to be overwritten for
-    // class implementations.
+    $entity_manager = $container->get('entity.manager');
     return new static(
-      $container->get('entity.manager')->getStorageController('domain'),
-      $container->get('entity.manager')
+      $entity_manager->getStorage('domain'),
+      $entity_manager
     );
   }
 
