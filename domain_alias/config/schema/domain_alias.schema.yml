@@ -1,7 +1,7 @@
 # Schema for the configuration files of the Domain Alias module.
 
 domain_alias.alias.*:
-  type: mapping
+  type: config_entity
   label: 'Domain alias'
   mapping:
     uuid:

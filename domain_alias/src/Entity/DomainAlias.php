@@ -16,7 +16,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 /**
  * Defines the domain alias entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "domain_alias",
  *   label = @Translation("Domain alias"),
  *   module = "domain_alias",
