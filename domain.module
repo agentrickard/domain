@@ -6,6 +6,7 @@
  */
 
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Entity\Domain;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -82,7 +83,7 @@ function domain_default() {
  *   An array of domain entities indexed by domain_id.
  */
 function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
-  return entity_load_multiple('domain', $ids, $reset);
+  return Domain::loadMultiple($ids, $reset);
 }
 
 /**
@@ -98,7 +99,7 @@ function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
  */
 function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
   // @TODO: filter for inactive domains?
-  $domains = entity_load_multiple('domain', $ids, $reset);
+  $domains = Domain::loadMultiple($ids, $reset);
   uasort($domains, 'domain_list_sort');
   return $domains;
 }
@@ -116,7 +117,7 @@ function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load($id = NULL, $reset = FALSE) {
-  return entity_load('domain', $id, $reset);
+  return Domain::load($id, $reset);
 }
 
 /**
@@ -165,7 +166,7 @@ function domain_create($inherit = FALSE, array $values = array()) {
     $values['name'] = \Drupal::config('system.site')->get('name');
     $values['id'] = domain_machine_name($values['hostname']);
   }
-  $domain = entity_create('domain', $values);
+  $domain = Domain::create($values);
   return $domain;
 }
 

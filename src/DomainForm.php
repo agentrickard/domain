@@ -8,7 +8,7 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * Base form for domain edit forms.
@@ -19,6 +19,7 @@ class DomainForm extends EntityForm {
    * Overrides Drupal\Core\Entity\EntityForm::form().
    */
   public function form(array $form, array &$form_state) {
+    $form = parent::form($form, $form_state);
     $domain = $this->entity;
     $domains = domain_load_multiple();
     // Create defaults if this is the first domain.
@@ -87,7 +88,7 @@ class DomainForm extends EntityForm {
         $form[$key]['#required'] = TRUE;
       }
     }
-    return parent::form($form, $form_state, $domain);
+    return $form;
   }
 
   /**
