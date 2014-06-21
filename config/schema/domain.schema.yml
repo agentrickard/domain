@@ -1,8 +1,8 @@
 # Schema for the configuration files of the Domain module.
 
 domain.domain.*:
-  type: mapping
-  label: 'Domain'
+  type: config_entity
+  label: 'Domain record'
   mapping:
     uuid:
       type: string

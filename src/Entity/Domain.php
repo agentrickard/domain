@@ -8,7 +8,6 @@
 namespace Drupal\domain\Entity;
 
 use Drupal\domain\DomainInterface;
-
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
@@ -17,7 +16,7 @@ use GuzzleHttp\Exception\RequestException;
 /**
  * Defines the domain entity.
  *
- * @EntityType(
+ * @ConfigEntityType(
  *   id = "domain",
  *   label = @Translation("Domain record"),
  *   module = "domain",
