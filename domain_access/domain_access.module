@@ -137,7 +137,7 @@ function domain_access_node_access_records(NodeInterface $node) {
 /**
  * Sets the default value for new fields.
  */
-function domain_access_default_value($entity, $field, $instance, $langcode) {
+function domain_access_default_value($entity, $instance) {
   $item = array();
   if ($active = domain_get_domain()) {
     $item[0]['target_uuid'] = $active->uuid;
