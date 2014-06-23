@@ -4,6 +4,9 @@ domain_alias.alias.*:
   type: config_entity
   label: 'Domain alias'
   mapping:
+    id:
+      type: string
+      label: 'ID'
     uuid:
       type: string
       label: 'ID'
