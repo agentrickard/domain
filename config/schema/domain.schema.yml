@@ -4,6 +4,9 @@ domain.record.*:
   type: config_entity
   label: 'Domain record'
   mapping:
+    id:
+      type: string
+      label: 'ID'
     uuid:
       type: string
       label: 'ID'
