@@ -262,7 +262,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       // @TODO: set the default domain in the manager?
       return FALSE;
     }
-    return ($this->machine_name == $domain->machine_name);
+    return ($this->id() == $domain->id());
   }
 
   /**
