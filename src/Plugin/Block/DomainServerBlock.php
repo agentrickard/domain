@@ -39,6 +39,8 @@ class DomainServerBlock extends BlockBase {
       t('HTTP_HOST request'),
       check_plain($_SERVER['HTTP_HOST']),
     );
+    // Check the response test.
+    $domain->checkResponse();
     $check = domain_load_hostname($_SERVER['HTTP_HOST']);
     $match = t('TRUE');
     if (!$check) {
