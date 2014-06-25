@@ -30,7 +30,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *       "delete" = "Drupal\domain_alias\Form\DomainAliasDeleteForm"
  *     }
  *   },
- *   config_prefix = "domain_alias.alias",
+ *   config_prefix = "alias",
  *   admin_permission = "administer domains",
  *   entity_keys = {
  *     "id" = "id",

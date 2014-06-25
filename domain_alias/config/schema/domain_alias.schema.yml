@@ -9,7 +9,7 @@ domain_alias.alias.*:
       label: 'ID'
     uuid:
       type: string
-      label: 'ID'
+      label: 'UUID'
     domain_id:
       type: string
       label: 'Domain ID'
