@@ -112,7 +112,7 @@ class DomainServerBlock extends BlockBase {
       '#theme' => 'item_list',
       '#items' => $items,
     );
-    return $variables;
+    return render($variables);
   }
 
 }
