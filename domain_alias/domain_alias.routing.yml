@@ -5,7 +5,7 @@ domain_alias.admin:
     _title: 'Domain aliases'
     _title_context: 'With modules'
   requirements:
-    _entity_access: domain.update
+    _permission: 'administer domains'
 
 domain_alias.edit:
   path: '/admin/structure/domain/alias/edit/{domain_alias}'

@@ -23,6 +23,7 @@ class DomainAccessController extends EntityAccessController {
    */
   public function checkAccess(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
     // Check the global permission.
+    dpm($operation);
     if ($account->hasPermission('administer domains')) {
       return TRUE;
     }
@@ -30,7 +31,7 @@ class DomainAccessController extends EntityAccessController {
       return TRUE;
     }
     // @TODO: assign users to domains and check.
-    if ($operation == 'edit' && $account->hasPermission('edit assigned domains')) {
+    if ($operation == 'update' && $account->hasPermission('edit assigned domains')) {
       return TRUE;
     }
     if ($operation == 'delete' && $account->hasPermission('edit assigned domains')) {
