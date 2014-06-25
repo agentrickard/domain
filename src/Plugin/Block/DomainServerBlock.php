@@ -42,7 +42,7 @@ class DomainServerBlock extends BlockBase {
     // Check the response test.
     $domain->checkResponse();
     $check = domain_load_hostname($_SERVER['HTTP_HOST']);
-    $match = t('TRUE');
+    $match = t('Exact match');
     if (!$check) {
       // Specific check for Domain Alias.
       if (isset($domain->alias)) {

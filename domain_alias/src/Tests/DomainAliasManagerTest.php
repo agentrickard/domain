@@ -54,7 +54,7 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
       }
       $this->drupalGet($domain->path);
       $this->assertRaw($domain->name, 'Loaded the proper domain.');
-      $this->assertRaw('<td>Domain match</td><td>TRUE</td>', 'Direct domain match.');
+      $this->assertRaw('Exact match', 'Direct domain match.');
     }
 
     // Now, test an alias.
@@ -66,7 +66,7 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
     $url = $alias_domain->getPath();
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->name, 'Loaded the proper domain.');
-    $this->assertRaw('<td>Domain match</td><td>ALIAS:', 'No direct domain match.');
+    $this->assertRaw('ALIAS:', 'No direct domain match.');
     $this->assertRaw($alias->pattern, 'Alias match.');
 
     // Test redirections.
@@ -75,12 +75,12 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
     $alias->save();
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->name, 'Loaded the proper domain.');
-    $this->assertRaw('<td>Domain match</td><td>TRUE</td>', 'Direct domain match.');
+    $this->assertRaw('Exact match', 'Direct domain match.');
     $alias->redirect = 302;
     $alias->save();
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->name, 'Loaded the proper domain.');
-    $this->assertRaw('<td>Domain match</td><td>TRUE</td>', 'Direct domain match.');
+    $this->assertRaw('Exact match', 'Direct domain match.');
     // Revoke the permission change
     user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
 
