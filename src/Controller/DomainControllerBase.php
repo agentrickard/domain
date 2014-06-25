@@ -8,7 +8,7 @@
 namespace Drupal\domain\Controller;
 
 use Drupal\domain\DomainInterface;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\domain_alias\Controller\DomainAliasController
  */
-class DomainControllerBase implements ContainerInjectionInterface {
+class DomainControllerBase extends ControllerBase {
 
   /**
    * The entity storage.

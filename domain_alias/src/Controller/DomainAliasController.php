@@ -30,6 +30,6 @@ class DomainAliasController extends DomainControllerBase {
     $values['domain_id'] = $domain->id();
     // @TODO: ensure that this value is present in all cases.
     $alias = entity_create('domain_alias', $values);
-    return $this->entityManager->getForm($alias);
+    return $this->entityFormBuilder()->getForm($alias);
   }
 }

@@ -13,7 +13,7 @@ domain_alias.edit:
     _entity_form: domain_alias.edit
     _title: 'Edit domain alias'
   requirements:
-    _permission: 'create domains'
+    _permission: 'administer domains'
 
 domain_alias.delete:
   path: '/admin/structure/domain/alias/delete/{domain_alias}'
@@ -21,7 +21,7 @@ domain_alias.delete:
     _entity_form: domain_alias.delete
     _title: 'Delete domain alias'
   requirements:
-    _permission: 'create domains'
+    _permission: 'administer domains'
 
 domain_alias.add:
   path: '/admin/structure/domain/alias/{domain}/add'
@@ -30,4 +30,4 @@ domain_alias.add:
     _title: 'Add domain alias'
     _title_context: 'With modules'
   requirements:
-    _permission: 'create domains'
+    _permission: 'administer domains'
