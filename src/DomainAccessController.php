@@ -23,7 +23,6 @@ class DomainAccessController extends EntityAccessController {
    */
   public function checkAccess(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
     // Check the global permission.
-    dpm($operation);
     if ($account->hasPermission('administer domains')) {
       return TRUE;
     }
