@@ -1,9 +1,4 @@
 services:
-  domain.subscriber:
-    class: Drupal\domain\EventSubscriber\DomainSubscriber
-    tags:
-      - { name: event_subscriber }
-    arguments: ['@domain.manager']
   domain.manager:
     class: Drupal\domain\DomainManager
     tags:
