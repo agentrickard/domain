@@ -25,7 +25,7 @@ class DomainAliasDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function getCancelRoute() {
+  public function getCancelUrl() {
     return new Url('domain_alias.admin');
   }
 

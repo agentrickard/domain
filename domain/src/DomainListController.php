@@ -36,11 +36,14 @@ class DomainListController extends DraggableListBuilder {
     $default = $entity->is_default;
     $id = $entity->id();
     // @TODO: permission checks.
+    // Get a drupal CSRF token. (The actual service is called 'csrf_token').
+    $token_generator = \Drupal::csrfToken();
+
     if ($entity->status && !$default) {
       $operations['disable'] = array(
         'title' => t('Disable'),
         'href' => "admin/structure/domain/disable/$id",
-        'query' => array('token' => drupal_get_token()),
+        'query' => array('token' => $token_generator->get()),
         'weight' => 50,
       );
     }
@@ -48,7 +51,7 @@ class DomainListController extends DraggableListBuilder {
       $operations['enable'] = array(
         'title' => t('Enable'),
         'href' => "admin/structure/domain/enable/$id",
-        'query' => array('token' => drupal_get_token()),
+        'query' => array('token' => $token_generator->get()),
         'weight' => 40,
       );
     }
@@ -56,7 +59,7 @@ class DomainListController extends DraggableListBuilder {
       $operations['default'] = array(
         'title' => t('Make default'),
         'href' => "admin/structure/domain/default/$id",
-        'query' => array('token' => drupal_get_token()),
+        'query' => array('token' => $token_generator->get()),
         'weight' => 30,
       );
       $operations['delete'] = array(
