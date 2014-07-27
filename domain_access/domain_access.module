@@ -9,6 +9,7 @@ use Drupal\domain\DomainManager;
 use Drupal\domain\DomainInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Defines the name of the node access control field.
@@ -72,7 +73,7 @@ function domain_access_permission() {
  */
 function domain_editor_list_permissions($type) {
   $info = entity_load('node_type', $type);
-  $type = check_plain($info->type);
+  $type = String::checkPlain($info->type);
 
   // Build standard list of node permissions for this type.
   $perms = array(

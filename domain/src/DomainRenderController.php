@@ -7,6 +7,7 @@
 
 namespace Drupal\domain;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRenderController;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
@@ -34,8 +35,8 @@ class DomainRenderController extends EntityRenderController {
         if (!empty($entity->{$key}) && $display->getComponent($key)) {
           $class = str_replace('_', '-', $key);
           $entity->content[$key] = array(
-            '#markup' => check_plain($entity->{$key}),
-            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . check_plain($key) . ':</strong><br />',
+            '#markup' => String::checkPlain($entity->{$key}),
+            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . String::checkPlain($key) . ':</strong><br />',
             '#suffix' => '</div>',
           );
         }

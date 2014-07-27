@@ -7,6 +7,7 @@
 
 namespace Drupal\domain\Plugin\Block;
 
+use Drupal\Component\Utility\String;
 use Drupal\block\BlockBase;
 use Drupal\Core\Session\AccountInterface;
 
@@ -37,7 +38,7 @@ class DomainServerBlock extends BlockBase {
     $header = array(t('Property'), t('Value'));
     $rows[] = array(
       t('HTTP_HOST request'),
-      check_plain($_SERVER['HTTP_HOST']),
+      String::checkPlain($_SERVER['HTTP_HOST']),
     );
     // Check the response test.
     $domain->checkResponse();
@@ -72,8 +73,8 @@ class DomainServerBlock extends BlockBase {
         $value = empty($value) ? t('FALSE') : t('TRUE');
       }
       $rows[] = array(
-        check_plain($key),
-        !is_array($value) ? check_plain($value) : $this->printArray($value),
+        String::checkPlain($key),
+        !is_array($value) ? String::checkPlain($value) : $this->printArray($value),
       );
     }
     return array(
@@ -97,7 +98,7 @@ class DomainServerBlock extends BlockBase {
     foreach ($array as $key => $val) {
       $value = 'array';
       if (!is_array($val)) {
-        $value = check_plain($val);
+        $value = String::checkPlain($val);
       }
       else {
         $list = array();

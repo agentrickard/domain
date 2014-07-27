@@ -7,6 +7,7 @@
 
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Implements hook_drush_command().
@@ -188,7 +189,7 @@ function drush_domain_list() {
   foreach ($domains as $domain) {
     $row = array();
     foreach ($header as $key => $name) {
-      $row[] = check_plain($domain->{$key});
+      $row[] = String::checkPlain($domain->{$key});
     }
     $rows[] = $row;
   }
