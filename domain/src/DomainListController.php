@@ -93,6 +93,7 @@ class DomainListController extends DraggableListBuilder {
   public function buildHeader() {
     $header['label'] = t('Name');
     $header['hostname'] = t('Hostname');
+    $header['status'] = t('Status');
     $header['is_default'] = t('Default');
     return $header + parent::buildHeader();
   }
@@ -107,6 +108,7 @@ class DomainListController extends DraggableListBuilder {
       $row['hostname']['#prefix'] = '<strong>';
       $row['hostname']['#suffix'] = '</strong>';
     }
+    $row['status'] = array('#markup' => $entity->isEnabled() ? t('Active') : t('Inactive'));
     $row['is_default'] = array('#markup' => ($entity->is_default ? t('Yes') : t('No')));
     $row += parent::buildRow($entity);
     $row['weight']['#delta'] = count(domain_load_multiple()) + 1;

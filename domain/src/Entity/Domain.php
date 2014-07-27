@@ -266,10 +266,17 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Detects if the current domain is the default domain.
+   * Detects if the domain is the default domain.
    */
   public function isDefault() {
     return (bool) $this->is_default;
+  }
+
+  /**
+   * Detects if the domain is enabled.
+   */
+  public function isEnabled() {
+    return (bool) $this->status;
   }
 
   /**
