@@ -8,7 +8,6 @@ namespace Drupal\domain\Controller;
 
 use Drupal\domain\DomainInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Controller routines for domain routes.
@@ -24,16 +23,6 @@ class DomainController {
    *   The operation being performed.
    */
   public function ajaxOperation(DomainInterface $domain, $op = NULL) {
-    // @todo CSRF tokens are validated in page callbacks rather than access
-    //   callbacks, because access callbacks are also invoked during menu link
-    //   generation. Add token support to routing: http://drupal.org/node/755584.
-    $token = drupal_container()->get('request')->query->get('token');
-    $allowed_actions = array('enable', 'disable', 'default');
-
-    if (!in_array($op, $allowed_actions) || !isset($token) || !drupal_valid_token($token)) {
-      throw new AccessDeniedHttpException();
-    }
-
     $success = FALSE;
     switch($op) {
       case 'default':
@@ -65,8 +54,8 @@ class DomainController {
     }
 
     // Return to the invoking page.
-    $destination = drupal_get_destination();
-    return new RedirectResponse($destination['destination']);
+    // @TODO: Should this check the referrer?
+    return new RedirectResponse(url('admin/structure/domain'));
   }
 
 }

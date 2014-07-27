@@ -43,4 +43,5 @@ domain.inline_action:
     _controller: 'Drupal\domain\Controller\DomainController::ajaxOperation'
   requirements:
     _entity_access: domain.update
+    _csrf_token: 'TRUE'
     op: 'enable|disable|default'

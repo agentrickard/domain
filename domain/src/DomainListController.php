@@ -35,36 +35,38 @@ class DomainListController extends DraggableListBuilder {
     $destination = drupal_get_destination();
     $default = $entity->is_default;
     $id = $entity->id();
-    // @TODO: permission checks.
-    // Get a drupal CSRF token. (The actual service is called 'csrf_token').
+
+    // Get CSRF token service.
     $token_generator = \Drupal::csrfToken();
 
+    // @TODO: permission checks.
     if ($entity->status && !$default) {
       $operations['disable'] = array(
         'title' => t('Disable'),
-        'href' => "admin/structure/domain/disable/$id",
-        'query' => array('token' => $token_generator->get()),
+        'route_name' => 'domain.inline_action',
+        'route_parameters' => array('op' => 'disable', 'domain' => $id),
         'weight' => 50,
       );
     }
     elseif (!$default) {
       $operations['enable'] = array(
         'title' => t('Enable'),
-        'href' => "admin/structure/domain/enable/$id",
-        'query' => array('token' => $token_generator->get()),
+        'route_name' => 'domain.inline_action',
+        'route_parameters' => array('op' => 'enable', 'domain' => $id),
         'weight' => 40,
       );
     }
     if (!$default) {
       $operations['default'] = array(
         'title' => t('Make default'),
-        'href' => "admin/structure/domain/default/$id",
-        'query' => array('token' => $token_generator->get()),
+        'route_name' => 'domain.inline_action',
+        'route_parameters' => array('op' => 'default', 'domain' => $id),
         'weight' => 30,
       );
       $operations['delete'] = array(
         'title' => t('Delete'),
-        'href' => "admin/structure/domain/delete/$id",
+        'route_name' => 'domain.delete',
+        'route_parameters' => array('domain' => $id),
         'query' => array(),
         'weight' => 20,
       );
