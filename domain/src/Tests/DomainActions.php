@@ -10,19 +10,13 @@ use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain record actions.
+ *
+ * @group domain
  */
 class DomainActions extends DomainTestBase {
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain record actions',
-      'description' => 'Tests domain record actions.',
-      'group' => 'Domain',
-    );
-  }
-
   /**
-   * Test bulk actions through the Views module.
+   * Tests bulk actions through the Views module.
    */
   function testDomainActions() {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));

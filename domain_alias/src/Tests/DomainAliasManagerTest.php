@@ -11,17 +11,11 @@ use Drupal\domain\DomainInterface;
 use Drupal\domain_alias\Tests\DomainAliasTestBase;
 
 /**
- * Tests the domain record creation API.
+ * Tests domain alias request negotiation.
+ *
+ * @group domain_alias
  */
 class DomainAliasManagerTest extends DomainAliasTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain alias manager tests',
-      'description' => 'Tests domain alias response management.',
-      'group' => 'Domain Alias',
-    );
-  }
 
   /**
    * Modules to enable.
@@ -30,6 +24,9 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
    */
   public static $modules = array('domain', 'block');
 
+  /**
+   * Tests the handling of aliased requests.
+   */
   function testDomainAliasManager() {
     // No domains should exist.
     $this->domainTableIsEmpty();

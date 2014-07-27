@@ -10,7 +10,7 @@ use Drupal\simpletest\WebTestBase;
 use Drupal\domain\DomainInterface;
 
 /**
- * Tests the domain record interface.
+ * Base class with helper methods for domain tests.
  */
 abstract class DomainTestBase extends WebTestBase {
 

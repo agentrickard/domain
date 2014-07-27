@@ -9,17 +9,11 @@ namespace Drupal\domain\Tests;
 use Drupal\domain\DomainInterface;
 
 /**
- * Tests the domain record creation API.
+ * Tests the domain negotation manager.
+ *
+ * @group domain
  */
 class DomainManager extends DomainTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain manager tests',
-      'description' => 'Tests domain response management.',
-      'group' => 'Domain',
-    );
-  }
 
   /**
    * Modules to enable.
@@ -28,6 +22,9 @@ class DomainManager extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_test', 'block');
 
+  /**
+   * Tests the handling of an inbound request.
+   */
   function testDomainManager() {
     // No domains should exist.
     $this->domainTableIsEmpty();

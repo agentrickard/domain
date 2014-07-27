@@ -10,6 +10,8 @@ use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain record entity reference field type.
+ *
+ * @group domain
  */
 class DomainEntityReference extends DomainTestBase {
 
@@ -19,14 +21,6 @@ class DomainEntityReference extends DomainTestBase {
    * @var array
    */
   public static $modules = array('domain', 'field', 'field_ui');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain entity reference field',
-      'description' => 'Tests entity references for domain fields.',
-      'group' => 'Domain',
-    );
-  }
 
   /**
    * Create, edit and delete a domain field via the user interface.

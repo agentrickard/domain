@@ -10,16 +10,10 @@ use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain record interface.
+ *
+ * @group domain
  */
 class DomainForms extends DomainTestBase {
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain form interface',
-      'description' => 'Tests the domain record user interface.',
-      'group' => 'Domain',
-    );
-  }
 
   /**
    * Create, edit and delete a domain via the user interface.

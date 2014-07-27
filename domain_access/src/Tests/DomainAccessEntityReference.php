@@ -11,6 +11,8 @@ use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain access entity reference field type.
+ *
+ * @group domain_access
  */
 class DomainAccessEntityReference extends DomainTestBase {
 
@@ -20,14 +22,6 @@ class DomainAccessEntityReference extends DomainTestBase {
    * @var array
    */
   public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain access entity reference field',
-      'description' => 'Tests entity references for domain access.',
-      'group' => 'Domain Access',
-    );
-  }
 
   function setUp() {
     parent::setUp();
@@ -61,7 +55,7 @@ class DomainAccessEntityReference extends DomainTestBase {
   }
 
   /**
-   * Create content for a domain access field.
+   * Tests the storage of the domain access field.
    */
   function testDomainAccessFieldStorage() {
     $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains'));

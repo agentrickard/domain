@@ -10,18 +10,15 @@ namespace Drupal\domain_config\Tests;
 use Drupal\domain_config\EventSubscriber\DomainConfigSubscriber;
 
 /**
- * Tests the domain record creation API.
+ * Tests the domain config system.
+ *
+ * @group domain_config
  */
 class DomainConfigOverride extends DomainConfigTestBase {
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain configuration overrides',
-      'description' => 'Set domain-specific variables.',
-      'group' => 'Domain Configuration',
-    );
-  }
-
+  /**
+   * Tests that domain-specific variable loading works.
+   */
   function testDomainConfigOverride() {
     // No domains should exist.
     $this->domainTableIsEmpty();

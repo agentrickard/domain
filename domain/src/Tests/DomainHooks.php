@@ -9,7 +9,9 @@ namespace Drupal\domain\Tests;
 use Drupal\domain\DomainInterface;
 
 /**
- * Tests the domain record creation API.
+ * Tests the domain module hook invocations.
+ *
+ * @group domain
  */
 class DomainHooks extends DomainTestBase {
 
@@ -20,17 +22,8 @@ class DomainHooks extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_test');
 
-
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain module hooks',
-      'description' => 'Tests domain module API hooks.',
-      'group' => 'Domain',
-    );
-  }
-
   /**
-   * Test domain loading.
+   * Tests domain loading.
    */
   function testHookDomainLoad() {
     // No domains should exist.

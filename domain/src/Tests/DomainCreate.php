@@ -10,19 +10,13 @@ use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain record creation API.
+ *
+ * @group domain
  */
 class DomainCreate extends DomainTestBase {
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain record creation',
-      'description' => 'Tests domain record CRUD API.',
-      'group' => 'Domain',
-    );
-  }
-
   /**
-   * Test initial domain creation.
+   * Tests initial domain creation.
    */
   function testDomainCreate() {
     // No domains should exist.

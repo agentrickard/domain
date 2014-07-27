@@ -9,18 +9,16 @@ namespace Drupal\domain\Tests;
 use Drupal\domain\DomainInterface;
 
 /**
- * Tests the domain record creation API.
+ * Tests domain record validation.
+ *
+ * @group domain
  */
 class DomainValidate extends DomainTestBase {
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Domain record validation',
-      'description' => 'Tests domain record validation.',
-      'group' => 'Domain',
-    );
-  }
-
+  /**
+   * Tests that a domain response is proper.
+   * @TODO: This class needs a rewrite.
+   */
   public function testDomainResponse() {
     // No domains should exist.
     $this->domainTableIsEmpty();

@@ -10,7 +10,7 @@ namespace Drupal\domain_config\Tests;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
- * Tests the domain record interface.
+ * Helper test methods for Domain Config testing.
  */
 abstract class DomainConfigTestBase extends DomainTestBase {
 
