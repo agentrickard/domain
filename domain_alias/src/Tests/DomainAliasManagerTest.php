@@ -41,9 +41,6 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
     // To get around block access, let the anon user view the block.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
 
-    $account = user_load(0, TRUE);
-    $this->assertTrue(user_access('administer domains', $account), 'Anonymous user can view Domain Server block.');
-
     // Test the response of the default home page.
     foreach (domain_load_multiple() as $domain) {
       if (!isset($alias_domain)) {
