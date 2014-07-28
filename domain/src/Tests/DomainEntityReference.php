@@ -125,7 +125,7 @@ class DomainEntityReference extends DomainTestBase {
         'target_type' => 'domain',
       ),
     );
-    $field = entity_create('field_config', $settings);
+    $field = entity_create('field_storage_config', $settings);
     $field->save();
 
     $instance = array(

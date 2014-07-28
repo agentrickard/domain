@@ -73,10 +73,10 @@ function domain_access_install() {
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
-  if ($field = entity_load('field_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
+  if ($field = entity_load('field_storage_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
     $field->delete();
   }
-  if ($field = entity_load('field_config', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  if ($field = entity_load('field_storage_config', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
     $field->delete();
   }
 }
