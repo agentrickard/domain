@@ -9,6 +9,7 @@ namespace Drupal\domain;
 
 use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * User interface for the domain overview screen.
@@ -118,7 +119,7 @@ class DomainListController extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
     $form[$this->entitiesKey]['#domains'] = $this->entities;
     $form['actions']['submit']['#value'] = t('Save configuration');
@@ -128,7 +129,7 @@ class DomainListController extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
     drupal_set_message(t('Configuration saved.'));
