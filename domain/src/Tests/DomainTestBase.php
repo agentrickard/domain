@@ -7,6 +7,7 @@
 
 namespace Drupal\domain\Tests;
 use Drupal\simpletest\WebTestBase;
+use Drupal\Component\Utility\Crypt;
 use Drupal\domain\DomainInterface;
 
 /**
@@ -101,6 +102,22 @@ abstract class DomainTestBase extends WebTestBase {
     }
     $domains = domain_load_multiple(NULL, TRUE);
     $this->assertTrue((count($domains) - count($original_domains)) == $count, format_string('Created %count new domains.', array('%count' => $count)));
+  }
+
+  /**
+   * Returns whether a given user account is logged in.
+   *
+   * @param \Drupal\user\UserInterface $account
+   *   The user account object to check.
+   */
+  protected function drupalUserIsLoggedIn($account) {
+    // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
+    if (!isset($account->session_id)) {
+      return (bool) $account->id();
+    }
+    // The session ID is hashed before being stored in the database.
+    // @see \Drupal\Core\Session\SessionHandler::read()
+    return (bool) db_query("SELECT sid FROM {users} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
   }
 
 }
