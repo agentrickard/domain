@@ -9,6 +9,7 @@ namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Base form for domain edit forms.
@@ -18,7 +19,7 @@ class DomainForm extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityForm::form().
    */
-  public function form(array $form, array &$form_state) {
+  public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $domain = $this->entity;
     $domains = domain_load_multiple();
@@ -94,7 +95,7 @@ class DomainForm extends EntityForm {
   /**
    * Overrides \Drupal\Core\Entity\EntityForm::validate().
    */
-  public function validate(array $form, array &$form_state) {
+  public function validate(array $form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
     $errors = $entity->validate();
     if (!empty($errors)) {
@@ -105,7 +106,7 @@ class DomainForm extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityForm::save().
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     $domain = $this->entity;
     if ($domain->isNew()) {
       drupal_set_message(t('Domain record created.'));
@@ -119,7 +120,7 @@ class DomainForm extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityForm::delete().
    */
-  public function delete(array $form, array &$form_state) {
+  public function delete(array $form, FormStateInterface $form_state) {
     $domain = $this->entity;
     $domain->delete();
     $form_state['redirect'] = 'admin/structure/domain';

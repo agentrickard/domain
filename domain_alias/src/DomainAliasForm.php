@@ -9,6 +9,7 @@ namespace Drupal\domain_alias;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Base form controller for domain alias edit forms.
@@ -18,7 +19,7 @@ class DomainAliasForm extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityForm::form().
    */
-  public function form(array $form, array &$form_state) {
+  public function form(array $form, FormStateInterface $form_state) {
     $alias = $this->entity;
 
     $form['domain_id'] = array(
@@ -63,7 +64,7 @@ class DomainAliasForm extends EntityForm {
   /**
    * Overrides \Drupal\Core\Entity\EntityForm::validate().
    */
-  public function validate(array $form, array &$form_state) {
+  public function validate(array $form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
     $errors = $entity->validate();
     if (!empty($errors)) {
@@ -74,7 +75,7 @@ class DomainAliasForm extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityForm::save().
    */
-  public function save(array $form, array &$form_state) {
+  public function save(array $form, FormStateInterface $form_state) {
     $alias = $this->entity;
     if ($alias->isNew()) {
       drupal_set_message(t('Domain alias created.'));
@@ -89,7 +90,7 @@ class DomainAliasForm extends EntityForm {
   /**
    * Overrides Drupal\Core\Entity\EntityForm::delete().
    */
-  public function delete(array $form, array &$form_state) {
+  public function delete(array $form, FormStateInterface $form_state) {
     $alias = $this->entity;
     $alias->delete();
     $form_state['redirect'] = 'admin/structure/domain/alias/' . $alias->domain_id;

@@ -8,6 +8,7 @@
 namespace Drupal\domain\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
 /**
@@ -39,7 +40,7 @@ class DomainDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, array &$form_state) {
+  public function submit(array $form, FormStateInterface $form_state) {
     $this->entity->delete();
     drupal_set_message(t('Domain %label has been deleted.', array('%label' => $this->entity->label())));
     watchdog('domain', 'Domain %label has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
