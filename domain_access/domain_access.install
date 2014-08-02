@@ -11,11 +11,23 @@
  * Installs the default domain field on nodes.
  */
 function domain_access_install() {
+  $exists = entity_load('field_storage_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD);
+  if (!$exists) {
+    $storage = array(
+      'name' => DOMAIN_ACCESS_NODE_FIELD,
+      'entity_type' => 'node',
+      'type' => 'entity_reference',
+    );
+    $field_storage = entity_create('field_storage_config', $storage);
+    $field_storage->save();
+  }
   $node_types = entity_load_multiple('node_type');
+
   foreach ($node_types as $type => $info) {
     if ($field = entity_load('field_instance_config', 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD)) {
       continue;
     }
+
     $instance = array(
       'field_name' => DOMAIN_ACCESS_NODE_FIELD,
       'entity_type' => 'node',
@@ -45,6 +57,13 @@ function domain_access_install() {
   if ($field = entity_load('field_instance_config', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
     return;
   }
+  $storage = array(
+    'name' => DOMAIN_ACCESS_USER_FIELD,
+    'entity_type' => 'user',
+    'type' => 'entity_reference',
+  );
+  $field_storage = entity_create('field_storage_config', $storage);
+  $field_storage->save();
 
   $instance = array(
     'field_name' => DOMAIN_ACCESS_USER_FIELD,
@@ -76,7 +95,7 @@ function domain_access_uninstall() {
   if ($field = entity_load('field_storage_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
     $field->delete();
   }
-  if ($field = entity_load('field_storage_config', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  if ($field = entity_load('field_storage_config', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
     $field->delete();
   }
 }

@@ -1,4 +1,4 @@
-id: user.field_domain_user
+id: user.user.field_domain_user
 status: true
 langcode: en
 name: field_domain_user
