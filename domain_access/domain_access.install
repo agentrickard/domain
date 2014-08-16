@@ -16,6 +16,7 @@ function domain_access_install() {
     $storage = array(
       'name' => DOMAIN_ACCESS_NODE_FIELD,
       'entity_type' => 'node',
+      'cardinality' => -1,
       'type' => 'entity_reference',
     );
     $field_storage = entity_create('field_storage_config', $storage);
@@ -37,6 +38,7 @@ function domain_access_install() {
       'description' => 'Select the affiliate domain(s) for this content.',
       'default_value_function' => 'domain_access_default_value',
       'settings' => array(
+        'target_type' => 'domain',
         'handler_settings' => array(
           'sort' => array('field' => 'weight', 'direction' => 'ASC'),
         ),
@@ -59,6 +61,7 @@ function domain_access_install() {
   }
   $storage = array(
     'name' => DOMAIN_ACCESS_USER_FIELD,
+    'cardinality' => -1,
     'entity_type' => 'user',
     'type' => 'entity_reference',
   );
@@ -73,7 +76,9 @@ function domain_access_install() {
     'required' => FALSE,
     'description' => 'Select the affiliate domain(s) for this user.',
     'default_value_function' => 'domain_access_default_value',
-    'settings' => array(),
+    'settings' => array(
+      'target_type' => 'domain',
+    ),
   );
   $field_instance = entity_create('field_instance_config', $instance);
   $field_instance->save();
