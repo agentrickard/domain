@@ -1,23 +1,22 @@
 <?php
+
 /**
  * @file
- * Definition of \Drupal\domain_config\EventSubscriber\DomainConfigSubscriber.
+ * Contains \Drupal\domain_config\DomainConfigOverrider.
  */
 
-namespace Drupal\domain_config\EventSubscriber;
+namespace Drupal\domain_config;
 
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Config\ConfigModuleOverridesEvent;
 use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\domain\DomainManagerInterface;
 use Drupal\domain\DomainInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Domain Config helper
+ * Domain-specific config overrides.
  */
-class DomainConfigSubscriber implements EventSubscriberInterface {
-
+class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * The domain manager.
    *
@@ -54,15 +53,11 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
     $this->configFactory = $config_factory;
     $this->storage = $storage;
   }
-
   /**
-   * Override configuration values with domain-specific data.
-   *
-   * @param \Drupal\Core\Config\ConfigModuleOverridesEvent $event
-   *   The Event to process.
+   * {@inheritdoc}
    */
-  public function onDomainModuleOverride(ConfigModuleOverridesEvent $event) {
-    $names = $event->getNames();
+  public function loadOverrides($names) {
+    $overrides = array();
     // @TODO: language handling?
     // @TODO: caching?
     if ($domain = $this->domainManager->getActiveDomain()) {
@@ -71,10 +66,11 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
         // Check to see if the config storage has an appropriately named file
         // containing override data.
         if ($override = $this->storage->read($config_name)) {
-          $event->setOverride($name, $override);
+          $overrides[$name] = $override;
         }
       }
     }
+    return $overrides;
   }
 
   /**
@@ -96,10 +92,18 @@ class DomainConfigSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Implements EventSubscriberInterface::getSubscribedEvents().
+   * {@inheritdoc}
    */
-  static function getSubscribedEvents() {
-    $events['config.module.overrides'][] = array('onDomainModuleOverride', 400);
-    return $events;
+  public function getCacheSuffix() {
+    return 'DomainConfigOverrider';
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
+    return NULL;
+  }
+
 }
+

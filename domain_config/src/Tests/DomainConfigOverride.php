@@ -7,8 +7,6 @@
 
 namespace Drupal\domain_config\Tests;
 
-use Drupal\domain_config\EventSubscriber\DomainConfigSubscriber;
-
 /**
  * Tests the domain config system.
  *

@@ -1,6 +1,7 @@
 services:
-  domain_config.subscriber:
-    class: Drupal\domain_config\EventSubscriber\DomainConfigSubscriber
+  domain_config.overrider:
+    class: Drupal\domain_config\DomainConfigOverrider
     tags:
-      - { name: event_subscriber }
+      - { name: config.factory.override}
     arguments: ['@domain.manager', '@config.factory', '@config.storage']
+
