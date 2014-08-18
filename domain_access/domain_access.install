@@ -18,6 +18,9 @@ function domain_access_install() {
       'entity_type' => 'node',
       'cardinality' => -1,
       'type' => 'entity_reference',
+      'settings' => array(
+        'target_type' => 'domain',
+      ),
     );
     $field_storage = entity_create('field_storage_config', $storage);
     $field_storage->save();
@@ -64,6 +67,9 @@ function domain_access_install() {
     'cardinality' => -1,
     'entity_type' => 'user',
     'type' => 'entity_reference',
+    'settings' => array(
+      'target_type' => 'domain',
+    ),
   );
   $field_storage = entity_create('field_storage_config', $storage);
   $field_storage->save();
