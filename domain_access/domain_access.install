@@ -41,7 +41,6 @@ function domain_access_install() {
       'description' => 'Select the affiliate domain(s) for this content.',
       'default_value_function' => 'domain_access_default_value',
       'settings' => array(
-        'target_type' => 'domain',
         'handler_settings' => array(
           'sort' => array('field' => 'weight', 'direction' => 'ASC'),
         ),
@@ -83,7 +82,9 @@ function domain_access_install() {
     'description' => 'Select the affiliate domain(s) for this user.',
     'default_value_function' => 'domain_access_default_value',
     'settings' => array(
-      'target_type' => 'domain',
+      'handler_settings' => array(
+        'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+      ),
     ),
   );
   $field_instance = entity_create('field_instance_config', $instance);
