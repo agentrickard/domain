@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\domain_alias\Form\DomainAliasListController.
+ * Contains \Drupal\domain_alias\Form\DomainAliasListBuilder.
  */
 
 namespace Drupal\domain_alias;
@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
 /**
  * User interface for the domain alias overview screen.
  */
-class DomainAliasListController extends ConfigEntityListBuilder {
+class DomainAliasListBuilder extends ConfigEntityListBuilder {
 
   /**
    * {@inheritdoc}

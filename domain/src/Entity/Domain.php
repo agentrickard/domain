@@ -24,7 +24,7 @@ use GuzzleHttp\Exception\RequestException;
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
  *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "access" = "Drupal\domain\DomainAccessController",
- *     "list_builder" = "Drupal\domain\DomainListController",
+ *     "list_builder" = "Drupal\domain\DomainListBuilder",
  *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\domain\DomainForm",

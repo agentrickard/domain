@@ -2,34 +2,46 @@
 
 /**
  * @file
- * Contains \Drupal\domain\DomainViewBuilder.
+ * Definition of Drupal\domain\DomainViewBuilder.
  */
 
 namespace Drupal\domain;
 
+use Drupal\Component\Utility\String;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
+use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 
 /**
- * Provides a Domain view builder.
+ * Render controller for domain records.
  */
 class DomainViewBuilder extends EntityViewBuilder {
 
   /**
-   * {@inheritdoc}
+   * Overrides Drupal\Core\Entity\EntityViewBuilder::buildContent().
    */
-  public function viewMultiple(array $entities = array(), $view_mode = 'full', $langcode = NULL) {
-    // @TODO: This is a stopgap. The entire entity list should be returned in
-    // one function.
-    $build = array();
-    uasort($entities, 'domain_list_sort');
-    foreach ($entities as $entity_id => $entity) {
-      // @TODO: set this properly from variables.
-      $build[$entity_id] = array(
-        '#markup' => l($entity->name, $entity->url),
-        '#entity' => $entity,
-      );
+  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
+    // If we can get domain_field_extra_fields() working here, we may not even
+    // need this override class and can do everything via formatters.
+    parent::buildContent($entities, $displays, $view_mode, $langcode);
+    $fields = domain_field_extra_fields();
+    $list = array_keys($fields['domain']['domain']['display']);
+
+    foreach ($entities as $entity) {
+      // Add the fields.
+      // @TODO: get field sort order.
+      $display = $displays[$entity->bundle()];
+      foreach ($list as $key) {
+        if (!empty($entity->{$key}) && $display->getComponent($key)) {
+          $class = str_replace('_', '-', $key);
+          $entity->content[$key] = array(
+            '#markup' => String::checkPlain($entity->{$key}),
+            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . String::checkPlain($key) . ':</strong><br />',
+            '#suffix' => '</div>',
+          );
+        }
+      }
     }
-    return $build;
   }
 
 }

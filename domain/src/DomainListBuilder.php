@@ -2,46 +2,137 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainViewBuilder.
+ * Contains \Drupal\domain\Form\DomainListBuilder.
  */
 
 namespace Drupal\domain;
 
-use Drupal\Component\Utility\String;
+use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Render controller for domain records.
+ * User interface for the domain overview screen.
  */
-class DomainViewBuilder extends EntityViewBuilder {
+class DomainListBuilder extends DraggableListBuilder {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityViewBuilder::buildContent().
+   * {@inheritdoc}
    */
-  public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
-    // If we can get domain_field_extra_fields() working here, we may not even
-    // need this override class and can do everything via formatters.
-    parent::buildContent($entities, $displays, $view_mode, $langcode);
-    $fields = domain_field_extra_fields();
-    $list = array_keys($fields['domain']['domain']['display']);
+  protected $entitiesKey = 'domains';
 
-    foreach ($entities as $entity) {
-      // Add the fields.
-      // @TODO: get field sort order.
-      $display = $displays[$entity->bundle()];
-      foreach ($list as $key) {
-        if (!empty($entity->{$key}) && $display->getComponent($key)) {
-          $class = str_replace('_', '-', $key);
-          $entity->content[$key] = array(
-            '#markup' => String::checkPlain($entity->{$key}),
-            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . String::checkPlain($key) . ':</strong><br />',
-            '#suffix' => '</div>',
-          );
-        }
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormId() {
+    return 'domain_admin_overview_form';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOperations(EntityInterface $entity) {
+    $operations = parent::getOperations($entity);
+    $destination = drupal_get_destination();
+    $default = $entity->is_default;
+    $id = $entity->id();
+
+    // Get CSRF token service.
+    $token_generator = \Drupal::csrfToken();
+
+    // @TODO: permission checks.
+    if ($entity->status && !$default) {
+      $operations['disable'] = array(
+        'title' => t('Disable'),
+        'route_name' => 'domain.inline_action',
+        'route_parameters' => array('op' => 'disable', 'domain' => $id),
+        'weight' => 50,
+      );
+    }
+    elseif (!$default) {
+      $operations['enable'] = array(
+        'title' => t('Enable'),
+        'route_name' => 'domain.inline_action',
+        'route_parameters' => array('op' => 'enable', 'domain' => $id),
+        'weight' => 40,
+      );
+    }
+    if (!$default) {
+      $operations['default'] = array(
+        'title' => t('Make default'),
+        'route_name' => 'domain.inline_action',
+        'route_parameters' => array('op' => 'default', 'domain' => $id),
+        'weight' => 30,
+      );
+      $operations['delete'] = array(
+        'title' => t('Delete'),
+        'route_name' => 'domain.delete',
+        'route_parameters' => array('domain' => $id),
+        'query' => array(),
+        'weight' => 20,
+      );
+    }
+    // @TODO: should this be handled differently?
+    $operations += \Drupal::moduleHandler()->invokeAll('domain_operations', array($entity));
+    foreach ($operations as $key => $value) {
+      if (isset($value['query']['token'])) {
+        $operations[$key]['query'] += $destination;
       }
     }
+    $default = domain_default();
+
+    // Deleting the site default domain is not allowed.
+    if ($id == $default->id) {
+      unset($operations['delete']);
+    }
+    return $operations;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildHeader() {
+    $header['label'] = t('Name');
+    $header['hostname'] = t('Hostname');
+    $header['status'] = t('Status');
+    $header['is_default'] = t('Default');
+    return $header + parent::buildHeader();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildRow(EntityInterface $entity) {
+    $row['label'] = $this->getLabel($entity);
+    $row['hostname'] = array('#markup' => l($entity->hostname, $entity->url));
+    if ($entity->isActive()) {
+      $row['hostname']['#prefix'] = '<strong>';
+      $row['hostname']['#suffix'] = '</strong>';
+    }
+    $row['status'] = array('#markup' => $entity->isEnabled() ? t('Active') : t('Inactive'));
+    $row['is_default'] = array('#markup' => ($entity->is_default ? t('Yes') : t('No')));
+    $row += parent::buildRow($entity);
+    $row['weight']['#delta'] = count(domain_load_multiple()) + 1;
+    return $row;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildForm($form, $form_state);
+    $form[$this->entitiesKey]['#domains'] = $this->entities;
+    $form['actions']['submit']['#value'] = t('Save configuration');
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+
+    drupal_set_message(t('Configuration saved.'));
   }
 
 }
