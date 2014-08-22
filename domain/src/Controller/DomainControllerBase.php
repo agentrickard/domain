@@ -27,7 +27,7 @@ class DomainControllerBase extends ControllerBase {
   /**
    * The entity storage.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigStorageController
+   * @var \Drupal\Core\Config\Entity\ConfigEntityStorage
    */
   protected $entityStorage;
 
@@ -41,7 +41,7 @@ class DomainControllerBase extends ControllerBase {
   /**
    * Constructs a new DomainAliasController.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigStorageController $entity_storage
+   * @param \Drupal\Core\Config\Entity\ConfigEntityStorage $entity_storage
    *   The storage controller.
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
