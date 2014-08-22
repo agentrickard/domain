@@ -20,7 +20,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   id = "domain_alias",
  *   label = @Translation("Domain alias"),
  *   module = "domain_alias",
- *   controllers = {
+ *   handlers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
  *     "access" = "Drupal\domain\DomainAccessControlHandler",
  *     "list_builder" = "Drupal\domain_alias\DomainAliasListBuilder",
