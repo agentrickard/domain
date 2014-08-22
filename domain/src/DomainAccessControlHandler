@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\domain\DomainAccessController.
+ * Contains \Drupal\domain\DomainAccessControlHandler.
  */
 
 namespace Drupal\domain;
@@ -16,7 +16,7 @@ use Drupal\Core\Session\AccountInterface;
 /**
  * Defines the access controller for the domain entity type.
  */
-class DomainAccessController extends EntityAccessControlHandler {
+class DomainAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
