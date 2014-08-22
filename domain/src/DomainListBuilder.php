@@ -2,23 +2,23 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainRenderController.
+ * Definition of Drupal\domain\DomainViewBuilder.
  */
 
 namespace Drupal\domain;
 
 use Drupal\Component\Utility\String;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityRenderController;
+use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 
 /**
  * Render controller for domain records.
  */
-class DomainRenderController extends EntityRenderController {
+class DomainViewBuilder extends EntityViewBuilder {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityRenderController::buildContent().
+   * Overrides Drupal\Core\Entity\EntityViewBuilder::buildContent().
    */
   public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
     // If we can get domain_field_extra_fields() working here, we may not even

@@ -22,7 +22,7 @@ use GuzzleHttp\Exception\RequestException;
  *   module = "domain",
  *   controllers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
- *     "render" = "Drupal\domain\DomainRenderController",
+ *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "access" = "Drupal\domain\DomainAccessController",
  *     "list_builder" = "Drupal\domain\DomainListController",
  *     "view_builder" = "Drupal\domain\DomainViewBuilder",
