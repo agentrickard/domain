@@ -1,0 +1,8 @@
+administer domains:
+  title: 'Administer all domain records'
+create domains:
+  title:'Create domain records'
+edit assigned domains:
+  title: 'Edit assigned domain records'
+delete assigned domains:
+  title: 'Delete assigned domain records'

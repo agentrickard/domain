@@ -10,27 +10,6 @@ use Drupal\domain\Entity\Domain;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
- * Implements hook_permission().
- */
-function domain_permission() {
-  $permissions = array(
-    'administer domains' => array(
-      'title' => t('Administer all domain records'),
-    ),
-    'create domains' => array(
-      'title' => t('Create domain records'),
-    ),
-    'edit assigned domains' => array(
-      'title' => t('Edit assigned domain records'),
-    ),
-    'delete assigned domains' => array(
-      'title' => t('Delete assigned domain records'),
-    ),
-  );
-  return $permissions;
-}
-
-/**
  * Implements hook_entity_bundle_info().
  */
 function domain_entity_bundle_info() {
