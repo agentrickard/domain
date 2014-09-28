@@ -116,7 +116,7 @@ class DomainEntityReference extends DomainTestBase {
     $label = 'domain';
     $name = 'field_' . $label;
 
-    $settings = array(
+    $storage = array(
       'name' => $name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
@@ -125,10 +125,10 @@ class DomainEntityReference extends DomainTestBase {
         'target_type' => 'domain',
       ),
     );
-    $field = entity_create('field_storage_config', $settings);
-    $field->save();
+    $field_storage_config = entity_create('field_storage_config', $storage);
+    $field_storage_config->save();
 
-    $instance = array(
+    $field = array(
       'field_name' => $name,
       'entity_type' => 'node',
       'label' => 'Domain test field',
@@ -139,8 +139,8 @@ class DomainEntityReference extends DomainTestBase {
         ),
       ),
     );
-    $field_instance = entity_create('field_instance_config', $instance);
-    $field_instance->save();
+    $field_config = entity_create('field_config', $field);
+    $field_config->save();
 
     // Tell the form system how to behave.
     entity_get_form_display('node', 'article', 'default')

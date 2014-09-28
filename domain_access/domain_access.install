@@ -22,17 +22,17 @@ function domain_access_install() {
         'target_type' => 'domain',
       ),
     );
-    $field_storage = entity_create('field_storage_config', $storage);
-    $field_storage->save();
+    $field_storage_config = entity_create('field_storage_config', $storage);
+    $field_storage_config->save();
   }
   $node_types = entity_load_multiple('node_type');
 
   foreach ($node_types as $type => $info) {
-    if ($field = entity_load('field_instance_config', 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD)) {
+    if ($field = entity_load('field_storage_config', 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD)) {
       continue;
     }
 
-    $instance = array(
+    $field = array(
       'field_name' => DOMAIN_ACCESS_NODE_FIELD,
       'entity_type' => 'node',
       'label' => 'Domain Access',
@@ -46,8 +46,8 @@ function domain_access_install() {
         ),
       ),
     );
-    $field_instance = entity_create('field_instance_config', $instance);
-    $field_instance->save();
+    $field_config = entity_create('field_config', $field);
+    $field_config->save();
 
     // Tell the form system how to behave. Default to radio buttons.
     entity_get_form_display('node', $type, 'default')
@@ -58,7 +58,7 @@ function domain_access_install() {
   }
 
   // Save to the user form.
-  if ($field = entity_load('field_instance_config', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  if ($field = entity_load('field_storage_config', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
     return;
   }
   $storage = array(
@@ -70,10 +70,10 @@ function domain_access_install() {
       'target_type' => 'domain',
     ),
   );
-  $field_storage = entity_create('field_storage_config', $storage);
-  $field_storage->save();
+  $field_storage_config = entity_create('field_storage_config', $storage);
+  $field_storage_config->save();
 
-  $instance = array(
+  $field = array(
     'field_name' => DOMAIN_ACCESS_USER_FIELD,
     'entity_type' => 'user',
     'label' => 'Domain Access',
@@ -87,8 +87,8 @@ function domain_access_install() {
       ),
     ),
   );
-  $field_instance = entity_create('field_instance_config', $instance);
-  $field_instance->save();
+  $field_config = entity_create('field_config', $field);
+  $field_config->save();
 
   // Tell the form system how to behave. Default to radio buttons.
   entity_get_form_display('user', 'user', 'default')
