@@ -8,7 +8,6 @@
 namespace Drupal\domain\Plugin\Block;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Component\Utility\String;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Session\AccountInterface;
 
