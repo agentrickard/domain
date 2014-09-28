@@ -38,7 +38,7 @@ class DomainManager implements DomainManagerInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param Drupal\Core\Config\TypedConfigManagerInterface $typed_config
-   *   The types config handler.
+   *   The typed config handler.
    */
   public function __construct(ModuleHandlerInterface $module_handler, TypedConfigManagerInterface $typed_config) {
     $this->httpHost = NULL;
