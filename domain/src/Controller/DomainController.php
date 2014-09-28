@@ -8,11 +8,16 @@ namespace Drupal\domain\Controller;
 
 use Drupal\domain\DomainInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Routing\UrlGeneratorTrait;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Controller routines for domain routes.
  */
 class DomainController {
+
+  use StringTranslationTrait;
+  use UrlGeneratorTrait;
 
   /**
    * Controller for handling Ajax operations from the overview page.
@@ -27,21 +32,21 @@ class DomainController {
     switch($op) {
       case 'default':
         $domain->saveDefault();
-        $verb = t('set as default');
+        $verb = $this->t('set as default');
         if ($domain->isDefault()) {
           $success = TRUE;
         }
         break;
       case 'enable':
         $domain->enable();
-        $verb = t('has been enabled.');
+        $verb = $this->t('has been enabled.');
         if ($domain->status) {
           $success = TRUE;
         }
         break;
       case 'disable':
         $domain->disable();
-        $verb = t('has been disabled.');
+        $verb = $this->t('has been disabled.');
         if (!$domain->status) {
           $success = TRUE;
         }
@@ -50,12 +55,12 @@ class DomainController {
 
     // Set a message.
     if ($success) {
-      drupal_set_message(t('Domain record !verb.', array('!verb' => $verb)));
+      drupal_set_message($this->t('Domain record !verb.', array('!verb' => $verb)));
     }
 
     // Return to the invoking page.
     // @TODO: Should this check the referrer?
-    return new RedirectResponse(url('admin/structure/domain'));
+    return new RedirectResponse($this->url('domain.admin'));
   }
 
 }
