@@ -10,11 +10,14 @@ namespace Drupal\domain;
 use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * User interface for the domain overview screen.
  */
 class DomainListBuilder extends DraggableListBuilder {
+
+  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
@@ -43,7 +46,7 @@ class DomainListBuilder extends DraggableListBuilder {
     // @TODO: permission checks.
     if ($entity->status && !$default) {
       $operations['disable'] = array(
-        'title' => t('Disable'),
+        'title' => $this->t('Disable'),
         'route_name' => 'domain.inline_action',
         'route_parameters' => array('op' => 'disable', 'domain' => $id),
         'weight' => 50,
@@ -51,7 +54,7 @@ class DomainListBuilder extends DraggableListBuilder {
     }
     elseif (!$default) {
       $operations['enable'] = array(
-        'title' => t('Enable'),
+        'title' => $this->t('Enable'),
         'route_name' => 'domain.inline_action',
         'route_parameters' => array('op' => 'enable', 'domain' => $id),
         'weight' => 40,
@@ -59,13 +62,13 @@ class DomainListBuilder extends DraggableListBuilder {
     }
     if (!$default) {
       $operations['default'] = array(
-        'title' => t('Make default'),
+        'title' => $this->t('Make default'),
         'route_name' => 'domain.inline_action',
         'route_parameters' => array('op' => 'default', 'domain' => $id),
         'weight' => 30,
       );
       $operations['delete'] = array(
-        'title' => t('Delete'),
+        'title' => $this->t('Delete'),
         'route_name' => 'domain.delete',
         'route_parameters' => array('domain' => $id),
         'query' => array(),
@@ -92,10 +95,10 @@ class DomainListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = t('Name');
-    $header['hostname'] = t('Hostname');
-    $header['status'] = t('Status');
-    $header['is_default'] = t('Default');
+    $header['label'] = $this->t('Name');
+    $header['hostname'] = $this->t('Hostname');
+    $header['status'] = $this->t('Status');
+    $header['is_default'] = $this->t('Default');
     return $header + parent::buildHeader();
   }
 
@@ -109,8 +112,8 @@ class DomainListBuilder extends DraggableListBuilder {
       $row['hostname']['#prefix'] = '<strong>';
       $row['hostname']['#suffix'] = '</strong>';
     }
-    $row['status'] = array('#markup' => $entity->isEnabled() ? t('Active') : t('Inactive'));
-    $row['is_default'] = array('#markup' => ($entity->is_default ? t('Yes') : t('No')));
+    $row['status'] = array('#markup' => $entity->isEnabled() ? $this->t('Active') : $this->t('Inactive'));
+    $row['is_default'] = array('#markup' => ($entity->is_default ? $this->t('Yes') : $this->t('No')));
     $row += parent::buildRow($entity);
     $row['weight']['#delta'] = count(domain_load_multiple()) + 1;
     return $row;
@@ -122,7 +125,7 @@ class DomainListBuilder extends DraggableListBuilder {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
     $form[$this->entitiesKey]['#domains'] = $this->entities;
-    $form['actions']['submit']['#value'] = t('Save configuration');
+    $form['actions']['submit']['#value'] = $this->t('Save configuration');
     return $form;
   }
 
@@ -132,7 +135,7 @@ class DomainListBuilder extends DraggableListBuilder {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    drupal_set_message(t('Configuration saved.'));
+    drupal_set_message($this->t('Configuration saved.'));
   }
 
 }
