@@ -28,42 +28,42 @@ class DomainServerBlock extends DomainBlockBase {
    */
   public function build() {
     $domain = domain_get_domain();
-    $header = array(t('Property'), t('Value'));
+    $header = array($this->t('Property'), $this->t('Value'));
     $rows[] = array(
-      t('HTTP_HOST request'),
+      $this->t('HTTP_HOST request'),
       String::checkPlain($_SERVER['HTTP_HOST']),
     );
     // Check the response test.
     $domain->checkResponse();
     $check = domain_load_hostname($_SERVER['HTTP_HOST']);
-    $match = t('Exact match');
+    $match = $this->t('Exact match');
     if (!$check) {
       // Specific check for Domain Alias.
       if (isset($domain->alias)) {
-        $match = t('ALIAS: Using alias %id', array('%id' => $domain->alias));
+        $match = $this->t('ALIAS: Using alias %id', array('%id' => $domain->alias));
       }
       else {
-        $match = t('FALSE: Using default domain.');
+        $match = $this->t('FALSE: Using default domain.');
       }
     }
     $rows[] = array(
-      t('Domain match'),
+      $this->t('Domain match'),
       $match,
     );
     $list = $domain->toArray();
     ksort($list);
     foreach ($list as $key => $value) {
       if (is_null($value)) {
-        $value = t('NULL');
+        $value = $this->t('NULL');
       }
       elseif ($value === TRUE) {
-        $value = t('TRUE');
+        $value = $this->t('TRUE');
       }
       elseif ($value === FALSE) {
-        $value = t('FALSE');
+        $value = $this->t('FALSE');
       }
       elseif ($key == 'status' || $key == 'is_default') {
-        $value = empty($value) ? t('FALSE') : t('TRUE');
+        $value = empty($value) ? $this->t('FALSE') : $this->t('TRUE');
       }
       $rows[] = array(
         String::checkPlain($key),
@@ -96,11 +96,11 @@ class DomainServerBlock extends DomainBlockBase {
       else {
         $list = array();
         foreach ($val as $k => $v) {
-          $list[] = t('@key : @value', array('@key' => $k, '@value' => $v));
+          $list[] = $this->t('@key : @value', array('@key' => $k, '@value' => $v));
         }
         $value = implode('<br />', $list);
       }
-      $items[] = t('@key : !value', array('@key' => $key, '!value' => $value));
+      $items[] = $this->t('@key : !value', array('@key' => $key, '!value' => $value));
     }
     $variables['domain_server'] = array(
       '#theme' => 'item_list',
