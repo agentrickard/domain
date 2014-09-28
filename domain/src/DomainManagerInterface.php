@@ -36,4 +36,9 @@ interface DomainManagerInterface {
    */
   public function getHttpHost();
 
+  /**
+   * Gets the schema for domain records.
+   */
+  public function getSchema();
+
 }

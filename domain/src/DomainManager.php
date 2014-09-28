@@ -10,6 +10,7 @@ namespace Drupal\domain;
 use Drupal\domain\DomainManagerInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 
 class DomainManager implements DomainManagerInterface {
 
@@ -25,15 +26,25 @@ class DomainManager implements DomainManagerInterface {
   protected $moduleHandler;
 
   /**
+   * The typed config handler.
+   *
+   * @var Drupal\Core\Config\TypedConfigManagerInterface
+   */
+  protected $typed_config;
+
+  /**
    * Constructs a DomainManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   *   The types config handler.
    */
-  public function __construct(ModuleHandlerInterface $module_handler) {
+  public function __construct(ModuleHandlerInterface $module_handler, TypedConfigManagerInterface $typed_config) {
     $this->httpHost = NULL;
     $this->domain = NULL;
     $this->moduleHandler = $module_handler;
+    $this->typedConfig = $typed_config;
   }
 
   public function setRequestDomain($httpHost) {
@@ -68,6 +79,11 @@ class DomainManager implements DomainManagerInterface {
 
   public function getHttpHost() {
     return $this->httpHost;
+  }
+
+  public function getSchema() {
+    $fields = $typedConfig->getDefinition('domain.record.*');
+    return $fields['mapping'];
   }
 
 }

@@ -7,6 +7,7 @@
 
 namespace Drupal\domain\Plugin\Block;
 
+use Drupal\domain\Entity\Domain;
 use Drupal\domain\Plugin\Block\DomainBlockBase;
 use Drupal\Component\Utility\String;
 
@@ -49,7 +50,7 @@ class DomainServerBlock extends DomainBlockBase {
       t('Domain match'),
       $match,
     );
-    $list = (array) $domain;
+    $list = $domain->toArray();
     ksort($list);
     foreach ($list as $key => $value) {
       if (is_null($value)) {
