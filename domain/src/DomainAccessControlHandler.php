@@ -7,6 +7,7 @@
 
 namespace Drupal\domain;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
@@ -24,18 +25,18 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
   public function checkAccess(EntityInterface $entity, $operation, $langcode = Language::LANGCODE_DEFAULT, AccountInterface $account = NULL) {
     // Check the global permission.
     if ($account->hasPermission('administer domains')) {
-      return TRUE;
+      return AccessResult::allowed();
     }
     if ($operation == 'create' && $account->hasPermission('create domains')) {
-      return TRUE;
+      return AccessResult::allowed();
     }
     // @TODO: assign users to domains and check.
     if ($operation == 'update' && $account->hasPermission('edit assigned domains')) {
-      return TRUE;
+      return AccessResult::allowed();
     }
     if ($operation == 'delete' && $account->hasPermission('edit assigned domains')) {
-      return TRUE;
+      return AccessResult::allowed();
     }
-    return FALSE;
+    return AccessResult::forbidden();
   }
 }
