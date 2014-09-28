@@ -40,11 +40,11 @@ class DomainDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submit(array $form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
     drupal_set_message(t('Domain %label has been deleted.', array('%label' => $this->entity->label())));
     watchdog('domain', 'Domain %label has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
-    $form_state['redirect_route']['route_name'] = 'domain.admin';
+    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
 }
