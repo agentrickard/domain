@@ -44,7 +44,7 @@ class DomainAliasDeleteForm extends EntityConfirmFormBase {
     $this->entity->delete();
     drupal_set_message(t('DomainAlias %label has been deleted.', array('%label' => $this->entity->label())));
     watchdog('domain_alias', 'DomainAlias %label has been deleted.', array('%label' => $this->entity->label()), WATCHDOG_NOTICE);
-    $form_state['redirect_route']['route_name'] = 'domain_alias.admin';
+    $form_state->setRedirectUrl($this->getCancelUrl());
   }
 
 }
