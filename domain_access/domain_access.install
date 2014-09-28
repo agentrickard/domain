@@ -58,7 +58,7 @@ function domain_access_install() {
   }
 
   // Save to the user form.
-  if ($field = entity_load('field_storage_config', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  if ($field = entity_load('field_storage_config', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
     return;
   }
   $storage = array(
