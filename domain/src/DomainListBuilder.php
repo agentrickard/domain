@@ -10,14 +10,11 @@ namespace Drupal\domain;
 use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * User interface for the domain overview screen.
  */
 class DomainListBuilder extends DraggableListBuilder {
-
-  use StringTranslationTrait;
 
   /**
    * {@inheritdoc}
