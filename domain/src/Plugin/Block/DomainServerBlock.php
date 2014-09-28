@@ -7,6 +7,7 @@
 
 namespace Drupal\domain\Plugin\Block;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Component\Utility\String;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Session\AccountInterface;
@@ -25,7 +26,7 @@ class DomainServerBlock extends BlockBase {
    * Overrides \Drupal\block\BlockBase::access().
    */
   public function access(AccountInterface $account) {
-    return $account->hasPermission('administer domains');
+    return AccessResult::allowedIfHasPermission($account, 'administer domains');
   }
 
   /**
