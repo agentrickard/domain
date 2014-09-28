@@ -34,7 +34,6 @@ use GuzzleHttp\Exception\RequestException;
  *   },
  *   config_prefix = "record",
  *   admin_permission = "administer domains",
- *   fieldable = TRUE,
  *   entity_keys = {
  *     "id" = "id",
  *     "domain_id" = "domain_id",
