@@ -34,11 +34,11 @@ class DomainForm extends EntityForm {
     );
     $form['hostname'] = array(
       '#type' => 'textfield',
-      '#title' => t('Hostname'),
+      '#title' => $this->t('Hostname'),
       '#size' => 40,
       '#maxlength' => 80,
       '#default_value' => $domain->hostname,
-      '#description' => t('The canonical hostname, using the full <em>path.example.com</em> format.') . '<br />' . t('Leave off the http:// and the trailing slash and do not include any paths.'),
+      '#description' => $this->t('The canonical hostname, using the full <em>path.example.com</em> format.') . '<br />' . $this->t('Leave off the http:// and the trailing slash and do not include any paths.'),
     );
     $form['id'] = array(
       '#type' => 'machine_name',
@@ -50,38 +50,38 @@ class DomainForm extends EntityForm {
     );
     $form['name'] = array(
       '#type' => 'textfield',
-      '#title' => t('Name'),
+      '#title' => $this->t('Name'),
       '#size' => 40,
       '#maxlength' => 80,
       '#default_value' => $domain->name,
-      '#description' => t('The human-readable name of this domain.')
+      '#description' => $this->t('The human-readable name of this domain.')
     );
     $form['scheme'] = array(
       '#type' => 'radios',
-      '#title' => t('Domain URL scheme'),
+      '#title' => $this->t('Domain URL scheme'),
       '#options' => array('http' => 'http://', 'https' => 'https://'),
       '#default_value' => $domain->scheme,
-      '#description' => t('The URL scheme for accessing this domain.')
+      '#description' => $this->t('The URL scheme for accessing this domain.')
     );
     $form['status'] = array(
       '#type' => 'radios',
-      '#title' => t('Domain status'),
-      '#options' => array(1 => t('Active'), 0 => t('Inactive')),
-      '#default_value' => $domain->status,
-      '#description' => t('Must be set to "Active" for users to navigate to this domain.')
+      '#title' => $this->t('Domain status'),
+      '#options' => array(1 => $this->t('Active'), 0 => $this->t('Inactive')),
+      '#default_value' => (int) $domain->status,
+      '#description' => $this->t('Must be set to "Active" for users to navigate to this domain.')
     );
     $form['weight'] = array(
       '#type' => 'weight',
-      '#title' => t('Weight'),
+      '#title' => $this->t('Weight'),
       '#delta' => count(domain_load_multiple()) + 1,
       '#default_value' => $domain->weight,
-      '#description' => t('The sort order for this record. Lower values display first.'),
+      '#description' => $this->t('The sort order for this record. Lower values display first.'),
     );
     $form['is_default'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Default domain'),
+      '#title' => $this->t('Default domain'),
       '#default_value' => $domain->is_default,
-      '#description' => t('If a URL request fails to match a domain record, the settings for this domain will be used.'),
+      '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used.'),
     );
     $required = domain_required_fields();
     foreach ($form as $key => $element) {
@@ -109,20 +109,21 @@ class DomainForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $domain = $this->entity;
     if ($domain->isNew()) {
-      drupal_set_message(t('Domain record created.'));
+      drupal_set_message($this->t('Domain record created.'));
     }
     else {
-      drupal_set_message(t('Domain record updated.'));
+      drupal_set_message($this->t('Domain record updated.'));
     }
     $domain->save();
+    $form_state->setRedirect('domain.admin');
   }
 
   /**
    * Overrides Drupal\Core\Entity\EntityForm::delete().
    */
-  public function delete(array $form, FormStateInterface $form_state) {
+  public function delete(array &$form, FormStateInterface $form_state) {
     $domain = $this->entity;
     $domain->delete();
-    $form_state['redirect'] = 'admin/structure/domain';
+    $form_state->setRedirect('domain.admin');
   }
 }
