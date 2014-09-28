@@ -7,10 +7,7 @@
 
 namespace Drupal\domain\Plugin\Block;
 
-use Drupal\Core\Access\AccessResult;
-use Drupal\Component\Utility\String;
-use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\Plugin\Block\DomainBlockBase;
 
 /**
  * Provides a server information block for a domain request.
@@ -20,14 +17,7 @@ use Drupal\Core\Session\AccountInterface;
  *   admin_label = @Translation("Domain server information")
  * )
  */
-class DomainServerBlock extends BlockBase {
-
-  /**
-   * Overrides \Drupal\block\BlockBase::access().
-   */
-  public function access(AccountInterface $account) {
-    return AccessResult::allowedIfHasPermission($account, 'administer domains');
-  }
+class DomainServerBlock extends DomainBlockBase {
 
   /**
    * Build the output.
