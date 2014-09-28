@@ -81,9 +81,14 @@ class DomainManager implements DomainManagerInterface {
     return $this->httpHost;
   }
 
+  /**
+   * @return array
+   *   An array keyed by field name and containing the name and
+   *   label for the field.
+   */
   public function getSchema() {
-    $fields = $typedConfig->getDefinition('domain.record.*');
-    return $fields['mapping'];
+    $fields = $this->typedConfig->getDefinition('domain.record.*');
+    return isset($fields['mapping']) ? $fields['mapping'] : array();
   }
 
 }
