@@ -117,7 +117,7 @@ class DomainEntityReference extends DomainTestBase {
     $name = 'field_' . $label;
 
     $storage = array(
-      'name' => $name,
+      'field_name' => $name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
       'cardinality' => -1,

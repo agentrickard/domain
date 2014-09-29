@@ -14,7 +14,7 @@ function domain_access_install() {
   $exists = entity_load('field_storage_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD);
   if (!$exists) {
     $storage = array(
-      'name' => DOMAIN_ACCESS_NODE_FIELD,
+      'field_name' => DOMAIN_ACCESS_NODE_FIELD,
       'entity_type' => 'node',
       'cardinality' => -1,
       'type' => 'entity_reference',
@@ -62,7 +62,7 @@ function domain_access_install() {
     return;
   }
   $storage = array(
-    'name' => DOMAIN_ACCESS_USER_FIELD,
+    'field_name' => DOMAIN_ACCESS_USER_FIELD,
     'cardinality' => -1,
     'entity_type' => 'user',
     'type' => 'entity_reference',
