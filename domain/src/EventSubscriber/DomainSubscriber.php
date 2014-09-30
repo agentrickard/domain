@@ -22,16 +22,16 @@ class DomainSubscriber implements EventSubscriberInterface {
   /**
    * @var \Drupal\domain\DomainResolverInterface
    */
-  protected $domainManager;
+  protected $domainResolver;
 
   /**
    * Constructs a DomainSubscriber object.
    *
-   * @param \Drupal\domain\DomainResolverInterface $domain_manager
-   *   The domain manager service.
+   * @param \Drupal\domain\DomainResolverInterface $resolver
+   *   The domain resolver service.
    */
-  public function __construct(DomainResolverInterface $domain_manager) {
-    $this->domainManager = $domain_manager;
+  public function __construct(DomainResolverInterface $resolver) {
+    $this->domainResolver = $resolver;
   }
 
   /**
@@ -43,8 +43,8 @@ class DomainSubscriber implements EventSubscriberInterface {
     $request = $event->getRequest();
     // TODO: Pass $url string or the entire Request?
     $httpHost = $request->getHttpHost();
-    $this->domainManager->setRequestDomain($httpHost);
-    $domain = $this->domainManager->getActiveDomain();
+    $this->domainResolver->setRequestDomain($httpHost);
+    $domain = $this->domainResolver->getActiveDomain();
     // Pass a redirect if necessary.
     if (!empty($domain->url) && !empty($domain->redirect)) {
       $response = new RedirectResponse($domain->url, $domain->redirect);

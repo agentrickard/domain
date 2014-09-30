@@ -22,7 +22,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   /**
    * @var \Drupal\domain\DomainResolverInterface
    */
-  protected $domainManager;
+  protected $domainResolver;
 
   /**
    * The module handler.
@@ -34,13 +34,13 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   /**
    * Constructs a DomainPathProcessor object.
    *
-   * @param \Drupal\domain\DomainResolverInterface $domain_manager
-   *   The domain manager service.
+   * @param \Drupal\domain\DomainResolverInterface $resolver
+   *   The domain resolver service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
-  public function __construct(DomainResolverInterface $domain_manager, ModuleHandlerInterface $module_handler) {
-    $this->domainManager = $domain_manager;
+  public function __construct(DomainResolverInterface $resolver, ModuleHandlerInterface $module_handler) {
+    $this->domainResolver = $resolver;
     $this->moduleHandler = $module_handler;
   }
 
@@ -50,7 +50,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   public function processOutbound($path, &$options = array(), Request $request = NULL) {
     static $active_domain;
     if (!isset($active_domain)) {
-      $active_domain = $this->domainManager->getActiveDomain();
+      $active_domain = $this->domainResolver->getActiveDomain();
     }
 
     // Only act on valid internal paths.

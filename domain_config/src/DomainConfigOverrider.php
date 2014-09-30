@@ -18,11 +18,11 @@ use Drupal\domain\DomainInterface;
  */
 class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
-   * The domain manager.
+   * The domain resolver.
    *
    * @var \Drupal\domain\DomainResolverInterface
    */
-  protected $domainManager;
+  protected $domainResolver;
 
   /**
    * The configuration storage service.
@@ -41,15 +41,15 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * Constructs a DomainConfigSubscriber object.
    *
-   * @param \Drupal\domain\DomainResolverInterface $domain_manager
-   *   The domain manager service.
+   * @param \Drupal\domain\DomainResolverInterface $resolver
+   *   The domain resolver service.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The configuration storage service.
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The configuration storage engine.
    */
-  public function __construct(DomainResolverInterface $domain_manager, ConfigFactory $config_factory, StorageInterface $storage) {
-    $this->domainManager = $domain_manager;
+  public function __construct(DomainResolverInterface $resolver, ConfigFactory $config_factory, StorageInterface $storage) {
+    $this->domainResolver = $resolver;
     $this->configFactory = $config_factory;
     $this->storage = $storage;
   }
@@ -60,7 +60,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $overrides = array();
     // @TODO: language handling?
     // @TODO: caching?
-    if ($domain = $this->domainManager->getActiveDomain()) {
+    if ($domain = $this->domainResolver->getActiveDomain()) {
       foreach ($names as $name) {
         $config_name = $this->getDomainConfigName($name, $domain);
         // Check to see if the config storage has an appropriately named file
