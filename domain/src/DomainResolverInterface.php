@@ -35,7 +35,7 @@ interface DomainResolverInterface {
   public function setHttpHost($httpHost);
 
   /**
-   * Retrieves the inbound httpHost request.
+   * Gets the inbound httpHost request.
    */
   public function getHttpHost();
 

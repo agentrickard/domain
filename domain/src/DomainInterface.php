@@ -48,7 +48,7 @@ interface DomainInterface extends ConfigEntityInterface {
    *   The value to set for the property.
    *
    */
-  public function saveAttribute($key, $value);
+  public function saveProperty($key, $value);
 
   /**
    * Sets the base path to this domain.

@@ -549,7 +549,7 @@ function drush_domain_enable($argument) {
 function drush_domain_name($argument, $name) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    $domain->saveAttribute('name', $name);
+    $domain->saveProperty('name', $name);
   }
 }
 
@@ -567,7 +567,7 @@ function drush_domain_machine_name($argument, $machine_name) {
         return;
       }
     }
-    $domain->saveAttribute('id', $machine_name);
+    $domain->saveProperty('id', $machine_name);
   }
 }
 
@@ -585,7 +585,7 @@ function drush_domain_scheme($argument) {
     if ($content == 2) {
       $scheme = 'https';
     }
-    $domain->saveAttribute('scheme', $scheme);
+    $domain->saveProperty('scheme', $scheme);
   }
 }
 

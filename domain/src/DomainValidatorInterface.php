@@ -24,5 +24,12 @@ interface DomainValidatorInterface {
    */
   public function checkResponse(DomainInterface $domain);
 
+  /**
+   * Returns the properties required to create a domain record.
+   *
+   * @return array
+   *   Array of property names.
+   */
   public function getRequiredFields();
+
 }

@@ -228,7 +228,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * Saves a specific domain attribute.
    */
-  public function saveAttribute($key, $value) {
+  public function saveProperty($key, $value) {
     if (isset($this->{$key})) {
       $this->{$key} = $value;
       $this->save();
