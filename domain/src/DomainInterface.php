@@ -75,5 +75,15 @@ interface DomainInterface extends ConfigEntityInterface {
    */
   public function getScheme();
 
+  /**
+   * Retrieves the value of the response test.
+   */
+  public function getResponse();
+
+  /**
+   * Sets the value of the response test.
+   */
+  public function setResponse($response);
+
 
 }

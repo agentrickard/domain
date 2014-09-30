@@ -20,7 +20,8 @@ DomainInterface.php
   public function getPath();
   public function getUrl();
   public function getScheme();
-
+  public function getResponse();
+  public function setResponse();
 
 DomainResolverInterface.php
   Takes an http Request and returns the proper domain
@@ -51,8 +52,6 @@ DomainLoaderInterface.php
   public function optionsList();
   public function sort($a, $b);
   public function getSchema();
-  public function validate();
-  public function checkResponse();
 
 
 DomainCreatorInterface.php
