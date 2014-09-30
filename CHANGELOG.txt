@@ -68,3 +68,7 @@ DomainCreatorInterface.php
 
 
 
+Negotiation Operations
+
+  Remove the EventListener and make it such that the Active
+  Domain is created on request to the Domain Resolver service.
