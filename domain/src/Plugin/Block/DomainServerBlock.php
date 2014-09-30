@@ -39,7 +39,7 @@ class DomainServerBlock extends DomainBlockBase {
       String::checkPlain($_SERVER['HTTP_HOST']),
     );
     // Check the response test.
-    $domain->setResponse();
+    $domain->getResponse();
     $check = domain_load_hostname($_SERVER['HTTP_HOST']);
     $match = $this->t('Exact match');
     if (!$check) {

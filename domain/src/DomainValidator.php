@@ -119,7 +119,7 @@ class DomainValidator implements DomainValidatorInterface {
     catch (RequestException $e) {
       watchdog_exception('domain', $e);
       // File a general server failure.
-      $domain->response = 500;
+      $domain->setResponse(500);
       return;
     }
     // Expected result (i.e. no exception thrown.)

@@ -293,7 +293,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * Returns the scheme for a domain record.
    */
-  public function getScheme($add_suffix = FALSE) {
+  public function getScheme($add_suffix = TRUE) {
     $scheme = $this->scheme;
     if ($scheme != 'https') {
       $scheme = 'http';

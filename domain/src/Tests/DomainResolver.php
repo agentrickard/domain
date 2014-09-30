@@ -41,7 +41,7 @@ class DomainResolver extends DomainTestBase {
 
     // Test the response of the default home page.
     foreach (domain_load_multiple() as $domain) {
-      $this->drupalGet($domain->path);
+      $this->drupalGet($domain->getPath());
       $this->assertRaw($domain->name, 'Loaded the proper domain.');
     }
 

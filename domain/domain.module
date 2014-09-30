@@ -150,7 +150,7 @@ function domain_next_id() {
  */
 function domain_hostname() {
   $creator = Drupal::service('domain.creator');
-  return $creator->createHostname($hostname);
+  return $creator->createHostname();
 }
 
 /**

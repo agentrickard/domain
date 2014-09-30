@@ -36,7 +36,7 @@ class DomainLoader implements DomainLoaderInterface {
    * @param Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed config handler.
    */
-  public function __construct(ModuleHandlerInterface $module_handler) {
+  public function __construct(ModuleHandlerInterface $module_handler, TypedConfigManagerInterface $typed_config) {
     $this->moduleHandler = $module_handler;
     $this->typedConfig = $typed_config;
   }
