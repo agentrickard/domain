@@ -46,7 +46,7 @@ class DomainLoader implements DomainLoaderInterface {
    *   An array keyed by field name and containing the name and
    *   label for the field.
    */
-  public function getSchema() {
+  public function loadSchema() {
     $fields = $this->typedConfig->getDefinition('domain.record.*');
     return isset($fields['mapping']) ? $fields['mapping'] : array();
   }
@@ -57,7 +57,7 @@ class DomainLoader implements DomainLoaderInterface {
    * @return
    *   The id of the default domain or FALSE if none is set.
    */
-  public function getDefaultId() {
+  public function loadDefaultId() {
     // manager getDefaultId.
     $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
     if (!empty($result)) {
@@ -69,7 +69,7 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * Gets the default domain object.
    */
-  public function getDefaultDomain() {
+  public function loadDefaultDomain() {
     $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
     if (!empty($result)) {
       return current($result);
@@ -106,7 +106,7 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * Returns the list of domains formatted for a form options list.
    */
-  public function optionsList() {
+  public function loadOptionsList() {
     $list = array();
     foreach ($this->loadMultipleSorted() as $id => $domain) {
       $list[$id] = $domain->name;

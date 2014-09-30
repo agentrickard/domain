@@ -17,12 +17,12 @@ interface DomainLoaderInterface {
   /**
    * Gets the default domain object.
    */
-  public function getDefaultDomain();
+  public function loadDefaultDomain();
 
   /**
    * Gets the default domain id.
    */
-  public function getDefaultId();
+  public function loadDefaultId();
 
   /**
    * Loads multiple domains.
@@ -42,7 +42,7 @@ interface DomainLoaderInterface {
   /**
    * Returns the list of domains formatted for a form options list.
    */
-  public function optionsList();
+  public function loadOptionsList();
 
   /**
    * Sorts domains by weight.
@@ -52,6 +52,6 @@ interface DomainLoaderInterface {
   /**
    * Gets the schema for domain records.
    */
-  public function getSchema();
+  public function loadSchema();
 
 }

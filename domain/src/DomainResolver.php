@@ -41,7 +41,6 @@ class DomainResolver implements DomainResolverInterface {
     $domain = domain_load_hostname($httpHost);
     // If a straight load fails, check with modules (like Domain Alias) that
     // register alternate paths with the main module.
-    dpm($domain);
     if (empty($domain)) {
       $domain = entity_create('domain', array('hostname' => $httpHost));
       // @TODO: Should this be an event instead?
@@ -62,7 +61,6 @@ class DomainResolver implements DomainResolverInterface {
   public function getActiveDomain() {
     if (is_null($this->domain)) {
       $this->setRequestDomain($this->resolveActiveHostname());
-      dpm($this->domain);
     }
     return $this->domain;
   }

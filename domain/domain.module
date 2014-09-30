@@ -29,12 +29,8 @@ function domain_entity_bundle_info() {
  *   The id of the default domain or FALSE if none is set.
  */
 function domain_default_id() {
-  // manager getDefaultId.
-  $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
-  if (!empty($result)) {
-    return key($result);
-  }
-  return FALSE;
+  $loader = Drupal::service('domain.loader');
+  return $loader->loadDefaultId();
 }
 
 /**
@@ -44,12 +40,8 @@ function domain_default_id() {
  *   The default domain or FALSE if none is set.
  */
 function domain_default() {
-  // manager getDefaultDomain
-  $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
-  if (!empty($result)) {
-    return current($result);
-  }
-  return FALSE;
+  $loader = Drupal::service('domain.loader');
+  return $loader->loadDefaultDomain();
 }
 
 /**
@@ -64,8 +56,8 @@ function domain_default() {
  *   An array of domain entities indexed by domain_id.
  */
 function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
-  // manager loadMultiple ??
-  return Domain::loadMultiple($ids, $reset);
+  $loader = Drupal::service('domain.loader');
+  return $loader->loadMultiple($ids, $reset);
 }
 
 /**
@@ -80,11 +72,8 @@ function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
  *   An array of domain entities indexed by domain_id and sorted by weight.
  */
 function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
-  // manager loadMultipleSorted ??
-  // @TODO: filter for inactive domains?
-  $domains = Domain::loadMultiple($ids, $reset);
-  uasort($domains, 'domain_list_sort');
-  return $domains;
+  $loader = Drupal::service('domain.loader');
+  return $loader->loadMultipleSorted($ids, $reset);
 }
 
 /**
@@ -100,8 +89,7 @@ function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load($id = NULL, $reset = FALSE) {
-  // entity_load ?
-  return Domain::load($id, $reset);
+  return entity_load('domain', $id, $reset);
 }
 
 /**
@@ -115,13 +103,8 @@ function domain_load($id = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load_hostname($hostname) {
-  // manager loadByHostname
-  dpm($hostname);
-  $entities = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
-  if (empty($entities)) {
-    return FALSE;
-  }
-  return current($entities);
+  $loader = Drupal::service('domain.loader');
+  return $loader->loadByHostname($hostname);
 }
 
 /**
@@ -275,20 +258,6 @@ function domain_entity_load(array $entities, $entity_type) {
  *   A list of domains, keyed by id.
  */
 function domain_options_list() {
-  // manager optionsList
-  $domains = domain_load_multiple();
-  uasort($domains, 'domain_list_sort');
-  $list = array();
-  foreach ($domains as $id => $domain) {
-    $list[$id] = $domain->name;
-  }
-  return $list;
-}
-
-/**
- * Sort filter for domain lists.
- */
-function domain_list_sort($a, $b) {
-  // manager sort
-  return $a->weight > $b->weight;
+  $loader = Drupal::service('domain.loader');
+  return $loader->loadOptionsList();
 }
