@@ -9,6 +9,9 @@ namespace Drupal\domain;
 
 use Drupal\domain\DomainInterface;
 
+/**
+ * Handles the negotation of the active domain record.
+ */
 interface DomainResolverInterface {
 
   /**

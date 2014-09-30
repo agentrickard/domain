@@ -1,7 +1,5 @@
 <?php
 
-<?php
-
 /**
  * @file
  * Definition of Drupal\domain\DomainLoaderInterface.
@@ -12,7 +10,7 @@ namespace Drupal\domain;
 use Drupal\domain\DomainInterface;
 
 /**
- * Supplies loader functions for common domain requests.
+ * Supplies loader methods for common domain requests.
  */
 interface DomainLoaderInterface {
 
