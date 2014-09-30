@@ -1,7 +1,9 @@
 services:
-  domain.access_check:
+  access_check.domain:
     class: Drupal\domain\DomainAccessCheck
-    arguments: ['@access_manager', '@current_user', '@module_handler']
+    tags:
+      - { name: access_check, applies_to: _access }
+    arguments: ['@domain.resolver', '@current_user', '@module_handler']
   domain.creator:
     class: Drupal\domain\DomainCreator
     tags:
