@@ -1,0 +1,17 @@
+Class hierarchy.
+
+DomainInterface.php
+  Defines attributes of the Domain Entity and directly
+  sets / gets properties of that entity.
+
+DomainResolverInterface.php
+  Takes an http Request and returns the proper domain
+  entity that governs the request. Called by classes that
+  wish to interact with the active domain.
+
+DomainLoaderInterface.php
+  Loads specific domains based on parameters. E.g. gets the
+  default domain object.
+
+DomainCreatorInterface.php
+  Helper class for the creation of new domains.
