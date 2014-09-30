@@ -31,7 +31,9 @@ class DomainValidate extends DomainTestBase {
     $domain = domain_load($key);
 
     // Our testing server should be able to acess the test PNG file.
-    $domain->checkResponse();
+    // @TODO: inject the service to the test?
+    $validator = \Drupal::service('domain.validator');
+    $validator->checkResponse($domain);
     $this->assertTrue($domain->response == 200, format_string('Server test for @url passed.', array('@url' => $domain->path)));
 
     // Now create a bad domain.
@@ -43,7 +45,7 @@ class DomainValidate extends DomainTestBase {
     $domain = domain_create(FALSE, $values);
 
     $domain->save();
-    $domain->checkResponse();
+    $validator->checkResponse($domain);
     $this->assertTrue($domain->response == 500, format_string('Server test for @url failed.', array('@url' => $domain->path)));
   }
 }

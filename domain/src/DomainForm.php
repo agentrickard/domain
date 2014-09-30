@@ -97,7 +97,8 @@ class DomainForm extends EntityForm {
    */
   public function validate(array $form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
-    $errors = $entity->validate();
+    $validator = \Drupal::service('domain.validator');
+    $errors = $validator->validate();
     if (!empty($errors)) {
       form_set_error('hostname', $errors);
     }

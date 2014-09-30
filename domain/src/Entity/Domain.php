@@ -11,7 +11,6 @@ use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
-use GuzzleHttp\Exception\RequestException;
 
 /**
  * Defines the domain entity.
@@ -150,15 +149,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       // @TODO: This is not reliable and creates duplicates.
       'domain_id' => $resolver->getNextId(),
     );
-  }
-
-  /**
-   * Sets the HTTP Client dependency.
-   *
-   * @TODO: Move to a proper service?
-   */
-  protected function getHttpClient() {
-    return \Drupal::httpClient();
   }
 
   /**

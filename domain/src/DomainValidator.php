@@ -10,12 +10,32 @@ namespace Drupal\domain;
 use Drupal\domain\DomainValidatorInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use GuzzleHttp\Exception\RequestException;
 
 class DomainValidator implements DomainValidatorInterface {
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * Constructs a DomainResolver object.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   */
+  public function __construct(ModuleHandlerInterface $module_handler) {
+    $this->moduleHandler = $module_handler;
+    // @TODO: Move to a proper service?
+    $this->httpClient = \Drupal::httpClient();
+  }
+
+
+  /**
    * Validates the hostname for a domain.
-   * // move to manager?
    */
   public function validate(DomainInterface $domain) {
     $hostname = $domain->hostname;
@@ -93,7 +113,7 @@ class DomainValidator implements DomainValidatorInterface {
     $url = $domain->getPath() . drupal_get_path('module', 'domain') . '/tests/200.png';
     try {
       // GuzzleHttp no longer allows for bogus URL calls.
-      $request = $domain->getHttpClient()->get($url);
+      $request = $this->httpClient->get($url);
     }
     // We cannot know which Guzzle Exception class will be returned; be generic.
     catch (RequestException $e) {

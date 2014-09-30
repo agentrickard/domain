@@ -26,25 +26,15 @@ class DomainResolver implements DomainResolverInterface {
   protected $moduleHandler;
 
   /**
-   * The typed config handler.
-   *
-   * @var Drupal\Core\Config\TypedConfigManagerInterface
-   */
-  protected $typed_config;
-
-  /**
    * Constructs a DomainResolver object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param Drupal\Core\Config\TypedConfigManagerInterface $typed_config
-   *   The typed config handler.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, TypedConfigManagerInterface $typed_config) {
+  public function __construct(ModuleHandlerInterface $module_handler) {
     $this->httpHost = NULL;
     $this->domain = NULL;
     $this->moduleHandler = $module_handler;
-    $this->typedConfig = $typed_config;
   }
 
   public function setRequestDomain($httpHost) {
