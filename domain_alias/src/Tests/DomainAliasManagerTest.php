@@ -46,8 +46,8 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
       if (!isset($alias_domain)) {
         $alias_domain = $domain;
       }
-      $this->drupalGet($domain->path);
-      $this->assertRaw($domain->name, 'Loaded the proper domain.');
+      $this->drupalGet($domain->getPath());
+      $this->assertRaw($domain->getProperty('name'), 'Loaded the proper domain.');
       $this->assertRaw('Exact match', 'Direct domain match.');
     }
 
