@@ -156,7 +156,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function isActive() {
     $resolver = \Drupal::service('domain.resolver');
-    $domain = $resolver->getActiveDommain();
+    $domain = $resolver->getActiveDomain();
     if (empty($domain)) {
       return FALSE;
     }

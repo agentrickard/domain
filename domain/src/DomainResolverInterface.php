@@ -40,33 +40,13 @@ interface DomainResolverInterface {
   public function getHttpHost();
 
   /**
-   * Creates a new domain record object.
-   */
-  public function createDomain($inherit = FALSE, array $values = array());
-
-  /**
-   * Gets the next numeric id for a domain.
-   */
-  public function getNextId();
-
-  /**
-   * Gets the hostname of the active request.
-   */
-  public function getHostname();
-
-  /**
-   * Gets the machine name of a host, used as primary key.
-   */
-  public function getMachineName($hostname);
-
-  /**
    * Gets the id of the active domain.
    */
   public function getActiveId();
 
   /**
-   * Gets the list of required fields.
+   * Gets the hostname of the active request.
    */
-  public function getRequiredFields();
+  public function resolveActiveHostname();
 
 }

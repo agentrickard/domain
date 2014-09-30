@@ -104,13 +104,6 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Gets the id of the active domain.
-   */
-  public function getActiveId() {
-    return $this->getActiveDomain()->id();
-  }
-
-  /**
    * Returns the list of domains formatted for a form options list.
    */
   public function optionsList() {
@@ -127,13 +120,5 @@ class DomainLoader implements DomainLoaderInterface {
   public function sort($a, $b) {
     return $a->weight > $b->weight;
   }
-
-  /**
-   * Gets the list of required fields.
-   */
-  public function getRequiredFields() {
-    return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
-  }
-
 
 }

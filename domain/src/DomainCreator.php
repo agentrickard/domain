@@ -45,7 +45,7 @@ class DomainCreator implements DomainCreatorInterface {
       $values['id'] = $this->createMachineName($values['hostname']);
     }
     // Fix this.
-    $domain = Domain::create($values);
+    $domain = entity_create('domain', $values);
     return $domain;
   }
 
@@ -77,5 +77,11 @@ class DomainCreator implements DomainCreatorInterface {
     return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
   }
 
+  /**
+   * Gets the list of required fields.
+   */
+  public function getRequiredFields() {
+    return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
+  }
 
 }

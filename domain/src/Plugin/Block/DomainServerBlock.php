@@ -28,13 +28,18 @@ class DomainServerBlock extends DomainBlockBase {
    */
   public function build() {
     $domain = domain_get_domain();
+    if (!$domain) {
+      return array(
+        '#markup' => $this->t('No domain record could be loaded.'),
+      );
+    }
     $header = array($this->t('Property'), $this->t('Value'));
     $rows[] = array(
       $this->t('HTTP_HOST request'),
       String::checkPlain($_SERVER['HTTP_HOST']),
     );
     // Check the response test.
-    $domain->checkResponse();
+    $domain->setResponse();
     $check = domain_load_hostname($_SERVER['HTTP_HOST']);
     $match = $this->t('Exact match');
     if (!$check) {

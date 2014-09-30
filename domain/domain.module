@@ -116,6 +116,7 @@ function domain_load($id = NULL, $reset = FALSE) {
  */
 function domain_load_hostname($hostname) {
   // manager loadByHostname
+  dpm($hostname);
   $entities = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
   if (empty($entities)) {
     return FALSE;
@@ -138,22 +139,8 @@ function domain_load_hostname($hostname) {
  *   A domain entity, with preset values for the current environment.
  */
 function domain_create($inherit = FALSE, array $values = array()) {
-  // manager createDomain
-  $default = domain_default_id();
-  $domains = domain_load_multiple();
-  $values += array(
-    'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
-    'status' => 1,
-    'weight' => count($domains) + 1,
-    'is_default' => (int) empty($default),
-  );
-  if ($inherit) {
-    $values['hostname'] = domain_hostname();
-    $values['name'] = \Drupal::config('system.site')->get('name');
-    $values['id'] = domain_machine_name($values['hostname']);
-  }
-  $domain = Domain::create($values);
-  return $domain;
+  $creator = Drupal::service('domain.creator');
+  return $creator->createDomain($values, $inherit);
 }
 
 /**
@@ -162,15 +149,8 @@ function domain_create($inherit = FALSE, array $values = array()) {
  * @TODO: Move this to Domain Access, which needs it?
  */
 function domain_next_id() {
-  // manager getNextId
-  $domains = domain_load_multiple();
-  $max = 0;
-  foreach ($domains as $domain) {
-    if ($domain->domain_id > $max) {
-      $max = $domain->domain_id;
-    }
-  }
-  return $max + 1;
+  $creator = Drupal::service('domain.creator');
+  return $creator->createNextId();
 }
 
 /**
@@ -186,8 +166,8 @@ function domain_next_id() {
  *   not set.
  */
 function domain_hostname() {
-  // manager getHostname`
-  return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+  $creator = Drupal::service('domain.creator');
+  return $creator->createHostname($hostname);
 }
 
 /**
@@ -200,8 +180,8 @@ function domain_hostname() {
  *  A string with dot and colon transformed to underscore.
  */
 function domain_machine_name($hostname) {
-  // manager getMachineName
-  return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
+  $creator = Drupal::service('domain.creator');
+  return $creator->createMachineName($hostname);
 }
 
 /**
@@ -211,26 +191,24 @@ function domain_machine_name($hostname) {
  *   An array of required field keys.
  */
 function domain_required_fields() {
-  // manager getRequiredFields
-  return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
+  $creator = Drupal::service('domain.creator');
+  return $creator->getRequiredFields();
 }
 
 /**
  * Returns the current domain record.
  */
 function domain_get_domain() {
-  // manager getActiveDomain
-  $domain = Drupal::service('domain.resolver');
-  return isset($domain->domain) ? $domain->domain : FALSE;
+  $resolver = Drupal::service('domain.resolver');
+  return $resolver->getActiveDomain();
 }
 
 /**
  * Returns the id of the current domain record.
  */
 function domain_get_active_id() {
-  // manager getActiveId
-  $domain = domain_get_domain();
-  return isset($domain->id) ? $domain->id : FALSE;
+  $resolver = Drupal::service('domain.resolver');
+  return $resolver->getActiveDomainId();
 }
 
 /**
