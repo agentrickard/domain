@@ -79,16 +79,17 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * Loads multiple domains.
    */
-  public function loadMultiple($ids = array(), $reset = FALSE) {
+  public function loadMultiple($ids = NULL, $reset = FALSE) {
     return entity_load_multiple('domain', $ids, $reset);
   }
 
   /**
    * Loads multiple domains and sorts by weight.
    */
-  public function loadMultipleSorted($ids = array()) {
+  public function loadMultipleSorted($ids = NULL) {
     $domains = $this->loadMultiple();
-    return uasort($domains, array($this, 'sort'));
+    uasort($domains, array($this, 'sort'));
+    return $domains;
   }
 
   /**

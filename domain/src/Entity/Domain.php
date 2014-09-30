@@ -314,5 +314,4 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     $this->response = $response;
   }
 
-
 }

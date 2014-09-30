@@ -27,12 +27,12 @@ interface DomainLoaderInterface {
   /**
    * Loads multiple domains.
    */
-  public function loadMultiple($ids = array(), $reset = FALSE);
+  public function loadMultiple($ids = NULL, $reset = FALSE);
 
   /**
    * Loads multiple domains and sorts by weight.
    */
-  public function loadMultipleSorted($ids = array());
+  public function loadMultipleSorted($ids = NULL);
 
   /**
    * Loads a domain record by hostname lookup.
