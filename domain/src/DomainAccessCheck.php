@@ -41,6 +41,7 @@ class DomainAccessCheck {
     $this->accessManager = $access_manager;
     $this->moduleHandler = $module_handler;
     $this->account = $account;
+    #$this->accessManager->addCheckService('domain.check', 'access', array(), TRUE);
   }
 
   public function access() {
