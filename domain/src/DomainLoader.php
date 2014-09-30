@@ -29,7 +29,7 @@ class DomainLoader implements DomainLoaderInterface {
   protected $typed_config;
 
   /**
-   * Constructs a DomainResolver object.
+   * Constructs a DomainLoader object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
@@ -101,39 +101,6 @@ class DomainLoader implements DomainLoaderInterface {
       return FALSE;
     }
     return current($entities);
-  }
-
-  /**
-   * Creates a new domain record object.
-   */
-  public function createDomain($inherit = FALSE, array $values = array()) { }
-
-  /**
-   * Gets the next numeric id for a domain.
-   */
-  public function getNextId() {
-    $domains = $this->loadMultiple();
-    $max = 0;
-    foreach ($domains as $domain) {
-      if ($domain->domain_id > $max) {
-        $max = $domain->domain_id;
-      }
-    }
-    return $max + 1;
-  }
-
-  /**
-   * Gets the hostname of the active request.
-   */
-  public function getHostname() {
-    return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
-  }
-
-  /**
-   * Gets the machine name of a host, used as primary key.
-   */
-  public function getMachineName($hostname) {
-    return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
   }
 
   /**

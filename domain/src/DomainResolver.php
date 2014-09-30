@@ -10,7 +10,6 @@ namespace Drupal\domain;
 use Drupal\domain\DomainResolverInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Config\TypedConfigManagerInterface;
 
 class DomainResolver implements DomainResolverInterface {
 

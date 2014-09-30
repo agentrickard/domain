@@ -1,4 +1,9 @@
 services:
+  domain.creator:
+    class: Drupal\domain\DomainCreator
+    tags:
+      - { name: persist }
+    arguments: ['@domain.loader']
   domain.loader:
     class: Drupal\domain\DomainLoader
     tags:
