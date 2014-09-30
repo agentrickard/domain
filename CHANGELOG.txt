@@ -67,6 +67,10 @@ DomainCreatorInterface.php
   public function getRequiredFields();
 
 
+DomainValidatorInterface.php
+
+  public function validate();
+  public function checkResponse();
 
 Negotiation Operations
 

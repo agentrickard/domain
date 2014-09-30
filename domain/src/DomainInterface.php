@@ -15,16 +15,6 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface DomainInterface extends ConfigEntityInterface {
 
   /**
-   * Validates the hostname for a domain.
-   */
-  public function validate();
-
-  /**
-   * Tests that a domain responds correctly.
-   */
-  public function checkResponse();
-
-  /**
    * Detects if the current domain is the active domain.
    */
   public function isActive();
