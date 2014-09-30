@@ -80,4 +80,10 @@ interface DomainInterface extends ConfigEntityInterface {
    */
   public function getUrl();
 
+  /**
+   * Returns the scheme for a domain record.
+   */
+  public function getScheme();
+
+
 }

@@ -29,6 +29,7 @@ function domain_entity_bundle_info() {
  *   The id of the default domain or FALSE if none is set.
  */
 function domain_default_id() {
+  // manager getDefaultId.
   $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
   if (!empty($result)) {
     return key($result);
@@ -43,6 +44,7 @@ function domain_default_id() {
  *   The default domain or FALSE if none is set.
  */
 function domain_default() {
+  // manager getDefaultDomain
   $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
   if (!empty($result)) {
     return current($result);
@@ -62,6 +64,7 @@ function domain_default() {
  *   An array of domain entities indexed by domain_id.
  */
 function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
+  // manager loadMultiple ??
   return Domain::loadMultiple($ids, $reset);
 }
 
@@ -77,6 +80,7 @@ function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
  *   An array of domain entities indexed by domain_id and sorted by weight.
  */
 function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
+  // manager loadMultipleSorted ??
   // @TODO: filter for inactive domains?
   $domains = Domain::loadMultiple($ids, $reset);
   uasort($domains, 'domain_list_sort');
@@ -96,6 +100,7 @@ function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load($id = NULL, $reset = FALSE) {
+  // entity_load ?
   return Domain::load($id, $reset);
 }
 
@@ -110,6 +115,7 @@ function domain_load($id = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load_hostname($hostname) {
+  // manager loadByHostname
   $entities = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
   if (empty($entities)) {
     return FALSE;
@@ -132,6 +138,7 @@ function domain_load_hostname($hostname) {
  *   A domain entity, with preset values for the current environment.
  */
 function domain_create($inherit = FALSE, array $values = array()) {
+  // manager createDomain
   $default = domain_default_id();
   $domains = domain_load_multiple();
   $values += array(
@@ -155,6 +162,7 @@ function domain_create($inherit = FALSE, array $values = array()) {
  * @TODO: Move this to Domain Access, which needs it?
  */
 function domain_next_id() {
+  // manager getNextId
   $domains = domain_load_multiple();
   $max = 0;
   foreach ($domains as $domain) {
@@ -178,6 +186,7 @@ function domain_next_id() {
  *   not set.
  */
 function domain_hostname() {
+  // manager getHostname`
   return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
 }
 
@@ -191,6 +200,7 @@ function domain_hostname() {
  *  A string with dot and colon transformed to underscore.
  */
 function domain_machine_name($hostname) {
+  // manager getMachineName
   return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
 }
 
@@ -201,6 +211,7 @@ function domain_machine_name($hostname) {
  *   An array of required field keys.
  */
 function domain_required_fields() {
+  // manager getRequiredFields
   return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
 }
 
@@ -208,6 +219,7 @@ function domain_required_fields() {
  * Returns the current domain record.
  */
 function domain_get_domain() {
+  // manager getActiveDomain
   $domain = Drupal::service('domain.manager');
   return isset($domain->domain) ? $domain->domain : FALSE;
 }
@@ -216,12 +228,13 @@ function domain_get_domain() {
  * Returns the id of the current domain record.
  */
 function domain_get_active_id() {
+  // manager getActiveId
   $domain = domain_get_domain();
   return isset($domain->id) ? $domain->id : FALSE;
 }
 
 /**
- * Generates an array for rendering the given node.
+ * Generates an array for rendering the given domain.
  *
  * @param Drupal\domain\DomainInterface $domain
  *   A domain entity.
@@ -276,47 +289,6 @@ function domain_entity_load(array $entities, $entity_type) {
 }
 
 /**
- * Ensure that the scheme value has not been hacked.
- *
- * Note that Domain Access only supports HTTP and HTTPS. Other protocols will
- * be removed.
- *
- * @param $scheme
- *   The request protocol for the requested domain.
- * @param $add_suffix
- *   Boolean indicator to add the :// string or not.
- *
- * @return
- *  Either 'http' or 'https'.
- */
-function domain_check_scheme($scheme, $add_suffix = FALSE) {
-  if ($scheme != 'https') {
-    $scheme = 'http';
-  }
-  $scheme .= ($add_suffix) ? '://' : '';
-
-  return $scheme;
-}
-
-/**
- * Returns the proper scheme value for a domain, including the ://.
- *
- * Note that this function is largely a wrapper so that the signature of
- * domain_check_scheme() doesn't change from Drupal 7.
- *
- * @see domain_check_scheme().
- *
- * @param $scheme
- *   The request protocol for the requested domain.
- *
- * @return
- *   Either http:// or https://.
- */
-function domain_scheme($scheme) {
-  return domain_check_scheme($scheme, TRUE);
-}
-
-/**
  * Returns a list of all domains, suitable for use in a form.
  *
  * @TODO: Access control.
@@ -325,6 +297,7 @@ function domain_scheme($scheme) {
  *   A list of domains, keyed by id.
  */
 function domain_options_list() {
+  // manager optionsList
   $domains = domain_load_multiple();
   uasort($domains, 'domain_list_sort');
   $list = array();
@@ -338,5 +311,6 @@ function domain_options_list() {
  * Sort filter for domain lists.
  */
 function domain_list_sort($a, $b) {
+  // manager sort
   return $a->weight > $b->weight;
 }

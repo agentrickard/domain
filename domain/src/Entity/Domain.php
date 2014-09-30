@@ -138,8 +138,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $default = domain_default_id();
-    $domains = domain_load_multiple();
+    $manager = \Drupal::service('domain.manager');
+    $default = $manager->getDefaultId();
+    $domains = $manager->loadMultiple();
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
       'status' => 1,
@@ -147,12 +148,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       'is_default' => (int) empty($default),
       // {node_access} still requires a numeric id.
       // @TODO: This is not reliable and creates duplicates.
-      'domain_id' => domain_next_id(),
+      'domain_id' => $manager->getNextId(),
     );
   }
 
   /**
    * Validates the hostname for a domain.
+   * // move to manager?
    */
   public function validate() {
     $hostname = $this->hostname;
@@ -256,9 +258,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * Detects if the current domain is the active domain.
    */
   public function isActive() {
-    $domain = domain_get_domain();
+    $manager = \Drupal::service('domain.manager');
+    $domain = $manager->getActiveDommain();
     if (empty($domain)) {
-      // @TODO: set the default domain in the manager?
       return FALSE;
     }
     return ($this->id() == $domain->id());
@@ -336,14 +338,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * Sets the base path to this domain.
    */
   public function setPath() {
-    $this->path = domain_scheme($this->scheme) . $this->hostname . base_path();
+    $this->path = $this->getScheme() . $this->hostname . base_path();
   }
 
   /**
    * Sets the domain-specific link to the current URL.
    */
   public function setUrl() {
-    $this->url = domain_scheme($this->scheme) . $this->hostname . request_uri();
+    $this->url = $this->getScheme() . $this->hostname . request_uri();
   }
 
   /**
@@ -371,7 +373,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
-    $default = domain_default();
+    $manager = \Drupal::service('domain.manager');
+    $default = $manager->getDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
     }
@@ -380,6 +383,19 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $default->is_default = 0;
       $default->save();
     }
+  }
+
+  /**
+   * Returns the scheme for a domain record.
+   */
+  public function getScheme() {
+    $scheme = $domain->scheme;
+    if ($scheme != 'https') {
+      $scheme = 'http';
+    }
+    $scheme .= ($add_suffix) ? '://' : '';
+
+    return $scheme;
   }
 
 }
