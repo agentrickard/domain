@@ -1,11 +1,11 @@
 services:
-  domain.manager:
-    class: Drupal\domain\DomainManager
+  domain.resolver:
+    class: Drupal\domain\DomainResolver
     tags:
       - { name: persist }
     arguments: ['@module_handler', '@config.typed']
   domain.path_processor:
     class: Drupal\domain\HttpKernel\DomainPathProcessor
-    arguments: ['@domain.manager', '@module_handler']
+    arguments: ['@domain.resolver', '@module_handler']
     tags:
       - { name: path_processor_outbound, priority: 200 }

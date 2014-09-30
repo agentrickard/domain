@@ -138,9 +138,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $manager = \Drupal::service('domain.manager');
-    $default = $manager->getDefaultId();
-    $domains = $manager->loadMultiple();
+    $resolver = \Drupal::service('domain.resolver');
+    $default = $resolver->getDefaultId();
+    $domains = $resolver->loadMultiple();
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
       'status' => 1,
@@ -148,7 +148,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       'is_default' => (int) empty($default),
       // {node_access} still requires a numeric id.
       // @TODO: This is not reliable and creates duplicates.
-      'domain_id' => $manager->getNextId(),
+      'domain_id' => $resolver->getNextId(),
     );
   }
 
@@ -258,8 +258,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * Detects if the current domain is the active domain.
    */
   public function isActive() {
-    $manager = \Drupal::service('domain.manager');
-    $domain = $manager->getActiveDommain();
+    $resolver = \Drupal::service('domain.resolver');
+    $domain = $resolver->getActiveDommain();
     if (empty($domain)) {
       return FALSE;
     }
@@ -373,8 +373,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
-    $manager = \Drupal::service('domain.manager');
-    $default = $manager->getDefaultDomain();
+    $resolver = \Drupal::service('domain.resolver');
+    $default = $resolver->getDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
     }

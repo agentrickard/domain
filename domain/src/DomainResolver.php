@@ -2,17 +2,17 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainManager.
+ * Definition of Drupal\domain\DomainResolver.
  */
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainManagerInterface;
+use Drupal\domain\DomainResolverInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 
-class DomainManager implements DomainManagerInterface {
+class DomainResolver implements DomainResolverInterface {
 
   public $httpHost;
 
@@ -33,7 +33,7 @@ class DomainManager implements DomainManagerInterface {
   protected $typed_config;
 
   /**
-   * Constructs a DomainManager object.
+   * Constructs a DomainResolver object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.

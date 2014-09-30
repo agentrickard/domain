@@ -7,7 +7,7 @@
 
 namespace Drupal\domain\EventSubscriber;
 
-use Drupal\domain\DomainManagerInterface;
+use Drupal\domain\DomainResolverInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -20,17 +20,17 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class DomainSubscriber implements EventSubscriberInterface {
 
   /**
-   * @var \Drupal\domain\DomainManagerInterface
+   * @var \Drupal\domain\DomainResolverInterface
    */
   protected $domainManager;
 
   /**
    * Constructs a DomainSubscriber object.
    *
-   * @param \Drupal\domain\DomainManagerInterface $domain_manager
+   * @param \Drupal\domain\DomainResolverInterface $domain_manager
    *   The domain manager service.
    */
-  public function __construct(DomainManagerInterface $domain_manager) {
+  public function __construct(DomainResolverInterface $domain_manager) {
     $this->domainManager = $domain_manager;
   }
 

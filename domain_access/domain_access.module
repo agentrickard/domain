@@ -5,7 +5,7 @@
  * Domain-based access control for content.
  */
 
-use Drupal\domain\DomainManager;
+use Drupal\domain\DomainResolver;
 use Drupal\domain\DomainInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\Entity\NodeType;

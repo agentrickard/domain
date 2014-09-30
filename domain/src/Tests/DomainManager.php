@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainManager
+ * Definition of Drupal\domain\Tests\DomainResolver
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainManager extends DomainTestBase {
+class DomainResolver extends DomainTestBase {
 
   /**
    * Modules to enable.
@@ -25,7 +25,7 @@ class DomainManager extends DomainTestBase {
   /**
    * Tests the handling of an inbound request.
    */
-  function testDomainManager() {
+  function testDomainResolver() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 

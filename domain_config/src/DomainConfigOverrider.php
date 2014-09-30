@@ -10,7 +10,7 @@ namespace Drupal\domain_config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
-use Drupal\domain\DomainManagerInterface;
+use Drupal\domain\DomainResolverInterface;
 use Drupal\domain\DomainInterface;
 
 /**
@@ -20,7 +20,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * The domain manager.
    *
-   * @var \Drupal\domain\DomainManagerInterface
+   * @var \Drupal\domain\DomainResolverInterface
    */
   protected $domainManager;
 
@@ -41,14 +41,14 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * Constructs a DomainConfigSubscriber object.
    *
-   * @param \Drupal\domain\DomainManagerInterface $domain_manager
+   * @param \Drupal\domain\DomainResolverInterface $domain_manager
    *   The domain manager service.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The configuration storage service.
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The configuration storage engine.
    */
-  public function __construct(DomainManagerInterface $domain_manager, ConfigFactory $config_factory, StorageInterface $storage) {
+  public function __construct(DomainResolverInterface $domain_manager, ConfigFactory $config_factory, StorageInterface $storage) {
     $this->domainManager = $domain_manager;
     $this->configFactory = $config_factory;
     $this->storage = $storage;

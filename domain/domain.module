@@ -220,7 +220,7 @@ function domain_required_fields() {
  */
 function domain_get_domain() {
   // manager getActiveDomain
-  $domain = Drupal::service('domain.manager');
+  $domain = Drupal::service('domain.resolver');
   return isset($domain->domain) ? $domain->domain : FALSE;
 }
 

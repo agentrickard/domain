@@ -8,7 +8,7 @@
 namespace Drupal\domain\HttpKernel;
 
 use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainManagerInterface;
+use Drupal\domain\DomainResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 class DomainPathProcessor implements OutboundPathProcessorInterface {
 
   /**
-   * @var \Drupal\domain\DomainManagerInterface
+   * @var \Drupal\domain\DomainResolverInterface
    */
   protected $domainManager;
 
@@ -34,12 +34,12 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   /**
    * Constructs a DomainPathProcessor object.
    *
-   * @param \Drupal\domain\DomainManagerInterface $domain_manager
+   * @param \Drupal\domain\DomainResolverInterface $domain_manager
    *   The domain manager service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
-  public function __construct(DomainManagerInterface $domain_manager, ModuleHandlerInterface $module_handler) {
+  public function __construct(DomainResolverInterface $domain_manager, ModuleHandlerInterface $module_handler) {
     $this->domainManager = $domain_manager;
     $this->moduleHandler = $module_handler;
   }

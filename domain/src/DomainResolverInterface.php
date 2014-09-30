@@ -2,14 +2,14 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainManagerInterface.
+ * Definition of Drupal\domain\DomainResolverInterface.
  */
 
 namespace Drupal\domain;
 
 use Drupal\domain\DomainInterface;
 
-interface DomainManagerInterface {
+interface DomainResolverInterface {
 
   /**
    * Determines the active domain request.
