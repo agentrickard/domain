@@ -1,9 +1,14 @@
 services:
+  domain.loader:
+    class: Drupal\domain\DomainLoader
+    tags:
+      - { name: persist }
+    arguments: ['@module_handler', '@config.typed']
   domain.resolver:
     class: Drupal\domain\DomainResolver
     tags:
       - { name: persist }
-    arguments: ['@module_handler', '@config.typed']
+    arguments: ['@module_handler']
   domain.path_processor:
     class: Drupal\domain\HttpKernel\DomainPathProcessor
     arguments: ['@domain.resolver', '@module_handler']
