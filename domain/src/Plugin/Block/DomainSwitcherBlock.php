@@ -31,7 +31,7 @@ class DomainSwitcherBlock extends DomainBlockBase {
     $active_domain = domain_get_domain();
     $items = array();
     foreach (domain_load_multiple() as $domain) {
-      $string = l($domain->name, $domain->url, array('external' => TRUE));
+      $string = l($domain->name, $domain->getProperty('url'), array('external' => TRUE));
       if (!$domain->status) {
         $string .= '*';
       }

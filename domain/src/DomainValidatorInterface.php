@@ -24,4 +24,5 @@ interface DomainValidatorInterface {
    */
   public function checkResponse(DomainInterface $domain);
 
+  public function getRequiredFields();
 }

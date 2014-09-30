@@ -104,13 +104,13 @@ class DomainListBuilder extends DraggableListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $this->getLabel($entity);
-    $row['hostname'] = array('#markup' => l($entity->hostname, $entity->url));
+    $row['hostname'] = array('#markup' => l($entity->getProperty('hostname'), $entity->getProperty('url')));
     if ($entity->isActive()) {
       $row['hostname']['#prefix'] = '<strong>';
       $row['hostname']['#suffix'] = '</strong>';
     }
     $row['status'] = array('#markup' => $entity->isEnabled() ? $this->t('Active') : $this->t('Inactive'));
-    $row['is_default'] = array('#markup' => ($entity->is_default ? $this->t('Yes') : $this->t('No')));
+    $row['is_default'] = array('#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No')));
     $row += parent::buildRow($entity);
     $row['weight']['#delta'] = count(domain_load_multiple()) + 1;
     return $row;

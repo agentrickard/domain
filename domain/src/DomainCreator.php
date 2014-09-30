@@ -77,11 +77,4 @@ class DomainCreator implements DomainCreatorInterface {
     return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
   }
 
-  /**
-   * Gets the list of required fields.
-   */
-  public function getRequiredFields() {
-    return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
-  }
-
 }

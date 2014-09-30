@@ -46,8 +46,8 @@ class DomainSubscriber implements EventSubscriberInterface {
     $this->domainResolver->setRequestDomain($httpHost);
     $domain = $this->domainResolver->getActiveDomain();
     // Pass a redirect if necessary.
-    if (!empty($domain->url) && !empty($domain->redirect)) {
-      $response = new RedirectResponse($domain->url, $domain->redirect);
+    if (!empty($domain->getProperty('url')) && !empty($domain->redirect)) {
+      $response = new RedirectResponse($domain->getProperty('url'), $domain->redirect);
       $event->setResponse($response);
     }
   }

@@ -73,7 +73,7 @@ interface DomainInterface extends ConfigEntityInterface {
   /**
    * Returns the scheme for a domain record.
    */
-  public function getScheme();
+  public function getScheme($add_suffix = FALSE);
 
   /**
    * Retrieves the value of the response test.
@@ -85,5 +85,12 @@ interface DomainInterface extends ConfigEntityInterface {
    */
   public function setResponse($response);
 
+  /**
+   * Gets a property from the domain record.
+   *
+   * @param $name
+   *  The name of the property to retrieve.
+   */
+  public function getProperty($name);
 
 }

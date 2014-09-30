@@ -126,5 +126,11 @@ class DomainValidator implements DomainValidatorInterface {
     $domain->setResponse($request->getStatusCode());
   }
 
+  /**
+   * Gets the list of required fields.
+   */
+  public function getRequiredFields() {
+    return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
+  }
 
 }

@@ -18,6 +18,5 @@ interface DomainCreatorInterface {
   public function createNextId();
   public function createHostname();
   public function createMachineName($hostname);
-  public function getRequiredFields();
 
 }

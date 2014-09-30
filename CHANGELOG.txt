@@ -19,7 +19,7 @@ DomainInterface.php
   public function setUrl();
   public function getPath();
   public function getUrl();
-  public function getScheme();
+  public function getProperty();
   public function getResponse();
   public function setResponse();
 

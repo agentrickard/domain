@@ -30,14 +30,14 @@ class DomainForm extends EntityForm {
     }
     $form['domain_id'] = array(
       '#type' => 'value',
-      '#value' => $domain->domain_id,
+      '#value' => $domain->id(),
     );
     $form['hostname'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Hostname'),
       '#size' => 40,
       '#maxlength' => 80,
-      '#default_value' => $domain->hostname,
+      '#default_value' => $domain->getProperty('hostname'),
       '#description' => $this->t('The canonical hostname, using the full <em>path.example.com</em> format.') . '<br />' . $this->t('Leave off the http:// and the trailing slash and do not include any paths.'),
     );
     $form['id'] = array(
@@ -53,34 +53,34 @@ class DomainForm extends EntityForm {
       '#title' => $this->t('Name'),
       '#size' => 40,
       '#maxlength' => 80,
-      '#default_value' => $domain->name,
+      '#default_value' => $domain->getProperty('name'),
       '#description' => $this->t('The human-readable name of this domain.')
     );
     $form['scheme'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Domain URL scheme'),
       '#options' => array('http' => 'http://', 'https' => 'https://'),
-      '#default_value' => $domain->scheme,
+      '#default_value' => $domain->getProperty('scheme'),
       '#description' => $this->t('The URL scheme for accessing this domain.')
     );
     $form['status'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Domain status'),
       '#options' => array(1 => $this->t('Active'), 0 => $this->t('Inactive')),
-      '#default_value' => (int) $domain->status,
+      '#default_value' => (int) $domain->getProperty('status'),
       '#description' => $this->t('Must be set to "Active" for users to navigate to this domain.')
     );
     $form['weight'] = array(
       '#type' => 'weight',
       '#title' => $this->t('Weight'),
       '#delta' => count(domain_load_multiple()) + 1,
-      '#default_value' => $domain->weight,
+      '#default_value' => $domain->getProperty('weight'),
       '#description' => $this->t('The sort order for this record. Lower values display first.'),
     );
     $form['is_default'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Default domain'),
-      '#default_value' => $domain->is_default,
+      '#default_value' => $domain->isDefault(),
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used.'),
     );
     $required = domain_required_fields();
@@ -98,7 +98,7 @@ class DomainForm extends EntityForm {
   public function validate(array $form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
     $validator = \Drupal::service('domain.validator');
-    $errors = $validator->validate();
+    $errors = $validator->validate($entity);
     if (!empty($errors)) {
       form_set_error('hostname', $errors);
     }

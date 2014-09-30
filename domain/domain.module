@@ -174,8 +174,8 @@ function domain_machine_name($hostname) {
  *   An array of required field keys.
  */
 function domain_required_fields() {
-  $creator = Drupal::service('domain.creator');
-  return $creator->getRequiredFields();
+  $validator = Drupal::service('domain.validator');
+  return $validator->getRequiredFields();
 }
 
 /**

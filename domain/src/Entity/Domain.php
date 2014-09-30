@@ -116,14 +116,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    *
    * @var string
    */
-  public $path;
+  private $path;
 
   /**
    * The domain record current url, a calculated value.
    *
    * @var string
    */
-  public $url;
+  private $url;
 
   /**
    * The domain record http response test (e.g. 200), a calculated value.
@@ -161,6 +161,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       return FALSE;
     }
     return ($this->id() == $domain->id());
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getProperty($name) {
+    return $this->{$name};
   }
 
   /**
@@ -270,8 +277,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
-    $resolver = \Drupal::service('domain.resolver');
-    $default = $resolver->getDefaultDomain();
+    $loader = \Drupal::service('domain.loader');
+    $default = $loader->loadDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
     }
@@ -285,8 +292,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * Returns the scheme for a domain record.
    */
-  public function getScheme() {
-    $scheme = $domain->scheme;
+  public function getScheme($add_suffix = FALSE) {
+    $scheme = $this->scheme;
     if ($scheme != 'https') {
       $scheme = 'http';
     }
