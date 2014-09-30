@@ -58,7 +58,6 @@ class DomainLoader implements DomainLoaderInterface {
    *   The id of the default domain or FALSE if none is set.
    */
   public function loadDefaultId() {
-    // manager getDefaultId.
     $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
     if (!empty($result)) {
       return key($result);

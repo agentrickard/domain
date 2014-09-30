@@ -183,7 +183,7 @@ function domain_required_fields() {
  */
 function domain_get_domain() {
   $resolver = Drupal::service('domain.resolver');
-  return $resolver->getActiveDomain();
+  return $resolver->resolveActiveDomain();
 }
 
 /**
@@ -191,7 +191,7 @@ function domain_get_domain() {
  */
 function domain_get_active_id() {
   $resolver = Drupal::service('domain.resolver');
-  return $resolver->getActiveDomainId();
+  return $resolver->resolveActiveDomainId();
 }
 
 /**

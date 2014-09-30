@@ -27,7 +27,7 @@ interface DomainResolverInterface {
   /**
    * Gets the active domain.
    */
-  public function getActiveDomain();
+  public function resolveActiveDomain();
 
   /**
    * Stores the inbound httpHost request.

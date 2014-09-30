@@ -30,8 +30,8 @@ class DomainCreator implements DomainCreatorInterface {
    * @param bool $inherit
    *   Indicates that values should be calculated from the current domain.
    */
-  public function createDomain(array $values, $inherit = FALSE) {
-    $default = $this->loader->getDefaultId();
+  public function createDomain(array $values = array(), $inherit = FALSE) {
+    $default = $this->loader->loadDefaultId();
     $domains = $this->loader->loadMultiple();
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',

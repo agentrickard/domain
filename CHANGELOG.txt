@@ -45,7 +45,7 @@ DomainLoaderInterface.php
   change get to load
 
   public function getDefaultDomain();
-  public function getDefaultId();
+  public function loadDefaultId();
   public function loadMultiple($ids = array(), $reset = FALSE);
   public function loadMultipleSorted($ids = array());
   public function loadByHostname($hostname);

@@ -137,9 +137,10 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $resolver = \Drupal::service('domain.resolver');
-    $default = $resolver->getDefaultId();
-    $domains = $resolver->loadMultiple();
+    $loader = \Drupal::service('domain.loader');
+    $creator = \Drupal::service('domain.creator');
+    $default = $loader->loadDefaultId();
+    $domains = $loader->loadMultiple();
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
       'status' => 1,
@@ -147,7 +148,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       'is_default' => (int) empty($default),
       // {node_access} still requires a numeric id.
       // @TODO: This is not reliable and creates duplicates.
-      'domain_id' => $resolver->getNextId(),
+      'domain_id' => $creator->createNextId(),
     );
   }
 
@@ -156,7 +157,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function isActive() {
     $resolver = \Drupal::service('domain.resolver');
-    $domain = $resolver->getActiveDomain();
+    $domain = $resolver->resolveActiveDomain();
     if (empty($domain)) {
       return FALSE;
     }

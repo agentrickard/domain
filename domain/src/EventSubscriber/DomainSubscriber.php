@@ -44,7 +44,7 @@ class DomainSubscriber implements EventSubscriberInterface {
     // TODO: Pass $url string or the entire Request?
     $httpHost = $request->getHttpHost();
     $this->domainResolver->setRequestDomain($httpHost);
-    $domain = $this->domainResolver->getActiveDomain();
+    $domain = $this->domainResolver->loadActiveDomain();
     // Pass a redirect if necessary.
     if (!empty($domain->getProperty('url')) && !empty($domain->redirect)) {
       $response = new RedirectResponse($domain->getProperty('url'), $domain->redirect);

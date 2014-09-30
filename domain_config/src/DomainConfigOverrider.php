@@ -60,7 +60,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $overrides = array();
     // @TODO: language handling?
     // @TODO: caching?
-    if ($domain = $this->domainResolver->getActiveDomain()) {
+    if ($domain = $this->domainResolver->loadActiveDomain()) {
       foreach ($names as $name) {
         $config_name = $this->getDomainConfigName($name, $domain);
         // Check to see if the config storage has an appropriately named file

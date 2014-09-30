@@ -58,7 +58,7 @@ class DomainResolver implements DomainResolverInterface {
     $this->domain = $domain;
   }
 
-  public function getActiveDomain() {
+  public function resolveActiveDomain() {
     if (is_null($this->domain)) {
       $this->setRequestDomain($this->resolveActiveHostname());
     }
@@ -69,7 +69,7 @@ class DomainResolver implements DomainResolverInterface {
    * Gets the id of the active domain.
    */
   public function getActiveId() {
-    return $this->getActiveDomain()->id();
+    return $this->loadActiveDomain()->id();
   }
 
   /**
