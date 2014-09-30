@@ -4,14 +4,67 @@ DomainInterface.php
   Defines attributes of the Domain Entity and directly
   sets / gets properties of that entity.
 
+  add getProperty($name) to replace the three getters
+  make the properties private?
+  change saveAttribute to saveProperty
+
+
+  public function isActive();
+  public function isDefault();
+  public function saveDefault();
+  public function enable();
+  public function disable();
+  public function saveAttribute($key, $value);
+  public function setPath();
+  public function setUrl();
+  public function getPath();
+  public function getUrl();
+  public function getScheme();
+
+
 DomainResolverInterface.php
   Takes an http Request and returns the proper domain
   entity that governs the request. Called by classes that
   wish to interact with the active domain.
 
+  clean up get/set names
+
+  public function setRequestDomain($httpHost);
+  public function setActiveDomain(DomainInterface $domain);
+  public function setHttpHost($httpHost);
+  public function getHttpHost();
+  public function getActiveDomain();
+  public function getActiveId();
+
+
 DomainLoaderInterface.php
   Loads specific domains based on parameters. E.g. gets the
   default domain object.
 
+  change get to load
+
+  public function getDefaultDomain();
+  public function getDefaultId();
+  public function loadMultiple($ids = array(), $reset = FALSE);
+  public function loadMultipleSorted($ids = array());
+  public function loadByHostname($hostname);
+  public function optionsList();
+  public function sort($a, $b);
+  public function getSchema();
+  public function validate();
+  public function checkResponse();
+
+
 DomainCreatorInterface.php
   Helper class for the creation of new domains.
+
+  change get to create or list
+
+  public function createDomain($inherit = FALSE, array $values = array());
+  public function getNextId();
+  public function getHostname();
+  public function getMachineName($hostname);
+  public function getRequiredFields();
+
+
+
