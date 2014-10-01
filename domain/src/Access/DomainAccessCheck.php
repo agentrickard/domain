@@ -2,20 +2,20 @@
 
 /**
  * @file
- * Defines \Drupal\domain\src\DomainAccessCheck.
+ * Defines \Drupal\domain\Access\DomainAccessCheck.
  */
 
-namespace Drupal\domain;
+namespace Drupal\domain\Access;
 
-use Drupal\Core\Routing\Access\AccessInterface;
+use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\Routing\Route;
 
-class DomainAccessCheck implements AccessInterface {
+class DomainAccessCheck implements AccessCheckInterface {
 
   /**
    * The current user.
@@ -45,7 +45,8 @@ class DomainAccessCheck implements AccessInterface {
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
+  public function applies(Route $route) {
+    // @TODO: Can we filter this at all?
     return TRUE;
   }
 
@@ -63,7 +64,9 @@ class DomainAccessCheck implements AccessInterface {
     }
     // @todo: how to issue a redirect from here.
     else {
-      return AccessResult::allowedIfHasPermissions($this->account, array('administer domains', 'access inactive domains'), 'OR');
+      $permissions = array('administer domains', 'access inactive domains');
+      $operator = 'OR';
+      return AccessResult::allowedIfHasPermissions($this->account, $permissions, $operator);
     }
   }
 
