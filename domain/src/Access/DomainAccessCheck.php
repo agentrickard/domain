@@ -13,6 +13,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 class DomainAccessCheck implements AccessCheckInterface {
@@ -47,17 +48,22 @@ class DomainAccessCheck implements AccessCheckInterface {
    */
   public function applies(Route $route) {
     // @TODO: Can we filter this at all?
+    $path = $route->getPath();
+    $list = explode($path, '/');
+    if (current($list) == 'user') {
+      return FALSE;
+    }
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function access(Route $route) {
+  public function access(AccountInterface $account) {
     $domain = $this->domainResolver->resolveActiveDomain();
     // Is the domain allowed?
-    if (!$domain) {
-      return AccessResult::neutral();
+    if (empty($domain)) {
+      return AccessResult::allowed();
     }
     if ($domain->isEnabled()) {
       return AccessResult::allowed();
