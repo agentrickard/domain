@@ -9,6 +9,7 @@ namespace Drupal\domain;
 
 use Drupal\domain\DomainResolverInterface;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainLoaderInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -17,6 +18,8 @@ class DomainResolver implements DomainResolverInterface {
   public $httpHost;
 
   public $domain;
+
+  public $domainLoader;
 
   /**
    * The request stack object.
@@ -41,16 +44,17 @@ class DomainResolver implements DomainResolverInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler) {
+  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainLoaderInterface $loader) {
     $this->httpHost = NULL;
     $this->requestStack = $requestStack;
     $this->domain = NULL;
     $this->moduleHandler = $module_handler;
+    $this->domainLoader = $loader;
   }
 
   public function setRequestDomain($httpHost) {
     $this->setHttpHost($httpHost);
-    $domain = domain_load_hostname($httpHost);
+    $domain = $this->domainLoader->loadByHostname($httpHost);
     // If a straight load fails, check with modules (like Domain Alias) that
     // register alternate paths with the main module.
     if (empty($domain)) {
@@ -88,8 +92,12 @@ class DomainResolver implements DomainResolverInterface {
    * Gets the hostname of the active request.
    */
   public function resolveActiveHostname() {
-    $request = $this->requestStack->getCurrentRequest();
-    $httpHost = $request->getHttpHost();
+    if ($request = $this->requestStack->getCurrentRequest()) {
+      $httpHost = $request->getHttpHost();
+    }
+    else {
+      $httpHost = $_SERVER['HTTP_HOST'];
+    }
     return !empty($httpHost) ? $httpHost : 'localhost';
   }
 

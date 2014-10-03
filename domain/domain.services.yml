@@ -18,7 +18,7 @@ services:
     class: Drupal\domain\DomainResolver
     tags:
       - { name: persist }
-    arguments: ['@request_stack', '@module_handler']
+    arguments: ['@request_stack', '@module_handler', '@domain.loader']
   domain.path_processor:
     class: Drupal\domain\HttpKernel\DomainPathProcessor
     arguments: ['@domain.resolver', '@module_handler']
