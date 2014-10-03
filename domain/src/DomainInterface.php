@@ -100,7 +100,10 @@ interface DomainInterface extends ConfigEntityInterface {
 
   /**
    * Returns a URL object for a domain.
+   *
+   * @param $path
+   *   An internal Drupal path to append to the final URL.
    */
-  public function getLink();
+  public function getLink($path = NULL);
 
 }
