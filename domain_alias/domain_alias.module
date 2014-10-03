@@ -75,7 +75,7 @@ function domain_alias_domain_request_alter(&$info) {
     if ($domain = domain_load($alias->domain_id)) {
       $domain->alias = $alias->pattern;
       if (!empty($alias->redirect)) {
-        $domain->redirect = $alias->redirect;
+        $domain->setRedirect($alias->redirect);
       }
       $info['domain'] = $domain;
     }

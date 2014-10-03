@@ -8,6 +8,9 @@
 namespace Drupal\domain\EventSubscriber;
 
 use Drupal\domain\DomainResolverInterface;
+use Drupal\Core\Access\AccessCheckInterface;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -24,14 +27,24 @@ class DomainSubscriber implements EventSubscriberInterface {
    */
   protected $domainResolver;
 
+  protected $accessCheck;
+
+  protected $account;
+
   /**
    * Constructs a DomainSubscriber object.
    *
    * @param \Drupal\domain\DomainResolverInterface $resolver
    *   The domain resolver service.
+   * @param Drupal\Core\Access\AccessCheckInterface
+   *   The access check interface.
+   * @param \Drupal\Core\Session\AccountInterface
+   *   The current user account.
    */
-  public function __construct(DomainResolverInterface $resolver) {
+  public function __construct(DomainResolverInterface $resolver, AccessCheckInterface $access_check, AccountInterface $account) {
     $this->domainResolver = $resolver;
+    $this->accessCheck = $access_check;
+    $this->account = $account;
   }
 
   /**
@@ -40,15 +53,29 @@ class DomainSubscriber implements EventSubscriberInterface {
    *   The Event to process.
    */
   public function onKernelRequestDomain(GetResponseEvent $event) {
-    $request = $event->getRequest();
-    // TODO: Pass $url string or the entire Request?
-    $httpHost = $request->getHttpHost();
-    $this->domainResolver->setRequestDomain($httpHost);
-    $domain = $this->domainResolver->resolveActiveDomain();
-    // Pass a redirect if necessary.
-    if (!empty($domain->getProperty('url')) && !empty($domain->redirect)) {
-      $response = new RedirectResponse($domain->getProperty('url'), $domain->redirect);
-      $event->setResponse($response);
+    $redirect = FALSE;
+    if ($domain = $this->domainResolver->resolveActiveDomain()) {
+      $domain_url = $domain->getProperty('url');
+      if ($domain_url) {
+        $redirect_type = $domain->getRedirect();
+        $path = trim($event->getRequest()->getPathInfo(), '/');
+        // If domain negotiation asked for a redirect, issue it.
+        if (!is_null($redirect_type)) {
+          $redirect = TRUE;
+        }
+        // Else check for active domain or inactive access.
+        elseif ($apply = $this->accessCheck->checkPath($path)) {
+          $access = $this->accessCheck->access($this->account);
+          if ($access->isForbidden()) {
+            $redirect = TRUE;
+          }
+        }
+      }
+      if ($redirect) {
+        // Pass a redirect if necessary.
+        $response = new RedirectResponse($domain_url, $redirect_type);
+        $event->setResponse($response);
+      }
     }
   }
 

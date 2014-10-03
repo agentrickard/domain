@@ -3,7 +3,7 @@ services:
     class: Drupal\domain\Access\DomainAccessCheck
     tags:
       - { name: access_check }
-    arguments: ['@domain.resolver', '@current_user', '@module_handler']
+    arguments: ['@domain.resolver']
   domain.creator:
     class: Drupal\domain\DomainCreator
     tags:
@@ -18,12 +18,17 @@ services:
     class: Drupal\domain\DomainResolver
     tags:
       - { name: persist }
-    arguments: ['@module_handler']
+    arguments: ['@request_stack', '@module_handler']
   domain.path_processor:
     class: Drupal\domain\HttpKernel\DomainPathProcessor
     arguments: ['@domain.resolver', '@module_handler']
     tags:
       - { name: path_processor_outbound, priority: 200 }
+  domain.subscriber:
+    class: Drupal\domain\EventSubscriber\DomainSubscriber
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@domain.resolver', '@access_check.domain', '@current_user']
   domain.validator:
     class: Drupal\domain\DomainValidator
     tags:

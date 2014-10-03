@@ -19,37 +19,23 @@ use Symfony\Component\Routing\Route;
 class DomainAccessCheck implements AccessCheckInterface {
 
   /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $account;
-
-  /**
    * @var \Drupal\domain\DomainResolverInterface
    */
   protected $domainResolver;
 
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $module_handler;
-
-  public function __construct(DomainResolverInterface $resolver, AccountInterface $account, ModuleHandlerInterface $module_handler) {
+  public function __construct(DomainResolverInterface $resolver) {
     $this->domainResolver = $resolver;
-    $this->account = $account;
-    $this->moduleHandler = $module_handler;
   }
 
   /**
    * {@inheritdoc}
    */
   public function applies(Route $route) {
-    // @TODO: Can we filter this at all?
-    $path = $route->getPath();
-    $list = explode($path, '/');
+    return $this->checkPath($route->getPath());
+  }
+
+  public function checkPath($path) {
+    $list = explode('/', $path);
     if (current($list) == 'user') {
       return FALSE;
     }
@@ -72,7 +58,7 @@ class DomainAccessCheck implements AccessCheckInterface {
     else {
       $permissions = array('administer domains', 'access inactive domains');
       $operator = 'OR';
-      return AccessResult::allowedIfHasPermissions($this->account, $permissions, $operator);
+      return AccessResult::allowedIfHasPermissions($account, $permissions, $operator);
     }
   }
 

@@ -10,12 +10,21 @@ namespace Drupal\domain;
 use Drupal\domain\DomainResolverInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class DomainResolver implements DomainResolverInterface {
 
   public $httpHost;
 
   public $domain;
+
+  /**
+   * The request stack object.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
 
   /**
    * The module handler.
@@ -27,11 +36,14 @@ class DomainResolver implements DomainResolverInterface {
   /**
    * Constructs a DomainResolver object.
    *
+   * @param \Symfony\Component\HttpFoundation\RequestStack
+   *   The request stack object.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
    */
-  public function __construct(ModuleHandlerInterface $module_handler) {
+  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler) {
     $this->httpHost = NULL;
+    $this->requestStack = $requestStack;
     $this->domain = NULL;
     $this->moduleHandler = $module_handler;
   }
@@ -76,7 +88,9 @@ class DomainResolver implements DomainResolverInterface {
    * Gets the hostname of the active request.
    */
   public function resolveActiveHostname() {
-    return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    $request = $this->requestStack->getCurrentRequest();
+    $httpHost = $request->getHttpHost();
+    return !empty($httpHost) ? $httpHost : 'localhost';
   }
 
   public function setHttpHost($httpHost) {

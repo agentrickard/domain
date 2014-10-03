@@ -106,4 +106,8 @@ interface DomainInterface extends ConfigEntityInterface {
    */
   public function getLink($current_path = TRUE);
 
+  function getRedirect();
+
+  function setRedirect($code = 302);
+
 }

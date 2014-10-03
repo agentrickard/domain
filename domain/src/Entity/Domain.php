@@ -134,6 +134,11 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   private $response = NULL;
 
   /**
+   * The redirect method to use, if needed.
+   */
+  private $redirect = NULL;
+
+  /**
    * {@inheritdoc}
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
@@ -332,4 +337,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     }
     return \Drupal::l($this->getProperty('hostname'), $url);
   }
+
+  function getRedirect() {
+    return $this->redirect;
+  }
+
+  function setRedirect($code = 302) {
+    $this->redirect = $code;
+  }
+
 }

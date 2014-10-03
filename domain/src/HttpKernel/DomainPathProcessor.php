@@ -11,11 +11,10 @@ use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Processes the inbound path using path alias lookups.
+ * Processes the outbound path using path alias lookups.
  */
 class DomainPathProcessor implements OutboundPathProcessorInterface {
 
