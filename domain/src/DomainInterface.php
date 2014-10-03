@@ -25,6 +25,11 @@ interface DomainInterface extends ConfigEntityInterface {
   public function isDefault();
 
   /**
+   * Detects if the domain uses https for links.
+   */
+  public function isHttps();
+
+  /**
    * Makes a domain record the default.
    */
   public function saveDefault();
@@ -92,5 +97,10 @@ interface DomainInterface extends ConfigEntityInterface {
    *  The name of the property to retrieve.
    */
   public function getProperty($name);
+
+  /**
+   * Returns a URL object for a domain.
+   */
+  public function getLink();
 
 }

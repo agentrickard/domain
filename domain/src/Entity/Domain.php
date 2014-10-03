@@ -11,6 +11,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
+use Drupal\Core\Url;
 
 /**
  * Defines the domain entity.
@@ -185,6 +186,10 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return (bool) $this->status;
   }
 
+  public function isHttps() {
+    return (bool) ($this->getScheme(FALSE) == 'https');
+  }
+
   /**
    * Makes a domain record the default.
    */
@@ -314,4 +319,12 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     $this->response = $response;
   }
 
+  /**
+   * Returns a URL object for a domain.
+   */
+  public function getLink() {
+    $options = array('absolute' => TRUE, 'https' => $this->isHttps());
+    $url = Url::fromUri($this->getUrl(), $options);
+    return \Drupal::l($this->getProperty('hostname'), $url);
+  }
 }
