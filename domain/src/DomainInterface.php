@@ -101,9 +101,9 @@ interface DomainInterface extends ConfigEntityInterface {
   /**
    * Returns a URL object for a domain.
    *
-   * @param $path
-   *   An internal Drupal path to append to the final URL.
+   * @param $current_path
+   *   Indicates that the link should point to the path of the current request.
    */
-  public function getLink($path = NULL);
+  public function getLink($current_path = TRUE);
 
 }

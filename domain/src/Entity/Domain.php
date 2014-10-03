@@ -322,9 +322,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * Returns a URL object for a domain.
    */
-  public function getLink($path = NULL) {
+  public function getLink($current_path = TRUE) {
     $options = array('absolute' => TRUE, 'https' => $this->isHttps());
-    $url = Url::fromUri($this->getUrl() . $path, $options);
+    if ($current_path) {
+      $url = Url::fromUri($this->getUrl(), $options);
+    }
+    else {
+      $url = Url::fromUri($this->getPath(), $options);
+    }
     return \Drupal::l($this->getProperty('hostname'), $url);
   }
 }
