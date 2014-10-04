@@ -47,12 +47,16 @@ class DomainResolver implements DomainResolverInterface {
   public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainLoaderInterface $loader) {
     $this->httpHost = NULL;
     $this->requestStack = $requestStack;
-    $this->domain = NULL;
     $this->moduleHandler = $module_handler;
     $this->domainLoader = $loader;
   }
 
-  public function setRequestDomain($httpHost) {
+  public function setRequestDomain($httpHost, $reset = FALSE) {
+    static $loookup;
+    if (isset($lookup[$httpHost]) && !$reset) {
+    var_dump($lookup);
+      return $lookup[$httpHost];
+    }
     $this->setHttpHost($httpHost);
     $domain = $this->domainLoader->loadByHostname($httpHost);
     // If a straight load fails, check with modules (like Domain Alias) that
@@ -68,15 +72,26 @@ class DomainResolver implements DomainResolverInterface {
     if (!empty($domain->id)) {
       $this->setActiveDomain($domain);
     }
+    $lookup[$httpHost] = $domain;
   }
 
   public function setActiveDomain(DomainInterface $domain) {
+    // @TODO: caching
     $this->domain = $domain;
   }
 
   public function resolveActiveDomain() {
-    if (is_null($this->domain)) {
-      $this->setRequestDomain($this->resolveActiveHostname());
+    $httpHost = $this->resolveActiveHostname();
+    $this->setRequestDomain($httpHost);
+    return $this->domain;
+  }
+
+  /**
+   * Gets the active domain.
+   */
+  public function getActiveDomain($reset = FALSE) {
+    if (!isset($this->domain) || $reset) {
+      $this->resolveActiveDomain();
     }
     return $this->domain;
   }
@@ -85,7 +100,7 @@ class DomainResolver implements DomainResolverInterface {
    * Gets the id of the active domain.
    */
   public function getActiveId() {
-    return $this->loadActiveDomain()->id();
+    return $this->domain->id();
   }
 
   /**
