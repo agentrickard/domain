@@ -49,12 +49,12 @@ class DomainResolver implements DomainResolverInterface {
     $this->requestStack = $requestStack;
     $this->moduleHandler = $module_handler;
     $this->domainLoader = $loader;
+    $this->domain = NULL;
   }
 
   public function setRequestDomain($httpHost, $reset = FALSE) {
     static $loookup;
     if (isset($lookup[$httpHost]) && !$reset) {
-    var_dump($lookup);
       return $lookup[$httpHost];
     }
     $this->setHttpHost($httpHost);
@@ -90,7 +90,7 @@ class DomainResolver implements DomainResolverInterface {
    * Gets the active domain.
    */
   public function getActiveDomain($reset = FALSE) {
-    if (!isset($this->domain) || $reset) {
+    if (is_null($this->domain) || $reset) {
       $this->resolveActiveDomain();
     }
     return $this->domain;

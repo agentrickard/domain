@@ -53,23 +53,28 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $this->configFactory = $config_factory;
     $this->storage = $storage;
   }
+
   /**
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
+    static $domain;
     $overrides = array();
-    static $domain = NULL;
-    // @TODO: language handling?
-    // @TODO: caching?
-    // There is an odd behavior here that causes an infinite loop
-    // if $domain is null. Not quite sure why.
-    if (!is_null($domain)) {
+    // loadOverrides() runs on config entities, which means that if we try
+    // to run this routine on our own data, then we end up in an infinite loop.
+    // So ensure that we are _not_ looking up a domain.record.*.
+    $check = current($names);
+    $list = explode('.', $check);
+    if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
+      return $overrides;
+    }
+    // Only look up the domain record once, if possible.
+    if (!isset($domain)) {
       $domain = $this->domainResolver->getActiveDomain();
     }
     if (!empty($domain)) {
       foreach ($names as $name) {
         $config_name = $this->getDomainConfigName($name, $domain);
-        debug($config_name);
         // Check to see if the config storage has an appropriately named file
         // containing override data.
         if ($override = $this->storage->read($config_name)) {
