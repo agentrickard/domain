@@ -17,7 +17,7 @@ interface DomainResolverInterface {
   /**
    * Determines the active domain request.
    */
-  public function setRequestDomain($httpHost);
+  public function setRequestDomain($httpHost, $reset = FALSE);
 
   /**
    * Sets the active domain.
@@ -48,5 +48,10 @@ interface DomainResolverInterface {
    * Gets the hostname of the active request.
    */
   public function resolveActiveHostname();
+
+  /**
+   * Gets the active domain.
+   */
+  public function getActiveDomain($rest = FALSE);
 
 }
