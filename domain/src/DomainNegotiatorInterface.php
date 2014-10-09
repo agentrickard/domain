@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainResolverInterface.
+ * Definition of Drupal\domain\DomainNegotiatorInterface.
  */
 
 namespace Drupal\domain;
@@ -12,7 +12,7 @@ use Drupal\domain\DomainInterface;
 /**
  * Handles the negotation of the active domain record.
  */
-interface DomainResolverInterface {
+interface DomainNegotiatorInterface {
 
   /**
    * Determines the active domain request.
@@ -27,7 +27,7 @@ interface DomainResolverInterface {
   /**
    * Gets the active domain.
    */
-  public function resolveActiveDomain();
+  public function negotiateActiveDomain();
 
   /**
    * Stores the inbound httpHost request.
@@ -47,7 +47,7 @@ interface DomainResolverInterface {
   /**
    * Gets the hostname of the active request.
    */
-  public function resolveActiveHostname();
+  public function negotiateActiveHostname();
 
   /**
    * Gets the active domain.

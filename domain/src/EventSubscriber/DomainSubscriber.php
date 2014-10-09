@@ -7,7 +7,7 @@
 
 namespace Drupal\domain\EventSubscriber;
 
-use Drupal\domain\DomainResolverInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
@@ -23,9 +23,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class DomainSubscriber implements EventSubscriberInterface {
 
   /**
-   * @var \Drupal\domain\DomainResolverInterface
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
-  protected $domainResolver;
+  protected $domainNegotiator;
 
   protected $accessCheck;
 
@@ -34,15 +34,15 @@ class DomainSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a DomainSubscriber object.
    *
-   * @param \Drupal\domain\DomainResolverInterface $resolver
-   *   The domain resolver service.
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
+   *   The domain negotiator service.
    * @param Drupal\Core\Access\AccessCheckInterface
    *   The access check interface.
    * @param \Drupal\Core\Session\AccountInterface
    *   The current user account.
    */
-  public function __construct(DomainResolverInterface $resolver, AccessCheckInterface $access_check, AccountInterface $account) {
-    $this->domainResolver = $resolver;
+  public function __construct(DomainNegotiatorInterface $negotiator, AccessCheckInterface $access_check, AccountInterface $account) {
+    $this->domainNegotiator = $negotiator;
     $this->accessCheck = $access_check;
     $this->account = $account;
   }
@@ -54,7 +54,7 @@ class DomainSubscriber implements EventSubscriberInterface {
    */
   public function onKernelRequestDomain(GetResponseEvent $event) {
     $redirect = FALSE;
-    if ($domain = $this->domainResolver->resolveActiveDomain()) {
+    if ($domain = $this->domainNegotiator->negotiateActiveDomain()) {
       $domain_url = $domain->getProperty('url');
       if ($domain_url) {
         $redirect_type = $domain->getRedirect();

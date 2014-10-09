@@ -22,7 +22,7 @@ class DomainValidator implements DomainValidatorInterface {
   protected $moduleHandler;
 
   /**
-   * Constructs a DomainResolver object.
+   * Constructs a DomainNegotiator object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.

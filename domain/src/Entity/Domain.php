@@ -162,8 +162,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * Detects if the current domain is the active domain.
    */
   public function isActive() {
-    $resolver = \Drupal::service('domain.resolver');
-    $domain = $resolver->resolveActiveDomain();
+    $negotiator = \Drupal::service('domain.negotiator');
+    $domain = $negotiator->negotiateActiveDomain();
     if (empty($domain)) {
       return FALSE;
     }

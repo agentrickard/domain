@@ -10,7 +10,7 @@ namespace Drupal\domain_config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
-use Drupal\domain\DomainResolverInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 
 /**
@@ -18,11 +18,11 @@ use Drupal\domain\DomainInterface;
  */
 class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
-   * The domain resolver.
+   * The domain negotiator.
    *
-   * @var \Drupal\domain\DomainResolverInterface
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
-  protected $domainResolver;
+  protected $domainNegotiator;
 
   /**
    * The configuration storage service.
@@ -41,15 +41,15 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * Constructs a DomainConfigSubscriber object.
    *
-   * @param \Drupal\domain\DomainResolverInterface $resolver
-   *   The domain resolver service.
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
+   *   The domain negotiator service.
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
    *   The configuration storage service.
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The configuration storage engine.
    */
-  public function __construct(DomainResolverInterface $resolver, ConfigFactory $config_factory, StorageInterface $storage) {
-    $this->domainResolver = $resolver;
+  public function __construct(DomainNegotiatorInterface $negotiator, ConfigFactory $config_factory, StorageInterface $storage) {
+    $this->domainNegotiator = $negotiator;
     $this->configFactory = $config_factory;
     $this->storage = $storage;
   }
@@ -70,7 +70,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     }
     // Only look up the domain record once, if possible.
     if (!isset($domain)) {
-      $domain = $this->domainResolver->getActiveDomain();
+      $domain = $this->domainNegotiator->getActiveDomain();
     }
     if (!empty($domain)) {
       foreach ($names as $name) {

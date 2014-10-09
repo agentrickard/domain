@@ -8,7 +8,7 @@
 namespace Drupal\domain\HttpKernel;
 
 use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainResolverInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +19,9 @@ use Symfony\Component\HttpFoundation\Request;
 class DomainPathProcessor implements OutboundPathProcessorInterface {
 
   /**
-   * @var \Drupal\domain\DomainResolverInterface
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
-  protected $domainResolver;
+  protected $domainNegotiator;
 
   /**
    * The module handler.
@@ -33,13 +33,13 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   /**
    * Constructs a DomainPathProcessor object.
    *
-   * @param \Drupal\domain\DomainResolverInterface $resolver
-   *   The domain resolver service.
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
+   *   The domain negotiator service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
-  public function __construct(DomainResolverInterface $resolver, ModuleHandlerInterface $module_handler) {
-    $this->domainResolver = $resolver;
+  public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler) {
+    $this->domainNegotiator = $negotiator;
     $this->moduleHandler = $module_handler;
   }
 
@@ -49,7 +49,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   public function processOutbound($path, &$options = array(), Request $request = NULL) {
     static $active_domain;
     if (!isset($active_domain)) {
-      $active_domain = $this->domainResolver->resolveActiveDomain();
+      $active_domain = $this->domainNegotiator->negotiateActiveDomain();
     }
 
     // Only act on valid internal paths.

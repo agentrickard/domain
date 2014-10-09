@@ -2,18 +2,18 @@
 
 /**
  * @file
- * Definition of Drupal\domain\DomainResolver.
+ * Definition of Drupal\domain\DomainNegotiator.
  */
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainResolverInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class DomainResolver implements DomainResolverInterface {
+class DomainNegotiator implements DomainNegotiatorInterface {
 
   public $httpHost;
 
@@ -37,7 +37,7 @@ class DomainResolver implements DomainResolverInterface {
   protected $moduleHandler;
 
   /**
-   * Constructs a DomainResolver object.
+   * Constructs a DomainNegotiator object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack
    *   The request stack object.
@@ -80,8 +80,8 @@ class DomainResolver implements DomainResolverInterface {
     $this->domain = $domain;
   }
 
-  public function resolveActiveDomain() {
-    $httpHost = $this->resolveActiveHostname();
+  public function negotiateActiveDomain() {
+    $httpHost = $this->negotiateActiveHostname();
     $this->setRequestDomain($httpHost);
     return $this->domain;
   }
@@ -91,7 +91,7 @@ class DomainResolver implements DomainResolverInterface {
    */
   public function getActiveDomain($reset = FALSE) {
     if (is_null($this->domain) || $reset) {
-      $this->resolveActiveDomain();
+      $this->negotiateActiveDomain();
     }
     return $this->domain;
   }
@@ -106,7 +106,7 @@ class DomainResolver implements DomainResolverInterface {
   /**
    * Gets the hostname of the active request.
    */
-  public function resolveActiveHostname() {
+  public function negotiateActiveHostname() {
     if ($request = $this->requestStack->getCurrentRequest()) {
       $httpHost = $request->getHttpHost();
     }
