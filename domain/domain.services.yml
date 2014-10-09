@@ -3,7 +3,7 @@ services:
     class: Drupal\domain\Access\DomainAccessCheck
     tags:
       - { name: access_check }
-    arguments: ['@domain.resolver']
+    arguments: ['@domain.negotiator']
   domain.creator:
     class: Drupal\domain\DomainCreator
     tags:
@@ -14,21 +14,21 @@ services:
     tags:
       - { name: persist }
     arguments: ['@module_handler', '@config.typed']
-  domain.resolver:
-    class: Drupal\domain\DomainResolver
+  domain.negotiator:
+    class: Drupal\domain\DomainNegotiator
     tags:
       - { name: persist }
     arguments: ['@request_stack', '@module_handler', '@domain.loader']
   domain.path_processor:
     class: Drupal\domain\HttpKernel\DomainPathProcessor
-    arguments: ['@domain.resolver', '@module_handler']
+    arguments: ['@domain.negotiator', '@module_handler']
     tags:
       - { name: path_processor_outbound, priority: 200 }
   domain.subscriber:
     class: Drupal\domain\EventSubscriber\DomainSubscriber
     tags:
       - { name: event_subscriber }
-    arguments: ['@domain.resolver', '@access_check.domain', '@current_user']
+    arguments: ['@domain.negotiator', '@access_check.domain', '@current_user']
   domain.validator:
     class: Drupal\domain\DomainValidator
     tags:

@@ -3,5 +3,5 @@ services:
     class: Drupal\domain_config\DomainConfigOverrider
     tags:
       - { name: config.factory.override}
-    arguments: ['@domain.resolver', '@config.factory', '@config.storage']
+    arguments: ['@domain.negotiator', '@config.factory', '@config.storage']
 

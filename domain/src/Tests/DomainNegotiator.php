@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainResolver
+ * Definition of Drupal\domain\Tests\DomainNegotiator
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainResolver extends DomainTestBase {
+class DomainNegotiator extends DomainTestBase {
 
   /**
    * Modules to enable.
@@ -25,7 +25,7 @@ class DomainResolver extends DomainTestBase {
   /**
    * Tests the handling of an inbound request.
    */
-  function testDomainResolver() {
+  function testDomainNegotiator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 

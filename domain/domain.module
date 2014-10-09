@@ -182,16 +182,16 @@ function domain_required_fields() {
  * Returns the current domain record.
  */
 function domain_get_domain() {
-  $resolver = Drupal::service('domain.resolver');
-  return $resolver->resolveActiveDomain();
+  $negotiator = Drupal::service('domain.negotiator');
+  return $negotiator->negotiateActiveDomain();
 }
 
 /**
  * Returns the id of the current domain record.
  */
 function domain_get_active_id() {
-  $resolver = Drupal::service('domain.resolver');
-  return $resolver->resolveActiveDomainId();
+  $negotiator = Drupal::service('domain.negotiator');
+  return $negotiator->negotiateActiveDomainId();
 }
 
 /**

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain_alias\Tests\DomainAliasManagerTest.
+ * Definition of Drupal\domain_alias\Tests\DomainAliasNegotiatorTest.
  */
 
 namespace Drupal\domain_alias\Tests;
@@ -15,7 +15,7 @@ use Drupal\domain_alias\Tests\DomainAliasTestBase;
  *
  * @group domain_alias
  */
-class DomainAliasManagerTest extends DomainAliasTestBase {
+class DomainAliasNegotiatorTest extends DomainAliasTestBase {
 
   /**
    * Modules to enable.
@@ -27,7 +27,7 @@ class DomainAliasManagerTest extends DomainAliasTestBase {
   /**
    * Tests the handling of aliased requests.
    */
-  function testDomainAliasManager() {
+  function testDomainAliasNegotiator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 

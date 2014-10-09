@@ -10,7 +10,7 @@ namespace Drupal\domain\Access;
 use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainResolverInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,12 +19,12 @@ use Symfony\Component\Routing\Route;
 class DomainAccessCheck implements AccessCheckInterface {
 
   /**
-   * @var \Drupal\domain\DomainResolverInterface
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
-  protected $domainResolver;
+  protected $domainNegotiator;
 
-  public function __construct(DomainResolverInterface $resolver) {
-    $this->domainResolver = $resolver;
+  public function __construct(DomainNegotiatorInterface $negotiator) {
+    $this->domainNegotiator = $negotiator;
   }
 
   /**
@@ -46,7 +46,7 @@ class DomainAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    $domain = $this->domainResolver->resolveActiveDomain();
+    $domain = $this->domainNegotiator->negotiateActiveDomain();
     // Is the domain allowed?
     if (empty($domain)) {
       return AccessResult::allowed();
