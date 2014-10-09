@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain_alias\Tests\DomainAliasNegotiatorTest.
+ * Definition of Drupal\domain_alias\Tests\DomainAliasNegotiator.
  */
 
 namespace Drupal\domain_alias\Tests;
@@ -15,7 +15,7 @@ use Drupal\domain_alias\Tests\DomainAliasTestBase;
  *
  * @group domain_alias
  */
-class DomainAliasNegotiatorTest extends DomainAliasTestBase {
+class DomainAliasNegotiator extends DomainAliasTestBase {
 
   /**
    * Modules to enable.
