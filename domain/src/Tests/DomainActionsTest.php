@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainActions.
+ * Definition of Drupal\domain\Tests\DomainActionsTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainActions extends DomainTestBase {
+class DomainActionsTest extends DomainTestBase {
 
   /**
    * Tests bulk actions through the Views module.

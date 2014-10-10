@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainForms
+ * Definition of Drupal\domain\Tests\DomainFormsTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainForms extends DomainTestBase {
+class DomainFormsTest extends DomainTestBase {
 
   /**
    * Create, edit and delete a domain via the user interface.

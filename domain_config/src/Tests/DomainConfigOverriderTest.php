@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainConfigOverride.
+ * Definition of Drupal\domain\Tests\DomainConfigOverriderTest.
  */
 
 namespace Drupal\domain_config\Tests;
@@ -12,12 +12,12 @@ namespace Drupal\domain_config\Tests;
  *
  * @group domain_config
  */
-class DomainConfigOverride extends DomainConfigTestBase {
+class DomainConfigOverriderTest extends DomainConfigTestBase {
 
   /**
    * Tests that domain-specific variable loading works.
    */
-  function testDomainConfigOverride() {
+  function testDomainConfigOverrider() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 

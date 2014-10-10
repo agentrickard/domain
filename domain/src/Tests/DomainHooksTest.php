@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainHooks
+ * Definition of Drupal\domain\Tests\DomainHooksTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainHooks extends DomainTestBase {
+class DomainHooksTest extends DomainTestBase {
 
   /**
    * Modules to enable.
