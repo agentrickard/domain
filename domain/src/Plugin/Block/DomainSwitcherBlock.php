@@ -37,9 +37,8 @@ class DomainSwitcherBlock extends DomainBlockBase {
         $string .= '*';
       }
       if ($domain->id() == $active_domain->id()) {
-        $string .= '**';
+        $string = '<em>' . $string . '</em>';
       }*/
-
       $items[] = $string;
     }
     return array(
