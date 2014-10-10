@@ -30,14 +30,15 @@ class DomainSwitcherBlock extends DomainBlockBase {
   public function build() {
     $active_domain = domain_get_domain();
     $items = array();
-    foreach (domain_load_multiple() as $domain) {
-      $string = l($domain->name, $domain->getProperty('url'), array('external' => TRUE));
-      if (!$domain->status) {
+    foreach (domain_load_and_sort() as $domain) {
+      $string = $domain->getLink();
+      // @TODO: These fail now, indicating a core theme change.
+      /*if (!$domain->status) {
         $string .= '*';
       }
       if ($domain->id() == $active_domain->id()) {
-        $string = '<em>' . $string . '</em>';
-      }
+        $string .= '**';
+      }*/
 
       $items[] = $string;
     }
