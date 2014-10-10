@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainNegotiator
+ * Definition of Drupal\domain\Tests\DomainNegotiatorTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainNegotiator extends DomainTestBase {
+class DomainNegotiatorTest extends DomainTestBase {
 
   /**
    * Modules to enable.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainTestBase
+ * Definition of Drupal\domain\Tests\DomainTestBase.
  */
 
 namespace Drupal\domain\Tests;

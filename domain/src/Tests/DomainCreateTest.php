@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainCreate
+ * Definition of Drupal\domain\Tests\DomainCreateTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainCreate extends DomainTestBase {
+class DomainCreateTest extends DomainTestBase {
 
   /**
    * Tests initial domain creation.

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainValidate
+ * Definition of Drupal\domain\Tests\DomainValidateTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainValidate extends DomainTestBase {
+class DomainValidateTest extends DomainTestBase {
 
   /**
    * Tests that a domain response is proper.

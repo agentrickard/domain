@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessEntityReference
+ * Definition of Drupal\domain_access\Tests\DomainAccessEntityReferenceTest
  */
 
 namespace Drupal\domain_access\Tests;
@@ -14,7 +14,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain_access
  */
-class DomainAccessEntityReference extends DomainTestBase {
+class DomainAccessEntityReferenceTest extends DomainTestBase {
 
   /**
    * Modules to enable.

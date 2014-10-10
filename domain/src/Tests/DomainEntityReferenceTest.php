@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainEntityReference
+ * Definition of Drupal\domain\Tests\DomainEntityReferenceTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainEntityReference extends DomainTestBase {
+class DomainEntityReferenceTest extends DomainTestBase {
 
   /**
    * Modules to enable.
