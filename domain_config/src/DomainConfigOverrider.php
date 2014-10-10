@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\domain_config\DomainConfigOverriderTest.
+ * Contains \Drupal\domain_config\DomainConfigOverrider.
  */
 
 namespace Drupal\domain_config;
@@ -16,7 +16,7 @@ use Drupal\domain\DomainInterface;
 /**
  * Domain-specific config overrides.
  */
-class DomainConfigOverriderTest implements ConfigFactoryOverrideInterface {
+class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * The domain negotiator.
    *
