@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * a domain argument. Drupal doesn't allow that natively, so we use this base
  * class to allow router arguments to be passed a domain object.
  *
- * @see \Drupal\domain_alias\Controller\DomainAliasController
+ * @see \Drupal\domainController\DomainController
  */
 class DomainControllerBase extends ControllerBase {
 
@@ -39,7 +39,7 @@ class DomainControllerBase extends ControllerBase {
   protected $entityManager;
 
   /**
-   * Constructs a new DomainAliasController.
+   * Constructs a new DomainControllerBase.
    *
    * @param \Drupal\Core\Config\Entity\ConfigEntityStorage $entity_storage
    *   The storage controller.

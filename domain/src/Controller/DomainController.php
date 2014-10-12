@@ -27,7 +27,7 @@ class DomainController {
    * @param $op
    *   The operation being performed.
    *
-   * @see DomainListBuilder.php
+   * @see \Drupal\domain\DomainListBuilder
    */
   public function ajaxOperation(DomainInterface $domain, $op = NULL) {
     $success = FALSE;

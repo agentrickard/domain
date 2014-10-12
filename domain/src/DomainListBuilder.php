@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\domain\Form\DomainListBuilder.
+ * Contains \Drupal\domain\DomainListBuilder.
  */
 
 namespace Drupal\domain;
