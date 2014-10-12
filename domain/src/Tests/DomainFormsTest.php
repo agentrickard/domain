@@ -54,7 +54,7 @@ class DomainFormsTest extends DomainTestBase {
 
     // Update the record.
     $edit['name'] = 'Foo';
-    $this->drupalPostForm($editUrl, $edit, t('Save'));
+    $this->drupalPostForm($editUrl, $edit, $this->t('Save'));
 
     // Check that the update succeeded.
     $domain = domain_load($default_id, TRUE);
@@ -65,7 +65,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet($deleteUrl);
 
     // Delete the record.
-    $this->drupalPostForm($deleteUrl, array(), t('Delete'));
+    $this->drupalPostForm($deleteUrl, array(), $this->t('Delete'));
     $domain = domain_load($default_id, TRUE);
     $this->assertTrue(empty($domain), 'Domain record deleted.');
 

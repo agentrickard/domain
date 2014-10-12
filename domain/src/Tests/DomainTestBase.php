@@ -9,11 +9,14 @@ namespace Drupal\domain\Tests;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Component\Utility\Crypt;
 use Drupal\domain\DomainInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Base class with helper methods for domain tests.
  */
 abstract class DomainTestBase extends WebTestBase {
+
+  use StringTranslationTrait;
 
   /**
    * Sets a base hostname for running tests.
