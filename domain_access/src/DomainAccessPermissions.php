@@ -7,11 +7,14 @@
 namespace Drupal\domain_access;
 
 use Drupal\node\Entity\NodeType;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Dynamic permissions class for Domain Access.
  */
 class DomainAccessPermissions {
+
+  use StringTranslationTrait;
 
   /**
    * Define permissions.
@@ -19,29 +22,29 @@ class DomainAccessPermissions {
   public function permissions() {
     $permissions = array(
       'assign domain editors' => array(
-        'title' => 'Assign editors to assigned domains',
+        'title' => $this->t('Assign editors to assigned domains'),
       ),
       // @TODO: check how this will work.
       'set domain access' => array(
-        'title' => 'Set domain access status for all content',
+        'title' => $this->t('Set domain access status for all content'),
       ),
       'publish to any assigned domain' => array(
-        'title' => 'Publish content to any assigned domain',
+        'title' => $this->t('Publish content to any assigned domain'),
       ),
       'publish from assigned domain' => array(
-        'title' => 'Publish content only from assigned domain',
+        'title' => $this->t('Publish content only from assigned domain'),
       ),
       'publish from default domain' => array(
-        'title' => 'Publish content only from the default domain',
+        'title' => $this->t('Publish content only from the default domain'),
       ),
       'edit domain content' => array(
-        'title' => 'Edit any content on assigned domains',
+        'title' => $this->t('Edit any content on assigned domains'),
       ),
       'delete domain content' => array(
-        'title' => 'Delete any content on assigned domains',
+        'title' => $this->t('Delete any content on assigned domains'),
       ),
       'view unpublished domain content' => array(
-        'title' => 'View unpublished content on assigned domains',
+        'title' => $this->t('View unpublished content on assigned domains'),
       ),
     );
 
@@ -67,13 +70,13 @@ class DomainAccessPermissions {
     // Build standard list of node permissions for this type.
     $perms = array(
       "create $type->type content on assigned domains" => array(
-        'title' => t('%type_name: Create new content on assigned domains', array('%type_name' => $type->name)),
+        'title' => $this->t('%type_name: Create new content on assigned domains', array('%type_name' => $type->name)),
       ),
       "update $type->type content on assigned domains" => array(
-        'title' => t('%type_name: Edit any content on assigned domains', array('%type_name' => $type->name)),
+        'title' => $this->t('%type_name: Edit any content on assigned domains', array('%type_name' => $type->name)),
       ),
       "delete $type->type content on assigned domains" => array(
-        'title' => t('%type_name: Delete any content on assigned domains', array('%type_name' => $type->name)),
+        'title' => $this->t('%type_name: Delete any content on assigned domains', array('%type_name' => $type->name)),
       ),
     );
 

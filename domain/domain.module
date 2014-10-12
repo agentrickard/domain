@@ -14,7 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
  */
 function domain_entity_bundle_info() {
   $bundles['domain']['domain'] = array(
-    'label' => 'Domain record',
+    'label' => t('Domain record'),
     'admin' => array(
       'real path' => 'admin/structure/domain',
     ),
