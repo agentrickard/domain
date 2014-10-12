@@ -1,0 +1,5 @@
+services:
+  domain_alias.validator:
+    class: Drupal\domain_alias\DomainAliasValidator
+    tags:
+      - { name: persist }

@@ -15,7 +15,11 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface DomainAliasInterface extends ConfigEntityInterface {
 
   /**
-   * Placeholder interface.
+   * Gets a property from the domain alias.
+   *
+   * @param $name
+   *  The name of the property to retrieve.
    */
+  public function getProperty($name);
 
 }
