@@ -165,7 +165,7 @@ function domain_drush_help($section) {
 }
 
 /**
- * Show the domain list.
+ * Shows the domain list.
  */
 function drush_domain_list() {
   $domains = domain_load_multiple(NULL, TRUE);
@@ -198,7 +198,7 @@ function drush_domain_list() {
 }
 
 /**
- * Generate a list of domains for testing.
+ * Generates a list of domains for testing.
  *
  * In my environment, I name hostnames one.* two.* up to ten. I also use
  * foo.* bar.* and baz.*. We also want a non-hostname here and use
@@ -292,7 +292,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
 }
 
 /**
- * Validate the domain generation script.
+ * Validates the domain generation script.
  *
  * @param $primary
  *   The root domain to use for domain creation.
@@ -310,7 +310,7 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
 }
 
 /**
- * Add a new domain.
+ * Adds a new domain.
  *
  * @param $hostname
  *   The domain name to register.
@@ -343,7 +343,7 @@ function drush_domain_add($hostname, $name) {
 }
 
 /**
- * Validate the domain add script.
+ * Validates the domain add script.
  *
  * @param $hostname
  *   The domain name to register.
@@ -374,13 +374,13 @@ function domain_drush_create(DomainInterface $domain) {
 }
 
 /**
- * Drush version of domain_validate.
+ * Validates a domain.
  *
  * @param $hostname
  *   The domain name to validate for syntax and uniqueness.
  *
  * @return
- *  An array of errors encountered.
+ *   An array of errors encountered.
  *
  * @see domain_validate()
  */
@@ -396,7 +396,7 @@ function domain_drush_validate_domain($hostname) {
 }
 
 /**
- * Delete a domain record.
+ * Deletes a domain record.
  *
  * @param $argument
  *   The domain_id to delete. Pass 'all' to delete all records.
@@ -457,7 +457,7 @@ function drush_domain_delete($argument = NULL) {
 }
 
 /**
- * Test a domain record.
+ * Tests a domain record for the proper HTTP response.
  *
  * @param $argument
  *   The domain_id to test. Passing no value tests all records.
@@ -490,7 +490,7 @@ function drush_domain_test($argument = NULL) {
 }
 
 /**
- * Set the default domain id.
+ * Sets the default domain id.
  */
 function drush_domain_default($argument) {
   // Resolve the domain.
@@ -517,7 +517,7 @@ function drush_domain_default($argument) {
 function drush_domain_disable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if ($domain->status) {
+    if ($domain->isEnabled()) {
       $domain->disable();
       drush_print(dt('!domain has been disabled.', array('!domain' => $domain->hostname)));
     }
@@ -533,7 +533,7 @@ function drush_domain_disable($argument) {
 function drush_domain_enable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if (!$domain->status) {
+    if (!$domain->isEnabled()) {
       $domain->enable();
       drush_print(dt('!domain has been enabled.', array('!domain' => $domain->hostname)));
     }
