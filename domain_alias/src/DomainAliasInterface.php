@@ -15,8 +15,7 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface DomainAliasInterface extends ConfigEntityInterface {
 
   /**
-   * Validates the alias.
+   * Placeholder interface.
    */
-  public function validate();
 
 }

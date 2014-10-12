@@ -66,7 +66,8 @@ class DomainAliasForm extends EntityForm {
    */
   public function validate(array $form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
-    $errors = $entity->validate();
+    $validator = \Drupal::service('domain_alias.validator');
+    $errors = $validator->validate($entity);
     if (!empty($errors)) {
       form_set_error('pattern', $errors);
     }
