@@ -12,6 +12,7 @@ use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Url;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Defines the domain entity.
@@ -48,6 +49,8 @@ use Drupal\Core\Url;
  * )
  */
 class Domain extends ConfigEntityBase implements DomainInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The ID of the domain entity.
@@ -189,6 +192,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
+   * Set a property on the domain entity.
+   */
+  public function setProperty($name, $value) {
+    $this->{$name} = $value;
+  }
+
+  /**
    * Detects if the domain is the default domain.
    */
   public function isDefault() {
@@ -221,7 +231,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->save();
     }
     else {
-      drupal_set_message(t('The selected domain is already the default.'), 'warning');
+      drupal_set_message($this->t('The selected domain is already the default.'), 'warning');
     }
   }
 
@@ -242,21 +252,21 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->save();
     }
     else {
-      drupal_set_message(t('The default domain cannot be disabled.'), 'warning');
+      drupal_set_message($this->t('The default domain cannot be disabled.'), 'warning');
     }
   }
 
   /**
    * Saves a specific domain attribute.
    */
-  public function saveProperty($key, $value) {
-    if (isset($this->{$key})) {
-      $this->{$key} = $value;
+  public function saveProperty($name, $value) {
+    if (isset($this->{$name})) {
+      $this->{$name} = $value;
       $this->save();
-      drupal_set_message(t('The @key attribute was set to @value for domain @hostname.', array('@key' => $key, '@value' => $value, '@hostname' => $this->hostname)));
+      drupal_set_message($this->t('The @key attribute was set to @value for domain @hostname.', array('@key' => $key, '@value' => $value, '@hostname' => $this->hostname)));
     }
     else {
-      drupal_set_message(t('The @key attribute does not exist.', array('@key' => $key)));
+      drupal_set_message($this->t('The @key attribute does not exist.', array('@key' => $key)));
     }
   }
 

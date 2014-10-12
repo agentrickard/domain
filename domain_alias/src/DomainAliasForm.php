@@ -79,10 +79,10 @@ class DomainAliasForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $alias = $this->entity;
     if ($alias->isNew()) {
-      drupal_set_message(t('Domain alias created.'));
+      drupal_set_message($this->t('Domain alias created.'));
     }
     else {
-      drupal_set_message(t('Domain alias updated.'));
+      drupal_set_message($this->t('Domain alias updated.'));
     }
     $alias->save();
     $form_state['redirect'] = 'admin/structure/domain/alias/' . $alias->domain_id;
