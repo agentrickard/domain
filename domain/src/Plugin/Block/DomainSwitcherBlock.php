@@ -32,14 +32,13 @@ class DomainSwitcherBlock extends DomainBlockBase {
     $items = array();
     foreach (domain_load_and_sort() as $domain) {
       $string = $domain->getLink();
-      // @TODO: These fail now, indicating a core theme change.
-      /*if (!$domain->status) {
+      if (!$domain->status) {
         $string .= '*';
       }
       if ($domain->id() == $active_domain->id()) {
         $string = '<em>' . $string . '</em>';
-      }*/
-      $items[] = $string;
+      }
+      $items[] = array('#markup' => $string);
     }
     return array(
       '#theme' => 'item_list',
