@@ -9,17 +9,36 @@ namespace Drupal\domain;
 
 use Drupal\domain\DomainCreatorInterface;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 
+/**
+ * Creates new domain records.
+ *
+ * This class is a helper that replaces legacy procedural code.
+ */
 class DomainCreator implements DomainCreatorInterface {
 
   /**
-   * Constructs a DomainLoader object.
+   * @var \Drupal\domain\DomainLoaderInterface
+   */
+  protected $loader;
+
+  /**
+   * @var \Drupal\domain\DomainNegotiatorInterface
+   */
+  protected $negotiator;
+
+  /**
+   * Constructs a DomainCreator object.
    *
    * @param \Drupal\domain\DomainLoaderInterface $loader
    *   The domain loader.
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
+   *   The domain negotiator.
    */
-  public function __construct(DomainLoaderInterface $loader) {
+  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator) {
     $this->loader = $loader;
+    $this->negotiator = $negotiator;
   }
 
   /**
@@ -29,6 +48,9 @@ class DomainCreator implements DomainCreatorInterface {
    *   The values for the domain.
    * @param bool $inherit
    *   Indicates that values should be calculated from the current domain.
+   *
+   * @return DomainInterface $domain
+   *   A domain record object.
    */
   public function createDomain(array $values = array(), $inherit = FALSE) {
     $default = $this->loader->loadDefaultId();
@@ -51,6 +73,10 @@ class DomainCreator implements DomainCreatorInterface {
 
   /**
    * Gets the next numeric id for a domain.
+   *
+   * Numeric id keys are still used by the node access system.
+   *
+   * @return integer
    */
   public function createNextId() {
     $domains = $this->loader->loadMultiple();
@@ -65,9 +91,12 @@ class DomainCreator implements DomainCreatorInterface {
 
   /**
    * Gets the hostname of the active request.
+   *
+   * @return string
+   *   The hostname string of the current request.
    */
   public function createHostname() {
-    return !empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+    return $this->negotiator->negotiateActiveHostname();
   }
 
   /**
