@@ -115,8 +115,8 @@ function domain_load_hostname($hostname) {
  *   current $_SERVER request. Useful for creating domain records on install.
  *
  * @param $values
- *  An array of values to be set when the domain object is created. If the
- *  $inherit property is set to TRUE, some values may be overridden.
+ *   An array of values to be set when the domain object is created. If the
+ *   $inherit property is set to TRUE, some values may be overridden.
  *
  * @return Drupal\domain\Entity\Domain
  *   A domain entity, with preset values for the current environment.
@@ -142,8 +142,6 @@ function domain_next_id() {
  * This function is used extensively in testing and domain creation, as it
  * ensures that our code is agnostic of the current server.
  *
- * @TODO: This may be replaced be Request objects at a later point.
- *
  * @return string
  *   The hostname portion of the current HTTP request, or 'localhost' if one is
  *   not set.
@@ -154,7 +152,7 @@ function domain_hostname() {
 }
 
 /**
- * Create a machine name for a domain record.
+ * Creates a machine name for a domain record.
  *
  * @param $hostname
  *  The hostname string of the record, which should be unique.
