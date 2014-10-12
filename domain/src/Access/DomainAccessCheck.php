@@ -23,6 +23,12 @@ class DomainAccessCheck implements AccessCheckInterface {
    */
   protected $domainNegotiator;
 
+  /**
+   * Constructs the object.
+   *
+   * @param DomainNegotiatorInterface $negotiator
+   *   The domain negotiation service.
+   */
   public function __construct(DomainNegotiatorInterface $negotiator) {
     $this->domainNegotiator = $negotiator;
   }
@@ -34,6 +40,9 @@ class DomainAccessCheck implements AccessCheckInterface {
     return $this->checkPath($route->getPath());
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function checkPath($path) {
     $list = explode('/', $path);
     if (current($list) == 'user') {
