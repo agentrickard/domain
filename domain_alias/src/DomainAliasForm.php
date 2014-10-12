@@ -28,11 +28,11 @@ class DomainAliasForm extends EntityForm {
     );
     $form['pattern'] = array(
       '#type' => 'textfield',
-      '#title' => t('Pattern'),
+      '#title' => $this->t('Pattern'),
       '#size' => 40,
       '#maxlength' => 80,
       '#default_value' => $alias->pattern,
-      '#description' => t('The matching pattern for this alias.'),
+      '#description' => $this->t('The matching pattern for this alias.'),
       '#required' => TRUE,
     );
     $form['id'] = array(
@@ -47,7 +47,7 @@ class DomainAliasForm extends EntityForm {
       '#type' => 'select',
       '#options' => $this->redirectOptions(),
       '#default_value' => $alias->redirect,
-      '#description' => t('Redirect status'),
+      '#description' => $this->t('Redirect status'),
     );
 
     return parent::form($form, $form_state, $alias);
@@ -55,9 +55,9 @@ class DomainAliasForm extends EntityForm {
 
   public function redirectOptions() {
     return array(
-      0 => t('Do not redirect'),
-      301 => t('301 redirect: Moved Permanently'),
-      302 => t('302 redirect: Found'),
+      0 => $this->t('Do not redirect'),
+      301 => $this->t('301 redirect: Moved Permanently'),
+      302 => $this->t('302 redirect: Found'),
     );
   }
 

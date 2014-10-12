@@ -12,6 +12,7 @@ use Drupal\domain_alias\DomainAliasInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Defines the domain alias entity.
@@ -45,6 +46,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  * )
  */
 class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The ID of the domain alias entity.
@@ -83,6 +86,8 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
 
   /**
    * Validates an alias.
+   *
+   * // @TODO: Move to its own class/interface.
    */
   public function validate() {
     $pattern = $this->pattern;
@@ -90,37 +95,35 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
     // 1) Check that the alias only has one wildcard.
     $count = substr_count($pattern, '*') + substr_count($pattern, '?');
     if ($count > 1) {
-      return t('You may only have one wildcard character in each alias.');
+      return $this->t('You may only have one wildcard character in each alias.');
     }
     // 2) Only one colon allowed, and it must be followed by an integer.
     $count = substr_count($pattern, ':');
     if ($count > 1) {
-      return t('You may only have one colon ":" character in each alias.');
+      return $this->t('You may only have one colon ":" character in each alias.');
     }
     elseif ($count == 1) {
       $int = substr($pattern, strpos($pattern, ':') + 1);
       if (!is_numeric($int)) {
-        return t('A colon may only be followed by an integer indicating the proper port.');
+        return $this->t('A colon may only be followed by an integer indicating the proper port.');
       }
     }
     // 3) Check that the alias doesn't contain any invalid characters.
     $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $pattern);
     if ($check == 0) {
-      return t('The pattern contains invalid characters.');
+      return $this->t('The pattern contains invalid characters.');
     }
     // 4) Check that the alias is not a direct match for a registered domain.
     $check = preg_match('/[a-z0-9\.\+\-:]*$/', $pattern);
     if ($check == 1 && $test = domain_load_hostname($pattern)) {
-      return t('The pattern matches an existing domain record.');
+      return $this->t('The pattern matches an existing domain record.');
     }
     // 5) Check that the alias is unique across all records.
     if ($alias = domain_alias_pattern_load($pattern)) {
       if ($alias->id() != $this->id()) {
-        return t('The pattern already exists.');
+        return $this->t('The pattern already exists.');
       }
     }
   }
-
-
 
 }

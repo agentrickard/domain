@@ -20,7 +20,7 @@ class DomainAliasDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return t('Are you sure you want to delete %name?', array('%name' => $this->entity->label()));
+    return $this->t('Are you sure you want to delete %name?', array('%name' => $this->entity->label()));
   }
 
   /**
@@ -34,7 +34,7 @@ class DomainAliasDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    return t('Delete');
+    return $this->t('Delete');
   }
 
   /**
