@@ -434,17 +434,17 @@ function drush_domain_delete($argument = NULL) {
 
   // TODO: Set options for re-assigning content.
   $list = domain_load_multiple(NULL, TRUE);
-  $options = array('0' => t('Do not reassign'));
+  $options = array('0' => dt('Do not reassign'));
   foreach ($list as $data) {
     if ($data->domain_id != $domain->domain_id) {
       $options[$data['domain_id']] = $data['hostname'];
     }
   }
-  $content = drush_choice($options, t('Reassign content to:'), '!value');
+  $content = drush_choice($options, dt('Reassign content to:'), '!value');
   if (empty($content)) {
     return;
   }
-  $users = drush_choice($options, t('Reassign users to:'), '!value');
+  $users = drush_choice($options, dt('Reassign users to:'), '!value');
   if (empty($users)) {
     return;
   }
