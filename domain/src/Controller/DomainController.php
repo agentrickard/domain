@@ -20,12 +20,14 @@ class DomainController {
   use UrlGeneratorTrait;
 
   /**
-   * Controller for handling Ajax operations from the overview page.
+   * Handles AJAX operations from the overview form.
    *
    * @param \Drupal\domain\DomainInterface
    *   A domain record object.
    * @param $op
    *   The operation being performed.
+   *
+   * @see DomainListBuilder.php
    */
   public function ajaxOperation(DomainInterface $domain, $op = NULL) {
     $success = FALSE;
@@ -59,7 +61,6 @@ class DomainController {
     }
 
     // Return to the invoking page.
-    // @TODO: Should this check the referrer?
     return new RedirectResponse($this->url('domain.admin'));
   }
 
