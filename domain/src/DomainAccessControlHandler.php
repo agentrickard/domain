@@ -16,6 +16,8 @@ use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the access controller for the domain entity type.
+ *
+ * Note that this is not a node access check.
  */
 class DomainAccessControlHandler extends EntityAccessControlHandler {
 
