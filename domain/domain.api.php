@@ -24,9 +24,7 @@
 function hook_domain_load(array $domains) {
   // Add a variable to the $domain.
   foreach ($domains as $domain) {
-    $domain->myvar = 'mydomainvar';
-    // Modify the site_grant flag, removing access to 'all affiliates.'
-    $domain->site_grant = FALSE;
+    $domain->addProperty('myvar', 'mydomainvar');
   }
 }
 

@@ -99,6 +99,16 @@ interface DomainInterface extends ConfigEntityInterface {
   public function getProperty($name);
 
   /**
+   * Adds a property to the domain record.
+   *
+   * @param $name
+   *  The name of the property to retrieve.
+   * @param $value
+   *  The value of the property.
+   */
+  public function addProperty($name, $value);
+
+  /**
    * Returns a URL object for a domain.
    *
    * @param $current_path

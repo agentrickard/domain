@@ -178,6 +178,17 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
+   * Allows modules to load new properties onto the object.
+   *
+   * @TODO: We need a safe way to modify these properties?
+   */
+  public function addProperty($name, $value) {
+    if (!isset($this->{$name})) {
+      $this->{$name} = $value;
+    }
+  }
+
+  /**
    * Detects if the domain is the default domain.
    */
   public function isDefault() {
