@@ -10,6 +10,7 @@ namespace Drupal\domain;
 use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * User interface for the domain overview screen.
@@ -44,35 +45,30 @@ class DomainListBuilder extends DraggableListBuilder {
     if ($entity->status && !$default) {
       $operations['disable'] = array(
         'title' => $this->t('Disable'),
-        'route_name' => 'domain.inline_action',
-        'route_parameters' => array('op' => 'disable', 'domain' => $id),
+        'url' => Url::fromRoute('domain.inline_action', array('op' => 'disable', 'domain' => $id)),
         'weight' => 50,
       );
     }
     elseif (!$default) {
       $operations['enable'] = array(
         'title' => $this->t('Enable'),
-        'route_name' => 'domain.inline_action',
-        'route_parameters' => array('op' => 'enable', 'domain' => $id),
+        'url' => Url::fromRoute('domain.inline_action', array('op' => 'enable', 'domain' => $id)),
         'weight' => 40,
       );
     }
     if (!$default) {
       $operations['default'] = array(
         'title' => $this->t('Make default'),
-        'route_name' => 'domain.inline_action',
-        'route_parameters' => array('op' => 'default', 'domain' => $id),
+        'url' => Url::fromRoute('domain.inline_action', array('op' => 'default', 'domain' => $id)),
         'weight' => 30,
       );
       $operations['delete'] = array(
         'title' => $this->t('Delete'),
-        'route_name' => 'domain.delete',
-        'route_parameters' => array('domain' => $id),
-        'query' => array(),
+        'url' => Url::fromRoute('domain.delete', array('domain' => $id)),
         'weight' => 20,
       );
     }
-    // @TODO: should this be handled differently?
+    // @TODO: inject this service?
     $operations += \Drupal::moduleHandler()->invokeAll('domain_operations', array($entity));
     foreach ($operations as $key => $value) {
       if (isset($value['query']['token'])) {
@@ -82,7 +78,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $default = domain_default();
 
     // Deleting the site default domain is not allowed.
-    if ($id == $default->id) {
+    if ($id == $default->id()) {
       unset($operations['delete']);
     }
     return $operations;
