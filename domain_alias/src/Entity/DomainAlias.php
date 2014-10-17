@@ -51,35 +51,35 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The parent domain record ID.
    *
    * @var string
    */
-  public $domain_id;
+  protected $domain_id;
 
   /**
    * The domain alias record UUID.
    *
    * @var string
    */
-  public $uuid;
+  protected $uuid;
 
   /**
    * The domain alias record pattern.
    *
    * @var string
    */
-  public $pattern;
+  protected $pattern;
 
   /**
    * The domain alias record redirect value.
    *
    * @var integer
    */
-  public $redirect;
+  protected $redirect;
 
   /**
    * @inheritdoc

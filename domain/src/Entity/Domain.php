@@ -57,89 +57,89 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * The domain record ID.
    *
    * @var integer
    */
-  public $domain_id;
+  protected $domain_id;
 
   /**
    * The domain record UUID.
    *
    * @var string
    */
-  public $uuid;
+  protected $uuid;
 
   /**
    * The domain list name (e.g. Drupal).
    *
    * @var string
    */
-  public $name;
+  protected $name;
 
   /**
    * The domain hostname (e.g. example.com).
    *
    * @var string
    */
-  public $hostname;
+  protected $hostname;
 
   /**
    * The domain status.
    *
    * @var boolean
    */
-  public $status;
+  protected $status;
 
   /**
    * The domain record sort order.
    *
    * @var integer
    */
-  public $weight;
+  protected $weight;
 
   /**
    * Indicates the default domain.
    *
    * @var boolean
    */
-  public $is_default;
+  protected $is_default;
 
   /**
    * The domain record protocol (e.g. http://).
    *
    * @var string
    */
-  public $scheme;
+  protected $scheme;
 
   /**
    * The domain record base path, a calculated value.
    *
    * @var string
    */
-  private $path;
+  protected $path;
 
   /**
    * The domain record current url, a calculated value.
    *
    * @var string
    */
-  private $url;
+  protected $url;
 
   /**
    * The domain record http response test (e.g. 200), a calculated value.
    *
    * @var integer
    */
-  private $response = NULL;
+  protected $response = NULL;
 
   /**
    * The redirect method to use, if needed.
    */
-  private $redirect = NULL;
+  protected $redirect = NULL;
 
   /**
    * {@inheritdoc}

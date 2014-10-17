@@ -46,7 +46,8 @@ class DomainActionsTest extends DomainTestBase {
 
     // Test some text on the page.
     foreach ($domains as $domain) {
-      $this->assertText($domain->name, format_string('@name found on overview page.', array('@name' => $domain->name)));
+      $name = $domain->getProperty('name');
+      $this->assertText($name, format_string('@name found on overview page.', array('@name' => $name)));
     }
     // @TODO: Test the list of actions.
     $actions = array('delete', 'disable', 'default');

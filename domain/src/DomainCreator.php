@@ -82,8 +82,9 @@ class DomainCreator implements DomainCreatorInterface {
     $domains = $this->loader->loadMultiple();
     $max = 0;
     foreach ($domains as $domain) {
-      if ($domain->domain_id > $max) {
-        $max = $domain->domain_id;
+      $domain_id = $domain->getProperty('domain_id');
+      if ($domain_id > $max) {
+        $max = $domain_id;
       }
     }
     return $max + 1;

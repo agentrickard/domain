@@ -35,14 +35,14 @@ class DomainListBuilder extends DraggableListBuilder {
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
     $destination = drupal_get_destination();
-    $default = $entity->is_default;
+    $default = $entity->isDefault();
     $id = $entity->id();
 
     // Get CSRF token service.
     $token_generator = \Drupal::csrfToken();
 
     // @TODO: permission checks.
-    if ($entity->status && !$default) {
+    if ($entity->isEnabled() && !$default) {
       $operations['disable'] = array(
         'title' => $this->t('Disable'),
         'url' => Url::fromRoute('domain.inline_action', array('op' => 'disable', 'domain' => $id)),
