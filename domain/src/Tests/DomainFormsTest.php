@@ -46,7 +46,8 @@ class DomainFormsTest extends DomainTestBase {
     $this->assertTrue($new_domain->id() == $edit['id'], 'Domain loaded properly.');
 
     // Has a UUID been set?
-    $this->assertTrue(!empty($new_domain->uuid), 'Entity UUID set properly.');
+    $uuid = $new_domain->getProperty('uuid');
+    $this->assertTrue(!empty($uuid), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
     $editUrl = 'admin/structure/domain/edit/' . $new_domain->id();
@@ -58,7 +59,7 @@ class DomainFormsTest extends DomainTestBase {
 
     // Check that the update succeeded.
     $domain = domain_load($default_id, TRUE);
-    $this->assertTrue($domain->name == 'Foo', 'Domain record updated via form.');
+    $this->assertTrue($domain->getProperty('name') == 'Foo', 'Domain record updated via form.');
 
     // Visit the delete domain administration page.
     $deleteUrl = 'admin/structure/domain/delete/' . $new_domain->id();

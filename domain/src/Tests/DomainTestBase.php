@@ -63,7 +63,7 @@ abstract class DomainTestBase extends WebTestBase {
     $domain = domain_create(TRUE);
     $required = domain_required_fields();
     foreach ($required as $key) {
-      $edit[$key] = $domain->{$key};
+      $edit[$key] = $domain->getProperty($key);
     }
     return $edit;
   }

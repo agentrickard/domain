@@ -25,8 +25,8 @@ class DomainForm extends EntityForm {
     $domains = domain_load_multiple();
     // Create defaults if this is the first domain.
     if (empty($domains)) {
-      $domain->hostname = domain_hostname();
-      $domain->name = \Drupal::config('system.site')->get('name');
+      $domain->addProperty('hostname', domain_hostname());
+      $domain->addProperty('name', \Drupal::config('system.site')->get('name'));
     }
     $form['domain_id'] = array(
       '#type' => 'value',
