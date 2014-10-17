@@ -69,7 +69,8 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $this->moduleHandler->alter('domain_request', $info);
       $domain = $info['domain'];
     }
-    if (!empty($domain->id)) {
+    $id = $domain->id();
+    if (!empty($id)) {
       $this->setActiveDomain($domain);
     }
     $lookup[$httpHost] = $domain;

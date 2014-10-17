@@ -42,7 +42,7 @@ class DomainNegotiatorTest extends DomainTestBase {
     // Test the response of the default home page.
     foreach (domain_load_multiple() as $domain) {
       $this->drupalGet($domain->getPath());
-      $this->assertRaw($domain->name, 'Loaded the proper domain.');
+      $this->assertRaw($domain->label(), 'Loaded the proper domain.');
     }
 
     // Revoke the permission change
