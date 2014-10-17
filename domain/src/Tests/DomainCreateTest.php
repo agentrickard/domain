@@ -26,15 +26,16 @@ class DomainCreateTest extends DomainTestBase {
     // @TODO: This may need a refactor.
     $domain = domain_create();
     foreach (array('id', 'name', 'hostname') as $key) {
-      $this->assertTrue(is_null($domain->{$key}), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
+      $this->assertTrue(is_null($domain->getProperty($key)), format_string('New $domain->!key property is set to NULL.', array('!key' => $key)));
     }
     foreach (array('domain_id', 'scheme', 'status', 'weight' , 'is_default') as $key) {
-      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to default value: %value.', array('!key' => $key, '%value' => $domain->{$key})));
+      $property = $domain->getProperty($key);
+      $this->assertTrue(isset($property), format_string('New $domain->!key property is set to default value: %value.', array('!key' => $key, '%value' => $property)));
     }
     // Now add the additional fields and save.
-    $domain->hostname = $this->base_hostname;
-    $domain->id = domain_machine_name($domain->hostname);
-    $domain->name = 'Default';
+    $domain->addProperty('hostname', $this->base_hostname);
+    $domain->addProperty('id', domain_machine_name($this->base_hostname));
+    $domain->addProperty('name', 'Default');
     $domain->save();
 
     // Did it save correctly?
@@ -60,7 +61,8 @@ class DomainCreateTest extends DomainTestBase {
     $domain = domain_create(TRUE);
     // @TODO: This may need a refactor.
     foreach (array('domain_id', 'hostname', 'name', 'id', 'scheme', 'status', 'weight' , 'is_default') as $key) {
-      $this->assertTrue(isset($domain->{$key}), format_string('New $domain->!key property is set to a default value: %value.', array('!key' => $key, '%value' => $domain->{$key})));
+      $property = $domain->getProperty($key);
+      $this->assertTrue(isset($property), format_string('New $domain->!key property is set to a default value: %value.', array('!key' => $key, '%value' => $property)));
     }
   }
 
