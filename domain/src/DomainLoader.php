@@ -109,7 +109,7 @@ class DomainLoader implements DomainLoaderInterface {
   public function loadOptionsList() {
     $list = array();
     foreach ($this->loadMultipleSorted() as $id => $domain) {
-      $list[$id] = $domain->name;
+      $list[$id] = $domain->label();
     }
     return $list;
   }
@@ -118,7 +118,7 @@ class DomainLoader implements DomainLoaderInterface {
    * Sorts domains by weight.
    */
   public function sort($a, $b) {
-    return $a->weight > $b->weight;
+    return $a->getProperty('weight') > $b->getProperty('weight');
   }
 
 }
