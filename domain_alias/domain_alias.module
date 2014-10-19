@@ -70,12 +70,13 @@ function domain_alias_pattern_load($pattern) {
  */
 function domain_alias_domain_request_alter(&$info) {
   $domain = $info['domain'];
-  $hostname = $domain->hostname;
+  $hostname = $domain->getProperty('hostname');
   if ($alias = domain_alias_match_hostname($hostname)) {
-    if ($domain = domain_load($alias->domain_id)) {
-      $domain->alias = $alias->pattern;
-      if (!empty($alias->redirect)) {
-        $domain->setRedirect($alias->redirect);
+    if ($domain = domain_load($alias->getProperty('domain_id'))) {
+      $domain->addProperty('alias', $alias->getProperty('pattern'));
+      $redirect = $alias->getProperty('redirect');
+      if (!empty($redirect)) {
+        $domain->setRedirect($redirect);
       }
       $info['domain'] = $domain;
     }

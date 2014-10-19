@@ -22,4 +22,15 @@ interface DomainAliasInterface extends ConfigEntityInterface {
    */
   public function getProperty($name);
 
+  /**
+   * Sets a specific domain alias attribute.
+   *
+   * @param $name
+   *   The property key to save for the $domain object.
+   * @param $value
+   *   The value to set for the property.
+   *
+   */
+  public function setProperty($name, $value);
+
 }
