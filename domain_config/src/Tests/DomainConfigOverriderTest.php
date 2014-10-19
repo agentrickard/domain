@@ -29,11 +29,11 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     foreach (domain_load_multiple() as $domain) {
       $path = $domain->getPath() . 'user';
       $this->drupalGet($path);
-      if ($domain->is_default) {
+      if ($domain->isDefault()) {
         $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
       }
       else {
-        $this->assertRaw('<title>Log in | ' . $domain->name . '</title>', 'Loaded the proper site name.');
+        $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
       }
     }
 
