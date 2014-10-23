@@ -38,7 +38,7 @@ class DomainForm extends EntityForm {
       '#size' => 40,
       '#maxlength' => 80,
       '#default_value' => $domain->getProperty('hostname'),
-      '#description' => $this->t('The canonical hostname, using the full <em>path.example.com</em> format.') . '<br />' . $this->t('Leave off the http:// and the trailing slash and do not include any paths.'),
+      '#description' => $this->t('The canonical hostname, using the full <em>subdomain.example.com</em> format. Leave off the http:// and the trailing slash and do not include any paths.<br />If this domain uses a custom http(s) port, you should specify it here, e.g.: <em>subdomain.example.com:1234</em><br />The hostname may contain only lowercase alphanumeric characters, dots, dashes, and a colon (if using alternative ports).'),
     );
     $form['id'] = array(
       '#type' => 'machine_name',
@@ -54,21 +54,21 @@ class DomainForm extends EntityForm {
       '#size' => 40,
       '#maxlength' => 80,
       '#default_value' => $domain->getProperty('name'),
-      '#description' => $this->t('The human-readable name of this domain.')
+      '#description' => $this->t('The human-readable name is shown in domain lists and may be used as the title tag.')
     );
     $form['scheme'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Domain URL scheme'),
       '#options' => array('http' => 'http://', 'https' => 'https://'),
       '#default_value' => $domain->getProperty('scheme'),
-      '#description' => $this->t('The URL scheme for accessing this domain.')
+      '#description' => $this->t('This URL scheme will be used when writing links and redirects to this domain and its resources.')
     );
     $form['status'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Domain status'),
       '#options' => array(1 => $this->t('Active'), 0 => $this->t('Inactive')),
       '#default_value' => (int) $domain->getProperty('status'),
-      '#description' => $this->t('Must be set to "Active" for users to navigate to this domain.')
+      '#description' => $this->t('"Inactive" domains are only accessible to user roles with that assigned permission.')
     );
     $form['weight'] = array(
       '#type' => 'weight',
@@ -81,7 +81,7 @@ class DomainForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => $this->t('Default domain'),
       '#default_value' => $domain->isDefault(),
-      '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used.'),
+      '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
     $required = domain_required_fields();
     foreach ($form as $key => $element) {
