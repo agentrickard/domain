@@ -192,12 +192,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Detects if the domain is enabled.
+   * Detects if the domain users HTTPS.
    */
-  public function isEnabled() {
-    return (bool) $this->status;
-  }
-
   public function isHttps() {
     return (bool) ($this->getScheme(FALSE) == 'https');
   }

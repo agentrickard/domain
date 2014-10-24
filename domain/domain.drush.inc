@@ -516,7 +516,7 @@ function drush_domain_default($argument) {
 function drush_domain_disable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if ($domain->isEnabled()) {
+    if ($domain->status()) {
       $domain->disable();
       drush_print(dt('!domain has been disabled.', array('!domain' => $domain->get('hostname'))));
     }
@@ -532,7 +532,7 @@ function drush_domain_disable($argument) {
 function drush_domain_enable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if (!$domain->isEnabled()) {
+    if (!$domain->status()) {
       $domain->enable();
       drush_print(dt('!domain has been enabled.', array('!domain' => $domain->get('hostname'))));
     }

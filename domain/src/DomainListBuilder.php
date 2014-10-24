@@ -42,7 +42,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $token_generator = \Drupal::csrfToken();
 
     // @TODO: permission checks.
-    if ($entity->isEnabled() && !$default) {
+    if ($entity->status() && !$default) {
       $operations['disable'] = array(
         'title' => $this->t('Disable'),
         'url' => Url::fromRoute('domain.inline_action', array('op' => 'disable', 'domain' => $id)),
@@ -105,7 +105,7 @@ class DomainListBuilder extends DraggableListBuilder {
       $row['hostname']['#prefix'] = '<strong>';
       $row['hostname']['#suffix'] = '</strong>';
     }
-    $row['status'] = array('#markup' => $entity->isEnabled() ? $this->t('Active') : $this->t('Inactive'));
+    $row['status'] = array('#markup' => $entity->status() ? $this->t('Active') : $this->t('Inactive'));
     $row['is_default'] = array('#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No')));
     $row += parent::buildRow($entity);
     $row['weight']['#delta'] = count(domain_load_multiple()) + 1;
