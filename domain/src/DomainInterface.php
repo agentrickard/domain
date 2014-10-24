@@ -56,17 +56,6 @@ interface DomainInterface extends ConfigEntityInterface {
   public function saveProperty($name, $value);
 
   /**
-   * Sets a specific domain attribute.
-   *
-   * @param $name
-   *   The property key to save for the $domain object.
-   * @param $value
-   *   The value to set for the property.
-   *
-   */
-  public function setProperty($name, $value);
-
-  /**
    * Sets the base path to this domain.
    */
   public function setPath();
@@ -100,14 +89,6 @@ interface DomainInterface extends ConfigEntityInterface {
    * Sets the value of the response test.
    */
   public function setResponse($response);
-
-  /**
-   * Gets a property from the domain record.
-   *
-   * @param $name
-   *  The name of the property to retrieve.
-   */
-  public function getProperty($name);
 
   /**
    * Adds a property to the domain record.

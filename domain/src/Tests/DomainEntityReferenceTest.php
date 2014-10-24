@@ -83,7 +83,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $domains = domain_load_multiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->getProperty('name'))));
+      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->get('name'))));
       if (!isset($one)) {
         $one = $domain->id();
         continue;

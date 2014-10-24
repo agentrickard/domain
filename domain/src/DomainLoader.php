@@ -118,7 +118,7 @@ class DomainLoader implements DomainLoaderInterface {
    * Sorts domains by weight.
    */
   public function sort($a, $b) {
-    return $a->getProperty('weight') > $b->getProperty('weight');
+    return $a->get('weight') > $b->get('weight');
   }
 
 }

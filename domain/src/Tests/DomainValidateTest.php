@@ -34,7 +34,7 @@ class DomainValidateTest extends DomainTestBase {
     // @TODO: inject the service to the test?
     $validator = \Drupal::service('domain.validator');
     $validator->checkResponse($domain);
-    $this->assertTrue($domain->getProperty('response') == 200, format_string('Server test for @url passed.', array('@url' => $domain->getPath())));
+    $this->assertTrue($domain->get('response') == 200, format_string('Server test for @url passed.', array('@url' => $domain->getPath())));
 
     // Now create a bad domain.
     $values = array(
@@ -46,6 +46,6 @@ class DomainValidateTest extends DomainTestBase {
 
     $domain->save();
     $validator->checkResponse($domain);
-    $this->assertTrue($domain->getProperty('response') == 500, format_string('Server test for @url failed.', array('@url' => $domain->getPath())));
+    $this->assertTrue($domain->get('response') == 500, format_string('Server test for @url failed.', array('@url' => $domain->getPath())));
   }
 }

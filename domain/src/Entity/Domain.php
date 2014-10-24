@@ -174,13 +174,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * @inheritdoc
-   */
-  public function getProperty($name) {
-    return $this->{$name};
-  }
-
-  /**
    * Allows modules to load new properties onto the object.
    *
    * @TODO: We need a safe way to modify these properties?
@@ -189,13 +182,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!isset($this->{$name})) {
       $this->{$name} = $value;
     }
-  }
-
-  /**
-   * Set a property on the domain entity.
-   */
-  public function setProperty($name, $value) {
-    $this->{$name} = $value;
   }
 
   /**
@@ -356,7 +342,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     else {
       $url = Url::fromUri($this->getPath(), $options);
     }
-    return \Drupal::l($this->getProperty('hostname'), $url);
+    return \Drupal::l($this->get('hostname'), $url);
   }
 
   function getRedirect() {

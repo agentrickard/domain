@@ -1,1 +1,50 @@
-Change the Responder class to Negotiator, to be more in line with core.
+Getters and setters
+
+Inherited methods
+
+id()
+label()
+uuid()
+get()
+set()
+isNew()
+create()
+delete()
+status()
+setStatus()
+
+New methods
+
+getDomainId()
+setDomainId()
+getHostname()
+setHostname()
+getWeight()
+setWeight()
+setDefault()
+getScheme()
+setScheme()
+getPath()
+setPath()
+getUrl()
+setUrl()
+getResponse()
+setResponse()
+getRedirect()
+setRedirect()
+
+
+To Refactor
+link()
+enable()
+disable()
+
+
+Domain Alias
+
+getPattern()
+setPattern()
+getDomainId()
+setDomainId()
+getRedirect()
+setRedirect()

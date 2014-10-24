@@ -41,7 +41,7 @@ abstract class DomainAliasTestBase extends DomainTestBase {
    */
   public function domainAliasCreateTestAlias(DomainInterface $domain, $pattern = NULL, $redirect = 0) {
     if (empty($pattern)) {
-      $pattern = '*.' . $domain->getProperty('hostname');
+      $pattern = '*.' . $domain->get('hostname');
     }
     $values = array(
       'domain_id' => $domain->id(),

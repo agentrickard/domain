@@ -54,7 +54,7 @@ function domain_access_node_access_records(NodeInterface $node) {
     if ($domain = domain_load($value)) {
       $grants[] = array(
         'realm' => 'domain_id',
-        'gid' => $domain->getProperty('domain_id'),
+        'gid' => $domain->get('domain_id'),
         'grant_view' => 1,
         'grant_update' => 1,
         'grant_delete' => 1,
@@ -70,7 +70,7 @@ function domain_access_node_access_records(NodeInterface $node) {
 function domain_access_default_value($entity, $instance) {
   $item = array();
   if ($active = domain_get_domain()) {
-    $item[0]['target_uuid'] = $active->getProperty('uuid');
+    $item[0]['target_uuid'] = $active->get('uuid');
   }
   return $item;
 }
