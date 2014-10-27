@@ -47,30 +47,30 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
         $alias_domain = $domain;
       }
       $this->drupalGet($domain->getPath());
-      $this->assertRaw($domain->getProperty('name'), 'Loaded the proper domain.');
+      $this->assertRaw($domain->label(), 'Loaded the proper domain.');
       $this->assertRaw('Exact match', 'Direct domain match.');
     }
 
     // Now, test an alias.
     $this->domainAliasCreateTestAlias($alias_domain);
-    $pattern = '*.' . $alias_domain->getProperty('hostname');
+    $pattern = '*.' . $alias_domain->getHostname();
     $alias = domain_alias_pattern_load($pattern);
-    $alias_domain->setProperty('hostname', 'two.' . $alias_domain->getProperty('hostname'));
+    $alias_domain->set('hostname', 'two.' . $alias_domain->getHostname());
     $alias_domain->setPath();
     $url = $alias_domain->getPath();
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->label(), 'Loaded the proper domain.');
     $this->assertRaw('ALIAS:', 'No direct domain match.');
-    $this->assertRaw($alias->getProperty('pattern'), 'Alias match.');
+    $this->assertRaw($alias->getPattern(), 'Alias match.');
 
     // Test redirections.
     // @TODO: This could be much more elegant.
-    $alias->setProperty('redirect', 301);
+    $alias->set('redirect', 301);
     $alias->save();
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->label(), 'Loaded the proper domain.');
     $this->assertRaw('Exact match', 'Direct domain match.');
-    $alias->setProperty('redirect', 302);
+    $alias->set('redirect', 302);
     $alias->save();
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->label(), 'Loaded the proper domain.');

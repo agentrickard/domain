@@ -174,13 +174,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * @inheritdoc
-   */
-  public function getProperty($name) {
-    return $this->{$name};
-  }
-
-  /**
    * Allows modules to load new properties onto the object.
    *
    * @TODO: We need a safe way to modify these properties?
@@ -192,13 +185,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Set a property on the domain entity.
-   */
-  public function setProperty($name, $value) {
-    $this->{$name} = $value;
-  }
-
-  /**
    * Detects if the domain is the default domain.
    */
   public function isDefault() {
@@ -206,12 +192,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Detects if the domain is enabled.
+   * Detects if the domain users HTTPS.
    */
-  public function isEnabled() {
-    return (bool) $this->status;
-  }
-
   public function isHttps() {
     return (bool) ($this->getScheme(FALSE) == 'https');
   }
@@ -237,18 +219,22 @@ class Domain extends ConfigEntityBase implements DomainInterface {
 
   /**
    * Enables a domain record.
+   *
+   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::enable().
    */
   public function enable() {
-    $this->status = 1;
+    $this->setStatus(TRUE);
     $this->save();
   }
 
   /**
    * Disables a domain record.
+   *
+   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::disable().
    */
   public function disable() {
     if (!$this->isDefault()) {
-      $this->status = 0;
+      $this->setStatus(FALSE);
       $this->save();
     }
     else {
@@ -339,6 +325,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $validator = \Drupal::service('domain.validator');
       $validator->checkResponse($this);
     }
+    return $this->response;
   }
 
   public function setResponse($response) {
@@ -356,7 +343,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     else {
       $url = Url::fromUri($this->getPath(), $options);
     }
-    return \Drupal::l($this->getProperty('hostname'), $url);
+    return \Drupal::l($this->getHostname(), $url);
   }
 
   function getRedirect() {
@@ -365,6 +352,22 @@ class Domain extends ConfigEntityBase implements DomainInterface {
 
   function setRedirect($code = 302) {
     $this->redirect = $code;
+  }
+
+  function getHostname() {
+    return $this->hostname;
+  }
+
+  function setHostname($hostname) {
+    $this->hostname = $hostname;
+  }
+
+  function getDomainId() {
+    return $this->domain_id;
+  }
+
+  function getWeight() {
+    return $this->weight;
   }
 
 }

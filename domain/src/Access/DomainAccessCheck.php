@@ -60,7 +60,7 @@ class DomainAccessCheck implements AccessCheckInterface {
     if (empty($domain)) {
       return AccessResult::allowed();
     }
-    if ($domain->isEnabled()) {
+    if ($domain->status()) {
       return AccessResult::allowed();
     }
     // @todo: how to issue a redirect from here.

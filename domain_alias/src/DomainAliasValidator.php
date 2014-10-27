@@ -22,7 +22,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
    * Validates the rules for a domain alias.
    */
   public function validate(DomainAliasInterface $alias);
-    $pattern = $alias->pattern;
+    $pattern = $alias->getPattern();
 
     // 1) Check that the alias only has one wildcard.
     $count = substr_count($pattern, '*') + substr_count($pattern, '?');

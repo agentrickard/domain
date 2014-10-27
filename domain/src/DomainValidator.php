@@ -41,7 +41,7 @@ class DomainValidator implements DomainValidatorInterface {
    * Validates the hostname for a domain.
    */
   public function validate(DomainInterface $domain) {
-    $hostname = $domain->getProperty('hostname');
+    $hostname = $domain->getHostname();
     $error_list = array();
     // Check for at least one dot or the use of 'localhost'.
     // Note that localhost can specify a port.

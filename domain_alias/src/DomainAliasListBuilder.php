@@ -38,7 +38,8 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['label'] = $this->getLabel($entity);
-    $row['redirect'] = empty($entity->redirect) ? $this->t('None') : $entity->redirect;
+    $redirect = $entity->getRedirect();
+    $row['redirect'] = empty($redirect) ? $this->t('None') : $redirect;
     return $row += parent::buildRow($entity);
   }
 

@@ -168,7 +168,7 @@ function domain_drush_help($section) {
  * Shows the domain list.
  */
 function drush_domain_list() {
-  $domains = domain_load_multiple(NULL, TRUE);
+  $domains = domain_load_and_sort(NULL, TRUE);
 
   if (empty($domains)) {
     drush_print(dt('No domains have been created. Use drush domain-add to create one.'));
@@ -189,7 +189,7 @@ function drush_domain_list() {
   foreach ($domains as $domain) {
     $row = array();
     foreach ($header as $key => $name) {
-      $row[] = String::checkPlain($domain->getProperty($key));
+      $row[] = String::checkPlain($domain->get($key));
     }
     $rows[] = $row;
   }
@@ -224,7 +224,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
   $existing = array();
   if (!empty($domains)) {
     foreach ($domains as $domain) {
-      $existing[] = $domain->getProperty('hostname');
+      $existing[] = $domain->getHostname();
     }
   }
   // Set up one.* and so on.
@@ -365,8 +365,8 @@ function drush_domain_add_validate($hostname, $name) {
  */
 function domain_drush_create(DomainInterface $domain) {
   $domain->save();
-  if ($domain->getProperty('domain_id')) {
-    drush_print(dt('Created @name at @domain.', array('@name' => $domain->label(), '@domain' => $domain->getProperty('hostname'))));
+  if ($domain->getDomainId()) {
+    drush_print(dt('Created @name at @domain.', array('@name' => $domain->label(), '@domain' => $domain->getHostname())));
   }
   else {
     drush_print(dt('The request could not be completed.'));
@@ -427,7 +427,7 @@ function drush_domain_delete($argument = NULL) {
   }
   foreach ($domains as $domain) {
     $domain->delete();
-    drush_print(dt('Domain record @domain deleted.', array('@domain' => $domain->getProperty('hostname'))));
+    drush_print(dt('Domain record @domain deleted.', array('@domain' => $domain->getHostname())));
   }
 
   return;
@@ -437,7 +437,7 @@ function drush_domain_delete($argument = NULL) {
   $options = array('0' => dt('Do not reassign'));
   foreach ($list as $data) {
     if ($data->id() != $domain->id()) {
-      $options[$data->getProperty('domain_id')] = $data->getProperty('hostname');
+      $options[$data->getDomainId()] = $data->getHostname();
     }
   }
   $content = drush_choice($options, dt('Reassign content to:'), '!value');
@@ -506,7 +506,7 @@ function drush_domain_default($argument) {
       }
     }*/
     $domain->saveDefault();
-    drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->getProperty('hostname'))));
+    drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->getHostname())));
   }
 }
 
@@ -516,12 +516,12 @@ function drush_domain_default($argument) {
 function drush_domain_disable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if ($domain->isEnabled()) {
+    if ($domain->status()) {
       $domain->disable();
-      drush_print(dt('!domain has been disabled.', array('!domain' => $domain->getProperty('hostname'))));
+      drush_print(dt('!domain has been disabled.', array('!domain' => $domain->getHostname())));
     }
     else {
-      drush_print(dt('!domain is already disabled.', array('!domain' => $domain->getProperty('hostname'))));
+      drush_print(dt('!domain is already disabled.', array('!domain' => $domain->getHostname())));
     }
   }
 }
@@ -532,12 +532,12 @@ function drush_domain_disable($argument) {
 function drush_domain_enable($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    if (!$domain->isEnabled()) {
+    if (!$domain->status()) {
       $domain->enable();
-      drush_print(dt('!domain has been enabled.', array('!domain' => $domain->getProperty('hostname'))));
+      drush_print(dt('!domain has been enabled.', array('!domain' => $domain->getHostname())));
     }
     else {
-      drush_print(dt('!domain is already enabled.', array('!domain' => $domain->getProperty('hostname'))));
+      drush_print(dt('!domain is already enabled.', array('!domain' => $domain->getHostname())));
     }
   }
 }
@@ -562,7 +562,7 @@ function drush_domain_machine_name($argument, $machine_name) {
     $results = entity_load_multiple_by_properties('domain', array('machine_name' => $machine_name));
     foreach ($results as $result) {
       if ($result->id() == $machine_name) {
-        drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', array('@machine_name' => $machine_name, '@hostname' => $result->getProperty('hostname'))));
+        drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', array('@machine_name' => $machine_name, '@hostname' => $result->getHostname())));
         return;
       }
     }
