@@ -338,7 +338,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     else {
       $url = Url::fromUri($this->getPath(), $options);
     }
-    return \Drupal::l($this->get('hostname'), $url);
+    return \Drupal::l($this->getHostname(), $url);
   }
 
   function getRedirect() {
@@ -348,5 +348,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   function setRedirect($code = 302) {
     $this->redirect = $code;
   }
+
+  function getHostname() {
+    return $this->hostname;
+  }
+
+  function setHostname($hostname) {
+    $this->hostname = $hostname;
+  }
+
 
 }

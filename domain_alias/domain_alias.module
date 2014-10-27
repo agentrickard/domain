@@ -70,7 +70,7 @@ function domain_alias_pattern_load($pattern) {
  */
 function domain_alias_domain_request_alter(&$info) {
   $domain = $info['domain'];
-  $hostname = $domain->get('hostname');
+  $hostname = $domain->getHostname();
   if ($alias = domain_alias_match_hostname($hostname)) {
     if ($domain = domain_load($alias->get('domain_id'))) {
       $domain->addProperty('alias', $alias->get('pattern'));

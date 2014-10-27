@@ -112,4 +112,8 @@ interface DomainInterface extends ConfigEntityInterface {
 
   function setRedirect($code = 302);
 
+  function getHostname();
+
+  function setHostname($hostname);
+
 }
