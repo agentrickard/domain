@@ -61,7 +61,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->label(), 'Loaded the proper domain.');
     $this->assertRaw('ALIAS:', 'No direct domain match.');
-    $this->assertRaw($alias->get('pattern'), 'Alias match.');
+    $this->assertRaw($alias->getPattern(), 'Alias match.');
 
     // Test redirections.
     // @TODO: This could be much more elegant.

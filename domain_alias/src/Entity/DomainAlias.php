@@ -81,4 +81,16 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
    */
   protected $redirect;
 
+  public function getPattern() {
+    return $this->pattern;
+  }
+
+  public function getDomainId() {
+    return $this->domain_id;
+  }
+
+  public function getRedirect() {
+    return $this->redirect;
+  }
+
 }

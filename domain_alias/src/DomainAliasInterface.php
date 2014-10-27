@@ -14,4 +14,8 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface DomainAliasInterface extends ConfigEntityInterface {
 
+  public function getPattern();
+  public function getDomainId();
+  public function getRedirect();
+
 }

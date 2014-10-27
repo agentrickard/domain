@@ -219,18 +219,22 @@ class Domain extends ConfigEntityBase implements DomainInterface {
 
   /**
    * Enables a domain record.
+   *
+   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::enable().
    */
   public function enable() {
-    $this->status = 1;
+    $this->setStatus(TRUE);
     $this->save();
   }
 
   /**
    * Disables a domain record.
+   *
+   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::disable().
    */
   public function disable() {
     if (!$this->isDefault()) {
-      $this->status = 0;
+      $this->setStatus(FALSE);
       $this->save();
     }
     else {
