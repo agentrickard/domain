@@ -325,6 +325,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $validator = \Drupal::service('domain.validator');
       $validator->checkResponse($this);
     }
+    return $this->response;
   }
 
   public function setResponse($response) {

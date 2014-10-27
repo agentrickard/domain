@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Definition of Drupal\domain\Tests\DomainValidateTest.
+ * Definition of Drupal\domain\Tests\DomainValidatorTest.
  */
 
 namespace Drupal\domain\Tests;
@@ -13,7 +13,7 @@ use Drupal\domain\DomainInterface;
  *
  * @group domain
  */
-class DomainValidateTest extends DomainTestBase {
+class DomainValidatorTest extends DomainTestBase {
 
   /**
    * Tests that a domain response is proper.
@@ -31,9 +31,6 @@ class DomainValidateTest extends DomainTestBase {
     $domain = domain_load($key);
 
     // Our testing server should be able to acess the test PNG file.
-    // @TODO: inject the service to the test?
-    $validator = \Drupal::service('domain.validator');
-    $validator->checkResponse($domain);
     $this->assertTrue($domain->getResponse() == 200, format_string('Server test for @url passed.', array('@url' => $domain->getPath())));
 
     // Now create a bad domain.
@@ -45,7 +42,6 @@ class DomainValidateTest extends DomainTestBase {
     $domain = domain_create(FALSE, $values);
 
     $domain->save();
-    $validator->checkResponse($domain);
     $this->assertTrue($domain->getResponse() == 500, format_string('Server test for @url failed.', array('@url' => $domain->getPath())));
   }
 }
