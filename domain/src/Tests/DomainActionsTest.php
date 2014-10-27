@@ -46,7 +46,7 @@ class DomainActionsTest extends DomainTestBase {
 
     // Test some text on the page.
     foreach ($domains as $domain) {
-      $name = $domain->get('name');
+      $name = $domain->label();
       $this->assertText($name, format_string('@name found on overview page.', array('@name' => $name)));
     }
     // @TODO: Test the list of actions.

@@ -47,7 +47,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
         $alias_domain = $domain;
       }
       $this->drupalGet($domain->getPath());
-      $this->assertRaw($domain->get('name'), 'Loaded the proper domain.');
+      $this->assertRaw($domain->label(), 'Loaded the proper domain.');
       $this->assertRaw('Exact match', 'Direct domain match.');
     }
 

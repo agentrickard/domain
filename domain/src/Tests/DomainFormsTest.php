@@ -59,7 +59,7 @@ class DomainFormsTest extends DomainTestBase {
 
     // Check that the update succeeded.
     $domain = domain_load($default_id, TRUE);
-    $this->assertTrue($domain->get('name') == 'Foo', 'Domain record updated via form.');
+    $this->assertTrue($domain->label() == 'Foo', 'Domain record updated via form.');
 
     // Visit the delete domain administration page.
     $deleteUrl = 'admin/structure/domain/delete/' . $new_domain->id();

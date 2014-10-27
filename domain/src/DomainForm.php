@@ -53,7 +53,7 @@ class DomainForm extends EntityForm {
       '#title' => $this->t('Name'),
       '#size' => 40,
       '#maxlength' => 80,
-      '#default_value' => $domain->get('name'),
+      '#default_value' => $domain->label(),
       '#description' => $this->t('The human-readable name is shown in domain lists and may be used as the title tag.')
     );
     $form['scheme'] = array(
