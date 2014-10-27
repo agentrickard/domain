@@ -67,7 +67,7 @@ class DomainForm extends EntityForm {
       '#type' => 'radios',
       '#title' => $this->t('Domain status'),
       '#options' => array(1 => $this->t('Active'), 0 => $this->t('Inactive')),
-      '#default_value' => (int) $domain->get('status'),
+      '#default_value' => (int) $domain->status(),
       '#description' => $this->t('"Inactive" domains are only accessible to user roles with that assigned permission.')
     );
     $form['weight'] = array(
