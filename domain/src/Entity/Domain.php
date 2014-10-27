@@ -361,4 +361,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $this->domain_id;
   }
 
+  function getWeight() {
+    return $this->weight;
+  }
+
 }

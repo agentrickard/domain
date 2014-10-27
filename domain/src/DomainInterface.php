@@ -118,4 +118,6 @@ interface DomainInterface extends ConfigEntityInterface {
 
   function getDomainId();
 
+  function getWeight();
+
 }

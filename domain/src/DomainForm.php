@@ -74,7 +74,7 @@ class DomainForm extends EntityForm {
       '#type' => 'weight',
       '#title' => $this->t('Weight'),
       '#delta' => count(domain_load_multiple()) + 1,
-      '#default_value' => $domain->get('weight'),
+      '#default_value' => $domain->getWeight(),
       '#description' => $this->t('The sort order for this record. Lower values display first.'),
     );
     $form['is_default'] = array(
