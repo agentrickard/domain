@@ -72,7 +72,7 @@ function domain_alias_domain_request_alter(&$info) {
   $domain = $info['domain'];
   $hostname = $domain->getHostname();
   if ($alias = domain_alias_match_hostname($hostname)) {
-    if ($domain = domain_load($alias->get('domain_id'))) {
+    if ($domain = domain_load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias->get('pattern'));
       $redirect = $alias->get('redirect');
       if (!empty($redirect)) {

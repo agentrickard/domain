@@ -357,5 +357,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     $this->hostname = $hostname;
   }
 
+  function getDomainId() {
+    return $this->domain_id;
+  }
 
 }

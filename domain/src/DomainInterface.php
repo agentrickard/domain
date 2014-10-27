@@ -116,4 +116,6 @@ interface DomainInterface extends ConfigEntityInterface {
 
   function setHostname($hostname);
 
+  function getDomainId();
+
 }

@@ -365,7 +365,7 @@ function drush_domain_add_validate($hostname, $name) {
  */
 function domain_drush_create(DomainInterface $domain) {
   $domain->save();
-  if ($domain->get('domain_id')) {
+  if ($domain->getDomainId()) {
     drush_print(dt('Created @name at @domain.', array('@name' => $domain->label(), '@domain' => $domain->getHostname())));
   }
   else {
@@ -437,7 +437,7 @@ function drush_domain_delete($argument = NULL) {
   $options = array('0' => dt('Do not reassign'));
   foreach ($list as $data) {
     if ($data->id() != $domain->id()) {
-      $options[$data->get('domain_id')] = $data->getHostname();
+      $options[$data->getDomainId()] = $data->getHostname();
     }
   }
   $content = drush_choice($options, dt('Reassign content to:'), '!value');

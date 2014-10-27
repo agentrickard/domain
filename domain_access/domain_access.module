@@ -54,7 +54,7 @@ function domain_access_node_access_records(NodeInterface $node) {
     if ($domain = domain_load($value)) {
       $grants[] = array(
         'realm' => 'domain_id',
-        'gid' => $domain->get('domain_id'),
+        'gid' => $domain->getDomainId(),
         'grant_view' => 1,
         'grant_update' => 1,
         'grant_delete' => 1,
