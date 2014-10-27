@@ -55,7 +55,7 @@ class DomainSubscriber implements EventSubscriberInterface {
   public function onKernelRequestDomain(GetResponseEvent $event) {
     $redirect = FALSE;
     if ($domain = $this->domainNegotiator->negotiateActiveDomain()) {
-      $domain_url = $domain->get('url');
+      $domain_url = $domain->getUrl();
       if ($domain_url) {
         $redirect_type = $domain->getRedirect();
         $path = trim($event->getRequest()->getPathInfo(), '/');
