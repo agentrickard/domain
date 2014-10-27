@@ -60,7 +60,7 @@ class DomainForm extends EntityForm {
       '#type' => 'radios',
       '#title' => $this->t('Domain URL scheme'),
       '#options' => array('http' => 'http://', 'https' => 'https://'),
-      '#default_value' => $domain->get('scheme'),
+      '#default_value' => $domain->getScheme(),
       '#description' => $this->t('This URL scheme will be used when writing links and redirects to this domain and its resources.')
     );
     $form['status'] = array(
