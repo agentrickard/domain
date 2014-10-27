@@ -52,6 +52,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $this->domain = NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setRequestDomain($httpHost, $reset = FALSE) {
     static $loookup;
     if (isset($lookup[$httpHost]) && !$reset) {
@@ -76,11 +79,17 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $lookup[$httpHost] = $domain;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setActiveDomain(DomainInterface $domain) {
     // @TODO: caching
     $this->domain = $domain;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function negotiateActiveDomain() {
     $httpHost = $this->negotiateActiveHostname();
     $this->setRequestDomain($httpHost);
@@ -88,7 +97,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   }
 
   /**
-   * Gets the active domain.
+   * {@inheritdoc}
    */
   public function getActiveDomain($reset = FALSE) {
     if (is_null($this->domain) || $reset) {
@@ -98,14 +107,14 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   }
 
   /**
-   * Gets the id of the active domain.
+   * {@inheritdoc}
    */
   public function getActiveId() {
     return $this->domain->id();
   }
 
   /**
-   * Gets the hostname of the active request.
+   * {@inheritdoc}
    */
   public function negotiateActiveHostname() {
     if ($request = $this->requestStack->getCurrentRequest()) {
@@ -117,10 +126,16 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     return !empty($httpHost) ? $httpHost : 'localhost';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setHttpHost($httpHost) {
     $this->httpHost = $httpHost;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getHttpHost() {
     return $this->httpHost;
   }

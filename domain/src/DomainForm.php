@@ -127,4 +127,5 @@ class DomainForm extends EntityForm {
     $domain->delete();
     $form_state->setRedirect('domain.admin');
   }
+
 }

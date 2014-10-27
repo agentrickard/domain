@@ -41,4 +41,5 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
     }
     return AccessResult::forbidden();
   }
+
 }

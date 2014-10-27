@@ -42,9 +42,7 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * @return array
-   *   An array keyed by field name and containing the name and
-   *   label for the field.
+   * {@inheritdoc}
    */
   public function loadSchema() {
     $fields = $this->typedConfig->getDefinition('domain.record.*');
@@ -52,10 +50,7 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Returns the id of the default domain.
-   *
-   * @return
-   *   The id of the default domain or FALSE if none is set.
+   * {@inheritdoc}
    */
   public function loadDefaultId() {
     $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
@@ -66,7 +61,7 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Gets the default domain object.
+   * {@inheritdoc}
    */
   public function loadDefaultDomain() {
     $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
@@ -77,14 +72,14 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Loads multiple domains.
+   * {@inheritdoc}
    */
   public function loadMultiple($ids = NULL, $reset = FALSE) {
     return entity_load_multiple('domain', $ids, $reset);
   }
 
   /**
-   * Loads multiple domains and sorts by weight.
+   * {@inheritdoc}
    */
   public function loadMultipleSorted($ids = NULL) {
     $domains = $this->loadMultiple();
@@ -93,7 +88,7 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Loads a domain record by hostname lookup.
+   * {@inheritdoc}
    */
   public function loadByHostname($hostname) {
     $entities = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
@@ -104,7 +99,7 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Returns the list of domains formatted for a form options list.
+   * {@inheritdoc}
    */
   public function loadOptionsList() {
     $list = array();
@@ -115,7 +110,7 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Sorts domains by weight.
+   * {@inheritdoc}
    */
   public function sort($a, $b) {
     return $a->getWeight() > $b->getWeight();

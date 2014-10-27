@@ -162,7 +162,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Detects if the current domain is the active domain.
+   * {@inheritdoc}
    */
   public function isActive() {
     $negotiator = \Drupal::service('domain.negotiator');
@@ -174,9 +174,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Allows modules to load new properties onto the object.
-   *
-   * @TODO: We need a safe way to modify these properties?
+   * {@inheritdoc}
    */
   public function addProperty($name, $value) {
     if (!isset($this->{$name})) {
@@ -185,21 +183,21 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Detects if the domain is the default domain.
+   * {@inheritdoc}
    */
   public function isDefault() {
     return (bool) $this->is_default;
   }
 
   /**
-   * Detects if the domain users HTTPS.
+   * {@inheritdoc}
    */
   public function isHttps() {
     return (bool) ($this->getScheme(FALSE) == 'https');
   }
 
   /**
-   * Makes a domain record the default.
+   * {@inheritdoc}
    */
   public function saveDefault() {
     if (!$this->isDefault()) {
@@ -218,8 +216,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Enables a domain record.
-   *
    * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::enable().
    */
   public function enable() {
@@ -228,8 +224,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Disables a domain record.
-   *
    * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::disable().
    */
   public function disable() {
@@ -243,7 +237,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Saves a specific domain attribute.
+   * {@inheritdoc}
    */
   public function saveProperty($name, $value) {
     if (isset($this->{$name})) {
@@ -257,21 +251,21 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Sets the base path to this domain.
+   * {@inheritdoc}
    */
   public function setPath() {
     $this->path = $this->getScheme() . $this->hostname . base_path();
   }
 
   /**
-   * Sets the domain-specific link to the current URL.
+   * {@inheritdoc}
    */
   public function setUrl() {
     $this->url = $this->getScheme() . $this->hostname . request_uri();
   }
 
   /**
-   * Gets the path for a domain.
+   * {@inheritdoc}
    */
   public function getPath() {
     if (!isset($this->path)) {
@@ -281,7 +275,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Gets the url for a domain.
+   * {@inheritdoc}
    */
   public function getUrl() {
     if (!isset($this->url)) {
@@ -308,7 +302,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Returns the scheme for a domain record.
+   * {@inheritdoc}
    */
   public function getScheme($add_suffix = TRUE) {
     $scheme = $this->scheme;
@@ -320,6 +314,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $scheme;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getResponse() {
     if (empty($this->response)) {
       $validator = \Drupal::service('domain.validator');
@@ -328,12 +325,15 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $this->response;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function setResponse($response) {
     $this->response = $response;
   }
 
   /**
-   * Returns a URL object for a domain.
+   * {@inheritdoc}
    */
   public function getLink($current_path = TRUE) {
     $options = array('absolute' => TRUE, 'https' => $this->isHttps());
@@ -346,26 +346,44 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return \Drupal::l($this->getHostname(), $url);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function getRedirect() {
     return $this->redirect;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function setRedirect($code = 302) {
     $this->redirect = $code;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function getHostname() {
     return $this->hostname;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function setHostname($hostname) {
     $this->hostname = $hostname;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function getDomainId() {
     return $this->domain_id;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   function getWeight() {
     return $this->weight;
   }
