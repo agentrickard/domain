@@ -46,7 +46,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->assertTrue($new_domain->id() == $edit['id'], 'Domain loaded properly.');
 
     // Has a UUID been set?
-    $uuid = $new_domain->get('uuid');
+    $uuid = $new_domain->uuid();
     $this->assertTrue(!empty($uuid), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
