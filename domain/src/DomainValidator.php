@@ -12,6 +12,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use GuzzleHttp\Exception\RequestException;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Component\Utility\Unicode;
 
 class DomainValidator implements DomainValidatorInterface {
 
@@ -78,7 +79,7 @@ class DomainValidator implements DomainValidatorInterface {
       }
     }
     // Check for lower case.
-    if ($hostname != drupal_strtolower($hostname)) {
+    if ($hostname !=  Unicode::strtolower($hostname)) {
       $error_list[] = $this->t('Only lower-case characters are allowed.');
     }
     // Check for 'www' prefix if redirection / handling is enabled under global domain settings.
