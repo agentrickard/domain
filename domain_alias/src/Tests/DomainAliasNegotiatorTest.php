@@ -58,6 +58,8 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $alias_domain->set('hostname', 'two.' . $alias_domain->getHostname());
     $alias_domain->setPath();
     $url = $alias_domain->getPath();
+    debug($alias_domain);
+    debug($url);
     $this->drupalGet($url);
     $this->assertRaw($alias_domain->label(), 'Loaded the proper domain.');
     $this->assertRaw('ALIAS:', 'No direct domain match.');

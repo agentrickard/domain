@@ -85,7 +85,7 @@ class DomainAliasForm extends EntityForm {
       drupal_set_message($this->t('Domain alias updated.'));
     }
     $alias->save();
-    $form_state['redirect'] = 'admin/structure/domain/alias/' . $alias->getDomainID();
+    $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainID()));
   }
 
   /**
@@ -93,7 +93,9 @@ class DomainAliasForm extends EntityForm {
    */
   public function delete(array $form, FormStateInterface $form_state) {
     $alias = $this->entity;
+    // @TODO: error handling?
     $alias->delete();
-    $form_state['redirect'] = 'admin/structure/domain/alias/' . $alias->getDomainID();
+
+    $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainID()));
   }
 }

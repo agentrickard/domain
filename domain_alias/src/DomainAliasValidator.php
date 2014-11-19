@@ -21,7 +21,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
   /**
    * Validates the rules for a domain alias.
    */
-  public function validate(DomainAliasInterface $alias);
+  public function validate(DomainAliasInterface $alias) {
     $pattern = $alias->getPattern();
 
     // 1) Check that the alias only has one wildcard.

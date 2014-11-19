@@ -62,20 +62,21 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     }
     $this->setHttpHost($httpHost);
     $domain = $this->domainLoader->loadByHostname($httpHost);
-    // If a straight load fails, check with modules (like Domain Alias) that
-    // register alternate paths with the main module.
+    // If a straight load fails, create a base domain for checking.
     if (empty($domain)) {
       $domain = entity_create('domain', array('hostname' => $httpHost));
-      // @TODO: Should this be an event instead?
-      // @TODO: Should this be hook_domain_bootstrap_lookup?
-      $info['domain'] = $domain;
-      $this->moduleHandler->alter('domain_request', $info);
-      $domain = $info['domain'];
     }
+    // Now check with modules (like Domain Alias) that register alternate
+    // lookup systems with the main module.
+    $info['domain'] = $domain;
+    $this->moduleHandler->alter('domain_request', $domain);
+
+    // We must have registered a valid id, else the request made no match.
     $id = $domain->id();
     if (!empty($id)) {
       $this->setActiveDomain($domain);
     }
+    // Store the result in local cache.
     $lookup[$httpHost] = $domain;
   }
 

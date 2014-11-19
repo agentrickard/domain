@@ -34,18 +34,15 @@ function hook_domain_load(array $domains) {
  * To issue a redirect, as in the case of Domain Alias, set a redirect
  * property to a valid response code (301 or 302).
  *
- * @param array $info
- *   An array passed by reference to allow for drupal_alter(). This array
- *   contains one item, the 'domain' key, which contains a $domain object.
- *   defined by Drupal\domain\DomainInterface.
+ * @param DomainInterface $domain
+ *   A domain object defined by Drupal\domain\DomainInterface.
  */
-function hook_domain_request_alter(&$info) {
-  $domain = $info['domain'];
-  if ($domain->id == 'example_com') {
+function hook_domain_request_alter(DomainInterface $domain) {
+  // Add a special case to the example domain.
+  if ($domain->id() == 'example_com') {
     // Do something here.
-    $domain->foo = 'Bar';
+    $domain->addProperty('foo', 'Bar');
   }
-  $info['domain'] = $domain;
 }
 
 /**
