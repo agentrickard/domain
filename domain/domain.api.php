@@ -37,7 +37,7 @@ function hook_domain_load(array $domains) {
  * @param DomainInterface $domain
  *   A domain object defined by Drupal\domain\DomainInterface.
  */
-function hook_domain_request_alter(DomainInterface $domain) {
+function hook_domain_request_alter(DomainInterface &$domain) {
   // Add a special case to the example domain.
   if ($domain->id() == 'example_com') {
     // Do something here.

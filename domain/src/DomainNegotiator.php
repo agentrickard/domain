@@ -68,7 +68,6 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     }
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
-    $info['domain'] = $domain;
     $this->moduleHandler->alter('domain_request', $domain);
 
     // We must have registered a valid id, else the request made no match.

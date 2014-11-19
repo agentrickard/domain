@@ -181,7 +181,7 @@ function domain_required_fields() {
  */
 function domain_get_domain() {
   $negotiator = Drupal::service('domain.negotiator');
-  return $negotiator->negotiateActiveDomain();
+  return $negotiator->getActiveDomain();
 }
 
 /**
@@ -189,7 +189,7 @@ function domain_get_domain() {
  */
 function domain_get_active_id() {
   $negotiator = Drupal::service('domain.negotiator');
-  return $negotiator->negotiateActiveDomainId();
+  return $negotiator->getActiveId();
 }
 
 /**

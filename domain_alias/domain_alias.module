@@ -69,7 +69,7 @@ function domain_alias_pattern_load($pattern) {
  *
  * These patterns should be sufficient for most conditions.
  */
-function domain_alias_domain_request_alter(DomainInterface $domain) {
+function domain_alias_domain_request_alter(DomainInterface &$domain) {
   $hostname = $domain->getHostname();
   if ($alias = domain_alias_match_hostname($hostname)) {
     if ($domain = domain_load($alias->getDomainId())) {
