@@ -7,7 +7,7 @@ domain.admin:
   requirements:
     _permission: 'administer domains'
 
-domain.add:
+entity.domain.add:
   path: '/admin/structure/domain/add'
   defaults:
     _entity_form: domain.edit
@@ -17,7 +17,7 @@ domain.add:
   requirements:
     _permission: "create domains"
 
-domain.edit:
+entity.domain.edit_form:
   path: '/admin/structure/domain/edit/{domain}'
   defaults:
     _entity_form: domain.edit
@@ -27,7 +27,7 @@ domain.edit:
   requirements:
     _entity_access: domain.update
 
-domain.delete:
+entity.domain.delete_form:
   path: '/admin/structure/domain/delete/{domain}'
   defaults:
     _entity_form: domain.delete

@@ -1,5 +1,5 @@
-domain.edit:
+entity.domain.edit_form:
   title: 'Edit'
-  route_name: domain.edit
+  route_name: entity.domain.edit_form
   parent_id: domain.admin
 

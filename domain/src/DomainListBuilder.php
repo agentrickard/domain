@@ -64,7 +64,7 @@ class DomainListBuilder extends DraggableListBuilder {
       );
       $operations['delete'] = array(
         'title' => $this->t('Delete'),
-        'url' => Url::fromRoute('domain.delete', array('domain' => $id)),
+        'url' => Url::fromRoute('entity.domain.delete_form', array('domain' => $id)),
         'weight' => 20,
       );
     }

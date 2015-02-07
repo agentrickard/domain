@@ -7,7 +7,7 @@ domain_alias.admin:
   requirements:
     _permission: 'administer domains'
 
-domain_alias.edit:
+entity.domain_alias.edit_form:
   path: '/admin/structure/domain/alias/edit/{domain_alias}'
   defaults:
     _entity_form: domain_alias.edit
@@ -15,7 +15,7 @@ domain_alias.edit:
   requirements:
     _permission: 'administer domains'
 
-domain_alias.delete:
+entity.domain_alias.delete_form:
   path: '/admin/structure/domain/alias/delete/{domain_alias}'
   defaults:
     _entity_form: domain_alias.delete
