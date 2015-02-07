@@ -19,7 +19,7 @@ abstract class DomainBlockBase extends BlockBase {
   /**
    * Overrides \Drupal\block\BlockBase::access().
    */
-  public function access(AccountInterface $account) {
+  public function access(AccountInterface $account, $return_as_object = FALSE) {
     return AccessResult::allowedIfHasPermission($account, 'administer domains');
   }
 
