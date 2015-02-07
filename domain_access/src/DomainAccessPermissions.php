@@ -68,15 +68,16 @@ class DomainAccessPermissions {
    */
   function nodePermissions($type) {
     // Build standard list of node permissions for this type.
+    $id = $type->id();
     $perms = array(
-      "create $type->type content on assigned domains" => array(
-        'title' => $this->t('%type_name: Create new content on assigned domains', array('%type_name' => $type->name)),
+      "create $id content on assigned domains" => array(
+        'title' => $this->t('%type_name: Create new content on assigned domains', array('%type_name' => $type->label())),
       ),
-      "update $type->type content on assigned domains" => array(
-        'title' => $this->t('%type_name: Edit any content on assigned domains', array('%type_name' => $type->name)),
+      "update $id content on assigned domains" => array(
+        'title' => $this->t('%type_name: Edit any content on assigned domains', array('%type_name' => $type->label())),
       ),
-      "delete $type->type content on assigned domains" => array(
-        'title' => $this->t('%type_name: Delete any content on assigned domains', array('%type_name' => $type->name)),
+      "delete $id content on assigned domains" => array(
+        'title' => $this->t('%type_name: Delete any content on assigned domains', array('%type_name' => $type->label())),
       ),
     );
 
