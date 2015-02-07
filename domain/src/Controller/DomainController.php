@@ -42,14 +42,14 @@ class DomainController {
       case 'enable':
         $domain->enable();
         $verb = $this->t('has been enabled.');
-        if ($domain->status) {
+        if ($domain->status()) {
           $success = TRUE;
         }
         break;
       case 'disable':
         $domain->disable();
         $verb = $this->t('has been disabled.');
-        if (!$domain->status) {
+        if (!$domain->status()) {
           $success = TRUE;
         }
         break;
