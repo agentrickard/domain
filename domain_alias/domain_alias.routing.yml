@@ -26,8 +26,7 @@ entity.domain_alias.delete_form:
 domain_alias.add:
   path: '/admin/structure/domain/alias/{domain}/add'
   defaults:
-    _content: '\Drupal\domain_alias\Controller\DomainAliasController::addAlias'
+    _controller: '\Drupal\domain_alias\Controller\DomainAliasController::addAlias'
     _title: 'Add domain alias'
-    _title_context: 'With modules'
   requirements:
     _permission: 'administer domains'

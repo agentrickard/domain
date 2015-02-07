@@ -27,7 +27,8 @@ class DomainAliasDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('domain_alias.admin');
+    $arguments['domain'] = $this->entity->getDomainId();
+    return new Url('domain_alias.admin', $arguments);
   }
 
   /**
