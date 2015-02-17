@@ -7,6 +7,7 @@
 namespace Drupal\domain_access;
 
 use Drupal\node\Entity\NodeType;
+use Drupal\node\NodeTypeInterface;
 
 /**
  * Dynamic permissions class for Domain Access.
@@ -63,17 +64,19 @@ class DomainAccessPermissions {
    * @return array
    *   An array of permission names and descriptions.
    */
-  function nodePermissions($type) {
+  function nodePermissions(NodeTypeInterface $type) {
     // Build standard list of node permissions for this type.
+    $typeId = $type->getEntityTypeId();
+    $typeLabel = $type->label();
     $perms = array(
-      "create $type->type content on assigned domains" => array(
-        'title' => t('%type_name: Create new content on assigned domains', array('%type_name' => $type->name)),
+      "create $typeId content on assigned domains" => array(
+        'title' => t('%type_name: Create new content on assigned domains', array('%type_name' => $typeLabel)),
       ),
-      "update $type->type content on assigned domains" => array(
-        'title' => t('%type_name: Edit any content on assigned domains', array('%type_name' => $type->name)),
+      "update $typeId content on assigned domains" => array(
+        'title' => t('%type_name: Edit any content on assigned domains', array('%type_name' => $typeLabel)),
       ),
-      "delete $type->type content on assigned domains" => array(
-        'title' => t('%type_name: Delete any content on assigned domains', array('%type_name' => $type->name)),
+      "delete $typeId content on assigned domains" => array(
+        'title' => t('%type_name: Delete any content on assigned domains', array('%type_name' => $typeLabel)),
       ),
     );
 

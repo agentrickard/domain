@@ -206,6 +206,7 @@ function domain_required_fields() {
 
 /**
  * Returns the current domain record.
+ * @return Domain
  */
 function domain_get_domain() {
   $domain = Drupal::service('domain.manager');

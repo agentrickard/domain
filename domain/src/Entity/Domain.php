@@ -7,6 +7,7 @@
 
 namespace Drupal\domain\Entity;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -192,7 +193,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       }
     }
     // Check for lower case.
-    if ($hostname != drupal_strtolower($hostname)) {
+    if ($hostname != Unicode::strtolower($hostname)) {
       $error_list[] = t('Only lower-case characters are allowed.');
     }
     // Check for 'www' prefix if redirection / handling is enabled under global domain settings.
