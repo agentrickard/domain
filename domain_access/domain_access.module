@@ -10,7 +10,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountProxy;
 use Drupal\user\UserInterface;
 
 /**
@@ -26,7 +26,7 @@ define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
 /**
  * Implements hook_node_grants().
  */
-function domain_access_node_grants(AccountInterface $account, $op) {
+function domain_access_node_grants(AccountProxy $account, $op) {
   $grants = array();
   $active = domain_get_domain();
   $id = $active->domain_id;
@@ -38,8 +38,9 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   }
 
   // Grants for edit/delete require permissions.
-  if($account instanceof UserInterface) {
-    $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+  if($account->isAuthenticated()) {
+    $user = entity_load('user', $account->id());
+    $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
     if ($op == 'update' && $account->hasPermission('edit domain content') && isset($user_domains[$id])) {
       $grants['domain_id'][] = $id;
     }
@@ -106,7 +107,8 @@ function domain_access_get_entity_values($entity, $field_name) {
   if (!empty($values)) {
     foreach ($values as $item) {
       if ($target = $item->getValue()) {
-        $list[$target['target_id']] = $target['target_id'];
+        $domain = domain_load($target['target_id']);
+        $list[$domain->domain_id] = $target['target_id'];
       }
     }
   }
