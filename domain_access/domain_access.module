@@ -38,15 +38,13 @@ function domain_access_node_grants(AccountProxy $account, $op) {
   }
 
   // Grants for edit/delete require permissions.
-  if($account->isAuthenticated()) {
-    $user = entity_load('user', $account->id());
-    $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
-    if ($op == 'update' && $account->hasPermission('edit domain content') && isset($user_domains[$id])) {
-      $grants['domain_id'][] = $id;
-    }
-    if ($op == 'delete' && $account->hasPermission('delete domain content') && isset($user_domains[$id])) {
-      $grants['domain_id'][] = $id;
-    }
+  $user = entity_load('user', $account->id());
+  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
+  if ($op == 'update' && $account->hasPermission('edit domain content') && isset($user_domains[$id])) {
+    $grants['domain_id'][] = $id;
+  }
+  if ($op == 'delete' && $account->hasPermission('delete domain content') && isset($user_domains[$id])) {
+    $grants['domain_id'][] = $id;
   }
 
   return $grants;
