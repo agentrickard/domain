@@ -10,7 +10,7 @@ use Drupal\domain\Tests\DomainTestBase;
 use Drupal\domain\DomainInterface;
 
 /**
- * Tests the domain access integtration with node_access records.
+ * Tests the domain access integration with node_access records.
  *
  * @group domain_access
  */
