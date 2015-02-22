@@ -8,7 +8,7 @@
 namespace Drupal\domain_access\Tests;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\domain\DomainInterface;
-use Drupal\node\Tests\NodeTestBase;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Tests the application of domain access grants.
@@ -30,6 +30,11 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // @TODO: figure out why this is necessary.
     module_load_install('domain_access');
     domain_access_install();
+    // Set the access handler.
+    $this->accessHandler = \Drupal::entityManager()->getAccessControlHandler('node');
+
+    // Clear permissions for authenticated users.
+    $this->config('user.role.' . DRUPAL_AUTHENTICATED_RID)->set('permissions', array())->save();
   }
 
   /**
@@ -54,6 +59,64 @@ class DomainAccessGrantsTest extends DomainTestBase {
       $this->drupalGet($domain->getPath() . 'node/' . $node1->id());
       $this->assertRaw($node1->getTitle(), 'Loaded the proper domain.');
     }
+    // @TODO: use the base methods instead of cloning them here.
+    // Ensures user without 'access content' permission can do nothing.
+    $web_user1 = $this->drupalCreateUser(array('create article content', 'edit any article content', 'delete any article content'));
+    $this->assertNodeAccess(array('view' => FALSE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user1);
+    // Grant access content and the user can view the node.
+    user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('access content'));
+    $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user1);
+    // @TODO: update and delete grants.
   }
+
+  /**
+   * Asserts that node access correctly grants or denies access.
+   *
+   * @param array $ops
+   *   An associative array of the expected node access grants for the node
+   *   and account, with each key as the name of an operation (e.g. 'view',
+   *   'delete') and each value a Boolean indicating whether access to that
+   *   operation should be granted.
+   * @param \Drupal\node\Entity\Node $node
+   *   The node object to check.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account for which to check access.
+   * @param string|null $langcode
+   *   (optional) The language code indicating which translation of the node
+   *   to check. If NULL, the untranslated (fallback) access is checked.
+   */
+  function assertNodeAccess(array $ops, $node, AccountInterface $account, $langcode = NULL) {
+    foreach ($ops as $op => $result) {
+      if (empty($langcode)) {
+        $langcode = $node->prepareLangcode();
+      }
+      $this->assertEqual($result, $this->accessHandler->access($node, $op, $langcode, $account), $this->nodeAccessAssertMessage($op, $result, $langcode));
+    }
+  }
+
+  /**
+   * Constructs an assert message for checking node access.
+   *
+   * @param string $operation
+   *   The operation to check access for.
+   * @param bool $result
+   *   Whether access should be granted or not.
+   * @param string|null $langcode
+   *   (optional) The language code indicating which translation of the node
+   *   to check. If NULL, the untranslated (fallback) access is checked.
+   *
+   * @return string
+   */
+  function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
+    return format_string(
+      'Node access returns @result with operation %op, language code %langcode.',
+      array(
+        '@result' => $result ? 'true' : 'false',
+        '%op' => $operation,
+        '%langcode' => !empty($langcode) ? $langcode : 'empty'
+      )
+    );
+  }
+
 
 }
