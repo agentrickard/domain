@@ -8,6 +8,7 @@
 namespace Drupal\domain_access\Tests;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\domain\DomainInterface;
+use Drupal\node\Tests\NodeTestBase;
 
 /**
  * Tests the application of domain access grants.
@@ -48,7 +49,11 @@ class DomainAccessGrantsTest extends DomainTestBase {
     ));
     $this->assertTrue(entity_load('node', $node1->id()), 'Article node created.');
 
-    debug($domain->id());
+    // Test the response of the node on each site. Should allow access.
+    foreach ($domains as $domain) {
+      $this->drupalGet($domain->getPath() . 'node/' . $node1->id());
+      $this->assertRaw($node1->getTitle(), 'Loaded the proper domain.');
+    }
   }
 
 }

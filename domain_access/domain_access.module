@@ -25,21 +25,22 @@ define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
 /**
  * Implements hook_node_grants().
  */
-function domain_access_node_grants($op, AccountInterface $account) {
+function domain_access_node_grants(AccountInterface $account, $op) {
   $grants = array();
   $active = domain_get_domain();
-  $id = $active->id();
+  $id = $active->getDomainId();
   // Grants for view are simple. Use the active domain.
   if ($op == 'view') {
     $grants['domain_id'][] = $id;
     return $grants;
   }
   // Grants for edit/delete require permissions.
-  $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
-  if ($op == 'update' && $account->hasPermission('edit domain content') && isset($account_domains[$id])) {
+  $user = entity_load('user', $account->id());
+  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
+  if ($op == 'update' && $user->hasPermission('edit domain content') && isset($account_domains[$id])) {
     $grants['domain_id'][] = $id;
   }
-  if ($op == 'delete' && $account->hasPermission('delete domain content') && isset($account_domains[$id])) {
+  if ($op == 'delete' && $user->hasPermission('delete domain content') && isset($account_domains[$id])) {
     $grants['domain_id'][] = $id;
   }
 
@@ -91,7 +92,7 @@ function domain_access_get_entity_values($entity, $field_name) {
   // @TODO: static cache.
   $list = array();
   // @TODO In tests, $entity is returning null.
-  if (is_null($entity) || $entity->isNew()) {
+  if (is_null($entity)) {
     return $list;
   }
   // Get the values of an entity.
