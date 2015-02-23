@@ -65,7 +65,10 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // Grant access content and the user can view the node.
     user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('access content'));
     $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user1);
-    // @TODO: update and delete grants.
+    // Check global update and delete grants.
+    // @TODO Assign the user to the test domain.
+    user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('edit domain content', 'delete domain content'));
+    $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $node1, $web_user1);
   }
 
   /**
