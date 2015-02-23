@@ -59,7 +59,6 @@ class DomainAccessGrantsTest extends DomainTestBase {
       $this->drupalGet($domain->getPath() . 'node/' . $node1->id());
       $this->assertRaw($node1->getTitle(), 'Loaded the proper domain.');
     }
-    // @TODO: use the base methods instead of cloning them here.
     // Ensures user without 'access content' permission can do nothing.
     $web_user1 = $this->drupalCreateUser(array('create article content', 'edit any article content', 'delete any article content'));
     $this->assertNodeAccess(array('view' => FALSE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user1);
@@ -117,6 +116,5 @@ class DomainAccessGrantsTest extends DomainTestBase {
       )
     );
   }
-
 
 }
