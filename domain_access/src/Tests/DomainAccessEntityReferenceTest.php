@@ -33,7 +33,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
   }
 
   /**
-   * Install the domain access field via hook_install().
+   * Tests that the module installed its field correctly.
    */
   function testDomainAccessNodeField() {
     $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
