@@ -3,7 +3,7 @@ administer domains:
 access inactive domains:
   title: 'Access inactive domains'
 create domains:
-  title:'Create domain records'
+  title: 'Create domain records'
 edit assigned domains:
   title: 'Edit assigned domain records'
 delete assigned domains:
