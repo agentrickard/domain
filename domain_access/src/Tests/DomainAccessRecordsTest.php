@@ -49,10 +49,13 @@ class DomainAccessRecordsTest extends DomainTestBase {
     $this->assertTrue(entity_load('node', $node1->id()), 'Article node created.');
 
     // Check to see if grants added by domain_node_access_records made it in.
-    $records = db_query('SELECT realm, gid FROM {node_access} WHERE nid = :nid', array(':nid' => $node1->id()))->fetchAll();
+    $records = db_query('SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid', array(':nid' => $node1->id()))->fetchAll();
     $this->assertEqual(count($records), 1, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
     $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
+    $this->assertEqual($records[0]->grant_view, 1, 'Grant view stored.');
+    $this->assertEqual($records[0]->grant_update, 1, 'Grant update stored.');
+    $this->assertEqual($records[0]->grant_delete, 1, 'Grant delete stored.');
   }
 
 }

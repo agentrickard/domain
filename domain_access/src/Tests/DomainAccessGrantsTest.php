@@ -66,9 +66,11 @@ class DomainAccessGrantsTest extends DomainTestBase {
     user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('access content'));
     $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user1);
     // Check global update and delete grants.
-    // @TODO Assign the user to the test domain.
+    // We have to use a new user here because the access check is cached.
+    $web_user2 = $this->drupalCreateUser(array('access content', 'create article content', 'edit any article content', 'delete any article content'));
+    $this->addDomainToEntity('user', $web_user2->id(), $active_domain, DOMAIN_ACCESS_USER_FIELD);
     user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('edit domain content', 'delete domain content'));
-    $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $node1, $web_user1);
+    $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $node1, $web_user2);
   }
 
   /**

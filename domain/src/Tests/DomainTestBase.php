@@ -124,4 +124,23 @@ abstract class DomainTestBase extends WebTestBase {
     return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
   }
 
+  /**
+   * Adds a test domain to an entity.
+   *
+   * @param $entity_type
+   *   The entity type being acted upon.
+   * @param $entity_id
+   *   The entity id.
+   * @param $id
+   *   The id of the domain to add.
+   * @param $field
+   *   The name of the domain field used to attach to the entity.
+   */
+  public function addDomainToEntity($entity_type, $entity_id, $id, $field) {
+    if ($entity = entity_load($entity_type, $entity_id)) {
+      $entity->set($field, $id);
+      $entity->save();
+    }
+  }
+
 }
