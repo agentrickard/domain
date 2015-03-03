@@ -11,6 +11,8 @@ use Drupal\node\NodeInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 
 /**
  * Defines the name of the node access control field.
@@ -69,7 +71,7 @@ function domain_access_node_access_records(NodeInterface $node) {
 /**
  * Sets the default value for new fields.
  */
-function domain_access_default_value($entity, $instance) {
+function domain_access_default_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
   $item = array();
   if ($active = domain_get_domain()) {
     $item[0]['target_uuid'] = $active->uuid();
