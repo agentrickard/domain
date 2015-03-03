@@ -39,7 +39,7 @@ function domain_access_install() {
       'bundle' => $type,
       'required' => TRUE,
       'description' => 'Select the affiliate domain(s) for this content.',
-      'default_value_function' => 'domain_access_default_value',
+      'default_value_callback' => 'domain_access_default_value',
       'settings' => array(
         'handler_settings' => array(
           'sort' => array('field' => 'weight', 'direction' => 'ASC'),
@@ -80,7 +80,7 @@ function domain_access_install() {
     'bundle' => 'user',
     'required' => FALSE,
     'description' => 'Select the affiliate domain(s) for this user.',
-    'default_value_function' => 'domain_access_default_value',
+    'default_value_callback' => 'domain_access_default_value',
     'settings' => array(
       'handler_settings' => array(
         'sort' => array('field' => 'weight', 'direction' => 'ASC'),
