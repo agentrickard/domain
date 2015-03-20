@@ -261,7 +261,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * {@inheritdoc}
    */
   public function setUrl() {
-    $this->url = $this->getScheme() . $this->hostname . request_uri();
+    $uri = \Drupal::request()->getRequestUri();
+    $this->url = $this->getScheme() . $this->hostname . $uri;
   }
 
   /**
