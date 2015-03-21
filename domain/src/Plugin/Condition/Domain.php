@@ -88,6 +88,7 @@ class Domain extends ConditionPluginBase {
     debug($this->getContextValue('domain'));
     $context = $this->getContextValue('domain');
     // @TODO: This is not right.
+    // @see http://cgit.drupalcode.org/drupal/tree/core/modules/block/src/EventSubscriber/CurrentUserContext.php
     if (empty($context)) {
       $active = domain_get_domain();
       $this->setContextValue($active->id());
