@@ -32,7 +32,7 @@ class DomainSwitcherBlock extends DomainBlockBase {
     $items = array();
     foreach (domain_load_and_sort() as $domain) {
       $string = $domain->getLink();
-      if (!$domain->status) {
+      if (!$domain->status()) {
         $string .= '*';
       }
       if ($domain->id() == $active_domain->id()) {
