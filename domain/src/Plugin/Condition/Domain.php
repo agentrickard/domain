@@ -60,7 +60,7 @@ class Domain extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function summary() {
-    // This doesn't seem to fire.
+    // @TODO: This doesn't seem to fire.
     // Use the domain labels. They will be sanitized below.
     $domains = array_intersect_key(domain_options_list(), $this->configuration['domains']);
     if (count($domains) > 1) {
@@ -69,11 +69,11 @@ class Domain extends ConditionPluginBase {
     else {
       $domains = reset($domains);
     }
-    if (!empty($this->configuration['negate'])) {
-      return $this->t('Active domain is not @domains', array('@domain' => $domains));
+    if ($this->isNegated()) {
+      return $this->t('Active domain is not @domains', array('@domains' => $domains));
     }
     else {
-      return $this->t('Active domain is @roles', array('@roles' => $domains));
+      return $this->t('Active domain is @domains', array('@domains' => $domains));
     }
   }
 
@@ -81,8 +81,13 @@ class Domain extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function evaluate() {
-    // This doesn't seem to fire.
-    return true;
+    $domains = $this->configuration['domains'];
+    if (empty($domains) && !$this->isNegated()) {
+      return TRUE;
+    }
+    $active = domain_get_domain();
+    // NOTE: The block system handles negation for us.
+    return (bool) in_array($active->id(), $domains);
   }
 
 }
