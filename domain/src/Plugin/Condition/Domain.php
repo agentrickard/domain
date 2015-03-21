@@ -85,9 +85,15 @@ class Domain extends ConditionPluginBase {
     if (empty($domains) && !$this->isNegated()) {
       return TRUE;
     }
-    $active = domain_get_domain();
+    debug($this->getContextValue('domain'));
+    $context = $this->getContextValue('domain');
+    // @TODO: This is not right.
+    if (empty($context)) {
+      $active = domain_get_domain();
+      $this->setContextValue($active->id());
+    }
     // NOTE: The block system handles negation for us.
-    return (bool) in_array($active->id(), $domains);
+    return (bool) in_array($this->getContextValue('domain'), $domains);
   }
 
 }
