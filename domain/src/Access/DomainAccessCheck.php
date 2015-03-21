@@ -45,6 +45,7 @@ class DomainAccessCheck implements AccessCheckInterface {
    */
   public function checkPath($path) {
     $list = explode('/', $path);
+    // @TODO: This list may need to be configurable.
     if (current($list) == 'user') {
       return FALSE;
     }

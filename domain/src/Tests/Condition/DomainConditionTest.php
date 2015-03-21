@@ -12,7 +12,7 @@ use Drupal\Component\Utility\String;
 use Drupal\domain\DomainInterface;
 
 /**
- * Tests the domain role condition.
+ * Tests the domain condition.
  *
  * @group domain
  */
