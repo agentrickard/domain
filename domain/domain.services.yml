@@ -33,7 +33,7 @@ services:
     class: Drupal\domain\EventSubscriber\DomainSubscriber
     tags:
       - { name: event_subscriber }
-    arguments: ['@domain.negotiator', '@access_check.domain', '@current_user']
+    arguments: ['@domain.negotiator', '@domain.loader', '@access_check.domain', '@current_user']
   domain.validator:
     class: Drupal\domain\DomainValidator
     tags:

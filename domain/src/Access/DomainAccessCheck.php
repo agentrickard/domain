@@ -45,6 +45,7 @@ class DomainAccessCheck implements AccessCheckInterface {
    */
   public function checkPath($path) {
     $list = explode('/', $path);
+    // @TODO: This list may need to be configurable.
     if (current($list) == 'user') {
       return FALSE;
     }
@@ -57,13 +58,15 @@ class DomainAccessCheck implements AccessCheckInterface {
   public function access(AccountInterface $account) {
     $domain = $this->domainNegotiator->negotiateActiveDomain();
     // Is the domain allowed?
+    // No domain, let it pass.
     if (empty($domain)) {
       return AccessResult::allowed();
     }
+    // Active domain, let it pass.
     if ($domain->status()) {
       return AccessResult::allowed();
     }
-    // @todo: how to issue a redirect from here.
+    // Inactive domain, require permissions.
     else {
       $permissions = array('administer domains', 'access inactive domains');
       $operator = 'OR';
