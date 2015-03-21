@@ -8,6 +8,7 @@
 namespace Drupal\domain\EventSubscriber;
 
 use Drupal\block\Event\BlockContextEvent;
+use Drupal\block\EventSubscriber\BlockContextSubscriberBase;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
@@ -22,25 +23,17 @@ class DomainContext extends BlockContextSubscriberBase {
   use StringTranslationTrait;
 
   /**
-   * @var \Drupal\domain\DomainLoaderInterface
-   */
-  protected $loader;
-
-  /**
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $negotiator;
 
   /**
-   * Constructs a DomainCreator object.
+   * Constructs a DomainContext object.
    *
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    */
-  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator) {
-    $this->loader = $loader;
+  public function __construct(DomainNegotiatorInterface $negotiator) {
     $this->negotiator = $negotiator;
   }
 
@@ -48,11 +41,10 @@ class DomainContext extends BlockContextSubscriberBase {
    * {@inheritdoc}
    */
   public function onBlockActiveContext(BlockContextEvent $event) {
-    $current_domain = $this->userStorage->load($this->account->id());
-
-    $context = new Context(new ContextDefinition('entity:user', $this->t('Current user')));
-    $context->setContextValue($current_user);
-    $event->setContext('user.current_user', $context);
+    $current_domain = $this->negotiator->getActiveDomain();
+    $context = new Context(new ContextDefinition('entity:domain', $this->t('Active domain')));
+    $context->setContextValue($current_domain);
+    $event->setContext('domain.current_domain', $context);
   }
 
   /**

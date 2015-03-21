@@ -67,16 +67,24 @@ class DomainConditionTest extends DomainTestBase {
     $condition = $this->manager->createInstance('domain')
       ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
       ->setContextValue('domain', $this->not_domain->id());
-    $this->assertFalse($condition->execute(), 'Domain request condition fails.');
+    $this->assertFalse($condition->execute(), 'Domain request condition fails on wrong domain.');
+
     // Grab the domain condition and configure it to check against itself.
     $condition = $this->manager->createInstance('domain')
       ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
       ->setContextValue('domain', $this->test_domain->id());
-    $this->assertTrue($condition->execute(), 'Domain request condition succeeds.');
+    $this->assertTrue($condition->execute(), 'Domain request condition succeeds on matching domain.');
 
     // Check for the proper summary.
     // Summaries require an extra space due to negate handling in summary().
-    #$this->assertEqual($condition->summary(), 'The domain is a member of Authenticated domain');
+    $this->assertEqual($condition->summary(), 'Active domain is ' . $this->test_domain->label());
+
+    // Check the negated summary.
+    $condition->setConfig('negate', TRUE);
+    $this->assertEqual($condition->summary(), 'Active domain is not ' . $this->test_domain->label());
+
+    // Check the negated condition.
+    $this->assertFalse($condition->execute(), 'Domain request condition fails when condition negated.');
   }
 
 }

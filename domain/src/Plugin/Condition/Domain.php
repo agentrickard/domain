@@ -85,14 +85,7 @@ class Domain extends ConditionPluginBase {
     if (empty($domains) && !$this->isNegated()) {
       return TRUE;
     }
-    debug($this->getContextValue('domain'));
     $context = $this->getContextValue('domain');
-    // @TODO: This is not right.
-    // @see http://cgit.drupalcode.org/drupal/tree/core/modules/block/src/EventSubscriber/CurrentUserContext.php
-    if (empty($context)) {
-      $active = domain_get_domain();
-      $this->setContextValue($active->id());
-    }
     // NOTE: The block system handles negation for us.
     return (bool) in_array($this->getContextValue('domain'), $domains);
   }
