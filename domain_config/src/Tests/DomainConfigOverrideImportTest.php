@@ -13,7 +13,7 @@ use Drupal\domain_config\Tests\DomainConfigTestBase;
 /**
  * Ensures the domain config overrides can be synchronized.
  *
- * @group domain
+ * @group domain_config
  */
 class DomainConfigOverrideImportTest extends DomainConfigTestBase {
 
