@@ -1,7 +1,7 @@
 services:
   domain.config_subscriber:
     class: Drupal\domain\EventSubscriber\ConfigSubscriber
-    arguments: ['@domain_negotiator', '@domain.loader']
+    arguments: ['@domain.loader', '@domain_negotiator']
     tags:
       - { name: event_subscriber }
   domain.config_factory_override:

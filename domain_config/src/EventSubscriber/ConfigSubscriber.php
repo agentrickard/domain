@@ -7,6 +7,9 @@
 
 namespace Drupal\domain_config\EventSubscriber;
 
+use Drupal\domain\DomainCreatorInterface;
+use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
@@ -18,30 +21,26 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ConfigSubscriber implements EventSubscriberInterface {
 
   /**
-   * The domain manager.
-   *
-   * @var \Drupal\Core\Domain\DomainManagerInterface
+   * @var \Drupal\domain\DomainLoaderInterface
    */
-  protected $domainManager;
+  protected $loader;
 
   /**
-   * The default domain.
-   *
-   * @var \Drupal\Core\Domain\DomainDefault
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
-  protected $domainDefault;
+  protected $negotiator;
 
   /**
-   * Constructs a new class object.
+   * Constructs a DomainCreator object.
    *
-   * @param \Drupal\Core\Domain\DomainManagerInterface $domain_manager
-   *   The domain manager.
-   * @param \Drupal\Core\Domain\DomainDefault $domain_default
-   *   The default domain.
+   * @param \Drupal\domain\DomainLoaderInterface $loader
+   *   The domain loader.
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
+   *   The domain negotiator.
    */
-  public function __construct(DomainManagerInterface $domain_manager, DomainDefault $domain_default) {
-    $this->domainManager = $domain_manager;
-    $this->domainDefault = $domain_default;
+  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator) {
+    $this->loader = $loader;
+    $this->negotiator = $negotiator;
   }
 
   /**
@@ -51,19 +50,12 @@ class ConfigSubscriber implements EventSubscriberInterface {
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
+    // @TODO The purpose here is not clear, and how does it apply to Domain?
+    // @see Drupal\language\EventSubscriber\ConfigSubscriber
     $saved_config = $event->getConfig();
-    if ($saved_config->getName() == 'system.site' && $event->isChanged('langcode')) {
-      $domain = $this->domainManager->getDomain($saved_config->get('langcode'));
-      // During an import the domain might not exist yet.
-      if ($domain) {
-        $this->domainDefault->set($domain);
-        $this->domainManager->reset();
-        domain_negotiation_url_prefixes_update();
-      }
-      // Trigger a container rebuild on the next request by deleting compiled
-      // from PHP storage.
-      PhpStorageFactory::get('service_container')->deleteAll();
-    }
+    // Trigger a container rebuild on the next request by deleting compiled
+    // from PHP storage.
+    PhpStorageFactory::get('service_container')->deleteAll();
   }
 
   /**
