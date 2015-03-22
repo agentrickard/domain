@@ -13,8 +13,13 @@ use Drupal\Core\Config\ConfigFactoryOverrideBase;
 use Drupal\Core\Config\ConfigRenameEvent;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\domain_config\Config\DomainConfigFactoryOverrideInterface;
+use Drupal\domain\DomainCreatorInterface;
+use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 
 /**
  * Provides domain overrides for the configuration factory.
@@ -27,14 +32,14 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
    * The configuration storage.
    *
    * Do not access this directly. Should be accessed through self::getStorage()
-   * so that the cache of storages per langcode is used.
+   * so that the cache of storages per domain is used.
    *
    * @var \Drupal\Core\Config\StorageInterface
    */
   protected $baseStorage;
 
   /**
-   * An array of configuration storages keyed by langcode.
+   * An array of configuration storages keyed by domain.
    *
    * @var \Drupal\Core\Config\StorageInterface[]
    */
@@ -55,9 +60,19 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
   protected $eventDispatcher;
 
   /**
+   * @var \Drupal\domain\DomainLoaderInterface
+   */
+  protected $loader;
+
+  /**
+   * @var \Drupal\domain\DomainNegotiatorInterface
+   */
+  protected $negotiator;
+
+  /**
    * The domain object used to override configuration data.
    *
-   * @var \Drupal\Core\Domain\DomainInterface
+   * @var \Drupal\domain\DomainInterface
    */
   protected $domain;
 
@@ -70,11 +85,17 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
    *   An event dispatcher instance to use for configuration events.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
+   * @param \Drupal\domain\DomainLoaderInterface $loader
+   *   The domain loader.
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
+   *   The domain negotiator.
    */
-  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
+  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config, DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator) {
     $this->baseStorage = $storage;
     $this->eventDispatcher = $event_dispatcher;
     $this->typedConfigManager = $typed_config;
+    $this->loader = $loader;
+    $this->negotiator = $negotiator;
   }
 
   /**
@@ -91,8 +112,8 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
   /**
    * {@inheritdoc}
    */
-  public function getOverride($langcode, $name) {
-    $storage = $this->getStorage($langcode);
+  public function getOverride($id, $name) {
+    $storage = $this->getStorage($id);
     $data = $storage->read($name);
 
     $override = new DomainConfigOverride(
@@ -111,11 +132,11 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
   /**
    * {@inheritdoc}
    */
-  public function getStorage($langcode) {
-    if (!isset($this->storages[$langcode])) {
-      $this->storages[$langcode] = $this->baseStorage->createCollection($this->createConfigCollectionName($langcode));
+  public function getStorage($id) {
+    if (!isset($this->storages[$id])) {
+      $this->storages[$id] = $this->baseStorage->createCollection($this->createConfigCollectionName($id));
     }
-    return $this->storages[$langcode];
+    return $this->storages[$id];
   }
 
   /**
@@ -143,7 +164,7 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
   /**
    * {@inheritdoc}
    */
-  public function setDomainFromDefault(DomainDefault $domain_default = NULL) {
+  public function setDomainFromDefault(DomainInterface $domain_default = NULL) {
     $this->domain = $domain_default ? $domain_default->get() : NULL;
     return $this;
   }
@@ -151,25 +172,25 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
   /**
    * {@inheritdoc}
    */
-  public function installDomainOverrides($langcode) {
+  public function installDomainOverrides($id) {
     /** @var \Drupal\Core\Config\ConfigInstallerInterface $config_installer */
     $config_installer = \Drupal::service('config.installer');
-    $config_installer->installCollectionDefaultConfig($this->createConfigCollectionName($langcode));
+    $config_installer->installCollectionDefaultConfig($this->createConfigCollectionName($id));
   }
 
   /**
    * {@inheritdoc}
    */
   public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
-    $langcode = $this->getLangcodeFromCollectionName($collection);
-    return $this->getOverride($langcode, $name);
+    $id = $this->getDomainIdFromCollectionName($collection);
+    return $this->getOverride($id, $name);
   }
 
   /**
    * {@inheritdoc}
    */
   public function addCollections(ConfigCollectionInfo $collection_info) {
-    foreach (\Drupal::domainManager()->getDomains() as $domain) {
+    foreach ($this->loader->loadMultiple() as $domain) {
       $collection_info->addCollection($this->createConfigCollectionName($domain->getId()), $this);
     }
   }
@@ -180,10 +201,10 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
   public function onConfigSave(ConfigCrudEvent $event) {
     $config = $event->getConfig();
     $name = $config->getName();
-    foreach (\Drupal::domainManager()->getDomains() as $domain) {
-      $config_translation = $this->getOverride($domain->getId(), $name);
-      if (!$config_translation->isNew()) {
-        $this->filterOverride($config, $config_translation);
+    foreach ($this->loader->loadMultiple() as $domain) {
+      $config_domain = $this->getOverride($domain->getId(), $name);
+      if (!$config_domain->isNew()) {
+        $this->filterOverride($config, $config_domain);
       }
     }
   }
@@ -195,13 +216,13 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
     $config = $event->getConfig();
     $name = $config->getName();
     $old_name = $event->getOldName();
-    foreach (\Drupal::domainManager()->getDomains() as $domain) {
-      $config_translation = $this->getOverride($domain->getId(), $old_name);
-      if (!$config_translation->isNew()) {
-        $saved_config = $config_translation->get();
+    foreach ($this->loader->loadMultiple() as $domain) {
+      $config_domain = $this->getOverride($domain->getId(), $old_name);
+      if (!$config_domain->isNew()) {
+        $saved_config = $config_domain->get();
         $storage = $this->getStorage($domain->getId());
         $storage->write($name, $saved_config);
-        $config_translation->delete();
+        $config_domain->delete();
       }
     }
   }
@@ -212,10 +233,10 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
   public function onConfigDelete(ConfigCrudEvent $event) {
     $config = $event->getConfig();
     $name = $config->getName();
-    foreach (\Drupal::domainManager()->getDomains() as $domain) {
-      $config_translation = $this->getOverride($domain->getId(), $name);
-      if (!$config_translation->isNew()) {
-        $config_translation->delete();
+    foreach ($this->loader->loadMultiple() as $domain) {
+      $config_domain = $this->getOverride($domain->getId(), $name);
+      if (!$config_domain->isNew()) {
+        $config_domain->delete();
       }
     }
   }
