@@ -49,9 +49,9 @@ class DomainConfigOverrideImportTest extends DomainConfigTestBase {
 
     $manager = \Drupal::service('domain.config_factory_override');
     $override = $manager->getOverride($test_domain->id(), 'system.site');
-    $this->assertEqual('One default site name', $override->get('name'));
+    $this->assertEqual('Test default site name', $override->get('name'));
     $this->drupalGet($test_domain->getUrl());
-    $this->assertText('One default site name');
+    $this->assertText('Test default site name');
 
     #$this->drupalLogin($this->rootUser);
     #$this->drupalGet('admin/config/development/maintenance/translate/fr/edit');
