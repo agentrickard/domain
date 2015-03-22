@@ -1,7 +1,12 @@
 services:
-  domain_config.overrider:
-    class: Drupal\domain_config\DomainConfigOverrider
+  domain.config_subscriber:
+    class: Drupal\domain\EventSubscriber\ConfigSubscriber
+    arguments: ['@domain_negotiator', '@domain.loader']
     tags:
-      - { name: config.factory.override}
-    arguments: ['@domain.negotiator', '@config.factory', '@config.storage']
-
+      - { name: event_subscriber }
+  domain.config_factory_override:
+    class: Drupal\domain\Config\DomainConfigFactoryOverride
+    arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
+    tags:
+      - { name: config.factory.override, priority: -250 }
+      - { name: event_subscriber }
