@@ -14,8 +14,8 @@ use Drupal\Core\Config\ConfigRenameEvent;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\domain_config\Config\DomainConfigFactoryOverrideInterface;
-use Drupal\domain\DomainCreatorInterface;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -103,7 +103,7 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
    */
   public function loadOverrides($names) {
     if ($this->domain) {
-      $storage = $this->getStorage($this->domain->getId());
+      $storage = $this->getStorage($this->domain->id());
       return $storage->readMultiple($names);
     }
     return array();
@@ -143,7 +143,7 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    return $this->domain ? $this->domain->getId() : NULL;
+    return $this->domain ? $this->domain->id() : NULL;
   }
 
   /**
@@ -191,7 +191,7 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
    */
   public function addCollections(ConfigCollectionInfo $collection_info) {
     foreach ($this->loader->loadMultiple() as $domain) {
-      $collection_info->addCollection($this->createConfigCollectionName($domain->getId()), $this);
+      $collection_info->addCollection($this->createConfigCollectionName($domain->id()), $this);
     }
   }
 
@@ -202,7 +202,7 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
     $config = $event->getConfig();
     $name = $config->getName();
     foreach ($this->loader->loadMultiple() as $domain) {
-      $config_domain = $this->getOverride($domain->getId(), $name);
+      $config_domain = $this->getOverride($domain->id(), $name);
       if (!$config_domain->isNew()) {
         $this->filterOverride($config, $config_domain);
       }
@@ -217,10 +217,10 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
     $name = $config->getName();
     $old_name = $event->getOldName();
     foreach ($this->loader->loadMultiple() as $domain) {
-      $config_domain = $this->getOverride($domain->getId(), $old_name);
+      $config_domain = $this->getOverride($domain->id(), $old_name);
       if (!$config_domain->isNew()) {
         $saved_config = $config_domain->get();
-        $storage = $this->getStorage($domain->getId());
+        $storage = $this->getStorage($domain->id());
         $storage->write($name, $saved_config);
         $config_domain->delete();
       }
@@ -234,7 +234,7 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
     $config = $event->getConfig();
     $name = $config->getName();
     foreach ($this->loader->loadMultiple() as $domain) {
-      $config_domain = $this->getOverride($domain->getId(), $name);
+      $config_domain = $this->getOverride($domain->id(), $name);
       if (!$config_domain->isNew()) {
         $config_domain->delete();
       }

@@ -7,8 +7,8 @@
 
 namespace Drupal\domain_config\EventSubscriber;
 
-use Drupal\domain\DomainCreatorInterface;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Config\ConfigCrudEvent;
