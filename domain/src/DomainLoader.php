@@ -91,7 +91,9 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByHostname($hostname) {
-    $entities = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
+    $entities = \Drupal::entityManager()
+      ->getStorage('domain')
+      ->loadByProperties(array('hostname' => $hostname));
     if (empty($entities)) {
       return FALSE;
     }

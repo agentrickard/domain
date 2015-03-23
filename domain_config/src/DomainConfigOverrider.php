@@ -89,7 +89,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * Get configuration name for this hostname.
    *
    * It will be the same name with a prefix depending on domain:
-   * domain.config.DOMAIN.ID
+   * domain.DOMAIN.ID
    *
    * @param string $name
    *   The name of the config object.
@@ -100,7 +100,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    return 'domain.config.' . $domain->id() . '.' . $name;
+    return 'domain.' . $domain->id() . '.' . $name;
   }
 
   /**
