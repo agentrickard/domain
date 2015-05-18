@@ -11,6 +11,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
