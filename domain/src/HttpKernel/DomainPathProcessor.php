@@ -11,6 +11,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -46,7 +47,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   /**
    * Implements Drupal\Core\PathProcessor\OutboundPathProcessorInterface::processOutbound().
    */
-  public function processOutbound($path, &$options = array(), Request $request = NULL) {
+  public function processOutbound($path, &$options = array(), Request $request = NULL, CacheableMetadata $cacheable_metadata = NULL) {
     static $active_domain;
     if (!isset($active_domain)) {
       $active_domain = $this->domainNegotiator->negotiateActiveDomain();
