@@ -33,7 +33,7 @@ class Domain extends ConditionPluginBase {
       '#type' => 'checkboxes',
       '#title' => $this->t('When the following domains are active'),
       '#default_value' => $this->configuration['domains'],
-      '#options' => array_map('\Drupal\Component\Utility\String::checkPlain', domain_options_list()),
+      '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', domain_options_list()),
       '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
     );
     return parent::buildConfigurationForm($form, $form_state);

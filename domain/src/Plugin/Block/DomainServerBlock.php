@@ -9,7 +9,7 @@ namespace Drupal\domain\Plugin\Block;
 
 use Drupal\domain\Entity\Domain;
 use Drupal\domain\Plugin\Block\DomainBlockBase;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Provides a server information block for a domain request.

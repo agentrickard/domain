@@ -7,7 +7,7 @@
 
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Implements hook_drush_command().

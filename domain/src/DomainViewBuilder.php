@@ -7,7 +7,7 @@
 
 namespace Drupal\domain;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;

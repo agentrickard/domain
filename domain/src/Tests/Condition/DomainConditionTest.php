@@ -8,7 +8,7 @@
 namespace Drupal\domain\Tests\Condition;
 
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\domain\DomainInterface;
 
 /**
