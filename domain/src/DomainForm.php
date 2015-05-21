@@ -56,11 +56,13 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->label(),
       '#description' => $this->t('The human-readable name is shown in domain lists and may be used as the title tag.')
     );
+    // Do not use the :// suffix when storing data.
+    $add_suffix = FALSE;
     $form['scheme'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Domain URL scheme'),
       '#options' => array('http' => 'http://', 'https' => 'https://'),
-      '#default_value' => $domain->getScheme(),
+      '#default_value' => $domain->getScheme($add_suffix),
       '#description' => $this->t('This URL scheme will be used when writing links and redirects to this domain and its resources.')
     );
     $form['status'] = array(
