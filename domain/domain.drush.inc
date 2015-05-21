@@ -189,7 +189,7 @@ function drush_domain_list() {
   foreach ($domains as $domain) {
     $row = array();
     foreach ($header as $key => $name) {
-      $row[] = String::checkPlain($domain->get($key));
+      $row[] = SafeMarkup::checkPlain($domain->get($key));
     }
     $rows[] = $row;
   }
