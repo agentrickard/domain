@@ -26,9 +26,9 @@ abstract class DomainBlockBase extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  protected function getRequiredCacheContexts() {
+  public function getCacheContexts() {
     // By default, all domain blocks are per-url.
-    return array('cache_context.url');
+    return ['url'];
   }
 
 }
