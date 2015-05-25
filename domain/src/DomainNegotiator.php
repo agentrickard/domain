@@ -56,7 +56,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    * {@inheritdoc}
    */
   public function setRequestDomain($httpHost, $reset = FALSE) {
-    static $loookup;
+    static $lookup;
     if (isset($lookup[$httpHost]) && !$reset) {
       return $lookup[$httpHost];
     }
@@ -90,9 +90,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function negotiateActiveDomain() {
+  public function negotiateActiveDomain($reset = TRUE) {
     $httpHost = $this->negotiateActiveHostname();
-    $this->setRequestDomain($httpHost);
+    $this->setRequestDomain($httpHost, $reset);
     return $this->domain;
   }
 
@@ -101,7 +101,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    */
   public function getActiveDomain($reset = FALSE) {
     if (is_null($this->domain) || $reset) {
-      $this->negotiateActiveDomain();
+      $this->negotiateActiveDomain($reset);
     }
     return $this->domain;
   }

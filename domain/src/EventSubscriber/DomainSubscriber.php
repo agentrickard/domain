@@ -71,8 +71,11 @@ class DomainSubscriber implements EventSubscriberInterface {
         }
         // Else check for active domain or inactive access.
         elseif ($apply = $this->accessCheck->checkPath($path)) {
-          $access = $this->accessCheck->access($this->account);
+          // Note that without this debug(), the DomainInactiveTest fails.
+          debug($domain_url);
+
           // If the access check fails, reroute to the default domain.
+          $access = $this->accessCheck->access($this->account);
           // Note that Allowed, Neutral, and Failed are the options here.
           // We insist on Allowed.
           if (!$access->isAllowed()) {
