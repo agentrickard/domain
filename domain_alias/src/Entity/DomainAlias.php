@@ -39,8 +39,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "uuid" = "uuid",
  *   },
  *   links = {
- *     "delete-form" = "/admin/structure/domain/alias/delete/{domain_alias}",
- *     "edit-form" = "/admin/structure/domain/alias/edit/{domain_alias}"
+ *     "delete-form" = "/admin/config/domain/alias/delete/{domain_alias}",
+ *     "edit-form" = "/admin/config/domain/alias/edit/{domain_alias}"
  *   }
  * )
  */

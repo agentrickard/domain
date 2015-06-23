@@ -16,7 +16,7 @@ function domain_entity_bundle_info() {
   $bundles['domain']['domain'] = array(
     'label' => t('Domain record'),
     'admin' => array(
-      'real path' => 'admin/structure/domain',
+      'real path' => 'admin/config/domain',
     ),
   );
   return $bundles;

@@ -64,13 +64,15 @@ class DomainAccessGrantsTest extends DomainTestBase {
     $this->assertNodeAccess(array('view' => FALSE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user1);
     // Grant access content and the user can view the node.
     user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('access content'));
-    $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user1);
+    // We have to use a new user here because the access check is cached.
+    $web_user2 = $this->drupalCreateUser(array('access content', 'create article content'));
+    $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $node1, $web_user2);
     // Check global update and delete grants.
     // We have to use a new user here because the access check is cached.
-    $web_user2 = $this->drupalCreateUser(array('access content', 'create article content', 'edit any article content', 'delete any article content'));
-    $this->addDomainToEntity('user', $web_user2->id(), $active_domain, DOMAIN_ACCESS_USER_FIELD);
+    $web_user3 = $this->drupalCreateUser(array('access content', 'create article content', 'edit any article content', 'delete any article content'));
+    $this->addDomainToEntity('user', $web_user3->id(), $active_domain, DOMAIN_ACCESS_USER_FIELD);
     user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID, array('edit domain content', 'delete domain content'));
-    $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $node1, $web_user2);
+    $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $node1, $web_user3);
   }
 
   /**
