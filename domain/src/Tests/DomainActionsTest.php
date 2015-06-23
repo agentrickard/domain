@@ -22,7 +22,7 @@ class DomainActionsTest extends DomainTestBase {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));
     $this->drupalLogin($this->admin_user);
 
-    $path = 'admin/structure/domain';
+    $path = 'admin/config/domain';
 
     // No domains should exist.
     $this->domainTableIsEmpty();

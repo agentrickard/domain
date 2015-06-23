@@ -1,5 +1,5 @@
 domain.admin:
-  path: '/admin/structure/domain'
+  path: '/admin/config/domain'
   defaults:
     _entity_list: 'domain'
     _title: 'Domains'
@@ -8,7 +8,7 @@ domain.admin:
     _permission: 'administer domains'
 
 entity.domain.add:
-  path: '/admin/structure/domain/add'
+  path: '/admin/config/domain/add'
   defaults:
     _entity_form: domain.edit
     _title: 'Add domain record'
@@ -18,7 +18,7 @@ entity.domain.add:
     _permission: "create domains"
 
 entity.domain.edit_form:
-  path: '/admin/structure/domain/edit/{domain}'
+  path: '/admin/config/domain/edit/{domain}'
   defaults:
     _entity_form: domain.edit
     _title: 'Edit domain record'
@@ -28,7 +28,7 @@ entity.domain.edit_form:
     _entity_access: domain.update
 
 entity.domain.delete_form:
-  path: '/admin/structure/domain/delete/{domain}'
+  path: '/admin/config/domain/delete/{domain}'
   defaults:
     _entity_form: domain.delete
     _title: 'Delete'
@@ -38,7 +38,7 @@ entity.domain.delete_form:
     _entity_access: domain.delete
 
 domain.inline_action:
-  path: '/admin/structure/domain/{op}/{domain}'
+  path: '/admin/config/domain/{op}/{domain}'
   defaults:
     _controller: 'Drupal\domain\Controller\DomainController::ajaxOperation'
   requirements:

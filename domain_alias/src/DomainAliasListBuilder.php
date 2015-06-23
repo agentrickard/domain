@@ -20,7 +20,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    */
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
-    $operations['delete']['href'] = 'admin/structure/domain/alias/delete/' . $entity->id();
+    $operations['delete']['href'] = 'admin/config/domain/alias/delete/' . $entity->id();
     return $operations;
   }
 

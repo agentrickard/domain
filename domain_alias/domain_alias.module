@@ -13,7 +13,7 @@ use Drupal\Core\Url;
  */
 function domain_alias_help($path, $arg) {
   switch ($path) {
-    case 'admin/structure/domain/alias/%':
+    case 'admin/config/domain/alias/%':
       return 'foo';
   }
 }
