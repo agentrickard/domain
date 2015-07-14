@@ -45,6 +45,9 @@ class DomainCreateTest extends DomainTestBase {
     // Does it load correctly?
     $new_domain = domain_load($default_id);
     $this->assertTrue($new_domain->id() == $domain->id(), 'Domain loaded properly.');
+    
+    // Has domain id been set?
+    $this->assertTrue($new_domain->getDomainId() == 1, 'Domain id set properly.');
 
     // Has a UUID been set?
     $this->assertTrue($new_domain->uuid(), 'Entity UUID set properly.');
