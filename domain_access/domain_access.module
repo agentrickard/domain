@@ -35,6 +35,10 @@ function domain_access_node_grants(AccountInterface $account, $op) {
     $active = domain_default(); 
   }
   
+  if(empty($active)) {
+    return $grants;
+  }
+  
   $id = $active->getDomainId();
   // Grants for view are simple. Use the active domain.
   if ($op == 'view') {
