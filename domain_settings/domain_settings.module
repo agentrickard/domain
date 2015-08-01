@@ -147,7 +147,7 @@ function domain_settings_form_submit($form, &$form_state) {
       }
       if ($domain_id == DOMAIN_SETTINGS_ALL_DOMAINS) {
         foreach(domain_domains() as $id => $value) {
-          domain_conf_variable_delete($id, $name);
+          domain_conf_delete_variable($id, $name);
         }
       }
     }

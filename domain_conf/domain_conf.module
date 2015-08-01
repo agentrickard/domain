@@ -335,7 +335,7 @@ function _domain_conf_load_primary($unset = FALSE) {
  * @param $variable
  *   The name of the variable you wish to delete.
  */
-function domain_conf_variable_delete($domain_id, $variable) {
+function domain_conf_delete_variable($domain_id, $variable) {
   // Get the current settings for this domain, if any.
   $settings = domain_unserialize(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField());
   // Settings found, remove them.

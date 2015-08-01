@@ -48,7 +48,7 @@ function drush_domain_conf_set($domain_id, $name, $value) {
   else {
     variable_set($name, $value);
     foreach (domain_domains(TRUE) as $domain) {
-      domain_conf_variable_delete($domain['domain_id'], $name);
+      domain_conf_delete_variable($domain['domain_id'], $name);
     }
     drush_print('Variable set for all domains.');
   }
