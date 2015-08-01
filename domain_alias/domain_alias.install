@@ -31,8 +31,8 @@ function domain_alias_schema() {
         'default' => '',
         ),
       'redirect' => array('type' => 'int',
-        'description' => 'Boolean flag indicating whether the alias should be redirected to the main domain.',
-        'size' => 'tiny',
+        'description' => 'Indicating whether the alias should be redirected to the main domain.',
+        'size' => 'small',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0,
@@ -69,4 +69,15 @@ function domain_alias_update_7300(&$sandbox) {
     ->condition('domain_id', 0)
     ->execute();
   return t('Domain Alias zero records removed.');
+}
+
+/**
+ * Update existing redirects to 302.
+ */
+function domain_alias_update_7301(&$sandbox) {
+  db_change_field('domain_alias', 'redirect', 'redirect', array('type' => 'int', 'size' => 'small'));
+  db_update('domain_alias')
+    ->fields(array('redirect' => '302'))
+    ->condition('redirect', '1')
+    ->execute();
 }

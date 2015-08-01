@@ -46,7 +46,7 @@ function domain_alias_domain_bootstrap_lookup($domain) {
   if ($alias != -1) {
     $domain['domain_id'] = $alias['domain_id'];
     $domain['active_alias_id'] = $alias['alias_id'];
-    $domain['redirect'] = (boolean) $alias['redirect'];
+    $domain['redirect'] = $alias['redirect'];
     return $domain;
   }
 }
@@ -61,9 +61,10 @@ function domain_alias_init() {
   $_domain = domain_get_domain();
   // Redirect to main domain if active domain alias is set to redirect.
   // $_domain['redirect'] gets set in domain_alias_domain_bootstrap_lookup().
-  if (isset($_domain['redirect']) && $_domain['redirect'] == TRUE) {
+  if (isset($_domain['redirect']) && !empty($_domain['redirect'])) {
     $domain = domain_lookup($_domain['domain_id']);
-    drupal_goto(domain_get_uri($domain));
+    $response_code = ($_domain['redirect'] < 300) ? 302 : $_domain['redirect'];
+    drupal_goto(domain_get_uri($domain), array(), $response_code);
   }
 }
 

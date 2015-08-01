@@ -58,7 +58,12 @@ function domain_alias_form($form, &$form_state, $domain, $arguments = array()) {
         '#value' => $alias_id,
       );
       $form['domain_alias'][$alias_id]['redirect'] = array(
-        '#type' => 'checkbox',
+        '#type' => 'select',
+        '#options' => array(
+          0 => t('Do not redirect'),
+          301 => t('Permanent redirect (301)'),
+          302 => t('Temporary redirect (302)'),
+        ),
         '#default_value' => $alias['redirect'],
       );
       $form['domain_alias'][$alias_id]['pattern'] = array(
@@ -87,8 +92,13 @@ function domain_alias_form($form, &$form_state, $domain, $arguments = array()) {
   );
   for ($i = 0; $i < 5; $i++) {
     $form['domain_alias_new'][$i]['redirect'] = array(
-      '#type' => 'checkbox',
-      '#default_value' => FALSE,
+      '#type' => 'select',
+      '#options' => array(
+        0 => t('Do not redirect'),
+        301 => t('Permanent redirect (301)'),
+        302 => t('Temporary redirect (302)'),
+      ),
+      '#default_value' => 0,
     );
     $form['domain_alias_new'][$i]['pattern'] = array(
       '#type' => 'textfield',
