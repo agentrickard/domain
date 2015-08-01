@@ -1138,7 +1138,11 @@ function domain_lookup($domain_id = NULL, $subdomain = NULL, $reset = FALSE) {
  */
 function domain_default($reset = FALSE, $alter = TRUE) {
   $default = &drupal_static(__FUNCTION__);
+  $altered = &drupal_static(__FUNCTION__ . '_altered');
+
   if (empty($default) || $reset) {
+    $altered = FALSE;
+
     // Temporary hack for update to 7.x.3.
     if (db_table_exists('domain_export')) {
       $default = db_query("SELECT domain_id, subdomain, sitename, scheme, valid, weight, is_default, machine_name FROM {domain} WHERE is_default = 1")->fetchAssoc();
@@ -1158,11 +1162,14 @@ function domain_default($reset = FALSE, $alter = TRUE) {
         'machine_name' => domain_machine_name($default['subdomain']),
       );
     }
-    if ($alter) {
-      // Let submodules overwrite the defaults, if they wish.
-      $default = domain_api($default, $reset);
-    }
   }
+
+  // If an altered version is requested, has $default been altered before?
+  if ($alter && !$altered) {
+    // Let submodules overwrite the defaults, if they wish.
+    $default = domain_api($default, $reset);
+  }
+
   return $default;
 }
 

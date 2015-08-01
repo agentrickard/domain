@@ -458,6 +458,17 @@ class DomainUnitTest extends DomainTestCase {
     parent::setUp($list);
   }
 
+  // Test that domain_default() purges the static when needed.
+  function testDomainDefault() {
+    // Reset the static, and don't allow domain_default() to run domain_api().
+    $domain = domain_default(TRUE, FALSE);
+    $this->assertTrue(empty($domain['path']), t('domain_default() didn\'t call domain_api when not being allowed to do so.'));
+
+    // Now call it again and allow domain_default() to run domain_api().
+    $domain = domain_default();
+    $this->assertTrue(!empty($domain['path']), t('domain_default() successfully purged static after being allowed to run domain_api().'));
+  }
+
   // Test that domain_node_load() and domain_get_node_domains() functions properly.
   function testDomainGetNodeDomains() {
     $count = db_query("SELECT COUNT(domain_id) FROM {domain}")->fetchField();
