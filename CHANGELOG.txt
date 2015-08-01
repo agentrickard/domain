@@ -14,7 +14,6 @@ Upgrading to Drupal 7 using Domain Access
 Upgrading to Domain Access 7.x.3 (from 7.x.2)
   - http://drupal.org/node/1280656
 
-
 ===============
 Version history
 ===============
