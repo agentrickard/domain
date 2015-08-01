@@ -276,6 +276,16 @@ class DomainCreateTest extends DomainTestCase {
     $this->assertTrue($domain['machine_name'] == $temp . 'foo', t('Updated domain has proper machine name.'));
   }
 
+  // Test domain_machine_name_load().
+  function testDomainMacineNameLoad() {
+    // For completeness, we should use hook_domain_load() to add data...
+    $this->domainCreateDomains();
+    $domains = domain_domains();
+    foreach ($domains as $domain) {
+      $load = domain_machine_name_load($domain['machine_name'], TRUE);
+      $this->assertTrue($load['domain_id'] == $domain['domain_id'], t('Loaded domain by machine name.'));
+    }
+  }
 }
 
 class DomainHookTest extends DomainTestCase {
