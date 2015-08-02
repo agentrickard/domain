@@ -707,14 +707,13 @@ function domain_form_user_form_alter(&$form, &$form_state) {
     }
     $format = domain_select_format();
 
-    $form['domain_user'] = array(
+    $form['domain'] = array(
       '#type' => 'fieldset',
       '#title' => t('Domain access'),
       '#collapsible' => TRUE,
       '#collapsed' => FALSE,
-      '#weight' => 1
     );
-    $form['domain_user']['domain_user'] = array(
+    $form['domain']['domain_user'] = array(
       '#type' => empty($format) ? 'checkboxes' : 'select',
       '#options' => $options,
       '#title' => t('Domain access settings'),
@@ -722,12 +721,12 @@ function domain_form_user_form_alter(&$form, &$form_state) {
       '#default_value' => $default
     );
     if ($format) {
-      $form['domain_user']['domain_user']['#multiple'] = TRUE;
-      $form['domain_user']['domain_user']['#size'] = count($options) > 10 ? 10 : count($options);
+      $form['domain']['domain_user']['#multiple'] = TRUE;
+      $form['domain']['domain_user']['#size'] = count($options) > 10 ? 10 : count($options);
     }
   }
   else {
-    $form['domain_user'] = array(
+    $form['domain'] = array(
       '#type' => 'value',
       '#value' => $default
     );
