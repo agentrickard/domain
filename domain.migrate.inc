@@ -257,8 +257,13 @@ class DomainNodeHandler extends MigrateDestinationHandler {
   }
 
   public function prepare($node, stdClass $row) {
-    // If set, ensure domains exist.
     $domains = array();
+    // If not set, be sure that we aren't updating an existing record.
+    if (!empty($node->nid) && empty($node->domains)) {
+      $nodes[$node->nid] = $node;
+      domain_node_load($nodes, array());
+    }
+    // If set, ensure domains exist.
     if (isset($node->domains)) {
       $node->domains = (array) $node->domains;
       foreach ($node->domains as $id) {
