@@ -35,6 +35,11 @@ class Domain extends ConditionPluginBase {
       '#default_value' => $this->configuration['domains'],
       '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', domain_options_list()),
       '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
+      '#attached' => array(
+        'library' => array(
+          'domain/drupal.domain',
+        ),
+      ),
     );
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -60,7 +65,6 @@ class Domain extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function summary() {
-    // @TODO: This doesn't seem to fire.
     // Use the domain labels. They will be sanitized below.
     $domains = array_intersect_key(domain_options_list(), $this->configuration['domains']);
     if (count($domains) > 1) {
