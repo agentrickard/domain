@@ -90,7 +90,6 @@ class Domain extends ConditionPluginBase {
       return TRUE;
     }
     $domain = $this->getContextValue('domain');
-    debug($domain->id());
     // NOTE: The block system handles negation for us.
     return (bool) in_array($domain->id(), $domains);
   }
