@@ -65,13 +65,13 @@ class DomainConditionTest extends DomainTestBase {
   public function testConditions() {
     // Grab the domain condition and configure it to check against one domain.
     $condition = $this->manager->createInstance('domain')
-      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain))
+      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
       ->setContextValue('domain', $this->not_domain);
     $this->assertFalse($condition->execute(), 'Domain request condition fails on wrong domain.');
 
     // Grab the domain condition and configure it to check against itself.
     $condition = $this->manager->createInstance('domain')
-      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain))
+      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
       ->setContextValue('domain', $this->test_domain);
     $this->assertTrue($condition->execute(), 'Domain request condition succeeds on matching domain.');
 
