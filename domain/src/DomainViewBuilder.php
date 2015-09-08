@@ -7,7 +7,7 @@
 
 namespace Drupal\domain;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
@@ -35,8 +35,8 @@ class DomainViewBuilder extends EntityViewBuilder {
         if (!empty($entity->{$key}) && $display->getComponent($key)) {
           $class = str_replace('_', '-', $key);
           $entity->content[$key] = array(
-            '#markup' => String::checkPlain($entity->{$key}),
-            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . String::checkPlain($key) . ':</strong><br />',
+            '#markup' => SafeMarkup::checkPlain($entity->{$key}),
+            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . SafeMarkup::checkPlain($key) . ':</strong><br />',
             '#suffix' => '</div>',
           );
         }

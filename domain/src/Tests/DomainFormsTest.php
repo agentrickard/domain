@@ -26,16 +26,16 @@ class DomainFormsTest extends DomainTestBase {
     $this->domainTableIsEmpty();
 
     // Visit the main domain administration page.
-    $this->drupalGet('admin/structure/domain');
+    $this->drupalGet('admin/config/domain');
 
     // Check for the add message.
     $this->assertText('There is no Domain record yet.', 'Text for no domains found.');
     // Visit the add domain administration page.
-    $this->drupalGet('admin/structure/domain/add');
+    $this->drupalGet('admin/config/domain/add');
 
-    // Make a POST request on admin/structure/domain/add.
+    // Make a POST request on admin/config/domain/add.
     $edit = $this->domainPostValues();
-    $this->drupalPostForm('admin/structure/domain/add', $edit, 'Save');
+    $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
 
     // Did it save correctly?
     $default_id = domain_default_id();
@@ -50,7 +50,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->assertTrue(!empty($uuid), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
-    $editUrl = 'admin/structure/domain/edit/' . $new_domain->id();
+    $editUrl = 'admin/config/domain/edit/' . $new_domain->id();
     $this->drupalGet($editUrl);
 
     // Update the record.
@@ -62,7 +62,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->assertTrue($domain->label() == 'Foo', 'Domain record updated via form.');
 
     // Visit the delete domain administration page.
-    $deleteUrl = 'admin/structure/domain/delete/' . $new_domain->id();
+    $deleteUrl = 'admin/config/domain/delete/' . $new_domain->id();
     $this->drupalGet($deleteUrl);
 
     // Delete the record.

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Routing\TrustedRedirectResponse;
 
 /**
  * Implements DomainSubscriber
@@ -85,7 +85,7 @@ class DomainSubscriber implements EventSubscriberInterface {
       }
       if ($redirect) {
         // Pass a redirect if necessary.
-        $response = new RedirectResponse($domain_url, $redirect_type);
+        $response = new TrustedRedirectResponse($domain_url, $redirect_type);
         $event->setResponse($response);
       }
     }
@@ -95,8 +95,8 @@ class DomainSubscriber implements EventSubscriberInterface {
    * Implements EventSubscriberInterface::getSubscribedEvents().
    */
   static function getSubscribedEvents() {
-    // Returns multiple times. Should be CONTROLLER?
-    $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 400);
+    // This needs to fire very early in the stack, before accounts are cached.
+    $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 50);
     return $events;
   }
 

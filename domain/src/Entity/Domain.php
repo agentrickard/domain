@@ -43,8 +43,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *     "weight" = "weight"
  *   },
  *   links = {
- *     "delete-form" = "/admin/structure/domain/delete/{domain}",
- *     "edit-form" = "/admin/structure/domain/edit/{domain}"
+ *     "delete-form" = "/admin/config/domain/delete/{domain}",
+ *     "edit-form" = "/admin/config/domain/edit/{domain}"
  *   }
  * )
  */

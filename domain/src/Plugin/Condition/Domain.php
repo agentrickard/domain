@@ -33,8 +33,13 @@ class Domain extends ConditionPluginBase {
       '#type' => 'checkboxes',
       '#title' => $this->t('When the following domains are active'),
       '#default_value' => $this->configuration['domains'],
-      '#options' => array_map('\Drupal\Component\Utility\String::checkPlain', domain_options_list()),
+      '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', domain_options_list()),
       '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
+      '#attached' => array(
+        'library' => array(
+          'domain/drupal.domain',
+        ),
+      ),
     );
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -60,7 +65,6 @@ class Domain extends ConditionPluginBase {
    * {@inheritdoc}
    */
   public function summary() {
-    // @TODO: This doesn't seem to fire.
     // Use the domain labels. They will be sanitized below.
     $domains = array_intersect_key(domain_options_list(), $this->configuration['domains']);
     if (count($domains) > 1) {
@@ -85,9 +89,9 @@ class Domain extends ConditionPluginBase {
     if (empty($domains) && !$this->isNegated()) {
       return TRUE;
     }
-    $context = $this->getContextValue('domain');
+    $domain = $this->getContextValue('domain');
     // NOTE: The block system handles negation for us.
-    return (bool) in_array($this->getContextValue('domain'), $domains);
+    return (bool) in_array($domain->id(), $domains);
   }
 
 }

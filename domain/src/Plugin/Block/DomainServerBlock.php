@@ -9,7 +9,7 @@ namespace Drupal\domain\Plugin\Block;
 
 use Drupal\domain\Entity\Domain;
 use Drupal\domain\Plugin\Block\DomainBlockBase;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Provides a server information block for a domain request.
@@ -36,7 +36,7 @@ class DomainServerBlock extends DomainBlockBase {
     $header = array($this->t('Property'), $this->t('Value'));
     $rows[] = array(
       $this->t('HTTP_HOST request'),
-      String::checkPlain($_SERVER['HTTP_HOST']),
+      SafeMarkup::checkPlain($_SERVER['HTTP_HOST']),
     );
     // Check the response test.
     $domain->getResponse();
@@ -71,8 +71,8 @@ class DomainServerBlock extends DomainBlockBase {
         $value = empty($value) ? $this->t('FALSE') : $this->t('TRUE');
       }
       $rows[] = array(
-        String::checkPlain($key),
-        !is_array($value) ? String::checkPlain($value) : $this->printArray($value),
+        SafeMarkup::checkPlain($key),
+        !is_array($value) ? SafeMarkup::checkPlain($value) : $this->printArray($value),
       );
     }
     return array(
@@ -96,7 +96,7 @@ class DomainServerBlock extends DomainBlockBase {
     foreach ($array as $key => $val) {
       $value = 'array';
       if (!is_array($val)) {
-        $value = String::checkPlain($val);
+        $value = SafeMarkup::checkPlain($val);
       }
       else {
         $list = array();

@@ -7,7 +7,7 @@
 
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Implements hook_drush_command().
@@ -189,7 +189,7 @@ function drush_domain_list() {
   foreach ($domains as $domain) {
     $row = array();
     foreach ($header as $key => $name) {
-      $row[] = String::checkPlain($domain->get($key));
+      $row[] = SafeMarkup::checkPlain($domain->get($key));
     }
     $rows[] = $row;
   }

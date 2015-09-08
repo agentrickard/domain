@@ -63,7 +63,7 @@ function hook_domain_operations(DomainInterface $domain) {
   $id = $domain->id();
   $operations['domain_alias'] = array(
     'title' => t('alias'),
-    'href' => "admin/structure/domain/$id/alias",
+    'href' => "admin/config/domain/$id/alias",
     'query' => array(),
     'weight' => 100, // Core operations start at 0 and increment by 10.
   );
