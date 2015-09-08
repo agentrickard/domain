@@ -10,6 +10,7 @@ namespace Drupal\domain_config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 
@@ -115,6 +116,14 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    */
   public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
     return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($name) {
+    $metadata = new CacheableMetadata();
+    return $metadata;
   }
 
 }
