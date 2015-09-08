@@ -50,7 +50,7 @@ class DomainConfigOverride extends StorableConfigBase {
   /**
    * {@inheritdoc}
    */
-  public function save() {
+  public function save($has_trusted_data = false) {
     // @todo Use configuration schema to validate.
     //   https://drupal.org/node/2270399
     // Perform basic data validation.

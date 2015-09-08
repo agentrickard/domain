@@ -13,6 +13,7 @@ use Drupal\Core\Config\ConfigFactoryOverrideBase;
 use Drupal\Core\Config\ConfigRenameEvent;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\domain_config\Config\DomainConfigFactoryOverrideInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
@@ -239,6 +240,14 @@ class DomainConfigFactoryOverride extends ConfigFactoryOverrideBase implements D
         $config_domain->delete();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($name) {
+    $metadata = new CacheableMetadata();
+    return $metadata;
   }
 
 }
