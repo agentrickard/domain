@@ -116,6 +116,13 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
     return NULL;
   }
-
+  
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($name) {
+    return NULL; 
+  }
+  }
 }
 
