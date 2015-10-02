@@ -117,5 +117,12 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     return NULL;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheableMetadata($name) {
+    return NULL;
+  }
+
 }
 
