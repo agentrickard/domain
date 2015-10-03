@@ -29,7 +29,7 @@ define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
  */
 function domain_access_node_grants(AccountInterface $account, $op) {
   $grants = array();
-  $active = domain_get_domain();
+  $active = \Drupal::service('domain.negotiator')->getActiveDomain();
 
   if(empty($active)) {
     $active = \Drupal::service('domain.loader')->loadDefaultDomain();
@@ -82,7 +82,7 @@ function domain_access_node_access_records(NodeInterface $node) {
  */
 function domain_access_default_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
   $item = array();
-  if ($active = domain_get_domain()) {
+  if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $item[0]['target_uuid'] = $active->uuid();
   }
   return $item;

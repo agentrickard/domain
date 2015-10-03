@@ -23,14 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Returns the current domain record.
- */
-function domain_get_domain() {
-  $negotiator = \Drupal::service('domain.negotiator');
-  return $negotiator->getActiveDomain();
-}
-
-/**
  * Returns the id of the current domain record.
  */
 function domain_get_active_id() {

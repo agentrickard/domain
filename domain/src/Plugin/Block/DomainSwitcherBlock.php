@@ -28,7 +28,7 @@ class DomainSwitcherBlock extends DomainBlockBase {
    * @TODO: abstract or theme this function?
    */
   public function build() {
-    $active_domain = domain_get_domain();
+    $active_domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     $items = array();
     foreach (\Drupal::service('domain.loader')->loadMultipleSorted() as $domain) {
       $string = $domain->getLink();

@@ -27,7 +27,7 @@ class DomainServerBlock extends DomainBlockBase {
    * @TODO: abstract or theme this function?
    */
   public function build() {
-    $domain = domain_get_domain();
+    $domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     if (!$domain) {
       return array(
         '#markup' => $this->t('No domain record could be loaded.'),
