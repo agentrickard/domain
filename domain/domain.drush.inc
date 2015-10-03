@@ -279,7 +279,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
       'status' => 1,
       'weight' => ($item != $primary) ? $key + $start_weight + 1 : -1,
       'is_default' => 0,
-      'id' => domain_machine_name($hostname),
+      'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
     );
     $domain = \Drupal::service('domain.creator')->createDomain($values);
     domain_drush_create($domain);
@@ -330,7 +330,7 @@ function drush_domain_add($hostname, $name) {
     'scheme' => (!drush_get_option('https')) ? 'http' : 'https',
     'weight' => ($weight = drush_get_option('weight')) ? $weight : $start_weight + 1,
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
-    'id' => domain_machine_name($hostname),
+    'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
   );
   $domain = \Drupal::service('domain.creator')->createDomain($values);
   /* TODO: Fix this check.

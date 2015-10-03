@@ -23,20 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Creates a machine name for a domain record.
- *
- * @param $hostname
- *  The hostname string of the record, which should be unique.
- *
- * @return
- *  A string with dot and colon transformed to underscore.
- */
-function domain_machine_name($hostname) {
-  $creator = \Drupal::service('domain.creator');
-  return $creator->createMachineName($hostname);
-}
-
-/**
  * Returns the current domain record.
  */
 function domain_get_domain() {

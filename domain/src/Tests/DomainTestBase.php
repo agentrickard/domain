@@ -99,7 +99,7 @@ abstract class DomainTestBase extends WebTestBase {
       $values = array(
         'hostname' => $hostname,
         'name' => $name,
-        'id' => domain_machine_name($hostname),
+        'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
       );
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
       $domain->save();
