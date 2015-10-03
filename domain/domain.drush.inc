@@ -168,7 +168,7 @@ function domain_drush_help($section) {
  * Shows the domain list.
  */
 function drush_domain_list() {
-  $domains = domain_load_and_sort(NULL, TRUE);
+  $domains = \Drupal::service('domain.loader')->loadMultipleSorted(NULL, TRUE);
 
   if (empty($domains)) {
     drush_print(dt('No domains have been created. Use drush domain-add to create one.'));
@@ -596,7 +596,7 @@ function drush_domain_scheme($argument) {
  * On failure, throws a drush error.
  */
 function drush_domain_get_from_argument($argument) {
-  $domain = domain_load($argument);
+  $domain = \Drupal::service('domain.loader')->load($argument);
   if (!$domain) {
     $domain = domain_load_hostname($argument);
   }

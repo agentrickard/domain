@@ -35,7 +35,7 @@ class DomainHooksTest extends DomainTestBase {
     // @TODO: We need a new loader?
     $key = domain_machine_name(domain_hostname());
 
-    $domain = domain_load($key);
+    $domain = \Drupal::service('domain.loader')->load($key);
 
     // Internal hooks.
     $path = $domain->getPath();

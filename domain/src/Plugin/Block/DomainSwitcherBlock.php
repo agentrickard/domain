@@ -30,7 +30,7 @@ class DomainSwitcherBlock extends DomainBlockBase {
   public function build() {
     $active_domain = domain_get_domain();
     $items = array();
-    foreach (domain_load_and_sort() as $domain) {
+    foreach (\Drupal::service('domain.loader')->loadMultipleSorted() as $domain) {
       $string = $domain->getLink();
       if (!$domain->status()) {
         $string .= '*';

@@ -64,7 +64,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
 function domain_access_node_access_records(NodeInterface $node) {
   $grants = array();
   foreach (domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD) as $id => $domainId) {
-    if ($domain = domain_load($id)) {
+    if ($domain = \Drupal::service('domain.loader')->load($id)) {
       $grants[] = array(
         'realm' => 'domain_id',
         'gid' => $domain->getDomainId(),
@@ -113,7 +113,7 @@ function domain_access_get_entity_values($entity, $field_name) {
   if (!empty($values)) {
     foreach ($values as $item) {
       if ($target = $item->getValue()) {
-        if ($domain = domain_load($target['target_id'])) {
+        if ($domain = \Drupal::service('domain.loader')->load($target['target_id'])) {
           $list[$domain->id()] = $domain->getDomainId();
         }
       }
@@ -184,7 +184,7 @@ function domain_access_domain_source_alter(&$source, $path, $options) {
   $node = $options['entity'];
   $list = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
   // @TODO: setting to enable this rewrite, as in older versions?
-  if ($list && $domains = domain_load_and_sort($list)) {
+  if ($list && $domains = \Drupal::service('domain.loader')->loadMultipleSorted($list)) {
     $first = current($domains);
     if ($first->id() != $options['active_domain']->id()) {
       $source = $first;

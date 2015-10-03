@@ -43,7 +43,7 @@ class DomainCreateTest extends DomainTestBase {
     $this->assertTrue(!empty($default_id), 'Default domain has been set.');
 
     // Does it load correctly?
-    $new_domain = domain_load($default_id);
+    $new_domain = \Drupal::service('domain.loader')->load($default_id);
     $this->assertTrue($new_domain->id() == $domain->id(), 'Domain loaded properly.');
     
     // Has domain id been set?
@@ -54,7 +54,7 @@ class DomainCreateTest extends DomainTestBase {
 
     // Delete the domain.
     $domain->delete();
-    $domain = domain_load($default_id, TRUE);
+    $domain = \Drupal::service('domain.loader')->load($default_id, TRUE);
     $this->assertTrue(empty($domain), 'Domain record deleted.');
 
     // No domains should exist.

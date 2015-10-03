@@ -76,7 +76,7 @@ function domain_alias_pattern_load($pattern) {
 function domain_alias_domain_request_alter(DomainInterface &$domain) {
   $hostname = $domain->getHostname();
   if ($alias = domain_alias_match_hostname($hostname)) {
-    if ($domain = domain_load($alias->getDomainId())) {
+    if ($domain = \Drupal::service('domain.loader')->load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias->getPattern());
       $redirect = $alias->getRedirect();
       if (!empty($redirect)) {

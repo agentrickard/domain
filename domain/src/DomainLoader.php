@@ -52,6 +52,17 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * {@inheritdoc}
    */
+  public function load($id, $reset = FALSE) {
+    $controller = \Drupal::entityManager()->getStorage('domain');
+    if ($reset) {
+      $controller->resetCache(array($id));
+    }
+    return $controller->load($id);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function loadDefaultId() {
     $result = \Drupal::entityManager()
       ->getStorage('domain')

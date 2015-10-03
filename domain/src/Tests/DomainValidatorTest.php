@@ -28,7 +28,7 @@ class DomainValidatorTest extends DomainTestBase {
 
     // @TODO: We need a new loader?
     $key = domain_machine_name(domain_hostname());
-    $domain = domain_load($key);
+    $domain = \Drupal::service('domain.loader')->load($key);
 
     // Our testing server should be able to acess the test PNG file.
     $this->assertTrue($domain->getResponse() == 200, format_string('Server test for @url passed.', array('@url' => $domain->getPath())));

@@ -23,42 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Loads multiple domain records and sorts by weight.
- *
- * @param array $ids
- *   (optional) An array of entity IDs. If omitted, all entities are loaded.
- * @param bool $reset
- *   (optional) Whether to reset the internal cache.  Defaults to FALSE.
- *
- * @return array
- *   An array of domain entities indexed by domain_id and sorted by weight.
- */
-function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
-  $loader = \Drupal::service('domain.loader');
-  return $loader->loadMultipleSorted($ids, $reset);
-}
-
-/**
- * Return the domain entity matching a domain id.
- *
- * @param $id
- *   The domain id.
- * @param bool $reset
- *   (optional) Whether to reset the internal cache. Defaults to FALSE.
- *
- * @return Drupal\domain\Entity\Domain|FALSE
- *   The domain entity, if exists, FALSE otherwise. Results are
- *   statically cached.
- */
-function domain_load($id = NULL, $reset = FALSE) {
-  $controller = \Drupal::entityManager()->getStorage('domain');
-  if ($reset) {
-    $controller->resetCache(array($id));
-  }
-  return $controller->load($id);
-}
-
-/**
  * Return the domain entity matching a hostname.
  *
  * @param $hostname
