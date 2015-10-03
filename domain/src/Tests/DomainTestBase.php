@@ -49,7 +49,7 @@ abstract class DomainTestBase extends WebTestBase {
    * Reusable test function for checking initial / empty table status.
    */
   public function domainTableIsEmpty() {
-    $domains = domain_load_multiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     $this->assertTrue(empty($domains), 'No domains have been created.');
     $default_id = \Drupal::service('domain.loader')->loadDefaultId();
     $this->assertTrue(empty($default_id), 'No default domain has been set.');
@@ -69,7 +69,7 @@ abstract class DomainTestBase extends WebTestBase {
   }
 
   public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
-    $original_domains = domain_load_multiple(NULL, TRUE);
+    $original_domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     if (empty($base_hostname)) {
       $base_hostname = $this->base_hostname;
     }
@@ -104,7 +104,7 @@ abstract class DomainTestBase extends WebTestBase {
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
       $domain->save();
     }
-    $domains = domain_load_multiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     $this->assertTrue((count($domains) - count($original_domains)) == $count, format_string('Created %count new domains.', array('%count' => $count)));
   }
 

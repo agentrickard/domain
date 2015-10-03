@@ -23,22 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Loads multiple domain records.
- *
- * @param array $ids
- *   (optional) An array of entity IDs. If omitted, all entities are loaded.
- * @param bool $reset
- *   (optional) Whether to reset the internal cache.  Defaults to FALSE.
- *
- * @return array
- *   An array of domain entities indexed by domain_id.
- */
-function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
-  $loader = \Drupal::service('domain.loader');
-  return $loader->loadMultiple($ids, $reset);
-}
-
-/**
  * Loads multiple domain records and sorts by weight.
  *
  * @param array $ids

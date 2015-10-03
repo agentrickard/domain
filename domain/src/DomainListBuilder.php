@@ -108,7 +108,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $row['status'] = array('#markup' => $entity->status() ? $this->t('Active') : $this->t('Inactive'));
     $row['is_default'] = array('#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No')));
     $row += parent::buildRow($entity);
-    $row['weight']['#delta'] = count(domain_load_multiple()) + 1;
+    $row['weight']['#delta'] = count(\Drupal::service('domain.loader')->loadMultiple()) + 1;
     return $row;
   }
 

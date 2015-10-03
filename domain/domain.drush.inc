@@ -216,7 +216,7 @@ function drush_domain_list() {
 function drush_domain_generate_domains($primary = 'example.com') {
   // Check the number of domains to create.
   $count = drush_get_option('count');
-  $domains = domain_load_multiple(NULL, TRUE);
+  $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
   if (empty($count)) {
     $count = 15;
   }
@@ -321,7 +321,7 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
  *   The domain created or an error message.
  */
 function drush_domain_add($hostname, $name) {
-  $start_weight = count(domain_load_multiple()) + 1;
+  $start_weight = count(\Drupal::service('domain.loader')->loadMultiple()) + 1;
   $hostname = strtolower($hostname);
   $values = array(
     'hostname' => $hostname,
@@ -406,7 +406,7 @@ function drush_domain_delete($argument = NULL) {
     drush_set_error('domain', dt('You must specify a domain to delete.'));
   }
   if ($argument == 'all') {
-    $domains = domain_load_multiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     if (empty($domains)) {
       drush_print(dt('There are no domains to delete.'));
       return;
@@ -433,7 +433,7 @@ function drush_domain_delete($argument = NULL) {
   return;
 
   // TODO: Set options for re-assigning content.
-  $list = domain_load_multiple(NULL, TRUE);
+  $list = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
   $options = array('0' => dt('Do not reassign'));
   foreach ($list as $data) {
     if ($data->id() != $domain->id()) {
@@ -468,7 +468,7 @@ function drush_domain_test($argument = NULL) {
     $GLOBALS['base_path'] = '/' . $base_path . '/';
   }
   if (is_null($argument)) {
-    $domains = domain_load_multiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
   }
   else {
     if ($domain = drush_domain_get_from_argument($argument)) {

@@ -22,7 +22,7 @@ class DomainForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $domain = $this->entity;
-    $domains = domain_load_multiple();
+    $domains = \Drupal::service('domain.loader')->loadMultiple();
     // Create defaults if this is the first domain.
     if (empty($domains)) {
       $domain->addProperty('hostname', domain_hostname());
@@ -75,7 +75,7 @@ class DomainForm extends EntityForm {
     $form['weight'] = array(
       '#type' => 'weight',
       '#title' => $this->t('Weight'),
-      '#delta' => count(domain_load_multiple()) + 1,
+      '#delta' => count(\Drupal::service('domain.loader')->loadMultiple()) + 1,
       '#default_value' => $domain->getWeight(),
       '#description' => $this->t('The sort order for this record. Lower values display first.'),
     );

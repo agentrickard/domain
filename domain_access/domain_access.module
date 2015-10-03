@@ -145,7 +145,7 @@ function domain_access_node_presave(EntityInterface $node) {
     }
     // Else set randomly.
     else {
-      $domains = domain_load_multiple();
+      $domains = \Drupal::service('domain.loader')->loadMultiple();
       $values = array(
         DOMAIN_ACCESS_NODE_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
       );

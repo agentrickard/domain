@@ -26,7 +26,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
 
     // Test the response of the default user page.
     // If we leave path as /, the test fails?!?
-    foreach (domain_load_multiple() as $domain) {
+    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       $path = $domain->getPath() . 'user';
       $this->drupalGet($path);
       if ($domain->isDefault()) {

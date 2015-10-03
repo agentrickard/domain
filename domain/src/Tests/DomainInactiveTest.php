@@ -18,7 +18,7 @@ class DomainInactiveTest extends DomainTestBase {
   public function testInactiveDomain() {
     // Create three new domains programmatically.
     $this->domainCreateTestDomains(3);
-    $domains = domain_load_multiple();
+    $domains = \Drupal::service('domain.loader')->loadMultiple();
     // Grab the last domain for testing/
     $domain = end($domains);
     $this->drupalGet($domain->getPath());
