@@ -23,16 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Generates a unique numeric id.
- *
- * @TODO: Move this to Domain Access, which needs it?
- */
-function domain_next_id() {
-  $creator = \Drupal::service('domain.creator');
-  return $creator->createNextId();
-}
-
-/**
  * Creates a base hostname for the current request.
  *
  * This function is used extensively in testing and domain creation, as it
