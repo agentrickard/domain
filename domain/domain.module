@@ -23,21 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Creates a base hostname for the current request.
- *
- * This function is used extensively in testing and domain creation, as it
- * ensures that our code is agnostic of the current server.
- *
- * @return string
- *   The hostname portion of the current HTTP request, or 'localhost' if one is
- *   not set.
- */
-function domain_hostname() {
-  $creator = \Drupal::service('domain.creator');
-  return $creator->createHostname();
-}
-
-/**
  * Creates a machine name for a domain record.
  *
  * @param $hostname

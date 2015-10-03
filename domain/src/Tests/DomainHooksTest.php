@@ -33,7 +33,7 @@ class DomainHooksTest extends DomainTestBase {
     $this->domainCreateTestDomains();
 
     // @TODO: We need a new loader?
-    $key = domain_machine_name(domain_hostname());
+    $key = domain_machine_name(\Drupal::service('domain.creator')->createHostname());
 
     $domain = \Drupal::service('domain.loader')->load($key);
 
