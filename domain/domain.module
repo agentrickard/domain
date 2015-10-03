@@ -23,14 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Returns the id of the current domain record.
- */
-function domain_get_active_id() {
-  $negotiator = \Drupal::service('domain.negotiator');
-  return $negotiator->getActiveId();
-}
-
-/**
  * Implements hook_entity_load().
  *
  * The $domain->path and $domain->uri properties are derived from data in the

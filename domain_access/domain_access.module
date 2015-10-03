@@ -168,7 +168,7 @@ function domain_access_form_devel_generate_content_form_alter(&$form, &$form_sta
     '#weight' => 2,
     '#multiple' => TRUE,
     '#size' => count($list) > 5 ? 5 : count($list),
-    '#default_value' => array(domain_get_active_id()),
+    '#default_value' => array(\Drupal::service('domain.negotiator')->getActiveId()),
   );
 }
 
