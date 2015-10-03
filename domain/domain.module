@@ -39,42 +39,6 @@ function domain_get_active_id() {
 }
 
 /**
- * Generates an array for rendering the given domain.
- *
- * @param Drupal\domain\DomainInterface $domain
- *   A domain entity.
- * @param $view_mode
- *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'full.'
- * @param $langcode
- *   (optional) A language code to use for rendering. Defaults to NULL which is
- *   the global content language of the current request.
- *
- * @return
- *   An array as expected by drupal_render().
- */
-function domain_view(DomainInterface $domain, $view_mode = 'full', $langcode = NULL) {
-  return entity_view($domain, $view_mode, $langcode);
-}
-
-/**
- * Constructs a drupal_render() style array from an array of loaded domains.
- *
- * @param $domains
- *   An array of domains as returned by domain_load_multiple().
- * @param $view_mode
- *   (optional) View mode, e.g., 'full', 'teaser'... Defaults to 'teaser.'
- * @param $langcode
- *   (optional) A language code to use for rendering. Defaults to the global
- *   content language of the current request.
- *
- * @return
- *   An array in the format expected by drupal_render().
- */
-function domain_view_multiple($domains, $view_mode = 'teaser', $langcode = NULL) {
-  return entity_view_multiple($domains, $view_mode, $langcode);
-}
-
-/**
  * Implements hook_entity_load().
  *
  * The $domain->path and $domain->uri properties are derived from data in the
