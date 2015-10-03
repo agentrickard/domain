@@ -89,7 +89,11 @@ function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load($id = NULL, $reset = FALSE) {
-  return entity_load('domain', $id, $reset);
+  $controller = \Drupal::entityManager()->getStorage('domain');
+  if ($reset) {
+    $controller->resetCache(array($id));
+  }
+  return $controller->load($id);
 }
 
 /**

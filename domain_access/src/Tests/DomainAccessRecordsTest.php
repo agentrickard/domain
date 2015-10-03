@@ -46,7 +46,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
       'type' => 'article',
       DOMAIN_ACCESS_NODE_FIELD => array($domain->id()),
     ));
-    $this->assertTrue(entity_load('node', $node1->id()), 'Article node created.');
+    $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node1->id()), 'Article node created.');
 
     // Check to see if grants added by domain_node_access_records made it in.
     $records = db_query('SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid', array(':nid' => $node1->id()))->fetchAll();

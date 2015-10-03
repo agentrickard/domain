@@ -78,8 +78,12 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadMultiple($ids = NULL) {
-    return \Drupal::entityManager()->getStorage('domain')->loadMultiple($ids);
+  public function loadMultiple($ids = NULL, $reset = FALSE) {
+    $controller = \Drupal::entityManager()->getStorage('domain');
+    if ($reset) {
+      $controller->resetCache($ids);
+    }
+    return $controller->loadMultiple($ids);
   }
 
   /**

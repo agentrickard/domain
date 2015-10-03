@@ -11,7 +11,8 @@
  * Installs the default domain field on nodes.
  */
 function domain_access_install() {
-  $exists = entity_load('field_storage_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD);
+  $id = 'node.' . DOMAIN_ACCESS_NODE_FIELD;
+  $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
   if (!$exists) {
     $storage = array(
       'field_name' => DOMAIN_ACCESS_NODE_FIELD,
@@ -28,7 +29,8 @@ function domain_access_install() {
   $node_types = entity_load_multiple('node_type');
 
   foreach ($node_types as $type => $info) {
-    if ($field = entity_load('field_storage_config', 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD)) {
+    $id = 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
       continue;
     }
 
@@ -58,7 +60,8 @@ function domain_access_install() {
   }
 
   // Save to the user form.
-  if ($field = entity_load('field_storage_config', 'user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  $id = 'user.' . DOMAIN_ACCESS_USER_FIELD;
+  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
     return;
   }
   $storage = array(
@@ -104,10 +107,12 @@ function domain_access_install() {
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
-  if ($field = entity_load('field_storage_config', 'node.' . DOMAIN_ACCESS_NODE_FIELD)) {
+  $id = 'node.' . DOMAIN_ACCESS_NODE_FIELD;
+  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
     $field->delete();
   }
-  if ($field = entity_load('field_storage_config', 'user.user.' . DOMAIN_ACCESS_USER_FIELD)) {
+  $id = 'user.user.' . DOMAIN_ACCESS_USER_FIELD;
+  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
     $field->delete();
   }
 }

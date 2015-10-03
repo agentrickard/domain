@@ -52,7 +52,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
       'type' => 'article',
       DOMAIN_ACCESS_NODE_FIELD => array($domain->id()),
     ));
-    $this->assertTrue(entity_load('node', $node1->id()), 'Article node created.');
+    $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node1->id()), 'Article node created.');
 
     // Test the response of the node on each site. Should allow access.
     foreach ($domains as $domain) {

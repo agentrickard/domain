@@ -31,7 +31,11 @@ function domain_alias_help($path, $arg) {
  *   statically cached.
  */
 function domain_alias_load($id = NULL, $reset = FALSE) {
-  return entity_load('domain_alias', $id, $reset);
+  $controller = \Drupal::entityManager()->getStorage('domain_alias');
+  if ($reset) {
+    $controller->resetCache(array($id));
+  }
+  return $controller->load($id);
 }
 
 /**
