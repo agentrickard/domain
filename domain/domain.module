@@ -81,17 +81,6 @@ function domain_machine_name($hostname) {
 }
 
 /**
- * Returns an array of required fields for a domain record.
- *
- * @return array
- *   An array of required field keys.
- */
-function domain_required_fields() {
-  $validator = \Drupal::service('domain.validator');
-  return $validator->getRequiredFields();
-}
-
-/**
  * Returns the current domain record.
  */
 function domain_get_domain() {

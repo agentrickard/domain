@@ -85,7 +85,7 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->isDefault(),
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
-    $required = domain_required_fields();
+    $required = \Drupal::service('domain.validator')->getRequiredFields();
     foreach ($form as $key => $element) {
       if (in_array($key, $required)) {
         $form[$key]['#required'] = TRUE;

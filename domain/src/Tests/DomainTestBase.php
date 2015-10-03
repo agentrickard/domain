@@ -61,7 +61,7 @@ abstract class DomainTestBase extends WebTestBase {
   public function domainPostValues() {
     $edit = array();
     $domain = domain_create(TRUE);
-    $required = domain_required_fields();
+    $required = \Drupal::service('domain.validator')->getRequiredFields();
     foreach ($required as $key) {
       $edit[$key] = $domain->get($key);
     }
