@@ -23,21 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Return the domain entity matching a hostname.
- *
- * @param $hostname
- *   The domain hostname.
- *
- * @return Drupal\domain\Entity\Domain|FALSE
- *   The domain entity, if exists, FALSE otherwise. Results are
- *   statically cached.
- */
-function domain_load_hostname($hostname) {
-  $loader = \Drupal::service('domain.loader');
-  return $loader->loadByHostname($hostname);
-}
-
-/**
  * Creates a new Domain entity record with default values.
  *
  * @param $inherit
