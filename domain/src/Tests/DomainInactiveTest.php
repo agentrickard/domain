@@ -26,7 +26,7 @@ class DomainInactiveTest extends DomainTestBase {
     $this->assertTrue($domain->status(), 'Tested domain is set to active.');
     // Disable the domain and test for redirect.
     $domain->disable();
-    $default = domain_default();
+    $default = \Drupal::service('domain.loader')->loadDefaultDomain();
     // This test is currently broken, but works in the browser.
     // @TODO: rewrite this test.
     $this->drupalGet($domain->getPath());

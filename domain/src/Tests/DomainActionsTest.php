@@ -39,7 +39,7 @@ class DomainActionsTest extends DomainTestBase {
     $this->assertTrue(count($domains) == 4, 'Four domain records found.');
 
     // Check the default domain.
-    $default = Drupal::service('domain.loader')->loadDefaultId();
+    $default = \Drupal::service('domain.loader')->loadDefaultId();
     // @TODO: We need a new loader?
     $key = domain_machine_name(domain_hostname());
     $this->assertTrue($default == $key, 'Default domain set correctly.');

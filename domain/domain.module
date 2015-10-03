@@ -23,17 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Returns the default domain.
- *
- * @return Domain
- *   The default domain or FALSE if none is set.
- */
-function domain_default() {
-  $loader = Drupal::service('domain.loader');
-  return $loader->loadDefaultDomain();
-}
-
-/**
  * Loads multiple domain records.
  *
  * @param array $ids
@@ -45,7 +34,7 @@ function domain_default() {
  *   An array of domain entities indexed by domain_id.
  */
 function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
-  $loader = Drupal::service('domain.loader');
+  $loader = \Drupal::service('domain.loader');
   return $loader->loadMultiple($ids, $reset);
 }
 
@@ -61,7 +50,7 @@ function domain_load_multiple(array $ids = NULL, $reset = FALSE) {
  *   An array of domain entities indexed by domain_id and sorted by weight.
  */
 function domain_load_and_sort(array $ids = NULL, $reset = FALSE) {
-  $loader = Drupal::service('domain.loader');
+  $loader = \Drupal::service('domain.loader');
   return $loader->loadMultipleSorted($ids, $reset);
 }
 
@@ -96,7 +85,7 @@ function domain_load($id = NULL, $reset = FALSE) {
  *   statically cached.
  */
 function domain_load_hostname($hostname) {
-  $loader = Drupal::service('domain.loader');
+  $loader = \Drupal::service('domain.loader');
   return $loader->loadByHostname($hostname);
 }
 
@@ -115,7 +104,7 @@ function domain_load_hostname($hostname) {
  *   A domain entity, with preset values for the current environment.
  */
 function domain_create($inherit = FALSE, array $values = array()) {
-  $creator = Drupal::service('domain.creator');
+  $creator = \Drupal::service('domain.creator');
   return $creator->createDomain($values, $inherit);
 }
 
@@ -125,7 +114,7 @@ function domain_create($inherit = FALSE, array $values = array()) {
  * @TODO: Move this to Domain Access, which needs it?
  */
 function domain_next_id() {
-  $creator = Drupal::service('domain.creator');
+  $creator = \Drupal::service('domain.creator');
   return $creator->createNextId();
 }
 
@@ -140,7 +129,7 @@ function domain_next_id() {
  *   not set.
  */
 function domain_hostname() {
-  $creator = Drupal::service('domain.creator');
+  $creator = \Drupal::service('domain.creator');
   return $creator->createHostname();
 }
 
@@ -154,7 +143,7 @@ function domain_hostname() {
  *  A string with dot and colon transformed to underscore.
  */
 function domain_machine_name($hostname) {
-  $creator = Drupal::service('domain.creator');
+  $creator = \Drupal::service('domain.creator');
   return $creator->createMachineName($hostname);
 }
 
@@ -165,7 +154,7 @@ function domain_machine_name($hostname) {
  *   An array of required field keys.
  */
 function domain_required_fields() {
-  $validator = Drupal::service('domain.validator');
+  $validator = \Drupal::service('domain.validator');
   return $validator->getRequiredFields();
 }
 
@@ -173,7 +162,7 @@ function domain_required_fields() {
  * Returns the current domain record.
  */
 function domain_get_domain() {
-  $negotiator = Drupal::service('domain.negotiator');
+  $negotiator = \Drupal::service('domain.negotiator');
   return $negotiator->getActiveDomain();
 }
 
@@ -181,7 +170,7 @@ function domain_get_domain() {
  * Returns the id of the current domain record.
  */
 function domain_get_active_id() {
-  $negotiator = Drupal::service('domain.negotiator');
+  $negotiator = \Drupal::service('domain.negotiator');
   return $negotiator->getActiveId();
 }
 
@@ -249,6 +238,6 @@ function domain_entity_load(array $entities, $entity_type) {
  *   A list of domains, keyed by id.
  */
 function domain_options_list() {
-  $loader = Drupal::service('domain.loader');
+  $loader = \Drupal::service('domain.loader');
   return $loader->loadOptionsList();
 }

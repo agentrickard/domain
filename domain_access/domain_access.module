@@ -32,7 +32,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   $active = domain_get_domain();
 
   if(empty($active)) {
-    $active = domain_default();
+    $active = \Drupal::service('domain.loader')->loadDefaultDomain();
   }
 
   if(empty($active)) {

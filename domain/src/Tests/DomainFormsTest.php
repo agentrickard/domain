@@ -38,7 +38,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
 
     // Did it save correctly?
-    $default_id = Drupal::service('domain.loader')->loadDefaultId();
+    $default_id = \Drupal::service('domain.loader')->loadDefaultId();
     $this->assertTrue(!empty($default_id), 'Domain record saved via form.');
 
     // Does it load correctly?

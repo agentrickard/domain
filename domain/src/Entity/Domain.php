@@ -202,7 +202,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function saveDefault() {
     if (!$this->isDefault()) {
       // Swap the current default.
-      if ($default = domain_default()) {
+      if ($default = \Drupal::service('domain.loader')->loadDefaultDomain()) {
         $default->is_default = 0;
         $default->save();
       }

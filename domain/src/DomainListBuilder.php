@@ -75,7 +75,7 @@ class DomainListBuilder extends DraggableListBuilder {
         $operations[$key]['query'] += $destination;
       }
     }
-    $default = domain_default();
+    $default = \Drupal::service('domain.loader')->loadDefaultDomain();
 
     // Deleting the site default domain is not allowed.
     if ($id == $default->id()) {
