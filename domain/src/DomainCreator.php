@@ -87,7 +87,10 @@ class DomainCreator implements DomainCreatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function createMachineName($hostname) {
+  public function createMachineName($hostname = NULL) {
+    if (empty($hostname)) {
+      $hostname = $this->createHostname();
+    }
     return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
   }
 

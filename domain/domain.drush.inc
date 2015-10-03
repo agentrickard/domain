@@ -556,7 +556,7 @@ function drush_domain_name($argument, $name) {
  * Changes a domain machine_name.
  */
 function drush_domain_machine_name($argument, $machine_name) {
-  $machine_name = domain_machine_name($machine_name);
+  $machine_name = \Drupal::service('domain.creator')->createMachineName($machine_name);
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
     $results = \Drupal::entityManager()

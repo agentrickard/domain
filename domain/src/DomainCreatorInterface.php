@@ -39,8 +39,6 @@ interface DomainCreatorInterface {
   /**
    * Gets the hostname of the active request.
    *
-   * This method is called if $inherit is set to TRUE.
-   *
    * @return string
    *   The hostname string of the current request.
    */
@@ -52,11 +50,12 @@ interface DomainCreatorInterface {
    * This string is the primary key of the entity.
    *
    * @param string $hostname
-   *   The hostname of the domain record.
+   *   The hostname of the domain record. If empty, the current request will be
+   *   used.
    *
    * @return
    *   A string containing A-Z, a-z, 0-9, and _ characters.
    */
-  public function createMachineName($hostname);
+  public function createMachineName($hostname = NULL);
 
 }

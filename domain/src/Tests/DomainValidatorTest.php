@@ -26,8 +26,8 @@ class DomainValidatorTest extends DomainTestBase {
     // Create a new domain programmatically.
     $this->domainCreateTestDomains();
 
-    // @TODO: We need a new loader?
-    $key = domain_machine_name(\Drupal::service('domain.creator')->createHostname());
+    // Check the created domain based on it's known id value.
+    $key = \Drupal::service('domain.creator')->createMachineName();
     $domain = \Drupal::service('domain.loader')->load($key);
 
     // Our testing server should be able to acess the test PNG file.

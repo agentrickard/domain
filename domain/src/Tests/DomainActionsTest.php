@@ -40,8 +40,7 @@ class DomainActionsTest extends DomainTestBase {
 
     // Check the default domain.
     $default = \Drupal::service('domain.loader')->loadDefaultId();
-    // @TODO: We need a new loader?
-    $key = domain_machine_name(\Drupal::service('domain.creator')->createHostname());
+    $key = \Drupal::service('domain.creator')->createMachineName();
     $this->assertTrue($default == $key, 'Default domain set correctly.');
 
     // Test some text on the page.
