@@ -45,7 +45,7 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->id(),
       '#machine_name' => array(
         'source' => array('hostname'),
-        'exists' => 'domain_load',
+        'exists' => '\Drupal\domain\Entity\Domain::load',
       ),
     );
     $form['name'] = array(
