@@ -66,8 +66,7 @@ class DomainCreator implements DomainCreatorInterface {
       $values['name'] = \Drupal::config('system.site')->get('name');
       $values['id'] = $this->createMachineName($values['hostname']);
     }
-    // Fix this.
-    $domain = entity_create('domain', $values);
+    $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
     return $domain;
   }
 

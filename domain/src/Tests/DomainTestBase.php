@@ -101,7 +101,7 @@ abstract class DomainTestBase extends WebTestBase {
         'name' => $name,
         'id' => domain_machine_name($hostname),
       );
-      $domain = entity_create('domain', $values);
+      $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
       $domain->save();
     }
     $domains = domain_load_multiple(NULL, TRUE);

@@ -125,7 +125,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
         'target_type' => 'domain',
       ),
     );
-    $field_storage_config = entity_create('field_storage_config', $storage);
+    $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
     $field_storage_config->save();
 
     $field = array(
@@ -139,7 +139,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
         ),
       ),
     );
-    $field_config = entity_create('field_config', $field);
+    $field_config = \Drupal::entityManager()->getStorage('field_storage')->create($field);
     $field_config->save();
 
     // Tell the form system how to behave.
