@@ -23,25 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Creates a new Domain entity record with default values.
- *
- * @param $inherit
- *   Boolean flag indicating that the new domain should inherit values from the
- *   current $_SERVER request. Useful for creating domain records on install.
- *
- * @param $values
- *   An array of values to be set when the domain object is created. If the
- *   $inherit property is set to TRUE, some values may be overridden.
- *
- * @return Drupal\domain\Entity\Domain
- *   A domain entity, with preset values for the current environment.
- */
-function domain_create($inherit = FALSE, array $values = array()) {
-  $creator = \Drupal::service('domain.creator');
-  return $creator->createDomain($values, $inherit);
-}
-
-/**
  * Generates a unique numeric id.
  *
  * @TODO: Move this to Domain Access, which needs it?

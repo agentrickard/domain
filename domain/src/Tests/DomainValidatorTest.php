@@ -39,7 +39,7 @@ class DomainValidatorTest extends DomainTestBase {
       'id' => 'foo_bar',
       'name' => 'Foo',
     );
-    $domain = domain_create(FALSE, $values);
+    $domain = \Drupal::service('domain.creator')->createDomain($values);
 
     $domain->save();
     $this->assertTrue($domain->getResponse() == 500, format_string('Server test for @url failed.', array('@url' => $domain->getPath())));

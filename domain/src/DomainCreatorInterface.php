@@ -20,15 +20,12 @@ interface DomainCreatorInterface {
    * @param array $values
    *   The values to assign to the domain record.
    *   Required values are: hostname, name.
-   *   Required values may be omitted if $inherit is set to TRUE.
-   * @param boolean $inherit
-   *   Indicates whether to inherit certain values from the current HTTP request.
-   *   These values are: hostname, name.
+   *   Passing an empty array will create a domain from the current request.
    *
    * @return DomainInterface $domain
    *   A domain record object.
    */
-  public function createDomain(array $values = array(), $inherit = FALSE);
+  public function createDomain(array $values = array());
 
   /**
    * Creates a numeric id for the domain.
