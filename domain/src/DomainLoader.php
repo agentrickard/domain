@@ -70,7 +70,7 @@ class DomainLoader implements DomainLoaderInterface {
     if (!empty($result)) {
       return key($result);
     }
-    return FALSE;
+    return NULL;
   }
 
   /**
@@ -83,7 +83,7 @@ class DomainLoader implements DomainLoaderInterface {
     if (!empty($result)) {
       return current($result);
     }
-    return FALSE;
+    return NULL;
   }
 
   /**
@@ -114,7 +114,7 @@ class DomainLoader implements DomainLoaderInterface {
       ->getStorage('domain')
       ->loadByProperties(array('hostname' => $hostname));
     if (empty($result)) {
-      return FALSE;
+      return NULL;
     }
     return current($result);
   }

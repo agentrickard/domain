@@ -103,7 +103,7 @@ function domain_access_default_value(FieldableEntityInterface $entity, FieldDefi
 function domain_access_get_entity_values($entity, $field_name) {
   // @TODO: static cache.
   $list = array();
-  // @TODO In tests, $entity is returning null.
+  // @TODO In tests, $entity is returning NULL.
   if (is_null($entity)) {
     return $list;
   }

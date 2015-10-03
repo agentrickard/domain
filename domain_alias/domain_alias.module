@@ -53,7 +53,7 @@ function domain_alias_pattern_load($pattern) {
     ->getStorage('domain_alias')
     ->loadByProperties(array('pattern' => $pattern));
   if (empty($result)) {
-    return FALSE;
+    return NULL;
   }
   return current($result);
 }

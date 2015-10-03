@@ -602,7 +602,7 @@ function drush_domain_get_from_argument($argument) {
   }
   if (!$domain) {
     drush_set_error('domain', dt('Domain record not found.'));
-    return FALSE;
+    return NULL;
   }
   return $domain;
 }
