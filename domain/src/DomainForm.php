@@ -22,10 +22,10 @@ class DomainForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
     $domain = $this->entity;
-    $domains = domain_load_multiple();
+    $domains = \Drupal::service('domain.loader')->loadMultiple();
     // Create defaults if this is the first domain.
     if (empty($domains)) {
-      $domain->addProperty('hostname', domain_hostname());
+      $domain->addProperty('hostname', \Drupal::service('domain.creator')->createHostname());
       $domain->addProperty('name', \Drupal::config('system.site')->get('name'));
     }
     $form['domain_id'] = array(
@@ -45,7 +45,7 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->id(),
       '#machine_name' => array(
         'source' => array('hostname'),
-        'exists' => 'domain_load',
+        'exists' => '\Drupal\domain\Entity\Domain::load',
       ),
     );
     $form['name'] = array(
@@ -75,7 +75,7 @@ class DomainForm extends EntityForm {
     $form['weight'] = array(
       '#type' => 'weight',
       '#title' => $this->t('Weight'),
-      '#delta' => count(domain_load_multiple()) + 1,
+      '#delta' => count(\Drupal::service('domain.loader')->loadMultiple()) + 1,
       '#default_value' => $domain->getWeight(),
       '#description' => $this->t('The sort order for this record. Lower values display first.'),
     );
@@ -85,7 +85,7 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->isDefault(),
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
-    $required = domain_required_fields();
+    $required = \Drupal::service('domain.validator')->getRequiredFields();
     foreach ($form as $key => $element) {
       if (in_array($key, $required)) {
         $form[$key]['#required'] = TRUE;

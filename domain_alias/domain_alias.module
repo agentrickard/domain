@@ -31,7 +31,11 @@ function domain_alias_help($path, $arg) {
  *   statically cached.
  */
 function domain_alias_load($id = NULL, $reset = FALSE) {
-  return entity_load('domain_alias', $id, $reset);
+  $controller = \Drupal::entityManager()->getStorage('domain_alias');
+  if ($reset) {
+    $controller->resetCache(array($id));
+  }
+  return $controller->load($id);
 }
 
 /**
@@ -39,19 +43,19 @@ function domain_alias_load($id = NULL, $reset = FALSE) {
  *
  * @param string $pattern
  *   An alias pattern, such as *.example.com.
- * @param bool $reset
- *   (optional) Whether to reset the internal cache. Defaults to FALSE.
  *
  * @return Drupal\domain_alias\Entity\DomainAlias|FALSE
  *   The domain alias entity, if it exists, FALSE otherwise. Results are
  *   statically cached.
  */
 function domain_alias_pattern_load($pattern) {
-  $entities = entity_load_multiple_by_properties('domain_alias', array('pattern' => $pattern));
-  if (empty($entities)) {
-    return FALSE;
+  $result = \Drupal::entityManager()
+    ->getStorage('domain_alias')
+    ->loadByProperties(array('pattern' => $pattern));
+  if (empty($result)) {
+    return NULL;
   }
-  return current($entities);
+  return current($result);
 }
 
 /**
@@ -72,7 +76,7 @@ function domain_alias_pattern_load($pattern) {
 function domain_alias_domain_request_alter(DomainInterface &$domain) {
   $hostname = $domain->getHostname();
   if ($alias = domain_alias_match_hostname($hostname)) {
-    if ($domain = domain_load($alias->getDomainId())) {
+    if ($domain = \Drupal::service('domain.loader')->load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias->getPattern());
       $redirect = $alias->getRedirect();
       if (!empty($redirect)) {

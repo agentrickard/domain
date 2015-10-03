@@ -42,41 +42,28 @@ class DomainCreator implements DomainCreatorInterface {
   }
 
   /**
-   * Creates a new domain record object.
-   *
-   * @param array $values
-   *   The values for the domain.
-   * @param bool $inherit
-   *   Indicates that values should be calculated from the current domain.
-   *
-   * @return DomainInterface $domain
-   *   A domain record object.
+   * {@inheritdoc}
    */
-  public function createDomain(array $values = array(), $inherit = FALSE) {
+  public function createDomain(array $values = array()) {
     $default = $this->loader->loadDefaultId();
     $domains = $this->loader->loadMultiple();
+    if (empty($values)) {
+      $values['hostname'] = $this->createHostname();
+      $values['name'] = \Drupal::config('system.site')->get('name');
+      $values['id'] = $this->createMachineName($values['hostname']);
+    }
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
     );
-    if ($inherit) {
-      $values['hostname'] = $this->createHostname();
-      $values['name'] = \Drupal::config('system.site')->get('name');
-      $values['id'] = $this->createMachineName($values['hostname']);
-    }
-    // Fix this.
-    $domain = entity_create('domain', $values);
+    $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
     return $domain;
   }
 
   /**
-   * Gets the next numeric id for a domain.
-   *
-   * Numeric id keys are still used by the node access system.
-   *
-   * @return integer
+   * {@inheritdoc}
    */
   public function createNextId() {
     $domains = $this->loader->loadMultiple();
@@ -91,19 +78,19 @@ class DomainCreator implements DomainCreatorInterface {
   }
 
   /**
-   * Gets the hostname of the active request.
-   *
-   * @return string
-   *   The hostname string of the current request.
+   * {@inheritdoc}
    */
   public function createHostname() {
     return $this->negotiator->negotiateActiveHostname();
   }
 
   /**
-   * Gets the machine name of a host, used as primary key.
+   * {@inheritdoc}
    */
-  public function createMachineName($hostname) {
+  public function createMachineName($hostname = NULL) {
+    if (empty($hostname)) {
+      $hostname = $this->createHostname();
+    }
     return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
   }
 

@@ -26,9 +26,9 @@ class DomainValidatorTest extends DomainTestBase {
     // Create a new domain programmatically.
     $this->domainCreateTestDomains();
 
-    // @TODO: We need a new loader?
-    $key = domain_machine_name(domain_hostname());
-    $domain = domain_load($key);
+    // Check the created domain based on it's known id value.
+    $key = \Drupal::service('domain.creator')->createMachineName();
+    $domain = \Drupal::service('domain.loader')->load($key);
 
     // Our testing server should be able to acess the test PNG file.
     $this->assertTrue($domain->getResponse() == 200, format_string('Server test for @url passed.', array('@url' => $domain->getPath())));
@@ -39,7 +39,7 @@ class DomainValidatorTest extends DomainTestBase {
       'id' => 'foo_bar',
       'name' => 'Foo',
     );
-    $domain = domain_create(FALSE, $values);
+    $domain = \Drupal::service('domain.creator')->createDomain($values);
 
     $domain->save();
     $this->assertTrue($domain->getResponse() == 500, format_string('Server test for @url failed.', array('@url' => $domain->getPath())));

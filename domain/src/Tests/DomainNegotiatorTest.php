@@ -40,7 +40,7 @@ class DomainNegotiatorTest extends DomainTestBase {
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
 
     // Test the response of the default home page.
-    foreach (domain_load_multiple() as $domain) {
+    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
       $this->assertRaw($domain->label(), 'Loaded the proper domain.');
     }

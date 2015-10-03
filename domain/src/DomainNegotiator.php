@@ -64,7 +64,8 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $domain = $this->domainLoader->loadByHostname($httpHost);
     // If a straight load fails, create a base domain for checking.
     if (empty($domain)) {
-      $domain = entity_create('domain', array('hostname' => $httpHost));
+      $values = array('hostname' => $httpHost);
+      $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
     }
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.

@@ -29,16 +29,16 @@ define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
  */
 function domain_access_node_grants(AccountInterface $account, $op) {
   $grants = array();
-  $active = domain_get_domain();
-  
-  if(empty($active)) { 
-    $active = domain_default(); 
+  $active = \Drupal::service('domain.negotiator')->getActiveDomain();
+
+  if(empty($active)) {
+    $active = \Drupal::service('domain.loader')->loadDefaultDomain();
   }
-  
+
   if(empty($active)) {
     return $grants;
   }
-  
+
   $id = $active->getDomainId();
   // Grants for view are simple. Use the active domain.
   if ($op == 'view') {
@@ -46,7 +46,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
     return $grants;
   }
   // Grants for edit/delete require permissions.
-  $user = entity_load('user', $account->id());
+  $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
   // @TODO Right now, we do not account for context of the request. Should we?
   if ($op == 'update' && $user->hasPermission('edit domain content') && !empty($user_domains)) {
@@ -64,7 +64,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
 function domain_access_node_access_records(NodeInterface $node) {
   $grants = array();
   foreach (domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD) as $id => $domainId) {
-    if ($domain = domain_load($id)) {
+    if ($domain = \Drupal::service('domain.loader')->load($id)) {
       $grants[] = array(
         'realm' => 'domain_id',
         'gid' => $domain->getDomainId(),
@@ -82,7 +82,7 @@ function domain_access_node_access_records(NodeInterface $node) {
  */
 function domain_access_default_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
   $item = array();
-  if ($active = domain_get_domain()) {
+  if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $item[0]['target_uuid'] = $active->uuid();
   }
   return $item;
@@ -103,7 +103,7 @@ function domain_access_default_value(FieldableEntityInterface $entity, FieldDefi
 function domain_access_get_entity_values($entity, $field_name) {
   // @TODO: static cache.
   $list = array();
-  // @TODO In tests, $entity is returning null.
+  // @TODO In tests, $entity is returning NULL.
   if (is_null($entity)) {
     return $list;
   }
@@ -113,7 +113,7 @@ function domain_access_get_entity_values($entity, $field_name) {
   if (!empty($values)) {
     foreach ($values as $item) {
       if ($target = $item->getValue()) {
-        if ($domain = domain_load($target['target_id'])) {
+        if ($domain = \Drupal::service('domain.loader')->load($target['target_id'])) {
           $list[$domain->id()] = $domain->getDomainId();
         }
       }
@@ -145,7 +145,7 @@ function domain_access_node_presave(EntityInterface $node) {
     }
     // Else set randomly.
     else {
-      $domains = domain_load_multiple();
+      $domains = \Drupal::service('domain.loader')->loadMultiple();
       $values = array(
         DOMAIN_ACCESS_NODE_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
       );
@@ -160,7 +160,7 @@ function domain_access_node_presave(EntityInterface $node) {
 function domain_access_form_devel_generate_content_form_alter(&$form, &$form_state, $form_id) {
   // Add our element to the devel generate form.
   $form['submit']['#weight'] = 10;
-  $list = domain_options_list();
+  $list = \Drupal::service('domain.loader')->loadOptionsList();
   $form['domain_access'] = array(
     '#title' => t('Domains'),
     '#type' => 'select',
@@ -168,7 +168,7 @@ function domain_access_form_devel_generate_content_form_alter(&$form, &$form_sta
     '#weight' => 2,
     '#multiple' => TRUE,
     '#size' => count($list) > 5 ? 5 : count($list),
-    '#default_value' => array(domain_get_active_id()),
+    '#default_value' => array(\Drupal::service('domain.negotiator')->getActiveId()),
   );
 }
 
@@ -184,7 +184,7 @@ function domain_access_domain_source_alter(&$source, $path, $options) {
   $node = $options['entity'];
   $list = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
   // @TODO: setting to enable this rewrite, as in older versions?
-  if ($list && $domains = domain_load_and_sort($list)) {
+  if ($list && $domains = \Drupal::service('domain.loader')->loadMultipleSorted($list)) {
     $first = current($domains);
     if ($first->id() != $options['active_domain']->id()) {
       $source = $first;

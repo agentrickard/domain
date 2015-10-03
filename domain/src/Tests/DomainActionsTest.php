@@ -35,13 +35,12 @@ class DomainActionsTest extends DomainTestBase {
     $this->assertResponse(200);
 
     // Test the domains.
-    $domains = domain_load_multiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     $this->assertTrue(count($domains) == 4, 'Four domain records found.');
 
     // Check the default domain.
-    $default = domain_default_id();
-    // @TODO: We need a new loader?
-    $key = domain_machine_name(domain_hostname());
+    $default = \Drupal::service('domain.loader')->loadDefaultId();
+    $key = \Drupal::service('domain.creator')->createMachineName();
     $this->assertTrue($default == $key, 'Default domain set correctly.');
 
     // Test some text on the page.

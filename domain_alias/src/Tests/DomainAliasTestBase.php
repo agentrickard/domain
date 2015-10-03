@@ -49,7 +49,7 @@ abstract class DomainAliasTestBase extends DomainTestBase {
       'redirect' => $redirect,
     );
     $values['id'] = str_replace(array('*', '.'), '_', $values['pattern']);
-    $alias = entity_create('domain_alias', $values);
+    $alias = \Drupal::entityManager()->getStorage('domain_alias')->create($values);
     // @TODO: test this logic.
     $alias->save();
     return $alias;

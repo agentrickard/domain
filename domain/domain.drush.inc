@@ -168,7 +168,7 @@ function domain_drush_help($section) {
  * Shows the domain list.
  */
 function drush_domain_list() {
-  $domains = domain_load_and_sort(NULL, TRUE);
+  $domains = \Drupal::service('domain.loader')->loadMultipleSorted(NULL, TRUE);
 
   if (empty($domains)) {
     drush_print(dt('No domains have been created. Use drush domain-add to create one.'));
@@ -216,7 +216,7 @@ function drush_domain_list() {
 function drush_domain_generate_domains($primary = 'example.com') {
   // Check the number of domains to create.
   $count = drush_get_option('count');
-  $domains = domain_load_multiple(NULL, TRUE);
+  $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
   if (empty($count)) {
     $count = 15;
   }
@@ -279,9 +279,9 @@ function drush_domain_generate_domains($primary = 'example.com') {
       'status' => 1,
       'weight' => ($item != $primary) ? $key + $start_weight + 1 : -1,
       'is_default' => 0,
-      'id' => domain_machine_name($hostname),
+      'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
     );
-    $domain = domain_create(FALSE, $values);
+    $domain = \Drupal::service('domain.creator')->createDomain($values);
     domain_drush_create($domain);
   }
 
@@ -321,7 +321,7 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
  *   The domain created or an error message.
  */
 function drush_domain_add($hostname, $name) {
-  $start_weight = count(domain_load_multiple()) + 1;
+  $start_weight = count(\Drupal::service('domain.loader')->loadMultiple()) + 1;
   $hostname = strtolower($hostname);
   $values = array(
     'hostname' => $hostname,
@@ -330,9 +330,9 @@ function drush_domain_add($hostname, $name) {
     'scheme' => (!drush_get_option('https')) ? 'http' : 'https',
     'weight' => ($weight = drush_get_option('weight')) ? $weight : $start_weight + 1,
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
-    'id' => domain_machine_name($hostname),
+    'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
   );
-  $domain = domain_create(FALSE, $values);
+  $domain = \Drupal::service('domain.creator')->createDomain($values);
   /* TODO: Fix this check.
   if (!empty($domain->is_default)) {
     $domain->checkResponse();
@@ -406,7 +406,7 @@ function drush_domain_delete($argument = NULL) {
     drush_set_error('domain', dt('You must specify a domain to delete.'));
   }
   if ($argument == 'all') {
-    $domains = domain_load_multiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     if (empty($domains)) {
       drush_print(dt('There are no domains to delete.'));
       return;
@@ -433,7 +433,7 @@ function drush_domain_delete($argument = NULL) {
   return;
 
   // TODO: Set options for re-assigning content.
-  $list = domain_load_multiple(NULL, TRUE);
+  $list = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
   $options = array('0' => dt('Do not reassign'));
   foreach ($list as $data) {
     if ($data->id() != $domain->id()) {
@@ -468,7 +468,7 @@ function drush_domain_test($argument = NULL) {
     $GLOBALS['base_path'] = '/' . $base_path . '/';
   }
   if (is_null($argument)) {
-    $domains = domain_load_multiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
   }
   else {
     if ($domain = drush_domain_get_from_argument($argument)) {
@@ -556,10 +556,12 @@ function drush_domain_name($argument, $name) {
  * Changes a domain machine_name.
  */
 function drush_domain_machine_name($argument, $machine_name) {
-  $machine_name = domain_machine_name($machine_name);
+  $machine_name = \Drupal::service('domain.creator')->createMachineName($machine_name);
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    $results = entity_load_multiple_by_properties('domain', array('machine_name' => $machine_name));
+    $results = \Drupal::entityManager()
+      ->getStorage('domain')
+      ->loadByProperties(array('machine_name' => $machine_name);
     foreach ($results as $result) {
       if ($result->id() == $machine_name) {
         drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', array('@machine_name' => $machine_name, '@hostname' => $result->getHostname())));
@@ -594,13 +596,13 @@ function drush_domain_scheme($argument) {
  * On failure, throws a drush error.
  */
 function drush_domain_get_from_argument($argument) {
-  $domain = domain_load($argument);
+  $domain = \Drupal::service('domain.loader')->load($argument);
   if (!$domain) {
-    $domain = domain_load_hostname($argument);
+    $domain = \Drupal::service('domain.loader')->loadByHostname($argument);
   }
   if (!$domain) {
     drush_set_error('domain', dt('Domain record not found.'));
-    return FALSE;
+    return NULL;
   }
   return $domain;
 }

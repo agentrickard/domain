@@ -15,9 +15,22 @@ use Drupal\domain\DomainInterface;
 interface DomainLoaderInterface {
 
   /**
+   * Loads a single domains.
+   *
+   * @param $id
+   *   A domain id to load.
+   * @param boolean $reset
+   *   Indicates that the entity cache should be reset.
+   *
+   * @return DomainInterface
+   *   A Drupal\domain\DomainInterface object | NULL.
+   */
+  public function load($id, $reset = FALSE);
+
+  /**
    * Gets the default domain object.
    *
-   * @return Drupal\domain\DomainInterface | FALSE
+   * @return Drupal\domain\DomainInterface | NULL
    */
   public function loadDefaultDomain();
 
@@ -59,7 +72,7 @@ interface DomainLoaderInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return Drupal\domain\DomainInterface | FALSE
+   * @return Drupal\domain\DomainInterface | NULL
    */
   public function loadByHostname($hostname);
 

@@ -29,7 +29,7 @@ class DomainAliasController extends DomainControllerBase {
     // the parent domain entity.
     $values['domain_id'] = $domain->id();
     // @TODO: ensure that this value is present in all cases.
-    $alias = entity_create('domain_alias', $values);
+    $alias = \Drupal::entityManager()->getStorage('domain_alias')->create($values);
     return $this->entityFormBuilder()->getForm($alias);
   }
 }
