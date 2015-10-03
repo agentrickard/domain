@@ -53,7 +53,9 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadDefaultId() {
-    $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
+    $result = \Drupal::entityManager()
+      ->getStorage('domain')
+      ->loadByProperties(array('is_default' => TRUE));
     if (!empty($result)) {
       return key($result);
     }
@@ -64,7 +66,9 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadDefaultDomain() {
-    $result = entity_load_multiple_by_properties('domain', array('is_default' => TRUE));
+    $result = \Drupal::entityManager()
+      ->getStorage('domain')
+      ->loadByProperties(array('is_default' => TRUE));
     if (!empty($result)) {
       return current($result);
     }
@@ -74,8 +78,8 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadMultiple($ids = NULL, $reset = FALSE) {
-    return entity_load_multiple('domain', $ids, $reset);
+  public function loadMultiple($ids = NULL) {
+    return \Drupal::entityManager()->getStorage('domain')->loadMultiple($ids);
   }
 
   /**
@@ -91,11 +95,13 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByHostname($hostname) {
-    $entities = entity_load_multiple_by_properties('domain', array('hostname' => $hostname));
-    if (empty($entities)) {
+    $result = \Drupal::entityManager()
+      ->getStorage('domain')
+      ->loadByProperties(array('hostname' => $hostname));
+    if (empty($result)) {
       return FALSE;
     }
-    return current($entities);
+    return current($result);
   }
 
   /**

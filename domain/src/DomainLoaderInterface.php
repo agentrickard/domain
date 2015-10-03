@@ -34,13 +34,11 @@ interface DomainLoaderInterface {
    *
    * @param array $ids
    *   An optional array of specific ids to load.
-   * @param boolean $reset
-   *   Indicates that the entity cache should be reset.
    *
    * @return array
    *   An array of Drupal\domain\DomainInterface objects.
    */
-  public function loadMultiple($ids = NULL, $reset = FALSE);
+  public function loadMultiple($ids = NULL);
 
   /**
    * Loads multiple domains and sorts by weight.

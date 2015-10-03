@@ -39,19 +39,19 @@ function domain_alias_load($id = NULL, $reset = FALSE) {
  *
  * @param string $pattern
  *   An alias pattern, such as *.example.com.
- * @param bool $reset
- *   (optional) Whether to reset the internal cache. Defaults to FALSE.
  *
  * @return Drupal\domain_alias\Entity\DomainAlias|FALSE
  *   The domain alias entity, if it exists, FALSE otherwise. Results are
  *   statically cached.
  */
 function domain_alias_pattern_load($pattern) {
-  $entities = entity_load_multiple_by_properties('domain_alias', array('pattern' => $pattern));
-  if (empty($entities)) {
+  $result = \Drupal::entityManager()
+    ->getStorage('domain_alias')
+    ->loadByProperties(array('pattern' => $pattern));
+  if (empty($result)) {
     return FALSE;
   }
-  return current($entities);
+  return current($result);
 }
 
 /**

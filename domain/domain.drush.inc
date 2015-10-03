@@ -559,7 +559,9 @@ function drush_domain_machine_name($argument, $machine_name) {
   $machine_name = domain_machine_name($machine_name);
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    $results = entity_load_multiple_by_properties('domain', array('machine_name' => $machine_name));
+    $results = \Drupal::entityManager()
+      ->getStorage('domain')
+      ->loadByProperties(array('machine_name' => $machine_name);
     foreach ($results as $result) {
       if ($result->id() == $machine_name) {
         drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', array('@machine_name' => $machine_name, '@hostname' => $result->getHostname())));
