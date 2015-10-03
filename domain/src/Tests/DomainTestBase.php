@@ -51,7 +51,7 @@ abstract class DomainTestBase extends WebTestBase {
   public function domainTableIsEmpty() {
     $domains = domain_load_multiple(NULL, TRUE);
     $this->assertTrue(empty($domains), 'No domains have been created.');
-    $default_id = domain_default_id();
+    $default_id = Drupal::service('domain.loader')->loadDefaultId();
     $this->assertTrue(empty($default_id), 'No default domain has been set.');
   }
 

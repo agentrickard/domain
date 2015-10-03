@@ -39,7 +39,7 @@ class DomainCreateTest extends DomainTestBase {
     $domain->save();
 
     // Did it save correctly?
-    $default_id = domain_default_id();
+    $default_id = Drupal::service('domain.loader')->loadDefaultId();
     $this->assertTrue(!empty($default_id), 'Default domain has been set.');
 
     // Does it load correctly?

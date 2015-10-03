@@ -23,17 +23,6 @@ function domain_entity_bundle_info() {
 }
 
 /**
- * Returns the id of the default domain.
- *
- * @return
- *   The id of the default domain or FALSE if none is set.
- */
-function domain_default_id() {
-  $loader = Drupal::service('domain.loader');
-  return $loader->loadDefaultId();
-}
-
-/**
  * Returns the default domain.
  *
  * @return Domain
