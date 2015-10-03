@@ -598,7 +598,7 @@ function drush_domain_scheme($argument) {
 function drush_domain_get_from_argument($argument) {
   $domain = \Drupal::service('domain.loader')->load($argument);
   if (!$domain) {
-    $domain = domain_load_hostname($argument);
+    $domain = \Drupal::service('domain.loader')->loadByHostname($argument);
   }
   if (!$domain) {
     drush_set_error('domain', dt('Domain record not found.'));

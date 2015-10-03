@@ -40,7 +40,7 @@ class DomainServerBlock extends DomainBlockBase {
     );
     // Check the response test.
     $domain->getResponse();
-    $check = domain_load_hostname($_SERVER['HTTP_HOST']);
+    $check = \Drupal::service('domain.loader')->loadByHostname($_SERVER['HTTP_HOST']);
     $match = $this->t('Exact match');
     if (!$check) {
       // Specific check for Domain Alias.

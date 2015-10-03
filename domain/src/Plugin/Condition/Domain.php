@@ -33,7 +33,7 @@ class Domain extends ConditionPluginBase {
       '#type' => 'checkboxes',
       '#title' => $this->t('When the following domains are active'),
       '#default_value' => $this->configuration['domains'],
-      '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', domain_options_list()),
+      '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', \Drupal::service('domain.loader')->loadOptionsList()),
       '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
       '#attached' => array(
         'library' => array(
@@ -66,7 +66,7 @@ class Domain extends ConditionPluginBase {
    */
   public function summary() {
     // Use the domain labels. They will be sanitized below.
-    $domains = array_intersect_key(domain_options_list(), $this->configuration['domains']);
+    $domains = array_intersect_key(\Drupal::service('domain.loader')->loadOptionsList(), $this->configuration['domains']);
     if (count($domains) > 1) {
       $domains = implode(', ', $domains);
     }

@@ -161,16 +161,3 @@ function domain_entity_load(array $entities, $entity_type) {
     }
   }
 }
-
-/**
- * Returns a list of all domains, suitable for use in a form.
- *
- * @TODO: Access control.
- *
- * @return array
- *   A list of domains, keyed by id.
- */
-function domain_options_list() {
-  $loader = \Drupal::service('domain.loader');
-  return $loader->loadOptionsList();
-}

@@ -47,7 +47,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
     }
     // 4) Check that the alias is not a direct match for a registered domain.
     $check = preg_match('/[a-z0-9\.\+\-:]*$/', $pattern);
-    if ($check == 1 && $test = domain_load_hostname($pattern)) {
+    if ($check == 1 && $test = \Drupal::service('domain.loader')->loadByHostname($pattern)) {
       return $this->t('The pattern matches an existing domain record.');
     }
     // 5) Check that the alias is unique across all records.

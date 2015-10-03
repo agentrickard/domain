@@ -160,7 +160,7 @@ function domain_access_node_presave(EntityInterface $node) {
 function domain_access_form_devel_generate_content_form_alter(&$form, &$form_state, $form_id) {
   // Add our element to the devel generate form.
   $form['submit']['#weight'] = 10;
-  $list = domain_options_list();
+  $list = \Drupal::service('domain.loader')->loadOptionsList();
   $form['domain_access'] = array(
     '#title' => t('Domains'),
     '#type' => 'select',
