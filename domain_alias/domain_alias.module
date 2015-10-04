@@ -39,26 +39,6 @@ function domain_alias_load($id = NULL, $reset = FALSE) {
 }
 
 /**
- * Return the domain alias entity matching an alias pattern.
- *
- * @param string $pattern
- *   An alias pattern, such as *.example.com.
- *
- * @return Drupal\domain_alias\Entity\DomainAlias|FALSE
- *   The domain alias entity, if it exists, FALSE otherwise. Results are
- *   statically cached.
- */
-function domain_alias_pattern_load($pattern) {
-  $result = \Drupal::entityManager()
-    ->getStorage('domain_alias')
-    ->loadByProperties(array('pattern' => $pattern));
-  if (empty($result)) {
-    return NULL;
-  }
-  return current($result);
-}
-
-/**
  * Implements hook_domain_request_alter().
  *
  * The logic in this function gives us the following matches for a request to
@@ -85,46 +65,6 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
     }
     // @TODO: error capture?
   }
-}
-
-/**
- * Tries to match an http hostname to a registered alias.
- *
- * @param string $hostname
- *   The hostname value (generally $_SERVER['HTTP_HOST']).
- *
- * @return Drupal\domain_alias\Entity\DomainAlias|FALSE
- *   A matching domain alias entity, if it exists, FALSE otherwise.
- */
-function domain_alias_match_hostname($hostname) {
-  $parts = explode('.', $hostname);
-  $patterns = array($hostname);
-  $patterns[] = $parts[0] . '.*';
-  $count = count($parts);
-  for ($i = 0; $i < $count; $i++) {
-    $temp = $parts;
-    $temp[$i] = '*';
-    $patterns[] = implode('.', $temp);
-  }
-  $patterns[] = '*.' . $hostname;
-  $patterns[] = $hostname . '.*';
-  uasort($patterns, 'domain_alias_sort');
-  foreach ($patterns as $pattern) {
-    if ($alias = domain_alias_pattern_load($pattern)) {
-      return $alias;
-    }
-  }
-  return FALSE;
-}
-
-/**
- * Sorts domains by wildcard to float exact matches to the top.
- */
-function domain_alias_sort($a, $b) {
-  if (substr_count($a, '*') > 0) {
-    return 1;
-  }
-  return 0;
 }
 
 /**

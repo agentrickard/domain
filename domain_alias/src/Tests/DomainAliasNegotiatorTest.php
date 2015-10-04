@@ -54,7 +54,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     // Now, test an alias.
     $this->domainAliasCreateTestAlias($alias_domain);
     $pattern = '*.' . $alias_domain->getHostname();
-    $alias = domain_alias_pattern_load($pattern);
+    $alias = \Drupal::service('domain_alias.loader')->loadByPattern($pattern);
     $alias_domain->set('hostname', 'two.' . $alias_domain->getHostname());
     $alias_domain->setPath();
     $url = $alias_domain->getPath();
