@@ -87,7 +87,7 @@ interface DomainLoaderInterface {
   /**
    * Sorts domains by weight.
    *
-   * For use by sort().
+   * For use by loadMultipleSorted().
    */
   public function sort($a, $b);
 
