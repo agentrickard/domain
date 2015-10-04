@@ -1,4 +1,9 @@
 services:
+  domain_alias.loader:
+    class: Drupal\domain_alias\DomainAliasLoader
+    tags:
+      - { name: persist }
+    arguments: ['@module_handler', '@config.typed']
   domain_alias.validator:
     class: Drupal\domain_alias\DomainAliasValidator
     tags:

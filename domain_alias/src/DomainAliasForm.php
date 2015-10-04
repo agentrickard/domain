@@ -40,7 +40,7 @@ class DomainAliasForm extends EntityForm {
       '#default_value' => $alias->id(),
       '#machine_name' => array(
         'source' => array('pattern'),
-        'exists' => 'domain_alias_load', // @TODO
+        'exists' => '\Drupal\domain_alias\Entity\DomainAlias::load',
       ),
     );
     $form['redirect'] = array(
