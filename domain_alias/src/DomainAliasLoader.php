@@ -7,8 +7,8 @@
 
 namespace Drupal\domain_alias;
 
-use Drupal\domain\DomainAliasLoaderInterface;
-use Drupal\domain\DomainAliasInterface;
+use Drupal\domain_alias\DomainAliasLoaderInterface;
+use Drupal\domain_alias\DomainAliasInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 

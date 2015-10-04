@@ -7,7 +7,7 @@
 
 namespace Drupal\domain_alias;
 
-use Drupal\domain_alais\DomainAliasInterface;
+use Drupal\domain_alias\DomainAliasInterface;
 
 /**
  * Supplies loader methods for common domain_alias requests.
