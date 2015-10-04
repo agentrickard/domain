@@ -69,4 +69,12 @@ interface DomainAliasLoaderInterface {
    */
   public function sort($a, $b);
 
+  /**
+   * Gets the schema for domain alias records.
+   *
+   * @return array
+   *   An array representing the field schema of the object.
+   */
+  public function loadSchema();
+
 }
