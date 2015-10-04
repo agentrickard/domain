@@ -19,26 +19,6 @@ function domain_alias_help($path, $arg) {
 }
 
 /**
- * Return the domain alias entity matching a domain alias id.
- *
- * @param $id
- *   The domain alias id.
- * @param bool $reset
- *   (optional) Whether to reset the internal cache. Defaults to FALSE.
- *
- * @return Drupal\domain_alias\Entity\DomainAlias|FALSE
- *   The domain alias entity, if exists, FALSE otherwise. Results are
- *   statically cached.
- */
-function domain_alias_load($id = NULL, $reset = FALSE) {
-  $controller = \Drupal::entityManager()->getStorage('domain_alias');
-  if ($reset) {
-    $controller->resetCache(array($id));
-  }
-  return $controller->load($id);
-}
-
-/**
  * Implements hook_domain_request_alter().
  *
  * The logic in this function gives us the following matches for a request to
