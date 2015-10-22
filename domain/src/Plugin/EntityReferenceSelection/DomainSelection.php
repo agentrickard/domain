@@ -2,25 +2,25 @@
 
 /**
  * @file
- * Contains \Drupal\domain\Plugin\Type\selection\DomainSelection.
+ * Contains \Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection.
  */
 
-namespace Drupal\domain\Plugin\entity_reference\selection;
+namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
-use Drupal\entity_reference\Plugin\entity_reference\selection\SelectionBase;
+use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 
 /**
  * Provides specific access control for the domain entity type.
  *
  * @EntityReferenceSelection(
- *   id = "domain_default",
+ *   id = "default:domain",
  *   label = @Translation("Domain selection"),
  *   entity_types = {"domain"},
  *   group = "default",
  *   weight = 1
  * )
  */
-class DomainSelection extends SelectionBase {
+class DomainSelection extends DefaultSelection {
 
   /**
    * {@inheritdoc}
@@ -29,7 +29,7 @@ class DomainSelection extends SelectionBase {
     $query = parent::buildEntityQuery($match, $match_operator);
     // Filter domains by the user's assignments.
     // @TODO: allow users to be assigned to domains.
-    $account = Drupal::currentUser();
+    $account = \Drupal::currentUser();
     if ($account->hasPermission('administer domains')) {
       return $query;
     }
