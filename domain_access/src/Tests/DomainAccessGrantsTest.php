@@ -87,16 +87,10 @@ class DomainAccessGrantsTest extends DomainTestBase {
    *   The node object to check.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account for which to check access.
-   * @param string|null $langcode
-   *   (optional) The language code indicating which translation of the node
-   *   to check. If NULL, the untranslated (fallback) access is checked.
    */
-  function assertNodeAccess(array $ops, $node, AccountInterface $account, $langcode = NULL) {
+  function assertNodeAccess(array $ops, $node, AccountInterface $account) {
     foreach ($ops as $op => $result) {
-      if (empty($langcode)) {
-        $langcode = $node->prepareLangcode();
-      }
-      $this->assertEqual($result, $this->accessHandler->access($node, $op, $langcode, $account), $this->nodeAccessAssertMessage($op, $result, $langcode));
+      $this->assertEqual($result, $this->accessHandler->access($node, $op, $account), $this->nodeAccessAssertMessage($op, $result));
     }
   }
 
@@ -107,19 +101,15 @@ class DomainAccessGrantsTest extends DomainTestBase {
    *   The operation to check access for.
    * @param bool $result
    *   Whether access should be granted or not.
-   * @param string|null $langcode
-   *   (optional) The language code indicating which translation of the node
-   *   to check. If NULL, the untranslated (fallback) access is checked.
    *
    * @return string
    */
-  function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
+  function nodeAccessAssertMessage($operation, $result) {
     return format_string(
-      'Node access returns @result with operation %op, language code %langcode.',
+      'Node access returns @result with operation %op.',
       array(
         '@result' => $result ? 'true' : 'false',
         '%op' => $operation,
-        '%langcode' => !empty($langcode) ? $langcode : 'empty'
       )
     );
   }
