@@ -6,5 +6,4 @@ version: VERSION
 core: 8.x
 dependencies:
   - options
-  - entity_reference
 configure: admin/config/domain
