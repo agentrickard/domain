@@ -9,7 +9,7 @@ namespace Drupal\domain\Controller;
 
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -34,7 +34,7 @@ class DomainControllerBase extends ControllerBase {
   /**
    * The entity manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityManager;
 
@@ -46,7 +46,7 @@ class DomainControllerBase extends ControllerBase {
    * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
    *   The entity manager.
    */
-  public function __construct(EntityStorageInterface $entity_storage, EntityManagerInterface $entity_manager) {
+  public function __construct(EntityStorageInterface $entity_storage, EntityTypeManagerInterface $entity_manager) {
     $this->entityStorage = $entity_storage;
     $this->entityManager = $entity_manager;
   }
@@ -55,7 +55,7 @@ class DomainControllerBase extends ControllerBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    $entity_manager = $container->get('entity.manager');
+    $entity_manager = $container->get('entity_type.manager');
     return new static(
       $entity_manager->getStorage('domain'),
       $entity_manager
