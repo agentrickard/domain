@@ -7,6 +7,7 @@
 
 namespace Drupal\domain_config;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
@@ -39,6 +40,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   protected $storage;
 
   /**
+   * The domain context of the request.
+   */
+  protected $domain;
+
+  /**
    * Constructs a DomainConfigSubscriber object.
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
@@ -58,7 +64,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    static $domain;
     $overrides = array();
     // loadOverrides() runs on config entities, which means that if we try
     // to run this routine on our own data, then we end up in an infinite loop.
@@ -69,12 +74,12 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
       return $overrides;
     }
     // Only look up the domain record once, if possible.
-    if (!isset($domain)) {
-      $domain = $this->domainNegotiator->getActiveDomain();
+    if (!isset($this->domain)) {
+      $this->domain = $this->domainNegotiator->getActiveDomain();
     }
-    if (!empty($domain)) {
+    if (!empty($this->domain)) {
       foreach ($names as $name) {
-        $config_name = $this->getDomainConfigName($name, $domain);
+        $config_name = $this->getDomainConfigName($name, $this->domain);
         // Check to see if the config storage has an appropriately named file
         // containing override data.
         if ($override = $this->storage->read($config_name)) {
@@ -121,7 +126,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata($name) {
-    return NULL;
+    $metadata = new CacheableMetadata();
+    if ($this->domain) {
+      $metadata->setCacheContexts(['domain']);
+    }
+    return $metadata;
   }
 
 }
