@@ -15,6 +15,12 @@ namespace Drupal\domain_config\Tests;
 class DomainConfigOverriderTest extends DomainConfigTestBase {
 
   /**
+   * Disabled config schema checking because Domain Config actually duplicates
+   * schemas provided by other modules, so cannot define its own.
+   */
+  protected $strictConfigSchema = FALSE;
+
+  /**
    * Tests that domain-specific variable loading works.
    */
   function testDomainConfigOverrider() {
@@ -23,7 +29,6 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
 
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(4);
-
     // Test the response of the default user page.
     // If we leave path as /, the test fails?!?
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
