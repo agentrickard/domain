@@ -36,14 +36,17 @@ class CurrentDomainContext implements ContextProviderInterface {
    * {@inheritdoc}
    */
   public function getRuntimeContexts(array $unqualified_context_ids) {
+    // Load the current domain.
     $current_domain = $this->negotiator->getActiveDomain();
+    // Set the context.
+    $context = new Context(new ContextDefinition('entity:domain', $this->t('Active domain')), $current_domain);
 
-    $context = new Context(new ContextDefinition('entity:domain', $this->t('Active domain')));
-    $context->setContextValue($current_domain);
+    // Allow caching.
     $cacheability = new CacheableMetadata();
-    $cacheability->setCacheContexts(['user']);
+    $cacheability->setCacheContexts(['domain']);
     $context->addCacheableDependency($cacheability);
 
+    // Prepare the result.
     $result = [
       'current_domain' => $context,
     ];

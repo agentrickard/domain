@@ -9,6 +9,7 @@ namespace Drupal\domain\Cache;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\domain\DomainNegotiatorInterface;
 
 /**
@@ -17,6 +18,8 @@ use Drupal\domain\DomainNegotiatorInterface;
  * Cache context ID: 'domain'.
  */
 class DomainCacheContext implements CacheContextInterface {
+
+  use StringTranslationTrait;
 
   /**
    * Constructs a CurrentDomainContext object.
@@ -32,7 +35,7 @@ class DomainCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public static function getLabel() {
-    return t('Domain request');
+    return $this->t('Domain request');
   }
 
   /**
