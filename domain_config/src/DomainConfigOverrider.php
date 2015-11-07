@@ -89,6 +89,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     if (!empty($this->domain)) {
       foreach ($names as $name) {
         $config_name = $this->getDomainConfigName($name, $this->domain);
+        #print $config_name . ' | ';
         // Check to see if the config storage has an appropriately named file
         // containing override data.
         if ($override = $this->storage->read($config_name)) {
@@ -119,6 +120,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // from the core service manager.
     if (!isset($this->langcode)) {
       $this->langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+      debug($this->langcode);
     }
     return 'domain.config.' . $domain->id() . '.' . $this->langcode . '.' . $name;
   }
