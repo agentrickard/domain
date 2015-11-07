@@ -8,3 +8,7 @@ edit assigned domains:
   title: 'Edit assigned domain records'
 delete assigned domains:
   title: 'Delete assigned domain records'
+use domain switcher block:
+  title: 'Access the domain switcher block'
+view domain information:
+  title: 'View debugging information for domain handling'

@@ -10,6 +10,9 @@ namespace Drupal\domain\Plugin\Block;
 use Drupal\domain\Entity\Domain;
 use Drupal\domain\Plugin\Block\DomainBlockBase;
 use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Session\AccountInterface;
+
 
 /**
  * Provides a server information block for a domain request.
@@ -20,6 +23,13 @@ use Drupal\Component\Utility\SafeMarkup;
  * )
  */
 class DomainServerBlock extends DomainBlockBase {
+
+  /**
+   * Overrides \Drupal\block\BlockBase::access().
+   */
+  public function access(AccountInterface $account, $return_as_object = FALSE) {
+    return AccessResult::allowedIfHasPermissions($account, array('administer domains', 'view domain information'), 'OR');
+  }
 
   /**
    * Build the output.

@@ -7,21 +7,12 @@
 
 namespace Drupal\domain\Plugin\Block;
 
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Creates a common block pattern for caching and access.
  */
 abstract class DomainBlockBase extends BlockBase {
-
-  /**
-   * Overrides \Drupal\block\BlockBase::access().
-   */
-  public function access(AccountInterface $account, $return_as_object = FALSE) {
-    return AccessResult::allowedIfHasPermission($account, 'administer domains');
-  }
 
   /**
    * {@inheritdoc}

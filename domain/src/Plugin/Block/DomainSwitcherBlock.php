@@ -23,6 +23,13 @@ use Drupal\Core\Session\AccountInterface;
 class DomainSwitcherBlock extends DomainBlockBase {
 
   /**
+   * Overrides \Drupal\block\BlockBase::access().
+   */
+  public function access(AccountInterface $account, $return_as_object = FALSE) {
+    return AccessResult::allowedIfHasPermissions($account, array('administer domains', 'use domain switcher block'), 'OR');
+  }
+
+  /**
    * Build the output.
    *
    * @TODO: abstract or theme this function?
