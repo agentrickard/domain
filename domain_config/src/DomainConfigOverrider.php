@@ -11,11 +11,15 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 
 /**
  * Domain-specific config overrides.
+ *
+ * See \Drupal\language\Config\LanguageConfigFactoryOverride for ways
+ * this might be improved.
  */
 class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
@@ -43,6 +47,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * The domain context of the request.
    */
   protected $domain;
+
+  /**
+   * The language context of the request.
+   */
+  protected $langcode;
 
   /**
    * Constructs a DomainConfigSubscriber object.
@@ -105,7 +114,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    return 'domain.config.' . $domain->id() . '.' . $name;
+    // Get the language context.
+    if (!isset($this->langcode)) {
+      $this->langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    }
+    return 'domain.config.' . $domain->id() . '.' . $this->langcode . '.' . $name;
   }
 
   /**
@@ -129,6 +142,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $metadata = new CacheableMetadata();
     if ($this->domain) {
       $metadata->setCacheContexts(['domain']);
+      $metadata->setCacheContexts(['languages:language_interface']);
     }
     return $metadata;
   }
