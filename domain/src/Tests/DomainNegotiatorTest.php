@@ -37,7 +37,7 @@ class DomainNegotiatorTest extends DomainTestBase {
     $this->drupalPlaceBlock('domain_server_block');
 
     // To get around block access, let the anon user view the block.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
+    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('view domain information'));
 
     // Test the response of the default home page.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
@@ -46,7 +46,7 @@ class DomainNegotiatorTest extends DomainTestBase {
     }
 
     // Revoke the permission change
-    user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
+    user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('view domain information'));
 
   }
 
