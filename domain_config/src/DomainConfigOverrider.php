@@ -114,7 +114,9 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    // Get the language context.
+    // Get the language context. Note that injecting the language manager
+    // into the service created a circular dependency error, so we load directly
+    // from the core service manager.
     if (!isset($this->langcode)) {
       $this->langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
     }
