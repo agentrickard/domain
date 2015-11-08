@@ -67,6 +67,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $this->domainNegotiator = $negotiator;
     $this->configFactory = $config_factory;
     $this->storage = $storage;
+    $this->domain = $this->domainNegotiator->getActiveDomain();
   }
 
   /**
@@ -81,10 +82,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $list = explode('.', $check);
     if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
       return $overrides;
-    }
-    // Only look up the domain record once, if possible.
-    if (!isset($this->domain)) {
-      $this->domain = $this->domainNegotiator->getActiveDomain();
     }
     if (!empty($this->domain)) {
       foreach ($names as $name) {

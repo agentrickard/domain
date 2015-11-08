@@ -21,6 +21,8 @@ class DomainCacheContext implements CacheContextInterface {
 
   use StringTranslationTrait;
 
+  protected $domain;
+
   /**
    * Constructs a CurrentDomainContext object.
    *
@@ -28,7 +30,8 @@ class DomainCacheContext implements CacheContextInterface {
    *   The domain negotiator.
    */
   public function __construct(DomainNegotiatorInterface $negotiator) {
-      $this->negotiator = $negotiator;
+    $this->negotiator = $negotiator;
+    $this->domain = $this->negotiator->getActiveDomain();
   }
 
   /**
@@ -42,16 +45,17 @@ class DomainCacheContext implements CacheContextInterface {
    * {@inheritdoc}
    */
   public function getContext() {
-    $domain = $this->negotiator->getActiveDomain();
-    return $domain->id();
+    return $this->domain->id();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheableMetadata() {
-    $metadata = new CacheableMetadata();
-    return $metadata;
+    // Cache context is domain-sensitive.
+    $tags = ['domain:' . $this->domain->id()];
+
+    return $cacheable_metadata->setCacheTags($tags);
   }
 
 }
