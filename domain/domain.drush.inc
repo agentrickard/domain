@@ -113,19 +113,19 @@ function domain_drush_command() {
   $items['domain-machine-name'] = array(
     'description' => 'Changes a domain name.',
     'examples' => array(
-      'drush domain-name example.com Foo',
-      'drush domain-name 1 Foo',
+      'drush domain-name example.com foo',
+      'drush domain-name 1 foo',
     ),
     'arguments' => array(
       'domain_id' => 'The numeric id or hostname of the domain to make default.',
-      'name' => 'The name to use for the domain.',
+      'name' => 'The machine-readable name to use for the domain.',
     ),
   );
   $items['domain-scheme'] = array(
     'description' => 'Changes a domain scheme.',
     'examples' => array(
       'drush domain-scheme example.com',
-      'drush domain-scheme 1 Foo',
+      'drush domain-scheme 1',
     ),
     'arguments' => array(
       'domain_id' => 'The numeric id or hostname of the domain to make default.',
