@@ -34,21 +34,21 @@ class DomainController {
     switch($op) {
       case 'default':
         $domain->saveDefault();
-        $verb = $this->t('set as default');
+        $message = $this->t('Domain record set as default');
         if ($domain->isDefault()) {
           $success = TRUE;
         }
         break;
       case 'enable':
         $domain->enable();
-        $verb = $this->t('has been enabled.');
+        $message = $this->t('Domain record has been enabled.');
         if ($domain->status()) {
           $success = TRUE;
         }
         break;
       case 'disable':
         $domain->disable();
-        $verb = $this->t('has been disabled.');
+        $message = $this->t('Domain record has been disabled.');
         if (!$domain->status()) {
           $success = TRUE;
         }
@@ -57,7 +57,7 @@ class DomainController {
 
     // Set a message.
     if ($success) {
-      drupal_set_message($this->t('Domain record !verb.', array('!verb' => $verb)));
+      drupal_set_message($message);
     }
 
     // Return to the invoking page.
