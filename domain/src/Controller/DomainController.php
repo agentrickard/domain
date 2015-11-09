@@ -7,7 +7,6 @@
 namespace Drupal\domain\Controller;
 
 use Drupal\domain\DomainInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -25,7 +24,12 @@ class DomainController {
    * @param \Drupal\domain\DomainInterface
    *   A domain record object.
    * @param $op
-   *   The operation being performed.
+   *   The operation being performed, either 'default' to make the domain record
+   *   the default, 'enable' to enable the domain record, or 'disable' to
+   *   disable the domain record.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response to redirect back to the domain record list.
    *
    * @see \Drupal\domain\DomainListBuilder
    */
@@ -61,7 +65,7 @@ class DomainController {
     }
 
     // Return to the invoking page.
-    return new RedirectResponse($this->url('domain.admin'));
+    return $this->redirect('domain.admin');
   }
 
 }
