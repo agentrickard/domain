@@ -9,11 +9,6 @@ services:
     arguments: ['@domain.negotiator']
     tags:
       - { name: 'context_provider' }
-  cache_context.domain:
-    class: Drupal\domain\Cache\DomainCacheContext
-    arguments: ['@domain.negotiator']
-    tags:
-      - { name: cache.context }
   domain.creator:
     class: Drupal\domain\DomainCreator
     tags:
