@@ -117,7 +117,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // from the core service manager.
     if (!isset($this->langcode)) {
       $this->langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
-      debug($this->langcode);
     }
     return 'domain.config.' . $domain->id() . '.' . $this->langcode . '.' . $name;
   }
