@@ -125,7 +125,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    return $this->domain->id();
+    return $this->domain ? $this->domain->id() : NULL;
   }
 
   /**
