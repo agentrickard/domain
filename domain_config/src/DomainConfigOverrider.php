@@ -100,8 +100,8 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * Get configuration name for this hostname.
    *
-   * It will be the same name with a prefix depending on domain:
-   * domain.config.DOMAIN.ID
+   * It will be the same name with a prefix depending on domain and language:
+   * domain.config.DOMAIN_ID.LANGCODE
    *
    * @param string $name
    *   The name of the config object.
