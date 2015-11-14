@@ -98,3 +98,21 @@ function hook_domain_validate_alter(&$error_list, $subdomain) {
     $error_list[] = t('Only .org domains may be registered.');
   }
 }
+
+/**
+ * Alter the list of domains that may be referenced.
+ *
+ * @param $query
+ *   An entity query prepared by DomainSelection::buildEntityQuery().
+ * @param $account
+ *   The account of the user viewing the reference list.
+ * @return
+ *   No return value. Modify the $query object via methods.
+ */
+function hook_domain_references_alter($query, $account) {
+  // Remove the default domain from non-admins.
+  if (!$account->hasPermission('administer domains')) {
+    $default = \Drupal::service('domain.loader')->loadDefaultId();
+    $query->condition('id', $default, '<>');
+  }
+}
