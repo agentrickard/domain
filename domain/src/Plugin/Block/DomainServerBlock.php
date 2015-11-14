@@ -115,7 +115,7 @@ class DomainServerBlock extends DomainBlockBase {
         }
         $value = implode('<br />', $list);
       }
-      $items[] = $this->t('@key : !value', array('@key' => $key, '!value' => $value));
+      $items[] = $this->t('@key : @value', array('@key' => $key, '@value' => $value));
     }
     $variables['domain_server'] = array(
       '#theme' => 'item_list',
