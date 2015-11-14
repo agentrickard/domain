@@ -36,4 +36,19 @@ class DomainSelection extends DefaultSelection {
 
     return $query;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateReferenceableNewEntities(array $entities) {
+    $entities = parent::validateReferenceableNewEntities($entities);
+    // Mirror the conditions checked in buildEntityQuery().
+    #if (!$this->currentUser->hasPermission('bypass node access') && !count($this->moduleHandler->getImplementations('node_grants'))) {
+    #  $entities = array_filter($entities, function ($node) {
+    #    /** @var \Drupal\node\NodeInterface $node */
+    #    return $node->isPublished();
+    #  });
+    #}
+    return $entities;
+  }
 }

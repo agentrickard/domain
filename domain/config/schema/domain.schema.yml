@@ -6,9 +6,9 @@ domain.settings:
     allow_non_ascii:
       type: boolean
       label: 'Allow non-ASCII characters'
-    www_prefix: false
+    www_prefix:
       type: boolean
-      label: "Prevent a 'www.' prefix of domains"
+      label: 'Ignore www prefix when negotiating domains'
 
 domain.record.*:
   type: config_entity
