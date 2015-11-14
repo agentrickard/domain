@@ -51,7 +51,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * The language context of the request.
    */
-  protected $langcode;
+  protected $language;
 
   /**
    * Constructs a DomainConfigSubscriber object.
@@ -68,6 +68,10 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $this->configFactory = $config_factory;
     $this->storage = $storage;
     $this->domain = $this->domainNegotiator->getActiveDomain();
+    // Get the language context. Note that injecting the language manager
+    // into the service created a circular dependency error, so we load directly
+    // from the core service manager.
+    $this->language = \Drupal::languageManager()->getCurrentLanguage();
   }
 
   /**
@@ -86,7 +90,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     if (!empty($this->domain)) {
       foreach ($names as $name) {
         $config_name = $this->getDomainConfigName($name, $this->domain);
-        #print $config_name . ' | ';
         // Check to see if the config storage has an appropriately named file
         // containing override data.
         if ($override = $this->storage->read($config_name)) {
@@ -112,20 +115,19 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    // Get the language context. Note that injecting the language manager
-    // into the service created a circular dependency error, so we load directly
-    // from the core service manager.
     if (!isset($this->langcode)) {
       $this->langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
     }
-    return 'domain.config.' . $domain->id() . '.' . $this->langcode . '.' . $name;
+    return 'domain.config.' . $domain->id() . '.' . $this->language->getId() . '.' . $name;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    return $this->domain ? $this->domain->id() : NULL;
+    $suffix = $this->domain ? $this->domain->id() : '';
+    $suffix .= $this->language ? $this->language->getId() : '';
+    return ($suffix) ? $suffix : NULL;
   }
 
   /**
