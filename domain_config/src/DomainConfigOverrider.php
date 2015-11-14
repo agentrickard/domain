@@ -112,7 +112,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    return 'DomainConfigOverrider';
+    return $this->domain ? $this->domain->id() : NULL;
   }
 
   /**
@@ -128,7 +128,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   public function getCacheableMetadata($name) {
     $metadata = new CacheableMetadata();
     if ($this->domain) {
-      $metadata->setCacheContexts(['domain']);
+      $metadata->addCacheContexts(['url.site']);
     }
     return $metadata;
   }
