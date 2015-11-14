@@ -1,5 +1,5 @@
 langcode: en
-status: '1'
+status: true
 dependencies:
   module:
     - domain
