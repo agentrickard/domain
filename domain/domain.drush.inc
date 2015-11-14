@@ -86,7 +86,7 @@ function domain_drush_command() {
       'drush domain-disable 1',
     ),
     'arguments' => array(
-      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+      'domain_id' => 'The numeric id or hostname of the domain to disable.',
     ),
   );
   $items['domain-enable'] = array(
@@ -96,39 +96,40 @@ function domain_drush_command() {
       'drush domain-disable 1',
     ),
     'arguments' => array(
-      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+      'domain_id' => 'The numeric id or hostname of the domain to enable.',
     ),
   );
   $items['domain-name'] = array(
-    'description' => 'Changes a domain name.',
+    'description' => 'Changes a domain label.',
     'examples' => array(
       'drush domain-name example.com Foo',
       'drush domain-name 1 Foo',
     ),
     'arguments' => array(
-      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+      'domain_id' => 'The numeric id or hostname of the domain to relabel.',
       'name' => 'The name to use for the domain.',
     ),
   );
   $items['domain-machine-name'] = array(
     'description' => 'Changes a domain name.',
     'examples' => array(
-      'drush domain-name example.com foo',
-      'drush domain-name 1 foo',
+      'drush domain-machine-name example.com foo',
+      'drush domain-machine-name 1 foo',
     ),
     'arguments' => array(
-      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+      'domain_id' => 'The numeric id or hostname of the domain to rename.',
       'name' => 'The machine-readable name to use for the domain.',
     ),
   );
   $items['domain-scheme'] = array(
     'description' => 'Changes a domain scheme.',
     'examples' => array(
-      'drush domain-scheme example.com',
-      'drush domain-scheme 1',
+      'drush domain-scheme example.com https',
+      'drush domain-scheme 1 https',
     ),
     'arguments' => array(
-      'domain_id' => 'The numeric id or hostname of the domain to make default.',
+      'domain_id' => 'The numeric id or hostname of the domain to change.',
+      'scheme' => 'The URL schema (http or https) to use for the domain.',
     ),
   );
   $items['generate-domains'] = array(
