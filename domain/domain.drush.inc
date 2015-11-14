@@ -421,6 +421,7 @@ function drush_domain_delete($argument = NULL) {
     if ($domain->isDefault()) {
       return drush_set_error('domain', dt('The primary domain may not be deleted. Use drush domain-default to set a new default domain.'));
     }
+    $domains = [$domain];
   }
   else {
     return;
