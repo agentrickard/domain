@@ -57,7 +57,7 @@ class DomainController {
 
     // Set a message.
     if ($success) {
-      drupal_set_message($this->t('Domain record !verb.', array('!verb' => $verb)));
+      drupal_set_message($this->t('Domain record @verb.', array('@verb' => $verb)));
     }
 
     // Return to the invoking page.

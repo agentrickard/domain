@@ -103,7 +103,7 @@ class DomainValidator implements DomainValidatorInterface {
 
     // Return the errors, if any.
     if (!empty($error_list)) {
-      return $this->t('The domain string is invalid for %subdomain: !errors', array('%subdomain' => $hostname, '!errors' => array('#theme' => 'item_list', '#items' => $error_list)));
+      return $this->t('The domain string is invalid for %subdomain: @errors', array('%subdomain' => $hostname, '@errors' => array('#theme' => 'item_list', '#items' => $error_list)));
     }
 
     return array();
