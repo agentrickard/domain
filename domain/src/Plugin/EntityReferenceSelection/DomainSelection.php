@@ -27,12 +27,17 @@ class DomainSelection extends DefaultSelection {
    */
   public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
     $query = parent::buildEntityQuery($match, $match_operator);
-    // Filter domains by the user's assignments.
-    // @TODO: allow users to be assigned to domains.
-    $account = \Drupal::currentUser();
-    if ($account->hasPermission('administer domains')) {
+    // Let administrators do anything.
+    if ($this->currentUser->hasPermission('administer domains')) {
       return $query;
     }
+    // Can this user access inactive domains?
+    if (!$this->currentUser->hasPermission('access inactive domains')) {
+      $query->condition('status', 1);
+    }
+    // Filter domains by the user's assignments.
+    // @TODO: allow users to be assigned to domains.
+    // This action should likely be an event or plugin.
 
     return $query;
   }
@@ -43,12 +48,12 @@ class DomainSelection extends DefaultSelection {
   public function validateReferenceableNewEntities(array $entities) {
     $entities = parent::validateReferenceableNewEntities($entities);
     // Mirror the conditions checked in buildEntityQuery().
-    #if (!$this->currentUser->hasPermission('bypass node access') && !count($this->moduleHandler->getImplementations('node_grants'))) {
-    #  $entities = array_filter($entities, function ($node) {
-    #    /** @var \Drupal\node\NodeInterface $node */
-    #    return $node->isPublished();
-    #  });
-    #}
+    if (!$this->currentUser->hasPermission('access inactive domains') && $this->currentUser->hasPermission('administer domains')) {
+      $entities = array_filter($entities, function ($domain) {
+        /** @var \Drupal\domain\DomainInterface $domain */
+        return $domain->status();
+      });
+    }
     return $entities;
   }
 }
