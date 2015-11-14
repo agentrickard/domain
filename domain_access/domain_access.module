@@ -197,8 +197,6 @@ function domain_access_domain_source_alter(&$source, $path, $options) {
  */
 function domain_access_domain_references_alter($query, $account) {
   // Restrict domains by assignment.
-  if (!$account->hasPermission('administer domains')) {
-    $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
-    $query->condition('id', array_keys($allowed), 'IN');
-  }
+  $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+  $query->condition('id', array_keys($allowed), 'IN');
 }

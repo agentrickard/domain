@@ -102,6 +102,9 @@ function hook_domain_validate_alter(&$error_list, $subdomain) {
 /**
  * Alter the list of domains that may be referenced.
  *
+ * Note that this hook does not fire for users with the 'administer domains'
+ * permission.
+ *
  * @param $query
  *   An entity query prepared by DomainSelection::buildEntityQuery().
  * @param $account
@@ -111,7 +114,7 @@ function hook_domain_validate_alter(&$error_list, $subdomain) {
  */
 function hook_domain_references_alter($query, $account) {
   // Remove the default domain from non-admins.
-  if (!$account->hasPermission('administer domains')) {
+  if (!$account->hasPermission('edit assigned domains')) {
     $default = \Drupal::service('domain.loader')->loadDefaultId();
     $query->condition('id', $default, '<>');
   }

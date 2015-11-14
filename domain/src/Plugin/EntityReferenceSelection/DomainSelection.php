@@ -42,19 +42,4 @@ class DomainSelection extends DefaultSelection {
     $this->moduleHandler->alter('domain_references', $query, $account);
     return $query;
   }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateReferenceableNewEntities(array $entities) {
-    $entities = parent::validateReferenceableNewEntities($entities);
-    // Mirror the conditions checked in buildEntityQuery().
-    if (!$this->currentUser->hasPermission('access inactive domains') && $this->currentUser->hasPermission('administer domains')) {
-      $entities = array_filter($entities, function ($domain) {
-        /** @var \Drupal\domain\DomainInterface $domain */
-        return $domain->status();
-      });
-    }
-    return $entities;
-  }
 }
