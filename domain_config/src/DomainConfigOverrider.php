@@ -115,9 +115,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    if (!isset($this->langcode)) {
-      $this->langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    }
     return 'domain.config.' . $domain->id() . '.' . $this->language->getId() . '.' . $name;
   }
 
