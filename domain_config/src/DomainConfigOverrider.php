@@ -11,11 +11,15 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 
 /**
  * Domain-specific config overrides.
+ *
+ * See \Drupal\language\Config\LanguageConfigFactoryOverride for ways
+ * this might be improved.
  */
 class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
@@ -45,6 +49,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   protected $domain;
 
   /**
+   * The language context of the request.
+   */
+  protected $language;
+
+  /**
    * Constructs a DomainConfigSubscriber object.
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
@@ -58,6 +67,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $this->domainNegotiator = $negotiator;
     $this->configFactory = $config_factory;
     $this->storage = $storage;
+    $this->domain = $this->domainNegotiator->getActiveDomain();
+    // Get the language context. Note that injecting the language manager
+    // into the service created a circular dependency error, so we load directly
+    // from the core service manager.
+    $this->language = \Drupal::languageManager()->getCurrentLanguage();
   }
 
   /**
@@ -72,10 +86,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $list = explode('.', $check);
     if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
       return $overrides;
-    }
-    // Only look up the domain record once, if possible.
-    if (!isset($this->domain)) {
-      $this->domain = $this->domainNegotiator->getActiveDomain();
     }
     if (!empty($this->domain)) {
       foreach ($names as $name) {
@@ -93,8 +103,8 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * Get configuration name for this hostname.
    *
-   * It will be the same name with a prefix depending on domain:
-   * domain.config.DOMAIN.ID
+   * It will be the same name with a prefix depending on domain and language:
+   * domain.config.DOMAIN_ID.LANGCODE
    *
    * @param string $name
    *   The name of the config object.
@@ -105,14 +115,19 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    *   The domain-specific config name.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    return 'domain.config.' . $domain->id() . '.' . $name;
+    if (!isset($this->langcode)) {
+      $this->langcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    }
+    return 'domain.config.' . $domain->id() . '.' . $this->language->getId() . '.' . $name;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    return $this->domain ? $this->domain->id() : NULL;
+    $suffix = $this->domain ? $this->domain->id() : '';
+    $suffix .= $this->language ? $this->language->getId() : '';
+    return ($suffix) ? $suffix : NULL;
   }
 
   /**
@@ -128,7 +143,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   public function getCacheableMetadata($name) {
     $metadata = new CacheableMetadata();
     if ($this->domain) {
-      $metadata->addCacheContexts(['url.site']);
+      $metadata->addCacheContexts(['url.site', 'languages']);
     }
     return $metadata;
   }
