@@ -9,6 +9,7 @@ use Drupal\domain\DomainNegotiator;
 use Drupal\domain\DomainInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\Entity\NodeType;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -53,12 +54,17 @@ function domain_access_node_grants(AccountInterface $account, $op) {
       }
     }
   }
-  // @TODO Right now, we do not account for context of the request. Should we?
+  // @TODO Right now, we only allow access to the current domain. This behavior
+  // is a change from Drupal 7 and lower and needs review.
   elseif ($op == 'update' && $user->hasPermission('edit domain content') && !empty($user_domains)) {
-    $grants['domain_id'] = array_values($user_domains);
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
+      $grants['domain_id'] = $id;
+    }
   }
   elseif ($op == 'delete' && $user->hasPermission('delete domain content') && !empty($user_domains)) {
-    $grants['domain_id'] = array_values($user_domains);
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
+      $grants['domain_id'] = $id;
+    }
   }
   return $grants;
 }
@@ -227,24 +233,32 @@ function domain_access_domain_references_alter($query, $account) {
 function domain_access_node_access(\Drupal\node\NodeInterface $node, $op, \Drupal\Core\Session\AccountInterface $account) {
   $type = $node->bundle();
 
+  $active = \Drupal::service('domain.negotiator')->getActiveDomain();
+  $id = $active->getDomainId();
+  // Advanced grants for edit/delete require permissions.
+  $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
+
+  // To use these permissions, the user must be an administrator, or assigned
+  // to the current domain. If not, we make no claim.
+  if (!$account->hasPermission('publish to any domain') && !($account->hasPermission('publish to any assigned domain') && in_array($id, $user_domains))) {
+    return AccessResult::neutral();
+  }
+
   switch ($op) {
     case 'create':
-      return AccessResult::allowedIfHasPermission($account, 'create ' . $type . ' content');
-
-    case 'update':
-      if ($account->hasPermission('edit any ' . $type . ' content', $account)) {
+      if ($account->hasPermission('create ' . $type . ' content on assigned domains', $account)) {
         return AccessResult::allowed()->cachePerPermissions();
       }
-      else {
-        return AccessResult::allowedIf($account->hasPermission('edit own ' . $type . ' content', $account) && ($account->id() == $node->getOwnerId()))->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
+
+    case 'update':
+      if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account)) {
+        return AccessResult::allowed()->cachePerPermissions();
       }
 
     case 'delete':
-      if ($account->hasPermission('delete any ' . $type . ' content', $account)) {
+      if ($account->hasPermission('delete ' . $type . ' content on assigned domains', $account)) {
         return AccessResult::allowed()->cachePerPermissions();
-      }
-      else {
-        return AccessResult::allowedIf($account->hasPermission('delete own ' . $type . ' content', $account) && ($account->id() == $node->getOwnerId()))->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
 
     default:
