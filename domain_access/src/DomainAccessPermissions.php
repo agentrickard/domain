@@ -24,10 +24,10 @@ class DomainAccessPermissions {
       'assign domain editors' => array(
         'title' => $this->t('Assign editors to assigned domains'),
       ),
-      // @TODO: check how this will work.
+      /* @TODO: check how this will work.
       'set domain access' => array(
         'title' => $this->t('Set domain access status for all content'),
-      ),
+      ),*/
       'publish to any assigned domain' => array(
         'title' => $this->t('Publish content to any assigned domain'),
       ),

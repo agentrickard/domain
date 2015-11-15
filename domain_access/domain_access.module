@@ -66,7 +66,7 @@ function domain_access_node_access_records(NodeInterface $node) {
   foreach (domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD) as $id => $domainId) {
     if ($domain = \Drupal::service('domain.loader')->load($id)) {
       $grants[] = array(
-        'realm' => 'domain_id',
+        'realm' => ($node->isPublished()) ? 'domain_id' : 'domain_unpublished',
         'gid' => $domain->getDomainId(),
         'grant_view' => 1,
         'grant_update' => 1,
@@ -199,4 +199,36 @@ function domain_access_domain_references_alter($query, $account) {
   // Restrict domains by assignment.
   $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
   $query->condition('id', array_keys($allowed), 'IN');
+}
+
+/**
+ * Implements hook_node_access().
+ */
+function domain_access_node_access(\Drupal\node\NodeInterface $node, $op, \Drupal\Core\Session\AccountInterface $account) {
+  $type = $node->bundle();
+
+  switch ($op) {
+    case 'create':
+      return AccessResult::allowedIfHasPermission($account, 'create ' . $type . ' content');
+
+    case 'update':
+      if ($account->hasPermission('edit any ' . $type . ' content', $account)) {
+        return AccessResult::allowed()->cachePerPermissions();
+      }
+      else {
+        return AccessResult::allowedIf($account->hasPermission('edit own ' . $type . ' content', $account) && ($account->id() == $node->getOwnerId()))->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
+      }
+
+    case 'delete':
+      if ($account->hasPermission('delete any ' . $type . ' content', $account)) {
+        return AccessResult::allowed()->cachePerPermissions();
+      }
+      else {
+        return AccessResult::allowedIf($account->hasPermission('delete own ' . $type . ' content', $account) && ($account->id() == $node->getOwnerId()))->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
+      }
+
+    default:
+      // No opinion.
+      return AccessResult::neutral();
+  }
 }
