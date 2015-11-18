@@ -13,9 +13,7 @@ use Drupal\domain\ContextProvider;
 /**
  * Defines the DomainCacheContext service, for "per domain" caching.
  *
- * Cache context ID: 'headers' (to vary by all headers).
- * Calculated cache context ID: 'headers:%name', e.g. 'headers:X-Something' (to
- * vary by the 'X-Something' header).
+ * Cache context ID: 'domain'.
  */
 class DomainCacheContext extends RequestStackCacheContextBase implements CalculatedCacheContextInterface {
 
