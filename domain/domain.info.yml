@@ -6,4 +6,4 @@ version: VERSION
 core: 8.x
 dependencies:
   - options
-configure: admin/config/domain
+configure: domain.admin

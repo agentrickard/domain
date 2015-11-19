@@ -7,7 +7,9 @@
 
 namespace Drupal\domain\Plugin\Action;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\DomainInterface;
 
 /**
@@ -37,6 +39,13 @@ class DisableDomain extends ActionBase {
         $object->disable();
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
+    $access_result = AccessResult::allowedIfHasPermission($account, 'administer domains');
   }
 
 }

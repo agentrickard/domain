@@ -26,7 +26,7 @@ class DomainCreateTest extends DomainTestBase {
     $domain = \Drupal::service('domain.creator')->createDomain();
     foreach (array('id', 'name', 'hostname', 'domain_id', 'scheme', 'status', 'weight' , 'is_default') as $key) {
       $property = $domain->get($key);
-      $this->assertTrue(isset($property), format_string('New $domain->!key property is set to default value: %value.', array('!key' => $key, '%value' => $property)));
+      $this->assertTrue(isset($property), format_string('New $domain->@key property is set to default value: %value.', array('@key' => $key, '%value' => $property)));
     }
     $domain->save();
 

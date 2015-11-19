@@ -26,13 +26,12 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
   function testDomainConfigOverrider() {
     // No domains should exist.
     $this->domainTableIsEmpty();
-
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(4);
-    // Test the response of the default user page.
-    // If we leave path as /, the test fails?!?
+    // Except for the default domain, the page title element should match what
+    // is in the override files.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
-      $path = $domain->getPath() . 'user';
+      $path = $domain->getPath();
       $this->drupalGet($path);
       if ($domain->isDefault()) {
         $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');

@@ -1,6 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - domain
 id: domain_delete_action
 label: 'Delete domain record'
-status: '1'
-langcode: en
 type: domain
 plugin: domain_delete_action
+configuration: {  }

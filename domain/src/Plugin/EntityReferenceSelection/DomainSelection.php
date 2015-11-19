@@ -8,6 +8,7 @@
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
+use Drupal\user\Entity\User;
 
 /**
  * Provides specific access control for the domain entity type.
@@ -27,13 +28,18 @@ class DomainSelection extends DefaultSelection {
    */
   public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
     $query = parent::buildEntityQuery($match, $match_operator);
-    // Filter domains by the user's assignments.
-    // @TODO: allow users to be assigned to domains.
-    $account = \Drupal::currentUser();
-    if ($account->hasPermission('administer domains')) {
+    // Let administrators do anything.
+    if ($this->currentUser->hasPermission('administer domains')) {
       return $query;
     }
-
+    // Can this user access inactive domains?
+    if (!$this->currentUser->hasPermission('access inactive domains')) {
+      $query->condition('status', 1);
+    }
+    // Filter domains by the user's assignments, which are controlled by other
+    // modules.
+    $account = User::load($this->currentUser->id());
+    $this->moduleHandler->alter('domain_references', $query, $account);
     return $query;
   }
 }
