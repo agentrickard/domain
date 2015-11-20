@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - domain
+id: domain_enable_action
+label: 'Enable domain record'
+type: domain
+plugin: domain_enable_action
+configuration: {  }

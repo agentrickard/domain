@@ -1,0 +1,47 @@
+domain.admin:
+  path: '/admin/config/domain'
+  defaults:
+    _entity_list: 'domain'
+    _title: 'Domains'
+    _title_context: 'With modules'
+  requirements:
+    _permission: 'administer domains'
+
+entity.domain.add:
+  path: '/admin/config/domain/add'
+  defaults:
+    _entity_form: domain.edit
+    _title: 'Add domain record'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: "create domains"
+
+entity.domain.edit_form:
+  path: '/admin/config/domain/edit/{domain}'
+  defaults:
+    _entity_form: domain.edit
+    _title: 'Edit domain record'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: domain.update
+
+entity.domain.delete_form:
+  path: '/admin/config/domain/delete/{domain}'
+  defaults:
+    _entity_form: domain.delete
+    _title: 'Delete'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_access: domain.delete
+
+domain.inline_action:
+  path: '/admin/config/domain/{op}/{domain}'
+  defaults:
+    _controller: 'Drupal\domain\Controller\DomainController::ajaxOperation'
+  requirements:
+    _entity_access: domain.update
+    _csrf_token: 'TRUE'
+    op: 'enable|disable|default'

@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Maps multiple host requests to a single domain record.
+ */
+
+use Drupal\domain\DomainInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function domain_alias_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/domain/alias/%':
+      return 'foo';
+  }
+}
+
+/**
+ * Implements hook_domain_request_alter().
+ *
+ * The logic in this function gives us the following matches for a request to
+ * foo.example.com.
+ *
+ *   'foo.*'
+ *   '*.example.com'
+ *   'foo.*.com'
+ *   'foo.example.*'
+ *   '*.foo.example.com'
+ *   'foo.example.com.*'
+ *
+ * These patterns should be sufficient for most conditions.
+ */
+function domain_alias_domain_request_alter(DomainInterface &$domain) {
+  $hostname = $domain->getHostname();
+  if ($alias = \Drupal::service('domain_alias.loader')->loadByHostname($hostname)) {
+    if ($domain = \Drupal::service('domain.loader')->load($alias->getDomainId())) {
+      $domain->addProperty('alias', $alias->getPattern());
+      $redirect = $alias->getRedirect();
+      if (!empty($redirect)) {
+        $domain->setRedirect($redirect);
+      }
+    }
+    // @TODO: error capture?
+  }
+}
+
+/**
+ * Implements hook_domain_operations.
+ */
+function domain_alias_domain_operations(DomainInterface $domain) {
+  // Add aliases to the list.
+  $id = $domain->id();
+  $operations['domain_alias'] = array(
+    'title' => t('Aliases'),
+    'url' => Url::fromRoute('domain_alias.admin', array('domain' => $id)),
+    'weight' => 60,
+  );
+  return $operations;
+}

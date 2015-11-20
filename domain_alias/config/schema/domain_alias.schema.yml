@@ -1,0 +1,21 @@
+# Schema for the configuration files of the Domain Alias module.
+
+domain_alias.alias.*:
+  type: config_entity
+  label: 'Domain alias'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    uuid:
+      type: string
+      label: 'UUID'
+    domain_id:
+      type: string
+      label: 'Domain ID'
+    pattern:
+      type: string
+      label: 'Pattern'
+    redirect:
+      type: integer
+      label: 'Redirect'

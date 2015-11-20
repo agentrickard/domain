@@ -1,0 +1,4 @@
+domain_alias.list:
+  title: 'Aliases'
+  route_name: domain_alias.admin
+  tab_root_id: entity.domain.edit_form

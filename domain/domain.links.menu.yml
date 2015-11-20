@@ -1,0 +1,12 @@
+domain.admin:
+  title: Domains
+  route_name: domain.admin
+  parent: system.admin_config
+  description: 'Domain configuration'
+  weight: 0
+domain.admin_list:
+  title: Domain records
+  route_name: domain.admin
+  parent: domain.admin
+  description: 'Manage the domain records used by the site.'
+  weight: -10

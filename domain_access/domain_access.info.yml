@@ -1,0 +1,8 @@
+name: Domain Access
+description: 'Domain-based access control for content.'
+type: module
+package: Domain
+version: VERSION
+core: 8.x
+dependencies:
+  - domain

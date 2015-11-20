@@ -1,0 +1,5 @@
+entity.domain_add:
+  route_name: entity.domain.add
+  title: 'Add domain record'
+  appears_on:
+    - domain.admin

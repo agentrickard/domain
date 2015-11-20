@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Domain Access module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Installs the default domain field on nodes.
+ */
+function domain_access_install() {
+  $id = 'node.' . DOMAIN_ACCESS_NODE_FIELD;
+  $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
+  if (!$exists) {
+    $storage = array(
+      'field_name' => DOMAIN_ACCESS_NODE_FIELD,
+      'entity_type' => 'node',
+      'cardinality' => -1,
+      'type' => 'entity_reference',
+      'settings' => array(
+        'target_type' => 'domain',
+      ),
+    );
+    $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
+    $field_storage_config->save();
+  }
+  $node_types = entity_load_multiple('node_type');
+
+  foreach ($node_types as $type => $info) {
+    $id = 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+      continue;
+    }
+
+    $field = array(
+      'field_name' => DOMAIN_ACCESS_NODE_FIELD,
+      'entity_type' => 'node',
+      'label' => 'Domain Access',
+      'bundle' => $type,
+      'required' => TRUE,
+      'description' => 'Select the affiliate domain(s) for this content.',
+      'default_value_callback' => 'domain_access_default_value',
+      'settings' => array(
+        'handler_settings' => array(
+          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+        ),
+      ),
+    );
+    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config->save();
+
+    // Tell the form system how to behave. Default to radio buttons.
+    entity_get_form_display('node', $type, 'default')
+      ->setComponent(DOMAIN_ACCESS_NODE_FIELD, array(
+        'type' => 'options_buttons',
+    ))
+    ->save();
+  }
+
+  // Save to the user form.
+  $id = 'user.' . DOMAIN_ACCESS_USER_FIELD;
+  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    return;
+  }
+  $storage = array(
+    'field_name' => DOMAIN_ACCESS_USER_FIELD,
+    'cardinality' => -1,
+    'entity_type' => 'user',
+    'type' => 'entity_reference',
+    'settings' => array(
+      'target_type' => 'domain',
+    ),
+  );
+  $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
+  $field_storage_config->save();
+
+  $field = array(
+    'field_name' => DOMAIN_ACCESS_USER_FIELD,
+    'entity_type' => 'user',
+    'label' => 'Domain Access',
+    'bundle' => 'user',
+    'required' => FALSE,
+    'description' => 'Select the affiliate domain(s) for this user.',
+    'default_value_callback' => 'domain_access_default_value',
+    'settings' => array(
+      'handler_settings' => array(
+        'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+      ),
+    ),
+  );
+  $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+  $field_config->save();
+
+  // Tell the form system how to behave. Default to radio buttons.
+  entity_get_form_display('user', 'user', 'default')
+    ->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
+      'type' => 'options_buttons',
+  ))
+  ->save();
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Removes access control fields on uninstall.
+ */
+function domain_access_uninstall() {
+  $id = 'node.' . DOMAIN_ACCESS_NODE_FIELD;
+  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    $field->delete();
+  }
+  $id = 'user.user.' . DOMAIN_ACCESS_USER_FIELD;
+  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    $field->delete();
+  }
+}

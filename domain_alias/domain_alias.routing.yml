@@ -1,0 +1,32 @@
+domain_alias.admin:
+  path: '/admin/config/domain/alias/{domain}'
+  defaults:
+    _entity_list: 'domain_alias'
+    _title: 'Domain aliases'
+    _title_context: 'With modules'
+  requirements:
+    _permission: 'administer domains'
+
+entity.domain_alias.edit_form:
+  path: '/admin/config/domain/alias/edit/{domain_alias}'
+  defaults:
+    _entity_form: domain_alias.edit
+    _title: 'Edit domain alias'
+  requirements:
+    _permission: 'administer domains'
+
+entity.domain_alias.delete_form:
+  path: '/admin/config/domain/alias/delete/{domain_alias}'
+  defaults:
+    _entity_form: domain_alias.delete
+    _title: 'Delete domain alias'
+  requirements:
+    _permission: 'administer domains'
+
+domain_alias.add:
+  path: '/admin/config/domain/alias/{domain}/add'
+  defaults:
+    _controller: '\Drupal\domain_alias\Controller\DomainAliasController::addAlias'
+    _title: 'Add domain alias'
+  requirements:
+    _permission: 'administer domains'

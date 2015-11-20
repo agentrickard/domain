@@ -1,0 +1,7 @@
+services:
+  domain_config.overrider:
+    class: Drupal\domain_config\DomainConfigOverrider
+    tags:
+      - { name: config.factory.override, priority: -250}
+    arguments: ['@domain.negotiator', '@config.factory', '@config.storage']
+

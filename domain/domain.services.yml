@@ -1,0 +1,41 @@
+services:
+  access_check.domain:
+    class: Drupal\domain\Access\DomainAccessCheck
+    tags:
+      - { name: access_check }
+    arguments: ['@domain.negotiator']
+  block.domain_context:
+    class: Drupal\domain\ContextProvider\CurrentDomainContext
+    arguments: ['@domain.negotiator']
+    tags:
+      - { name: 'context_provider' }
+  domain.creator:
+    class: Drupal\domain\DomainCreator
+    tags:
+      - { name: persist }
+    arguments: ['@domain.loader', '@domain.negotiator']
+  domain.loader:
+    class: Drupal\domain\DomainLoader
+    tags:
+      - { name: persist }
+    arguments: ['@module_handler', '@config.typed']
+  domain.negotiator:
+    class: Drupal\domain\DomainNegotiator
+    tags:
+      - { name: persist }
+    arguments: ['@request_stack', '@module_handler', '@domain.loader']
+  domain.path_processor:
+    class: Drupal\domain\HttpKernel\DomainPathProcessor
+    arguments: ['@domain.negotiator', '@module_handler']
+    tags:
+      - { name: path_processor_outbound, priority: 200 }
+  domain.subscriber:
+    class: Drupal\domain\EventSubscriber\DomainSubscriber
+    tags:
+      - { name: event_subscriber }
+    arguments: ['@domain.negotiator', '@domain.loader', '@access_check.domain', '@current_user']
+  domain.validator:
+    class: Drupal\domain\DomainValidator
+    tags:
+      - { name: persist }
+    arguments: ['@module_handler']

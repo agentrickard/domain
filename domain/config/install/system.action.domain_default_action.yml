@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - domain
+id: domain_default_action
+label: 'Set default domain record'
+type: domain
+plugin: domain_default_action
+configuration: {  }

@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Domain hook test module.
+ */
+
+/**
+ * Implements hook_domain_load().
+ */
+function domain_test_domain_load(array $domains) {
+  foreach ($domains as $domain) {
+    $domain->addProperty('foo', 'bar');
+  }
+}
