@@ -7,7 +7,6 @@
 namespace Drupal\domain\Controller;
 
 use Drupal\domain\DomainInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -25,7 +24,12 @@ class DomainController {
    * @param \Drupal\domain\DomainInterface
    *   A domain record object.
    * @param $op
-   *   The operation being performed.
+   *   The operation being performed, either 'default' to make the domain record
+   *   the default, 'enable' to enable the domain record, or 'disable' to
+   *   disable the domain record.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   *   A redirect response to redirect back to the domain record list.
    *
    * @see \Drupal\domain\DomainListBuilder
    */
@@ -34,21 +38,21 @@ class DomainController {
     switch($op) {
       case 'default':
         $domain->saveDefault();
-        $verb = $this->t('set as default');
+        $message = $this->t('Domain record set as default');
         if ($domain->isDefault()) {
           $success = TRUE;
         }
         break;
       case 'enable':
         $domain->enable();
-        $verb = $this->t('has been enabled.');
+        $message = $this->t('Domain record has been enabled.');
         if ($domain->status()) {
           $success = TRUE;
         }
         break;
       case 'disable':
         $domain->disable();
-        $verb = $this->t('has been disabled.');
+        $message = $this->t('Domain record has been disabled.');
         if (!$domain->status()) {
           $success = TRUE;
         }
@@ -57,11 +61,11 @@ class DomainController {
 
     // Set a message.
     if ($success) {
-      drupal_set_message($this->t('Domain record @verb.', array('@verb' => $verb)));
+      drupal_set_message($message);
     }
 
     // Return to the invoking page.
-    return new RedirectResponse($this->url('domain.admin'));
+    return $this->redirect('domain.admin');
   }
 
 }
