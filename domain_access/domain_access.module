@@ -230,11 +230,14 @@ function domain_access_domain_references_alter($query, $account) {
 /**
  * Implements hook_node_access().
  */
-function domain_access_node_access(\Drupal\node\NodeInterface $node, $op, \Drupal\Core\Session\AccountInterface $account) {
-  $type = $node->bundle();
-
-  $active = \Drupal::service('domain.negotiator')->getActiveDomain();
-  $id = $active->getDomainId();
+function domain_access_node_access(NodeInterface $node, $op, AccountInterface $account) {
+  // Check to see that we have a valid active domain.
+  if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
+    $id = $active->getDomainId();
+  }
+  else {
+    return AccessResult::neutral();
+  }
   // Advanced grants for edit/delete require permissions.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
@@ -244,6 +247,8 @@ function domain_access_node_access(\Drupal\node\NodeInterface $node, $op, \Drupa
   if (!$account->hasPermission('publish to any domain') && !($account->hasPermission('publish to any assigned domain') && in_array($id, $user_domains))) {
     return AccessResult::neutral();
   }
+
+  $type = $node->bundle();
 
   switch ($op) {
     case 'create':
