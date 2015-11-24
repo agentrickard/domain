@@ -43,7 +43,7 @@ class CurrentDomainContext implements ContextProviderInterface {
 
     // Allow caching.
     $cacheability = new CacheableMetadata();
-    $cacheability->setCacheContexts(['domain']);
+    $cacheability->setCacheContexts(['url.site']);
     $context->addCacheableDependency($cacheability);
 
     // Prepare the result.
