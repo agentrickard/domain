@@ -74,7 +74,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
  */
 function domain_access_node_access_records(NodeInterface $node) {
   $grants = array();
-  // If their are no domains set, use the current one.
+  // If there are no domains set, use the current one.
   $domains = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
   if (empty($domains) && $active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $domains[$active->id()] = $active->getDomainId();
