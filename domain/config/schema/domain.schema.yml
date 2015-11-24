@@ -41,3 +41,16 @@ domain.record.*:
     is_default:
       type: boolean
       label: 'Default domain'
+
+action.configuration.domain_default_action:
+  type: action_configuration_default
+  label: 'Set default domain record'
+action.configuration.domain_delete_action:
+  type: action_configuration_default
+  label: 'Delete domain record'
+action.configuration.domain_disable_action:
+  type: action_configuration_default
+  label: 'Disable domain record'
+action.configuration.domain_enable_action:
+  type: action_configuration_default
+  label: 'Enable domain record'
