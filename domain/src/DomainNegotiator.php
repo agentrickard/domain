@@ -62,6 +62,10 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     }
     $this->setHttpHost($httpHost);
     $domain = $this->domainLoader->loadByHostname($httpHost);
+    // Fallback to default domain
+    if (empty($domain)) {
+      $domain = $this->domainLoader->loadDefaultDomain();
+    }
     // If a straight load fails, create a base domain for checking.
     if (empty($domain)) {
       $values = array('hostname' => $httpHost);
