@@ -238,21 +238,17 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   else {
     return AccessResult::neutral();
   }
-  // Advanced grants for edit/delete require permissions.
-  $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
-
-  // To use these permissions, the user must be an administrator, or assigned
-  // to the current domain. If not, we make no claim.
-  if (!$account->hasPermission('publish to any domain') && !($account->hasPermission('publish to any assigned domain') && in_array($id, $user_domains))) {
-    return AccessResult::neutral();
-  }
 
   $type = $node->bundle();
 
   switch ($op) {
     case 'create':
-      if ($account->hasPermission('create ' . $type . ' content on assigned domains', $account)) {
+      // Load the full user record.
+      $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+      $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+      if (($account->hasPermission('create ' . $type . ' content on assigned domains', $account)
+          || $account->hasPermission('create domain content', $account))
+          && in_array($id, $user_domains)) {
         return AccessResult::allowed()->cachePerPermissions();
       }
 
@@ -260,9 +256,15 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
       if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account)) {
         return AccessResult::allowed()->cachePerPermissions();
       }
+      if ($account->hasPermission('edit domain content', $account) && domain_access_check_node($node, $account)) {
+        return AccessResult::allowed()->cachePerPermissions();
+      }
 
     case 'delete':
       if ($account->hasPermission('delete ' . $type . ' content on assigned domains', $account)) {
+        return AccessResult::allowed()->cachePerPermissions();
+      }
+      if ($account->hasPermission('delete domain content', $account) && domain_access_check_node($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions();
       }
 
@@ -270,4 +272,11 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
       // No opinion.
       return AccessResult::neutral();
   }
+}
+
+function domain_access_check_node($node, $account) {
+  $node_domains = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
+  $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+  $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+  return !empty(array_intersect($node_domains, $user_domains));
 }

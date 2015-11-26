@@ -30,6 +30,9 @@ class DomainAccessPermissions {
       'publish to any assigned domain' => array(
         'title' => $this->t('Publish content to any assigned domain'),
       ),
+      'create domain content' => array(
+        'title' => $this->t('Create any content on assigned domains'),
+      ),
       'edit domain content' => array(
         'title' => $this->t('Edit any content on assigned domains'),
       ),
