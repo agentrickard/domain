@@ -21,14 +21,16 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   protected $httpHost;
 
   /**
-   * Drupal\domain\DomainInterface
    * The domain record returned by the lookup request.
+   *
+   * @var \Drupal\domain\DomainInterface
    */
   protected $domain;
 
   /**
-   * Drupal\domain\DomainLoaderInterface
    * The loader class.
+   *
+   * @var \Drupal\domain\DomainLoaderInterface
    */
   protected $domainLoader;
 
