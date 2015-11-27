@@ -217,25 +217,6 @@ class DomainAccessPermissionsTest extends DomainTestBase {
   }
 
   /**
-   * Asserts that node create access correctly grants or denies access.
-   *
-   * @param string $bundle
-   *   The node bundle to check access to.
-   * @param bool $result
-   *   Whether access should be granted or not.
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The user account for which to check access.
-   * @param string|null $langcode
-   *   (optional) The language code indicating which translation of the node
-   *   to check. If NULL, the untranslated (fallback) access is checked.
-   */
-  function assertNodeCreateAccess($bundle, $result, AccountInterface $account, $langcode = NULL) {
-    $this->assertEqual($result, $this->accessHandler->createAccess($bundle, $account, array(
-      'langcode' => $langcode,
-    )), $this->nodeAccessAssertMessage('create', $result, $langcode));
-  }
-
-  /**
    * Constructs an assert message to display which node access was tested.
    *
    * @param string $operation
