@@ -297,7 +297,7 @@ function domain_access_check_node(NodeInterface $node, AccountInterface $account
  *
  * @link https://www.drupal.org/node/2348203
  */
-function domain_access_node_create_access($account, $context, $entity_bundle) {
+function domain_access_node_create_access(AccountInterface $account, $context, $entity_bundle) {
   // Check to see that we have a valid active domain.
   // Without one, we cannot assert an opinion about access.
   if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
