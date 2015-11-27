@@ -9,6 +9,7 @@ namespace Drupal\domain\Tests;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Component\Utility\Crypt;
 use Drupal\domain\DomainInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -140,6 +141,38 @@ abstract class DomainTestBase extends WebTestBase {
     if ($entity = \Drupal::entityManager()->getStorage($entity_type)->load($entity_id)) {
       $entity->set($field, $id);
       $entity->save();
+    }
+  }
+
+  /**
+   * Login a user on a specific domain.
+   *
+   * @param Drupal\domain\DomainInterface $domain
+   *  The domain to log the user into.
+   * @param Drupal\Core\Session\AccountInterface $account
+   *  The user account to login.
+   */
+  public function domainLogin(DomainInterface $domain, AccountInterface $account) {
+    if ($this->loggedInUser) {
+      $this->drupalLogout();
+    }
+
+    // For this to work, we must reset the password to a known value.
+    $pass = 'thisissatestpassword';
+    $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+    $user->setPassword($pass)->save();
+    $url = $domain->getPath() . '/user/login';
+    $edit = ['name' => $account->getUsername(), 'pass' => $pass];
+    $this->drupalPostForm($url, $edit, t('Log in'));
+
+    // @see WebTestBase::drupalUserIsLoggedIn()
+    if (isset($this->sessionId)) {
+      $account->session_id = $this->sessionId;
+    }
+    $pass = $this->assert($this->drupalUserIsLoggedIn($account), format_string('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
+    if ($pass) {
+      $this->loggedInUser = $account;
+      $this->container->get('current_user')->setAccount($account);
     }
   }
 

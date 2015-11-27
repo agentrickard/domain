@@ -22,20 +22,16 @@ class DomainAccessPermissions {
   public function permissions() {
     $permissions = array(
       'assign domain editors' => array(
-        'title' => $this->t('Assign editors to assigned domains'),
+        'title' => $this->t('Assign additional editors to assigned domains'),
       ),
-      // @TODO: check how this will work.
-      'set domain access' => array(
-        'title' => $this->t('Set domain access status for all content'),
+      'publish to any domain' => array(
+        'title' => $this->t('Publish to any domain'),
       ),
       'publish to any assigned domain' => array(
         'title' => $this->t('Publish content to any assigned domain'),
       ),
-      'publish from assigned domain' => array(
-        'title' => $this->t('Publish content only from assigned domain'),
-      ),
-      'publish from default domain' => array(
-        'title' => $this->t('Publish content only from the default domain'),
+      'create domain content' => array(
+        'title' => $this->t('Create any content on assigned domains'),
       ),
       'edit domain content' => array(
         'title' => $this->t('Edit any content on assigned domains'),
