@@ -54,8 +54,6 @@ function domain_access_node_grants(AccountInterface $account, $op) {
       }
     }
   }
-  // @TODO Right now, we only allow access to the current domain. This behavior
-  // is a change from Drupal 7 and lower and needs review.
   elseif ($op == 'update' && $user->hasPermission('edit domain content') && !empty($user_domains)) {
     if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
       $grants['domain_id'] = $id;
@@ -232,6 +230,7 @@ function domain_access_domain_references_alter($query, $account) {
  */
 function domain_access_node_access(NodeInterface $node, $op, AccountInterface $account) {
   // Check to see that we have a valid active domain.
+  // Without one, we cannot assert an opinion about access.
   if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $id = $active->getDomainId();
   }
@@ -243,29 +242,31 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
 
   switch ($op) {
     case 'create':
+      // This code no longer fires. See https://www.drupal.org/node/2348203.
       // Load the full user record.
       $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-      $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+      $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
       if (($account->hasPermission('create ' . $type . ' content on assigned domains', $account)
           || $account->hasPermission('create domain content', $account))
           && in_array($id, $user_domains)) {
-        return AccessResult::allowed()->cachePerPermissions();
+        // Note the cache context here!
+        return AccessResult::allowed()->addCacheContexts(['user.permissions', 'url.site']);
       }
 
     case 'update':
-      if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account)) {
-        return AccessResult::allowed()->cachePerPermissions();
+      if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account) && domain_access_check_node($node, $account)) {
+        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
       if ($account->hasPermission('edit domain content', $account) && domain_access_check_node($node, $account)) {
-        return AccessResult::allowed()->cachePerPermissions();
+        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
 
     case 'delete':
-      if ($account->hasPermission('delete ' . $type . ' content on assigned domains', $account)) {
-        return AccessResult::allowed()->cachePerPermissions();
+      if ($account->hasPermission('delete ' . $type . ' content on assigned domains', $account) && domain_access_check_node($node, $account)) {
+        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
       if ($account->hasPermission('delete domain content', $account) && domain_access_check_node($node, $account)) {
-        return AccessResult::allowed()->cachePerPermissions();
+        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
 
     default:
@@ -274,9 +275,46 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   }
 }
 
-function domain_access_check_node($node, $account) {
+/**
+ * Checks that a node belongs to a domain that the user can access.
+ *
+ * @param NodeInterface $node
+ *   The node being checked.
+ * @param AccountInterface $account
+ *   The account making the access request.
+ *
+ * @return boolean
+ */
+function domain_access_check_node(NodeInterface $node, AccountInterface $account) {
   $node_domains = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
   return !empty(array_intersect($node_domains, $user_domains));
+}
+
+/**
+ * Implements hook_node_create_access().
+ *
+ * @link https://www.drupal.org/node/2348203
+ */
+function domain_access_node_create_access($account, $context, $entity_bundle) {
+  // Check to see that we have a valid active domain.
+  // Without one, we cannot assert an opinion about access.
+  if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
+    $id = $active->getDomainId();
+  }
+  else {
+    return AccessResult::neutral();
+  }
+  // Load the full user record.
+  $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
+  if (($account->hasPermission('create ' . $entity_bundle . ' content on assigned domains', $account)
+      || $account->hasPermission('create domain content', $account))
+      && in_array($id, $user_domains)) {
+    // Note the cache context here!
+    return AccessResult::allowed()->addCacheContexts(['user.permissions', 'url.site']);
+  }
+  // No opinion.
+  return AccessResult::neutral();
 }

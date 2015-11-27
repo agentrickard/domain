@@ -153,7 +153,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $domain_node3, $domain_user3);
     $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $domain_node4, $domain_user3);
 
-    // Tests create permissions.
+    // Tests create permissions. Any content on assigned domains.
     $domain_user4 = $this->drupalCreateUser(array('access content', 'create domain content'));
     $this->addDomainToEntity('user', $domain_user4->id(), $two, DOMAIN_ACCESS_USER_FIELD);
     $domain_user4 = \Drupal::entityManager()->getStorage('user')->load($domain_user4->id());
@@ -161,10 +161,38 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
-    $this->drupalLogin($domain_user4);
     foreach ($domains as $domain) {
-      $url = $domain->getUrl() . 'node/add/page';
+      $this->domainLogin($domain, $domain_user4);
+      $url = $domain->getPath() . '/node/add/page';
       $this->drupalGet($url);
+      if ($domain->id() == $two) {
+        $this->assertResponse(200);
+      }
+      else {
+       $this->assertResponse(403);
+      }
+    }
+    // Tests create permissions. Page content on assigned domains.
+    $domain_user4 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
+    $this->addDomainToEntity('user', $domain_user4->id(), $two, DOMAIN_ACCESS_USER_FIELD);
+    $domain_user4 = \Drupal::entityManager()->getStorage('user')->load($domain_user4->id());
+    $assigned = domain_access_get_entity_values($domain_user4, DOMAIN_ACCESS_USER_FIELD);
+    $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
+    $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
+    // This test is domain sensitive.
+    foreach ($domains as $domain) {
+      $this->domainLogin($domain, $domain_user4);
+      $url = $domain->getPath() . '/node/add/page';
+      $this->drupalGet($url);
+      if ($domain->id() == $two) {
+        $this->assertResponse(200);
+      }
+      else {
+       $this->assertResponse(403);
+      }
+      $url = $domain->getPath() . '/node/add/article';
+      $this->drupalGet($url);
+      $this->assertResponse(403);
     }
 
   }

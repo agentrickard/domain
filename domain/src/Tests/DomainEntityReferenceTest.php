@@ -99,7 +99,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $edit["field_domain[{$two}]"] = TRUE;
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
-    $node = node_load(1);
+    $node = \Drupal::entityManager()->getStorage('node')->load(1);
     $values = $node->get('field_domain');
 
     // @TODO watch for changes in core that affect this test.
