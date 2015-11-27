@@ -15,11 +15,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DomainNegotiator implements DomainNegotiatorInterface {
 
-  public $httpHost;
+  /**
+   * The HTTP_HOST value of the request.
+   */
+  protected $httpHost;
 
-  public $domain;
+  /**
+   * Drupal\domain\DomainInterface
+   * The domain record returned by the lookup request.
+   */
+  protected $domain;
 
-  public $domainLoader;
+  /**
+   * Drupal\domain\DomainLoaderInterface
+   * The loader class.
+   */
+  protected $domainLoader;
 
   /**
    * The request stack object.
@@ -56,13 +67,15 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    * {@inheritdoc}
    */
   public function setRequestDomain($httpHost, $reset = FALSE) {
-    static $loookup;
-    if (isset($lookup[$httpHost]) && !$reset) {
-      return $lookup[$httpHost];
-    }
+    // @TODO: Investigate caching methods.
     $this->setHttpHost($httpHost);
     $domain = $this->domainLoader->loadByHostname($httpHost);
-    // If a straight load fails, create a base domain for checking.
+    // Fallback to default domain if no match.
+    if (empty($domain)) {
+      $domain = $this->domainLoader->loadDefaultDomain();
+    }
+    // If a straight load fails, create a base domain for checking. This data
+    // is required for hook_domain_request_alter().
     if (empty($domain)) {
       $values = array('hostname' => $httpHost);
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
@@ -76,8 +89,6 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     if (!empty($id)) {
       $this->setActiveDomain($domain);
     }
-    // Store the result in local cache.
-    $lookup[$httpHost] = $domain;
   }
 
   /**
