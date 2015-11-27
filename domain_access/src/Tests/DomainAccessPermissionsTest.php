@@ -153,7 +153,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $domain_node3, $domain_user3);
     $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $domain_node4, $domain_user3);
 
-    /* Tests create permissions.
+    // Tests create permissions.
     $domain_user4 = $this->drupalCreateUser(array('access content', 'create domain content'));
     $this->addDomainToEntity('user', $domain_user4->id(), $two, DOMAIN_ACCESS_USER_FIELD);
     $domain_user4 = \Drupal::entityManager()->getStorage('user')->load($domain_user4->id());
@@ -165,7 +165,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     foreach ($domains as $domain) {
       $url = $domain->getUrl() . 'node/add/page';
       $this->drupalGet($url);
-    }*/
+    }
 
   }
 
