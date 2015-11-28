@@ -109,47 +109,53 @@ function domain_access_install() {
   }
 
   // Assign domain access to users.
-  $id = 'user.user.' . DOMAIN_ACCESS_USER_FIELD;
-  if (!$field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    return;
-  }
-  $storage = array(
-    'field_name' => DOMAIN_ACCESS_USER_FIELD,
-    'cardinality' => -1,
-    'entity_type' => 'user',
-    'type' => 'entity_reference',
-    'settings' => array(
-      'target_type' => 'domain',
-    ),
-  );
-  $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
-  $field_storage_config->save();
-
-  $field = array(
-    'field_name' => DOMAIN_ACCESS_USER_FIELD,
-    'entity_type' => 'user',
-    'label' => 'Domain Access',
-    'bundle' => 'user',
-    'required' => FALSE,
-    'description' => 'Select the affiliate domain(s) for this user.',
-    'default_value_callback' => 'domain_access_default_value',
-    'settings' => array(
-      'handler_settings' => array(
-        'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+  $id = 'user.' . DOMAIN_ACCESS_USER_FIELD;
+  $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
+  if (!$exists) {
+    $storage = array(
+      'field_name' => DOMAIN_ACCESS_USER_FIELD,
+      'cardinality' => -1,
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'type' => 'entity_reference',
+      'settings' => array(
+        'target_type' => 'domain',
       ),
-    ),
-  );
-  $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
-  $field_config->save();
+    );
+    $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
+    $field_storage_config->save();
+  }
 
-  // Tell the form system how to behave. Default to radio buttons.
-  $display = \Drupal::entityManager()->getStorage('entity_form_display');
-  $display->load('user.user.default')
-    ->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
-      'type' => 'options_buttons',
-  ))
-  ->save();
+  $id = 'user.user.' . DOMAIN_ACCESS_USER_FIELD;
+  $exists = \Drupal::entityManager()->getStorage('field_config')->load($id);
+  if (!$exists) {
+    $field = array(
+      'field_name' => DOMAIN_ACCESS_USER_FIELD,
+      'entity_type' => 'user',
+      'label' => 'Domain Access',
+      'bundle' => 'user',
+      'required' => FALSE,
+      'description' => 'Select the affiliate domain(s) for this user.',
+      'default_value_callback' => 'domain_access_default_value',
+      'settings' => array(
+        'handler_settings' => array(
+          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+        ),
+      ),
+    );
+    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config->save();
 
+    // Tell the form system how to behave. Default to radio buttons.
+    $display = \Drupal::entityManager()->getStorage('entity_form_display');
+    $field = $display->load('user.user.default');
+    if ($field) {
+      $field->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
+        'type' => 'options_buttons',
+      ))
+      ->save();
+    }
+  }
   // Note that we don't add 'all affiliates' to users because we have a
   // permission for that. @TODO: Is that a UX failure?
 }

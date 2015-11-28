@@ -50,10 +50,11 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   // Advanced grants for edit/delete require permissions.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
-  // Grants for view are simple. Use the active domain.
+  // Grants for view are simple. Use the active domain and all affiliates.
   if ($op == 'view') {
     $grants['domain_id'][] = $id;
-    if ($user->hasPermission('administer domains') || ($user->hasPermission('view unpublished domain content'))) {
+    $grants['domain_site'][] = 0;
+    if ($user->hasPermission('view unpublished domain content')) {
       if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
         $grants['domain_unpublished'][] = $id;
       }
@@ -92,6 +93,15 @@ function domain_access_node_access_records(NodeInterface $node) {
         'grant_delete' => 1,
       );
     }
+  }
+  if (!empty($node->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $node->isPublished()) {
+    $grants[] = array(
+      'realm' => 'domain_site',
+      'gid' => 0,
+      'grant_view' => 1,
+      'grant_update' => 0,
+      'grant_delete' => 0,
+    );
   }
   return $grants;
 }
@@ -255,18 +265,6 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   $type = $node->bundle();
 
   switch ($op) {
-    case 'create':
-      // This code no longer fires. See https://www.drupal.org/node/2348203.
-      // Load the full user record.
-      $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-      $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
-      if (($account->hasPermission('create ' . $type . ' content on assigned domains', $account)
-          || $account->hasPermission('create domain content', $account))
-          && in_array($id, $user_domains)) {
-        // Note the cache context here!
-        return AccessResult::allowed()->addCacheContexts(['user.permissions', 'url.site']);
-      }
-
     case 'update':
       if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account) && domain_access_check_node($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
