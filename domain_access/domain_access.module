@@ -26,6 +26,11 @@ define('DOMAIN_ACCESS_NODE_FIELD', 'field_domain_access');
 define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
 
 /**
+ * Defines the name of the all affiliates field.
+ */
+define('DOMAIN_ACCESS_ALL_FIELD', 'field_domain_all_affiliates');
+
+/**
  * Implements hook_node_grants().
  */
 function domain_access_node_grants(AccountInterface $account, $op) {
@@ -99,6 +104,15 @@ function domain_access_default_value(FieldableEntityInterface $entity, FieldDefi
   if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $item[0]['target_uuid'] = $active->uuid();
   }
+  return $item;
+}
+
+/**
+ * Sets the default value for the all affiliate fields.
+ */
+function domain_access_all_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
+  // @TODO: This may become configurable.
+  $item = FALSE;
   return $item;
 }
 
