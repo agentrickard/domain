@@ -109,8 +109,8 @@ function domain_access_install() {
   }
 
   // Assign domain access to users.
-  $id = 'user.' . DOMAIN_ACCESS_USER_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+  $id = 'user.user.' . DOMAIN_ACCESS_USER_FIELD;
+  if (!$field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
     return;
   }
   $storage = array(
