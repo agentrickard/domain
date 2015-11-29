@@ -58,7 +58,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
    * Tests the storage of the domain access field.
    */
   function testDomainAccessFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains'));
+    $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains', 'publish to any domain'));
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.
