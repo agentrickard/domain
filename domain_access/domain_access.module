@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines the name of the node access control field.
@@ -244,8 +245,7 @@ function domain_access_domain_references_alter($query, $account) {
   }
   else {
     // Remove all options.
-    // @TODO: This should make the field invisible.
-    $query->condition('id', '-no-match-');
+    $query->condition('id', '-no-possible-match-');
   }
 }
 
@@ -329,4 +329,31 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
   }
   // No opinion.
   return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_form_node_form_alter().
+ *
+ * Hides fields that the user cannot access.
+ */
+function domain_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form[DOMAIN_ACCESS_NODE_FIELD])) {
+    $form[DOMAIN_ACCESS_NODE_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_NODE_FIELD]['widget']['#options']);
+  }
+  if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
+    $account = \Drupal::currentUser();
+    $form[DOMAIN_ACCESS_ALL_FIELD]['#access'] = $account->hasPermission('publish to any domain');
+  }
+}
+
+/**
+ * Implements hook_form_user_form_alter().
+ *
+ * Hides fields that the user cannot access.
+ */
+function domain_access_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form[DOMAIN_ACCESS_USER_FIELD])) {
+    $account = \Drupal::currentUser();
+    $form[DOMAIN_ACCESS_USER_FIELD]['#access'] = $account->hasPermission('publish to any domain');
+  }
 }
