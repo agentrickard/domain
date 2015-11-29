@@ -8,9 +8,11 @@
 /**
  * Implements hook_install().
  *
- * Installs the default domain field on nodes.
+ * Installs the default domain field on nodes. We don't do this via schema.yml
+ * files because we have an unknown number of node types.
  */
 function domain_access_install() {
+  // Create the domain access field.
   $id = 'node.' . DOMAIN_ACCESS_NODE_FIELD;
   $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
   if (!$exists) {
@@ -28,9 +30,26 @@ function domain_access_install() {
   }
   $node_types = entity_load_multiple('node_type');
 
+  // Create the all affiliates field.
+  $id = 'node.' . DOMAIN_ACCESS_ALL_FIELD;
+  $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
+  if (!$exists) {
+    $storage = array(
+      'field_name' => DOMAIN_ACCESS_ALL_FIELD,
+      'entity_type' => 'node',
+      'cardinality' => 1,
+      'type' => 'boolean',
+    );
+    $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
+    $field_storage_config->save();
+  }
+
+  // Assign domain access to nodes.
+  $node_types = entity_load_multiple('node_type');
+
   foreach ($node_types as $type => $info) {
     $id = 'node.' . $type . '.' . DOMAIN_ACCESS_NODE_FIELD;
-    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
       continue;
     }
 
@@ -52,53 +71,91 @@ function domain_access_install() {
     $field_config->save();
 
     // Tell the form system how to behave. Default to radio buttons.
-    entity_get_form_display('node', $type, 'default')
+    $display = \Drupal::entityManager()->getStorage('entity_form_display');
+    $display->load('node.' . $type . '.default')
       ->setComponent(DOMAIN_ACCESS_NODE_FIELD, array(
         'type' => 'options_buttons',
+        'weight' => 40,
+    ))
+    ->save();
+
+    // Assign the all affiliates field to nodes.
+    $id = 'node.' . $type . '.' . DOMAIN_ACCESS_ALL_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
+      continue;
+    }
+
+    $field = array(
+      'field_name' => DOMAIN_ACCESS_ALL_FIELD,
+      'entity_type' => 'node',
+      'label' => 'Send to all affiliates',
+      'bundle' => $type,
+      'required' => FALSE,
+      'description' => 'Make this content available on all domains.',
+      'default_value_callback' => 'domain_access_all_value',
+    );
+    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config->save();
+
+    // Tell the form system how to behave. Default to radio buttons.
+    $display = \Drupal::entityManager()->getStorage('entity_form_display');
+    $display->load('node.' . $type . '.default')
+      ->setComponent(DOMAIN_ACCESS_ALL_FIELD, array(
+        'type' => 'boolean_checkbox',
+        'settings' => array('display_label' => 1),
+        'weight' => 41,
     ))
     ->save();
   }
 
-  // Save to the user form.
+  // Assign domain access to users.
   $id = 'user.' . DOMAIN_ACCESS_USER_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    return;
-  }
-  $storage = array(
-    'field_name' => DOMAIN_ACCESS_USER_FIELD,
-    'cardinality' => -1,
-    'entity_type' => 'user',
-    'type' => 'entity_reference',
-    'settings' => array(
-      'target_type' => 'domain',
-    ),
-  );
-  $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
-  $field_storage_config->save();
-
-  $field = array(
-    'field_name' => DOMAIN_ACCESS_USER_FIELD,
-    'entity_type' => 'user',
-    'label' => 'Domain Access',
-    'bundle' => 'user',
-    'required' => FALSE,
-    'description' => 'Select the affiliate domain(s) for this user.',
-    'default_value_callback' => 'domain_access_default_value',
-    'settings' => array(
-      'handler_settings' => array(
-        'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+  $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
+  if (!$exists) {
+    $storage = array(
+      'field_name' => DOMAIN_ACCESS_USER_FIELD,
+      'cardinality' => -1,
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'type' => 'entity_reference',
+      'settings' => array(
+        'target_type' => 'domain',
       ),
-    ),
-  );
-  $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
-  $field_config->save();
+    );
+    $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
+    $field_storage_config->save();
+  }
 
+  $id = 'user.user.' . DOMAIN_ACCESS_USER_FIELD;
+  $exists = \Drupal::entityManager()->getStorage('field_config')->load($id);
+  if (!$exists) {
+    $field = array(
+      'field_name' => DOMAIN_ACCESS_USER_FIELD,
+      'entity_type' => 'user',
+      'label' => 'Domain Access',
+      'bundle' => 'user',
+      'required' => FALSE,
+      'description' => 'Select the affiliate domain(s) for this user.',
+      'default_value_callback' => 'domain_access_default_value',
+      'settings' => array(
+        'handler_settings' => array(
+          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+        ),
+      ),
+    );
+    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config->save();
+  }
   // Tell the form system how to behave. Default to radio buttons.
+  // @TODO: This function is deprecated, but using the OO syntax as above
+  // is causing test fails.
   entity_get_form_display('user', 'user', 'default')
     ->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
       'type' => 'options_buttons',
   ))
   ->save();
+  // Note that we don't add 'all affiliates' to users because we have a
+  // permission for that. @TODO: Is that a UX failure?
 }
 
 /**
@@ -108,6 +165,10 @@ function domain_access_install() {
  */
 function domain_access_uninstall() {
   $id = 'node.' . DOMAIN_ACCESS_NODE_FIELD;
+  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    $field->delete();
+  }
+  $id = 'node.' . DOMAIN_ACCESS_ALL_FIELD;
   if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
     $field->delete();
   }

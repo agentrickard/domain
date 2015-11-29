@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines the name of the node access control field.
@@ -24,6 +25,11 @@ define('DOMAIN_ACCESS_NODE_FIELD', 'field_domain_access');
  * Defines the names of the user assignment field.
  */
 define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
+
+/**
+ * Defines the name of the all affiliates field.
+ */
+define('DOMAIN_ACCESS_ALL_FIELD', 'field_domain_all_affiliates');
 
 /**
  * Implements hook_node_grants().
@@ -45,10 +51,11 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   // Advanced grants for edit/delete require permissions.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
-  // Grants for view are simple. Use the active domain.
+  // Grants for view are simple. Use the active domain and all affiliates.
   if ($op == 'view') {
     $grants['domain_id'][] = $id;
-    if ($user->hasPermission('administer domains') || ($user->hasPermission('view unpublished domain content'))) {
+    $grants['domain_site'][] = 0;
+    if ($user->hasPermission('view unpublished domain content')) {
       if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
         $grants['domain_unpublished'][] = $id;
       }
@@ -88,6 +95,15 @@ function domain_access_node_access_records(NodeInterface $node) {
       );
     }
   }
+  if (!empty($node->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $node->isPublished()) {
+    $grants[] = array(
+      'realm' => 'domain_site',
+      'gid' => 0,
+      'grant_view' => 1,
+      'grant_update' => 0,
+      'grant_delete' => 0,
+    );
+  }
   return $grants;
 }
 
@@ -99,6 +115,15 @@ function domain_access_default_value(FieldableEntityInterface $entity, FieldDefi
   if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $item[0]['target_uuid'] = $active->uuid();
   }
+  return $item;
+}
+
+/**
+ * Sets the default value for the all affiliate fields.
+ */
+function domain_access_all_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
+  // @TODO: This may become configurable.
+  $item = FALSE;
   return $item;
 }
 
@@ -209,19 +234,38 @@ function domain_access_domain_source_alter(&$source, $path, $options) {
 /**
  * Implements hook_domain_references_alter().
  */
-function domain_access_domain_references_alter($query, $account) {
+function domain_access_domain_references_alter($query, $account, $entity_type) {
   // Restrict domains by assignment.
-  if ($account->hasPermission('publish to any domain')) {
-    // Do nothing.
-  }
-  elseif ($account->hasPermission('publish to any assigned domain')) {
-    $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
-    $query->condition('id', array_keys($allowed), 'IN');
-  }
-  else {
-    // Remove all options.
-    // @TODO: This should make the field invisible.
-    $query->condition('id', '-no-match-');
+  switch ($entity_type) {
+    case 'node':
+      if ($account->hasPermission('publish to any domain')) {
+        // Do nothing.
+      }
+      elseif ($account->hasPermission('publish to any assigned domain')) {
+        $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+        $query->condition('id', array_keys($allowed), 'IN');
+      }
+      else {
+        // Remove all options.
+        $query->condition('id', '-no-possible-match-');
+      }
+      break;
+    case 'user':
+      if ($account->hasPermission('assign editors to any domain')) {
+        // Do nothing.
+      }
+      elseif ($account->hasPermission('assign domain editors')) {
+        $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+        $query->condition('id', array_keys($allowed), 'IN');
+      }
+      else {
+        // Remove all options.
+        $query->condition('id', '-no-possible-match-');
+      }
+      break;
+    default:
+      // No action taken.
+      break;
   }
 }
 
@@ -241,18 +285,6 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   $type = $node->bundle();
 
   switch ($op) {
-    case 'create':
-      // This code no longer fires. See https://www.drupal.org/node/2348203.
-      // Load the full user record.
-      $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-      $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
-      if (($account->hasPermission('create ' . $type . ' content on assigned domains', $account)
-          || $account->hasPermission('create domain content', $account))
-          && in_array($id, $user_domains)) {
-        // Note the cache context here!
-        return AccessResult::allowed()->addCacheContexts(['user.permissions', 'url.site']);
-      }
-
     case 'update':
       if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account) && domain_access_check_node($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
@@ -317,4 +349,32 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
   }
   // No opinion.
   return AccessResult::neutral();
+}
+
+/**
+ * Implements hook_form_node_form_alter().
+ *
+ * Hides fields that the user cannot access.
+ */
+function domain_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Filtering of options happens in hook_domain_references_alter().
+  if (isset($form[DOMAIN_ACCESS_NODE_FIELD])) {
+    $form[DOMAIN_ACCESS_NODE_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_NODE_FIELD]['widget']['#options']);
+  }
+  if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
+    $account = \Drupal::currentUser();
+    $form[DOMAIN_ACCESS_ALL_FIELD]['#access'] = $account->hasPermission('publish to any domain');
+  }
+}
+
+/**
+ * Implements hook_form_user_form_alter().
+ *
+ * Hides fields that the user cannot access.
+ */
+function domain_access_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Filtering of options happens in hook_domain_references_alter().
+  if (isset($form[DOMAIN_ACCESS_USER_FIELD])) {
+    $form[DOMAIN_ACCESS_USER_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_USER_FIELD]['widget']['#options']);
+  }
 }

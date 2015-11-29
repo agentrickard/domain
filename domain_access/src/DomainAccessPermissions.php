@@ -24,6 +24,9 @@ class DomainAccessPermissions {
       'assign domain editors' => array(
         'title' => $this->t('Assign additional editors to assigned domains'),
       ),
+      'assign editors to any domain' => array(
+        'title' => $this->t('Assign additional editors to any domains'),
+      ),
       'publish to any domain' => array(
         'title' => $this->t('Publish to any domain'),
       ),
