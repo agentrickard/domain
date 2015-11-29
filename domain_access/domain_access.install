@@ -145,17 +145,15 @@ function domain_access_install() {
     );
     $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
     $field_config->save();
-
-    // Tell the form system how to behave. Default to radio buttons.
-    $display = \Drupal::entityManager()->getStorage('entity_form_display');
-    $field = $display->load('user.user.default');
-    if ($field) {
-      $field->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
-        'type' => 'options_buttons',
-      ))
-      ->save();
-    }
   }
+  // Tell the form system how to behave. Default to radio buttons.
+  // @TODO: This function is deprecated, but using the OO syntax as above
+  // is causing test fails.
+  entity_get_form_display('user', 'user', 'default')
+    ->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
+      'type' => 'options_buttons',
+  ))
+  ->save();
   // Note that we don't add 'all affiliates' to users because we have a
   // permission for that. @TODO: Is that a UX failure?
 }
