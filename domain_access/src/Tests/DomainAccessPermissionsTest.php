@@ -107,6 +107,8 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->assertNodeAccess(array('view' => TRUE, 'update' => FALSE, 'delete' => FALSE), $domain_node3, $domain_user3);
     $this->assertNodeAccess(array('view' => TRUE, 'update' => TRUE, 'delete' => TRUE), $domain_node4, $domain_user3);
 
+    // @TODO: Test edit and delete for user with 'all affiliates' permission.
+
     // Tests create permissions. Any content on assigned domains.
     $domain_user4 = $this->drupalCreateUser(array('access content', 'create domain content'));
     $this->addDomainToEntity('user', $domain_user4->id(), $two, DOMAIN_ACCESS_USER_FIELD);
