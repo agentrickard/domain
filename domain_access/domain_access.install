@@ -152,10 +152,44 @@ function domain_access_install() {
   entity_get_form_display('user', 'user', 'default')
     ->setComponent(DOMAIN_ACCESS_USER_FIELD, array(
       'type' => 'options_buttons',
+      'weight' => 40,
   ))
   ->save();
-  // Note that we don't add 'all affiliates' to users because we have a
-  // permission for that. @TODO: Is that a UX failure?
+
+  // Create the all affiliates field.
+  $id = 'user.' . DOMAIN_ACCESS_ALL_FIELD;
+  $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
+  if (!$exists) {
+    $storage = array(
+      'field_name' => DOMAIN_ACCESS_ALL_FIELD,
+      'entity_type' => 'user',
+      'cardinality' => 1,
+      'type' => 'boolean',
+    );
+    $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
+    $field_storage_config->save();
+  }
+  // Assign the all affiliates field to users.
+  $id = 'user.user.' . DOMAIN_ACCESS_ALL_FIELD;
+  if (!$field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
+    $field = array(
+      'field_name' => DOMAIN_ACCESS_ALL_FIELD,
+      'entity_type' => 'user',
+      'label' => 'Editor for all affiliates',
+      'bundle' => 'user',
+      'required' => FALSE,
+      'description' => 'Allow this user to edit content assigned to any domain.',
+    );
+    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config->save();
+  }
+  entity_get_form_display('user', 'user', 'default')
+    ->setComponent(DOMAIN_ACCESS_ALL_FIELD, array(
+      'type' => 'boolean_checkbox',
+      'settings' => array('display_label' => 1),
+      'weight' => 41,
+  ))
+  ->save();
 }
 
 /**
