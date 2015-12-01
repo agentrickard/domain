@@ -113,8 +113,15 @@ function domain_access_node_access_records(NodeInterface $node) {
  */
 function domain_access_default_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
   $item = array();
-  if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
-    $item[0]['target_uuid'] = $active->uuid();
+  switch ($entity->getEntityType()) {
+    case 'user':
+    case 'node':
+      if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
+        $item[0]['target_uuid'] = $active->uuid();
+      }
+      break;
+    default:
+      break;
   }
   return $item;
 }
@@ -125,6 +132,14 @@ function domain_access_default_value(FieldableEntityInterface $entity, FieldDefi
 function domain_access_all_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
   // @TODO: This may become configurable.
   $item = FALSE;
+  switch ($entity->getEntityType()) {
+    case 'user':
+    case 'node':
+      $item = FALSE;
+      break;
+    default:
+      break;
+  }
   return $item;
 }
 
