@@ -19,12 +19,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Defines the name of the node access control field.
  */
-define('DOMAIN_ACCESS_NODE_FIELD', 'field_domain_access');
-
-/**
- * Defines the names of the user assignment field.
- */
-define('DOMAIN_ACCESS_USER_FIELD', 'field_domain_user');
+define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
 
 /**
  * Defines the name of the all affiliates field.
@@ -50,7 +45,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   $id = $active->getDomainId();
   // Advanced grants for edit/delete require permissions.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
+  $user_domains = domain_access_get_entity_values($user);
   // Grants for view are simple. Use the active domain and all affiliates.
   // Note that "X to any domain" is a global permission designed for admins.
   if ($op == 'view') {
@@ -81,7 +76,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
 function domain_access_node_access_records(NodeInterface $node) {
   $grants = array();
   // If there are no domains set, use the current one.
-  $domains = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
+  $domains = domain_access_get_entity_values($node);
   if (empty($domains) && $active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $domains[$active->id()] = $active->getDomainId();
   }
@@ -148,14 +143,14 @@ function domain_access_all_value(FieldableEntityInterface $entity, FieldDefiniti
  *
  * @param Drupal\Core\Entity\EntityInterface $entity
  *   The entity being checked.
- * @param $field_name
+ * @param $field_name (optional)
  *   The name of the field storing domain access values. Default fields are
  *   defined by this module.
  *
  * @return array
  *   An array of domain id values, where the key is id() and the value is domainId().
  */
-function domain_access_get_entity_values($entity, $field_name) {
+function domain_access_get_entity_values($entity, $field_name = DOMAIN_ACCESS_FIELD) {
   // @TODO: static cache.
   $list = array();
   // @TODO In tests, $entity is returning NULL.
@@ -195,14 +190,14 @@ function domain_access_node_presave(EntityInterface $node) {
     // If set by the form.
     if (isset($node->devel_generate['domain_access'])) {
       $values = array(
-        DOMAIN_ACCESS_NODE_FIELD => array_keys($node->devel_generate['domain_access']),
+        DOMAIN_ACCESS_FIELD => array_keys($node->devel_generate['domain_access']),
       );
     }
     // Else set randomly.
     else {
       $domains = \Drupal::service('domain.loader')->loadMultiple();
       $values = array(
-        DOMAIN_ACCESS_NODE_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
+        DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
       );
     }
     $node->setPropertyValues($values);
@@ -237,7 +232,7 @@ function domain_access_form_devel_generate_content_form_alter(&$form, &$form_sta
  */
 function domain_access_domain_source_alter(&$source, $path, $options) {
   $node = $options['entity'];
-  $list = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
+  $list = domain_access_get_entity_values($node);
   // @TODO: setting to enable this rewrite, as in older versions?
   if ($list && $domains = \Drupal::service('domain.loader')->loadMultipleSorted($list)) {
     $first = current($domains);
@@ -250,15 +245,18 @@ function domain_access_domain_source_alter(&$source, $path, $options) {
 /**
  * Implements hook_domain_references_alter().
  */
-function domain_access_domain_references_alter($query, $account, $entity_type) {
+function domain_access_domain_references_alter($query, $account, $context) {
   // Restrict domains by assignment.
-  switch ($entity_type) {
+  switch ($context['entity_type']) {
     case 'node':
       if ($account->hasPermission('publish to any domain')) {
-        // Do nothing.
+        break;
       }
       elseif ($account->hasPermission('publish to any assigned domain')) {
-        $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+        if (!empty($account->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+          break;
+        }
+        $allowed = domain_access_get_entity_values($account);
         $query->condition('id', array_keys($allowed), 'IN');
       }
       else {
@@ -271,7 +269,10 @@ function domain_access_domain_references_alter($query, $account, $entity_type) {
         // Do nothing.
       }
       elseif ($account->hasPermission('assign domain editors')) {
-        $allowed = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+        if (!empty($account->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+          break;
+        }
+        $allowed = domain_access_get_entity_values($account);
         $query->condition('id', array_keys($allowed), 'IN');
       }
       else {
@@ -334,12 +335,12 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
  * @return boolean
  */
 function domain_access_check_node(NodeInterface $node, AccountInterface $account) {
-  $node_domains = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
+  $node_domains = domain_access_get_entity_values($node);
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   if (!empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value) && !empty($node_domains)) {
     return TRUE;
   }
-  $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
+  $user_domains = domain_access_get_entity_values($account);
   return (bool) !empty(array_intersect($node_domains, $user_domains));
 }
 
@@ -359,7 +360,7 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
   }
   // Load the full user record.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-  $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
+  $user_domains = domain_access_get_entity_values($user);
   if (($account->hasPermission('create ' . $entity_bundle . ' content on assigned domains', $account)
       || $account->hasPermission('create domain content', $account))
       && in_array($id, $user_domains)) {
@@ -377,8 +378,8 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
  */
 function domain_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   // Filtering of options happens in hook_domain_references_alter().
-  if (isset($form[DOMAIN_ACCESS_NODE_FIELD])) {
-    $form[DOMAIN_ACCESS_NODE_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_NODE_FIELD]['widget']['#options']);
+  if (isset($form[DOMAIN_ACCESS_FIELD])) {
+    $form[DOMAIN_ACCESS_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_FIELD]['widget']['#options']);
   }
   if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
     $account = \Drupal::currentUser();
@@ -393,7 +394,7 @@ function domain_access_form_node_form_alter(&$form, FormStateInterface $form_sta
  */
 function domain_access_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   // Filtering of options happens in hook_domain_references_alter().
-  if (isset($form[DOMAIN_ACCESS_USER_FIELD])) {
-    $form[DOMAIN_ACCESS_USER_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_USER_FIELD]['widget']['#options']);
+  if (isset($form[DOMAIN_ACCESS_FIELD])) {
+    $form[DOMAIN_ACCESS_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_FIELD]['widget']['#options']);
   }
 }

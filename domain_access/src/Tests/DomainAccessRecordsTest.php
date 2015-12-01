@@ -44,7 +44,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
     // Create an article node.
     $node1 = $this->drupalCreateNode(array(
       'type' => 'article',
-      DOMAIN_ACCESS_NODE_FIELD => array($domain->id()),
+      DOMAIN_ACCESS_FIELD => array($domain->id()),
       DOMAIN_ACCESS_ALL_FIELD => 0,
     ));
     $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node1->id()), 'Article node created.');
@@ -61,7 +61,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
     // Create another article node.
     $node2 = $this->drupalCreateNode(array(
       'type' => 'article',
-      DOMAIN_ACCESS_NODE_FIELD => array($domain->id()),
+      DOMAIN_ACCESS_FIELD => array($domain->id()),
       DOMAIN_ACCESS_ALL_FIELD => 1,
     ));
     $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node2->id()), 'Article node created.');
