@@ -52,22 +52,23 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
   // Grants for view are simple. Use the active domain and all affiliates.
+  // @TODO: Do we deprecate "publish to any domain"?
   if ($op == 'view') {
     $grants['domain_id'][] = $id;
     $grants['domain_site'][] = 0;
     if ($user->hasPermission('view unpublished domain content')) {
-      if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
+      if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
         $grants['domain_unpublished'][] = $id;
       }
     }
   }
-  elseif ($op == 'update' && $user->hasPermission('edit domain content') && !empty($user_domains)) {
-    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
+  elseif ($op == 'update' && $user->hasPermission('edit domain content')) {
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
       $grants['domain_id'] = $id;
     }
   }
-  elseif ($op == 'delete' && $user->hasPermission('delete domain content') && !empty($user_domains)) {
-    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains)) {
+  elseif ($op == 'delete' && $user->hasPermission('delete domain content')) {
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
       $grants['domain_id'] = $id;
     }
   }
@@ -308,7 +309,7 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
 }
 
 /**
- * Checks that a node belongs to a domain that the user can access.
+ * Checks that a node belongs to a domain that the user can edit.
  *
  * @param NodeInterface $node
  *   The node being checked.
@@ -320,8 +321,11 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
 function domain_access_check_node(NodeInterface $node, AccountInterface $account) {
   $node_domains = domain_access_get_entity_values($node, DOMAIN_ACCESS_NODE_FIELD);
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+  if (!empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value) && !empty($node_domains)) {
+    return TRUE;
+  }
   $user_domains = domain_access_get_entity_values($account, DOMAIN_ACCESS_USER_FIELD);
-  return !empty(array_intersect($node_domains, $user_domains));
+  return (bool) !empty(array_intersect($node_domains, $user_domains));
 }
 
 /**
