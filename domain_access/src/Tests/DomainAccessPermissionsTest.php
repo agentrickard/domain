@@ -68,18 +68,18 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     }
     // Assign our user to domain $two. Test on $one and $two.
     $domain_user1 = $this->drupalCreateUser(array('access content', 'edit domain content', 'delete domain content'));
-    $this->addDomainToEntity('user', $domain_user1->id(), $two, DOMAIN_ACCESS_USER_FIELD);
+    $this->addDomainToEntity('user', $domain_user1->id(), $two);
     $domain_user1 = \Drupal::entityManager()->getStorage('user')->load($domain_user1->id());
-    $assigned = domain_access_get_entity_values($domain_user1, DOMAIN_ACCESS_USER_FIELD);
+    $assigned = domain_access_get_entity_values($domain_user1);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
 
     // Assign one node to default domain, and one to our test domain.
-    $domain_node1 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_NODE_FIELD => [$one]));
-    $domain_node2 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_NODE_FIELD => [$two]));
-    $assigned = domain_access_get_entity_values($domain_node1, DOMAIN_ACCESS_NODE_FIELD);
+    $domain_node1 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_FIELD => [$one]));
+    $domain_node2 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_FIELD => [$two]));
+    $assigned = domain_access_get_entity_values($domain_node1);
     $this->assertTrue(isset($assigned[$one]), 'Node1 assigned to proper test domain.');
-    $assigned = domain_access_get_entity_values($domain_node2, DOMAIN_ACCESS_NODE_FIELD);
+    $assigned = domain_access_get_entity_values($domain_node2);
     $this->assertTrue(isset($assigned[$two]), 'Node2 assigned to proper test domain.');
 
     // Tests 'edit domain content' to edit content assigned to their domains.
@@ -89,18 +89,18 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // Tests 'edit domain TYPE content'.
     // Assign our user to domain $two. Test on $one and $two.
     $domain_user3 = $this->drupalCreateUser(array('access content', 'update page content on assigned domains', 'delete page content on assigned domains'));
-    $this->addDomainToEntity('user', $domain_user3->id(), $two, DOMAIN_ACCESS_USER_FIELD);
+    $this->addDomainToEntity('user', $domain_user3->id(), $two);
     $domain_user3 = \Drupal::entityManager()->getStorage('user')->load($domain_user3->id());
-    $assigned = domain_access_get_entity_values($domain_user3, DOMAIN_ACCESS_USER_FIELD);
+    $assigned = domain_access_get_entity_values($domain_user3);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
 
     // Assign two different node types to our test domain.
-    $domain_node3 = $this->drupalCreateNode(array('type' => 'article', DOMAIN_ACCESS_NODE_FIELD => [$two]));
-    $domain_node4 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_NODE_FIELD => [$two]));
-    $assigned = domain_access_get_entity_values($domain_node3, DOMAIN_ACCESS_NODE_FIELD);
+    $domain_node3 = $this->drupalCreateNode(array('type' => 'article', DOMAIN_ACCESS_FIELD => [$two]));
+    $domain_node4 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_FIELD => [$two]));
+    $assigned = domain_access_get_entity_values($domain_node3);
     $this->assertTrue(isset($assigned[$two]), 'Node3 assigned to proper test domain.');
-    $assigned = domain_access_get_entity_values($domain_node4, DOMAIN_ACCESS_NODE_FIELD);
+    $assigned = domain_access_get_entity_values($domain_node4);
     $this->assertTrue(isset($assigned[$two]), 'Node4 assigned to proper test domain.');
 
     // Tests 'edit TYPE content on assigned domains.'
@@ -111,20 +111,20 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // Tests 'edit domain TYPE content'.
     // Assign our user to domain $two. Test on $one and $two.
     $domain_user4 = $this->drupalCreateUser(array('access content', 'update page content on assigned domains', 'delete page content on assigned domains'));
-    $this->addDomainToEntity('user', $domain_user4->id(), $two, DOMAIN_ACCESS_USER_FIELD);
+    $this->addDomainToEntity('user', $domain_user4->id(), $two);
     $this->addDomainToEntity('user', $domain_user4->id(), 1, DOMAIN_ACCESS_ALL_FIELD);
     $domain_user4 = \Drupal::entityManager()->getStorage('user')->load($domain_user4->id());
-    $assigned = domain_access_get_entity_values($domain_user4, DOMAIN_ACCESS_USER_FIELD);
+    $assigned = domain_access_get_entity_values($domain_user4);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     $this->assertTrue(!empty($domain_user4->get(DOMAIN_ACCESS_ALL_FIELD)->value), 'User assign to all affiliates.');
 
     // Assign two different node types to our test domain.
-    $domain_node5 = $this->drupalCreateNode(array('type' => 'article', DOMAIN_ACCESS_NODE_FIELD => [$one]));
-    $domain_node6 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_NODE_FIELD => [$one]));
-    $assigned = domain_access_get_entity_values($domain_node5, DOMAIN_ACCESS_NODE_FIELD);
+    $domain_node5 = $this->drupalCreateNode(array('type' => 'article', DOMAIN_ACCESS_FIELD => [$one]));
+    $domain_node6 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_FIELD => [$one]));
+    $assigned = domain_access_get_entity_values($domain_node5);
     $this->assertTrue(isset($assigned[$one]), 'Node5 assigned to proper test domain.');
-    $assigned = domain_access_get_entity_values($domain_node6, DOMAIN_ACCESS_NODE_FIELD);
+    $assigned = domain_access_get_entity_values($domain_node6);
     $this->assertTrue(isset($assigned[$one]), 'Node6 assigned to proper test domain.');
 
     // Tests 'edit TYPE content on assigned domains.'
@@ -133,9 +133,9 @@ class DomainAccessPermissionsTest extends DomainTestBase {
 
     // Tests create permissions. Any content on assigned domains.
     $domain_user5 = $this->drupalCreateUser(array('access content', 'create domain content'));
-    $this->addDomainToEntity('user', $domain_user5->id(), $two, DOMAIN_ACCESS_USER_FIELD);
+    $this->addDomainToEntity('user', $domain_user5->id(), $two);
     $domain_user5 = \Drupal::entityManager()->getStorage('user')->load($domain_user5->id());
-    $assigned = domain_access_get_entity_values($domain_user5, DOMAIN_ACCESS_USER_FIELD);
+    $assigned = domain_access_get_entity_values($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
@@ -152,9 +152,9 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     }
     // Tests create permissions. Page content on assigned domains.
     $domain_user5 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
-    $this->addDomainToEntity('user', $domain_user5->id(), $two, DOMAIN_ACCESS_USER_FIELD);
+    $this->addDomainToEntity('user', $domain_user5->id(), $two);
     $domain_user5 = \Drupal::entityManager()->getStorage('user')->load($domain_user5->id());
-    $assigned = domain_access_get_entity_values($domain_user5, DOMAIN_ACCESS_USER_FIELD);
+    $assigned = domain_access_get_entity_values($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.

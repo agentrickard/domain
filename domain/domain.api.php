@@ -109,15 +109,15 @@ function hook_domain_validate_alter(&$error_list, $subdomain) {
  *   An entity query prepared by DomainSelection::buildEntityQuery().
  * @param $account
  *   The account of the user viewing the reference list.
- * @param $entity_type
- *   The type of entity (e.g. node, user) that requested the list.
- * @param $bundle
- *   The entity subtype (e.g. 'article' or 'page').
+ * @param $contect array
+ *   A keyed array passing two items:
+ *   - entity_type The type of entity (e.g. node, user) that requested the list.
+ *   - bundle The entity subtype (e.g. 'article' or 'page').
  *
  * @return
  *   No return value. Modify the $query object via methods.
  */
-function hook_domain_references_alter($query, $account, $entity_type, $bundle) {
+function hook_domain_references_alter($query, $account, $context) {
   // Remove the default domain from non-admins when editing nodes.
   if ($entity_type == 'node' && !$account->hasPermission('edit assigned domains')) {
     $default = \Drupal::service('domain.loader')->loadDefaultId();
