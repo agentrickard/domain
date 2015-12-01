@@ -178,6 +178,7 @@ function domain_access_install() {
       'label' => 'Editor for all affiliates',
       'bundle' => 'user',
       'required' => FALSE,
+      'default_value_callback' => 'domain_access_all_value',
       'description' => 'Allow this user to edit content assigned to any domain.',
     );
     $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);

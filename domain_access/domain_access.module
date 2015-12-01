@@ -52,7 +52,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = domain_access_get_entity_values($user, DOMAIN_ACCESS_USER_FIELD);
   // Grants for view are simple. Use the active domain and all affiliates.
-  // @TODO: Do we deprecate "publish to any domain"?
+  // Note that "X to any domain" is a global permission designed for admins.
   if ($op == 'view') {
     $grants['domain_id'][] = $id;
     $grants['domain_site'][] = 0;
