@@ -111,11 +111,13 @@ function hook_domain_validate_alter(&$error_list, $subdomain) {
  *   The account of the user viewing the reference list.
  * @param $entity_type
  *   The type of entity (e.g. node, user) that requested the list.
+ * @param $bundle
+ *   The entity subtype (e.g. 'article' or 'page').
  *
  * @return
  *   No return value. Modify the $query object via methods.
  */
-function hook_domain_references_alter($query, $account, $entity_type) {
+function hook_domain_references_alter($query, $account, $entity_type, $bundle) {
   // Remove the default domain from non-admins when editing nodes.
   if ($entity_type == 'node' && !$account->hasPermission('edit assigned domains')) {
     $default = \Drupal::service('domain.loader')->loadDefaultId();

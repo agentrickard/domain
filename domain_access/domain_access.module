@@ -250,7 +250,7 @@ function domain_access_domain_source_alter(&$source, $path, $options) {
 /**
  * Implements hook_domain_references_alter().
  */
-function domain_access_domain_references_alter($query, $account, $entity_type) {
+function domain_access_domain_references_alter($query, $account, $entity_type, $bundle) {
   // Restrict domains by assignment.
   switch ($entity_type) {
     case 'node':
