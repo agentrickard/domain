@@ -23,34 +23,34 @@ interface DomainAccessManagerInterface {
    *
    * @return array
    */
-  public function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {}
+  public function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD);
 
   /**
    * Get the all affiliates field values from an entity.
    *
    * return boolean
    */
-  public function getAllValue(EntityInterface $entity) {}
+  public function getAllValue(EntityInterface $entity);
 
   /**
    * Compare the entity values against a user's account assignments.
    *
    * return boolean
    */
-  public function checkEntity(EntityInterface $entity, AccountInterface $account) {}
+  public function checkEntityAccess(EntityInterface $entity, AccountInterface $account);
 
   /**
    * Get the default field value for an entity.
    *
    * @return array
    */
-  public function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {}
+  public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
 
   /**
    * Get the default all affiliates value for an entity.
    *
    * @return array
    */
-  public function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {}
+  public static function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
 
 }

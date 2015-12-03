@@ -45,7 +45,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   $id = $active->getDomainId();
   // Advanced grants for edit/delete require permissions.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-  $user_domains = domain_access_get_entity_values($user);
+  $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($user);
   // Grants for view are simple. Use the active domain and all affiliates.
   // Note that "X to any domain" is a global permission designed for admins.
   if ($op == 'view') {
@@ -76,7 +76,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
 function domain_access_node_access_records(NodeInterface $node) {
   $grants = array();
   // If there are no domains set, use the current one.
-  $domains = domain_access_get_entity_values($node);
+  $domains = \Drupal::service('domain_access.manager')->getAccessValues($node);
   if (empty($domains) && $active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $domains[$active->id()] = $active->getDomainId();
   }
@@ -101,75 +101,6 @@ function domain_access_node_access_records(NodeInterface $node) {
     );
   }
   return $grants;
-}
-
-/**
- * Sets the default value for new fields.
- */
-function domain_access_default_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
-  $item = array();
-  switch ($entity->getEntityType()) {
-    case 'user':
-    case 'node':
-      if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
-        $item[0]['target_uuid'] = $active->uuid();
-      }
-      break;
-    default:
-      break;
-  }
-  return $item;
-}
-
-/**
- * Sets the default value for the all affiliate fields.
- */
-function domain_access_all_value(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
-  // @TODO: This may become configurable.
-  $item = FALSE;
-  switch ($entity->getEntityType()) {
-    case 'user':
-    case 'node':
-      $item = FALSE;
-      break;
-    default:
-      break;
-  }
-  return $item;
-}
-
-/**
- * Returns the Domain Access values from an entity.
- *
- * @param Drupal\Core\Entity\EntityInterface $entity
- *   The entity being checked.
- * @param $field_name (optional)
- *   The name of the field storing domain access values. Default fields are
- *   defined by this module.
- *
- * @return array
- *   An array of domain id values, where the key is id() and the value is domainId().
- */
-function domain_access_get_entity_values($entity, $field_name = DOMAIN_ACCESS_FIELD) {
-  // @TODO: static cache.
-  $list = array();
-  // @TODO In tests, $entity is returning NULL.
-  if (is_null($entity)) {
-    return $list;
-  }
-  // Get the values of an entity.
-  $values = $entity->get($field_name);
-  // Must be at least one item.
-  if (!empty($values)) {
-    foreach ($values as $item) {
-      if ($target = $item->getValue()) {
-        if ($domain = \Drupal::service('domain.loader')->load($target['target_id'])) {
-          $list[$domain->id()] = $domain->getDomainId();
-        }
-      }
-    }
-  }
-  return $list;
 }
 
 /**
@@ -232,7 +163,7 @@ function domain_access_form_devel_generate_content_form_alter(&$form, &$form_sta
  */
 function domain_access_domain_source_alter(&$source, $path, $options) {
   $node = $options['entity'];
-  $list = domain_access_get_entity_values($node);
+  $list = \Drupal::service('domain_access.manager')->getAccessValues($node);
   // @TODO: setting to enable this rewrite, as in older versions?
   if ($list && $domains = \Drupal::service('domain.loader')->loadMultipleSorted($list)) {
     $first = current($domains);
@@ -256,7 +187,7 @@ function domain_access_domain_references_alter($query, $account, $context) {
         if (!empty($account->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
           break;
         }
-        $allowed = domain_access_get_entity_values($account);
+        $allowed = \Drupal::service('domain_access.manager')->getAccessValues($account);
         $query->condition('id', array_keys($allowed), 'IN');
       }
       else {
@@ -272,7 +203,7 @@ function domain_access_domain_references_alter($query, $account, $context) {
         if (!empty($account->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
           break;
         }
-        $allowed = domain_access_get_entity_values($account);
+        $allowed = \Drupal::service('domain_access.manager')->getAccessValues($account);
         $query->condition('id', array_keys($allowed), 'IN');
       }
       else {
@@ -300,21 +231,22 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   }
 
   $type = $node->bundle();
+  $manager = \Drupal::service('domain_access.manager');
 
   switch ($op) {
     case 'update':
-      if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account) && domain_access_check_node($node, $account)) {
+      if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account) && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
-      if ($account->hasPermission('edit domain content', $account) && domain_access_check_node($node, $account)) {
+      if ($account->hasPermission('edit domain content', $account) && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
 
     case 'delete':
-      if ($account->hasPermission('delete ' . $type . ' content on assigned domains', $account) && domain_access_check_node($node, $account)) {
+      if ($account->hasPermission('delete ' . $type . ' content on assigned domains', $account) && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
-      if ($account->hasPermission('delete domain content', $account) && domain_access_check_node($node, $account)) {
+      if ($account->hasPermission('delete domain content', $account) && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
 
@@ -322,26 +254,6 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
       // No opinion.
       return AccessResult::neutral();
   }
-}
-
-/**
- * Checks that a node belongs to a domain that the user can edit.
- *
- * @param NodeInterface $node
- *   The node being checked.
- * @param AccountInterface $account
- *   The account making the access request.
- *
- * @return boolean
- */
-function domain_access_check_node(NodeInterface $node, AccountInterface $account) {
-  $node_domains = domain_access_get_entity_values($node);
-  $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-  if (!empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value) && !empty($node_domains)) {
-    return TRUE;
-  }
-  $user_domains = domain_access_get_entity_values($account);
-  return (bool) !empty(array_intersect($node_domains, $user_domains));
 }
 
 /**
@@ -360,7 +272,7 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
   }
   // Load the full user record.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
-  $user_domains = domain_access_get_entity_values($user);
+  $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($user);
   if (($account->hasPermission('create ' . $entity_bundle . ' content on assigned domains', $account)
       || $account->hasPermission('create domain content', $account))
       && in_array($id, $user_domains)) {
