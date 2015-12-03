@@ -1,0 +1,6 @@
+services:
+  domain_access.manager:
+    class: Drupal\domain_access\DomainAccessManager
+    tags:
+      - { name: persist }
+    arguments: ['@domain.loader', '@domain.negotiator']
