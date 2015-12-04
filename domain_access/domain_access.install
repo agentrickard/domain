@@ -29,20 +29,14 @@ function domain_access_install() {
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
-  $id = 'node.' . DOMAIN_ACCESS_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
-  }
-  $id = 'node.' . DOMAIN_ACCESS_ALL_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
-  }
-  $id = 'user.' . DOMAIN_ACCESS_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
-  }
-  $id = 'user.' . DOMAIN_ACCESS_ALL_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
+  foreach (array('node', 'user') as $type) {
+    $id = $type . '.' . DOMAIN_ACCESS_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+      $field->delete();
+    }
+    $id = $type . '.' . DOMAIN_ACCESS_ALL_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+      $field->delete();
+    }
   }
 }
