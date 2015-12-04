@@ -12,6 +12,9 @@
  * files because we have an unknown number of node types.
  */
 function domain_access_install() {
+  // @see node_add_body_field().
+  // @see NodeTypeForm::save().
+  // @see core/profiles/standard/config/field.storage.node.field_tags.yml
   // Create the domain access field.
   foreach (array('node', 'user') as $entity_type) {
     $id = $entity_type . '.' . DOMAIN_ACCESS_FIELD;
