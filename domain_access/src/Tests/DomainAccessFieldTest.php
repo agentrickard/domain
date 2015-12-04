@@ -8,6 +8,7 @@
 namespace Drupal\domain_access\Tests;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\domain\DomainInterface;
+use Drupal\node\Entity\NodeType;
 
 /**
  * Tests the domain access entity reference field type.
@@ -135,6 +136,28 @@ class DomainAccessFieldTest extends DomainTestBase {
     foreach ($domains as $domain) {
        $this->assertNoText($domain->label(), 'Domain form item not found.');
     }
+
+    // Test a user who can access all domain settings.
+    $user7 = $this->drupalCreateUser(array('bypass node access', 'publish to any domain'));
+    $this->drupalLogin($user7);
+
+    // Create a new content type and test that the fields are created.
+    // Create a content type programmatically.
+    $type = $this->drupalCreateContentType();
+
+    $type_exists = (bool) NodeType::load($type->id());
+    $this->assertTrue($type_exists, 'The new content type has been created in the database.');
+
+    // Visit the article creation page.
+    $this->drupalGet('node/add/' . $type->id());
+    $this->assertResponse(200, $type->id() . ' creation found.');
+
+    // Check for the form options.
+    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    foreach ($domains as $domain) {
+      $this->assertText($domain->label(), 'Domain form item found.');
+    }
+    $this->assertText($label, 'All affiliates field found.');
   }
 
 }

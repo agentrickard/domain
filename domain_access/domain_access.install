@@ -12,133 +12,31 @@
  * files because we have an unknown number of node types.
  */
 function domain_access_install() {
-  // Create the domain access field.
-  foreach (array('node', 'user') as $entity_type) {
-    $id = $entity_type . '.' . DOMAIN_ACCESS_FIELD;
-    $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
-    if (!$exists) {
-      $storage = array(
-        'field_name' => DOMAIN_ACCESS_FIELD,
-        'entity_type' => $entity_type,
-        'cardinality' => -1,
-        'type' => 'entity_reference',
-        'settings' => array(
-          'target_type' => 'domain',
-        ),
-      );
-      $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
-      $field_storage_config->save();
-    }
-    // Create the all affiliates field.
-    $id = $entity_type . '.' . DOMAIN_ACCESS_ALL_FIELD;
-    $exists = \Drupal::entityManager()->getStorage('field_storage_config')->load($id);
-    if (!$exists) {
-      $storage = array(
-        'field_name' => DOMAIN_ACCESS_ALL_FIELD,
-        'entity_type' => $entity_type,
-        'cardinality' => 1,
-        'type' => 'boolean',
-      );
-      $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
-      $field_storage_config->save();
-    }
-  }
-
   // Assign domain access to bundles.
   $list['user'] = 'user';
   $node_types = entity_load_multiple('node_type');
   foreach ($node_types as $type => $info) {
     $list[$type] = 'node';
   }
-  $text = [
-    'node' => [
-      'label' => 'content',
-      'description' => 'Make this content available on all domains.',
-    ],
-    'user' => [
-      'label' => 'user',
-      'description' => 'Make this user an editor on all domains.',
-    ]
-  ];
-
+  // Install our fields.
   foreach ($list as $bundle => $entity_type) {
-    $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
-    if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
-      continue;
-    }
-
-    $field = array(
-      'field_name' => DOMAIN_ACCESS_FIELD,
-      'entity_type' => $entity_type,
-      'label' => 'Domain Access',
-      'bundle' => $bundle,
-      'required' => TRUE,
-      'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['label'],
-      'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
-      'settings' => array(
-        'handler_settings' => array(
-          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
-        ),
-      ),
-    );
-    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
-    $field_config->save();
-
-    // Assign the all affiliates field to nodes.
-    $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
-    if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
-      continue;
-    }
-
-    $field = array(
-      'field_name' => DOMAIN_ACCESS_ALL_FIELD,
-      'entity_type' => $entity_type,
-      'label' => 'Send to all affiliates',
-      'bundle' => $bundle,
-      'required' => FALSE,
-      'description' => $text[$entity_type]['description'],
-      'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultAllValue',
-    );
-    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
-    $field_config->save();
-
-    // Tell the form system how to behave. Default to radio buttons.
-    // @TODO: This function is deprecated, but using the OO syntax is causing
-    // test fails.
-    entity_get_form_display($entity_type, $bundle, 'default')
-      ->setComponent(DOMAIN_ACCESS_FIELD, array(
-        'type' => 'options_buttons',
-        'weight' => 40,
-      ))
-      ->setComponent(DOMAIN_ACCESS_ALL_FIELD, array(
-        'type' => 'boolean_checkbox',
-        'settings' => array('display_label' => 1),
-        'weight' => 41,
-      ))
-      ->save();
+    domain_access_confirm_fields($entity_type, $bundle);
   }
 }
-
 /**
  * Implements hook_uninstall().
  *
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
-  $id = 'node.' . DOMAIN_ACCESS_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
-  }
-  $id = 'node.' . DOMAIN_ACCESS_ALL_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
-  }
-  $id = 'user.' . DOMAIN_ACCESS_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
-  }
-  $id = 'user.' . DOMAIN_ACCESS_ALL_FIELD;
-  if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
-    $field->delete();
+  foreach (array('node', 'user') as $type) {
+    $id = $type . '.' . DOMAIN_ACCESS_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+      $field->delete();
+    }
+    $id = $type . '.' . DOMAIN_ACCESS_ALL_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+      $field->delete();
+    }
   }
 }
