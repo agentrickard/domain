@@ -371,6 +371,7 @@ function domain_access_confirm_fields($entity_type, $bundle) {
       'bundle' => $bundle,
       'required' => FALSE,
       'description' => $text[$entity_type]['description'],
+     # 'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultAllValue',
     );
     $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
     $field_config->save();
