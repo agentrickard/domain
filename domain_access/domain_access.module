@@ -289,7 +289,7 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
 function domain_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $account = \Drupal::currentUser();
   if (isset($form[DOMAIN_ACCESS_FIELD])) {
-    $form[DOMAIN_ACCESS_FIELD]['#access'] = ($account->hasPermission('publish to any domain') || $account->hasPermission('publish to assigned domains'));
+    $form[DOMAIN_ACCESS_FIELD]['#access'] = ($account->hasPermission('publish to any domain') || $account->hasPermission('publish to any assigned domain'));
   }
   if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
     $form[DOMAIN_ACCESS_ALL_FIELD]['#access'] = $account->hasPermission('publish to any domain');
