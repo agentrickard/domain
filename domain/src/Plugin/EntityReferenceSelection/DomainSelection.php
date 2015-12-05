@@ -57,10 +57,7 @@ class DomainSelection extends DefaultSelection {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $entity_type_id = $this->configuration['target_type'];
     $selection_handler_settings = $this->configuration['handler_settings'];
-    $entity_type = $this->entityManager->getDefinition($entity_type_id);
-    $bundles = $this->entityManager->getBundleInfo($entity_type_id);
 
     // Merge-in default values.
     $selection_handler_settings += array(
