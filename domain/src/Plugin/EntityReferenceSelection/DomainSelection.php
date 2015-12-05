@@ -7,8 +7,10 @@
 
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
-use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\user\Entity\User;
+use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Provides specific access control for the domain entity type.
@@ -50,4 +52,61 @@ class DomainSelection extends DefaultSelection {
 
     return $query;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $entity_type_id = $this->configuration['target_type'];
+    $selection_handler_settings = $this->configuration['handler_settings'];
+    $entity_type = $this->entityManager->getDefinition($entity_type_id);
+    $bundles = $this->entityManager->getBundleInfo($entity_type_id);
+
+    // Merge-in default values.
+    $selection_handler_settings += array(
+      // For the 'target_bundles' setting, a NULL value is equivalent to "allow
+      // entities from any bundle to be referenced" and an empty array value is
+      // equivalent to "no entities from any bundle can be referenced".
+      'target_bundles' => NULL,
+      'sort' => array(
+        'field' => 'weight',
+        'direction' => 'ASC',
+      ),
+      'auto_create' => FALSE,
+      'default_selection' => 'current',
+    );
+
+    $form['target_bundles'] = array(
+      '#type' => 'value',
+      '#value' => NULL,
+    );
+
+    $fields = array(
+      'weight' => $this->t('Weight'),
+      'label' => $this->t('Name'),
+      'hostname' => $this->t('Hostname'),
+    );
+
+    $form['sort']['field'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('Sort by'),
+      '#options' => $fields,
+      '#ajax' => FALSE,
+      '#default_value' => $selection_handler_settings['sort']['field'],
+    );
+
+    $form['sort']['direction'] = array(
+      '#type' => 'select',
+      '#title' => $this->t('Sort direction'),
+      '#required' => TRUE,
+      '#options' => array(
+        'ASC' => $this->t('Ascending'),
+        'DESC' => $this->t('Descending'),
+      ),
+      '#default_value' => $selection_handler_settings['sort']['direction'],
+    );
+
+    return $form;
+  }
+
 }
