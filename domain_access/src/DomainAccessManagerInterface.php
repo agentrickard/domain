@@ -52,28 +52,4 @@ interface DomainAccessManagerInterface {
    */
   public function checkEntityAccess(EntityInterface $entity, AccountInterface $account);
 
-  /**
-   * Get the default field value for an entity.
-   *
-   * @param Drupal\Core\Entity\FieldableEntityInterface
-   *   The entity being created.
-   * @param Drupal\Core\Field\FieldDefinitionInterface
-   *   The field being created.
-   *
-   * @return array
-   */
-  public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
-
-  /**
-   * Get the default all affiliates value for an entity.
-   *
-   * @param Drupal\Core\Entity\FieldableEntityInterface
-   *   The entity being created.
-   * @param Drupal\Core\Field\FieldDefinitionInterface
-   *   The field being created.
-   *
-   * @return array
-   */
-  public static function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
-
 }

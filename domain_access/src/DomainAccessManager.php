@@ -89,39 +89,4 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     return (bool) !empty(array_intersect($entity_domains, $user_domains));
   }
 
-  /**
-   * @inheritdoc
-   */
-  public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
-    $item = array();
-    switch ($entity->getEntityType()) {
-      case 'user':
-      case 'node':
-        if ($active = $this->negotiator->getActiveDomain()) {
-          $item[0]['target_uuid'] = $active->uuid();
-        }
-        break;
-      default:
-        break;
-    }
-    return $item;
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public static function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
-    // @TODO: This may become configurable.
-    $item = FALSE;
-    switch ($entity->getEntityType()) {
-      case 'user':
-      case 'node':
-        $item = FALSE;
-        break;
-      default:
-        break;
-    }
-    return $item;
-  }
-
 }
