@@ -287,12 +287,11 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
  * Hides fields that the user cannot access.
  */
 function domain_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // Filtering of options happens in hook_domain_references_alter().
+  $account = \Drupal::currentUser();
   if (isset($form[DOMAIN_ACCESS_FIELD])) {
-    $form[DOMAIN_ACCESS_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_FIELD]['widget']['#options']);
+    $form[DOMAIN_ACCESS_FIELD]['#access'] = ($account->hasPermission('publish to any domain') || $account->hasPermission('publish to assigned domains'));
   }
   if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
-    $account = \Drupal::currentUser();
     $form[DOMAIN_ACCESS_ALL_FIELD]['#access'] = $account->hasPermission('publish to any domain');
   }
 }
@@ -303,9 +302,12 @@ function domain_access_form_node_form_alter(&$form, FormStateInterface $form_sta
  * Hides fields that the user cannot access.
  */
 function domain_access_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // Filtering of options happens in hook_domain_references_alter().
+  $account = \Drupal::currentUser();
   if (isset($form[DOMAIN_ACCESS_FIELD])) {
-    $form[DOMAIN_ACCESS_FIELD]['#access'] = !empty($form[DOMAIN_ACCESS_FIELD]['widget']['#options']);
+    $form[DOMAIN_ACCESS_FIELD]['#access'] = ($account->hasPermission('assign domain editors') || $account->hasPermission('assign editors to any domain'));
+  }
+  if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
+    $form[DOMAIN_ACCESS_ALL_FIELD]['#access'] = $account->hasPermission('assign editors to any domain');
   }
 }
 
