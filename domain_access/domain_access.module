@@ -102,52 +102,73 @@ function domain_access_node_access_records(NodeInterface $node) {
 }
 
 /**
- * Implements hook_node_presave().
+ * Implements hook_ENTITY_TYPE_presave().
  *
  * Fires only if Devel Generate module is present, to assign test nodes to
  * domains.
- *
- * @TODO: should we always set default values here?
- * @TODO: pull values from the Devel Generate form.
  *
  * @param \Drupal\Core\Entity\EntityInterface stdClass $node
  *   The node entity on which the operation is to be performed.
  */
 function domain_access_node_presave(EntityInterface $node) {
   $exists = \Drupal::moduleHandler()->moduleExists('devel_generate');
+  $values = [];
   if ($exists && isset($node->devel_generate)) {
     // If set by the form.
     if (isset($node->devel_generate['domain_access'])) {
-      $values = array(
-        DOMAIN_ACCESS_FIELD => array_keys($node->devel_generate['domain_access']),
-      );
+      $selection = array_filter($node->devel_generate['domain_access']);
+      if (isset($selection['random-selection'])) {
+        $domains = \Drupal::service('domain.loader')->loadMultiple();
+        $values[DOMAIN_ACCESS_FIELD] = array_rand($domains, ceil(rand(1, count($domains))));
+      }
+      else {
+        $values[DOMAIN_ACCESS_FIELD] = array_keys($selection);
+      }
     }
-    // Else set randomly.
-    else {
-      $domains = \Drupal::service('domain.loader')->loadMultiple();
-      $values = array(
-        DOMAIN_ACCESS_FIELD => array_rand($domains, ceil(rand(1, count($domains)))),
-      );
+    if (isset($node->devel_generate['domain_all'])) {
+      $selection = $node->devel_generate['domain_all'];
+      if ($selection == 'random-selection') {
+        $values[DOMAIN_ACCESS_ALL_FIELD] = rand(0, 1);
+      }
+      else {
+        $values[DOMAIN_ACCESS_ALL_FIELD] = ($selection = 'yes' ? 1 : 0);
+      }
     }
-    $node->setPropertyValues($values);
+    foreach ($values as $name => $value) {
+      $node->set($name, $value);
+    }
   }
 }
 
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function domain_access_form_devel_generate_content_form_alter(&$form, &$form_state, $form_id) {
+function domain_access_form_devel_generate_form_content_alter(&$form, &$form_state, $form_id) {
   // Add our element to the devel generate form.
   $form['submit']['#weight'] = 10;
-  $list = \Drupal::service('domain.loader')->loadOptionsList();
+  $list = ['random-selection' => t('Random selection')];
+  $list += \Drupal::service('domain.loader')->loadOptionsList();
   $form['domain_access'] = array(
     '#title' => t('Domains'),
-    '#type' => 'select',
+    '#type' => 'checkboxes',
     '#options' => $list,
     '#weight' => 2,
     '#multiple' => TRUE,
     '#size' => count($list) > 5 ? 5 : count($list),
-    '#default_value' => array(\Drupal::service('domain.negotiator')->getActiveId()),
+    '#default_value' => ['random-selection'],
+    '#description' => t('Sets the domains for created nodes. Random selection overrides other choices.'),
+  );
+  $form['domain_all'] = array(
+    '#title' => t('Send to all affiliates'),
+    '#type' => 'radios',
+    '#options' => [
+      'random-selection' => t('Random selection'),
+      'yes' => t('Yes'),
+      'no' => t('No'),
+    ],
+    '#default_value' => 'random-selection',
+    '#weight' => 3,
+    '#description' => t('Sets visibility across all affiliates.'),
   );
 }
 
