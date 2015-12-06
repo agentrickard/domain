@@ -92,7 +92,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
         $config_name = $this->getDomainConfigName($name, $this->domain);
         // Check to see if the config storage has an appropriately named file
         // containing override data.
-        if ($override = $this->storage->read($config_name)) {
+        if ($override = $this->storage->read($config_name['langcode'])) {
+          $overrides[$name] = $override;
+        }
+        // Check to see if we have a file without a specific language.
+        elseif ($override = $this->storage->read($config_name['domain'])) {
           $overrides[$name] = $override;
         }
       }
@@ -111,11 +115,14 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * @param \Drupal\domain\DomainInterface $domain
    *   The domain object.
    *
-   * @return string
-   *   The domain-specific config name.
+   * @return array
+   *   The domain-language, and domain-specific config names.
    */
   public function getDomainConfigName($name, DomainInterface $domain) {
-    return 'domain.config.' . $domain->id() . '.' . $this->language->getId() . '.' . $name;
+    return [
+      'langcode' => 'domain.config.' . $domain->id() . '.' . $this->language->getId() . '.' . $name,
+      'domain' => 'domain.config.' . $domain->id() . '.' . $name,
+    ];
   }
 
   /**

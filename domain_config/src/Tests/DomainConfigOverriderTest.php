@@ -7,6 +7,8 @@
 
 namespace Drupal\domain_config\Tests;
 
+use Drupal\domain_config\Tests\DomainConfigTestBase;
+
 /**
  * Tests the domain config system.
  *
@@ -15,22 +17,18 @@ namespace Drupal\domain_config\Tests;
 class DomainConfigOverriderTest extends DomainConfigTestBase {
 
   /**
-   * Disabled config schema checking because Domain Config actually duplicates
-   * schemas provided by other modules, so cannot define its own.
-   */
-  protected $strictConfigSchema = FALSE;
-
-  /**
    * Tests that domain-specific variable loading works.
    */
   function testDomainConfigOverrider() {
     // No domains should exist.
     $this->domainTableIsEmpty();
     // Create four new domains programmatically.
-    $this->domainCreateTestDomains(4);
+    $this->domainCreateTestDomains(5);
+    // Get the domain list.
+    $domains = \Drupal::service('domain.loader')->loadMultiple();
     // Except for the default domain, the page title element should match what
     // is in the override files.
-    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+    foreach ($domains as $domain) {
       $path = $domain->getPath();
       $this->drupalGet($path);
       if ($domain->isDefault()) {
@@ -38,6 +36,20 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
       }
       else {
         $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
+      }
+    }
+    // Now set a language context. Based on how we have our files setup, we
+    // expect the following outcomes:
+    //  example.com name = 'Drupal' for English, 'Drupal' for Spanish.
+    //  one.example.com name = 'One' for English, 'Drupal' for Spanish.
+    //  two.example.com name = 'Two' for English, 'Dos' for Spanish.
+    //  three.example.com name = 'Three' for English, 'Drupal' for Spanish.
+    //  four.example.com name = 'Four' for English, 'Four' for Spanish.
+    $languages = array_merge(['en'], $this->langcodes);
+    foreach ($languages as $langcode) {
+      foreach ($domains as $domain) {
+        $path = $domain->getPath() . $langcode;
+        $this->drupalGet($path);
       }
     }
 
