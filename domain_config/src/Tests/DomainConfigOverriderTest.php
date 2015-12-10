@@ -45,14 +45,46 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     //  two.example.com name = 'Two' for English, 'Dos' for Spanish.
     //  three.example.com name = 'Three' for English, 'Drupal' for Spanish.
     //  four.example.com name = 'Four' for English, 'Four' for Spanish.
-    $languages = array_merge(['en'], $this->langcodes);
-    foreach ($languages as $langcode) {
-      foreach ($domains as $domain) {
-        $path = $domain->getPath() . $langcode;
-        $this->drupalGet($path);
+    foreach ($domains as $domain) {
+      $path = $domain->getPath();
+      $this->drupalGet($path);
+      if ($domain->isDefault()) {
+        $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
+      }
+      else {
+        $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
+      }
+      $path = $domain->getPath() . 'es';
+      $this->drupalGet($path);
+      if ($domain->isDefault()) {
+        $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
+      }
+      else {
+        $this->assertRaw('<title>Log in | ' . $this->expectedName($domain) . '</title>', 'Loaded the proper site name.');
       }
     }
 
+  }
+
+  /**
+   * Returns the expected site name value from our test configuration.
+   *
+   * @return string
+   */
+  private function expectedName($domain) {
+    switch ($domain->id()) {
+      case 'one_example_com':
+      case 'three_example_com':
+        $name = 'Drupal';
+        break;
+      case 'two_example_com':
+        $name = 'Dos';
+        break;
+      case 'four_example_com':
+        $name = 'Four';
+        break;
+    }
+    return $name;
   }
 
 }

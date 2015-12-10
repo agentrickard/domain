@@ -35,17 +35,27 @@ abstract class DomainConfigTestBase extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('language', 'domain_config_test');
+  public static $modules = array('domain', 'language', 'domain_config_test', 'domain_config');
 
   /**
    * Test setup.
    */
   function setUp() {
     parent::setUp();
-    // Add languages.
+    // Add languages. If we use the createFromLangcode() method, it causes a
+    // circular dependency.
     foreach ($this->langcodes as $langcode) {
-      ConfigurableLanguage::createFromLangcode($langcode)->save();
+      $values = [
+        'id' => $langcode,
+        'label' => $langcode,
+      ];
+      \Drupal::entityManager()->getStorage('configurable_language')->create($values);
     }
+    // In order to reflect the changes for a multilingual site in the container
+    // we have to rebuild it.
+    $this->rebuildContainer();
+    $es = ConfigurableLanguage::load('es');
+    $this->assertTrue(!empty($es));
     // Let anon users see content.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
   }
