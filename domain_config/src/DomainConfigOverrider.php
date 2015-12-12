@@ -8,10 +8,8 @@
 namespace Drupal\domain_config;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 
@@ -28,13 +26,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $domainNegotiator;
-
-  /**
-   * The configuration storage service.
-   *
-   * @var \Drupal\Core\Config\ConfigFactory
-   */
-  protected $configFactory;
 
   /**
    * A storage controller instance for reading and writing configuration data.
