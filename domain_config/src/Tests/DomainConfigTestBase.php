@@ -9,6 +9,7 @@ namespace Drupal\domain_config\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Helper test methods for Domain Config testing.
@@ -28,7 +29,7 @@ abstract class DomainConfigTestBase extends DomainTestBase {
    *
    * @var array
    */
-  protected $langcodes = array('es');
+  protected $langcodes = array('es' => 'Spanish');
 
   /**
    * Modules to enable.
@@ -42,20 +43,16 @@ abstract class DomainConfigTestBase extends DomainTestBase {
    */
   function setUp() {
     parent::setUp();
-    // Add languages. If we use the createFromLangcode() method, it causes a
-    // circular dependency.
-    foreach ($this->langcodes as $langcode) {
-      $values = [
-        'id' => $langcode,
-        'label' => $langcode,
-      ];
-      \Drupal::entityManager()->getStorage('configurable_language')->create($values);
+
+    // Add languages.
+    foreach ($this->langcodes as $langcode => $label) {
+      ConfigurableLanguage::createFromLangcode($langcode)->save();
     }
     // In order to reflect the changes for a multilingual site in the container
     // we have to rebuild it.
     $this->rebuildContainer();
-    $es = ConfigurableLanguage::load('es');
-    $this->assertTrue(!empty($es));
+    $es = \Drupal::entityManager()->getStorage('configurable_language')->load('es');
+    $this->assertTrue(!empty($es), 'Created test language.');
     // Let anon users see content.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
   }

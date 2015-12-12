@@ -54,13 +54,15 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
       else {
         $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
       }
-      $path = $domain->getPath() . 'es';
-      $this->drupalGet($path);
-      if ($domain->isDefault()) {
-        $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
-      }
-      else {
-        $this->assertRaw('<title>Log in | ' . $this->expectedName($domain) . '</title>', 'Loaded the proper site name.');
+      foreach ($this->langcodes as $langcode => $language) {
+        $path = $domain->getPath() . $langcode;
+        $this->drupalGet($path);
+        if ($domain->isDefault()) {
+          $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
+        }
+        else {
+          $this->assertRaw('<title>Log in | ' . $this->expectedName($domain) . '</title>', 'Loaded the proper site name.');
+        }
       }
     }
 
