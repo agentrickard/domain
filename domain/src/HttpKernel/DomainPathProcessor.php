@@ -53,8 +53,8 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
       $active_domain = $this->domainNegotiator->negotiateActiveDomain();
     }
 
-    // Only act on valid internal paths.
-    if (empty($path) || !empty($options['external'])) {
+    // Only act on valid internal paths and when a domain loads.
+    if (empty($active_domain) || empty($path) || !empty($options['external'])) {
       return $path;
     }
 
