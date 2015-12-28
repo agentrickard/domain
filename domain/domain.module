@@ -40,3 +40,12 @@ function domain_entity_load(array $entities, $entity_type) {
     }
   }
 }
+
+/**
+ * Format a nice debug message.
+ */
+function domain_debug($message) {
+  $output = '<pre>' . var_dump($message) . '</pre>';
+  print $output;
+}
+

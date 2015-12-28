@@ -418,5 +418,6 @@ function domain_access_confirm_fields($entity_type, $bundle) {
  * Implements hook_views_data_alter().
  */
 function domain_access_views_data_alter(array &$data) {
-  $data['node_field_data'][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_node';
+  $field = 'node__' . DOMAIN_ACCESS_FIELD;
+  $data[$field][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_node';
 }
