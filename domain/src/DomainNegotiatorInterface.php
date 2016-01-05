@@ -52,6 +52,6 @@ interface DomainNegotiatorInterface {
   /**
    * Gets the active domain.
    */
-  public function getActiveDomain($rest = FALSE);
+  public function getActiveDomain($reset = FALSE);
 
 }
