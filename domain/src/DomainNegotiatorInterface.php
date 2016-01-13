@@ -25,11 +25,6 @@ interface DomainNegotiatorInterface {
   public function setActiveDomain(DomainInterface $domain);
 
   /**
-   * Gets the active domain.
-   */
-  public function negotiateActiveDomain();
-
-  /**
    * Stores the inbound httpHost request.
    */
   public function setHttpHost($httpHost);

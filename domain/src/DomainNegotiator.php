@@ -102,9 +102,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Determine the active domain.
    */
-  public function negotiateActiveDomain() {
+  protected function negotiateActiveDomain() {
     $httpHost = $this->negotiateActiveHostname();
     $this->setRequestDomain($httpHost);
     return $this->domain;
