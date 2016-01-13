@@ -56,7 +56,7 @@ class DomainAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    $domain = $this->domainNegotiator->negotiateActiveDomain();
+    $domain = $this->domainNegotiator->getActiveDomain();
     // Is the domain allowed?
     // No domain, let it pass.
     if (empty($domain)) {

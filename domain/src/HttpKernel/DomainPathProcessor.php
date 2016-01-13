@@ -50,7 +50,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   public function processOutbound($path, &$options = array(), Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
     static $active_domain;
     if (!isset($active_domain)) {
-      $active_domain = $this->domainNegotiator->negotiateActiveDomain();
+      $active_domain = $this->domainNegotiator->getActiveDomain();
     }
 
     // Only act on valid internal paths and when a domain loads.
