@@ -33,6 +33,7 @@ marked with [x] are considered complete.
 - [x] Test and document cross-domain logins
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
+- [ ] Add help text to domain overview screen.
 
 # Beta
 - [x] Actions for domain operations
@@ -53,6 +54,7 @@ marked with [x] are considered complete.
   - [ ] Path matching for URL rewrites?
   - [ ] Allow non-ascii characters in domains
 - [ ] Recreate the Domain Nav module
+- [ ] Support Tour module
 
 # Final
 - [ ] Security review
