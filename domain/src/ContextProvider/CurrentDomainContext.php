@@ -13,6 +13,9 @@ use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\domain\DomainNegotiatorInterface;
 
+/**
+ * Provides a context handler for the block system.
+ */
 class CurrentDomainContext implements ContextProviderInterface {
 
   use StringTranslationTrait;
@@ -50,6 +53,7 @@ class CurrentDomainContext implements ContextProviderInterface {
     $result = [
       'current_domain' => $context,
     ];
+
     return $result;
   }
 
