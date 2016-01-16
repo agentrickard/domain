@@ -11,7 +11,7 @@ use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Controller routines for domain routes.
+ * Controller routines for AJAX callbacks for domain actions.
  */
 class DomainController {
 
@@ -28,8 +28,11 @@ class DomainController {
    *   the default, 'enable' to enable the domain record, or 'disable' to
    *   disable the domain record.
    *
+   *   Note: The delete action is handled by the entity form system.
+   *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response to redirect back to the domain record list.
+   *   Supported by the UrlGeneratorTrait.
    *
    * @see \Drupal\domain\DomainListBuilder
    */
@@ -62,6 +65,9 @@ class DomainController {
     // Set a message.
     if ($success) {
       drupal_set_message($message);
+    }
+    else {
+      drupal_set_message($this->t('The operation failed.'));
     }
 
     // Return to the invoking page.
