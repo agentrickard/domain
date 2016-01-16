@@ -5,7 +5,7 @@ Domain module for Drupal port to Drupal 8.
 
 Active branch is 8-x.1-x. Begin any forks from there.
 
-The underlying API is stable, and it's currently usable for acces control. The configuration supports manual editing. Themes should work. Views and Bulk Operations are not yet supported.
+The underlying API is stable, and it's currently usable for access control. The configuration supports manual editing. Themes should work. Views and Bulk Operations are not yet supported.
 
 Implementation Notes
 ======
