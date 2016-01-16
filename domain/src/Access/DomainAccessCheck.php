@@ -9,13 +9,14 @@ namespace Drupal\domain\Access;
 
 use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\Routing\Route;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Session\AccountInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Route;
 
+/**
+ * Provides a global access check to ensure inactive domains are restricted.
+ */
 class DomainAccessCheck implements AccessCheckInterface {
 
   /**
