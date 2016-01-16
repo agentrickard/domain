@@ -59,6 +59,7 @@ class DomainCreator implements DomainCreatorInterface {
       'is_default' => (int) empty($default),
     );
     $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
+
     return $domain;
   }
 
@@ -91,6 +92,7 @@ class DomainCreator implements DomainCreatorInterface {
     if (empty($hostname)) {
       $hostname = $this->createHostname();
     }
+    // @TODO Non ASCII-character support.
     return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
   }
 
