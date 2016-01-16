@@ -31,6 +31,7 @@ marked with [x] are considered complete.
 - [x] Support the all affiliates concept of publication
 - [x] Support the all affiliates concept for editors
 - [x] Test and document cross-domain logins
+- [ ] Ensure unique numeric ids for use with node access.
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
 - [ ] Add help text to domain overview screen.
