@@ -51,6 +51,7 @@ marked with [x] are considered complete.
   - [ ] www prefix handling
   - [ ] Add domain-specific CSS classes
   - [ ] Path matching for URL rewrites?
+  - [ ] Allow non-ascii characters in domains
 - [ ] Recreate the Domain Nav module
 
 # Final
