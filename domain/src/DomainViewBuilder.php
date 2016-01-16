@@ -7,9 +7,9 @@
 
 namespace Drupal\domain;
 
-use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 
 /**
@@ -18,7 +18,7 @@ use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 class DomainViewBuilder extends EntityViewBuilder {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityViewBuilder::buildContent().
+   * @inheritdoc
    */
   public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
     // If we can get domain_field_extra_fields() working here, we may not even
