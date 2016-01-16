@@ -62,4 +62,5 @@ marked with [x] are considered complete.
 - [ ] Security review
 - [ ] Provide an upgrade path from 6.x
 - [ ] Provide an upgrade path from 7.x-3.x
+- [ ] Remove calls to deprecated methods / classes
 
