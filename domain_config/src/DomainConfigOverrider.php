@@ -7,13 +7,14 @@
 
 namespace Drupal\domain_config;
 
+use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
+use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain\DomainInterface;
+
 
 /**
  * Domain-specific config overrides.
@@ -22,6 +23,7 @@ use Drupal\domain\DomainInterface;
  * this might be improved.
  */
 class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
+
   /**
    * The domain negotiator.
    *
