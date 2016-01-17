@@ -59,6 +59,7 @@ marked with [x] are considered complete.
 - [ ] Support Tour module
 - [ ] Allow selective access to domain record editing
 - [ ] Allow access to actions based on assigned domain permissions
+- [ ] Implement theme functions or twig templates where proper
 
 # Final
 - [ ] Security review
