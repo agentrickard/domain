@@ -8,12 +8,12 @@
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
 use Drupal\Core\Database\Query\SelectInterface;
-use Drupal\user\Entity\User;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\Entity\User;
 
 /**
- * Provides specific access control for the domain entity type.
+ * Provides entity reference selections for the domain entity type.
  *
  * @EntityReferenceSelection(
  *   id = "default:domain",
