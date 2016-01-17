@@ -7,19 +7,11 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\domain\DomainLoaderInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 
 class DomainLoader implements DomainLoaderInterface {
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * The typed config handler.
@@ -31,13 +23,12 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * Constructs a DomainLoader object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
+   * @TODO: Trying to inject the storage manager threw an exception.
+   *
    * @param Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed config handler.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, TypedConfigManagerInterface $typed_config) {
-    $this->moduleHandler = $module_handler;
+  public function __construct(TypedConfigManagerInterface $typed_config) {
     $this->typedConfig = $typed_config;
   }
 

@@ -9,18 +9,18 @@ namespace Drupal\domain\Controller;
 
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Sets a base class for injecting domain information into controllers.
  *
  * This class is useful in cases where your controller needs to respond to
- * a domain argument. Drupal doesn't allow that natively, so we use this base
+ * a domain argument. Drupal doesn't do that natively, so we use this base
  * class to allow router arguments to be passed a domain object.
  *
- * @see \Drupal\domainController\DomainController
+ * @see \Drupal\domain_alias\Controller\DomainAliasController
  */
 class DomainControllerBase extends ControllerBase {
 

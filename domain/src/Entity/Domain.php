@@ -142,7 +142,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   protected $redirect = NULL;
 
   /**
-   * {@inheritdoc}
+   * Overrides Drupal\Core\Entity\Entity:preCreate().
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
@@ -286,7 +286,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::preSave().
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.

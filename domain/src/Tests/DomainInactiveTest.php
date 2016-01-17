@@ -6,10 +6,12 @@
  */
 
 namespace Drupal\domain\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
- * Tests the redirects for inactive domains.
+ * Tests the access rules and redirects for inactive domains.
  *
  * @group domain
  */

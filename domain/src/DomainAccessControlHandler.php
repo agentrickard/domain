@@ -8,10 +8,8 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Language\Language;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\Entity;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -36,7 +34,8 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
     if ($operation == 'update' && $account->hasPermission('edit assigned domains')) {
       return AccessResult::allowed();
     }
-    if ($operation == 'delete' && $account->hasPermission('edit assigned domains')) {
+    // @TODO: assign users to domains and check.
+    if ($operation == 'delete' && $account->hasPermission('delete assigned domains')) {
       return AccessResult::allowed();
     }
     return AccessResult::forbidden();

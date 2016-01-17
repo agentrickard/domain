@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\domain\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain record entity reference field type.
@@ -110,7 +112,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
   /**
    * Creates a simple field for testing on the article content type.
    *
-   * @TODO: This code is a model for auto-creation of fields.
+   * Note: This code is a model for auto-creation of fields.
    */
   function domainCreateTestField() {
     $label = 'domain';

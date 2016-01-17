@@ -45,7 +45,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   }
 
   /**
-   * Implements Drupal\Core\PathProcessor\OutboundPathProcessorInterface::processOutbound().
+   * @inheritdoc
    */
   public function processOutbound($path, &$options = array(), Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
     static $active_domain;
@@ -61,6 +61,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
     $source = NULL;
     $options['active_domain'] = $active_domain;
 
+    // @TODO: Is this actually more performant?
     // One hook for nodes.
     if (isset($options['entity_type']) && $options['entity_type'] == 'node') {
       $this->moduleHandler->alter('domain_source', $source, $path, $options);
