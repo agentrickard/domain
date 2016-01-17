@@ -62,6 +62,7 @@ marked with [x] are considered complete.
 - [ ] Allow access to actions based on assigned domain permissions
 - [ ] Implement theme functions or twig templates where proper
 - [ ] Tests for all module hooks
+- [ ] Proper tests for domain record validation
 
 # Final
 - [ ] Security review
