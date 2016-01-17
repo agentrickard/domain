@@ -9,9 +9,9 @@ namespace Drupal\domain_access;
 
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Checks the access status of entities based on domain settings.
@@ -36,7 +36,7 @@ interface DomainAccessManagerInterface {
    * @param Drupal\Core\Entity\EntityInterface
    *   The entity to retrieve field data from.
    *
-   * return boolean
+   * @return boolean
    */
   public function getAllValue(EntityInterface $entity);
 
@@ -48,7 +48,7 @@ interface DomainAccessManagerInterface {
    * @param Drupal\Core\Session\AccountInterface
    *   The account of the user performing the action.
    *
-   * return boolean
+   * @return boolean
    */
   public function checkEntityAccess(EntityInterface $entity, AccountInterface $account);
 
