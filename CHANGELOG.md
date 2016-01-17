@@ -35,6 +35,7 @@ marked with [x] are considered complete.
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
 - [ ] Add help text to domain overview screen.
+- [ ] Finish the path alter behavior
 
 # Beta
 - [x] Actions for domain operations
