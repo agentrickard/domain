@@ -7,6 +7,8 @@
 
 namespace Drupal\domain_config\Tests;
 
+use Drupal\domain_config\Tests\DomainConfigTestBase;
+
 /**
  * Tests the domain config system.
  *
@@ -40,7 +42,6 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
         $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
       }
     }
-
   }
 
 }
