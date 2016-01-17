@@ -57,7 +57,8 @@ marked with [x] are considered complete.
   - [ ] Allow non-ascii characters in domains
 - [ ] Recreate the Domain Nav module
 - [ ] Support Tour module
-- [ ] Allow selective access to domain record editing.
+- [ ] Allow selective access to domain record editing
+- [ ] Allow access to actions based on assigned domain permissions
 
 # Final
 - [ ] Security review
