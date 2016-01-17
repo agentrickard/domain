@@ -30,6 +30,8 @@ class DomainAliasController extends DomainControllerBase {
     $values['domain_id'] = $domain->id();
     // @TODO: ensure that this value is present in all cases.
     $alias = \Drupal::entityManager()->getStorage('domain_alias')->create($values);
+
     return $this->entityFormBuilder()->getForm($alias);
   }
+
 }
