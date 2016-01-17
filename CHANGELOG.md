@@ -31,10 +31,10 @@ marked with [x] are considered complete.
 - [x] Support the all affiliates concept of publication
 - [x] Support the all affiliates concept for editors
 - [x] Test and document cross-domain logins
-- [ ] Ensure unique numeric ids for use with node access.
+- [ ] Ensure unique numeric ids for use with node access
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
-- [ ] Add help text to domain overview screen.
+- [ ] Add help text to domain overview screen
 - [ ] Finish the path alter behavior
 - [ ] Catalog @TODO items as issues
 
@@ -69,4 +69,4 @@ marked with [x] are considered complete.
 - [ ] Provide an upgrade path from 6.x
 - [ ] Provide an upgrade path from 7.x-3.x
 - [ ] Remove calls to deprecated methods / classes
-
+- [ ] Remove unnecessary use statements
