@@ -53,6 +53,11 @@ class DomainAliasForm extends EntityForm {
     return parent::form($form, $form_state, $alias);
   }
 
+  /**
+   * Returns a list of valid redirect options for the form.
+   *
+   * @return array
+   */
   public function redirectOptions() {
     return array(
       0 => $this->t('Do not redirect'),
@@ -98,4 +103,5 @@ class DomainAliasForm extends EntityForm {
 
     $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainID()));
   }
+
 }
