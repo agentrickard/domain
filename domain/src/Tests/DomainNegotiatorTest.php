@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\domain\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain negotation manager.
@@ -47,6 +49,8 @@ class DomainNegotiatorTest extends DomainTestBase {
 
     // Revoke the permission change
     user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('view domain information'));
+
+    // @TODO: Any other testing needed here?
 
   }
 
