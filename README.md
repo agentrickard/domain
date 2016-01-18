@@ -9,7 +9,7 @@ The underlying API is stable, and it's currently usable for access control.
 The configuration supports manual editing. Themes should work. Views and Bulk
 Operations are not yet supported.
 
-For a complete feature status list, see [CHANGELOG.md](https://github.com/agentrickard/domain/blob/8.x-1.x/CHANGELOG.txt)
+For a complete feature status list, see [CHANGELOG.md](https://github.com/agentrickard/domain/blob/8.x-1.x/CHANGELOG.md)
 
 Implementation Notes
 ======
