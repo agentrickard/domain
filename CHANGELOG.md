@@ -36,7 +36,7 @@ marked with [x] are considered complete.
 - [ ] Recreate the Domain Content module with bulk operations
 - [ ] Add help text to domain overview screen
 - [ ] Finish the path alter behavior
-- [ ] Catalog @TODO items as issues
+- [x] Catalog @TODO items as issues
 
 # Beta
 - [x] Actions for domain operations
