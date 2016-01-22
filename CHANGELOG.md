@@ -35,6 +35,7 @@ marked with [x] are considered complete.
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
 - [ ] Add help text to domain overview screen
+- [ ] Use domain source for path rewrites
 - [ ] Finish the path alter behavior
 - [x] Catalog @TODO items as issues
 
@@ -74,7 +75,6 @@ marked with [x] are considered complete.
 - [ ] Make all affiliates default value configurable?
 - [ ] Cache in the DomainAccessManager
 - [ ] Remove deprecated `entity_get_form_display`
-- [ ] Use domain source for path rewrites
 - [ ] Review drupalUserIsLoggedIn() hack
 - [ ] Review DomainNegotiatorTest for completeness
 - [ ] Review core note in DomainEntityReferenceTest
