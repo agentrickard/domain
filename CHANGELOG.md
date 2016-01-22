@@ -47,7 +47,7 @@ marked with [x] are considered complete.
 - [ ] Advanced drush integration / complete labelled tasks
 - [ ] Check domain responses on configuration forms
 - [ ] Handle site name overrides -- perhaps as a new field?
-- [ ] Restore the domain_grant_all permission?
+- [ ] Restore the `domain_grant_all` permission?
 - [ ] Domain token support
 - [ ] Test cron handling
 - [ ] Module configurations
@@ -63,6 +63,29 @@ marked with [x] are considered complete.
 - [ ] Implement theme functions or twig templates where proper
 - [ ] Tests for all module hooks
 - [ ] Proper tests for domain record validation
+- [ ] Check test logic in testDomainAliasNegotiator()
+- [ ] Test that sort logic in DomainAliasLoader matches what is documented
+- [ ] Error handling in DomainAliasForm
+- [ ] Error checking in DomainAliasController
+- [ ] Deprecated methods in DomainAliasController
+- [ ] Error reporting in `domain_alias_domain_request_alter()`
+- [ ] Ensure completeness of DomainAccessPermissionsTest
+- [ ] Check module setup behavior in tests
+- [ ] Make all affiliates default value configurable?
+- [ ] Cache in the DomainAccessManager
+- [ ] Remove deprecated `entity_get_form_display`
+- [ ] Use domain source for path rewrites
+- [ ] Review drupalUserIsLoggedIn() hack
+- [ ] Review DomainNegotiatorTest for completeness
+- [ ] Review core note in DomainEntityReferenceTest
+- [ ] Expand DomainActionsTest
+- [ ] DomainViewBuilder review
+- [ ] Dependency Injection in DomainValidator
+- [ ] Caching strategies in DomainNegotiator
+- [ ] Replace / inject the storage manager in DomainAliasLoader.
+- [ ] Replace / inject the storage manager in DomainLoader.
+- [ ] Inject the module handler service in DomainListBuilder::getOperations()
+- [ ] `drush_domain_generate_domains()` has odd counting logic
 
 # Final
 - [ ] Security review
