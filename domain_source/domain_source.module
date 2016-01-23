@@ -32,7 +32,6 @@ function domain_source_confirm_fields($entity_type, $bundle) {
       'bundle' => $bundle,
       'required' => FALSE,
       'description' => 'Select the canonical domain for this content.',
-    #  'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
       'settings' => array(
         'handler_settings' => array(
           'sort' => array('field' => 'weight', 'direction' => 'ASC'),
@@ -48,7 +47,7 @@ function domain_source_confirm_fields($entity_type, $bundle) {
   // test fails.
   entity_get_form_display($entity_type, $bundle, 'default')
     ->setComponent(DOMAIN_SOURCE_FIELD, array(
-      'type' => 'options_buttons',
+      'type' => 'options_select',
       'weight' => 40,
     ))
     ->save();
