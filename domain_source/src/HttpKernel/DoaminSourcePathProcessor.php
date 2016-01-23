@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains Drupal\domain\HttpKernel\DomainPathProcessor.
+ * Contains Drupal\domain_source\HttpKernel\DomainSourcePathProcessor.
  */
 
-namespace Drupal\domain\HttpKernel;
+namespace Drupal\domain_source\HttpKernel;
 
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiatorInterface;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Processes the outbound path using path alias lookups.
  */
-class DomainPathProcessor implements OutboundPathProcessorInterface {
+class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
 
   /**
    * @var \Drupal\domain\DomainNegotiatorInterface
@@ -32,7 +32,7 @@ class DomainPathProcessor implements OutboundPathProcessorInterface {
   protected $moduleHandler;
 
   /**
-   * Constructs a DomainPathProcessor object.
+   * Constructs a DomainSourcePathProcessor object.
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator service.
