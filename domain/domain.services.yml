@@ -24,11 +24,6 @@ services:
     tags:
       - { name: persist }
     arguments: ['@request_stack', '@module_handler', '@domain.loader']
-  domain.path_processor:
-    class: Drupal\domain\HttpKernel\DomainPathProcessor
-    arguments: ['@domain.negotiator', '@module_handler']
-    tags:
-      - { name: path_processor_outbound, priority: 200 }
   domain.subscriber:
     class: Drupal\domain\EventSubscriber\DomainSubscriber
     tags:
