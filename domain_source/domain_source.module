@@ -11,6 +11,11 @@
 define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
 
 /**
+ * Defines a constant to tell domain source not to rewrite links.
+ */
+define('DOMAIN_SOURCE_USE_ACTIVE', -5);
+
+/**
  * Creates our fields for an entity bundle.
  *
  * @param $entity_type
@@ -30,7 +35,7 @@ function domain_source_confirm_fields($entity_type, $bundle) {
       'entity_type' => $entity_type,
       'label' => 'Domain Source',
       'bundle' => $bundle,
-      'required' => TRUE,
+      'required' => FALSE,
       'description' => 'Select the canonical domain for this content.',
     #  'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
       'settings' => array(
