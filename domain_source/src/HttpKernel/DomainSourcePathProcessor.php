@@ -91,7 +91,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     if (!empty($source)) {
       $options['base_url'] = $source->getPath();
       $options['absolute'] = TRUE;
-      // @TODO: we may need the port-checking code from PathProcessorLanguage.
     }
     return $path;
   }
