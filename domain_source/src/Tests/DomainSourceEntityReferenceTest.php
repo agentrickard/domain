@@ -9,6 +9,7 @@ namespace Drupal\domain_source\Tests;
 
 use Drupal\domain\DomainInterface;
 use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Core\Url;
 
 /**
  * Tests the domain source entity reference field type.
@@ -98,6 +99,10 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $this->assertTrue($value == $two, 'Node saved with proper source record.');
 
     // @TODO: Test the url.
+    drupal_flush_all_caches();
+    $url = new Url('entity.node.canonical', array('node' => 1));
+    // Returns node/1 but doesn't trigger the path processor? Why?
+    debug($url->toString());
 
     // Try to post a node, assigned to no domain.
     $edit['title[0][value]'] = 'Test node';
@@ -108,8 +113,9 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Check that the value is set.
     $value = domain_source_get($node);
     $this->assertNull($value, 'Node saved with proper source record.');
-    // @TODO: Test the url.
 
+    // @TODO: Test the url.
+    $this->drupalGet('node');
   }
 
 }
