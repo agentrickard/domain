@@ -5,6 +5,12 @@
  * Domain-based path rewrites for content.
  */
 
+use Drupal\domain\DomainNegotiator;
+use Drupal\domain\DomainInterface;
+use Drupal\node\NodeInterface;
+use Drupal\node\Entity\NodeType;
+use Drupal\Core\Entity\EntityInterface;
+
 /**
  * Defines the name of the source domain field.
  */

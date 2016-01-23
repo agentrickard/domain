@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\domain_source\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain source entity reference field type.
@@ -57,7 +59,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
    * Tests the storage of the domain source field.
    */
   function testDomainSourceFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array('bypass node source', 'administer content types', 'administer node fields', 'administer node display', 'administer domains', 'publish to any domain'));
+    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.
