@@ -18,7 +18,7 @@ services:
     class: Drupal\domain\DomainLoader
     tags:
       - { name: persist }
-    arguments: ['@module_handler', '@config.typed']
+    arguments: ['@config.typed']
   domain.negotiator:
     class: Drupal\domain\DomainNegotiator
     tags:

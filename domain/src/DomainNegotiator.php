@@ -7,9 +7,9 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 

@@ -7,9 +7,9 @@
 
 namespace Drupal\domain\Tests\Condition;
 
+use Drupal\domain\DomainInterface;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\Component\Utility\SafeMarkup;
-use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain condition.
@@ -31,13 +31,12 @@ class DomainConditionTest extends DomainTestBase {
   protected $test_domain;
 
   /**
-   * A test domain that never matches the above.
+   * A test domain that never matches $test_domain.
    */
   protected $not_domain;
 
-
   /**
-   * An array of all domains.
+   * An array of all testing domains.
    */
   protected $domains;
 

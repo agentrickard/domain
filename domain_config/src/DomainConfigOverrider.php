@@ -9,11 +9,10 @@ namespace Drupal\domain_config;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactory;
-use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Config\StorageInterface;
 
 /**
  * Domain-specific config overrides.
@@ -22,6 +21,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
  * this might be improved.
  */
 class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
+
   /**
    * The domain negotiator.
    *

@@ -9,16 +9,6 @@ use Drupal\domain\DomainInterface;
 use Drupal\Core\Url;
 
 /**
- * Implements hook_help().
- */
-function domain_alias_help($path, $arg) {
-  switch ($path) {
-    case 'admin/config/domain/alias/%':
-      return 'foo';
-  }
-}
-
-/**
  * Implements hook_domain_request_alter().
  *
  * The logic in this function gives us the following matches for a request to
