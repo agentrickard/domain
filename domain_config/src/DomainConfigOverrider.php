@@ -118,7 +118,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    // TODO check with full caching enabled
     $suffix = $this->domain ? $this->domain->id() : '';
     $suffix .= $this->language ? $this->language->getId() : '';
     return ($suffix) ? $suffix : NULL;
