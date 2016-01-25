@@ -7,11 +7,11 @@
 
 namespace Drupal\domain_config;
 
+use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\domain\DomainInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
-use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\StorageInterface;
 
 /**
