@@ -9,6 +9,7 @@ namespace Drupal\domain;
 
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 
 class DomainLoader implements DomainLoaderInterface {
@@ -18,14 +19,14 @@ class DomainLoader implements DomainLoaderInterface {
    *
    * @var \Drupal\Core\Config\TypedConfigManagerInterface
    */
-  protected $typed_config;
+  protected $typedConfig;
 
   /**
    * Constructs a DomainLoader object.
    *
    * @TODO: Trying to inject the storage manager threw an exception.
    *
-   * @param Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed config handler.
    */
   public function __construct(TypedConfigManagerInterface $typed_config) {
@@ -127,5 +128,4 @@ class DomainLoader implements DomainLoaderInterface {
   public function sort($a, $b) {
     return $a->getWeight() > $b->getWeight();
   }
-
 }
