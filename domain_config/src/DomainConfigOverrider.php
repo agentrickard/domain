@@ -10,7 +10,6 @@ namespace Drupal\domain_config;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -18,7 +17,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
 /**
  * Domain-specific config overrides.
  *
- * See \Drupal\language\Config\LanguageConfigFactoryOverride for ways
+ * @see \Drupal\language\Config\LanguageConfigFactoryOverride for ways
  * this might be improved.
  */
 class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
@@ -29,13 +28,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $domainNegotiator;
-
-  /**
-   * The configuration storage service.
-   *
-   * @var \Drupal\Core\Config\ConfigFactory
-   */
-  protected $configFactory;
 
   /**
    * A storage controller instance for reading and writing configuration data.
@@ -55,7 +47,9 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   protected $language;
 
   /**
-   * Drupal language manager
+   * Drupal language manager.
+   *
+   * Using dependency injection for this service causes a circular dependency.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
@@ -66,14 +60,11 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator service.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
-   *   The configuration storage service.
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The configuration storage engine.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, ConfigFactory $config_factory, StorageInterface $storage) {
+  public function __construct(DomainNegotiatorInterface $negotiator, StorageInterface $storage) {
     $this->domainNegotiator = $negotiator;
-    $this->configFactory = $config_factory;
     $this->storage = $storage;
   }
 
@@ -90,7 +81,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
       return $overrides;
     }
-    $this->initiateDomainAndLanguage();
+    $this->initiateContext();
     if (!empty($this->domain)) {
       foreach ($names as $name) {
         $config_name = $this->getDomainConfigName($name, $this->domain);
@@ -122,7 +113,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * @return array
    *   The domain-language, and domain-specific config names.
    */
-  public function getDomainConfigName($name, DomainInterface $domain) {
+  protected function getDomainConfigName($name, DomainInterface $domain) {
     return [
       'langcode' => 'domain.config.' . $domain->id() . '.' . $this->language->getId() . '.' . $name,
       'domain' => 'domain.config.' . $domain->id() . '.' . $name,
@@ -149,28 +140,28 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata($name) {
-    $this->initiateDomainAndLanguage();
+    $this->initiateContext();
     $metadata = new CacheableMetadata();
-    if ($this->domain) {
-      $metadata->addCacheContexts(['url.site', 'languages']);
+    if (!empty($this->domain)) {
+      $metadata->addCacheContexts(['url.site', 'languages:language_interface']);
     }
     return $metadata;
   }
 
   /**
-   * Set domain and language
+   * Sets domain and language contexts for the request.
+   *
    * We wait to do this in order to avoid circular dependencies
-   * with the locale module
+   * with the locale module.
    */
-  private function initiateDomainAndLanguage() {
-    if (empty($this->domain)) {
-      // Get the language context. Note that injecting the language manager
-      // into the service created a circular dependency error, so we load directly
-      // from the core service manager.
-      $this->languageManager = \Drupal::languageManager();
-      $this->language = $this->languageManager->getCurrentLanguage();
-      $this->domain = $this->domainNegotiator->getActiveDomain();
-    }
+  protected function initiateContext() {
+    // @TODO: Is this cacheable?
+    // Get the language context. Note that injecting the language manager
+    // into the service created a circular dependency error, so we load from
+    // the core service manager.
+    $this->languageManager = \Drupal::languageManager();
+    $this->language = $this->languageManager->getCurrentLanguage();
+    // Get the domain context.
+    $this->domain = $this->domainNegotiator->getActiveDomain();
   }
 }
-

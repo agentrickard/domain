@@ -1,6 +1,6 @@
-name: 'Two'
+name: 'Four'
 mail: admin@example.com
-slogan: 'I have it'
+slogan: ''
 page:
   403: ''
   404: ''
