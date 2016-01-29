@@ -1,0 +1,8 @@
+name: Domain Source
+description: 'Domain-based path rewrites for content.'
+type: module
+package: Domain
+version: VERSION
+core: 8.x
+dependencies:
+  - domain

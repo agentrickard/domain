@@ -6,10 +6,6 @@
  */
 
 /**
- * Standard classes and implementations.
- */
-
-/**
  * Notifies other modules that we are loading a domain record from the database.
  *
  * When using this hook, you should invoke the namespace with:
@@ -122,56 +118,5 @@ function hook_domain_references_alter($query, $account, $context) {
   if ($entity_type == 'node' && !$account->hasPermission('edit assigned domains')) {
     $default = \Drupal::service('domain.loader')->loadDefaultId();
     $query->condition('id', $default, '<>');
-  }
-}
-
-/**
- * Allows modules to specify the target link for a node.
- *
- * @param &$source
- *   A domain object or NULL if not set.
- * @param $path
- *   The outbound path request.
- * @param array $options
- *   The options for the url, as defined by
- *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface
- *
- * @return
- *   No return value; modify $source by reference.
- *
- * @TODO: This function is not stable.
- */
-function hook_domain_source_alter(&$source, $path, $options) {
-  // Taken from the Domain Source module
-  $source = domain_source_lookup($nid);
-}
-
-/**
- * Allows modules to specify the target link for a Drupal path.
- *
- * Note: This hook is not meant to be used for node paths, which
- * are handled by hook_domain_source_alter(). This hook is split
- * from hook_domain_source_alter() for better performance.
- *
- * Currently, no modules in the package implement this hook.
- *
- * @param &$source
- *   The domain array from domain_get_node_match(), passed by reference.
- * @param $path
- *   The outbound path request.
- * @param array $options
- *   The options for the url, as defined by
- *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface
- *
- * @return
- *   No return value; modify $source by reference.
- *
- * @TODO: This function is not stable.
- */
-function hook_domain_source_path_alter(&$source, $path, $options) {
-  // Always make admin links go to the primary domain.
-  $base = arg(0, $path);
-  if ($base == 'admin') {
-    $source = domain_default();
   }
 }
