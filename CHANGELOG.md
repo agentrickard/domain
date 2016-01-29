@@ -35,6 +35,7 @@ marked with [x] are considered complete.
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
 - [ ] Add help text to domain overview screen
+- [ ] Make language optional for domain overrides
 - [x] Use domain source for path rewrites
 - [x] Finish the path alter behavior
 - [x] Catalog @TODO items as issues
@@ -43,7 +44,6 @@ marked with [x] are considered complete.
 - [x] Actions for domain operations
 - [x] Drush support for domain operations
 - [ ] Restrict Domain Source options using JS
-- [ ] Make language optional for domain overrides
 - [ ] Provide a user interface for domain overrides
 - [ ] Recreate the Domain Theme module
 - [ ] Advanced drush integration / complete labelled tasks
