@@ -89,7 +89,8 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     // If a source domain is specified, rewrite the link.
     if (!empty($source)) {
-      $options['base_url'] = $source->getPath();
+      // Note that url rewrites add a leading /, which getPath() also adds.
+      $options['base_url'] = trim($source->getPath(), '/');
       $options['absolute'] = TRUE;
     }
     return $path;

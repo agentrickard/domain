@@ -9,7 +9,6 @@ namespace Drupal\domain_source\Tests;
 
 use Drupal\domain\DomainInterface;
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\Core\Url;
 
 /**
  * Tests the domain source entity reference field type.
@@ -84,6 +83,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
       }
       if (!isset($two)) {
         $two = $domain->id();
+        $two_path = $domain->getPath();
       }
     }
     $this->assertRaw('value="_none"', 'Found the _none_ option.');
@@ -98,11 +98,11 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $value = domain_source_get($node);
     $this->assertTrue($value == $two, 'Node saved with proper source record.');
 
-    // @TODO: Test the url.
-    drupal_flush_all_caches();
-    $url = new Url('entity.node.canonical', array('node' => 1));
-    // Returns node/1 but doesn't trigger the path processor? Why?
-    debug($url->toString());
+    // Test the URL.
+    $url = $node->toUrl()->toString();
+    $expected_url = $two_path . 'node/1';
+    $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
+
 
     // Try to post a node, assigned to no domain.
     $edit['title[0][value]'] = 'Test node';
@@ -114,8 +114,10 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $value = domain_source_get($node);
     $this->assertNull($value, 'Node saved with proper source record.');
 
-    // @TODO: Test the url.
-    $this->drupalGet('node');
+    // Test the url.
+    $url = $node->toUrl()->toString();
+    $expected_url = base_path() . 'node/2';
+    $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
   }
 
 }
