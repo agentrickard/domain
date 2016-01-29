@@ -28,18 +28,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     // Except for the default domain, the page title element should match what
     // is in the override files.
-    foreach ($domains as $domain) {
-      $path = $domain->getPath();
-      $this->drupalGet($path);
-      if ($domain->isDefault()) {
-        $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
-      }
-      else {
-        $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
-      }
-    }
-
-    // Now set a language context. Based on how we have our files setup, we
+    // With a language context, based on how we have our files setup, we
     // expect the following outcomes:
     //  example.com name = 'Drupal' for English, 'Drupal' for Spanish.
     //  one.example.com name = 'One' for English, 'Drupal' for Spanish.

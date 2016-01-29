@@ -44,13 +44,26 @@ abstract class DomainConfigTestBase extends DomainTestBase {
   function setUp() {
     parent::setUp();
 
-    // Add languages.
-    foreach ($this->langcodes as $langcode => $label) {
-      ConfigurableLanguage::createFromLangcode($langcode)->save();
-    }
+    // Create and login user.
+    $admin_user = $this->drupalCreateUser(array('administer languages', 'access administration pages'));
+    $this->drupalLogin($admin_user);
+
+    // Add language.
+    $edit = array(
+      'predefined_langcode' => 'es',
+    );
+    $this->drupalPostForm('admin/config/regional/language/add', $edit, t('Add language'));
+
+    // Enable URL language detection and selection.
+    $edit = array('language_interface[enabled][language-url]' => '1');
+    $this->drupalPostForm('admin/config/regional/language/detection', $edit, t('Save settings'));
+
+    $this->drupalLogout();
+
     // In order to reflect the changes for a multilingual site in the container
     // we have to rebuild it.
     $this->rebuildContainer();
+
     $es = \Drupal::entityManager()->getStorage('configurable_language')->load('es');
     $this->assertTrue(!empty($es), 'Created test language.');
     // Let anon users see content.

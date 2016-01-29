@@ -140,9 +140,9 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata($name) {
-    $this->initiateDomainAndLanguage();
+    $this->initiateContext();
     $metadata = new CacheableMetadata();
-    if ($this->domain) {
+    if (!empty($this->domain)) {
       $metadata->addCacheContexts(['url.site', 'languages:language_interface']);
     }
     return $metadata;
@@ -155,11 +155,12 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * with the locale module.
    */
   private function initiateContext() {
-    if (!isset($this->domain)) {
+    if (empty($this->domain)) {
       // Get the language context. Note that injecting the language manager
       // into the service created a circular dependency error, so we load from
       // the core service manager.
       $this->languageManager = \Drupal::languageManager();
+      $this->languageManager->reset();
       $this->language = $this->languageManager->getCurrentLanguage();
       $this->domain = $this->domainNegotiator->getActiveDomain();
     }
