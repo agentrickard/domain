@@ -92,7 +92,7 @@ interface DomainLoaderInterface {
   public function sort($a, $b);
 
   /**
-   * Gets the schema for domain records.
+   * Gets the entity field schema for domain records.
    *
    * @return array
    *   An array representing the field schema of the object.

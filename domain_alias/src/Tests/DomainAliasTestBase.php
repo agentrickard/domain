@@ -7,11 +7,11 @@
 
 namespace Drupal\domain_alias\Tests;
 
-use Drupal\domain\Tests\DomainTestBase;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
- * Tests the domain alias interface.
+ * Base class and helper methods for testing domain aliases.
  */
 abstract class DomainAliasTestBase extends DomainTestBase {
 
@@ -22,6 +22,9 @@ abstract class DomainAliasTestBase extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_alias');
 
+  /**
+   * @inheritdoc
+   */
   public function setUp() {
     parent::setUp();
   }
@@ -48,10 +51,11 @@ abstract class DomainAliasTestBase extends DomainTestBase {
       'pattern' => $pattern,
       'redirect' => $redirect,
     );
+    // Replicate the logic for creating machine_name patterns.
     $values['id'] = str_replace(array('*', '.'), '_', $values['pattern']);
     $alias = \Drupal::entityManager()->getStorage('domain_alias')->create($values);
-    // @TODO: test this logic.
     $alias->save();
+
     return $alias;
   }
 

@@ -73,8 +73,8 @@ interface DomainInterface extends ConfigEntityInterface {
    *
    * @return string
    *   A URL string for the current request on the requested domain. If the
-   *   current request is http://example.com/user the return would be
-   *   http://one.example.com/user.
+   *   current request is /user the return would be http://example.com/user or
+   *   http://one.example.com, depending on the current domain context.
    */
   public function getUrl();
 
@@ -93,7 +93,7 @@ interface DomainInterface extends ConfigEntityInterface {
    * Retrieves the value of the response test.
    *
    * @return int
-   *   The HTTP response code of the domain test, usually 200.
+   *   The HTTP response code of the domain test, expected to be 200.
    */
   public function getResponse();
 

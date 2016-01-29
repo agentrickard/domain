@@ -6,10 +6,12 @@
  */
 
 namespace Drupal\domain\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
- * Tests the redirects for inactive domains.
+ * Tests the access rules and redirects for inactive domains.
  *
  * @group domain
  */
@@ -23,7 +25,7 @@ class DomainInactiveTest extends DomainTestBase {
     $domain = end($domains);
     $this->drupalGet($domain->getPath());
     $this->assertTrue($domain->status(), 'Tested domain is set to active.');
-    $this->assertRaw($domain->getPath(), 'Loaded the active domain.');
+    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the active domain.');
 
     // Disable the domain and test for redirect.
     $domain->disable();
@@ -33,7 +35,7 @@ class DomainInactiveTest extends DomainTestBase {
     $this->drupalGet($domain->getPath());
 
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
-    $this->assertRaw($default->getPath(), 'Redirected an inactive domain to the default domain.');
+    $this->assertTrue($default->getPath() == $this->getUrl(), 'Redirected an inactive domain to the default domain.');
 
     // Try to access with the proper permission.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access inactive domains'));
@@ -41,7 +43,7 @@ class DomainInactiveTest extends DomainTestBase {
     // Must flush cache.
     drupal_flush_all_caches();
     $this->drupalGet($domain->getPath());
-    $this->assertRaw($domain->getPath(), 'Loaded the inactive domain with permission.');
+    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the inactive domain with permission.');
   }
 
 }

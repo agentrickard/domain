@@ -38,6 +38,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
         $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
       }
     }
+
     // Now set a language context. Based on how we have our files setup, we
     // expect the following outcomes:
     //  example.com name = 'Drupal' for English, 'Drupal' for Spanish.
@@ -65,7 +66,6 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
         }
       }
     }
-
   }
 
   /**

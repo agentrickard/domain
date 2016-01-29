@@ -11,8 +11,8 @@ use Drupal\node\NodeInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Defines the name of the node access control field.
@@ -142,6 +142,8 @@ function domain_access_node_presave(EntityInterface $node) {
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
+ * Add options for domains when using Devel Generate.
  */
 function domain_access_form_devel_generate_form_content_alter(&$form, &$form_state, $form_id) {
   // Add our element to the devel generate form.
@@ -170,26 +172,6 @@ function domain_access_form_devel_generate_form_content_alter(&$form, &$form_sta
     '#weight' => 3,
     '#description' => t('Sets visibility across all affiliates.'),
   );
-}
-
-/**
- * Implements hook_domain_source_alter().
- *
- * If this node is assigned to a domain other than current, rewrite the url
- * to point to the highest-weighted domain.
- *
- * This code is proof-of-concept and may be deprecated for Domain Source.
- */
-function domain_access_domain_source_alter(&$source, $path, $options) {
-  $node = $options['entity'];
-  $list = \Drupal::service('domain_access.manager')->getAccessValues($node);
-  // @TODO: setting to enable this rewrite, as in older versions?
-  if ($list && $domains = \Drupal::service('domain.loader')->loadMultipleSorted($list)) {
-    $first = current($domains);
-    if ($first->id() != $options['active_domain']->id()) {
-      $source = $first;
-    }
-  }
 }
 
 /**
@@ -335,19 +317,22 @@ function domain_access_form_user_form_alter(&$form, FormStateInterface $form_sta
 /**
  * Implements hook_ENTITY_TYPE_insert().
  *
- * Create our fields whern new node types are created.
+ * Creates our fields when new node types are created.
  */
 function domain_access_node_type_insert(EntityInterface $entity) {
   domain_access_confirm_fields('node', $entity->id());
 }
 
 /**
- * Creates our fields whern new node types are created.
+ * Creates our fields for an entity bundle.
  *
  * @param $entity_type
  *   The entity type being created. Node and user are supported.
  * @param $bundle
  *   The bundle being created.
+ *
+ * @see domain_access_node_type_insert()
+ * @see domain_access_install()
  */
 function domain_access_confirm_fields($entity_type, $bundle) {
   $text = [

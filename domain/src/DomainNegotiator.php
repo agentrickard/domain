@@ -7,9 +7,9 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -102,9 +102,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Determine the active domain.
    */
-  public function negotiateActiveDomain() {
+  protected function negotiateActiveDomain() {
     $httpHost = $this->negotiateActiveHostname();
     $this->setRequestDomain($httpHost);
     return $this->domain;

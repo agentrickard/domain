@@ -6,10 +6,6 @@
  */
 
 /**
- * Standard classes and implementations.
- */
-
-/**
  * Notifies other modules that we are loading a domain record from the database.
  *
  * When using this hook, you should invoke the namespace with:
