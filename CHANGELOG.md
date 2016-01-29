@@ -35,7 +35,7 @@ marked with [x] are considered complete.
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
 - [ ] Add help text to domain overview screen
-- [ ] Make language optional for domain overrides
+- [x] Make language optional for domain overrides
 - [x] Use domain source for path rewrites
 - [x] Finish the path alter behavior
 - [x] Catalog @TODO items as issues
@@ -83,6 +83,7 @@ marked with [x] are considered complete.
 - [ ] DomainViewBuilder review
 - [ ] Dependency Injection in DomainValidator
 - [ ] Caching strategies in DomainNegotiator
+- [ ] Caching strategies in DomainConfigOverrides
 - [ ] Replace / inject the storage manager in DomainAliasLoader.
 - [ ] Replace / inject the storage manager in DomainLoader.
 - [ ] Inject the module handler service in DomainListBuilder::getOperations()

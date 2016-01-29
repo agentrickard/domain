@@ -113,7 +113,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * @return array
    *   The domain-language, and domain-specific config names.
    */
-  public function getDomainConfigName($name, DomainInterface $domain) {
+  protected function getDomainConfigName($name, DomainInterface $domain) {
     return [
       'langcode' => 'domain.config.' . $domain->id() . '.' . $this->language->getId() . '.' . $name,
       'domain' => 'domain.config.' . $domain->id() . '.' . $name,
@@ -154,16 +154,14 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * We wait to do this in order to avoid circular dependencies
    * with the locale module.
    */
-  private function initiateContext() {
-    if (empty($this->domain)) {
-      // Get the language context. Note that injecting the language manager
-      // into the service created a circular dependency error, so we load from
-      // the core service manager.
-      $this->languageManager = \Drupal::languageManager();
-      $this->languageManager->reset();
-      $this->language = $this->languageManager->getCurrentLanguage();
-      $this->domain = $this->domainNegotiator->getActiveDomain();
-    }
+  protected function initiateContext() {
+    // @TODO: Is this cacheable?
+    // Get the language context. Note that injecting the language manager
+    // into the service created a circular dependency error, so we load from
+    // the core service manager.
+    $this->languageManager = \Drupal::languageManager();
+    $this->language = $this->languageManager->getCurrentLanguage();
+    // Get the domain context.
+    $this->domain = $this->domainNegotiator->getActiveDomain();
   }
 }
-
