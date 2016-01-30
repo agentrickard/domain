@@ -27,8 +27,12 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   /**
    * Constructs a DomainAliasLoader object.
    *
-   * @param Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * Trying to inject the storage manager throws an exception.
+   *
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed config handler.
+   *
+   * @see getStorage()
    */
   public function __construct(TypedConfigManagerInterface $typed_config) {
     $this->typedConfig = $typed_config;
@@ -46,7 +50,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function load($id, $reset = FALSE) {
-    $controller = \Drupal::entityManager()->getStorage('domain_alias');
+    $controller = $this->getStorage();
     if ($reset) {
       $controller->resetCache(array($id));
     }
@@ -57,7 +61,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadMultiple($ids = NULL, $reset = FALSE) {
-    $controller = \Drupal::entityManager()->getStorage('domain_alias');
+    $controller = $this->getStorage();
     if ($reset) {
       $controller->resetCache($ids);
     }
@@ -95,9 +99,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByPattern($pattern) {
-    $result = \Drupal::entityManager()
-      ->getStorage('domain_alias')
-      ->loadByProperties(array('pattern' => $pattern));
+    $result = $this->getStorage()->loadByProperties(array('pattern' => $pattern));
     if (empty($result)) {
       return NULL;
     }
@@ -113,6 +115,18 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
       return 1;
     }
     return 0;
+  }
+
+  /**
+   * Loads the storage controller.
+   *
+   * We use the loader very early in the request cycle. As a result, if we try
+   * to inject the storage container, we hit a circular dependency. Using this
+   * method at least keeps our code easier to update.
+   */
+  protected function getStorage() {
+    $storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
+    return $storage;
   }
 
 }

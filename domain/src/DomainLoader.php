@@ -60,7 +60,7 @@ class DomainLoader implements DomainLoaderInterface {
   public function loadDefaultId() {
     $result = $this->loadDefaultDomain();
     if (!empty($result)) {
-      return key($result);
+      return $result->id();
     }
     return NULL;
   }
@@ -136,4 +136,5 @@ class DomainLoader implements DomainLoaderInterface {
     $storage = \Drupal::entityTypeManager()->getStorage('domain');
     return $storage;
   }
+
 }
