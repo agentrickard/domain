@@ -1,0 +1,8 @@
+domain_config.front_override:
+  path: '/domain_config_homepage'
+  defaults:
+    _controller: '\Drupal\domain_config\Controller\HomepageOverrideController::homePage'
+    _title: Home
+  requirements:
+    _access: 'TRUE'
+

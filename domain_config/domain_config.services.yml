@@ -4,4 +4,9 @@ services:
     tags:
       - { name: config.factory.override, priority: -150}
     arguments: ['@domain.negotiator', '@config.storage']
+  domain_config.path_processor_front:
+    class: Drupal\domain_config\PathProcessor\DomainConfigPathProcessorFront
+    tags:
+      - { name: path_processor_inbound, priority: 210 }
+    arguments: ['@config.factory', '@cache.data']
 
