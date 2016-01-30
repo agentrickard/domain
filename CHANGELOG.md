@@ -31,20 +31,22 @@ marked with [x] are considered complete.
 - [x] Support the all affiliates concept of publication
 - [x] Support the all affiliates concept for editors
 - [x] Test and document cross-domain logins
-- [ ] Ensure unique numeric ids for use with node access
-- [ ] Provide common views support for attached fields
-- [ ] Recreate the Domain Content module with bulk operations
-- [ ] Add help text to domain overview screen
-- [ ] Drupal cache system makes it difficult to serve different homepage for each domain
-- [ ] Provide a user interface for domain overrides
 - [x] Make language optional for domain overrides
 - [x] Use domain source for path rewrites
 - [x] Finish the path alter behavior
 - [x] Catalog @TODO items as issues
+- [ ] Drupal cache system makes it difficult to serve different homepage for each domain
+- [ ] Ensure unique numeric ids for use with node access
+- [ ] Provide common views support for attached fields
+- [ ] Recreate the Domain Content module with bulk operations
+- [ ] Add help text to domain overview screen
+- [ ] Provide a user interface for domain overrides
 
 # Beta
 - [x] Actions for domain operations
 - [x] Drush support for domain operations
+- [x] Replace / inject the storage manager in DomainAliasLoader.
+- [x] Replace / inject the storage manager in DomainLoader.
 - [ ] Restrict Domain Source options using JS
 - [ ] Recreate the Domain Theme module
 - [ ] Advanced drush integration / complete labelled tasks
@@ -85,8 +87,6 @@ marked with [x] are considered complete.
 - [ ] Dependency Injection in DomainValidator
 - [ ] Caching strategies in DomainNegotiator
 - [ ] Caching strategies in DomainConfigOverrides
-- [ ] Replace / inject the storage manager in DomainAliasLoader.
-- [ ] Replace / inject the storage manager in DomainLoader.
 - [ ] Inject the module handler service in DomainListBuilder::getOperations()
 - [ ] `drush_domain_generate_domains()` has odd counting logic
 
