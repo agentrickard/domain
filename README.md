@@ -62,7 +62,7 @@ code without test coverage.
 I use SimpleTest, though unit tests would also be welcome -- as would kernel tests. Those
 might take longer to review.
 
-Because Domain requires varying http host requests to test, we can't normally use the Drupal
+Because Domain requires varying http host requests to test, we can't normally use the Drupal.org
 testing infrastructure. (This may change, but we are not counting on it.)
 
 To setup a proper environment locally, you need multiple or wilcard domains configured to
