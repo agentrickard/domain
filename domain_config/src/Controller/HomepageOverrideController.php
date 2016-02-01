@@ -23,8 +23,8 @@ class HomepageOverrideController {
     $server = $_SERVER;
     $request = Request::create($uri, $method = 'GET', $parameters = array(), $cookies = array(), $files = array(), $server);
     $route = $provider->getRouteCollectionForRequest($request);
-    if (!empty($route)) {
-      $callable = current(current($route));
+    if (!empty($route) && $object = $route->getIterator()) {
+      $callable = current($object);
       if ($controller = $callable->getDefault('_controller')) {
         $path_array = explode('/', trim($uri, '/'));
         $options = $callable->getOptions();
