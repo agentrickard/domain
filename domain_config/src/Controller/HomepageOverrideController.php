@@ -25,12 +25,18 @@ class HomepageOverrideController {
     $route = $provider->getRouteCollectionForRequest($request);
     if (!empty($route)) {
       $callable = current(current($route));
-      $controller = $callable->getDefault('_controller');
-      $path_array = explode('/', trim($uri, '/'));
-      $options = $callable->getOptions();
-      $response = $this->forward($controller, $request);
+      if ($controller = $callable->getDefault('_controller')) {
+        $path_array = explode('/', trim($uri, '/'));
+        $options = $callable->getOptions();
+        $response = $this->forward($controller, $request);
+      }
     }
-    return $response;
+    if (!empty($response)) {
+      return $response;
+    }
+    else {
+      $response = new Response('An error has occured loading the page.');
+    }
   }
 
 
