@@ -35,7 +35,7 @@ class DomainHooksTest extends DomainTestBase {
     $this->domainCreateTestDomains();
 
     // Check the created domain based on it's known id value.
-    $key = \Drupal::service('domain.creator')->createMachineName();
+    $key = 'example_com';
 
     $domain = \Drupal::service('domain.loader')->load($key);
 
