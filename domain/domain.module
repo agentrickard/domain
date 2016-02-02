@@ -8,6 +8,7 @@
 use Drupal\domain\DomainInterface;
 use Drupal\domain\Entity\Domain;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Implements hook_entity_bundle_info().
@@ -38,5 +39,27 @@ function domain_entity_load(array $entities, $entity_type) {
       $domain->setPath();
       $domain->setUrl();
     }
+  }
+}
+
+/**
+ * Implements hook_help().
+ */
+function domain_help($route_name, RouteMatchInterface $route_match) {
+
+  switch ($route_name) {
+    case 'domain.admin':
+      $domains = \Drupal::service('domain.loader')->loadMultipleSorted(NULL, TRUE);
+      foreach ($domains as $domain) {
+        if ($domain->get('is_default') == 1) {
+          $name = $domain->get('name');
+          //$name = $domain->get('hostname');
+        }
+      }
+      $output = t('<p>The following domains have been created for your site.  The currently active domain
+                   <strong>is shown in boldface</strong>.  You may click on a domain to change the currently active domain.
+                   Your default domain is :name, which will be used for all requests that fail to resolve to a registered
+                   domain.</p>', array(':name' => $name));
+      return $output;
   }
 }
