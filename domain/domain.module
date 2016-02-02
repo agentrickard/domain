@@ -9,7 +9,6 @@ use Drupal\domain\DomainInterface;
 use Drupal\domain\Entity\Domain;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Config\Config;
 
 /**
  * Implements hook_entity_bundle_info().
