@@ -49,17 +49,10 @@ function domain_help($route_name, RouteMatchInterface $route_match) {
 
   switch ($route_name) {
     case 'domain.admin':
-      $domains = \Drupal::service('domain.loader')->loadMultipleSorted(NULL, TRUE);
-      foreach ($domains as $domain) {
-        if ($domain->get('is_default') == 1) {
-          $name = $domain->get('name');
-          //$name = $domain->get('hostname');
-        }
-      }
       $output = t('<p>The following domains have been created for your site.  The currently active domain
                    <strong>is shown in boldface</strong>.  You may click on a domain to change the currently active domain.
                    Your default domain is :name, which will be used for all requests that fail to resolve to a registered
-                   domain.</p>', array(':name' => $name));
+                   domain.</p>', array(':name' => \Drupal::service('domain.loader')->loadDefaultDomain()->get('name')));
       return $output;
   }
 }
