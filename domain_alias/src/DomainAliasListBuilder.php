@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\domain_alias\Form\DomainAliasListBuilder.
+ * Contains \Drupal\domain_alias\DomainAliasListBuilder.
  */
 
 namespace Drupal\domain_alias;
@@ -14,6 +14,11 @@ use Drupal\Core\Entity\EntityInterface;
  * User interface for the domain alias overview screen.
  */
 class DomainAliasListBuilder extends ConfigEntityListBuilder {
+
+  /**
+   * A domain object loaded from the controller.
+   */
+  protected $domain;
 
   /**
    * {@inheritdoc}
@@ -59,5 +64,27 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
       }
     }
     return $build;
+  }
+
+  /**
+   * Loads entity IDs using a pager sorted by the entity id.
+   *
+   * @return array
+   *   An array of entity IDs.
+   */
+  protected function getEntityIds() {
+    $query = $this->getStorage()->getQuery()
+      ->condition('domain_id', $this->domain->id())
+      ->sort($this->entityType->getKey('id'));
+
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $query->pager($this->limit);
+    }
+    return $query->execute();
+  }
+
+  public function setDomain($domain) {
+    $this->domain = $domain;
   }
 }
