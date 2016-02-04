@@ -20,6 +20,8 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
 
   /**
    * Tests that domain-specific homepage loading works.
+   *
+   * @TODO: Requires https://www.drupal.org/node/2662196
    */
   function testDomainConfigHomepage() {
     // Let anon users see content.
