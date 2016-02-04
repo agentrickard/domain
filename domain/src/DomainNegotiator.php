@@ -58,11 +58,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    *   The module handler.
    */
   public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainLoaderInterface $loader) {
-    $this->httpHost = NULL;
     $this->requestStack = $requestStack;
     $this->moduleHandler = $module_handler;
     $this->domainLoader = $loader;
-    $this->domain = NULL;
   }
 
   /**
@@ -84,6 +82,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     }
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
+
     $this->moduleHandler->alter('domain_request', $domain);
 
     // We must have registered a valid id, else the request made no match.
@@ -114,7 +113,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    * {@inheritdoc}
    */
   public function getActiveDomain($reset = FALSE) {
-    if (is_null($this->domain) || $reset) {
+    if ($reset) {
       $this->negotiateActiveDomain();
     }
     return $this->domain;
