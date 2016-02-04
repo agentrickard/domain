@@ -36,7 +36,8 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     //  three.example.com name = 'Three' for English, 'Drupal' for Spanish.
     //  four.example.com name = 'Four' for English, 'Four' for Spanish.
     foreach ($domains as $domain) {
-      $path = $domain->getPath();
+      // Test the login page, because our default homepages do not exist.
+      $path = $domain->getPath() . 'user/login';
       $this->drupalGet($path);
       if ($domain->isDefault()) {
         $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
@@ -45,7 +46,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
         $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
       }
       foreach ($this->langcodes as $langcode => $language) {
-        $path = $domain->getPath() . $langcode;
+        $path = $domain->getPath() . $langcode  . '/user/login';
         $this->drupalGet($path);
         if ($domain->isDefault()) {
           $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');

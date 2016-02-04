@@ -74,7 +74,9 @@ abstract class DomainTestBase extends WebTestBase {
    * Generates a list of domains for testing.
    *
    * In my environment, I use the example.com hostname as a base. Then I name
-   * hostnames one.* two.* up to ten.
+   * hostnames one.* two.* up to ten. Note that we always use *_example_com
+   * for the machine_name (entity id) value, though the hostname can vary
+   * based on the system. This naming allows us to load test schema files.
    *
    * The script may also add test1, test2, test3 up to any number to test a
    * large number of domains.
@@ -101,23 +103,26 @@ abstract class DomainTestBase extends WebTestBase {
       if (!empty($list[$i])) {
         if ($i < 11) {
           $hostname = $list[$i] . '.' . $base_hostname;
+          $machine_name = $list[$i] . '.' . 'example.com';
           $name = ucfirst($list[$i]);
         }
         // These domains are not setup and are just for UX testing.
         else {
           $hostname = 'test' . $i . '.' . $base_hostname;
+          $machine_name = 'test' . $i . '.' . 'example.com';
           $name = 'Test ' . $i;
         }
       }
       else {
         $hostname = $base_hostname;
+        $machine_name = 'example.com';
         $name = 'Example';
       }
       // Create a new domain programmatically.
       $values = array(
         'hostname' => $hostname,
         'name' => $name,
-        'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
+        'id' => \Drupal::service('domain.creator')->createMachineName($machine_name),
       );
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
       $domain->save();

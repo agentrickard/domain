@@ -66,8 +66,6 @@ abstract class DomainConfigTestBase extends DomainTestBase {
 
     $es = \Drupal::entityManager()->getStorage('configurable_language')->load('es');
     $this->assertTrue(!empty($es), 'Created test language.');
-    // Let anon users see content.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
   }
 
 }
