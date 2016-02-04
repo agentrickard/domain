@@ -21,7 +21,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
   /**
    * Tests that domain-specific homepage loading works.
    */
-  function testDomainConfigOverrider() {
+  function testDomainConfigHomepage() {
     // Let anon users see content.
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
 
