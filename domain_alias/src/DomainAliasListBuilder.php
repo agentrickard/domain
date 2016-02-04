@@ -9,7 +9,6 @@ namespace Drupal\domain_alias;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
-use Symfony\Cmf\Component\Routing;
 
 /**
  * User interface for the domain alias overview screen.
