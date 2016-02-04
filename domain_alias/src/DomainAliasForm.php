@@ -89,6 +89,7 @@ class DomainAliasForm extends EntityForm {
     else {
       drupal_set_message($this->t('Domain alias updated.'));
     }
+    \Drupal\Core\Cache\Cache::invalidateTags(array('rendered'));
     $alias->save();
     $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainID()));
   }
