@@ -117,13 +117,8 @@ class DomainForm extends EntityForm {
     else {
       drupal_set_message($this->t('Domain record updated.'));
     }
-
-    if ($domain->isDefault()) {
-      \Drupal\Core\Cache\Cache::invalidateTags(array('rendered'));
-    }
-
+    \Drupal\Core\Cache\Cache::invalidateTags(array('rendered'));
     $domain->save();
-
     $form_state->setRedirect('domain.admin');
   }
 
