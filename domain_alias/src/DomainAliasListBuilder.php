@@ -47,11 +47,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function render() {
-
-    $current_path = \Drupal::service('path.current')->getPath();
-    $path_args = explode('/', $current_path);
-    $domain_id = array_pop($path_args);
-
+    $domain_id = \Drupal::routeMatch()->getParameter('domain');
     $build = array(
       '#theme' => 'table',
       '#header' => $this->buildHeader(),
