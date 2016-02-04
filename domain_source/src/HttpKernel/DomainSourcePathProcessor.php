@@ -65,7 +65,12 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   public function processOutbound($path, &$options = array(), Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
     static $active_domain;
     if (!isset($active_domain)) {
-      $active_domain = $this->negotiator->getActiveDomain();
+      // Ensure that the loader has run. In some tests, the kernel event has not.
+      $active = \Drupal::service('domain.negotiator')->getActiveDomain();
+      if (empty($active)) {
+        $active = \Drupal::service('domain.negotiator')->getActiveDomain(TRUE);
+      }
+      $active_domain = $active;
     }
 
     // Only act on valid internal paths and when a domain loads.
