@@ -9,6 +9,7 @@ namespace Drupal\domain_alias;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Symfony\Cmf\Component\Routing;
 
 /**
  * User interface for the domain alias overview screen.
@@ -47,6 +48,11 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function render() {
+
+    $current_path = \Drupal::service('path.current')->getPath();
+    $path_args = explode('/', $current_path);
+    $domain_id = array_pop($path_args);
+
     $build = array(
       '#theme' => 'table',
       '#header' => $this->buildHeader(),
@@ -54,8 +60,10 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
       '#empty' => $this->t('No aliases have been created for this domain.'),
     );
     foreach ($this->load() as $entity) {
-      if ($row = $this->buildRow($entity)) {
-        $build['#rows'][$entity->id()] = $row;
+      if ($entity->getDomainId() == $domain_id) {
+        if ($row = $this->buildRow($entity)) {
+          $build['#rows'][$entity->id()] = $row;
+        }
       }
     }
     return $build;
