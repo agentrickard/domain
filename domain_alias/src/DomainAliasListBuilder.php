@@ -7,6 +7,7 @@
 
 namespace Drupal\domain_alias;
 
+use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -74,7 +75,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    */
   protected function getEntityIds() {
     $query = $this->getStorage()->getQuery()
-      ->condition('domain_id', $this->domain->id())
+      ->condition('domain_id', $this->getDomainId())
       ->sort($this->entityType->getKey('id'));
 
     // Only add the pager if a limit is specified.
@@ -84,7 +85,22 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
     return $query->execute();
   }
 
-  public function setDomain($domain) {
+  /**
+   * Sets the domain context for this list.
+   *
+   * @param Drupal\domain\DomainInterface $domain
+   */
+  public function setDomain(DomainInterface $domain) {
     $this->domain = $domain;
+  }
+
+  /**
+   * Gets the domain context for this list.
+   *
+   * @return Drupal\domain\DomainInterface $domain
+   */
+  public function getDomainId() {
+    // @TODO: check for a use-case where we might need to derive the id?
+    return !empty($this->domain) ? $this->domain->id() : NULL;
   }
 }
