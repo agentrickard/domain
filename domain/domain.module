@@ -14,9 +14,9 @@ use Drupal\Core\Entity\EntityInterface;
  *
  * @see hook_domain_request_alter().
  */
-define('DOMAIN_NO_MATCH', 0);
-define('DOMAIN_EXACT_MATCH', 1);
-define('DOMAIN_ALIAS_MATCH', 2);
+define('DOMAIN_MATCH_NONE', 0);
+define('DOMAIN_MATCH_EXACT', 1);
+define('DOMAIN_MATCH_ALIAS', 2);
 
 /**
  * Implements hook_entity_bundle_info().

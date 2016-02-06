@@ -35,7 +35,7 @@ marked with [x] are considered complete.
 - [x] Use domain source for path rewrites
 - [x] Finish the path alter behavior
 - [x] Catalog @TODO items as issues
-- [ ] Drupal cache system makes it difficult to serve different homepage for each domain
+- [x] Drupal cache system makes it difficult to serve different homepage for each domain
 - [ ] Ensure unique numeric ids for use with node access
 - [ ] Provide common views support for attached fields
 - [ ] Recreate the Domain Content module with bulk operations
@@ -89,6 +89,10 @@ marked with [x] are considered complete.
 - [ ] Caching strategies in DomainConfigOverrides
 - [ ] Inject the module handler service in DomainListBuilder::getOperations()
 - [ ] `drush_domain_generate_domains()` has odd counting logic
+- [ ] Separate permissions for Domain Alias
+- [ ] Check loader logic in the DomainSource PathProcessor
+- [ ] Check loader logic in Domain Access node_access
+- [ ] Check id logic in Domain Alias list controller
 
 # Final
 - [ ] Security review
