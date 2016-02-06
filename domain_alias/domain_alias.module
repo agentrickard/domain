@@ -24,10 +24,16 @@ use Drupal\Core\Url;
  * These patterns should be sufficient for most conditions.
  */
 function domain_alias_domain_request_alter(DomainInterface &$domain) {
+  // If an exact match has loaded, do nothing.
+  if ($domain->getMatchType() == DOMAIN_MATCH_EXACT) {
+    return;
+  }
+  // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
   if ($alias = \Drupal::service('domain_alias.loader')->loadByHostname($hostname)) {
     if ($domain = \Drupal::service('domain.loader')->load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias->getPattern());
+      $domain->setMatchType(DOMAIN_MATCH_ALIAS);
       $redirect = $alias->getRedirect();
       if (!empty($redirect)) {
         $domain->setRedirect($redirect);

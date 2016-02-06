@@ -142,6 +142,11 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   protected $redirect = NULL;
 
   /**
+   * The type of match returned by the negotator.
+   */
+  protected $matchType;
+
+  /**
    * Overrides Drupal\Core\Entity\Entity:preCreate().
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
@@ -254,7 +259,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * {@inheritdoc}
    */
   public function setPath() {
-    $this->path = $this->getScheme() . $this->hostname . base_path();
+    $this->path = $this->getScheme() . $this->getHostname() . base_path();
   }
 
   /**
@@ -387,6 +392,20 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   function getWeight() {
     return $this->weight;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMatchType($match_type = DOMAIN_MATCH_EXACT) {
+    $this->matchType = $match_type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMatchType() {
+    return $this->matchType;
   }
 
 }

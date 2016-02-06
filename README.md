@@ -71,5 +71,7 @@ point to your drupal instance. I use variants of `example.com` for local tests. 
 `example.com`, though we also expect to find the subdomains `one.*, two.*, three.*, four.*, five.*`
 in most test cases. See `DomainTestBase::domainCreateTestDomains()` for the logic.
 
+When running tests, you normally need to be on the default domain.
+
 If anyone is capable of building a vagrant box to simplify testing, that would be ideal.
 
