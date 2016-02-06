@@ -183,6 +183,13 @@ interface DomainInterface extends ConfigEntityInterface {
 
   /**
    * Gets the type of record match returned by the negotiator.
+   *
+   * This value will be set by the domain negotiation routine and is not present
+   * when loading a domain record via DomainLoaderInterface.
+   *
+   * @return int
+   *
+   * @see setMatchType()
    */
   public function getMatchType();
 
