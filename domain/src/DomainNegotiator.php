@@ -69,20 +69,23 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   public function setRequestDomain($httpHost, $reset = FALSE) {
     // @TODO: Investigate caching methods.
     $this->setHttpHost($httpHost);
-    $domain = $this->domainLoader->loadByHostname($httpHost);
+    if ($domain = $this->domainLoader->loadByHostname($httpHost)) {
+      // If the load worked, set an exact match flag for the hook.
+      $domain->setMatchType(DOMAIN_EXACT_MATCH);
+    }
     // Fallback to default domain if no match.
-    if (empty($domain)) {
-      $domain = $this->domainLoader->loadDefaultDomain();
+    elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
+      $domain->setMatchType(DOMAIN_NO_MATCH);
     }
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
-    if (empty($domain)) {
+    else {
       $values = array('hostname' => $httpHost);
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
+      $domain->setMatchType(DOMAIN_NO_MATCH);
     }
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
-
     $this->moduleHandler->alter('domain_request', $domain);
 
     // We must have registered a valid id, else the request made no match.

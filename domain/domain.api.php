@@ -27,6 +27,12 @@ function hook_domain_load(array $domains) {
 /**
  * Allows modules to modify the inbound domain request.
  *
+ * When using this hook, first check $domain->getMatchType(), which returns a
+ * numeric constant indicating the type of match derived by the caller or by
+ * earlier returns of this hook (such as domain_alias_request_alter()).
+ * Use this value to determine if the request needs to be overridden. Valid
+ * types are DOMAIN_NO_MATCH, DOMAIN_EXACT_MATCH, DOMAIN_ALIAS_MATCH.
+ *
  * To issue a redirect, as in the case of Domain Alias, set a redirect
  * property to a valid response code (301 or 302).
  *
