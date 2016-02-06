@@ -41,7 +41,7 @@ function hook_domain_load(array $domains) {
  */
 function hook_domain_request_alter(DomainInterface &$domain) {
   // Add a special case to the example domain.
-  if ($domain->id() == 'example_com') {
+  if ($domain->getMatchType() == DOMAIN_EXACT_MATCH && $domain->id() == 'example_com') {
     // Do something here.
     $domain->addProperty('foo', 'Bar');
   }
