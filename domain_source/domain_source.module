@@ -1,0 +1,93 @@
+<?php
+
+/**
+ * @file
+ * Domain-based path rewrites for content.
+ */
+
+use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\node\NodeInterface;
+use Drupal\node\Entity\NodeType;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Defines the name of the source domain field.
+ */
+define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
+
+/**
+ * Creates our fields for an entity bundle.
+ *
+ * @param $entity_type
+ *   The entity type being created. Node and user are supported.
+ * @param $bundle
+ *   The bundle being created.
+ *
+ * @see domain_source_node_type_insert()
+ * @see domain_source_install()
+ */
+function domain_source_confirm_fields($entity_type, $bundle) {
+  $id = $entity_type . '.' . $bundle . '.' . DOMAIN_SOURCE_FIELD;
+
+  if (!$field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
+    $field = array(
+      'field_name' => DOMAIN_SOURCE_FIELD,
+      'entity_type' => $entity_type,
+      'label' => 'Domain Source',
+      'bundle' => $bundle,
+      'required' => FALSE,
+      'description' => 'Select the canonical domain for this content.',
+      'settings' => array(
+        'handler_settings' => array(
+          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+        ),
+      ),
+    );
+    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config->save();
+  }
+
+  // Tell the form system how to behave. Default to radio buttons.
+  // @TODO: This function is deprecated, but using the OO syntax is causing
+  // test fails.
+  entity_get_form_display($entity_type, $bundle, 'default')
+    ->setComponent(DOMAIN_SOURCE_FIELD, array(
+      'type' => 'options_select',
+      'weight' => 40,
+    ))
+    ->save();
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * @TODO: Make this possible for all entity types.
+ *
+ * Creates our fields when new node types are created.
+ */
+function domain_source_node_type_insert(EntityInterface $entity) {
+  domain_source_confirm_fields('node', $entity->id());
+}
+
+/**
+ * Returns the source domain associated to an entity.
+ *
+ * @param Drupal\Core\Entity\EntityInterface $entity
+ *   The entity to check.
+ *
+ * @return
+ *   The value assigned to the entity, either a domain id string or NULL.
+ */
+function domain_source_get(EntityInterface $entity) {
+  $source = NULL;
+  $value = $entity->get(DOMAIN_SOURCE_FIELD)->offsetGet(0);
+  if (!empty($value)) {
+    $target_id = $value->target_id;
+    if ($domain = \Drupal::service('domain.loader')->load($target_id)) {
+      $source = $domain->id();
+    }
+  }
+  return $source;
+}

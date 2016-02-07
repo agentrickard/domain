@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\domain\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests domain record validation.
@@ -17,7 +19,10 @@ class DomainValidatorTest extends DomainTestBase {
 
   /**
    * Tests that a domain response is proper.
-   * @TODO: This class needs a rewrite.
+   *
+   * @TODO: This class checks for proper responses, and should be moved to a
+   * new class. What we want to test here are the validation rules for creating
+   * a domain.
    */
   public function testDomainResponse() {
     // No domains should exist.
@@ -27,7 +32,7 @@ class DomainValidatorTest extends DomainTestBase {
     $this->domainCreateTestDomains();
 
     // Check the created domain based on it's known id value.
-    $key = \Drupal::service('domain.creator')->createMachineName();
+    $key = 'example_com';
     $domain = \Drupal::service('domain.loader')->load($key);
 
     // Our testing server should be able to acess the test PNG file.

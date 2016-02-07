@@ -6,14 +6,15 @@
  */
 
 namespace Drupal\domain\Tests;
-use Drupal\simpletest\WebTestBase;
-use Drupal\Component\Utility\Crypt;
+
 use Drupal\domain\DomainInterface;
+use Drupal\simpletest\WebTestBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Component\Utility\Crypt;
 
 /**
- * Base class with helper methods for domain tests.
+ * Base class with helper methods and setup for domain tests.
  */
 abstract class DomainTestBase extends WebTestBase {
 
@@ -69,6 +70,24 @@ abstract class DomainTestBase extends WebTestBase {
     return $edit;
   }
 
+  /**
+   * Generates a list of domains for testing.
+   *
+   * In my environment, I use the example.com hostname as a base. Then I name
+   * hostnames one.* two.* up to ten. Note that we always use *_example_com
+   * for the machine_name (entity id) value, though the hostname can vary
+   * based on the system. This naming allows us to load test schema files.
+   *
+   * The script may also add test1, test2, test3 up to any number to test a
+   * large number of domains.
+   *
+   * @param interger $count
+   *   The number of domains to create.
+   * @param $base_hostname
+   *   The root domain to use for domain creation (e.g. example.com).
+   * @param array $list
+   *   An optional list of subdomains to apply instead of the default set.
+   */
   public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
     $original_domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     if (empty($base_hostname)) {
@@ -84,23 +103,26 @@ abstract class DomainTestBase extends WebTestBase {
       if (!empty($list[$i])) {
         if ($i < 11) {
           $hostname = $list[$i] . '.' . $base_hostname;
+          $machine_name = $list[$i] . '.' . 'example.com';
           $name = ucfirst($list[$i]);
         }
         // These domains are not setup and are just for UX testing.
         else {
           $hostname = 'test' . $i . '.' . $base_hostname;
+          $machine_name = 'test' . $i . '.' . 'example.com';
           $name = 'Test ' . $i;
         }
       }
       else {
         $hostname = $base_hostname;
+        $machine_name = 'example.com';
         $name = 'Example';
       }
       // Create a new domain programmatically.
       $values = array(
         'hostname' => $hostname,
         'name' => $name,
-        'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
+        'id' => \Drupal::service('domain.creator')->createMachineName($machine_name),
       );
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
       $domain->save();
@@ -114,6 +136,8 @@ abstract class DomainTestBase extends WebTestBase {
    *
    * @param \Drupal\user\UserInterface $account
    *   The user account object to check.
+   *
+   * @return boolean
    */
   protected function drupalUserIsLoggedIn($account) {
     // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.

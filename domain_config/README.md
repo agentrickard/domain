@@ -4,8 +4,9 @@ Domain Config
 This module provides a per-domain configuration option so that you can change
 settings like the site name for each domain.
 
-By default, these settings are also language-aware.
-
+By default, these settings are also language-aware. An override may exist per
+domain, or per-language per domain, based on the prefixes used in the config
+file.
 
 Usage
 =====
@@ -13,7 +14,9 @@ Usage
 Currently, there is no user interface for changing settings, but you can load
 in new files that contain settings configuration per domain.
 
-The pattern for override files is `domain.config.DOMAIN_ID.LANGCODE.setting`.
+The pattern for override files is
+`domain.config.DOMAIN_MACHINE_NAME.LANGCODE.setting`, with the backup for
+language-insensitive files as `domain.config.DOMAIN_MACHINE_NAME.setting`.
 
 To override the site name, for instance, you have a file like the following:
 
@@ -32,8 +35,14 @@ langcode: en
 default_langcode: en
 ```
 
-We want this to apply when the domain `three.example.com` is active. Therefore,
-this file would be named `domain.config.three_example_com.en.system.site`.
+We want this to apply when the domain `three.example.com` is active and English
+is the active language. Therefore, this file would be named
+`domain.config.three_example_com.en.system.site`. If we wanted this file to
+apply whenever the domain `three.example.com` is active, we would leave off the
+language prefix: `domain.config.three_example_com.system.site`.
+
+For further examples, see the files in
+`\domain\domain_config\tests\modules\domain_config_test\config\install`.
 
 Import that file's contents at the Configuration Synchronization screen:
 `admin/config/development/configuration/single/import`
@@ -57,7 +66,8 @@ You can clone `default.services.yml` and then edit it. In that file, find:
     required_cache_contexts: ['languages:language_interface', 'theme', 'user.permissions']
 ```
 
-Edit the `required_cache_contexts` to add domain-awareness.
+Edit the `required_cache_contexts` to add domain-awareness, as indicated by the
+`url.site` parameter.
 
 ```
     required_cache_contexts: ['languages:language_interface', 'theme', 'user.permissions', 'url.site']

@@ -73,8 +73,8 @@ interface DomainInterface extends ConfigEntityInterface {
    *
    * @return string
    *   A URL string for the current request on the requested domain. If the
-   *   current request is http://example.com/user the return would be
-   *   http://one.example.com/user.
+   *   current request is /user the return would be http://example.com/user or
+   *   http://one.example.com, depending on the current domain context.
    */
   public function getUrl();
 
@@ -93,7 +93,7 @@ interface DomainInterface extends ConfigEntityInterface {
    * Retrieves the value of the response test.
    *
    * @return int
-   *   The HTTP response code of the domain test, usually 200.
+   *   The HTTP response code of the domain test, expected to be 200.
    */
   public function getResponse();
 
@@ -132,7 +132,7 @@ interface DomainInterface extends ConfigEntityInterface {
    * @return integer | NULL
    *   If numeric, the type of redirect to issue (301 or 302).
    */
-  function getRedirect();
+  public function getRedirect();
 
   /**
    * Sets a redirect on the current domain.
@@ -140,14 +140,14 @@ interface DomainInterface extends ConfigEntityInterface {
    * @param integer $code
    *   A valid HTTP redirect code (301 or 302).
    */
-  function setRedirect($code = 302);
+  public function setRedirect($code = 302);
 
   /**
    * Gets the hostname of the domain.
    *
    * @return string
    */
-  function getHostname();
+  public function getHostname();
 
   /**
    * Sets the hostname of the domain.
@@ -155,20 +155,42 @@ interface DomainInterface extends ConfigEntityInterface {
    * @param string $hostname
    *   The hostname value to set, in the format example.com.
    */
-  function setHostname($hostname);
+  public function setHostname($hostname);
 
   /**
    * Gets the numeric id of the domain record.
    *
    * @return integer
    */
-  function getDomainId();
+  public function getDomainId();
 
   /**
    * Gets the sort weight of the domain record.
    *
    * @return integer
    */
-  function getWeight();
+  public function getWeight();
+
+  /**
+   * Sets the type of record match returned by the negotiator.
+   *
+   * @param $match_type
+   *   A numeric constant indicating the type of match derived by the caller.
+   *   Use this value to determine if the request needs to be overridden. Valid
+   *   types are DOMAIN_MATCH_NONE, DOMAIN_MATCH_EXACT, DOMAIN_MATCH_ALIAS.
+   */
+  public function setMatchType($match_type = DOMAIN_MATCH_EXACT);
+
+  /**
+   * Gets the type of record match returned by the negotiator.
+   *
+   * This value will be set by the domain negotiation routine and is not present
+   * when loading a domain record via DomainLoaderInterface.
+   *
+   * @return int
+   *
+   * @see setMatchType()
+   */
+  public function getMatchType();
 
 }

@@ -17,7 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
 class DomainForm extends EntityForm {
 
   /**
-   * Overrides Drupal\Core\Entity\EntityForm::form().
+   * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
@@ -95,7 +95,7 @@ class DomainForm extends EntityForm {
   }
 
   /**
-   * Overrides \Drupal\Core\Entity\EntityForm::validate().
+   * {@inheritdoc}
    */
   public function validate(array $form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
@@ -107,7 +107,7 @@ class DomainForm extends EntityForm {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityForm::save().
+   * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
     $domain = $this->entity;
@@ -122,7 +122,7 @@ class DomainForm extends EntityForm {
   }
 
   /**
-   * Overrides Drupal\Core\Entity\EntityForm::delete().
+   * {@inheritdoc}
    */
   public function delete(array &$form, FormStateInterface $form_state) {
     $domain = $this->entity;

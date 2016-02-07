@@ -7,13 +7,16 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainValidatorInterface;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainValidatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use GuzzleHttp\Exception\RequestException;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Unicode;
+use GuzzleHttp\Exception\RequestException;
 
+/**
+ * Provides validation of domain strings against RFC standards for hostnames.
+ */
 class DomainValidator implements DomainValidatorInterface {
 
   use StringTranslationTrait;
@@ -37,9 +40,11 @@ class DomainValidator implements DomainValidatorInterface {
     $this->httpClient = \Drupal::httpClient();
   }
 
-
   /**
-   * Validates the hostname for a domain.
+   * @inheritdoc
+   *
+   * @TODO: Divide this into separate methods. Do not return Drupal-specfic
+   * responses.
    */
   public function validate(DomainInterface $domain) {
     $hostname = $domain->getHostname();
@@ -110,10 +115,7 @@ class DomainValidator implements DomainValidatorInterface {
   }
 
   /**
-   * Tests that a domain responds correctly.
-   *
-   * This is a server-level configuration test. The requested image should be
-   * returned properly.
+   * @inheritdoc
    */
   public function checkResponse(DomainInterface $domain) {
     $url = $domain->getPath() . drupal_get_path('module', 'domain') . '/tests/200.png';
@@ -133,7 +135,7 @@ class DomainValidator implements DomainValidatorInterface {
   }
 
   /**
-   * Gets the list of required fields.
+   * @inheritdoc
    */
   public function getRequiredFields() {
     return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');

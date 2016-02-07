@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\domain\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain module hook invocations.
@@ -33,7 +35,7 @@ class DomainHooksTest extends DomainTestBase {
     $this->domainCreateTestDomains();
 
     // Check the created domain based on it's known id value.
-    $key = \Drupal::service('domain.creator')->createMachineName();
+    $key = 'example_com';
 
     $domain = \Drupal::service('domain.loader')->load($key);
 
@@ -45,6 +47,8 @@ class DomainHooksTest extends DomainTestBase {
 
     // External hooks.
     $this->assertTrue($domain->foo == 'bar', 'The foo property was set to <em>bar</em> by hook_domain_load.');
+
+    // @TODO: test additional hooks.
   }
 
 }

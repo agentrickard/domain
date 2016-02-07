@@ -6,7 +6,9 @@
  */
 
 namespace Drupal\domain\Tests;
+
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain record actions.
@@ -16,7 +18,7 @@ use Drupal\domain\DomainInterface;
 class DomainActionsTest extends DomainTestBase {
 
   /**
-   * Tests bulk actions through the Views module.
+   * Tests bulk actions through the domain overview page.
    */
   function testDomainActions() {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));
@@ -30,7 +32,7 @@ class DomainActionsTest extends DomainTestBase {
     // Create test domains.
     $this->domainCreateTestDomains(4);
 
-    // Visit the domains views administration page.
+    // Visit the domain overview administration page.
     $this->drupalGet($path);
     $this->assertResponse(200);
 
@@ -40,7 +42,7 @@ class DomainActionsTest extends DomainTestBase {
 
     // Check the default domain.
     $default = \Drupal::service('domain.loader')->loadDefaultId();
-    $key = \Drupal::service('domain.creator')->createMachineName();
+    $key = 'example_com';
     $this->assertTrue($default == $key, 'Default domain set correctly.');
 
     // Test some text on the page.
@@ -53,9 +55,11 @@ class DomainActionsTest extends DomainTestBase {
     foreach ($actions as $action) {
       $this->assertRaw("/domain/{$action}/", format_string('@action action found.', array('@action' => $action)));
     }
-    // @TODO Disable a domain and test the enable link.
+    // @TODO: Disable a domain and test the enable link.
 
-    // @TODO test the link behaviors.
+    // @TODO: test the link behaviors.
+
+    // @TODO: test permissions on actions
 
   }
 

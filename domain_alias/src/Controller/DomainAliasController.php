@@ -29,7 +29,24 @@ class DomainAliasController extends DomainControllerBase {
     // the parent domain entity.
     $values['domain_id'] = $domain->id();
     // @TODO: ensure that this value is present in all cases.
-    $alias = \Drupal::entityManager()->getStorage('domain_alias')->create($values);
+    $alias = \Drupal::entityTypeManager()->getStorage('domain_alias')->create($values);
+
     return $this->entityFormBuilder()->getForm($alias);
   }
+
+  /**
+   * Provides the listing page for aliases.
+   *
+   * @param \Drupal\domain\DomainInterface $domain
+   *   An domain record entity.
+   *
+   * @return array
+   *   A render array as expected by drupal_render().
+   */
+  public function listing(DomainInterface $domain) {
+    $list = \Drupal::entityTypeManager()->getListBuilder('domain_alias');
+    $list->setDomain($domain);
+    return $list->render();
+  }
+
 }

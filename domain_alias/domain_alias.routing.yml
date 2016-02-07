@@ -1,7 +1,7 @@
 domain_alias.admin:
   path: '/admin/config/domain/alias/{domain}'
   defaults:
-    _entity_list: 'domain_alias'
+    _controller: '\Drupal\domain_alias\Controller\DomainAliasController::listing'
     _title: 'Domain aliases'
     _title_context: 'With modules'
   requirements:

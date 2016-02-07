@@ -7,9 +7,9 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -58,11 +58,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    *   The module handler.
    */
   public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainLoaderInterface $loader) {
-    $this->httpHost = NULL;
     $this->requestStack = $requestStack;
     $this->moduleHandler = $module_handler;
     $this->domainLoader = $loader;
-    $this->domain = NULL;
   }
 
   /**
@@ -71,16 +69,20 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   public function setRequestDomain($httpHost, $reset = FALSE) {
     // @TODO: Investigate caching methods.
     $this->setHttpHost($httpHost);
-    $domain = $this->domainLoader->loadByHostname($httpHost);
+    if ($domain = $this->domainLoader->loadByHostname($httpHost)) {
+      // If the load worked, set an exact match flag for the hook.
+      $domain->setMatchType(DOMAIN_MATCH_EXACT);
+    }
     // Fallback to default domain if no match.
-    if (empty($domain)) {
-      $domain = $this->domainLoader->loadDefaultDomain();
+    elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
+      $domain->setMatchType(DOMAIN_MATCH_NONE);
     }
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
-    if (empty($domain)) {
+    else {
       $values = array('hostname' => $httpHost);
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
+      $domain->setMatchType(DOMAIN_MATCH_NONE);
     }
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
@@ -102,9 +104,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Determine the active domain.
    */
-  public function negotiateActiveDomain() {
+  protected function negotiateActiveDomain() {
     $httpHost = $this->negotiateActiveHostname();
     $this->setRequestDomain($httpHost);
     return $this->domain;
@@ -114,7 +116,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    * {@inheritdoc}
    */
   public function getActiveDomain($reset = FALSE) {
-    if (is_null($this->domain) || $reset) {
+    if ($reset) {
       $this->negotiateActiveDomain();
     }
     return $this->domain;

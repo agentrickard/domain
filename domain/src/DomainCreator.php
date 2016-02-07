@@ -59,6 +59,7 @@ class DomainCreator implements DomainCreatorInterface {
       'is_default' => (int) empty($default),
     );
     $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
+
     return $domain;
   }
 

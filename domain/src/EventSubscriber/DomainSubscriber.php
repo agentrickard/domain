@@ -11,27 +11,44 @@ use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Drupal\Core\Routing\TrustedRedirectResponse;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Implements DomainSubscriber
+ * Sets the domain context for an http request.
  */
 class DomainSubscriber implements EventSubscriberInterface {
 
   /**
+   * The domain negotiator service.
+   *
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $domainNegotiator;
 
+  /**
+   * The domain loader service.
+   *
+   * @var \Drupal\domain\DomainLoaderInterface
+   */
   protected $domainLoader;
 
+  /**
+   * The core access check service.
+   *
+   * @var \Drupal\Core\Access\AccessCheckInterface
+   */
   protected $accessCheck;
 
+  /**
+   * The current user account.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
   protected $account;
 
   /**
@@ -54,13 +71,21 @@ class DomainSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Sets the domain context of the request.
+   *
+   * This method also determines the redirect status for the http request.
+   *
+   * Specifically, here we determine if a redirect is required. That happens
+   * in one of two cases: an unauthorized request to an inactive domain is made;
+   * a domain alias is set to redirect to its primary domain record.
    *
    * @param Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The Event to process.
    */
   public function onKernelRequestDomain(GetResponseEvent $event) {
     $redirect = FALSE;
-    if ($domain = $this->domainNegotiator->negotiateActiveDomain()) {
+    // Negotiate the request and set domain context.
+    if ($domain = $this->domainNegotiator->getActiveDomain(TRUE)) {
       $domain_url = $domain->getUrl();
       if ($domain_url) {
         $redirect_type = $domain->getRedirect();
@@ -92,7 +117,7 @@ class DomainSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Implements EventSubscriberInterface::getSubscribedEvents().
+   * @inheritdoc
    */
   static function getSubscribedEvents() {
     // This needs to fire very early in the stack, before accounts are cached.

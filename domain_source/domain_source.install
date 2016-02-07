@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Domain Access module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Installs the domain source field on nodes. We don't do this via schema.yml
+ * files because we have an unknown number of node types.
+ */
+function domain_source_install() {
+  // Assign domain source to bundles.
+  $list = array();
+  $node_types = entity_load_multiple('node_type');
+  foreach ($node_types as $type => $info) {
+    $list[$type] = 'node';
+  }
+  // Install our fields.
+  foreach ($list as $bundle => $entity_type) {
+    domain_source_confirm_fields($entity_type, $bundle);
+  }
+}
+/**
+ * Implements hook_uninstall().
+ *
+ * Removes source domain fields on uninstall.
+ */
+function domain_source_uninstall() {
+  foreach (array('node') as $type) {
+    $id = $type . '.' . DOMAIN_SOURCE_FIELD;
+    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+      $field->delete();
+    }
+  }
+}

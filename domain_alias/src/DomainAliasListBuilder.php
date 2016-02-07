@@ -2,11 +2,12 @@
 
 /**
  * @file
- * Contains \Drupal\domain_alias\Form\DomainAliasListBuilder.
+ * Contains \Drupal\domain_alias\DomainAliasListBuilder.
  */
 
 namespace Drupal\domain_alias;
 
+use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 
@@ -14,6 +15,11 @@ use Drupal\Core\Entity\EntityInterface;
  * User interface for the domain alias overview screen.
  */
 class DomainAliasListBuilder extends ConfigEntityListBuilder {
+
+  /**
+   * A domain object loaded from the controller.
+   */
+  protected $domain;
 
   /**
    * {@inheritdoc}
@@ -59,5 +65,42 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
       }
     }
     return $build;
+  }
+
+  /**
+   * Loads entity IDs using a pager sorted by the entity id.
+   *
+   * @return array
+   *   An array of entity IDs.
+   */
+  protected function getEntityIds() {
+    $query = $this->getStorage()->getQuery()
+      ->condition('domain_id', $this->getDomainId())
+      ->sort($this->entityType->getKey('id'));
+
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $query->pager($this->limit);
+    }
+    return $query->execute();
+  }
+
+  /**
+   * Sets the domain context for this list.
+   *
+   * @param Drupal\domain\DomainInterface $domain
+   */
+  public function setDomain(DomainInterface $domain) {
+    $this->domain = $domain;
+  }
+
+  /**
+   * Gets the domain context for this list.
+   *
+   * @return Drupal\domain\DomainInterface $domain
+   */
+  public function getDomainId() {
+    // @TODO: check for a use-case where we might need to derive the id?
+    return !empty($this->domain) ? $this->domain->id() : NULL;
   }
 }

@@ -1,0 +1,6 @@
+services:
+  domain_source.path_processor:
+    class: Drupal\domain_source\HttpKernel\DomainSourcePathProcessor
+    arguments: ['@domain.loader', '@domain.negotiator', '@module_handler']
+    tags:
+      - { name: path_processor_outbound, priority: 200 }

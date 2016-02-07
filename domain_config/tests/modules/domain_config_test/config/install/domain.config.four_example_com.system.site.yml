@@ -1,10 +1,10 @@
-name: 'Two'
+name: 'Four'
 mail: admin@example.com
-slogan: 'I have it'
+slogan: ''
 page:
   403: ''
   404: ''
-  front: /node
+  front: /node/2
 admin_compact_mode: false
 weight_select_max: 100
 langcode: en

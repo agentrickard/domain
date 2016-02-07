@@ -142,7 +142,12 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   protected $redirect = NULL;
 
   /**
-   * {@inheritdoc}
+   * The type of match returned by the negotator.
+   */
+  protected $matchType;
+
+  /**
+   * Overrides Drupal\Core\Entity\Entity:preCreate().
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
@@ -166,7 +171,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function isActive() {
     $negotiator = \Drupal::service('domain.negotiator');
-    $domain = $negotiator->negotiateActiveDomain();
+    $domain = $negotiator->getActiveDomain();
     if (empty($domain)) {
       return FALSE;
     }
@@ -254,7 +259,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * {@inheritdoc}
    */
   public function setPath() {
-    $this->path = $this->getScheme() . $this->hostname . base_path();
+    $this->path = $this->getScheme() . $this->getHostname() . base_path();
   }
 
   /**
@@ -286,7 +291,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::preSave().
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
@@ -387,6 +392,20 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   function getWeight() {
     return $this->weight;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMatchType($match_type = DOMAIN_MATCH_EXACT) {
+    $this->matchType = $match_type;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMatchType() {
+    return $this->matchType;
   }
 
 }
