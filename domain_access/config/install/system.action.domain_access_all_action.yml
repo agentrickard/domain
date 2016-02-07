@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: domain_access_all_action
+label: 'Assign to all affiliates'
+type: node
+plugin: domain_access_all_action
+configuration: {  }
