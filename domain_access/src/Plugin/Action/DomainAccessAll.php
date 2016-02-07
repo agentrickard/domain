@@ -36,7 +36,7 @@ class DomainAccessAll extends ActionBase {
     /** @var \Drupal\node\NodeInterface $object */
     // @TODO: Check this logic.
     $result = $object->access('update', $account, TRUE)
-      ->andIf($object->status->access('edit', $account, TRUE)
+      ->andIf($object->status->access('edit', $account, TRUE))
       ->andIf($account->hasPermission('publish to any domain'));
 
     return $return_as_object ? $result : $result->isAllowed();
