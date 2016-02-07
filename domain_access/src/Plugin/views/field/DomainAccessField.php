@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\domain_access\Plugin\views\field\DomainAccessNode.
+ * Contains \Drupal\domain_access\Plugin\views\field\DomainAccessField.
  */
 
 namespace Drupal\domain_access\Plugin\views\field;
@@ -11,11 +11,11 @@ use Drupal\views\ResultRow;
 use Drupal\views\Plugin\views\field\Field;
 
 /**
- * Field handler to present the link to a node on a domain.
+ * Field handler to present the link an entity on a domain.
  *
- * @ViewsField("domain_access_node")
+ * @ViewsField("domain_access_field")
  */
-class DomainAccessNode extends Field {
+class DomainAccessField extends Field {
 
   /**
    * {@inheritdoc}
@@ -26,8 +26,8 @@ class DomainAccessNode extends Field {
     // page, not the node we are looking at.
     foreach ($items as &$item) {
       $object = $item['raw'];
-      $node = $object->getEntity();
-      $url = $node->toUrl()->toString();
+      $entity = $object->getEntity();
+      $url = $entity->toUrl()->toString();
       $domain = $item['rendered']['#options']['entity'];
       $item['rendered']['#type'] = 'markup';
       $item['rendered']['#markup'] = '<a href="' . $domain->buildUrl($url) . '">' . $domain->label() . '</a>';

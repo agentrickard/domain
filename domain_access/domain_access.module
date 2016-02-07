@@ -410,5 +410,8 @@ function domain_access_confirm_fields($entity_type, $bundle) {
  */
 function domain_access_views_data_alter(array &$data) {
   $field = 'node__' . DOMAIN_ACCESS_FIELD;
-  $data[$field][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_node';
+  $data[$field][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
+  $field = 'user__' . DOMAIN_ACCESS_FIELD;
+  $data[$field][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
+
 }
