@@ -11,7 +11,7 @@ use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Session\AccountInterface;
 
 /**
- * Assigns a node to all affiliates..
+ * Assigns a node to all affiliates.
  *
  * @Action(
  *   id = "domain_access_all_action",
