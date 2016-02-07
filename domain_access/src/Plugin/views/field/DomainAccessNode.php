@@ -32,7 +32,14 @@ class DomainAccessNode extends Field {
       $item['rendered']['#type'] = 'markup';
       $item['rendered']['#markup'] = '<a href="' . $domain->buildUrl($url) . '">' . $domain->label() . '</a>';
     }
+    uasort($items, array($this, 'sort'));
     return $items;
+  }
+
+  private function sort($a, $b) {
+    $domainA = $a['rendered']['#options']['entity'];
+    $domainB = $b['rendered']['#options']['entity'];
+    return $domainA->getWeight() > $domainB->getWeight();
   }
 
 }
