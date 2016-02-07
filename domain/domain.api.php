@@ -52,7 +52,7 @@ function hook_domain_request_alter(DomainInterface &$domain) {
  *
  * @param &$operations
  *  An array of links, which uses a unique string key and requires the
- *  elements 'title' and 'href'; the 'query' value is optional, and used
+ *  elements 'title' and 'url'; the 'query' value is optional, and used
  *  for link-actions with tokens.
  * @param Drupal\domain\DomainInterface
  *   A domain record object.
@@ -64,10 +64,9 @@ function hook_domain_operations(DomainInterface $domain) {
   // Add aliases to the list.
   $id = $domain->id();
   $operations['domain_alias'] = array(
-    'title' => t('alias'),
-    'href' => "admin/config/domain/$id/alias",
-    'query' => array(),
-    'weight' => 100, // Core operations start at 0 and increment by 10.
+    'title' => t('Aliases'),
+    'url' => Url::fromRoute('domain_alias.admin', array('domain' => $id)),
+    'weight' => 60,
   );
   return $operations;
 }

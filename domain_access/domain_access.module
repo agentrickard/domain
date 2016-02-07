@@ -13,6 +13,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 
 /**
  * Defines the name of the node access control field.
@@ -409,9 +410,29 @@ function domain_access_confirm_fields($entity_type, $bundle) {
  * Implements hook_views_data_alter().
  */
 function domain_access_views_data_alter(array &$data) {
-  $field = 'node__' . DOMAIN_ACCESS_FIELD;
-  $data[$field][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
-  $field = 'user__' . DOMAIN_ACCESS_FIELD;
-  $data[$field][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
+  $table = 'node__' . DOMAIN_ACCESS_FIELD;
+  $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
+  $table = 'user__' . DOMAIN_ACCESS_FIELD;
+  $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
+}
 
+/**
+ * Implements hook_domain_operations().
+ */
+function domain_access_domain_operations(DomainInterface $domain) {
+  // Add aliases to the list.
+  $id = $domain->id();
+  $operations['domain_content'] = array(
+    'title' => t('Content'),
+    'url' => Url::fromUri("internal:/admin/config/domain/content/$id"),
+    'weight' => 120, // Core operations start at 0 and increment by 10.
+  );
+  $operations['domain_users'] = array(
+    'title' => t('Editors'),
+    'url' => Url::fromUri("internal:/admin/config/domain/editors/$id"),
+    'weight' => 120, // Core operations start at 0 and increment by 10.
+  );
+  return $operations;
 }
