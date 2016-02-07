@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: domain_access_add_action
+label: 'Add domain to content'
+type: node
+plugin: domain_access_add_action
+configuration: {  }
