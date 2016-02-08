@@ -18,6 +18,8 @@ use Drupal\Core\Session\AccountInterface;
  *   label = @Translation("Add domain to content"),
  *   type = "node"
  * )
+ *
+ * @see user_user_role_insert() user_user_role_delete().
  */
 class DomainAccessAdd extends ActionBase {
 
