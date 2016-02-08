@@ -436,3 +436,76 @@ function domain_access_domain_operations(DomainInterface $domain) {
   );
   return $operations;
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() fpr domain entities.
+ */
+function domain_access_domain_insert($entity) {
+  $id = 'domain_access_add_action.' . $entity->id();
+  if (!entity_load('action', $id)) {
+    $action = entity_create('action', array(
+      'id' => $id,
+      'type' => 'node',
+      'label' => t('Add the @label domain to the selected content', array('@label' => $entity->label())),
+      'configuration' => array(
+        'id' => $entity->id(),
+      ),
+      'plugin' => 'domain_access_add_action',
+    ));
+    $action->trustData()->save();
+  }
+  $remove_id = 'domain_access_remove_action.' . $entity->id();
+  if (!entity_load('action', $remove_id)) {
+    $action = entity_create('action', array(
+      'id' => $remove_id,
+      'type' => 'node',
+      'label' => t('Remove the @label domain from the selected content', array('@label' => $entity->label())),
+      'configuration' => array(
+        'id' => $entity->id(),
+      ),
+      'plugin' => 'domain_access_remove_action',
+    ));
+    $action->trustData()->save();
+  }
+  $id = 'domain_access_add_editor_action.' . $entity->id();
+  if (!entity_load('action', $id)) {
+    $action = entity_create('action', array(
+      'id' => $id,
+      'type' => 'user',
+      'label' => t('Add the @label domain to the selected editors', array('@label' => $entity->label())),
+      'configuration' => array(
+        'id' => $entity->id(),
+      ),
+      'plugin' => 'domain_access_add_editor_action',
+    ));
+    $action->trustData()->save();
+  }
+  $remove_id = 'domain_access_remove_editor_action.' . $entity->id();
+  if (!entity_load('action', $remove_id)) {
+    $action = entity_create('action', array(
+      'id' => $remove_id,
+      'type' => 'user',
+      'label' => t('Remove the @label domain from the selected editors', array('@label' => $entity->label())),
+      'configuration' => array(
+        'id' => $entity->id(),
+      ),
+      'plugin' => 'domain_access_remove_editor_action',
+    ));
+    $action->trustData()->save();
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for domain entities.
+ */
+function domain_access_domain_delete(EntityInterface $entity) {
+  $actions = entity_load_multiple('action', array(
+    'domain_access_add_action.' . $entity->id(),
+    'domain_access_remove_action.' . $entity->id(),
+    'domain_access_add_editor_action.' . $entity->id(),
+    'domain_access_remove_editor_action.' . $entity->id(),
+  ));
+  foreach ($actions as $action) {
+    $action->delete();
+  }
+}
