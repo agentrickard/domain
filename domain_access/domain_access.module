@@ -446,7 +446,7 @@ function domain_access_domain_insert($entity) {
     $action = entity_create('action', array(
       'id' => $id,
       'type' => 'node',
-      'label' => t('Add the @label domain to the selected content', array('@label' => $entity->label())),
+      'label' => t('Add selected content to the @label domain', array('@label' => $entity->label())),
       'configuration' => array(
         'id' => $entity->id(),
       ),
@@ -459,7 +459,7 @@ function domain_access_domain_insert($entity) {
     $action = entity_create('action', array(
       'id' => $remove_id,
       'type' => 'node',
-      'label' => t('Remove the @label domain from the selected content', array('@label' => $entity->label())),
+      'label' => t('Remove selected content from the @label domain', array('@label' => $entity->label())),
       'configuration' => array(
         'id' => $entity->id(),
       ),
@@ -472,7 +472,7 @@ function domain_access_domain_insert($entity) {
     $action = entity_create('action', array(
       'id' => $id,
       'type' => 'user',
-      'label' => t('Add the @label domain to the selected editors', array('@label' => $entity->label())),
+      'label' => t('Add editors to the @label domain', array('@label' => $entity->label())),
       'configuration' => array(
         'id' => $entity->id(),
       ),
@@ -485,7 +485,7 @@ function domain_access_domain_insert($entity) {
     $action = entity_create('action', array(
       'id' => $remove_id,
       'type' => 'user',
-      'label' => t('Remove the @label domain from the selected editors', array('@label' => $entity->label())),
+      'label' => t('Remove editors from the @label domain', array('@label' => $entity->label())),
       'configuration' => array(
         'id' => $entity->id(),
       ),
