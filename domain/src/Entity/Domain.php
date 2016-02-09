@@ -310,6 +310,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(array('rendered'));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getScheme($add_suffix = TRUE) {
     $scheme = $this->scheme;
     if ($scheme != 'https') {
