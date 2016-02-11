@@ -413,6 +413,19 @@ function domain_access_views_data_alter(array &$data) {
   $table = 'node__' . DOMAIN_ACCESS_FIELD;
   $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
   $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
+
+  // Current domain filter.
+  $data[$table]['current_all'] = array(
+    'title' => t('Current domain'),
+    'group' => t('Domain'),
+    'filter' => array(
+      'field' => DOMAIN_ACCESS_FIELD . '_target_id',
+      'id' => 'domain_access_current_all_filter',
+      'title' => t('Available on current domain'),
+      'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates).'),
+    ),
+  );
+
   $table = 'user__' . DOMAIN_ACCESS_FIELD;
   $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
   $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
