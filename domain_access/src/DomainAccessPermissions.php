@@ -45,6 +45,12 @@ class DomainAccessPermissions {
       'view unpublished domain content' => array(
         'title' => $this->t('View unpublished content on assigned domains'),
       ),
+      'view domain content lists' => array(
+        'title' => $this->t('View list of content per domain'),
+      ),
+      'view domain editor lists' => array(
+        'title' => $this->t('View list of editors per domain'),
+      ),
     );
 
     // Generate standard node permissions for all applicable node types.

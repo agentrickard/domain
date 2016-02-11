@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: domain_access_none_action
+label: 'Remove from all affiliates'
+type: node
+plugin: domain_access_none_action
+configuration: {  }
