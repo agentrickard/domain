@@ -4,7 +4,7 @@ dependencies:
   module:
     - node
 id: domain_access_edit_none_action
-label: 'Remove editor from all affiliates'
+label: 'Remove editors from all affiliates'
 type: user
 plugin: domain_access_edit_none_action
 configuration: {  }

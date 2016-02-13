@@ -4,7 +4,7 @@ dependencies:
   module:
     - node
 id: domain_access_edit_all_action
-label: 'Assign editor to all affiliates'
+label: 'Assign editors to all affiliates'
 type: user
 plugin: domain_access_edit_all_action
 configuration: {  }

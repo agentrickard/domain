@@ -1,0 +1,40 @@
+action.configuration.domain_access_all_action:
+  type: action_configuration_default
+  label: 'Assign content to all affiliates'
+action.configuration.domain_access_edit_all_action:
+  type: action_configuration_default
+  label: 'Assign editors to all affiliates'
+action.configuration.domain_access_edit_none_action:
+  type: action_configuration_default
+  label: 'Remove editors from all affiliates'
+action.configuration.domain_access_none_action:
+  type: action_configuration_default
+  label: 'Remove content from all affiliates'
+action.configuration.domain_access_add_action:
+  type: mapping
+  label: 'Configuration for the add domain(s) to content action'
+  mapping:
+    domain_id:
+      type: string
+      label: 'The ID(s) of the domain(s) to add'
+action.configuration.domain_access_remove_action:
+  type: mapping
+  label: 'Configuration for the remove domain(s) from content action'
+  mapping:
+    domain_id:
+      type: string
+      label: 'The ID(s) of the domain(s) to remove'
+action.configuration.domain_access_add_editor_action:
+  type: mapping
+  label: 'Configuration for the add domain(s) to users action'
+  mapping:
+    domain_id:
+      type: string
+      label: 'The ID(s) of the domain(s) to add'
+action.configuration.domain_access_remove_editor_action:
+  type: mapping
+  label: 'Configuration for the remove domain(s) from users action'
+  mapping:
+    domain_id:
+      type: string
+      label: 'The ID(s) of the domain(s) to remove'
