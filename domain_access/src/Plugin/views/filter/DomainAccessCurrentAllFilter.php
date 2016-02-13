@@ -47,19 +47,30 @@ class DomainAccessCurrentAllFilter extends BooleanOperator {
    */
   public function query() {
     $this->ensureMyTable();
-    $where = "$this->tableAlias.$this->realField ";
+    // @TODO: Proper abstraction of table and field name.
+    $all_table = $this->query->ensureTable('node__field_domain_all_affiliates');
     $current_domain = \Drupal::service('domain.negotiator')->getActiveId();
-
     if (empty($this->value)) {
-      $where .= "<> '$current_domain'";
-      if ($this->accept_null) {
-        $where = '(' . $where . " OR $this->tableAlias.$this->realField IS NULL)";
-      }
+      // @TODO proper handling of NULL?
+      $where = "$this->tableAlias.$this->realField <> '$current_domain'";
+      $where = '(' . $where . " OR $this->tableAlias.$this->realField IS NULL)";
+      $where = '(' . $where . " AND ($all_table.field_domain_all_affiliates_value = 0 OR $all_table.field_domain_all_affiliates_value IS NULL))";
     }
     else {
-      $where .= "= '$current_domain'";
+      $where = "($this->tableAlias.$this->realField = '$current_domain' OR $all_table.field_domain_all_affiliates_value = 1)";
     }
     $this->query->addWhereExpression($this->options['group'], $where);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    $contexts = parent::getCacheContexts();
+
+    $contexts[] = 'url.site';
+
+    return $contexts;
   }
 
 }
