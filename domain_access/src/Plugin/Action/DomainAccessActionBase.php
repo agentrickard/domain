@@ -63,7 +63,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $domains = \Drupal::service('domain_loader')->loadOptionsList();
+    $domains = \Drupal::service('domain.loader')->loadOptionsList();
     $form['id'] = array(
       '#type' => 'radios',
       '#title' => t('Domain'),
