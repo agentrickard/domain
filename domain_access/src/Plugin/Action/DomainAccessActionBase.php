@@ -46,7 +46,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager')->getDefinition('user_role')
+      $container->get('entity.manager')->getDefinition('domain')
     );
   }
 
@@ -55,7 +55,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    */
   public function defaultConfiguration() {
     return array(
-      'id' => '',
+      'domain_id' => '',
     );
   }
 
@@ -64,8 +64,8 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $domains = \Drupal::service('domain.loader')->loadOptionsList();
-    $form['id'] = array(
-      '#type' => 'radios',
+    $form['domain_id'] = array(
+      '#type' => 'checkboxes',
       '#title' => t('Domain'),
       '#options' => $domains,
       '#default_value' => $this->configuration['id'],
@@ -78,16 +78,16 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
-    $this->configuration['id'] = $form_state->getValue('id');
+    $this->configuration['domain_id'] = $form_state->getValue('domain_id');
   }
 
   /**
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    if (!empty($this->configuration['id'])) {
+    if (!empty($this->configuration['domain_id'])) {
       $prefix = $this->entityType->getConfigPrefix() . '.';
-      $this->addDependency('config', $prefix . $this->configuration['id']);
+      $this->addDependency('config', $prefix . $this->configuration['domain_id']);
     }
     return $this->dependencies;
   }

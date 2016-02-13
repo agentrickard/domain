@@ -25,12 +25,18 @@ class DomainAccessRemove extends DomainAccessActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    $id = $this->configuration['id'];
+    $ids = $this->configuration['domain_id'];
+    $save = FALSE;
     $node_domains = \Drupal::service('domain_access.manager')->getAccessValues($entity);
-    // Skip adding the role to the user if they already have it.
-    if ($entity !== FALSE && isset($node_domains[$id])) {
-      unset($node_domains[$id]);
-      $entity->set(DOMAIN_ACCESS_FIELD, array_keys($new_domains));
+    // Remove domain assignment if present.
+    foreach ($ids as $id) {
+      if ($entity !== FALSE && isset($node_domains[$id])) {
+        unset($node_domains[$id]);
+        $save = TRUE;
+      }
+    }
+    if ($save) {
+      $entity->set(DOMAIN_ACCESS_FIELD, array_keys($node_domains));
       $entity->save();
     }
   }
