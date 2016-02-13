@@ -44,8 +44,10 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *   },
  *   links = {
  *     "delete-form" = "/admin/config/domain/delete/{domain}",
- *     "edit-form" = "/admin/config/domain/edit/{domain}"
- *   }
+ *     "edit-form" = "/admin/config/domain/edit/{domain}",
+ *     "collection" = "/admin/config/domain",
+ *   },
+ *   uri_callback = "domain_uri"
  * )
  */
 class Domain extends ConfigEntityBase implements DomainInterface {
@@ -267,7 +269,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function setUrl() {
     $uri = \Drupal::request()->getRequestUri();
-    $this->url = $this->getScheme() . $this->hostname . $uri;
+    $this->url = $this->getScheme() . $this->getHostname() . $uri;
   }
 
   /**
@@ -278,6 +280,24 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->setPath();
     }
     return $this->path;
+  }
+
+  /**
+   * Returns the raw path of the domain object, without the base url.
+   */
+  public function getRawPath() {
+    return $this->getScheme() . $this->getHostname();
+  }
+
+  /**
+   * Builds a link from a known internal path.
+   *
+   * @param $path
+   *   A Drupal-formatted internal path, starting with /. Note that it is the
+   *   caller's responsibility to handle the base_path().
+   */
+  public function buildUrl($path) {
+    return $this->getRawPath() . $path;
   }
 
   /**
