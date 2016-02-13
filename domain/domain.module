@@ -72,12 +72,3 @@ function domain_help($route_name, RouteMatchInterface $route_match) {
       return $output;
   }
 }
-
-/**
- * Format a nice debug message.
- */
-function domain_debug($message) {
-  $output = '<pre>' . var_dump($message) . '</pre>';
-  print $output;
-}
-
