@@ -60,7 +60,7 @@ class DomainAccessCurrentAllFilter extends BooleanOperator {
       $where = "($this->tableAlias.$this->realField = '$current_domain' OR $all_table.field_domain_all_affiliates_value = 1)";
     }
     $this->query->addWhereExpression($this->options['group'], $where);
-    // @TODO: This filter causes duplicates.
+    // This filter causes duplicates.
     $this->query->options['distinct'] = TRUE;
   }
 
