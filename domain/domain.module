@@ -33,6 +33,13 @@ function domain_entity_bundle_info() {
 }
 
 /**
+ * Entity URI callback.
+ */
+function domain_uri(DomainInterface $domain) {
+  return Url::fromUri($domain->getPath(), ['absolute' => TRUE]);
+}
+
+/**
  * Implements hook_entity_load().
  *
  * The $domain->path and $domain->uri properties are derived from data in the

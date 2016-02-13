@@ -44,8 +44,10 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *   },
  *   links = {
  *     "delete-form" = "/admin/config/domain/delete/{domain}",
- *     "edit-form" = "/admin/config/domain/edit/{domain}"
- *   }
+ *     "edit-form" = "/admin/config/domain/edit/{domain}",
+ *     "collection" = "/admin/config/domain",
+ *   },
+ *   uri_callback = "domain_uri"
  * )
  */
 class Domain extends ConfigEntityBase implements DomainInterface {
