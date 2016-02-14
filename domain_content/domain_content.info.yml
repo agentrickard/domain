@@ -7,4 +7,6 @@ core: 8.x
 dependencies:
   - domain
   - domain_access
+  - node
+  - user
   - views
