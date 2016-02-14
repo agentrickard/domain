@@ -15,15 +15,18 @@ use Drupal\Core\Url;
 function domain_content_domain_operations(DomainInterface $domain) {
   // Add content to the list.
   $account = \Drupal::currentUser();
+  // Advanced grants for edit/delete require permissions.
+  $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
+  $allowed = \Drupal::service('domain_access.manager')->getAccessValues($user);
   $id = $domain->id();
-  if ($account->hasPermission('access domain content')) {
+  if ($account->hasPermission('publish to any domain') || ($account->hasPermission('publish to any assigned domain') && isset($allowed[$domain->id()]))) {
     $operations['domain_content'] = array(
       'title' => t('Content'),
       'url' => Url::fromUri("internal:/admin/content/domain-content/$id"),
       'weight' => 120, // Core operations start at 0 and increment by 10.
     );
   }
-  if ($account->hasPermission('access domain content editors')) {
+  if ($account->hasPermission('assign editors to any domain') || ($account->hasPermission('assign domain editors') && isset($allowed[$domain->id()]))) {
     $operations['domain_users'] = array(
       'title' => t('Editors'),
       'url' => Url::fromUri("internal:/admin/content/domain-editors/$id"),
