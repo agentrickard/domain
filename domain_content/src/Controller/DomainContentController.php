@@ -23,7 +23,7 @@ class DomainContentController extends DomainControllerBase {
       '#theme' => 'table',
       '#header' => [$this->t('Domain'), $this->t('Content count')],
     ];
-    $build['#rows'][] = [$this->l($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-content/all_affiliates')), $this->getEditorCount()];
+    $build['#rows'][] = [$this->l($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-content/all_affiliates')), $this->getContentCount()];
     // @TODO: Inject this service.
     $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
     foreach ($domains as $domain) {
@@ -56,18 +56,23 @@ class DomainContentController extends DomainControllerBase {
     return ['#markup' => $domain->label()];
   }
 
-  protected function getContentCount($domain = NULL) {
+  protected function getContentCount($domain = NULL, $entity_type = 'node') {
     if (is_null($domain)) {
-      return 50;
+      $field = DOMAIN_ACCESS_ALL_FIELD;
+      $value = 1;
     }
-    return 100;
+    else {
+      $field = DOMAIN_ACCESS_FIELD;
+      $value = $domain->id();
+    }
+    $query = \Drupal::entityQuery($entity_type)
+      ->condition($field, $value);
+
+    return count($query->execute());
   }
 
-  protected function getEditorCount($domain = NULL) {
-    if (is_null($domain)) {
-      return 50;
-    }
-    return 100;
+  protected function getEditorCount($domain = NULL, $entity_type = 'user') {
+    return $this->getContentCount($domain, $entity_type);
   }
 
 }

@@ -23,7 +23,7 @@ class DomainAccessField extends Field {
   public function getItems(ResultRow $values) {
     // Override the default link generator, which wants to send us to the entity
     // page, not the node we are looking at.
-    if ($this->options['render_as_link']) {
+    if ($this->options['settings']['link']) {
       $items = parent::getItems($values);
       foreach ($items as &$item) {
         $object = $item['raw'];
