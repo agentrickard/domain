@@ -47,6 +47,7 @@ marked with [x] are considered complete.
 - [x] Drush support for domain operations
 - [x] Replace / inject the storage manager in DomainAliasLoader.
 - [x] Replace / inject the storage manager in DomainLoader.
+- [ ] Write tests for Domain Content.
 - [ ] Restrict Domain Source options using JS
 - [ ] Recreate the Domain Theme module
 - [ ] Advanced drush integration / complete labelled tasks
