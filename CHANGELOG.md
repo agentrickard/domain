@@ -41,7 +41,7 @@ marked with [x] are considered complete.
 - [x] Add help text to domain overview screen
 - [ ] Ensure unique numeric ids for use with node access
 - [ ] Provide a user interface for domain overrides
-- [ ] Views argument handler to show proper title.
+- [x] Views argument handler to show proper title.
 - [ ] Views access handler for domain content.
 
 # Beta
