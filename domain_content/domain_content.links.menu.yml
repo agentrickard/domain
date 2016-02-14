@@ -1,0 +1,12 @@
+domain_content.content_list:
+  title: Affiliated content
+  route_name: domain_content.content_list
+  parent: system.admin_content
+  description: 'Lists content by domain assignment.'
+  weight: 10
+domain_content.editors_list:
+  title: Affiliated editors
+  route_name: domain_content.editors_list
+  parent: system.admin_content
+  description: 'Lists editors by domain assignment.'
+  weight: 10

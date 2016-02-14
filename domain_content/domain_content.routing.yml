@@ -1,0 +1,14 @@
+domain_content.content_list:
+  path: '/admin/content/domain-content'
+  defaults:
+    _controller: 'Drupal\domain_content\Controller\DomainContentController::contentList'
+    _title: 'Affiliated content'
+  requirements:
+    _permission: 'access domain content'
+domain_content.editors_list:
+  path: '/admin/content/domain-editors'
+  defaults:
+    _controller: 'Drupal\domain_content\Controller\DomainContentController::editorsList'
+    _title: 'Affiliated editors'
+  requirements:
+    _permission: 'access domain content editors'
