@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Review content by assigned domain.
+ */
+
+use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiator;
+
+
+/**
+ * Implements hook_domain_operations().
+ */
+function domain_content_domain_operations(DomainInterface $domain) {
+  // Add aliases to the list.
+  $id = $domain->id();
+  $operations['domain_content'] = array(
+    'title' => t('Content'),
+    'url' => Url::fromUri("internal:/admin/content/domain_content/$id"),
+    'weight' => 120, // Core operations start at 0 and increment by 10.
+  );
+  $operations['domain_users'] = array(
+    'title' => t('Editors'),
+    'url' => Url::fromUri("internal:/admin/content/domain_editors/$id"),
+    'weight' => 120, // Core operations start at 0 and increment by 10.
+  );
+  return $operations;
+}

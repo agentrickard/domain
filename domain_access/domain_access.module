@@ -432,25 +432,6 @@ function domain_access_views_data_alter(array &$data) {
 }
 
 /**
- * Implements hook_domain_operations().
- */
-function domain_access_domain_operations(DomainInterface $domain) {
-  // Add aliases to the list.
-  $id = $domain->id();
-  $operations['domain_content'] = array(
-    'title' => t('Content'),
-    'url' => Url::fromUri("internal:/admin/config/domain/content/$id"),
-    'weight' => 120, // Core operations start at 0 and increment by 10.
-  );
-  $operations['domain_users'] = array(
-    'title' => t('Editors'),
-    'url' => Url::fromUri("internal:/admin/config/domain/editors/$id"),
-    'weight' => 120, // Core operations start at 0 and increment by 10.
-  );
-  return $operations;
-}
-
-/**
  * Implements hook_ENTITY_TYPE_insert() fpr domain entities.
  */
 function domain_access_domain_insert($entity) {
