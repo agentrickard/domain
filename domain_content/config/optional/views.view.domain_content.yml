@@ -9,7 +9,7 @@ dependencies:
     - node
     - user
 _core:
-  default_config_hash: z8XxeJ_VN7B0PugrC1Xgj-FubvoLSKgnFJJ3DbXlAmA
+  default_config_hash: 80am62bndx8zJNcM94qCHJcsfULTTuUIZHd13f6UNyQ
 id: affiliated_content
 label: 'Affiliated content'
 module: node
@@ -765,11 +765,15 @@ display:
             sort_order: asc
             number_of_records: 0
             format: default_summary
-          specify_validation: false
+          specify_validation: true
           validate:
-            type: none
+            type: 'entity:domain'
             fail: 'not found'
-          validate_options: {  }
+          validate_options:
+            operation: view
+            multiple: 0
+            access: false
+            bundles: null
           glossary: false
           limit: 0
           case: none

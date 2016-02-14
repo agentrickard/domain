@@ -25,4 +25,5 @@ class DomainAccessArgument extends StringArgument {
     }
     return parent::title();
   }
+
 }

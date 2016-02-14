@@ -8,7 +8,7 @@ dependencies:
     - domain_access
     - user
 _core:
-  default_config_hash: queuLjhKGUQ_b-lNh_TkhCvOPrVunfJopvVGOf3cjAo
+  default_config_hash: Xfk6mJlu1ulvrGc8liItGZNh4BpK_lzdlC_85g3HSgE
 id: affiliated_editors
 label: 'Affiliated editors'
 module: user
@@ -1075,11 +1075,15 @@ display:
             sort_order: asc
             number_of_records: 0
             format: default_summary
-          specify_validation: false
+          specify_validation: true
           validate:
-            type: none
+            type: 'entity:domain'
             fail: 'not found'
-          validate_options: {  }
+          validate_options:
+            operation: view
+            multiple: 0
+            access: false
+            bundles: null
           glossary: false
           limit: 0
           case: none
