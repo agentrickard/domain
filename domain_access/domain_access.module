@@ -443,6 +443,7 @@ function domain_access_views_data_alter(array &$data) {
   $table = 'node__' . DOMAIN_ACCESS_FIELD;
   $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
   $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
 
   // Current domain filter.
   $data[$table]['current_all'] = array(
@@ -459,6 +460,7 @@ function domain_access_views_data_alter(array &$data) {
   $table = 'user__' . DOMAIN_ACCESS_FIELD;
   $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
   $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
 }
 
 /**
