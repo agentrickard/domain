@@ -1,0 +1,12 @@
+name: Domain Content
+description: 'Review content by assigned domain.'
+type: module
+package: Domain
+version: VERSION
+core: 8.x
+dependencies:
+  - domain
+  - domain_access
+  - node
+  - user
+  - views

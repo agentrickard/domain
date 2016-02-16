@@ -22,6 +22,11 @@ function domain_access_install() {
   foreach ($list as $bundle => $entity_type) {
     domain_access_confirm_fields($entity_type, $bundle);
   }
+  // Install our actions.
+  $domains = \Drupal::service('domain.loader')->loadMultiple();
+  foreach ($domains as $domain) {
+    domain_access_domain_insert($domain);
+  }
 }
 /**
  * Implements hook_uninstall().

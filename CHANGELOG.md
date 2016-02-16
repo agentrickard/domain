@@ -36,17 +36,20 @@ marked with [x] are considered complete.
 - [x] Finish the path alter behavior
 - [x] Catalog @TODO items as issues
 - [x] Drupal cache system makes it difficult to serve different homepage for each domain
+- [x] Provide common views support for attached fields
+- [x] Recreate the Domain Content module with bulk operations
+- [x] Add help text to domain overview screen
 - [ ] Ensure unique numeric ids for use with node access
-- [ ] Provide common views support for attached fields
-- [ ] Recreate the Domain Content module with bulk operations
-- [ ] Add help text to domain overview screen
 - [ ] Provide a user interface for domain overrides
+- [x] Views argument handler to show proper title.
+- [ ] Views access handler for domain content.
 
 # Beta
 - [x] Actions for domain operations
 - [x] Drush support for domain operations
 - [x] Replace / inject the storage manager in DomainAliasLoader.
 - [x] Replace / inject the storage manager in DomainLoader.
+- [ ] Write tests for Domain Content.
 - [ ] Restrict Domain Source options using JS
 - [ ] Recreate the Domain Theme module
 - [ ] Advanced drush integration / complete labelled tasks
