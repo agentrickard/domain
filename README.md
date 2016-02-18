@@ -51,6 +51,10 @@ We would like to tackle issues in that order, but feel free to work on what moti
 Testing
 ====
 
+@zerolab built a Travis definition file for automated testing! That means all pull requests will automatically run tests!
+
+[![Build Status](https://travis-ci.org/agentrickard/domain.svg?branch=8.x-1.x)](https://travis-ci.org/agentrickard/domain)
+
 The module does have solid test coverage, and complete coverage is required for release.
 Right now, we mostly use SimpleTest, because it is most familiar, and much of our
 testing is about browser and http behavior.
