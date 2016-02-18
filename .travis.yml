@@ -1,0 +1,78 @@
+language: php
+sudo: false
+
+php: [5.5, 5.6, 7.0, hhvm]
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: hhvm
+
+addons:
+  hosts:
+    - one.localhost
+    - two.localhost
+    - three.localhost
+    - four.localhost
+    - five.localhost
+
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
+env:
+  - DRUPAL=8.0.x
+  - DRUPAL=8.1.x
+
+mysql:
+  database: domain
+  username: root
+  encoding: utf8
+
+notifications:
+  email: false
+
+before_install:
+  # Add composer's global bin directory to the path
+  # see: https://github.com/drush-ops/drush#install---composer
+  - export PATH="$HOME/.composer/vendor/bin:$PATH"
+
+  # Remove Xdebug. Not an issue for PHP 7.
+  - phpenv config-rm xdebug.ini || true
+
+  - composer self-update
+
+install:
+  # Install Drush.
+  - composer global require drush/drush:dev-master
+  - phpenv rehash
+
+  # Create database.
+  - mysql -e 'create database domain'
+
+before_script:
+  # Remember the current rules test directory for later use in the Drupal installation.
+  - TESTDIR=$(pwd)
+  # Navigate out of module directory to prevent blown stack by recursive module lookup.
+  - cd ..
+
+  # Download Drupal 8 core.
+  - travis_retry git clone --branch $DRUPAL --depth 1 http://git.drupal.org/project/drupal.git
+  - cd drupal
+
+  # Make the module appear in the correct place
+  - ln -s $TESTDIR modules/domain
+
+  # Install drupal default profile
+  - drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
+  - drush --yes en simpletest domain
+  - drush cr
+
+  # Start a web server on port 8080 in the background.
+  - nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
+
+  # Wait until the web server is responding.
+  - until curl -s localhost:8080; do true; done > /dev/null
+
+script:
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://localhost:8080 "domain" "domain_access" "domain_alias" "domain_config" "domain_source" | tee /tmp/domain-test-results.txt
