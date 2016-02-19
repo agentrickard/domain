@@ -9,7 +9,9 @@ namespace Drupal\domain\Plugin\Condition;
 
 use Drupal\Core\Condition\ConditionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\domain\DomainNegotiator;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a 'Domain' condition.
@@ -17,29 +19,62 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
  * @Condition(
  *   id = "domain",
  *   label = @Translation("Domain"),
- *   context = {
- *     "domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"))
- *   }
  * )
  *
  */
-class Domain extends ConditionPluginBase {
+class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The domain negotiator.
+   *
+   * @var \Drupal\domain\DomainNegotiator
+   */
+  protected $domainNegotiator;
+
+  /**
+   * Constructs a Domain condition plugin.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\domain\DomainNegotiator $domain_negotiator
+   *   The domain negotiator.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainNegotiator $domain_negotiator) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->domainNegotiator = $domain_negotiator;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+        $configuration,
+        $plugin_id,
+        $plugin_definition,
+        $container->get('domain.negotiator')
+    );
+  }
 
   /**
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['domains'] = array(
-      '#type' => 'checkboxes',
-      '#title' => $this->t('When the following domains are active'),
-      '#default_value' => $this->configuration['domains'],
-      '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', \Drupal::service('domain.loader')->loadOptionsList()),
-      '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
-      '#attached' => array(
-        'library' => array(
-          'domain/drupal.domain',
+        '#type' => 'checkboxes',
+        '#title' => $this->t('When the following domains are active'),
+        '#default_value' => $this->configuration['domains'],
+        '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', \Drupal::service('domain.loader')->loadOptionsList()),
+        '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
+        '#attached' => array(
+            'library' => array(
+                'domain/drupal.domain',
+            ),
         ),
-      ),
     );
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -49,7 +84,7 @@ class Domain extends ConditionPluginBase {
    */
   public function defaultConfiguration() {
     return array(
-      'domains' => array(),
+        'domains' => array(),
     ) + parent::defaultConfiguration();
   }
 
@@ -89,9 +124,19 @@ class Domain extends ConditionPluginBase {
     if (empty($domains) && !$this->isNegated()) {
       return TRUE;
     }
-    $domain = $this->getContextValue('domain');
+    $domain = $this->domainNegotiator->getActiveDomain();
+    //dpm($domain);
     // NOTE: The block system handles negation for us.
     return (bool) in_array($domain->id(), $domains);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    $contexts = parent::getCacheContexts();
+    $contexts[] = 'domain';
+    return $contexts;
   }
 
 }
