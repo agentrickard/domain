@@ -6,12 +6,12 @@
 
 namespace Drupal\domain\ContextProvider;
 
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Provides a context handler for the block system.

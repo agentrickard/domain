@@ -34,16 +34,16 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
   /**
    * Constructs a Domain condition plugin.
    *
+   * @param \Drupal\domain\DomainNegotiator $domain_negotiator
+   *   The domain negotiator service.
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\domain\DomainNegotiator $domain_negotiator
-   *   The domain negotiator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainNegotiator $domain_negotiator) {
+  public function __construct(DomainNegotiator $domain_negotiator, array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->domainNegotiator = $domain_negotiator;
   }
@@ -53,10 +53,10 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
+        $container->get('domain.negotiator'),
         $configuration,
         $plugin_id,
-        $plugin_definition,
-        $container->get('domain.negotiator')
+        $plugin_definition
     );
   }
 
@@ -125,7 +125,6 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
       return TRUE;
     }
     $domain = $this->domainNegotiator->getActiveDomain();
-    //dpm($domain);
     // NOTE: The context system handles negation for us.
     return (bool) in_array($domain->id(), $domains);
   }
