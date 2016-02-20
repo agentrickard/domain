@@ -64,7 +64,10 @@ function domain_entity_load(array $entities, $entity_type) {
 function domain_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'domain.admin':
-      $name = \Drupal::service('domain.loader')->loadDefaultDomain()->get('name');
+      if ($default_domain = \Drupal::service('domain.loader')->loadDefaultDomain()) {
+        $name = $default_domain->get('name');
+      }
+      else $name = 'not yet set';
       $output = t('<p>The following domains have been created for your site.  The currently active domain
                      <strong>is shown in boldface</strong>.  You may click on a domain to change the currently active domain.
                      Your default domain is :name, which will be used for all requests that fail to resolve to a registered
