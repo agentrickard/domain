@@ -1,0 +1,14 @@
+domain_config.mapper_list:
+  path: '/admin/config/domain/domain-config'
+  defaults:
+    _title: 'Domain configuration'
+    _controller: '\Drupal\domain_config\Controller\DomainConfigMapperList::render'
+  requirements:
+    _permission: 'edit domain configuration'
+
+domain_config.entity_list:
+  path: '/admin/config/domain/domain-config/{mapper_id}'
+  defaults:
+    _controller: '\Drupal\domain_config\Controller\DomainConfigListController::listing'
+  requirements:
+    _permission: 'edit domain configuration'

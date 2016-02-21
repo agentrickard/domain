@@ -5,3 +5,17 @@ services:
       - { name: config.factory.override, priority: -150}
     arguments: ['@domain.negotiator', '@config.storage']
 
+  domain_config.route_subscriber:
+    class: Drupal\domain_config\Routing\RouteSubscriber
+    arguments: ['@plugin.manager.domain_config.mapper']
+    tags:
+      - { name: event_subscriber }
+
+  plugin.manager.domain_config.mapper:
+    class: Drupal\domain_config\DomainConfigMapperManager
+    arguments:
+      - '@cache.default'
+      - '@domain.negotiator'
+      - '@module_handler'
+      - '@config.typed'
+      - '@theme_handler'

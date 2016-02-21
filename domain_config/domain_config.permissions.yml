@@ -1,0 +1,4 @@
+edit domain configuration:
+  title: 'Edit domain configuration'
+  description: 'Edit domain-based configuration including those shipped with modules and themes.'
+  restrict access: true

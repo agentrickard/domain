@@ -1,0 +1,6 @@
+domain_config.mapper_list:
+  title: 'Domain configuration'
+  parent: domain.admin
+  description: 'Customize configuration settings per domain.'
+  route_name: domain_config.mapper_list
+  weight: 30
