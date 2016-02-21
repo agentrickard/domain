@@ -47,7 +47,17 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *     "edit-form" = "/admin/config/domain/edit/{domain}",
  *     "collection" = "/admin/config/domain",
  *   },
- *   uri_callback = "domain_uri"
+ *   uri_callback = "domain_uri",
+ *   config_export = {
+ *     "id",
+ *     "domain_id",
+ *     "hostname",
+ *     "name",
+ *     "scheme",
+ *     "status",
+ *     "weight",
+ *     "is_default",
+ *   }
  * )
  */
 class Domain extends ConfigEntityBase implements DomainInterface {
