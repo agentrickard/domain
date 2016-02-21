@@ -63,6 +63,7 @@ class DomainConfigListController extends ControllerBase {
       throw new NotFoundHttpException();
     }
     $entity_type = $mapper->getType();
+
     // If the mapper, for example the mapper for fields, has a custom list
     // controller defined, use it. Other mappers, for examples the ones for
     // node_type and block, fallback to the generic domain configuration

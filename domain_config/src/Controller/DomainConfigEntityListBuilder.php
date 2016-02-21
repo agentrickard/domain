@@ -86,14 +86,8 @@ class DomainConfigEntityListBuilder extends ConfigEntityListBuilder implements D
    */
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
-    foreach (array_keys($operations) as $operation) {
-      // This is a translation UI for translators. Show the translation
-      // operation only.
-      if (!($operation == 'translate')) {
-        unset($operations[$operation]);
-      }
-    }
-    return $operations;
+    // This is a UI for domain overrides only.
+    return $operations['domain_config'];
   }
 
   /**
