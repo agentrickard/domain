@@ -42,7 +42,6 @@ marked with [x] are considered complete.
 - [ ] Ensure unique numeric ids for use with node access
 - [ ] Provide a user interface for domain overrides
 - [x] Views argument handler to show proper title.
-- [ ] Views access handler for domain content.
 
 # Beta
 - [x] Actions for domain operations
@@ -50,6 +49,7 @@ marked with [x] are considered complete.
 - [x] Replace / inject the storage manager in DomainAliasLoader.
 - [x] Replace / inject the storage manager in DomainLoader.
 - [ ] Write tests for Domain Content.
+- [ ] Views access handler for domain content.
 - [ ] Restrict Domain Source options using JS
 - [ ] Recreate the Domain Theme module
 - [ ] Advanced drush integration / complete labelled tasks
