@@ -6,12 +6,13 @@
 
 namespace Drupal\domain\ContextProvider;
 
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Plugin\Context\Context;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\domain\DomainNegotiatorInterface;
+
 
 /**
  * Provides a context handler for the block system.
@@ -33,6 +34,7 @@ class CurrentDomainContext implements ContextProviderInterface {
    */
   public function __construct(DomainNegotiatorInterface $negotiator) {
       $this->negotiator = $negotiator;
+
   }
 
   /**
@@ -51,7 +53,7 @@ class CurrentDomainContext implements ContextProviderInterface {
 
     // Prepare the result.
     $result = [
-      'current_domain' => $context,
+      'entity:domain' => $context,
     ];
 
     return $result;

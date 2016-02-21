@@ -54,3 +54,11 @@ action.configuration.domain_disable_action:
 action.configuration.domain_enable_action:
   type: action_configuration_default
   label: 'Enable domain record'
+
+condition.plugin.domain:
+  type: condition.plugin
+  mapping:
+    domains:
+      type: sequence
+      sequence:
+        type: string

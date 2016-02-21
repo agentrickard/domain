@@ -4,7 +4,7 @@ services:
     tags:
       - { name: access_check }
     arguments: ['@domain.negotiator']
-  block.domain_context:
+  domain.current_domain_context:
     class: Drupal\domain\ContextProvider\CurrentDomainContext
     arguments: ['@domain.negotiator']
     tags:
