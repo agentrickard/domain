@@ -131,6 +131,10 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
     if (!$domain = $this->getContextValue('entity:domain')) {
       $domain = $this->domainNegotiator->getActiveDomain();
     }
+    // No context found?
+    if (empty($domain)) {
+      return FALSE;
+    }
     // NOTE: The context system handles negation for us.
     return (bool) in_array($domain->id(), $domains);
   }
