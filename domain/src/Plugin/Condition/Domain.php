@@ -19,6 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @Condition(
  *   id = "domain",
  *   label = @Translation("Domain"),
+ *   context = {
+ *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = FALSE)
+ *   }
  * )
  *
  */
@@ -124,7 +127,10 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
     if (empty($domains) && !$this->isNegated()) {
       return TRUE;
     }
-    $domain = $this->domainNegotiator->getActiveDomain();
+    // If the context did not load, derive from the request.
+    if (!$domain = $this->getContextValue('entity:domain')) {
+      $domain = $this->domainNegotiator->getActiveDomain();
+    }
     // NOTE: The context system handles negation for us.
     return (bool) in_array($domain->id(), $domains);
   }
