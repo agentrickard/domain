@@ -135,7 +135,6 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
    */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
-
     if (!isset($definition['base_route_name'])) {
       throw new InvalidPluginDefinitionException($plugin_id, "The plugin definition of the mapper '$plugin_id' does not contain a base_route_name.");
     }
@@ -154,9 +153,17 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
   protected function findDefinitions() {
     $definitions = $this->getDiscovery()->getDefinitions();
     foreach ($definitions as $plugin_id => &$definition) {
-      $this->processDefinition($definition, $plugin_id);
+      // We support only certain tupes.
+      if (in_array($definition['type'], $this->allowedTypes())) {
+        $definition['base_route_name'] = '';
+        $this->processDefinition($definition, $plugin_id);
+      }
+      else {
+        unset($definitions[$plugin_id]);
+      }
     }
-    if ($this->alterHook) {
+
+   if ($this->alterHook) {
       $this->moduleHandler->alter($this->alterHook, $definitions);
     }
 
@@ -168,6 +175,15 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
       }
     }
     return $definitions;
+  }
+
+  public function allowedTypes() {
+    $types = [
+      'config_object',
+      'config_entity',
+      'theme_settings',
+    ];
+    return $types;
   }
 
   /**

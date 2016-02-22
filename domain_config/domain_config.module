@@ -131,6 +131,7 @@ function domain_config_entity_operation(EntityInterface $entity) {
  * Implements hook_config_schema_info_alter().
  */
 function domain_config_config_schema_info_alter(&$definitions) {
+  // @TODO: booleans, etc.
   $map = array(
     'label' => '\Drupal\domain_config\FormElement\Textfield',
     'text' => '\Drupal\domain_config\FormElement\Textarea',
