@@ -106,7 +106,8 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
 
       // Check for files named MODULE.domain_config.yml and
       // THEME.domain_config.yml in module/theme roots.
-      $this->discovery = new YamlDiscovery('domain_config', $directories);
+      // @TODO: This YAML discovery is not sufficient for our needs.
+      $this->discovery = new YamlDiscovery('config_translation', $directories);
       $this->discovery = new InfoHookDecorator($this->discovery, 'domain_config_info');
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     }
