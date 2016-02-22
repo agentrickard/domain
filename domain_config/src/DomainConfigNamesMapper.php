@@ -234,7 +234,7 @@ class DomainConfigNamesMapper extends PluginBase implements DomainConfigMapperIn
    */
   public function getOverviewRoute() {
     $route = new Route(
-      $this->getBaseRoute()->getPath() . '/translate',
+      $this->getBaseRoute()->getPath() . '/domain-config',
       array(
         '_controller' => '\Drupal\domain_config\Controller\DomainConfigController::itemPage',
         'plugin_id' => $this->getPluginId(),
@@ -275,7 +275,7 @@ class DomainConfigNamesMapper extends PluginBase implements DomainConfigMapperIn
    */
   public function getAddRoute() {
     $route = new Route(
-      $this->getBaseRoute()->getPath() . '/translate/{langcode}/add',
+      $this->getBaseRoute()->getPath() . '/domain-config/{domain}/add',
       array(
         '_form' => '\Drupal\domain_config\Form\DomainConfigAddForm',
         'plugin_id' => $this->getPluginId(),
@@ -305,7 +305,7 @@ class DomainConfigNamesMapper extends PluginBase implements DomainConfigMapperIn
    */
   public function getEditRoute() {
     $route = new Route(
-      $this->getBaseRoute()->getPath() . '/translate/{langcode}/edit',
+      $this->getBaseRoute()->getPath() . '/domain-config/{domain}/edit',
       array(
         '_form' => '\Drupal\domain_config\Form\DomainConfigEditForm',
         'plugin_id' => $this->getPluginId(),
@@ -335,7 +335,7 @@ class DomainConfigNamesMapper extends PluginBase implements DomainConfigMapperIn
    */
   public function getDeleteRoute() {
     $route = new Route(
-      $this->getBaseRoute()->getPath() . '/translate/{langcode}/delete',
+      $this->getBaseRoute()->getPath() . '/domain-config/{domain}/delete',
       array(
         '_form' => '\Drupal\domain_config\Form\DomainConfigDeleteForm',
         'plugin_id' => $this->getPluginId(),
@@ -371,7 +371,7 @@ class DomainConfigNamesMapper extends PluginBase implements DomainConfigMapperIn
    * {@inheritdoc}
    */
   public function populateFromRouteMatch(RouteMatchInterface $route_match) {
-    $this->langcode = $route_match->getParameter('langcode');
+    $this->langcode = $route_match->getParameter('domain');
   }
 
   /**
