@@ -40,6 +40,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   links = {
  *     "delete-form" = "/admin/config/domain/alias/delete/{domain_alias}",
  *     "edit-form" = "/admin/config/domain/alias/edit/{domain_alias}",
+ *   },
  *   config_export = {
  *     "id",
  *     "domain_id",
