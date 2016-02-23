@@ -181,7 +181,6 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
         unset($definitions[$plugin_id]);
       }
     }
-    kint($definitions);
     return $definitions;
   }
 
@@ -193,7 +192,10 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
       // @TODO: Name matching is unreliable. Perhaps we can derive from controllers?
       foreach ($discovery->getDefinitions() as $route => $data) {
         // Assume that a _form property indicates a config_object.
-        if (isset($data['defaults']['_form'])) {
+        // Do not allow arguments in the form.
+        // Ensure that the route id includes the 'settings' keyword.
+        // Ensure that we are not loading 'theme' settings.
+        if (isset($data['defaults']['_form']) && substr_count($data['path'], '{') < 1 && substr_count($data['id'], 'settings') > 0 && substr_count($data['id'], 'theme') < 1) {
           $definition['base_route_name'] = $route;
         }
       }
@@ -204,7 +206,7 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
   public function allowedTypes() {
     $types = [
       'config_object',
-      'config_entity',
+      #'config_entity',
       #'theme_settings',
     ];
     return $types;
