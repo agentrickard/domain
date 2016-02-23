@@ -155,7 +155,9 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
     foreach ($definitions as $plugin_id => &$definition) {
       // We support only certain tupes.
       if (in_array($definition['type'], $this->allowedTypes())) {
-        $definition['base_route_name'] = '';
+        $definition = $this->deriveRoute($definition);
+      }
+      if (isset($definition['base_route_name'])) {
         $this->processDefinition($definition, $plugin_id);
       }
       else {
@@ -163,7 +165,7 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
       }
     }
 
-   if ($this->alterHook) {
+    if ($this->alterHook) {
       $this->moduleHandler->alter($this->alterHook, $definitions);
     }
 
@@ -177,11 +179,26 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
     return $definitions;
   }
 
+  private function deriveRoute($definition) {
+    if (isset($definition['provider']) && $module = $this->moduleHandler->getModule($definition['provider'])) {
+      $directory[$definition['provider']] = $module->getPath();
+      $discovery = new YamlDiscovery('routing', $directory);
+      // @TODO: Proof-of-concept, we need all routes for the module.
+      // @TODO: Name matching is unreliable. Perhaps we can derive from controllers?
+      foreach ($discovery->getDefinitions() as $route => $data) {
+        if (isset($data['defaults']['_title']) && $data['defaults']['_title'] == $definition['label']) {
+          $definition['base_route_name'] = $route;
+        }
+      }
+    }
+    return $definition;
+  }
+
   public function allowedTypes() {
     $types = [
       'config_object',
       'config_entity',
-      'theme_settings',
+      #'theme_settings',
     ];
     return $types;
   }
