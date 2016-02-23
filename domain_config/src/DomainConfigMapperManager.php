@@ -153,7 +153,12 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
   protected function findDefinitions() {
     $definitions = $this->getDiscovery()->getDefinitions();
     foreach ($definitions as $plugin_id => &$definition) {
-      // We support only certain tupes.
+      // We do not allow configuring domains by domain.
+      if ($definition['provider'] == 'domain') {
+        unset($definitions[$plugin_id]);
+        continue;
+      }
+      // We support only certain types.
       if (in_array($definition['type'], $this->allowedTypes())) {
         $definition = $this->deriveRoute($definition);
       }
@@ -176,6 +181,7 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
         unset($definitions[$plugin_id]);
       }
     }
+    kint($definitions);
     return $definitions;
   }
 
@@ -186,7 +192,8 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
       // @TODO: Proof-of-concept, we need all routes for the module.
       // @TODO: Name matching is unreliable. Perhaps we can derive from controllers?
       foreach ($discovery->getDefinitions() as $route => $data) {
-        if (isset($data['defaults']['_title']) && $data['defaults']['_title'] == $definition['label']) {
+        // Assume that a _form property indicates a config_object.
+        if (isset($data['defaults']['_form'])) {
           $definition['base_route_name'] = $route;
         }
       }
