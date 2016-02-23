@@ -206,7 +206,7 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
   public function allowedTypes() {
     $types = [
       'config_object',
-      #'config_entity',
+      'config_entity',
       #'theme_settings',
     ];
     return $types;
