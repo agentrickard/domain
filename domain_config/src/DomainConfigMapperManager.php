@@ -193,10 +193,13 @@ class DomainConfigMapperManager extends DefaultPluginManager implements DomainCo
       foreach ($discovery->getDefinitions() as $route => $data) {
         // Assume that a _form property indicates a config_object.
         // Do not allow arguments in the form.
-        // Ensure that the route id includes the 'settings' keyword.
         // Ensure that we are not loading 'theme' settings.
-        if (isset($data['defaults']['_form']) && substr_count($data['path'], '{') < 1 && substr_count($data['id'], 'settings') > 0 && substr_count($data['id'], 'theme') < 1) {
+        // Must match on title.
+        // This doesn't work, because of mismatched definitions.
+        // We likely need our own registry.
+        if ($data['defaults']['_title'] == $definition['label'] && isset($data['defaults']['_form']) && substr_count($data['path'], '{') < 1 && substr_count($data['id'], 'theme') < 1) {
           $definition['base_route_name'] = $route;
+          $definition['title'] = $definition['label'];
         }
       }
     }
