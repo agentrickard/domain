@@ -57,7 +57,7 @@ before_script:
   - cd ..
 
   # Download Drupal 8 core.
-  - travis_retry git clone --branch $DRUPAL --depth 1 http://git.drupal.org/project/drupal.git
+  - travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
   - cd drupal
 
   # Make the module appear in the correct place
