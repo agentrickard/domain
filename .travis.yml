@@ -65,7 +65,7 @@ before_script:
 
   # Install drupal default profile
   - /usr/bin/env PHP_OPTIONS="-d sendmail_path=$(which true)" drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
-  - drush --yes en simpletest domain
+  - drush --yes en simpletest domain domain_access domain_alias domain_config domain_source
   - drush cr
 
   # Start a web server on port 8080 in the background.
@@ -75,4 +75,4 @@ before_script:
   - until curl -s localhost:8080; do true; done > /dev/null
 
 script:
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://localhost:8080 "domain" "domain_access" "domain_alias" "domain_config" "domain_source" | tee /tmp/domain-test-results.txt
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://localhost:8080 "domain,domain_access,domain_alias,domain_config,domain_source" | tee /tmp/domain-test-results.txt
