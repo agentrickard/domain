@@ -57,14 +57,14 @@ before_script:
   - cd ..
 
   # Download Drupal 8 core.
-  - travis_retry git clone --branch $DRUPAL --depth 1 http://git.drupal.org/project/drupal.git
+  - travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
   - cd drupal
 
   # Make the module appear in the correct place
   - ln -s $TESTDIR modules/domain
 
   # Install drupal default profile
-  - drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
+  - /usr/bin/env PHP_OPTIONS="-d sendmail_path=$(which true)" drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
   - drush --yes en simpletest domain
   - drush cr
 
