@@ -28,7 +28,9 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
 
     // Configure 'node' as front page.
-    $this->config('system.site')->set('page.front', '/node')->save();
+
+    $site_config = $this->config('system.site');
+    $site_config->set('page.front', '/node')->save();
 
     // No domains should exist.
     $this->domainTableIsEmpty();
@@ -48,10 +50,22 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     ));
     $homepages = $this->getHomepages();
     foreach ($domains as $domain) {
+      // Clone the site configuration to set individual home pages if different
+      // than default
+      if ($homepages[$domain->id()] != 'node') {
+        $conf_name = 'domain.config.' . $domain->id() . '.system.site';
+        $site_config->setName($conf_name);
+        $site_config->set('page.front', '/' . $homepages[$domain->id()])
+          ->save();
+      }
+
       $home = $this->drupalGet($domain->getPath());
+
+      // Check if this setting is picked up
       $expected = $domain->getPath() . $homepages[$domain->id()];
       $expected_home = $this->drupalGet($expected);
-      $this->assertTrue($home == $expected_home, 'Proper home page loaded.');
+
+      $this->assertTrue($home == $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
     }
   }
 
