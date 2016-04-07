@@ -9,15 +9,12 @@ namespace Drupal\domain_content\Controller;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 
 /**
  * Controller routines domain content pages.
  */
 class DomainContentController extends ControllerBase {
-
-  use StringTranslationTrait;
 
   /**
    * Generates a list of content by domain.
@@ -107,7 +104,7 @@ class DomainContentController extends ControllerBase {
   /**
    * Checks that a user can access the internal page for a domain list.
    *
-   * @param AccoutnInterface $account
+   * @param AccountInterface $account
    *   The fully loaded user account.
    * @param DomainInterface $domain
    *   The domain being checked.
