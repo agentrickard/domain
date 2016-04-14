@@ -20,7 +20,7 @@ language-insensitive files as `domain.config.DOMAIN_MACHINE_NAME.setting`.
 
 To override the site name, for instance, you have a file like the following:
 
-```
+```YAML
 uuid: 536db351-7aec-407e-a746-70ba9cc9f190
 name: Three
 mail: admin@example.com
@@ -50,27 +50,15 @@ Import that file's contents at the Configuration Synchronization screen:
 Installation
 ============
 
-Because of Drupal 8's render cache, for the module to function correctly, you
-must have a site-specific `services.yml` file.
+Previously the module relied on manually cloning `default.services.yml`
+to change `required_cache_contexts` to:
 
-You can clone `default.services.yml` and then edit it. In that file, find:
-
-```
-  renderer.config:
-    # Renderer required cache contexts:
-    #
-    # The Renderer will automatically associate these cache contexts with every
-    # render array, hence varying every render array by these cache contexts.
-    #
-    # @default ['languages:language_interface', 'theme', 'user.permissions']
-    required_cache_contexts: ['languages:language_interface', 'theme', 'user.permissions']
-```
-
-Edit the `required_cache_contexts` to add domain-awareness, as indicated by the
-`url.site` parameter.
-
-```
+```YAML
     required_cache_contexts: ['languages:language_interface', 'theme', 'user.permissions', 'url.site']
 ```
 
-Then force a cache clear and you're ready to go.
+Dependencies
+============
+
+- Domain
+- The patch from [#2662196 Cache route by Uri and not just Query+Path](https://www.drupal.org/node/2662196)
