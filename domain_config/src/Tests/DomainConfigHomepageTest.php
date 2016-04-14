@@ -28,7 +28,6 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
 
     // Configure 'node' as front page.
-
     $site_config = $this->config('system.site');
     $site_config->set('page.front', '/node')->save();
 
@@ -38,27 +37,18 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     $this->domainCreateTestDomains(5);
     // Get the domain list.
     $domains = \Drupal::service('domain.loader')->loadMultiple();
-    $node1 = $this->drupalCreateNode(array(
+    $this->drupalCreateNode(array(
       'type' => 'article',
       'title' => 'Node 1',
       'promoted' => TRUE,
     ));
-    $node2 = $this->drupalCreateNode(array(
+    $this->drupalCreateNode(array(
       'type' => 'article',
       'title' => 'Node 2',
       'promoted' => TRUE,
     ));
     $homepages = $this->getHomepages();
     foreach ($domains as $domain) {
-      // Clone the site configuration to set individual home pages if different
-      // than default
-      if ($homepages[$domain->id()] != 'node') {
-        $conf_name = 'domain.config.' . $domain->id() . '.system.site';
-        $site_config->setName($conf_name);
-        $site_config->set('page.front', '/' . $homepages[$domain->id()])
-          ->save();
-      }
-
       $home = $this->drupalGet($domain->getPath());
 
       // Check if this setting is picked up
