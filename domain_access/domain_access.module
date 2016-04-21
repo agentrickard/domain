@@ -58,12 +58,12 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   }
   elseif ($op == 'update' && $user->hasPermission('edit domain content')) {
     if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
-      $grants['domain_id'] = $id;
+      $grants['domain_id'][] = $id;
     }
   }
   elseif ($op == 'delete' && $user->hasPermission('delete domain content')) {
     if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
-      $grants['domain_id'] = $id;
+      $grants['domain_id'][] = $id;
     }
   }
   return $grants;
