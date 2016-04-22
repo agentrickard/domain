@@ -23,6 +23,7 @@ cache:
 env:
   - DRUPAL=8.0.x
   - DRUPAL=8.1.x
+  - DRUPAL=8.2.x
 
 mysql:
   database: domain
