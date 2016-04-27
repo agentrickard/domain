@@ -384,6 +384,11 @@ function domain_access_confirm_fields($entity_type, $bundle) {
       'description' => 'Make this user an editor on all domains.',
     ]
   ];
+
+  //Allow users to manage other entities
+  $moduleHandler = Drupal::moduleHandler();
+  $moduleHandler->alter('domain_access_confirm_fields', $text);
+
   $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
 
   if (!$field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
