@@ -12,7 +12,6 @@ use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Domain-specific config overrides.

@@ -6,13 +6,14 @@
  */
 
 use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainNegotiator;
 use Drupal\Core\Url;
 
 /**
  * Implements hook_domain_operations().
  */
 function domain_content_domain_operations(DomainInterface $domain) {
+  $operations = array();
+  
   // Add content to the list.
   $account = \Drupal::currentUser();
   // Advanced grants for edit/delete require permissions.
