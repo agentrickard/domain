@@ -8,7 +8,6 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -21,6 +20,7 @@ class DomainForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = $this->entity;
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     // Create defaults if this is the first domain.
@@ -102,7 +102,7 @@ class DomainForm extends EntityForm {
     $validator = \Drupal::service('domain.validator');
     $errors = $validator->validate($entity);
     if (!empty($errors)) {
-      form_set_error('hostname', $errors);
+      $form_state->setErrorByName('hostname', $errors);
     }
   }
 

@@ -7,10 +7,9 @@
 
 namespace Drupal\domain\Plugin\Block;
 
-use Drupal\domain\Plugin\Block\DomainBlockBase;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\Entity\Domain;
 
 /**
  * Provides a block that links to all domains.
@@ -26,7 +25,8 @@ class DomainSwitcherBlock extends DomainBlockBase {
    * Overrides \Drupal\block\BlockBase::access().
    */
   public function access(AccountInterface $account, $return_as_object = FALSE) {
-    return AccessResult::allowedIfHasPermissions($account, array('administer domains', 'use domain switcher block'), 'OR');
+    $access = AccessResult::allowedIfHasPermissions($account, array('administer domains', 'use domain switcher block'), 'OR');
+    return $return_as_object ? $access : $access->isAllowed();
   }
 
   /**
@@ -35,8 +35,10 @@ class DomainSwitcherBlock extends DomainBlockBase {
    * @TODO: abstract or theme this function?
    */
   public function build() {
+    /** @var Domain $active_domain */
     $active_domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     $items = array();
+    /** @var Domain $domain */
     foreach (\Drupal::service('domain.loader')->loadMultipleSorted() as $domain) {
       $string = $domain->getLink();
       if (!$domain->status()) {

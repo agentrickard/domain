@@ -7,7 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
 
 /**
  * Handles the negotation of the active domain record.
@@ -30,7 +29,7 @@ interface DomainNegotiatorInterface {
   /**
    * Sets the active domain.
    *
-   * @param Drupal\domain\DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   Sets the domain record as active for the duration of that request.
    */
   public function setActiveDomain(DomainInterface $domain);

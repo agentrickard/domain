@@ -7,8 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainValidatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Unicode;
@@ -28,6 +26,9 @@ class DomainValidator implements DomainValidatorInterface {
    */
   protected $moduleHandler;
 
+  /** @var \GuzzleHttp\Client */
+  protected $httpClient;
+
   /**
    * Constructs a DomainNegotiator object.
    *
@@ -43,7 +44,7 @@ class DomainValidator implements DomainValidatorInterface {
   /**
    * @inheritdoc
    *
-   * @TODO: Divide this into separate methods. Do not return Drupal-specfic
+   * @TODO: Divide this into separate methods. Do not return Drupal-specific
    * responses.
    */
   public function validate(DomainInterface $domain) {
@@ -104,7 +105,7 @@ class DomainValidator implements DomainValidatorInterface {
       }
     }
     // Allow modules to alter this behavior.
-    \Drupal::moduleHandler()->invokeAll('domain_validate', $error_list, $hostname);
+    \Drupal::moduleHandler()->invokeAll('domain_validate', array($error_list, $hostname));
 
     // Return the errors, if any.
     if (!empty($error_list)) {

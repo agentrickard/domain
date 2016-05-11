@@ -5,9 +5,8 @@
  * Defines a Domain concept for use with Drupal.
  */
 
+use Drupal\Core\Url;
 use Drupal\domain\DomainInterface;
-use Drupal\domain\Entity\Domain;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -34,6 +33,10 @@ function domain_entity_bundle_info() {
 
 /**
  * Entity URI callback.
+ *
+ * @param \Drupal\domain\DomainInterface $domain
+ *   The Domain object.
+ * @return \Drupal\Core\Url
  */
 function domain_uri(DomainInterface $domain) {
   return Url::fromUri($domain->getPath(), ['absolute' => TRUE]);

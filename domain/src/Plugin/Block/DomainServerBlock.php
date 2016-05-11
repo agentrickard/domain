@@ -28,7 +28,8 @@ class DomainServerBlock extends DomainBlockBase {
    * Overrides \Drupal\block\BlockBase::access().
    */
   public function access(AccountInterface $account, $return_as_object = FALSE) {
-    return AccessResult::allowedIfHasPermissions($account, array('administer domains', 'view domain information'), 'OR');
+    $access = AccessResult::allowedIfHasPermissions($account, array('administer domains', 'view domain information'), 'OR');
+    return $return_as_object ? $access : $access->isAllowed();
   }
 
   /**
@@ -37,6 +38,7 @@ class DomainServerBlock extends DomainBlockBase {
    * @TODO: abstract or theme this function?
    */
   public function build() {
+    /** @var Domain $domain */
     $domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     if (!$domain) {
       return array(
@@ -98,13 +100,12 @@ class DomainServerBlock extends DomainBlockBase {
    * @param $array
    *  An array of data. Note that we support two levels of nesting.
    *
-   * @return
+   * @return string
    *  A suitable output string.
    */
   public function printArray(array $array) {
     $items = array();
     foreach ($array as $key => $val) {
-      $value = 'array';
       if (!is_array($val)) {
         $value = SafeMarkup::checkPlain($val);
       }

@@ -7,7 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
 
 /**
  * Supplies validator methods for common domain requests.
@@ -17,7 +16,7 @@ interface DomainValidatorInterface {
   /**
    * Validates the hostname for a domain.
    *
-   * @param Drupal\domain\DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   A domain record.
    *
    * @return array
@@ -33,7 +32,7 @@ interface DomainValidatorInterface {
    *
    * That file is /domain/tests/200.png.
    *
-   * @param Drupal\domain\DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   A domain record.
    *
    * @return integer

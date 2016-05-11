@@ -46,6 +46,7 @@ class EnableDomain extends ActionBase {
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
     $access_result = AccessResult::allowedIfHasPermission($account, 'administer domains');
+    return $return_as_object ? $access_result : $access_result->isAllowed();
   }
 
 }

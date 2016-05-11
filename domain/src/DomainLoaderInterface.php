@@ -7,7 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
 
 /**
  * Supplies loader methods for common domain requests.
@@ -30,7 +29,7 @@ interface DomainLoaderInterface {
   /**
    * Gets the default domain object.
    *
-   * @return Drupal\domain\DomainInterface | NULL
+   * @return \Drupal\domain\DomainInterface | NULL
    */
   public function loadDefaultDomain();
 
@@ -72,7 +71,7 @@ interface DomainLoaderInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return Drupal\domain\DomainInterface | NULL
+   * @return \Drupal\domain\DomainInterface | NULL
    */
   public function loadByHostname($hostname);
 

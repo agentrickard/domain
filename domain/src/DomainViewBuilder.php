@@ -7,10 +7,8 @@
 
 namespace Drupal\domain;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Component\Utility\SafeMarkup;
-use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 
 /**
  * Render controller for domain records.
@@ -19,6 +17,9 @@ class DomainViewBuilder extends EntityViewBuilder {
 
   /**
    * @inheritdoc
+   *
+   * @TODO EntityViewBuilder does not have a buildContent() method. viewMultiple() is the likely candidate.
+   * @TODO domain_field_extra_fields() is not defined anywhere.
    */
   public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
     // If we can get domain_field_extra_fields() working here, we may not even

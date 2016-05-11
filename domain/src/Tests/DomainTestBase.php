@@ -9,9 +9,9 @@ namespace Drupal\domain\Tests;
 
 use Drupal\domain\DomainInterface;
 use Drupal\simpletest\WebTestBase;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Crypt;
+use Drupal\user\UserInterface;
 
 /**
  * Base class with helper methods and setup for domain tests.
@@ -81,7 +81,7 @@ abstract class DomainTestBase extends WebTestBase {
    * The script may also add test1, test2, test3 up to any number to test a
    * large number of domains.
    *
-   * @param interger $count
+   * @param integer $count
    *   The number of domains to create.
    * @param $base_hostname
    *   The root domain to use for domain creation (e.g. example.com).
@@ -171,12 +171,12 @@ abstract class DomainTestBase extends WebTestBase {
   /**
    * Login a user on a specific domain.
    *
-   * @param Drupal\domain\DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *  The domain to log the user into.
-   * @param Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\user\UserInterface $account
    *  The user account to login.
    */
-  public function domainLogin(DomainInterface $domain, AccountInterface $account) {
+  public function domainLogin(DomainInterface $domain, UserInterface $account) {
     if ($this->loggedInUser) {
       $this->drupalLogout();
     }

@@ -7,9 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainLoaderInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 
 class DomainLoader implements DomainLoaderInterface {

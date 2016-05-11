@@ -13,7 +13,7 @@
  * use Drupal\domain\DomainInterface;
  *
  *
- * @param array $domain
+ * @param array $domains
  *   An array of $domain record objects.
  *
  */
@@ -36,10 +36,10 @@ function hook_domain_load(array $domains) {
  * To issue a redirect, as in the case of Domain Alias, set a redirect
  * property to a valid response code (301 or 302).
  *
- * @param DomainInterface $domain
+ * @param \Drupal\domain\DomainInterface $domain
  *   A domain object defined by Drupal\domain\DomainInterface.
  */
-function hook_domain_request_alter(DomainInterface &$domain) {
+function hook_domain_request_alter(\Drupal\domain\DomainInterface &$domain) {
   // Add a special case to the example domain.
   if ($domain->getMatchType() == DOMAIN_MATCH_EXACT && $domain->id() == 'example_com') {
     // Do something here.
@@ -50,17 +50,15 @@ function hook_domain_request_alter(DomainInterface &$domain) {
 /**
  * Adds administrative operations for the domain overview form.
  *
- * @param &$operations
- *  An array of links, which uses a unique string key and requires the
- *  elements 'title' and 'url'; the 'query' value is optional, and used
- *  for link-actions with tokens.
- * @param Drupal\domain\DomainInterface
+ * @param \Drupal\domain\DomainInterface $domain
  *   A domain record object.
  *
  * @return array
- *   An array of operations.
+ *   An array of operations which uses a unique string key and requires the
+ *  elements 'title' and 'url'; the 'query' value is optional, and used
+ *  for link-actions with tokens
  */
-function hook_domain_operations(DomainInterface $domain) {
+function hook_domain_operations(\Drupal\domain\DomainInterface $domain) {
   // Add aliases to the list.
   $id = $domain->id();
   $operations['domain_alias'] = array(
@@ -80,10 +78,10 @@ function hook_domain_operations(DomainInterface $domain) {
  *
  * NOTE: This does not apply to Domain Alias records.
  *
- * @param &$error_list
+ * @param array &$error_list
  *   The list of current validation errors. Modify this value by reference.
  *   If you return an empty array or NULL, the domain is considered valid.
- * @param $hostname
+ * @param string $hostname
  *   The HTTP_HOST string value being validated, such as one.example.com.
  *   Note that this is checked for uniqueness separately. This value is not
  *   modifiable.
@@ -93,9 +91,9 @@ function hook_domain_operations(DomainInterface $domain) {
  *
  * @see domain_valid_domain()
  */
-function hook_domain_validate_alter(&$error_list, $subdomain) {
+function hook_domain_validate_alter(&$error_list, $hostname) {
   // Only allow TLDs to be .org for our site.
-  if (substr($subdomain, -4) != '.org') {
+  if (substr($hostname, -4) != '.org') {
     $error_list[] = t('Only .org domains may be registered.');
   }
 }

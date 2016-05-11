@@ -10,7 +10,7 @@ namespace Drupal\domain\Access;
 use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain\DomainInterface;
+use Drupal\domain\Entity\Domain;
 use Drupal\domain\DomainNegotiatorInterface;
 use Symfony\Component\Routing\Route;
 
@@ -57,6 +57,7 @@ class DomainAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
+    /** @var Domain $domain */
     $domain = $this->domainNegotiator->getActiveDomain();
     // Is the domain allowed?
     // No domain, let it pass.

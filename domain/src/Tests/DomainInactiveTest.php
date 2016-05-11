@@ -7,8 +7,7 @@
 
 namespace Drupal\domain\Tests;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Tests the access rules and redirects for inactive domains.
@@ -39,7 +38,7 @@ class DomainInactiveTest extends DomainTestBase {
     $this->assertTrue($default->getPath() == $this->getUrl(), 'Redirected an inactive domain to the default domain.');
 
     // Try to access with the proper permission.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access inactive domains'));
+    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
     // Must flush cache.
     drupal_flush_all_caches();

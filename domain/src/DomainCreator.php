@@ -7,9 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainCreatorInterface;
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Creates new domain records.
@@ -69,6 +66,7 @@ class DomainCreator implements DomainCreatorInterface {
   public function createNextId() {
     $domains = $this->loader->loadMultiple();
     $max = 0;
+    /** @var \Drupal\domain\Entity\Domain $domain */
     foreach ($domains as $domain) {
       $domain_id = $domain->getDomainId();
       if ($domain_id > $max) {

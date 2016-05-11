@@ -7,8 +7,6 @@
 
 namespace Drupal\domain\Tests;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests domain record validation.
@@ -33,9 +31,10 @@ class DomainValidatorTest extends DomainTestBase {
 
     // Check the created domain based on it's known id value.
     $key = 'example_com';
+    /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = \Drupal::service('domain.loader')->load($key);
 
-    // Our testing server should be able to acess the test PNG file.
+    // Our testing server should be able to access the test PNG file.
     $this->assertTrue($domain->getResponse() == 200, format_string('Server test for @url passed.', array('@url' => $domain->getPath())));
 
     // Now create a bad domain.

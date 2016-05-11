@@ -121,7 +121,7 @@ interface DomainInterface extends ConfigEntityInterface {
    * @param $current_path
    *   Indicates that the link should point to the path of the current request.
    *
-   * @return Drupal\Core\Url
+   * @return \Drupal\Core\Url
    *   A core URL object.
    */
   public function getLink($current_path = TRUE);

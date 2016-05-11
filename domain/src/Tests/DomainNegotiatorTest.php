@@ -6,12 +6,11 @@
  */
 
 namespace Drupal\domain\Tests;
+use Drupal\Core\Session\AccountInterface;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
 
 /**
- * Tests the domain negotation manager.
+ * Tests the domain negotiation manager.
  *
  * @group domain
  */
@@ -39,7 +38,7 @@ class DomainNegotiatorTest extends DomainTestBase {
     $this->drupalPlaceBlock('domain_server_block');
 
     // To get around block access, let the anon user view the block.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('view domain information'));
+    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('view domain information'));
 
     // Test the response of the default home page.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
@@ -48,7 +47,7 @@ class DomainNegotiatorTest extends DomainTestBase {
     }
 
     // Revoke the permission change
-    user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('view domain information'));
+    user_role_revoke_permissions(AccountInterface::ANONYMOUS_ROLE, array('view domain information'));
 
     // @TODO: Any other testing needed here?
 

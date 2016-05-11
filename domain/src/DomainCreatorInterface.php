@@ -7,7 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
 
 /**
  * Handles the creation of new domain records.
