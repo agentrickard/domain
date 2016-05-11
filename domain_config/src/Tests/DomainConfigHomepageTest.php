@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\domain_config\Tests;
+use Drupal\user\RoleInterface;
 
-use Drupal\domain_config\Tests\DomainConfigTestBase;
 
 /**
  * Tests the domain config system handling of home page routes.
@@ -25,7 +25,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
    */
   function testDomainConfigHomepage() {
     // Let anon users see content.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('access content'));
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('access content'));
 
     // Configure 'node' as front page.
     $site_config = $this->config('system.site');

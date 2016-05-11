@@ -9,6 +9,7 @@
  */
 
 namespace Drupal\domain_config\Routing;
+
 use Drupal\Core\Routing\RouteProvider;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Symfony\Component\HttpFoundation\Request;

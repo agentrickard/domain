@@ -7,7 +7,8 @@
 
 namespace Drupal\domain_config\Tests;
 
-use Drupal\domain_config\Tests\DomainConfigTestBase;
+use Drupal\domain\Entity\Domain;
+
 
 /**
  * Tests the domain config system.
@@ -61,6 +62,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
   /**
    * Returns the expected site name value from our test configuration.
    *
+   * @param Domain $domain
    * @return string
    */
   private function expectedName($domain) {

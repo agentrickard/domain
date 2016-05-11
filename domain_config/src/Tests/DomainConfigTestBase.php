@@ -8,8 +8,6 @@
 namespace Drupal\domain_config\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Helper test methods for Domain Config testing.
