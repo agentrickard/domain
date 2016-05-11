@@ -17,9 +17,9 @@
  * been verified before this hook is called.
  *
  *
- * @param &$source
+ * @param \Drupal\domain\Entity\Domain|NULL &$source
  *   A domain object or NULL if not set.
- * @param $path
+ * @param string $path
  *   The outbound path request.
  * @param array $options
  *   The options for the url, as defined by
@@ -50,9 +50,9 @@ function hook_domain_source_alter(&$source, $path, $options) {
  * loading a valid domain record or set $source = NULL to discard an existing
  * $source value and not rewrite the path.
  *
- * @param &$source
+ * @param array &$source
  *   The domain array from domain_get_node_match(), passed by reference.
- * @param $path
+ * @param string $path
  *   The outbound path request.
  * @param array $options
  *   The options for the url, as defined by

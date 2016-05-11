@@ -7,7 +7,6 @@
 
 namespace Drupal\domain_source\HttpKernel;
 
-use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;

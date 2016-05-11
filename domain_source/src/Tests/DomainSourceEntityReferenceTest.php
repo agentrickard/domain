@@ -7,7 +7,6 @@
 
 namespace Drupal\domain_source\Tests;
 
-use Drupal\domain\DomainInterface;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
