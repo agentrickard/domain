@@ -88,7 +88,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
   /**
    * Sets the domain context for this list.
    *
-   * @param Drupal\domain\DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    */
   public function setDomain(DomainInterface $domain) {
     $this->domain = $domain;
@@ -97,7 +97,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
   /**
    * Gets the domain context for this list.
    *
-   * @return Drupal\domain\DomainInterface $domain
+   * @return \Drupal\domain\DomainInterface $domain
    */
   public function getDomainId() {
     // @TODO: check for a use-case where we might need to derive the id?

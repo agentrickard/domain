@@ -9,8 +9,6 @@ namespace Drupal\domain_alias\Entity;
 
 use Drupal\domain_alias\DomainAliasInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Config\Entity\ConfigEntityStorage;
-use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
  * Defines the domain alias entity.

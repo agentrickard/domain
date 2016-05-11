@@ -7,7 +7,6 @@
 
 namespace Drupal\domain_alias;
 
-use Drupal\domain_alias\DomainAliasInterface;
 
 /**
  * Supplies validator methods for common domain requests.
@@ -16,6 +15,8 @@ interface DomainAliasValidatorInterface {
 
   /**
    * Validates the rules for a domain alias.
+   * 
+   * @param \Drupal\domain_alias\DomainAliasInterface $alias
    */
   public function validate(DomainAliasInterface $alias);
 

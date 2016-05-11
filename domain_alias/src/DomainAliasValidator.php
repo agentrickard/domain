@@ -7,8 +7,6 @@
 
 namespace Drupal\domain_alias;
 
-use Drupal\domain_alias\DomainAliasInterface;
-use Drupal\domain_alias\DomainAliasValidatorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -20,6 +18,10 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
 
   /**
    * Validates the rules for a domain alias.
+   *
+   * @param \Drupal\domain_alias\DomainAliasInterface $alias
+   *   The Domain Alias to validate.
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    */
   public function validate(DomainAliasInterface $alias) {
     $pattern = $alias->getPattern();
@@ -47,7 +49,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
     }
     // 4) Check that the alias is not a direct match for a registered domain.
     $check = preg_match('/[a-z0-9\.\+\-:]*$/', $pattern);
-    if ($check == 1 && $test = \Drupal::service('domain.loader')->loadByHostname($pattern)) {
+    if ($check == 1 && \Drupal::service('domain.loader')->loadByHostname($pattern)) {
       return $this->t('The pattern matches an existing domain record.');
     }
     // 5) Check that the alias is unique across all records.

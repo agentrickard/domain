@@ -7,7 +7,6 @@
 
 namespace Drupal\domain_alias;
 
-use Drupal\domain_alias\DomainAliasInterface;
 
 /**
  * Supplies loader methods for common domain_alias requests.
@@ -48,7 +47,7 @@ interface DomainAliasLoaderInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
    */
   public function loadByHostname($hostname);
 
@@ -58,7 +57,7 @@ interface DomainAliasLoaderInterface {
    * @param string $pattern
    *   A pattern string, in the format *.example.com.
    *
-   * @return Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
    */
   public function loadByPattern($pattern);
 

@@ -8,7 +8,6 @@
 namespace Drupal\domain_alias;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -74,7 +73,7 @@ class DomainAliasForm extends EntityForm {
     $validator = \Drupal::service('domain_alias.validator');
     $errors = $validator->validate($entity);
     if (!empty($errors)) {
-      form_set_error('pattern', $errors);
+      $form_state->setErrorByName('pattern', $errors);
     }
   }
 

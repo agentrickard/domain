@@ -7,10 +7,7 @@
 
 namespace Drupal\domain_alias;
 
-use Drupal\domain_alias\DomainAliasLoaderInterface;
-use Drupal\domain_alias\DomainAliasInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Alias loader utility class.
@@ -20,9 +17,9 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   /**
    * The typed config handler.
    *
-   * @var Drupal\Core\Config\TypedConfigManagerInterface
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface
    */
-  protected $typed_config;
+  protected $typedConfig;
 
   /**
    * Constructs a DomainAliasLoader object.
