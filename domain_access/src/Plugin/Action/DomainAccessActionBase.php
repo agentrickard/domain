@@ -7,7 +7,6 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityTypeInterface;

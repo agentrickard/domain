@@ -6,9 +6,10 @@
  */
 
 namespace Drupal\domain_access\Tests;
-use Drupal\domain\Tests\DomainTestBase;
-use Drupal\domain\DomainInterface;
+
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\Tests\DomainTestBase;
+
 
 /**
  * Tests the application of domain access grants.
@@ -16,6 +17,9 @@ use Drupal\Core\Session\AccountInterface;
  * @group domain_access
  */
 class DomainAccessGrantsTest extends DomainTestBase {
+
+  /** @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $accessHandler */
+  protected $accessHandler;
 
   /**
    * Modules to enable.
@@ -34,7 +38,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
     $this->accessHandler = \Drupal::entityManager()->getAccessControlHandler('node');
 
     // Clear permissions for authenticated users.
-    $this->config('user.role.' . DRUPAL_AUTHENTICATED_RID)->set('permissions', array())->save();
+    $this->config('user.role.' . AccountInterface::ANONYMOUS_ROLE)->set('permissions', array())->save();
   }
 
   /**

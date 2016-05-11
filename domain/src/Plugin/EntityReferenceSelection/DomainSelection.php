@@ -8,7 +8,6 @@
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
 use Drupal\user\Entity\User;
-use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -42,7 +41,7 @@ class DomainSelection extends DefaultSelection {
     // Filter domains by the user's assignments, which are controlled by other
     // modules. Those modules must know what type of entity they are dealing
     // with, so look up the entity type and bundle.
-    $info = $query->getMetadata('entity_reference_selection_handler');
+    $info = $query->getMetaData('entity_reference_selection_handler');
     $context['entity_type'] = $info->configuration['entity']->getEntityTypeId();
     $context['bundle'] = $info->configuration['entity']->bundle();
 

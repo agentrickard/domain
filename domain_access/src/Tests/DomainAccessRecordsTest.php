@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\domain_access\Tests;
+
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain access integration with node_access records.

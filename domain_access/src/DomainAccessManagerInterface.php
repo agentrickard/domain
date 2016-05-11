@@ -7,7 +7,6 @@
 
 namespace Drupal\domain_access;
 
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -21,7 +20,7 @@ interface DomainAccessManagerInterface {
   /**
    * Get the domain access field values from an entity.
    *
-   * @param Drupal\Core\Entity\EntityInterface
+   * @param \Drupal\Core\Entity\EntityInterface
    *   The entity to retrieve field data from.
    * @param $field_name
    *   The name of the field that holds our data.
@@ -33,7 +32,7 @@ interface DomainAccessManagerInterface {
   /**
    * Get the all affiliates field values from an entity.
    *
-   * @param Drupal\Core\Entity\EntityInterface
+   * @param \Drupal\Core\Entity\EntityInterface
    *   The entity to retrieve field data from.
    *
    * @return boolean
@@ -43,9 +42,9 @@ interface DomainAccessManagerInterface {
   /**
    * Compare the entity values against a user's account assignments.
    *
-   * @param Drupal\Core\Entity\EntityInterface
+   * @param \Drupal\Core\Entity\EntityInterface
    *   The entity being checked for access.
-   * @param Drupal\Core\Session\AccountInterface
+   * @param \Drupal\Core\Session\AccountInterface
    *   The account of the user performing the action.
    *
    * @return boolean
@@ -55,9 +54,9 @@ interface DomainAccessManagerInterface {
   /**
    * Get the default field value for an entity.
    *
-   * @param Drupal\Core\Entity\FieldableEntityInterface
+   * @param \Drupal\Core\Entity\FieldableEntityInterface
    *   The entity being created.
-   * @param Drupal\Core\Field\FieldDefinitionInterface
+   * @param \Drupal\Core\Field\FieldDefinitionInterface
    *   The field being created.
    *
    * @return array
@@ -67,9 +66,9 @@ interface DomainAccessManagerInterface {
   /**
    * Get the default all affiliates value for an entity.
    *
-   * @param Drupal\Core\Entity\FieldableEntityInterface
+   * @param \Drupal\Core\Entity\FieldableEntityInterface
    *   The entity being created.
-   * @param Drupal\Core\Field\FieldDefinitionInterface
+   * @param \Drupal\Core\Field\FieldDefinitionInterface
    *   The field being created.
    *
    * @return array

@@ -6,8 +6,8 @@
  */
 
 namespace Drupal\domain_access\Tests;
+
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\domain\DomainInterface;
 use Drupal\node\Entity\NodeType;
 
 /**

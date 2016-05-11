@@ -7,10 +7,8 @@
 
 namespace Drupal\domain_access;
 
-use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -97,6 +95,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     switch ($entity->getEntityType()) {
       case 'user':
       case 'node':
+        // @TODO $this is no accessible in a static context.
         if ($active = $this->negotiator->getActiveDomain()) {
           $item[0]['target_uuid'] = $active->uuid();
         }

@@ -5,15 +5,11 @@
  * Domain-based access control for content.
  */
 
-use Drupal\domain\DomainNegotiator;
-use Drupal\domain\DomainInterface;
 use Drupal\node\NodeInterface;
-use Drupal\node\Entity\NodeType;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Url;
 
 /**
  * Defines the name of the node access control field.
@@ -30,6 +26,7 @@ define('DOMAIN_ACCESS_ALL_FIELD', 'field_domain_all_affiliates');
  */
 function domain_access_node_grants(AccountInterface $account, $op) {
   $grants = array();
+  /** @var \Drupal\domain\Entity\Domain $active */
   $active = \Drupal::service('domain.negotiator')->getActiveDomain();
 
   if (empty($active)) {
@@ -43,6 +40,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
 
   $id = $active->getDomainId();
   // Advanced grants for edit/delete require permissions.
+  /** @var \Drupal\user\UserInterface $user */
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($user);
   // Grants for view are simple. Use the active domain and all affiliates.
@@ -273,18 +271,18 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
 
   switch ($op) {
     case 'update':
-      if ($account->hasPermission('update ' . $type . ' content on assigned domains', $account) && $manager->checkEntityAccess($node, $account)) {
+      if ($account->hasPermission('update ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
-      if ($account->hasPermission('edit domain content', $account) && $manager->checkEntityAccess($node, $account)) {
+      if ($account->hasPermission('edit domain content') && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
 
     case 'delete':
-      if ($account->hasPermission('delete ' . $type . ' content on assigned domains', $account) && $manager->checkEntityAccess($node, $account)) {
+      if ($account->hasPermission('delete ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
-      if ($account->hasPermission('delete domain content', $account) && $manager->checkEntityAccess($node, $account)) {
+      if ($account->hasPermission('delete domain content') && $manager->checkEntityAccess($node, $account)) {
         return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
       }
 
@@ -311,8 +309,8 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
   // Load the full user record.
   $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
   $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($user);
-  if (($account->hasPermission('create ' . $entity_bundle . ' content on assigned domains', $account)
-      || $account->hasPermission('create domain content', $account))
+  if (($account->hasPermission('create ' . $entity_bundle . ' content on assigned domains')
+      || $account->hasPermission('create domain content'))
       && in_array($id, $user_domains)) {
     // Note the cache context here!
     return AccessResult::allowed()->addCacheContexts(['user.permissions', 'url.site']);

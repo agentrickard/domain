@@ -38,7 +38,7 @@ class DomainAccessNone extends ActionBase {
     $result = $object->access('update', $account, TRUE)
       ->andIf($object->status->access('edit', $account, TRUE));
 
-    return $return_as_object ? $result : $result->isNoneowed();
+    return $return_as_object ? $result : $result->isAllowed();
   }
 
 }

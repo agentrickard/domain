@@ -6,10 +6,11 @@
  */
 
 namespace Drupal\domain_access\Tests;
+
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\RoleInterface;
+
 
 /**
  * Tests the domain access integration with node_access callbacks.
@@ -17,6 +18,12 @@ use Drupal\user\RoleInterface;
  * @group domain_access
  */
 class DomainAccessPermissionsTest extends DomainTestBase {
+
+  /** @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $accessHandler */
+  protected $accessHandler;
+
+  /** @var \Drupal\domain_access\DomainAccessManagerInterface $manager */
+  protected $manager;
 
   /**
    * Modules to enable.
@@ -54,7 +61,6 @@ class DomainAccessPermissionsTest extends DomainTestBase {
   function testDomainAccessPermissions() {
     // Note that these are hook_node_access() rules. Node Access system tests
     // are in DomainAccessRecordsTest.
-
     // We expect to find 5 domain options. Set two for later use.
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     foreach ($domains as $domain) {
