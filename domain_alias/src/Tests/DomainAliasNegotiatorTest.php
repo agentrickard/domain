@@ -7,8 +7,6 @@
 
 namespace Drupal\domain_alias\Tests;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain_alias\Tests\DomainAliasTestBase;
 
 /**
  * Tests domain alias request negotiation.
@@ -42,6 +40,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
 
     // Test the response of the default home page.
+    /** @var \Drupal\domain\Entity\Domain $domain */
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       if (!isset($alias_domain)) {
         $alias_domain = $domain;
