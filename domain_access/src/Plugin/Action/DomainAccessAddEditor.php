@@ -19,6 +19,7 @@ class DomainAccessAddEditor extends DomainAccessActionBase {
   public function execute($entity = NULL) {
     $id = $this->configuration['id'];
     $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($entity);
+    
     // Skip adding the role to the user if they already have it.
     if ($entity !== FALSE && !isset($user_domains[$id])) {
       $user_domains[$id] = $id;
