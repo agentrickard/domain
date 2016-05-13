@@ -45,7 +45,7 @@ before_install:
 
 install:
   # Install Drush.
-  - composer global require drush/drush:dev-master
+  - composer global require drush/drush:8.*
   - phpenv rehash
 
   # Create database.
