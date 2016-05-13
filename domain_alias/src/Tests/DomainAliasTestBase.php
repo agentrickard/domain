@@ -32,14 +32,14 @@ abstract class DomainAliasTestBase extends DomainTestBase {
   /**
    * Creates an alias for testing.
    *
-   * @param Drupal\domain\Entity\Domain $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   A domain entity.
    * @param string $pattern
    *   An optional alias pattern.
    * @param int $redirect
    *   An optional redirect (301 or 302).
    *
-   * @return Drupal\domain_alias\Entity\DomainAlias
+   * @return \Drupal\domain_alias\Entity\DomainAlias
    *   A domain alias entity.
    */
   public function domainAliasCreateTestAlias(DomainInterface $domain, $pattern = NULL, $redirect = 0) {
@@ -52,7 +52,10 @@ abstract class DomainAliasTestBase extends DomainTestBase {
       'redirect' => $redirect,
     );
     // Replicate the logic for creating machine_name patterns.
-    $values['id'] = str_replace(array('*', '.'), '_', $values['pattern']);
+    // @see ConfigBase::validate()
+    $machine_name = str_replace(array('?', '<', '>', '"', '\'', '/', '\\'), '', $values['pattern']);
+    $values['id'] = str_replace(array('*', '.', ':'), '_', $machine_name);
+
     $alias = \Drupal::entityManager()->getStorage('domain_alias')->create($values);
     $alias->save();
 
