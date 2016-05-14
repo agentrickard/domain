@@ -13,7 +13,6 @@ use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain\Entity\Domain;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -86,7 +85,7 @@ class DomainSubscriber implements EventSubscriberInterface {
   public function onKernelRequestDomain(GetResponseEvent $event) {
     $redirect = FALSE;
     // Negotiate the request and set domain context.
-    /** @var Domain $domain */
+    /** @var \Drupal\domain\DomainInterface $domain */
     if ($domain = $this->domainNegotiator->getActiveDomain(TRUE)) {
       $domain_url = $domain->getUrl();
       if ($domain_url) {
@@ -104,7 +103,7 @@ class DomainSubscriber implements EventSubscriberInterface {
           // Note that Allowed, Neutral, and Failed are the options here.
           // We insist on Allowed.
           if (!$access->isAllowed()) {
-            /** @var Domain $default */
+            /** @var \Drupal\domain\DomainInterface $default */
             $default = $this->domainLoader->loadDefaultDomain();
             $domain_url = $default->getUrl();
             $redirect = TRUE;

@@ -7,8 +7,6 @@
 
 namespace Drupal\domain\Plugin\Block;
 
-use Drupal\domain\Entity\Domain;
-use Drupal\domain\Plugin\Block\DomainBlockBase;
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
@@ -38,7 +36,7 @@ class DomainServerBlock extends DomainBlockBase {
    * @TODO: abstract or theme this function?
    */
   public function build() {
-    /** @var Domain $domain */
+    /** @var \Drupal\domain\DomainInterface $domain */
     $domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     if (!$domain) {
       return array(

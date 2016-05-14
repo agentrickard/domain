@@ -7,11 +7,11 @@
 
 namespace Drupal\domain\Entity;
 
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\domain\DomainInterface;
 
 /**
  * Defines the domain entity.
@@ -188,7 +188,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function isActive() {
     $negotiator = \Drupal::service('domain.negotiator');
-    /** @var Domain $domain */
+    /** @var DomainInterface $domain */
     $domain = $negotiator->getActiveDomain();
     if (empty($domain)) {
       return FALSE;
@@ -338,7 +338,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
     $loader = \Drupal::service('domain.loader');
-    /** @var Domain $default */
+    /** @var DomainInterface $default */
     $default = $loader->loadDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
