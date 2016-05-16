@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\DomainAccessControlHandler.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Access\AccessResult;

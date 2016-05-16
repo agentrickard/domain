@@ -1,20 +1,13 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\EventSubscriber\DomainSubscriber.
- */
-
 namespace Drupal\domain\EventSubscriber;
 
-use Drupal\Core\Access\AccessResult;
 use Drupal\domain\Access\DomainAccessCheck;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -97,7 +90,7 @@ class DomainSubscriber implements EventSubscriberInterface {
         }
         // Else check for active domain or inactive access.
         elseif ($this->accessCheck->checkPath($path)) {
-          /** @var AccessResult $access */
+          /** @var \Drupal\Core\Access\AccessResult $access */
           $access = $this->accessCheck->access($this->account);
           // If the access check fails, reroute to the default domain.
           // Note that Allowed, Neutral, and Failed are the options here.
@@ -120,9 +113,9 @@ class DomainSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  static function getSubscribedEvents() {
+  public static function getSubscribedEvents() {
     // This needs to fire very early in the stack, before accounts are cached.
     $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 50);
     return $events;

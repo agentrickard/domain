@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\Tests\DomainAliasNegotiatorTest
- */
-
 namespace Drupal\domain_alias\Tests;
 
 use Drupal\user\RoleInterface;
-
 
 /**
  * Tests domain alias request negotiation.
@@ -27,7 +21,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
   /**
    * Tests the handling of aliased requests.
    */
-  function testDomainAliasNegotiator() {
+  public function testDomainAliasNegotiator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -71,9 +65,8 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $alias->set('redirect', 302);
     $alias->save();
     $this->drupalGet($url);
-    // Revoke the permission change
+    // Revoke the permission change.
     user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
-
   }
 
 }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\Action\DomainAccessActionBase.
- */
-
 namespace Drupal\domain_access\Plugin\Action;
 
 use Drupal\Core\Action\ConfigurableActionBase;

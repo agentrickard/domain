@@ -1,14 +1,12 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainLoader.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Config\TypedConfigManagerInterface;
 
+/**
+ * Loads Domain records.
+ */
 class DomainLoader implements DomainLoaderInterface {
 
   /**

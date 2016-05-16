@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainInactiveTest.
- */
-
 namespace Drupal\domain\Tests;
 
 use Drupal\Core\Session\AccountInterface;
@@ -16,6 +11,9 @@ use Drupal\Core\Session\AccountInterface;
  */
 class DomainInactiveTest extends DomainTestBase {
 
+  /**
+   * Test inactive domain.
+   */
   public function testInactiveDomain() {
     // Create three new domains programmatically.
     $this->domainCreateTestDomains(3);

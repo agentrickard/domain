@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\Action\DomainAccessAddEditor.
- */
-
 namespace Drupal\domain_access\Plugin\Action;
-
 
 /**
  * Assigns an editor to a domain.

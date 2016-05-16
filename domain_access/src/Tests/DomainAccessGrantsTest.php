@@ -1,15 +1,9 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessGrantsTest
- */
-
 namespace Drupal\domain_access\Tests;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\Tests\DomainTestBase;
-
 
 /**
  * Tests the application of domain access grants.
@@ -18,7 +12,11 @@ use Drupal\domain\Tests\DomainTestBase;
  */
 class DomainAccessGrantsTest extends DomainTestBase {
 
-  /** @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $accessHandler */
+  /**
+   * The Entity access handler.
+   *
+   * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $accessHandler
+   */
   protected $accessHandler;
 
   /**
@@ -28,7 +26,10 @@ class DomainAccessGrantsTest extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_access', 'field', 'node');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
     // Run the install hook.
     // @TODO: figure out why this is necessary.
@@ -44,7 +45,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
   /**
    * Creates a node and tests the creation of node access rules.
    */
-  function testDomainAccessGrants() {
+  public function testDomainAccessGrants() {
     // The {node_access} table is not emptied properly by the setup.
     db_delete('node_access')->execute();
     // Create 5 domains.

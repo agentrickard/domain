@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\Entity\DomainAlias.
- */
-
 namespace Drupal\domain_alias\Entity;
 
 use Drupal\domain_alias\DomainAliasInterface;

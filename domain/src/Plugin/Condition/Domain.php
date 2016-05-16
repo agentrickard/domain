@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Plugin\Condition\Domain.
- */
-
 namespace Drupal\domain\Plugin\Condition;
 
 use Drupal\Core\Condition\ConditionPluginBase;
@@ -23,7 +18,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = FALSE)
  *   }
  * )
- *
  */
 class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterface {
 
@@ -68,16 +62,16 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form['domains'] = array(
-        '#type' => 'checkboxes',
-        '#title' => $this->t('When the following domains are active'),
-        '#default_value' => $this->configuration['domains'],
-        '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', \Drupal::service('domain.loader')->loadOptionsList()),
-        '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
-        '#attached' => array(
-            'library' => array(
-                'domain/drupal.domain',
-            ),
+      '#type' => 'checkboxes',
+      '#title' => $this->t('When the following domains are active'),
+      '#default_value' => $this->configuration['domains'],
+      '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', \Drupal::service('domain.loader')->loadOptionsList()),
+      '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
+      '#attached' => array(
+        'library' => array(
+          'domain/drupal.domain',
         ),
+      ),
     );
     return parent::buildConfigurationForm($form, $form_state);
   }
@@ -87,7 +81,7 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
    */
   public function defaultConfiguration() {
     return array(
-        'domains' => array(),
+      'domains' => array(),
     ) + parent::defaultConfiguration();
   }
 

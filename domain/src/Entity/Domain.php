@@ -1,14 +1,10 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Entity\Domain.
- */
-
 namespace Drupal\domain\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\domain\DomainInterface;
@@ -225,6 +221,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function saveDefault() {
     if (!$this->isDefault()) {
       // Swap the current default.
+      /** @var DomainInterface $default */
       if ($default = \Drupal::service('domain.loader')->loadDefaultDomain()) {
         $default->is_default = 0;
         $default->save();
@@ -266,7 +263,11 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (isset($this->{$name})) {
       $this->{$name} = $value;
       $this->save();
-      drupal_set_message($this->t('The @key attribute was set to @value for domain @hostname.', array('@key' => $name, '@value' => $value, '@hostname' => $this->hostname)));
+      drupal_set_message($this->t('The @key attribute was set to @value for domain @hostname.', array(
+        '@key' => $name,
+        '@value' => $value,
+        '@hostname' => $this->hostname,
+      )));
     }
     else {
       drupal_set_message($this->t('The @key attribute does not exist.', array('@key' => $name)));
@@ -308,7 +309,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * Builds a link from a known internal path.
    *
-   * @param $path
+   * @param string $path
    *   A Drupal-formatted internal path, starting with /. Note that it is the
    *   caller's responsibility to handle the base_path().
    *
@@ -392,48 +393,48 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     else {
       $url = Url::fromUri($this->getPath(), $options);
     }
-    return \Drupal::l($this->getHostname(), $url);
+    return Link::fromTextAndUrl($this->getHostname(), $url);
   }
 
   /**
    * {@inheritdoc}
    */
-  function getRedirect() {
+  public function getRedirect() {
     return $this->redirect;
   }
 
   /**
    * {@inheritdoc}
    */
-  function setRedirect($code = 302) {
+  public function setRedirect($code = 302) {
     $this->redirect = $code;
   }
 
   /**
    * {@inheritdoc}
    */
-  function getHostname() {
+  public function getHostname() {
     return $this->hostname;
   }
 
   /**
    * {@inheritdoc}
    */
-  function setHostname($hostname) {
+  public function setHostname($hostname) {
     $this->hostname = $hostname;
   }
 
   /**
    * {@inheritdoc}
    */
-  function getDomainId() {
+  public function getDomainId() {
     return $this->domain_id;
   }
 
   /**
    * {@inheritdoc}
    */
-  function getWeight() {
+  public function getWeight() {
     return $this->weight;
   }
 

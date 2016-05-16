@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Defines \Drupal\domain\Access\DomainAccessCheck.
- */
-
 namespace Drupal\domain\Access;
 
 use Drupal\Core\Access\AccessCheckInterface;
@@ -19,6 +14,8 @@ use Symfony\Component\Routing\Route;
 class DomainAccessCheck implements AccessCheckInterface {
 
   /**
+   * The Domain negotiator.
+   *
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $domainNegotiator;

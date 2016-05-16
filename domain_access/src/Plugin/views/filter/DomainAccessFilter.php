@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\views\filter\DomainAccessFilter.
- */
-
 namespace Drupal\domain_access\Plugin\views\filter;
 
 use Drupal\views\Plugin\views\filter\InOperator;

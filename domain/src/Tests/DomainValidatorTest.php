@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainValidatorTest.
- */
-
 namespace Drupal\domain\Tests;
-
 
 /**
  * Tests domain record validation.
@@ -48,4 +42,5 @@ class DomainValidatorTest extends DomainTestBase {
     $domain->save();
     $this->assertTrue($domain->getResponse() == 500, format_string('Server test for @url failed.', array('@url' => $domain->getPath())));
   }
+
 }

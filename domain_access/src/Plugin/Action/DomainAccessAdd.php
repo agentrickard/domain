@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\Action\DomainAccessAdd.
- */
-
 namespace Drupal\domain_access\Plugin\Action;
-
 
 /**
  * Assigns a node to a domain.

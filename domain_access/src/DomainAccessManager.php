@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\DomainAccessManager.
- */
-
 namespace Drupal\domain_access;
 
 use Drupal\domain\DomainLoaderInterface;

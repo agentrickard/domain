@@ -1,15 +1,9 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainNegotiatorInterface.
- */
-
 namespace Drupal\domain;
 
-
 /**
- * Handles the negotation of the active domain record.
+ * Handles the negotiation of the active domain record.
  */
 interface DomainNegotiatorInterface {
 
@@ -19,9 +13,9 @@ interface DomainNegotiatorInterface {
    * The negotiator is passed an httpHost value, which is checked against domain
    * records for a match.
    *
-   * @param $httpHost
+   * @param string $httpHost
    *   A string representing the hostname of the request (e.g. example.com).
-   * @param boolean $reset
+   * @param bool $reset
    *   Indicates whether to reset the internal cache.
    */
   public function setRequestDomain($httpHost, $reset = FALSE);
@@ -37,7 +31,7 @@ interface DomainNegotiatorInterface {
   /**
    * Stores the inbound httpHost request.
    *
-   * @param $httpHost
+   * @param string $httpHost
    *   A string representing the hostname of the request (e.g. example.com).
    */
   public function setHttpHost($httpHost);
@@ -45,7 +39,7 @@ interface DomainNegotiatorInterface {
   /**
    * Gets the inbound httpHost request.
    *
-   * @return
+   * @return string
    *   A string representing the hostname of the request (e.g. example.com).
    */
   public function getHttpHost();
@@ -70,7 +64,7 @@ interface DomainNegotiatorInterface {
    * This method should be called by external classes using the negotiator
    * service.
    *
-   * @param boolean $reset
+   * @param bool $reset
    *   Reset the internal cache of the active domain.
    */
   public function getActiveDomain($reset = FALSE);

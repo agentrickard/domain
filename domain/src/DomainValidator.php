@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainValidator.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -26,7 +21,11 @@ class DomainValidator implements DomainValidatorInterface {
    */
   protected $moduleHandler;
 
-  /** @var \GuzzleHttp\Client */
+  /**
+   * The HTTP client.
+   *
+   * @var \GuzzleHttp\Client
+   */
   protected $httpClient;
 
   /**
@@ -42,7 +41,7 @@ class DomainValidator implements DomainValidatorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * @TODO: Divide this into separate methods. Do not return Drupal-specific
    * responses.
@@ -85,10 +84,11 @@ class DomainValidator implements DomainValidatorInterface {
       }
     }
     // Check for lower case.
-    if ($hostname !=  Unicode::strtolower($hostname)) {
+    if ($hostname != Unicode::strtolower($hostname)) {
       $error_list[] = $this->t('Only lower-case characters are allowed.');
     }
-    // Check for 'www' prefix if redirection / handling is enabled under global domain settings.
+    // Check for 'www' prefix if redirection / handling is
+    // enabled under global domain settings.
     // Note that www prefix handling must be set explicitly in the UI.
     // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
     if (\Drupal::config('domain.settings')->get('www_prefix') && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
@@ -109,14 +109,20 @@ class DomainValidator implements DomainValidatorInterface {
 
     // Return the errors, if any.
     if (!empty($error_list)) {
-      return $this->t('The domain string is invalid for %subdomain: @errors', array('%subdomain' => $hostname, '@errors' => array('#theme' => 'item_list', '#items' => $error_list)));
+      return $this->t('The domain string is invalid for %subdomain: @errors', array(
+        '%subdomain' => $hostname,
+        '@errors' => array(
+          '#theme' => 'item_list',
+          '#items' => $error_list,
+        ),
+      ));
     }
 
     return array();
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function checkResponse(DomainInterface $domain) {
     $url = $domain->getPath() . drupal_get_path('module', 'domain') . '/tests/200.png';
@@ -136,7 +142,7 @@ class DomainValidator implements DomainValidatorInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getRequiredFields() {
     return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');

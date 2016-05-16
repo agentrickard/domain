@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Plugin\Action\DeleteDomain.
- */
-
 namespace Drupal\domain\Plugin\Action;
 
 use Drupal\Core\Access\AccessResult;
@@ -35,7 +30,7 @@ class DeleteDomain extends ActionBase {
    */
   public function executeMultiple(array $objects) {
     foreach ($objects as $object) {
-      if ($object instanceOf DomainInterface) {
+      if ($object instanceof DomainInterface) {
         $object->delete();
       }
     }

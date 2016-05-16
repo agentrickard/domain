@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Tests\Condition\DomainConditionTest.
- */
-
 namespace Drupal\domain\Tests\Condition;
 
 use Drupal\domain\Tests\DomainTestBase;

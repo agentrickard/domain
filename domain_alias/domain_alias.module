@@ -46,7 +46,7 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
 }
 
 /**
- * Implements hook_domain_operations.
+ * Implements hook_domain_operations().
  */
 function domain_alias_domain_operations(DomainInterface $domain) {
   // Add aliases to the list.

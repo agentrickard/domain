@@ -1,13 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainNegotiatorTest.
- */
-
 namespace Drupal\domain\Tests;
-use Drupal\Core\Session\AccountInterface;
 
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Tests the domain negotiation manager.
@@ -26,7 +21,7 @@ class DomainNegotiatorTest extends DomainTestBase {
   /**
    * Tests the handling of an inbound request.
    */
-  function testDomainNegotiator() {
+  public function testDomainNegotiator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -46,7 +41,7 @@ class DomainNegotiatorTest extends DomainTestBase {
       $this->assertRaw($domain->label(), 'Loaded the proper domain.');
     }
 
-    // Revoke the permission change
+    // Revoke the permission change.
     user_role_revoke_permissions(AccountInterface::ANONYMOUS_ROLE, array('view domain information'));
 
     // @TODO: Any other testing needed here?

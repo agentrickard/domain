@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_source\Tests\DomainSourceEntityReferenceTest
- */
-
 namespace Drupal\domain_source\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
@@ -23,7 +18,10 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_source', 'field', 'field_ui');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
 
     // Run the install hook.
@@ -35,8 +33,13 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
   /**
    * Tests that the module installed its field correctly.
    */
-  function testDomainSourceNodeField() {
-    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
+  public function testDomainSourceNodeField() {
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -57,8 +60,13 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
   /**
    * Tests the storage of the domain source field.
    */
-  function testDomainSourceFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
+  public function testDomainSourceFieldStorage() {
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.

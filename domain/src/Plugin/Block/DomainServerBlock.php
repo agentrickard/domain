@@ -1,16 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Plugin\Block\DomainServerBlock.
- */
-
 namespace Drupal\domain\Plugin\Block;
 
 use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
-
 
 /**
  * Provides a server information block for a domain request.
@@ -95,11 +89,11 @@ class DomainServerBlock extends DomainBlockBase {
   /**
    * Prints array data for the server block.
    *
-   * @param $array
-   *  An array of data. Note that we support two levels of nesting.
+   * @param array $array
+   *   An array of data. Note that we support two levels of nesting.
    *
    * @return string
-   *  A suitable output string.
+   *   A suitable output string.
    */
   public function printArray(array $array) {
     $items = array();

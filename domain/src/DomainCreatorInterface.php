@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainCreatorInterface.
- */
-
 namespace Drupal\domain;
-
 
 /**
  * Handles the creation of new domain records.
@@ -31,7 +25,8 @@ interface DomainCreatorInterface {
    *
    * The node access system still requires numeric keys.
    *
-   * @return integer
+   * @return int
+   *   The next domain id.
    */
   public function createNextId();
 
@@ -52,7 +47,7 @@ interface DomainCreatorInterface {
    *   The hostname of the domain record. If empty, the current request will be
    *   used.
    *
-   * @return
+   * @return string
    *   A string containing A-Z, a-z, 0-9, and _ characters.
    */
   public function createMachineName($hostname = NULL);

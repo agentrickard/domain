@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Plugin\Block\DomainSwitcherBlock.
- */
-
 namespace Drupal\domain\Plugin\Block;
 
 use Drupal\Core\Access\AccessResult;

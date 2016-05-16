@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_alias\DomainAliasListBuilder.
- */
-
 namespace Drupal\domain_alias;
 
 use Drupal\domain\DomainInterface;
@@ -89,6 +84,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    * Sets the domain context for this list.
    *
    * @param \Drupal\domain\DomainInterface $domain
+   *   The domain to set as context for the list.
    */
   public function setDomain(DomainInterface $domain) {
     $this->domain = $domain;
@@ -98,9 +94,11 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    * Gets the domain context for this list.
    *
    * @return \Drupal\domain\DomainInterface $domain
+   *   The domain that is context for this list.
    */
   public function getDomainId() {
     // @TODO: check for a use-case where we might need to derive the id?
     return !empty($this->domain) ? $this->domain->id() : NULL;
   }
+
 }

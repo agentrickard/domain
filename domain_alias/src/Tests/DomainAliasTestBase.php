@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\Tests\DomainAliasTestBase.
- */
-
 namespace Drupal\domain_alias\Tests;
 
 use Drupal\domain\DomainInterface;
@@ -23,9 +18,9 @@ abstract class DomainAliasTestBase extends DomainTestBase {
   public static $modules = array('domain', 'domain_alias');
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
   }
 

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\DomainAliasLoader.
- */
-
 namespace Drupal\domain_alias;
 
 use Drupal\Core\Config\TypedConfigManagerInterface;

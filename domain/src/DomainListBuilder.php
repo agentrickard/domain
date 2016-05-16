@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\DomainListBuilder.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Config\Entity\DraggableListBuilder;
@@ -37,7 +32,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $destination = \Drupal::destination()->getAsArray();
     $default = $entity->isDefault();
     $id = $entity->id();
-    
+
     // @TODO: permission checks.
     if ($entity->status() && !$default) {
       $operations['disable'] = array(
@@ -72,6 +67,7 @@ class DomainListBuilder extends DraggableListBuilder {
         $operations[$key]['query'] += $destination;
       }
     }
+    /** @var DomainInterface $default */
     $default = \Drupal::service('domain.loader')->loadDefaultDomain();
 
     // Deleting the site default domain is not allowed.

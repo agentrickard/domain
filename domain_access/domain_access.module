@@ -74,10 +74,12 @@ function domain_access_node_access_records(NodeInterface $node) {
   $grants = array();
   // If there are no domains set, use the current one.
   $domains = \Drupal::service('domain_access.manager')->getAccessValues($node);
+  /** @var \Drupal\domain\DomainInterface $active */
   if (empty($domains) && $active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
     $domains[$active->id()] = $active->getDomainId();
   }
   foreach ($domains as $id => $domainId) {
+    /** @var \Drupal\domain\DomainInterface $domain */
     if ($domain = \Drupal::service('domain.loader')->load($id)) {
       $grants[] = array(
         'realm' => ($node->isPublished()) ? 'domain_id' : 'domain_unpublished',
@@ -105,9 +107,6 @@ function domain_access_node_access_records(NodeInterface $node) {
  *
  * Fires only if Devel Generate module is present, to assign test nodes to
  * domains.
- *
- * @param \Drupal\Core\Entity\EntityInterface stdClass $node
- *   The node entity on which the operation is to be performed.
  */
 function domain_access_node_presave(EntityInterface $node) {
   domain_access_presave_generate($node);
@@ -118,9 +117,6 @@ function domain_access_node_presave(EntityInterface $node) {
  *
  * Fires only if Devel Generate module is present, to assign test nodes to
  * domains.
- *
- * @param \Drupal\Core\Entity\EntityInterface $account
- *   The user entity on which the operation is to be performed.
  */
 function domain_access_user_presave(EntityInterface $account) {
   domain_access_presave_generate($account);
@@ -166,7 +162,7 @@ function domain_access_presave_generate(EntityInterface $entity) {
  * Add options for domains when using Devel Generate.
  */
 function domain_access_form_devel_generate_form_content_alter(&$form, &$form_state, $form_id) {
-  // Add our element to the devel generate form.
+  // Add our element to the Devel generate form.
   $form['submit']['#weight'] = 10;
   $list = ['random-selection' => t('Random selection')];
   $list += \Drupal::service('domain.loader')->loadOptionsList();
@@ -225,6 +221,7 @@ function domain_access_domain_references_alter($query, $account, $context) {
         $query->condition('id', '-no-possible-match-');
       }
       break;
+
     case 'user':
       if ($account->hasPermission('assign editors to any domain')) {
         // Do nothing.
@@ -241,6 +238,7 @@ function domain_access_domain_references_alter($query, $account, $context) {
         $query->condition('id', '-no-possible-match-');
       }
       break;
+
     default:
       // No action taken.
       break;
@@ -269,27 +267,38 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   $type = $node->bundle();
   $manager = \Drupal::service('domain_access.manager');
 
-  switch ($op) {
-    case 'update':
-      if ($account->hasPermission('update ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
-        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
-      }
-      if ($account->hasPermission('edit domain content') && $manager->checkEntityAccess($node, $account)) {
-        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
-      }
-
-    case 'delete':
-      if ($account->hasPermission('delete ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
-        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
-      }
-      if ($account->hasPermission('delete domain content') && $manager->checkEntityAccess($node, $account)) {
-        return AccessResult::allowed()->cachePerPermissions()->cachePerUser()->cacheUntilEntityChanges($node);
-      }
-
-    default:
-      // No opinion.
-      return AccessResult::neutral();
+  if ($op == 'update') {
+    if ($account->hasPermission('update ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
+      return AccessResult::allowed()
+        ->cachePerPermissions()
+        ->cachePerUser()
+        ->cacheUntilEntityChanges($node);
+    }
+    if ($account->hasPermission('edit domain content') && $manager->checkEntityAccess($node, $account)) {
+      return AccessResult::allowed()
+        ->cachePerPermissions()
+        ->cachePerUser()
+        ->cacheUntilEntityChanges($node);
+    }
   }
+
+  if ($op == 'delete') {
+    if ($account->hasPermission('delete ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
+      return AccessResult::allowed()
+        ->cachePerPermissions()
+        ->cachePerUser()
+        ->cacheUntilEntityChanges($node);
+    }
+    if ($account->hasPermission('delete domain content') && $manager->checkEntityAccess($node, $account)) {
+      return AccessResult::allowed()
+        ->cachePerPermissions()
+        ->cachePerUser()
+        ->cacheUntilEntityChanges($node);
+    }
+  }
+
+  // No opinion.
+  return AccessResult::neutral();
 }
 
 /**
@@ -361,9 +370,9 @@ function domain_access_node_type_insert(EntityInterface $entity) {
 /**
  * Creates our fields for an entity bundle.
  *
- * @param $entity_type
+ * @param string $entity_type
  *   The entity type being created. Node and user are supported.
- * @param $bundle
+ * @param string $bundle
  *   The bundle being created.
  *
  * @see domain_access_node_type_insert()
@@ -380,7 +389,7 @@ function domain_access_confirm_fields($entity_type, $bundle) {
       'type' => 'user',
       'label' => 'Editor for all affiliates',
       'description' => 'Make this user an editor on all domains.',
-    ]
+    ],
   ];
   $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
 
@@ -462,7 +471,7 @@ function domain_access_views_data_alter(array &$data) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_insert() fpr domain entities.
+ * Implements hook_ENTITY_TYPE_insert().
  */
 function domain_access_domain_insert($entity) {
   $id = 'domain_access_add_action.' . $entity->id();
@@ -520,7 +529,7 @@ function domain_access_domain_insert($entity) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_delete() for domain entities.
+ * Implements hook_ENTITY_TYPE_delete().
  */
 function domain_access_domain_delete(EntityInterface $entity) {
   $actions = entity_load_multiple('action', array(

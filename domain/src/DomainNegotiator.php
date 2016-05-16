@@ -1,15 +1,13 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainNegotiator.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * {@inheritdoc}
+ */
 class DomainNegotiator implements DomainNegotiatorInterface {
 
   /**

@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainValidatorInterface.
- */
-
 namespace Drupal\domain;
-
 
 /**
  * Supplies validator methods for common domain requests.
@@ -35,7 +29,7 @@ interface DomainValidatorInterface {
    * @param \Drupal\domain\DomainInterface $domain
    *   A domain record.
    *
-   * @return integer
+   * @return int
    *   The server response code for the request.
    */
   public function checkResponse(DomainInterface $domain);

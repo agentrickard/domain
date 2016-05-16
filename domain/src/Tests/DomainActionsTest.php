@@ -1,14 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainActionsTest.
- */
-
 namespace Drupal\domain\Tests;
-
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain record actions.
@@ -20,7 +12,7 @@ class DomainActionsTest extends DomainTestBase {
   /**
    * Tests bulk actions through the domain overview page.
    */
-  function testDomainActions() {
+  public function testDomainActions() {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));
     $this->drupalLogin($this->admin_user);
 

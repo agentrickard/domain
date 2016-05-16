@@ -1,16 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection.
- */
-
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
 use Drupal\user\Entity\User;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
 use Drupal\Core\Form\FormStateInterface;
-
 
 /**
  * Provides entity reference selections for the domain entity type.

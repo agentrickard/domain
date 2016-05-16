@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\DomainAliasValidator.
- */
-
 namespace Drupal\domain_alias;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -21,7 +16,9 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
    *
    * @param \Drupal\domain_alias\DomainAliasInterface $alias
    *   The Domain Alias to validate.
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup | NULL
+   *   A validation error message, if any.
    */
   public function validate(DomainAliasInterface $alias) {
     $pattern = $alias->getPattern();

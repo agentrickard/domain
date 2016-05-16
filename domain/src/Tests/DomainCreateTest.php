@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainCreateTest.
- */
-
 namespace Drupal\domain\Tests;
-
 
 /**
  * Tests the domain record creation API.
@@ -18,7 +12,7 @@ class DomainCreateTest extends DomainTestBase {
   /**
    * Tests initial domain creation.
    */
-  function testDomainCreate() {
+  public function testDomainCreate() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 

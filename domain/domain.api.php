@@ -12,10 +12,8 @@
  *
  * use Drupal\domain\DomainInterface;
  *
- *
  * @param array $domains
  *   An array of $domain record objects.
- *
  */
 function hook_domain_load(array $domains) {
   // Add a variable to the $domain.
@@ -55,8 +53,8 @@ function hook_domain_request_alter(\Drupal\domain\DomainInterface &$domain) {
  *
  * @return array
  *   An array of operations which uses a unique string key and requires the
- *  elements 'title' and 'url'; the 'query' value is optional, and used
- *  for link-actions with tokens
+ *   elements 'title' and 'url'; the 'query' value is optional, and used
+ *   for link-actions with tokens
  */
 function hook_domain_operations(\Drupal\domain\DomainInterface $domain) {
   // Add aliases to the list.
@@ -85,6 +83,7 @@ function hook_domain_operations(\Drupal\domain\DomainInterface $domain) {
  *   The HTTP_HOST string value being validated, such as one.example.com.
  *   Note that this is checked for uniqueness separately. This value is not
  *   modifiable.
+ *
  * @return
  *   No return value. Modify $error_list by reference. Return an empty array
  *   or NULL to validate this domain.
@@ -104,11 +103,11 @@ function hook_domain_validate_alter(&$error_list, $hostname) {
  * Note that this hook does not fire for users with the 'administer domains'
  * permission.
  *
- * @param $query
+ * @param \Drupal\Core\Entity\Query\QueryInterface $query
  *   An entity query prepared by DomainSelection::buildEntityQuery().
- * @param $account
+ * @param \Drupal\Core\Session\AccountInterface $account
  *   The account of the user viewing the reference list.
- * @param $contect array
+ * @param array $context
  *   A keyed array passing two items:
  *   - entity_type The type of entity (e.g. node, user) that requested the list.
  *   - bundle The entity subtype (e.g. 'article' or 'page').
@@ -118,7 +117,7 @@ function hook_domain_validate_alter(&$error_list, $hostname) {
  */
 function hook_domain_references_alter($query, $account, $context) {
   // Remove the default domain from non-admins when editing nodes.
-  if ($entity_type == 'node' && !$account->hasPermission('edit assigned domains')) {
+  if ($context['entity_type'] == 'node' && !$account->hasPermission('edit assigned domains')) {
     $default = \Drupal::service('domain.loader')->loadDefaultId();
     $query->condition('id', $default, '<>');
   }

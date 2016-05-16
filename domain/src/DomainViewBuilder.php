@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainViewBuilder.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityViewBuilder;
@@ -16,7 +11,7 @@ use Drupal\Component\Utility\SafeMarkup;
 class DomainViewBuilder extends EntityViewBuilder {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * @TODO EntityViewBuilder does not have a buildContent() method. viewMultiple() is the likely candidate.
    * @TODO domain_field_extra_fields() is not defined anywhere.

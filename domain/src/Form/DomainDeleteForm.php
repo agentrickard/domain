@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Form\DomainDeleteForm.
- */
-
 namespace Drupal\domain\Form;
 
 use Drupal\Core\Entity\EntityConfirmFormBase;

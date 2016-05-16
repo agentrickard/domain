@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainHooksTest.
- */
-
 namespace Drupal\domain\Tests;
 
 
@@ -25,7 +20,7 @@ class DomainHooksTest extends DomainTestBase {
   /**
    * Tests domain loading.
    */
-  function testHookDomainLoad() {
+  public function testHookDomainLoad() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 

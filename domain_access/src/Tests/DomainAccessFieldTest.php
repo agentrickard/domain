@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessFieldTest
- */
-
 namespace Drupal\domain_access\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
@@ -24,7 +19,10 @@ class DomainAccessFieldTest extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_access', 'field', 'field_ui', 'user');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
 
     // Run the install hook.
@@ -36,7 +34,7 @@ class DomainAccessFieldTest extends DomainTestBase {
   /**
    * Tests that the fields are accessed properly.
    */
-  function testDomainAccessFields() {
+  public function testDomainAccessFields() {
     $label = 'Send to all affiliates';
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
@@ -87,7 +85,7 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Check for the form options.
     foreach ($domains as $domain) {
-       $this->assertNoText($domain->label(), 'Domain form item not found.');
+      $this->assertNoText($domain->label(), 'Domain form item not found.');
     }
     $this->assertNoText($label, 'All affiliates field not found.');
 
@@ -134,7 +132,7 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Check for the form options.
     foreach ($domains as $domain) {
-       $this->assertNoText($domain->label(), 'Domain form item not found.');
+      $this->assertNoText($domain->label(), 'Domain form item not found.');
     }
 
     // Test a user who can access all domain settings.

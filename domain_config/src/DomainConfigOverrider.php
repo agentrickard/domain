@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_config\DomainConfigOverrider.
- */
-
 namespace Drupal\domain_config;
 
 use Drupal\domain\DomainInterface;
@@ -42,6 +37,8 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
 
   /**
    * The language context of the request.
+   *
+   * @var \Drupal\Core\Language\LanguageInterface $language
    */
   protected $language;
 
@@ -102,7 +99,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * Get configuration name for this hostname.
    *
    * It will be the same name with a prefix depending on domain and language:
-   * domain.config.DOMAIN_ID.LANGCODE
+   * @code domain.config.DOMAIN_ID.LANGCODE @endcode
    *
    * @param string $name
    *   The name of the config object.
@@ -163,4 +160,5 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // Get the domain context.
     $this->domain = $this->domainNegotiator->getActiveDomain();
   }
+
 }

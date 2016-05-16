@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\Action\DomainAccessRemoveEditor.
- */
-
 namespace Drupal\domain_access\Plugin\Action;
 
 

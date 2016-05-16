@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainCreator.
- */
-
 namespace Drupal\domain;
-
 
 /**
  * Creates new domain records.
@@ -16,12 +10,16 @@ namespace Drupal\domain;
 class DomainCreator implements DomainCreatorInterface {
 
   /**
-   * @var \Drupal\domain\DomainLoaderInterface
+   * The Domain loader.
+   *
+   * @var \Drupal\domain\DomainLoaderInterface $loader
    */
   protected $loader;
 
   /**
-   * @var \Drupal\domain\DomainNegotiatorInterface
+   * The Domain negotiator.
+   *
+   * @var \Drupal\domain\DomainNegotiatorInterface $negotiator
    */
   protected $negotiator;
 

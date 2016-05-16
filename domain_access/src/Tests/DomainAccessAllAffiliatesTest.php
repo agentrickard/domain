@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessAllAffiliatesTest
- */
-
 namespace Drupal\domain_access\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
-
 
 /**
  * Tests the domain access entity reference field type.
@@ -24,7 +18,10 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
 
     // Run the install hook.
@@ -36,9 +33,14 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
   /**
    * Tests that the module installed its field correctly.
    */
-  function testDomainAccessAllField() {
+  public function testDomainAccessAllField() {
     $label = 'Send to all affiliates';
-    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -59,9 +61,16 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
   /**
    * Tests the storage of the domain access field.
    */
-  function testDomainAccessAllFieldStorage() {
+  public function testDomainAccessAllFieldStorage() {
     $label = 'Send to all affiliates';
-    $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains', 'publish to any domain'));
+    $this->admin_user = $this->drupalCreateUser(array(
+      'bypass node access',
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+      'publish to any domain',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.

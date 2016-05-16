@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_alias\Controller\DomainAliasController.
- */
-
 namespace Drupal\domain_alias\Controller;
 
 use Drupal\domain\DomainInterface;

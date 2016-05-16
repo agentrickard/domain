@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessRecordsTest
- */
-
 namespace Drupal\domain_access\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
@@ -23,7 +18,10 @@ class DomainAccessRecordsTest extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
     // Run the install hook.
     // @TODO: figure out why this is necessary.
@@ -34,7 +32,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
   /**
    * Creates a node and tests the creation of node access rules.
    */
-  function testDomainAccessRecords() {
+  public function testDomainAccessRecords() {
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
     // Assign a node to a random domain.
@@ -78,7 +76,6 @@ class DomainAccessRecordsTest extends DomainTestBase {
     $this->assertEqual($records[1]->grant_view, 1, 'Grant view stored.');
     $this->assertEqual($records[1]->grant_update, 0, 'Grant update stored.');
     $this->assertEqual($records[1]->grant_delete, 0, 'Grant delete stored.');
-
   }
 
 }
