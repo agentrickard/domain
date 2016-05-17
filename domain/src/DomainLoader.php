@@ -116,7 +116,7 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * {@inheritdoc}
    */
-  public function sort($a, $b) {
+  public function sort(DomainInterface $a, DomainInterface $b) {
     return $a->getWeight() > $b->getWeight();
   }
 
