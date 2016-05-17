@@ -51,6 +51,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
     }
     // 5) Check that the alias is unique across all records.
     if ($alias_check = \Drupal::service('domain_alias.loader')->loadByPattern($pattern)) {
+      /** @var \Drupal\domain_alias\DomainAliasInterface $alias_check */
       if ($alias_check->id() != $alias->id()) {
         return $this->t('The pattern already exists.');
       }

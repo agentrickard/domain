@@ -2,7 +2,7 @@
 
 namespace Drupal\domain\Plugin\Block;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
 
@@ -40,7 +40,7 @@ class DomainServerBlock extends DomainBlockBase {
     $header = array($this->t('Property'), $this->t('Value'));
     $rows[] = array(
       $this->t('HTTP_HOST request'),
-      SafeMarkup::checkPlain($_SERVER['HTTP_HOST']),
+      Html::escape($_SERVER['HTTP_HOST']),
     );
     // Check the response test.
     $domain->getResponse();
@@ -75,8 +75,8 @@ class DomainServerBlock extends DomainBlockBase {
         $value = empty($value) ? $this->t('FALSE') : $this->t('TRUE');
       }
       $rows[] = array(
-        SafeMarkup::checkPlain($key),
-        !is_array($value) ? SafeMarkup::checkPlain($value) : $this->printArray($value),
+        Html::escape($key),
+        !is_array($value) ? Html::escape($value) : $this->printArray($value),
       );
     }
     return array(
@@ -99,7 +99,7 @@ class DomainServerBlock extends DomainBlockBase {
     $items = array();
     foreach ($array as $key => $val) {
       if (!is_array($val)) {
-        $value = SafeMarkup::checkPlain($val);
+        $value = Html::escape($val);
       }
       else {
         $list = array();

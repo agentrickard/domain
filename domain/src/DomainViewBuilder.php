@@ -2,8 +2,8 @@
 
 namespace Drupal\domain;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Render controller for domain records.
@@ -31,8 +31,8 @@ class DomainViewBuilder extends EntityViewBuilder {
         if (!empty($entity->{$key}) && $display->getComponent($key)) {
           $class = str_replace('_', '-', $key);
           $entity->content[$key] = array(
-            '#markup' => SafeMarkup::checkPlain($entity->{$key}),
-            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . SafeMarkup::checkPlain($key) . ':</strong><br />',
+            '#markup' => Html::escape($entity->{$key}),
+            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . Html::escape($key) . ':</strong><br />',
             '#suffix' => '</div>',
           );
         }

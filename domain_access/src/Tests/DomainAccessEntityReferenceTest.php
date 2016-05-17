@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_access\Tests;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -85,7 +86,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->label())));
+      $this->assertRaw($string, new FormattableMarkup('Found the %domain option.', array('%domain' => $domain->label())));
       if (!isset($one)) {
         $one = $domain->id();
         continue;

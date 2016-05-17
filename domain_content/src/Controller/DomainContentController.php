@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_content\Controller;
 
+use Drupal\Core\Link;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountInterface;
@@ -24,16 +25,17 @@ class DomainContentController extends ControllerBase {
     ];
     if ($account->hasPermission('publish to any domain')) {
       $build['#rows'][] = [
-        $this->l($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-content/all_affiliates')),
+        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-content/all_affiliates')),
         $this->getCount('node'),
       ];
     }
     // Loop through domains.
     $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
+    /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
       if ($account->hasPermission('publish to any domain') || $this->allowAccess($account, $domain, $permission)) {
         $row = [
-          $this->l($domain->label(), Url::fromUri('internal:/admin/content/domain-content/' . $domain->id())),
+          Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-content/' . $domain->id())),
           $this->getCount('node', $domain),
         ];
         $build['#rows'][] = $row;
@@ -54,16 +56,17 @@ class DomainContentController extends ControllerBase {
     ];
     if ($account->hasPermission('assign editors to any domain')) {
       $build['#rows'][] = [
-        $this->l($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-editors/all_affiliates')),
+        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-editors/all_affiliates')),
         $this->getCount('user'),
       ];
     }
     // Loop through domains.
     $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
+    /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
       if ($account->hasPermission('assign editors to any domain') || $this->allowAccess($account, $domain, $permission)) {
         $row = [
-          $this->l($domain->label(), Url::fromUri('internal:/admin/content/domain-editors/' . $domain->id())),
+          Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-editors/' . $domain->id())),
           $this->getCount('user', $domain),
         ];
         $build['#rows'][] = $row;

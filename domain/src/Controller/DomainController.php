@@ -2,9 +2,10 @@
 
 namespace Drupal\domain\Controller;
 
+use Drupal\core\Url;
 use Drupal\domain\DomainInterface;
-use Drupal\Core\Routing\UrlGeneratorTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Controller routines for AJAX callbacks for domain actions.
@@ -12,7 +13,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class DomainController {
 
   use StringTranslationTrait;
-  use UrlGeneratorTrait;
 
   /**
    * Handles AJAX operations from the overview form.
@@ -69,7 +69,8 @@ class DomainController {
     }
 
     // Return to the invoking page.
-    return $this->redirect('domain.admin');
+    $url = Url::fromRoute('domain.domain', array(), array('absolute' => TRUE));
+    return new RedirectResponse($url, 302);
   }
 
 }

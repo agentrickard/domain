@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_access\Tests;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\Entity\Node;
@@ -234,7 +235,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
    *   about the node access permission test that was performed.
    */
   public function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
-    return format_string(
+    return new FormattableMarkup(
       'Node access returns @result with operation %op, language code %langcode.',
       array(
         '@result' => $result ? 'true' : 'false',

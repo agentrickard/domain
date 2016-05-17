@@ -13,6 +13,8 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
 
   /**
    * A domain object loaded from the controller.
+   *
+   * @var DomainInterface $domain
    */
   protected $domain;
 
@@ -38,10 +40,14 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    $row['label'] = $this->getLabel($entity);
+    $row = array();
+
+    $row['label'] = $entity->label();
     $redirect = $entity->getRedirect();
     $row['redirect'] = empty($redirect) ? $this->t('None') : $redirect;
-    return $row += parent::buildRow($entity);
+    $row += parent::buildRow($entity);
+
+    return $row;
   }
 
   /**

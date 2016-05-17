@@ -65,7 +65,7 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
       '#type' => 'checkboxes',
       '#title' => $this->t('When the following domains are active'),
       '#default_value' => $this->configuration['domains'],
-      '#options' => array_map('\Drupal\Component\Utility\SafeMarkup::checkPlain', \Drupal::service('domain.loader')->loadOptionsList()),
+      '#options' => array_map('\Drupal\Component\Utility\Html::checkPlain', \Drupal::service('domain.loader')->loadOptionsList()),
       '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
       '#attached' => array(
         'library' => array(

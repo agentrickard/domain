@@ -32,6 +32,8 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
 
   /**
    * The domain context of the request.
+   *
+   * @var \Drupal\domain\DomainInterface $domain
    */
   protected $domain;
 

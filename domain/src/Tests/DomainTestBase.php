@@ -2,6 +2,7 @@
 
 namespace Drupal\domain\Tests;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\DomainInterface;
 use Drupal\simpletest\WebTestBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -126,7 +127,7 @@ abstract class DomainTestBase extends WebTestBase {
       $domain->save();
     }
     $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
-    $this->assertTrue((count($domains) - count($original_domains)) == $count, format_string('Created %count new domains.', array('%count' => $count)));
+    $this->assertTrue((count($domains) - count($original_domains)) == $count, new FormattableMarkup('Created %count new domains.', array('%count' => $count)));
   }
 
   /**
@@ -191,7 +192,7 @@ abstract class DomainTestBase extends WebTestBase {
     if (isset($this->sessionId)) {
       $account->session_id = $this->sessionId;
     }
-    $pass = $this->assert($this->drupalUserIsLoggedIn($account), format_string('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
+    $pass = $this->assert($this->drupalUserIsLoggedIn($account), new FormattableMarkup('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
     if ($pass) {
       $this->loggedInUser = $account;
       $this->container->get('current_user')->setAccount($account);
