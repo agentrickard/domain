@@ -393,7 +393,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     else {
       $url = Url::fromUri($this->getPath(), $options);
     }
-    return Link::fromTextAndUrl($this->getHostname(), $url);
+
+    return Link::fromTextAndUrl($this->getHostname(), $url)->toString();
   }
 
   /**
