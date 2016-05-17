@@ -1,18 +1,14 @@
 <?php
 
-/**
- * @file
- * Review content by assigned domain.
- */
-
 use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainNegotiator;
 use Drupal\Core\Url;
 
 /**
  * Implements hook_domain_operations().
  */
 function domain_content_domain_operations(DomainInterface $domain) {
+  $operations = array();
+
   // Add content to the list.
   $account = \Drupal::currentUser();
   // Advanced grants for edit/delete require permissions.
@@ -23,14 +19,16 @@ function domain_content_domain_operations(DomainInterface $domain) {
     $operations['domain_content'] = array(
       'title' => t('Content'),
       'url' => Url::fromUri("internal:/admin/content/domain-content/$id"),
-      'weight' => 120, // Core operations start at 0 and increment by 10.
+      // Core operations start at 0 and increment by 10.
+      'weight' => 120,
     );
   }
   if ($account->hasPermission('assign editors to any domain') || ($account->hasPermission('assign domain editors') && isset($allowed[$domain->id()]))) {
     $operations['domain_users'] = array(
       'title' => t('Editors'),
       'url' => Url::fromUri("internal:/admin/content/domain-editors/$id"),
-      'weight' => 120, // Core operations start at 0 and increment by 10.
+      // Core operations start at 0 and increment by 10.
+      'weight' => 120,
     );
   }
 

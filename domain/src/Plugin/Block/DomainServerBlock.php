@@ -1,18 +1,10 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Plugin\Block\DomainServerBlock.
- */
-
 namespace Drupal\domain\Plugin\Block;
 
-use Drupal\domain\Entity\Domain;
-use Drupal\domain\Plugin\Block\DomainBlockBase;
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
-
 
 /**
  * Provides a server information block for a domain request.
@@ -28,7 +20,8 @@ class DomainServerBlock extends DomainBlockBase {
    * Overrides \Drupal\block\BlockBase::access().
    */
   public function access(AccountInterface $account, $return_as_object = FALSE) {
-    return AccessResult::allowedIfHasPermissions($account, array('administer domains', 'view domain information'), 'OR');
+    $access = AccessResult::allowedIfHasPermissions($account, array('administer domains', 'view domain information'), 'OR');
+    return $return_as_object ? $access : $access->isAllowed();
   }
 
   /**
@@ -37,6 +30,7 @@ class DomainServerBlock extends DomainBlockBase {
    * @TODO: abstract or theme this function?
    */
   public function build() {
+    /** @var \Drupal\domain\DomainInterface $domain */
     $domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     if (!$domain) {
       return array(
@@ -46,7 +40,7 @@ class DomainServerBlock extends DomainBlockBase {
     $header = array($this->t('Property'), $this->t('Value'));
     $rows[] = array(
       $this->t('HTTP_HOST request'),
-      SafeMarkup::checkPlain($_SERVER['HTTP_HOST']),
+      Html::escape($_SERVER['HTTP_HOST']),
     );
     // Check the response test.
     $domain->getResponse();
@@ -81,8 +75,8 @@ class DomainServerBlock extends DomainBlockBase {
         $value = empty($value) ? $this->t('FALSE') : $this->t('TRUE');
       }
       $rows[] = array(
-        SafeMarkup::checkPlain($key),
-        !is_array($value) ? SafeMarkup::checkPlain($value) : $this->printArray($value),
+        Html::escape($key),
+        !is_array($value) ? Html::escape($value) : $this->printArray($value),
       );
     }
     return array(
@@ -95,18 +89,17 @@ class DomainServerBlock extends DomainBlockBase {
   /**
    * Prints array data for the server block.
    *
-   * @param $array
-   *  An array of data. Note that we support two levels of nesting.
+   * @param array $array
+   *   An array of data. Note that we support two levels of nesting.
    *
-   * @return
-   *  A suitable output string.
+   * @return string
+   *   A suitable output string.
    */
   public function printArray(array $array) {
     $items = array();
     foreach ($array as $key => $val) {
-      $value = 'array';
       if (!is_array($val)) {
-        $value = SafeMarkup::checkPlain($val);
+        $value = Html::escape($val);
       }
       else {
         $list = array();

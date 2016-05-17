@@ -1,11 +1,8 @@
 <?php
-/**
- * @file
- * Contains \Drupal\domain_content\Controller\DomainContentController.
- */
 
 namespace Drupal\domain_content\Controller;
 
+use Drupal\Core\Link;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Session\AccountInterface;
@@ -27,13 +24,20 @@ class DomainContentController extends ControllerBase {
       '#header' => [$this->t('Domain'), $this->t('Content count')],
     ];
     if ($account->hasPermission('publish to any domain')) {
-      $build['#rows'][] = [$this->l($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-content/all_affiliates')), $this->getCount('node')];
+      $build['#rows'][] = [
+        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-content/all_affiliates')),
+        $this->getCount('node'),
+      ];
     }
     // Loop through domains.
     $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
+    /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
       if ($account->hasPermission('publish to any domain') || $this->allowAccess($account, $domain, $permission)) {
-        $row = [$this->l($domain->label(), Url::fromUri('internal:/admin/content/domain-content/' . $domain->id())), $this->getCount('node', $domain)];
+        $row = [
+          Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-content/' . $domain->id())),
+          $this->getCount('node', $domain),
+        ];
         $build['#rows'][] = $row;
       }
     }
@@ -51,13 +55,20 @@ class DomainContentController extends ControllerBase {
       '#header' => [$this->t('Domain'), $this->t('Editor count')],
     ];
     if ($account->hasPermission('assign editors to any domain')) {
-      $build['#rows'][] = [$this->l($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-editors/all_affiliates')), $this->getCount('user')];
+      $build['#rows'][] = [
+        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-editors/all_affiliates')),
+        $this->getCount('user'),
+      ];
     }
     // Loop through domains.
     $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
+    /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
       if ($account->hasPermission('assign editors to any domain') || $this->allowAccess($account, $domain, $permission)) {
-        $row = [$this->l($domain->label(), Url::fromUri('internal:/admin/content/domain-editors/' . $domain->id())), $this->getCount('user', $domain)];
+        $row = [
+          Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-editors/' . $domain->id())),
+          $this->getCount('user', $domain),
+        ];
         $build['#rows'][] = $row;
       }
     }
@@ -67,14 +78,15 @@ class DomainContentController extends ControllerBase {
   /**
    * Counts the content for a domain.
    *
-   * @param $entity_type
-   *  The entity type.
+   * @param string $entity_type
+   *   The entity type.
    * @param DomainInterface $domain
-   *  The domain to query. If passed NULL, checks status for all affiliates.
+   *   The domain to query. If passed NULL, checks status for all affiliates.
    *
    * @return int
+   *   The content count for the given domain.
    */
-  protected function getCount($entity_type = 'node', $domain = NULL) {
+  protected function getCount($entity_type = 'node', DomainInterface $domain = NULL) {
     if (is_null($domain)) {
       $field = DOMAIN_ACCESS_ALL_FIELD;
       $value = 1;
@@ -94,6 +106,7 @@ class DomainContentController extends ControllerBase {
    * Returns a fully loaded user object for the current request.
    *
    * @return AccountInterface
+   *   The current user object.
    */
   protected function getUser() {
     $account = $this->currentUser();
@@ -108,10 +121,11 @@ class DomainContentController extends ControllerBase {
    *   The fully loaded user account.
    * @param DomainInterface $domain
    *   The domain being checked.
-   * @param $permission
+   * @param string $permission
    *   The relevant permission to check.
    *
-   * @return boolean
+   * @return bool
+   *   Returns TRUE if the user can access the domain list page.
    */
   protected function allowAccess(AccountInterface $account, DomainInterface $domain, $permission) {
     $allowed = \Drupal::service('domain_access.manager')->getAccessValues($account);

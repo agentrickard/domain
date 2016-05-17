@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\views\field\DomainAccessField.
- */
-
 namespace Drupal\domain_access\Plugin\views\field;
 
 use Drupal\views\ResultRow;

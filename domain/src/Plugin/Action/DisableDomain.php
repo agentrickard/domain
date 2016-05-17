@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Plugin\Action\DisableDomain.
- */
-
 namespace Drupal\domain\Plugin\Action;
 
 use Drupal\Core\Access\AccessResult;
@@ -35,7 +30,7 @@ class DisableDomain extends ActionBase {
    */
   public function executeMultiple(array $objects) {
     foreach ($objects as $object) {
-      if ($object instanceOf DomainInterface) {
+      if ($object instanceof DomainInterface) {
         $object->disable();
       }
     }
@@ -46,6 +41,7 @@ class DisableDomain extends ActionBase {
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
     $access_result = AccessResult::allowedIfHasPermission($account, 'administer domains');
+    return $return_as_object ? $access_result : $access_result->isAllowed();
   }
 
 }

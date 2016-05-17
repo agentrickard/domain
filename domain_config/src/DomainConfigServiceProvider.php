@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_config\DomainConfigServiceProvider.
- */
-
 namespace Drupal\domain_config;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -13,8 +8,10 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\domain_config\Routing\DomainRouteProvider;
 
 /**
- * Overrides the router.route_provider service to point to our customized one
- * and adds url.site to the required_cache_contexts renderer configuration.
+ * Overrides the router.route_provider service.
+ *
+ * Point to our customized one and adds url.site to the
+ * required_cache_contexts renderer configuration.
  *
  * @see https://www.drupal.org/node/2662196#comment-10838164
  */
@@ -37,4 +34,5 @@ class DomainConfigServiceProvider extends ServiceProviderBase implements Service
       $container->setParameter('renderer.config', $renderer_config);
     }
   }
+
 }

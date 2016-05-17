@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\Tests\DomainAliasTestBase.
- */
-
 namespace Drupal\domain_alias\Tests;
 
 use Drupal\domain\DomainInterface;
@@ -23,23 +18,23 @@ abstract class DomainAliasTestBase extends DomainTestBase {
   public static $modules = array('domain', 'domain_alias');
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
   }
 
   /**
    * Creates an alias for testing.
    *
-   * @param Drupal\domain\Entity\Domain $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   A domain entity.
    * @param string $pattern
    *   An optional alias pattern.
    * @param int $redirect
    *   An optional redirect (301 or 302).
    *
-   * @return Drupal\domain_alias\Entity\DomainAlias
+   * @return \Drupal\domain_alias\Entity\DomainAlias
    *   A domain alias entity.
    */
   public function domainAliasCreateTestAlias(DomainInterface $domain, $pattern = NULL, $redirect = 0) {

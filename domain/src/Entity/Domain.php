@@ -1,18 +1,13 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Entity\Domain.
- */
-
 namespace Drupal\domain\Entity;
 
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Config\Entity\ConfigEntityStorage;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\domain\DomainInterface;
 
 /**
  * Defines the domain entity.
@@ -154,12 +149,18 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   protected $redirect = NULL;
 
   /**
-   * The type of match returned by the negotator.
+   * The type of match returned by the negotiator.
    */
   protected $matchType;
 
   /**
    * Overrides Drupal\Core\Entity\Entity:preCreate().
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage_controller
+   *   The entity storage object.
+   * @param mixed[] $values
+   *   An array of values to set, keyed by property name. If the entity type has
+   *   bundles the bundle key has to be specified.
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
@@ -183,6 +184,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function isActive() {
     $negotiator = \Drupal::service('domain.negotiator');
+    /** @var DomainInterface $domain */
     $domain = $negotiator->getActiveDomain();
     if (empty($domain)) {
       return FALSE;
@@ -219,6 +221,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function saveDefault() {
     if (!$this->isDefault()) {
       // Swap the current default.
+      /** @var DomainInterface $default */
       if ($default = \Drupal::service('domain.loader')->loadDefaultDomain()) {
         $default->is_default = 0;
         $default->save();
@@ -260,10 +263,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (isset($this->{$name})) {
       $this->{$name} = $value;
       $this->save();
-      drupal_set_message($this->t('The @key attribute was set to @value for domain @hostname.', array('@key' => $key, '@value' => $value, '@hostname' => $this->hostname)));
+      drupal_set_message($this->t('The @key attribute was set to @value for domain @hostname.', array(
+        '@key' => $name,
+        '@value' => $value,
+        '@hostname' => $this->hostname,
+      )));
     }
     else {
-      drupal_set_message($this->t('The @key attribute does not exist.', array('@key' => $key)));
+      drupal_set_message($this->t('The @key attribute does not exist.', array('@key' => $name)));
     }
   }
 
@@ -302,9 +309,12 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * Builds a link from a known internal path.
    *
-   * @param $path
+   * @param string $path
    *   A Drupal-formatted internal path, starting with /. Note that it is the
    *   caller's responsibility to handle the base_path().
+   *
+   * @return string
+   *   The built link.
    */
   public function buildUrl($path) {
     return $this->getRawPath() . $path;
@@ -322,10 +332,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
 
   /**
    * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::preSave().
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage_controller
+   *   The entity storage object.
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
     $loader = \Drupal::service('domain.loader');
+    /** @var DomainInterface $default */
     $default = $loader->loadDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
@@ -379,48 +393,49 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     else {
       $url = Url::fromUri($this->getPath(), $options);
     }
-    return \Drupal::l($this->getHostname(), $url);
+
+    return Link::fromTextAndUrl($this->getHostname(), $url)->toString();
   }
 
   /**
    * {@inheritdoc}
    */
-  function getRedirect() {
+  public function getRedirect() {
     return $this->redirect;
   }
 
   /**
    * {@inheritdoc}
    */
-  function setRedirect($code = 302) {
+  public function setRedirect($code = 302) {
     $this->redirect = $code;
   }
 
   /**
    * {@inheritdoc}
    */
-  function getHostname() {
+  public function getHostname() {
     return $this->hostname;
   }
 
   /**
    * {@inheritdoc}
    */
-  function setHostname($hostname) {
+  public function setHostname($hostname) {
     $this->hostname = $hostname;
   }
 
   /**
    * {@inheritdoc}
    */
-  function getDomainId() {
+  public function getDomainId() {
     return $this->domain_id;
   }
 
   /**
    * {@inheritdoc}
    */
-  function getWeight() {
+  public function getWeight() {
     return $this->weight;
   }
 

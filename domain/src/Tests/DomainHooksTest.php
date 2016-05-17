@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainHooksTest.
- */
-
 namespace Drupal\domain\Tests;
+use Drupal\Component\Render\FormattableMarkup;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain module hook invocations.
@@ -27,7 +21,7 @@ class DomainHooksTest extends DomainTestBase {
   /**
    * Tests domain loading.
    */
-  function testHookDomainLoad() {
+  public function testHookDomainLoad() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -42,8 +36,8 @@ class DomainHooksTest extends DomainTestBase {
     // Internal hooks.
     $path = $domain->getPath();
     $url = $domain->getUrl();
-    $this->assertTrue(isset($path), format_string('The path property was set to %path by hook_entity_load.', array('%path' => $path)));
-    $this->assertTrue(isset($url), format_string('The url property was set to %url by hook_entity_load.', array('%url' => $url)));
+    $this->assertTrue(isset($path), new FormattableMarkup('The path property was set to %path by hook_entity_load.', array('%path' => $path)));
+    $this->assertTrue(isset($url), new FormattableMarkup('The url property was set to %url by hook_entity_load.', array('%url' => $url)));
 
     // External hooks.
     $this->assertTrue($domain->foo == 'bar', 'The foo property was set to <em>bar</em> by hook_domain_load.');

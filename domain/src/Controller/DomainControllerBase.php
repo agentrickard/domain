@@ -1,13 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Controller\DomainControllerBase.
- */
-
 namespace Drupal\domain\Controller;
 
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -41,9 +35,9 @@ class DomainControllerBase extends ControllerBase {
   /**
    * Constructs a new DomainControllerBase.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityStorage $entity_storage
+   * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
    *   The storage controller.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *   The entity manager.
    */
   public function __construct(EntityStorageInterface $entity_storage, EntityTypeManagerInterface $entity_manager) {

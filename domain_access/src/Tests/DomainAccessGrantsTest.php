@@ -1,14 +1,9 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessGrantsTest
- */
-
 namespace Drupal\domain_access\Tests;
-use Drupal\domain\Tests\DomainTestBase;
-use Drupal\domain\DomainInterface;
+
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the application of domain access grants.
@@ -18,13 +13,23 @@ use Drupal\Core\Session\AccountInterface;
 class DomainAccessGrantsTest extends DomainTestBase {
 
   /**
+   * The Entity access handler.
+   *
+   * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $accessHandler
+   */
+  protected $accessHandler;
+
+  /**
    * Modules to enable.
    *
    * @var array
    */
   public static $modules = array('domain', 'domain_access', 'field', 'node');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
     // Run the install hook.
     // @TODO: figure out why this is necessary.
@@ -34,13 +39,13 @@ class DomainAccessGrantsTest extends DomainTestBase {
     $this->accessHandler = \Drupal::entityManager()->getAccessControlHandler('node');
 
     // Clear permissions for authenticated users.
-    $this->config('user.role.' . DRUPAL_AUTHENTICATED_RID)->set('permissions', array())->save();
+    $this->config('user.role.' . AccountInterface::ANONYMOUS_ROLE)->set('permissions', array())->save();
   }
 
   /**
    * Creates a node and tests the creation of node access rules.
    */
-  function testDomainAccessGrants() {
+  public function testDomainAccessGrants() {
     // The {node_access} table is not emptied properly by the setup.
     db_delete('node_access')->execute();
     // Create 5 domains.

@@ -1,14 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\Action\DomainAccessRemove.
- */
-
 namespace Drupal\domain_access\Plugin\Action;
 
-use Drupal\domain_access\Plugin\Action\DomainAccessActionBase;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Removes a node from a domain.

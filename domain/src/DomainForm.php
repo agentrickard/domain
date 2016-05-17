@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainForm.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -21,6 +15,7 @@ class DomainForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = $this->entity;
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     // Create defaults if this is the first domain.
@@ -54,7 +49,7 @@ class DomainForm extends EntityForm {
       '#size' => 40,
       '#maxlength' => 80,
       '#default_value' => $domain->label(),
-      '#description' => $this->t('The human-readable name is shown in domain lists and may be used as the title tag.')
+      '#description' => $this->t('The human-readable name is shown in domain lists and may be used as the title tag.'),
     );
     // Do not use the :// suffix when storing data.
     $add_suffix = FALSE;
@@ -63,14 +58,14 @@ class DomainForm extends EntityForm {
       '#title' => $this->t('Domain URL scheme'),
       '#options' => array('http' => 'http://', 'https' => 'https://'),
       '#default_value' => $domain->getScheme($add_suffix),
-      '#description' => $this->t('This URL scheme will be used when writing links and redirects to this domain and its resources.')
+      '#description' => $this->t('This URL scheme will be used when writing links and redirects to this domain and its resources.'),
     );
     $form['status'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Domain status'),
       '#options' => array(1 => $this->t('Active'), 0 => $this->t('Inactive')),
       '#default_value' => (int) $domain->status(),
-      '#description' => $this->t('"Inactive" domains are only accessible to user roles with that assigned permission.')
+      '#description' => $this->t('"Inactive" domains are only accessible to user roles with that assigned permission.'),
     );
     $form['weight'] = array(
       '#type' => 'weight',
@@ -102,7 +97,7 @@ class DomainForm extends EntityForm {
     $validator = \Drupal::service('domain.validator');
     $errors = $validator->validate($entity);
     if (!empty($errors)) {
-      form_set_error('hostname', $errors);
+      $form_state->setErrorByName('hostname', $errors);
     }
   }
 

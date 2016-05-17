@@ -1,17 +1,13 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainTestBase.
- */
-
 namespace Drupal\domain\Tests;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\DomainInterface;
 use Drupal\simpletest\WebTestBase;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Crypt;
+use Drupal\user\UserInterface;
 
 /**
  * Base class with helper methods and setup for domain tests.
@@ -35,7 +31,10 @@ abstract class DomainTestBase extends WebTestBase {
    */
   public static $modules = array('domain', 'node');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
 
     // Create Basic page and Article node types.
@@ -81,9 +80,9 @@ abstract class DomainTestBase extends WebTestBase {
    * The script may also add test1, test2, test3 up to any number to test a
    * large number of domains.
    *
-   * @param interger $count
+   * @param int $count
    *   The number of domains to create.
-   * @param $base_hostname
+   * @param string|NULL $base_hostname
    *   The root domain to use for domain creation (e.g. example.com).
    * @param array $list
    *   An optional list of subdomains to apply instead of the default set.
@@ -103,13 +102,13 @@ abstract class DomainTestBase extends WebTestBase {
       if (!empty($list[$i])) {
         if ($i < 11) {
           $hostname = $list[$i] . '.' . $base_hostname;
-          $machine_name = $list[$i] . '.' . 'example.com';
+          $machine_name = $list[$i] . '.example.com';
           $name = ucfirst($list[$i]);
         }
         // These domains are not setup and are just for UX testing.
         else {
           $hostname = 'test' . $i . '.' . $base_hostname;
-          $machine_name = 'test' . $i . '.' . 'example.com';
+          $machine_name = 'test' . $i . '.example.com';
           $name = 'Test ' . $i;
         }
       }
@@ -128,7 +127,7 @@ abstract class DomainTestBase extends WebTestBase {
       $domain->save();
     }
     $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
-    $this->assertTrue((count($domains) - count($original_domains)) == $count, format_string('Created %count new domains.', array('%count' => $count)));
+    $this->assertTrue((count($domains) - count($original_domains)) == $count, new FormattableMarkup('Created %count new domains.', array('%count' => $count)));
   }
 
   /**
@@ -137,7 +136,7 @@ abstract class DomainTestBase extends WebTestBase {
    * @param \Drupal\user\UserInterface $account
    *   The user account object to check.
    *
-   * @return boolean
+   * @return bool
    */
   protected function drupalUserIsLoggedIn($account) {
     // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
@@ -152,13 +151,13 @@ abstract class DomainTestBase extends WebTestBase {
   /**
    * Adds a test domain to an entity.
    *
-   * @param $entity_type
+   * @param string $entity_type
    *   The entity type being acted upon.
-   * @param $entity_id
+   * @param int $entity_id
    *   The entity id.
-   * @param $id
+   * @param int $id
    *   The id of the domain to add.
-   * @param $field
+   * @param string $field
    *   The name of the domain field used to attach to the entity.
    */
   public function addDomainToEntity($entity_type, $entity_id, $id, $field = DOMAIN_ACCESS_FIELD) {
@@ -171,12 +170,12 @@ abstract class DomainTestBase extends WebTestBase {
   /**
    * Login a user on a specific domain.
    *
-   * @param Drupal\domain\DomainInterface $domain
-   *  The domain to log the user into.
-   * @param Drupal\Core\Session\AccountInterface $account
-   *  The user account to login.
+   * @param \Drupal\domain\DomainInterface $domain
+   *   The domain to log the user into.
+   * @param \Drupal\user\UserInterface $account
+   *   The user account to login.
    */
-  public function domainLogin(DomainInterface $domain, AccountInterface $account) {
+  public function domainLogin(DomainInterface $domain, UserInterface $account) {
     if ($this->loggedInUser) {
       $this->drupalLogout();
     }
@@ -193,7 +192,7 @@ abstract class DomainTestBase extends WebTestBase {
     if (isset($this->sessionId)) {
       $account->session_id = $this->sessionId;
     }
-    $pass = $this->assert($this->drupalUserIsLoggedIn($account), format_string('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
+    $pass = $this->assert($this->drupalUserIsLoggedIn($account), new FormattableMarkup('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
     if ($pass) {
       $this->loggedInUser = $account;
       $this->container->get('current_user')->setAccount($account);

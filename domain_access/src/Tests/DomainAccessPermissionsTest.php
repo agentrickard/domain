@@ -1,14 +1,11 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessPermissionsTest
- */
-
 namespace Drupal\domain_access\Tests;
+
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\node\Entity\Node;
 use Drupal\user\RoleInterface;
 
 /**
@@ -19,13 +16,30 @@ use Drupal\user\RoleInterface;
 class DomainAccessPermissionsTest extends DomainTestBase {
 
   /**
+   * The Entity access control handler.
+   *
+   * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $accessHandler
+   */
+  protected $accessHandler;
+
+  /**
+   * The Domain Access manager.
+   *
+   * @var \Drupal\domain_access\DomainAccessManagerInterface $manager
+   */
+  protected $manager;
+
+  /**
    * Modules to enable.
    *
    * @var array
    */
   public static $modules = array('domain', 'domain_access', 'field', 'node');
 
-  public function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
     // Clear permissions for authenticated users.
     $this->config('user.role.' . RoleInterface::AUTHENTICATED_ID)->set('permissions', array())->save();
@@ -51,10 +65,9 @@ class DomainAccessPermissionsTest extends DomainTestBase {
   /**
    * Runs basic tests for node_access function.
    */
-  function testDomainAccessPermissions() {
+  public function testDomainAccessPermissions() {
     // Note that these are hook_node_access() rules. Node Access system tests
     // are in DomainAccessRecordsTest.
-
     // We expect to find 5 domain options. Set two for later use.
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     foreach ($domains as $domain) {
@@ -67,7 +80,11 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       }
     }
     // Assign our user to domain $two. Test on $one and $two.
-    $domain_user1 = $this->drupalCreateUser(array('access content', 'edit domain content', 'delete domain content'));
+    $domain_user1 = $this->drupalCreateUser(array(
+      'access content',
+      'edit domain content',
+      'delete domain content',
+    ));
     $this->addDomainToEntity('user', $domain_user1->id(), $two);
     $domain_user1 = \Drupal::entityManager()->getStorage('user')->load($domain_user1->id());
     $assigned = $this->manager->getAccessValues($domain_user1);
@@ -88,7 +105,11 @@ class DomainAccessPermissionsTest extends DomainTestBase {
 
     // Tests 'edit domain TYPE content'.
     // Assign our user to domain $two. Test on $one and $two.
-    $domain_user3 = $this->drupalCreateUser(array('access content', 'update page content on assigned domains', 'delete page content on assigned domains'));
+    $domain_user3 = $this->drupalCreateUser(array(
+      'access content',
+      'update page content on assigned domains',
+      'delete page content on assigned domains',
+    ));
     $this->addDomainToEntity('user', $domain_user3->id(), $two);
     $domain_user3 = \Drupal::entityManager()->getStorage('user')->load($domain_user3->id());
     $assigned = $this->manager->getAccessValues($domain_user3);
@@ -110,7 +131,11 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // @TODO: Test edit and delete for user with 'all affiliates' permission.
     // Tests 'edit domain TYPE content'.
     // Assign our user to domain $two. Test on $one and $two.
-    $domain_user4 = $this->drupalCreateUser(array('access content', 'update page content on assigned domains', 'delete page content on assigned domains'));
+    $domain_user4 = $this->drupalCreateUser(array(
+      'access content',
+      'update page content on assigned domains',
+      'delete page content on assigned domains',
+    ));
     $this->addDomainToEntity('user', $domain_user4->id(), $two);
     $this->addDomainToEntity('user', $domain_user4->id(), 1, DOMAIN_ACCESS_ALL_FIELD);
     $domain_user4 = \Drupal::entityManager()->getStorage('user')->load($domain_user4->id());
@@ -147,7 +172,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
         $this->assertResponse(200);
       }
       else {
-       $this->assertResponse(403);
+        $this->assertResponse(403);
       }
     }
     // Tests create permissions. Page content on assigned domains.
@@ -166,7 +191,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
         $this->assertResponse(200);
       }
       else {
-       $this->assertResponse(403);
+        $this->assertResponse(403);
       }
       $url = $domain->getPath() . '/node/add/article';
       $this->drupalGet($url);
@@ -188,7 +213,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account for which to check access.
    */
-  function assertNodeAccess(array $ops, $node, AccountInterface $account) {
+  public function assertNodeAccess(array $ops, Node $node, AccountInterface $account) {
     foreach ($ops as $op => $result) {
       $this->assertEqual($result, $this->accessHandler->access($node, $op, $account), $this->nodeAccessAssertMessage($op, $result));
     }
@@ -209,13 +234,13 @@ class DomainAccessPermissionsTest extends DomainTestBase {
    *   An assert message string which contains information in plain English
    *   about the node access permission test that was performed.
    */
-  function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
-    return format_string(
+  public function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
+    return new FormattableMarkup(
       'Node access returns @result with operation %op, language code %langcode.',
       array(
         '@result' => $result ? 'true' : 'false',
         '%op' => $operation,
-        '%langcode' => !empty($langcode) ? $langcode : 'empty'
+        '%langcode' => !empty($langcode) ? $langcode : 'empty',
       )
     );
   }

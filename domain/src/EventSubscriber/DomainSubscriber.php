@@ -1,20 +1,13 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\EventSubscriber\DomainSubscriber.
- */
-
 namespace Drupal\domain\EventSubscriber;
 
+use Drupal\domain\Access\DomainAccessCheck;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainLoaderInterface;
-use Drupal\Core\Access\AccessCheckInterface;
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -58,12 +51,12 @@ class DomainSubscriber implements EventSubscriberInterface {
    *   The domain negotiator service.
    * @param \Drupal\domain\DomainLoaderInterface $loader
    *   The domain loader.
-   * @param Drupal\Core\Access\AccessCheckInterface
+   * @param \Drupal\domain\Access\DomainAccessCheck $access_check
    *   The access check interface.
-   * @param \Drupal\Core\Session\AccountInterface
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user account.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, DomainLoaderInterface $loader, AccessCheckInterface $access_check, AccountInterface $account) {
+  public function __construct(DomainNegotiatorInterface $negotiator, DomainLoaderInterface $loader, DomainAccessCheck $access_check, AccountInterface $account) {
     $this->domainNegotiator = $negotiator;
     $this->domainLoader = $loader;
     $this->accessCheck = $access_check;
@@ -79,12 +72,13 @@ class DomainSubscriber implements EventSubscriberInterface {
    * in one of two cases: an unauthorized request to an inactive domain is made;
    * a domain alias is set to redirect to its primary domain record.
    *
-   * @param Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The Event to process.
    */
   public function onKernelRequestDomain(GetResponseEvent $event) {
     $redirect = FALSE;
     // Negotiate the request and set domain context.
+    /** @var \Drupal\domain\DomainInterface $domain */
     if ($domain = $this->domainNegotiator->getActiveDomain(TRUE)) {
       $domain_url = $domain->getUrl();
       if ($domain_url) {
@@ -95,12 +89,14 @@ class DomainSubscriber implements EventSubscriberInterface {
           $redirect = TRUE;
         }
         // Else check for active domain or inactive access.
-        elseif ($apply = $this->accessCheck->checkPath($path)) {
+        elseif ($this->accessCheck->checkPath($path)) {
+          /** @var \Drupal\Core\Access\AccessResult $access */
           $access = $this->accessCheck->access($this->account);
           // If the access check fails, reroute to the default domain.
           // Note that Allowed, Neutral, and Failed are the options here.
           // We insist on Allowed.
           if (!$access->isAllowed()) {
+            /** @var \Drupal\domain\DomainInterface $default */
             $default = $this->domainLoader->loadDefaultDomain();
             $domain_url = $default->getUrl();
             $redirect = TRUE;
@@ -117,9 +113,9 @@ class DomainSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  static function getSubscribedEvents() {
+  public static function getSubscribedEvents() {
     // This needs to fire very early in the stack, before accounts are cached.
     $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 50);
     return $events;

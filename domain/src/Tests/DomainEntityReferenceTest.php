@@ -1,14 +1,7 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainEntityReferenceTest.
- */
-
 namespace Drupal\domain\Tests;
-
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Tests the domain record entity reference field type.
@@ -27,8 +20,13 @@ class DomainEntityReferenceTest extends DomainTestBase {
   /**
    * Create, edit and delete a domain field via the user interface.
    */
-  function testDomainField() {
-    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
+  public function testDomainField() {
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -64,8 +62,14 @@ class DomainEntityReferenceTest extends DomainTestBase {
   /**
    * Create content for a domain field.
    */
-  function testDomainFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains'));
+  public function testDomainFieldStorage() {
+    $this->admin_user = $this->drupalCreateUser(array(
+      'bypass node access',
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Create test domain field.
@@ -85,7 +89,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->label())));
+      $this->assertRaw($string, new FormattableMarkup('Found the %domain option.', array('%domain' => $domain->label())));
       if (!isset($one)) {
         $one = $domain->id();
         continue;
@@ -114,7 +118,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
    *
    * Note: This code is a model for auto-creation of fields.
    */
-  function domainCreateTestField() {
+  public function domainCreateTestField() {
     $label = 'domain';
     $name = 'field_' . $label;
 
@@ -148,8 +152,8 @@ class DomainEntityReferenceTest extends DomainTestBase {
     entity_get_form_display('node', 'article', 'default')
       ->setComponent($name, array(
         'type' => 'options_buttons',
-    ))
-    ->save();
+      ))
+      ->save();
   }
 
 }

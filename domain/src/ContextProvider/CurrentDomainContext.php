@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\domain\ContextProvider\CurrentDomainContext.
- */
 
 namespace Drupal\domain\ContextProvider;
 
@@ -13,7 +9,6 @@ use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
-
 /**
  * Provides a context handler for the block system.
  */
@@ -22,6 +17,8 @@ class CurrentDomainContext implements ContextProviderInterface {
   use StringTranslationTrait;
 
   /**
+   * The Domain negotiator.
+   *
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $negotiator;
@@ -33,8 +30,7 @@ class CurrentDomainContext implements ContextProviderInterface {
    *   The domain negotiator.
    */
   public function __construct(DomainNegotiatorInterface $negotiator) {
-      $this->negotiator = $negotiator;
-
+    $this->negotiator = $negotiator;
   }
 
   /**

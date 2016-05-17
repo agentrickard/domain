@@ -1,14 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainFormsTest.
- */
-
 namespace Drupal\domain\Tests;
-
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
 
 /**
  * Tests the domain record form interface.
@@ -20,7 +12,7 @@ class DomainFormsTest extends DomainTestBase {
   /**
    * Create, edit and delete a domain via the user interface.
    */
-  function testDomainInterface() {
+  public function testDomainInterface() {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
     $this->drupalLogin($this->admin_user);
 

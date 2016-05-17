@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\views\argument\DomainAccessArgument.
- */
-
 namespace Drupal\domain_access\Plugin\views\argument;
 
 use Drupal\views\Plugin\views\argument\StringArgument;
@@ -17,9 +12,9 @@ use Drupal\views\Plugin\views\argument\StringArgument;
 class DomainAccessArgument extends StringArgument {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  function title() {
+  public function title() {
     if ($domain = \Drupal::service('domain.loader')->load($this->argument)) {
       return $domain->label();
     }

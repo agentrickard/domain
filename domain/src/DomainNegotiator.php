@@ -1,18 +1,13 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainNegotiator.
- */
-
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainLoaderInterface;
-use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * {@inheritdoc}
+ */
 class DomainNegotiator implements DomainNegotiatorInterface {
 
   /**
@@ -52,10 +47,12 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   /**
    * Constructs a DomainNegotiator object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack object.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\domain\DomainLoaderInterface $loader
+   *   The Domain loader object.
    */
   public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainLoaderInterface $loader) {
     $this->requestStack = $requestStack;
@@ -81,6 +78,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // is required for hook_domain_request_alter().
     else {
       $values = array('hostname' => $httpHost);
+      /** @var \Drupal\domain\Entity\Domain $domain */
       $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
       $domain->setMatchType(DOMAIN_MATCH_NONE);
     }

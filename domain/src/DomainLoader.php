@@ -1,17 +1,12 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainLoader.
- */
-
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainLoaderInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 
+/**
+ * Loads Domain records.
+ */
 class DomainLoader implements DomainLoaderInterface {
 
   /**
@@ -121,7 +116,7 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * {@inheritdoc}
    */
-  public function sort($a, $b) {
+  public function sort(DomainInterface $a, DomainInterface $b) {
     return $a->getWeight() > $b->getWeight();
   }
 

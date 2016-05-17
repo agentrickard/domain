@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\Action\DomainAccessEditNone.
- */
-
 namespace Drupal\domain_access\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;

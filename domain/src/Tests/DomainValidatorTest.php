@@ -1,14 +1,7 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainValidatorTest.
- */
-
 namespace Drupal\domain\Tests;
-
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Tests domain record validation.
@@ -33,10 +26,11 @@ class DomainValidatorTest extends DomainTestBase {
 
     // Check the created domain based on it's known id value.
     $key = 'example_com';
+    /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = \Drupal::service('domain.loader')->load($key);
 
-    // Our testing server should be able to acess the test PNG file.
-    $this->assertTrue($domain->getResponse() == 200, format_string('Server test for @url passed.', array('@url' => $domain->getPath())));
+    // Our testing server should be able to access the test PNG file.
+    $this->assertTrue($domain->getResponse() == 200, new FormattableMarkup('Server test for @url passed.', array('@url' => $domain->getPath())));
 
     // Now create a bad domain.
     $values = array(
@@ -47,6 +41,7 @@ class DomainValidatorTest extends DomainTestBase {
     $domain = \Drupal::service('domain.creator')->createDomain($values);
 
     $domain->save();
-    $this->assertTrue($domain->getResponse() == 500, format_string('Server test for @url failed.', array('@url' => $domain->getPath())));
+    $this->assertTrue($domain->getResponse() == 500, new FormattableMarkup('Server test for @url failed.', array('@url' => $domain->getPath())));
   }
+
 }

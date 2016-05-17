@@ -14,7 +14,7 @@
 function domain_source_install() {
   // Assign domain source to bundles.
   $list = array();
-  $node_types = entity_load_multiple('node_type');
+  $node_types = \Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple();
   foreach ($node_types as $type => $info) {
     $list[$type] = 'node';
   }
@@ -31,7 +31,7 @@ function domain_source_install() {
 function domain_source_uninstall() {
   foreach (array('node') as $type) {
     $id = $type . '.' . DOMAIN_SOURCE_FIELD;
-    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    if ($field = \Drupal::entityTypeManager()->getStorage('field_storage_config')->load($id)) {
       $field->delete();
     }
   }

@@ -1,16 +1,9 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainViewBuilder.
- */
-
 namespace Drupal\domain;
 
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\Component\Utility\SafeMarkup;
-use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 
 /**
  * Render controller for domain records.
@@ -18,7 +11,10 @@ use Drupal\entity\Plugin\Core\Entity\EntityDisplay;
 class DomainViewBuilder extends EntityViewBuilder {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
+   *
+   * @TODO EntityViewBuilder does not have a buildContent() method. viewMultiple() is the likely candidate.
+   * @TODO domain_field_extra_fields() is not defined anywhere.
    */
   public function buildContent(array $entities, array $displays, $view_mode, $langcode = NULL) {
     // If we can get domain_field_extra_fields() working here, we may not even
@@ -35,8 +31,8 @@ class DomainViewBuilder extends EntityViewBuilder {
         if (!empty($entity->{$key}) && $display->getComponent($key)) {
           $class = str_replace('_', '-', $key);
           $entity->content[$key] = array(
-            '#markup' => SafeMarkup::checkPlain($entity->{$key}),
-            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . SafeMarkup::checkPlain($key) . ':</strong><br />',
+            '#markup' => Html::escape($entity->{$key}),
+            '#prefix' => '<div class="domain-' . $class . '">' . '<strong>' . Html::escape($key) . ':</strong><br />',
             '#suffix' => '</div>',
           );
         }

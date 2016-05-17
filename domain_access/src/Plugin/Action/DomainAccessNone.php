@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain_access\Plugin\Action\DomainAccessNone.
- */
-
 namespace Drupal\domain_access\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
@@ -38,7 +33,7 @@ class DomainAccessNone extends ActionBase {
     $result = $object->access('update', $account, TRUE)
       ->andIf($object->status->access('edit', $account, TRUE));
 
-    return $return_as_object ? $result : $result->isNoneowed();
+    return $return_as_object ? $result : $result->isAllowed();
   }
 
 }

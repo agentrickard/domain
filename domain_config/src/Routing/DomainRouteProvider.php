@@ -1,28 +1,29 @@
 <?php
-/**
- * Custom modification of router.route_provider service in order
- * to make it domain context sensitive.
- * 
- * The default behaviour is to cache routes by path and query parameters only,
- * for multiple domains this can make the home page of domain 1 be served from 
- * cache as the home page of domain 2.
- */
 
 namespace Drupal\domain_config\Routing;
+
 use Drupal\Core\Routing\RouteProvider;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * Custom router.route_provider service to make it domain context sensitive.
+ *
+ * The default behaviour is to cache routes by path and query parameters only,
+ * for multiple domains this can make the home page of domain 1 be served from
+ * cache as the home page of domain 2.
+ */
 class DomainRouteProvider extends RouteProvider {
+
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * Modify the caching of the route.
    */
   public function getRouteCollectionForRequest(Request $request) {
     // Cache both the system path as well as route parameters and matching
-    // routes. Here we add in the domain as well
-    $cid = 'route:' . $request->getHost() . ':' . $request->getPathInfo() . ':' .  $request->getQueryString();
+    // routes. Here we add in the domain as well.
+    $cid = 'route:' . $request->getHost() . ':' . $request->getPathInfo() . ':' . $request->getQueryString();
     if ($cached = $this->cache->get($cid)) {
       $this->currentPath->setPath($cached->data['path'], $request);
       $request->query->replace($cached->data['query']);
@@ -46,4 +47,5 @@ class DomainRouteProvider extends RouteProvider {
       return $routes;
     }
   }
+
 }

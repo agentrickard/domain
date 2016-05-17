@@ -1,15 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_config\Tests\DomainConfigTestBase.
- */
-
 namespace Drupal\domain_config\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Core\Language\LanguageInterface;
 
 /**
  * Helper test methods for Domain Config testing.
@@ -17,8 +10,10 @@ use Drupal\Core\Language\LanguageInterface;
 abstract class DomainConfigTestBase extends DomainTestBase {
 
   /**
-   * Disabled config schema checking because Domain Config actually duplicates
-   * schemas provided by other modules, so cannot define its own.
+   * Disabled config schema checking.
+   *
+   * Domain Config actually duplicates schemas provided by other modules,
+   * so it cannot define its own.
    */
   protected $strictConfigSchema = FALSE;
 
@@ -39,9 +34,9 @@ abstract class DomainConfigTestBase extends DomainTestBase {
   public static $modules = array('domain', 'language', 'domain_config_test', 'domain_config');
 
   /**
-   * Test setup.
+   * {@inheritdoc}
    */
-  function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Create and login user.

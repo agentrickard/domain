@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\Tests\DomainAliasNegotiatorTest
- */
-
 namespace Drupal\domain_alias\Tests;
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain_alias\Tests\DomainAliasTestBase;
+use Drupal\user\RoleInterface;
 
 /**
  * Tests domain alias request negotiation.
@@ -27,7 +21,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
   /**
    * Tests the handling of aliased requests.
    */
-  function testDomainAliasNegotiator() {
+  public function testDomainAliasNegotiator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -39,7 +33,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $this->drupalPlaceBlock('domain_server_block');
 
     // To get around block access, let the anon user view the block.
-    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
 
     // Test the response of the default home page.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
@@ -71,9 +65,8 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $alias->set('redirect', 302);
     $alias->save();
     $this->drupalGet($url);
-    // Revoke the permission change
-    user_role_revoke_permissions(DRUPAL_ANONYMOUS_RID, array('administer domains'));
-
+    // Revoke the permission change.
+    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
   }
 
 }

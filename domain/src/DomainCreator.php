@@ -1,15 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainCreator.
- */
-
 namespace Drupal\domain;
-
-use Drupal\domain\DomainCreatorInterface;
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Creates new domain records.
@@ -19,12 +10,16 @@ use Drupal\domain\DomainNegotiatorInterface;
 class DomainCreator implements DomainCreatorInterface {
 
   /**
-   * @var \Drupal\domain\DomainLoaderInterface
+   * The Domain loader.
+   *
+   * @var \Drupal\domain\DomainLoaderInterface $loader
    */
   protected $loader;
 
   /**
-   * @var \Drupal\domain\DomainNegotiatorInterface
+   * The Domain negotiator.
+   *
+   * @var \Drupal\domain\DomainNegotiatorInterface $negotiator
    */
   protected $negotiator;
 
@@ -69,6 +64,7 @@ class DomainCreator implements DomainCreatorInterface {
   public function createNextId() {
     $domains = $this->loader->loadMultiple();
     $max = 0;
+    /** @var \Drupal\domain\Entity\Domain $domain */
     foreach ($domains as $domain) {
       $domain_id = $domain->getDomainId();
       if ($domain_id > $max) {

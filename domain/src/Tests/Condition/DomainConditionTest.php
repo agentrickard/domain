@@ -1,15 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\Tests\Condition\DomainConditionTest.
- */
-
 namespace Drupal\domain\Tests\Condition;
 
-use Drupal\domain\DomainInterface;
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\Component\Utility\SafeMarkup;
 
 /**
  * Tests the domain condition.

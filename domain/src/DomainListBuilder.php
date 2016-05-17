@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\domain\DomainListBuilder.
- */
-
 namespace Drupal\domain;
 
 use Drupal\Core\Config\Entity\DraggableListBuilder;
@@ -34,12 +29,9 @@ class DomainListBuilder extends DraggableListBuilder {
    */
   public function getOperations(EntityInterface $entity) {
     $operations = parent::getOperations($entity);
-    $destination = drupal_get_destination();
+    $destination = \Drupal::destination()->getAsArray();
     $default = $entity->isDefault();
     $id = $entity->id();
-
-    // Get CSRF token service.
-    $token_generator = \Drupal::csrfToken();
 
     // @TODO: permission checks.
     if ($entity->status() && !$default) {
@@ -75,6 +67,7 @@ class DomainListBuilder extends DraggableListBuilder {
         $operations[$key]['query'] += $destination;
       }
     }
+    /** @var DomainInterface $default */
     $default = \Drupal::service('domain.loader')->loadDefaultDomain();
 
     // Deleting the site default domain is not allowed.

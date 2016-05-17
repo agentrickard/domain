@@ -1,14 +1,8 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\DomainAliasForm.
- */
-
 namespace Drupal\domain_alias;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -20,6 +14,7 @@ class DomainAliasForm extends EntityForm {
    * Overrides Drupal\Core\Entity\EntityForm::form().
    */
   public function form(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\domain_alias\DomainAliasInterface $alias */
     $alias = $this->entity;
 
     $form['domain_id'] = array(
@@ -50,13 +45,14 @@ class DomainAliasForm extends EntityForm {
       '#description' => $this->t('Redirect status'),
     );
 
-    return parent::form($form, $form_state, $alias);
+    return parent::form($form, $form_state);
   }
 
   /**
    * Returns a list of valid redirect options for the form.
    *
    * @return array
+   *   A list of valid redirect options.
    */
   public function redirectOptions() {
     return array(
@@ -74,7 +70,7 @@ class DomainAliasForm extends EntityForm {
     $validator = \Drupal::service('domain_alias.validator');
     $errors = $validator->validate($entity);
     if (!empty($errors)) {
-      form_set_error('pattern', $errors);
+      $form_state->setErrorByName('pattern', $errors);
     }
   }
 
@@ -82,6 +78,7 @@ class DomainAliasForm extends EntityForm {
    * Overrides Drupal\Core\Entity\EntityForm::save().
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\domain_alias\DomainAliasInterface $alias */
     $alias = $this->entity;
     if ($alias->isNew()) {
       drupal_set_message($this->t('Domain alias created.'));
@@ -90,18 +87,19 @@ class DomainAliasForm extends EntityForm {
       drupal_set_message($this->t('Domain alias updated.'));
     }
     $alias->save();
-    $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainID()));
+    $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainId()));
   }
 
   /**
    * Overrides Drupal\Core\Entity\EntityForm::delete().
    */
   public function delete(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\domain_alias\DomainAliasInterface $alias */
     $alias = $this->entity;
     // @TODO: error handling?
     $alias->delete();
 
-    $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainID()));
+    $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainId()));
   }
 
 }

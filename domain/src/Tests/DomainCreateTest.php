@@ -1,14 +1,7 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainCreateTest.
- */
-
 namespace Drupal\domain\Tests;
-
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Tests the domain record creation API.
@@ -20,7 +13,7 @@ class DomainCreateTest extends DomainTestBase {
   /**
    * Tests initial domain creation.
    */
-  function testDomainCreate() {
+  public function testDomainCreate() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -28,7 +21,7 @@ class DomainCreateTest extends DomainTestBase {
     $domain = \Drupal::service('domain.creator')->createDomain();
     foreach (array('id', 'name', 'hostname', 'domain_id', 'scheme', 'status', 'weight' , 'is_default') as $key) {
       $property = $domain->get($key);
-      $this->assertTrue(isset($property), format_string('New $domain->@key property is set to default value: %value.', array('@key' => $key, '%value' => $property)));
+      $this->assertTrue(isset($property), new FormattableMarkup('New $domain->@key property is set to default value: %value.', array('@key' => $key, '%value' => $property)));
     }
     $domain->save();
 

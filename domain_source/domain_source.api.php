@@ -16,16 +16,13 @@
  * $options['entity_type'] is the type of entity. These values have already
  * been verified before this hook is called.
  *
- *
- * @param &$source
+ * @param \Drupal\domain\Entity\Domain|NULL &$source
  *   A domain object or NULL if not set.
- * @param $path
+ * @param string $path
  *   The outbound path request.
  * @param array $options
  *   The options for the url, as defined by
- *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface
- *
- *
+ *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface.
  */
 function hook_domain_source_alter(&$source, $path, $options) {
   // Always link to the default domain.
@@ -50,13 +47,13 @@ function hook_domain_source_alter(&$source, $path, $options) {
  * loading a valid domain record or set $source = NULL to discard an existing
  * $source value and not rewrite the path.
  *
- * @param &$source
+ * @param array &$source
  *   The domain array from domain_get_node_match(), passed by reference.
- * @param $path
+ * @param string $path
  *   The outbound path request.
  * @param array $options
  *   The options for the url, as defined by
- *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface
+ *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface.
  */
 function hook_domain_source_path_alter(&$source, $path, $options) {
   // Always make admin links go to the primary domain.

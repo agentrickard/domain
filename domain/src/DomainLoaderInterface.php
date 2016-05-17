@@ -7,7 +7,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\domain\DomainInterface;
 
 /**
  * Supplies loader methods for common domain requests.
@@ -17,9 +16,9 @@ interface DomainLoaderInterface {
   /**
    * Loads a single domains.
    *
-   * @param $id
+   * @param int $id
    *   A domain id to load.
-   * @param boolean $reset
+   * @param bool $reset
    *   Indicates that the entity cache should be reset.
    *
    * @return DomainInterface
@@ -30,14 +29,15 @@ interface DomainLoaderInterface {
   /**
    * Gets the default domain object.
    *
-   * @return Drupal\domain\DomainInterface | NULL
+   * @return \Drupal\domain\DomainInterface | NULL
+   *   The default domain object or NULL.
    */
   public function loadDefaultDomain();
 
   /**
    * Returns the id of the default domain.
    *
-   * @return
+   * @return int
    *   The id of the default domain or FALSE if none is set.
    */
   public function loadDefaultId();
@@ -47,7 +47,7 @@ interface DomainLoaderInterface {
    *
    * @param array $ids
    *   An optional array of specific ids to load.
-   * @param boolean $reset
+   * @param bool $reset
    *   Indicates that the entity cache should be reset.
    *
    * @return array
@@ -72,7 +72,8 @@ interface DomainLoaderInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return Drupal\domain\DomainInterface | NULL
+   * @return \Drupal\domain\DomainInterface | NULL
+   *   The domain record or NULL.
    */
   public function loadByHostname($hostname);
 
@@ -88,8 +89,16 @@ interface DomainLoaderInterface {
    * Sorts domains by weight.
    *
    * For use by loadMultipleSorted().
+   *
+   * @param DomainInterface $a
+   *   The first Domain object to sort.
+   * @param DomainInterface $b
+   *   The Domain object to compare against.
+   *
+   * @return bool
+   *   Wether the first domain weight is greater or not.
    */
-  public function sort($a, $b);
+  public function sort(DomainInterface $a, DomainInterface $b);
 
   /**
    * Gets the entity field schema for domain records.

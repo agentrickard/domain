@@ -1,16 +1,9 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\DomainAccessManager.
- */
-
 namespace Drupal\domain_access;
 
-use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -81,7 +74,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    */
   public function checkEntityAccess(EntityInterface $entity, AccountInterface $account) {
     $entity_domains = $this->getAccessValues($entity);
-    $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
     if (!empty($this->getAllValue($user)) && !empty($entity_domains)) {
       return TRUE;
     }
@@ -97,6 +90,8 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     switch ($entity->getEntityType()) {
       case 'user':
       case 'node':
+        // @TODO $this is no accessible in a static context.
+        /** @var \Drupal\domain\DomainInterface $active */
         if ($active = $this->negotiator->getActiveDomain()) {
           $item[0]['target_uuid'] = $active->uuid();
         }

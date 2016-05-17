@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\domain_access\DomainAccessPermissions.
- */
 
 namespace Drupal\domain_access;
 
@@ -60,12 +56,13 @@ class DomainAccessPermissions {
    *
    * Shamelessly lifted from node_list_permissions().
    *
-   * @param $type
+   * @param NodeType $type
    *   The node type object.
+   *
    * @return array
    *   An array of permission names and descriptions.
    */
-  function nodePermissions($type) {
+  private function nodePermissions(NodeType $type) {
     // Build standard list of node permissions for this type.
     $id = $type->id();
     $perms = array(

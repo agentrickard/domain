@@ -1,13 +1,9 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_access\Tests\DomainAccessEntityReferenceTest
- */
-
 namespace Drupal\domain_access\Tests;
+
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\domain\DomainInterface;
 
 /**
  * Tests the domain access entity reference field type.
@@ -23,7 +19,10 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
    */
   public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
 
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
     parent::setUp();
 
     // Run the install hook.
@@ -35,8 +34,13 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
   /**
    * Tests that the module installed its field correctly.
    */
-  function testDomainAccessNodeField() {
-    $this->admin_user = $this->drupalCreateUser(array('administer content types', 'administer node fields', 'administer node display', 'administer domains'));
+  public function testDomainAccessNodeField() {
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -57,8 +61,15 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
   /**
    * Tests the storage of the domain access field.
    */
-  function testDomainAccessFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array('bypass node access', 'administer content types', 'administer node fields', 'administer node display', 'administer domains', 'publish to any domain'));
+  public function testDomainAccessFieldStorage() {
+    $this->admin_user = $this->drupalCreateUser(array(
+      'bypass node access',
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+      'publish to any domain',
+    ));
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.
@@ -75,7 +86,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, format_string('Found the %domain option.', array('%domain' => $domain->label())));
+      $this->assertRaw($string, new FormattableMarkup('Found the %domain option.', array('%domain' => $domain->label())));
       if (!isset($one)) {
         $one = $domain->id();
         continue;

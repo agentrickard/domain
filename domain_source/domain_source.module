@@ -5,11 +5,6 @@
  * Domain-based path rewrites for content.
  */
 
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainLoaderInterface;
-use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\node\NodeInterface;
-use Drupal\node\Entity\NodeType;
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -20,9 +15,9 @@ define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
 /**
  * Creates our fields for an entity bundle.
  *
- * @param $entity_type
+ * @param string $entity_type
  *   The entity type being created. Node and user are supported.
- * @param $bundle
+ * @param string $bundle
  *   The bundle being created.
  *
  * @see domain_source_node_type_insert()
@@ -63,9 +58,9 @@ function domain_source_confirm_fields($entity_type, $bundle) {
 /**
  * Implements hook_ENTITY_TYPE_insert().
  *
- * @TODO: Make this possible for all entity types.
- *
  * Creates our fields when new node types are created.
+ *
+ * @TODO: Make this possible for all entity types.
  */
 function domain_source_node_type_insert(EntityInterface $entity) {
   domain_source_confirm_fields('node', $entity->id());
@@ -77,7 +72,7 @@ function domain_source_node_type_insert(EntityInterface $entity) {
  * @param Drupal\Core\Entity\EntityInterface $entity
  *   The entity to check.
  *
- * @return
+ * @return string|NULL
  *   The value assigned to the entity, either a domain id string or NULL.
  */
 function domain_source_get(EntityInterface $entity) {

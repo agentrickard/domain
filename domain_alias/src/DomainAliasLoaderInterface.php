@@ -1,13 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain_alias\DomainAliasLoaderInterface.
- */
-
 namespace Drupal\domain_alias;
-
-use Drupal\domain_alias\DomainAliasInterface;
 
 /**
  * Supplies loader methods for common domain_alias requests.
@@ -17,9 +10,9 @@ interface DomainAliasLoaderInterface {
   /**
    * Loads a single alias.
    *
-   * @param $id
+   * @param string $id
    *   A domain_alias id to load.
-   * @param boolean $reset
+   * @param bool $reset
    *   Indicates that the entity cache should be reset.
    *
    * @return DomainAliasInterface
@@ -32,7 +25,7 @@ interface DomainAliasLoaderInterface {
    *
    * @param array $ids
    *   An optional array of specific ids to load.
-   * @param boolean $reset
+   * @param bool $reset
    *   Indicates that the entity cache should be reset.
    *
    * @return array
@@ -48,7 +41,8 @@ interface DomainAliasLoaderInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
+   *   The best match alias record for the provided hostname.
    */
   public function loadByHostname($hostname);
 
@@ -58,7 +52,8 @@ interface DomainAliasLoaderInterface {
    * @param string $pattern
    *   A pattern string, in the format *.example.com.
    *
-   * @return Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
+   *   The domain alias record given a pattern string.
    */
   public function loadByPattern($pattern);
 

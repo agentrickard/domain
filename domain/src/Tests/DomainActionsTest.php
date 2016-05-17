@@ -1,14 +1,7 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\Tests\DomainActionsTest.
- */
-
 namespace Drupal\domain\Tests;
-
-use Drupal\domain\DomainInterface;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Tests the domain record actions.
@@ -20,7 +13,7 @@ class DomainActionsTest extends DomainTestBase {
   /**
    * Tests bulk actions through the domain overview page.
    */
-  function testDomainActions() {
+  public function testDomainActions() {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));
     $this->drupalLogin($this->admin_user);
 
@@ -48,12 +41,12 @@ class DomainActionsTest extends DomainTestBase {
     // Test some text on the page.
     foreach ($domains as $domain) {
       $name = $domain->label();
-      $this->assertText($name, format_string('@name found on overview page.', array('@name' => $name)));
+      $this->assertText($name, new FormattableMarkup('@name found on overview page.', array('@name' => $name)));
     }
     // @TODO: Test the list of actions.
     $actions = array('delete', 'disable', 'default');
     foreach ($actions as $action) {
-      $this->assertRaw("/domain/{$action}/", format_string('@action action found.', array('@action' => $action)));
+      $this->assertRaw("/domain/{$action}/", new FormattableMarkup('@action action found.', array('@action' => $action)));
     }
     // @TODO: Disable a domain and test the enable link.
 
