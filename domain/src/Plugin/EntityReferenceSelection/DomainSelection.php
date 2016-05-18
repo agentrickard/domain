@@ -36,13 +36,16 @@ class DomainSelection extends DefaultSelection {
     // modules. Those modules must know what type of entity they are dealing
     // with, so look up the entity type and bundle.
     $info = $query->getMetaData('entity_reference_selection_handler');
-    $context['entity_type'] = $info->configuration['entity']->getEntityTypeId();
-    $context['bundle'] = $info->configuration['entity']->bundle();
 
-    // Load the current user.
-    $account = User::load($this->currentUser->id());
-    // Run the alter hook.
-    $this->moduleHandler->alter('domain_references', $query, $account, $context);
+    if (!empty($info->configuration['entity'])) {
+      $context['entity_type'] = $info->configuration['entity']->getEntityTypeId();
+      $context['bundle'] = $info->configuration['entity']->bundle();
+
+      // Load the current user.
+      $account = User::load($this->currentUser->id());
+      // Run the alter hook.
+      $this->moduleHandler->alter('domain_references', $query, $account, $context);
+    }
 
     return $query;
   }
