@@ -356,7 +356,7 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
       $access = AccessResult::allowedIfHasPermissions($account, [
         'publish to any domain',
         'publish to any assigned domain',
-      ]);
+      ], 'OR');
     }
 
     // allowedIfHasPermissions returns allowed() or neutral().
