@@ -11,6 +11,7 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\user\Entity\User;
 
 /**
  * Defines the name of the node access control field.
@@ -339,15 +340,38 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
     return AccessResult::neutral();
   }
 
-  if ($field_definition->getName() == DOMAIN_ACCESS_FIELD) {
-    $access = AccessResult::allowedIfHasPermissions($account, ['assign domain editors', 'assign editors to any domain'], 'OR');
+  // The entity the field is attached to.
+  $entity = $items->getEntity();
 
+  if ($field_definition->getName() == DOMAIN_ACCESS_FIELD) {
+    if ($entity instanceof User) {
+      $access = AccessResult::allowedIfHasPermissions($account, [
+        'assign domain editors',
+        'assign editors to any domain',
+      ], 'OR');
+    }
+    else {
+      // Treat any other entity as content.
+      $access = AccessResult::allowedIfHasPermissions($account, [
+        'publish to any domain',
+        'publish to any assigned domain',
+      ]);
+    }
+
+    // allowedIfHasPermissions returns allowed() or neutral().
+    // In this case, we want it to be forbidden,
+    // if user doesn't have the permissions above.
     if (!$access->isAllowed()) {
       return AccessResult::forbidden();
     }
   }
   elseif ($field_definition->getName() == DOMAIN_ACCESS_ALL_FIELD) {
-    return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));
+    if ($entity instanceof User) {
+      return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));
+    }
+
+    // Treat any other entity as content.
+    return AccessResult::forbiddenIf(!$account->hasPermission('publish to any domain'));
   }
 
   return AccessResult::neutral();
