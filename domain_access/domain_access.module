@@ -5,10 +5,11 @@
  * Domain-based access control for content.
  */
 
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -320,7 +321,7 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
   $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($user);
   if (($account->hasPermission('create ' . $entity_bundle . ' content on assigned domains')
       || $account->hasPermission('create domain content'))
-      && in_array($id, $user_domains)) {
+    && in_array($id, $user_domains)) {
     // Note the cache context here!
     return AccessResult::allowed()->addCacheContexts(['user.permissions', 'url.site']);
   }
@@ -329,33 +330,27 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
 }
 
 /**
- * Implements hook_form_node_form_alter().
- *
- * Hides fields that the user cannot access.
+ * Implements hook_entity_field_access().
  */
-function domain_access_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $account = \Drupal::currentUser();
-  if (isset($form[DOMAIN_ACCESS_FIELD])) {
-    $form[DOMAIN_ACCESS_FIELD]['#access'] = ($account->hasPermission('publish to any domain') || $account->hasPermission('publish to any assigned domain'));
+function domain_access_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  // Hide the domain access fields from the entity add/edit forms
+  // when the user cannot access them.
+  if ($operation != 'edit') {
+    return AccessResult::neutral();
   }
-  if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
-    $form[DOMAIN_ACCESS_ALL_FIELD]['#access'] = $account->hasPermission('publish to any domain');
-  }
-}
 
-/**
- * Implements hook_form_user_form_alter().
- *
- * Hides fields that the user cannot access.
- */
-function domain_access_form_user_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $account = \Drupal::currentUser();
-  if (isset($form[DOMAIN_ACCESS_FIELD])) {
-    $form[DOMAIN_ACCESS_FIELD]['#access'] = ($account->hasPermission('assign domain editors') || $account->hasPermission('assign editors to any domain'));
+  if ($field_definition->getName() == DOMAIN_ACCESS_FIELD) {
+    $access = AccessResult::allowedIfHasPermissions($account, ['assign domain editors', 'assign editors to any domain'], 'OR');
+
+    if (!$access->isAllowed()) {
+      return AccessResult::forbidden();
+    }
   }
-  if (isset($form[DOMAIN_ACCESS_ALL_FIELD])) {
-    $form[DOMAIN_ACCESS_ALL_FIELD]['#access'] = $account->hasPermission('assign editors to any domain');
+  elseif ($field_definition->getName() == DOMAIN_ACCESS_ALL_FIELD) {
+    return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));
   }
+
+  return AccessResult::neutral();
 }
 
 /**
