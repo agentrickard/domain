@@ -2,6 +2,8 @@
 
 namespace Drupal\domain_access\Tests;
 
+use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Url;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\node\Entity\NodeType;
 
@@ -29,6 +31,9 @@ class DomainAccessFieldTest extends DomainTestBase {
     // @TODO: figure out why this is necessary.
     module_load_install('domain_access');
     domain_access_install();
+
+    // Create 5 domains.
+    $this->domainCreateTestDomains(5);
   }
 
   /**
@@ -36,8 +41,6 @@ class DomainAccessFieldTest extends DomainTestBase {
    */
   public function testDomainAccessFields() {
     $label = 'Send to all affiliates';
-    // Create 5 domains.
-    $this->domainCreateTestDomains(5);
 
     // Test a user who can access all domain settings.
     $user1 = $this->drupalCreateUser(array('create article content', 'publish to any domain'));
@@ -88,6 +91,22 @@ class DomainAccessFieldTest extends DomainTestBase {
       $this->assertNoText($domain->label(), 'Domain form item not found.');
     }
     $this->assertNoText($label, 'All affiliates field not found.');
+
+    // Attempt saving the node.
+    // The domain/domain affiliates fields are not accessible to this user.
+    // The save will fail with an EntityStorageException until
+    // https://www.drupal.org/node/2609252 is fixed.
+    $edit = array();
+    $edit['title[0][value]'] = $this->randomMachineName(8);
+    $edit['body[0][value]'] = $this->randomMachineName(16);
+    $this->drupalPostForm('node/add/article', $edit, t('Save'));
+
+    $failed = $this->assertResponse(500, "Expected 500 until https://www.drupal.org/node/2609252 is fixed");
+    if (!$failed) {
+      // Check that the node exists in the database.
+      $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
+      $this->assertTrue($node, 'Node found in database.');
+    }
 
     // Test a user who can assign users to domains.
     $user4 = $this->drupalCreateUser(array('administer users', 'assign editors to any domain'));
@@ -156,6 +175,30 @@ class DomainAccessFieldTest extends DomainTestBase {
       $this->assertText($domain->label(), 'Domain form item found.');
     }
     $this->assertText($label, 'All affiliates field found.');
+
+
+    // Test user without access to affiliates field editing their user page.
+    $user8 = $this->drupalCreateUser(array('change own username'));
+    $this->drupalLogin($user8);
+
+    $user_edit_page = 'user/' . $user8->id() . '/edit';
+    $this->drupalGet($user_edit_page);
+    // Check for the form options.
+    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    foreach ($domains as $domain) {
+      $this->assertNoText($domain->label(), 'Domain form item not found.');
+    }
+
+    $this->assertNoText($label, 'All affiliates field not found.');
+
+    // Change own username.
+    // The save will fail with an EntityStorageException until
+    // https://www.drupal.org/node/2609252 is fixed.
+    $edit = array();
+    $edit['name'] = $this->randomMachineName();
+
+    $this->drupalPostForm($user_edit_page, $edit, t('Save'));
+    $this->assertResponse(500, "Expected 500 until https://www.drupal.org/node/2609252 is fixed");
   }
 
 }
