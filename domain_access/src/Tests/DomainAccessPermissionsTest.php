@@ -166,7 +166,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // This test is domain sensitive.
     foreach ($domains as $domain) {
       $this->domainLogin($domain, $domain_user5);
-      $url = $domain->getPath() . '/node/add/page';
+      $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
       if ($domain->id() == $two) {
         $this->assertResponse(200);
@@ -185,7 +185,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // This test is domain sensitive.
     foreach ($domains as $domain) {
       $this->domainLogin($domain, $domain_user5);
-      $url = $domain->getPath() . '/node/add/page';
+      $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
       if ($domain->id() == $two) {
         $this->assertResponse(200);
@@ -193,7 +193,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       else {
         $this->assertResponse(403);
       }
-      $url = $domain->getPath() . '/node/add/article';
+      $url = $domain->getPath() . 'node/add/article';
       $this->drupalGet($url);
       $this->assertResponse(403);
     }

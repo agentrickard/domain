@@ -138,7 +138,7 @@ abstract class DomainTestBase extends WebTestBase {
    *
    * @return bool
    */
-  protected function drupalUserIsLoggedIn($account) {
+  protected function drupalUserIsLoggedIn(UserInterface $account) {
     // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
     if (!isset($account->session_id)) {
       return (bool) $account->id();
@@ -184,7 +184,7 @@ abstract class DomainTestBase extends WebTestBase {
     $pass = 'thisissatestpassword';
     $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
     $user->setPassword($pass)->save();
-    $url = $domain->getPath() . '/user/login';
+    $url = $domain->getPath() . 'user/login';
     $edit = ['name' => $account->getUsername(), 'pass' => $pass];
     $this->drupalPostForm($url, $edit, t('Log in'));
 
