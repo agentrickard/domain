@@ -106,7 +106,36 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     // Check that two values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
+  }
 
+  /**
+   * Test the usage of DomainAccessManager::getDefaultValue().
+   */
+  public function testDomainAccessDefaultValue() {
+    $this->admin_user = $this->drupalCreateUser(array(
+      'bypass node access',
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+      'publish to any domain',
+    ));
+    $this->drupalLogin($this->admin_user);
+
+    // Create 5 domains.
+    $this->domainCreateTestDomains(5);
+
+    // Visit the article field display administration page.
+    $this->drupalGet('node/add/article');
+    $this->assertResponse(200);
+
+    $domain_field = \Drupal::entityManager()->getBaseFieldDefinitions('node')[DOMAIN_ACCESS_FIELD];
+    $config = $domain_field->getConfig('article');
+    $this->assertEqual($config->get('default_value_callback'), 'Drupal\domain_access\DomainAccessManager::getDefaultValue');
+
+    // Check the new field exists on the page.
+    $this->assertText('Domain Access', 'Found the domain field instance.');
+    $this->assertRaw('checked="checked" value="example_com"', 'Default domain selected.');
   }
 
 }

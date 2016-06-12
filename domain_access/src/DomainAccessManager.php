@@ -87,12 +87,11 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    */
   public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
     $item = array();
-    switch ($entity->getEntityType()) {
+    switch ($entity->getEntityType()->id()) {
       case 'user':
       case 'node':
-        // @TODO $this is no accessible in a static context.
         /** @var \Drupal\domain\DomainInterface $active */
-        if ($active = $this->negotiator->getActiveDomain()) {
+        if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
           $item[0]['target_uuid'] = $active->uuid();
         }
         break;
