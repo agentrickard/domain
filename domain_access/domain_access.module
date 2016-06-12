@@ -128,6 +128,15 @@ function domain_access_user_presave(EntityInterface $account) {
  * Handles presave operations for devel generate.
  */
 function domain_access_presave_generate(EntityInterface $entity) {
+  // There is a core bug https://www.drupal.org/node/2609252 that causes a
+  // fatal database errors if the boolean DOMAIN_ACCESS_ALL_FIELD is set when
+  // a user cannot access the field. See domain_access_entity_field_access().
+  // To overcome this issue, we cast the boolean to integer, which prevents the
+  // failure.
+  $value = (int) $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value;
+  $entity->set(DOMAIN_ACCESS_ALL_FIELD, $value);
+
+  // Handle devel module settings.
   $exists = \Drupal::moduleHandler()->moduleExists('devel_generate');
   $values = [];
   if ($exists && isset($entity->devel_generate)) {

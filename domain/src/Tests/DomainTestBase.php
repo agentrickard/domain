@@ -184,7 +184,7 @@ abstract class DomainTestBase extends WebTestBase {
     $pass = 'thisissatestpassword';
     $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
     $user->setPassword($pass)->save();
-    $url = $domain->getPath() . '/user/login';
+    $url = $domain->getPath() . 'user/login';
     $edit = ['name' => $account->getUsername(), 'pass' => $pass];
     $this->drupalPostForm($url, $edit, t('Log in'));
 

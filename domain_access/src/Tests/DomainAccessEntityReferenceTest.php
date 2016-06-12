@@ -129,13 +129,9 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $this->drupalGet('node/add/article');
     $this->assertResponse(200);
 
-    $domain_field = \Drupal::entityManager()->getBaseFieldDefinitions('node')[DOMAIN_ACCESS_FIELD];
-    $config = $domain_field->getConfig('article');
-    $this->assertEqual($config->get('default_value_callback'), 'Drupal\domain_access\DomainAccessManager::getDefaultValue');
-
     // Check the new field exists on the page.
     $this->assertText('Domain Access', 'Found the domain field instance.');
-    $this->assertRaw('checked="checked" value="example_com"', 'Default domain selected.');
+    $this->assertRaw('name="field_domain_access[example_com]" value="example_com" checked="checked"', 'Default domain selected.');
   }
 
 }

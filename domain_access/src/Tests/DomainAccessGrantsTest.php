@@ -35,11 +35,6 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // @TODO: figure out why this is necessary.
     module_load_install('domain_access');
     domain_access_install();
-    // Set the access handler.
-    $this->accessHandler = \Drupal::entityManager()->getAccessControlHandler('node');
-
-    // Clear permissions for authenticated users.
-    $this->config('user.role.' . AccountInterface::ANONYMOUS_ROLE)->set('permissions', array())->save();
   }
 
   /**

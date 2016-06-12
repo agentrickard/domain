@@ -106,11 +106,11 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    */
   public static function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
     // @TODO: This may become configurable.
-    $item = FALSE;
+    $item = 0;
     switch ($entity->getEntityType()) {
       case 'user':
       case 'node':
-        $item = FALSE;
+        $item = 0;
         break;
       default:
         break;
