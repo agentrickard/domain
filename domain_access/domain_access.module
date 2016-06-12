@@ -399,68 +399,74 @@ function domain_access_node_type_insert(EntityInterface $entity) {
  * @see domain_access_install()
  */
 function domain_access_confirm_fields($entity_type, $bundle) {
-  $text = [
-    'node' => [
-      'type' => 'content',
-      'label' => 'Send to all affiliates',
-      'description' => 'Make this content available on all domains.',
-    ],
-    'user' => [
-      'type' => 'user',
-      'label' => 'Editor for all affiliates',
-      'description' => 'Make this user an editor on all domains.',
-    ],
-  ];
-  $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
+  // We have reports that importing config causes this function to fail.
+  try {
+    $text = [
+      'node' => [
+        'type' => 'content',
+        'label' => 'Send to all affiliates',
+        'description' => 'Make this content available on all domains.',
+      ],
+      'user' => [
+        'type' => 'user',
+        'label' => 'Editor for all affiliates',
+        'description' => 'Make this user an editor on all domains.',
+      ],
+    ];
+    $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
 
-  if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
-    $field = array(
-      'field_name' => DOMAIN_ACCESS_FIELD,
-      'entity_type' => $entity_type,
-      'label' => 'Domain Access',
-      'bundle' => $bundle,
-      'required' => TRUE,
-      'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['type'],
-      'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
-      'settings' => array(
-        'handler_settings' => array(
-          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+    if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
+      $field = array(
+        'field_name' => DOMAIN_ACCESS_FIELD,
+        'entity_type' => $entity_type,
+        'label' => 'Domain Access',
+        'bundle' => $bundle,
+        'required' => TRUE,
+        'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['type'],
+        'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
+        'settings' => array(
+          'handler_settings' => array(
+            'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+          ),
         ),
-      ),
-    );
-    $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
-    $field_config->save();
+      );
+      $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
+      $field_config->save();
 
+    }
+    // Assign the all affiliates field to nodes.
+    $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
+    if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
+      $field = array(
+        'field_name' => DOMAIN_ACCESS_ALL_FIELD,
+        'entity_type' => $entity_type,
+        'label' => $text[$entity_type]['label'],
+        'bundle' => $bundle,
+        'required' => FALSE,
+        'description' => $text[$entity_type]['description'],
+        'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultAllValue',
+      );
+      $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
+      $field_config->save();
+    }
+    // Tell the form system how to behave. Default to radio buttons.
+    // @TODO: This function is deprecated, but using the OO syntax is causing
+    // test fails.
+    entity_get_form_display($entity_type, $bundle, 'default')
+      ->setComponent(DOMAIN_ACCESS_FIELD, array(
+        'type' => 'options_buttons',
+        'weight' => 40,
+      ))
+      ->setComponent(DOMAIN_ACCESS_ALL_FIELD, array(
+        'type' => 'boolean_checkbox',
+        'settings' => array('display_label' => 1),
+        'weight' => 41,
+      ))
+      ->save();
   }
-  // Assign the all affiliates field to nodes.
-  $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
-  if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
-    $field = array(
-      'field_name' => DOMAIN_ACCESS_ALL_FIELD,
-      'entity_type' => $entity_type,
-      'label' => $text[$entity_type]['label'],
-      'bundle' => $bundle,
-      'required' => FALSE,
-      'description' => $text[$entity_type]['description'],
-      'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultAllValue',
-    );
-    $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
-    $field_config->save();
+  catch (Exception $e) {
+    \Drupal::logger('domain_access')->notice('Field installation failed.');
   }
-  // Tell the form system how to behave. Default to radio buttons.
-  // @TODO: This function is deprecated, but using the OO syntax is causing
-  // test fails.
-  entity_get_form_display($entity_type, $bundle, 'default')
-    ->setComponent(DOMAIN_ACCESS_FIELD, array(
-      'type' => 'options_buttons',
-      'weight' => 40,
-    ))
-    ->setComponent(DOMAIN_ACCESS_ALL_FIELD, array(
-      'type' => 'boolean_checkbox',
-      'settings' => array('display_label' => 1),
-      'weight' => 41,
-    ))
-    ->save();
 }
 
 /**
