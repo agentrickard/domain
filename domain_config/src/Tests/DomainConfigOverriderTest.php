@@ -67,15 +67,19 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
 
     switch ($domain->id()) {
       case 'one_example_com':
+      case 'one_example_com_8080':
       case 'three_example_com':
+      case 'three_example_com_8080':
         $name = 'Drupal';
         break;
 
       case 'two_example_com':
+      case 'two_example_com_8080':
         $name = 'Dos';
         break;
 
       case 'four_example_com':
+      case 'four_example_com_8080':
         $name = 'Four';
         break;
     }
