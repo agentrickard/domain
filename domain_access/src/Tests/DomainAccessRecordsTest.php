@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_access\Tests;
 
+use Drupal\Core\Database\Database;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -39,16 +40,22 @@ class DomainAccessRecordsTest extends DomainTestBase {
     $domains = \Drupal::service('domain.loader')->loadMultiple();
     $active_domain = array_rand($domains, 1);
     $domain = $domains[$active_domain];
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+
     // Create an article node.
     $node1 = $this->drupalCreateNode(array(
       'type' => 'article',
       DOMAIN_ACCESS_FIELD => array($domain->id()),
       DOMAIN_ACCESS_ALL_FIELD => 0,
     ));
-    $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node1->id()), 'Article node created.');
+    $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
 
     // Check to see if grants added by domain_node_access_records made it in.
-    $records = db_query('SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid', array(':nid' => $node1->id()))->fetchAll();
+    $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid';
+    $records = Database::getConnection()
+      ->query($query, array(':nid' => $node1->id()))
+      ->fetchAll();
+
     $this->assertEqual(count($records), 1, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
     $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
@@ -62,9 +69,12 @@ class DomainAccessRecordsTest extends DomainTestBase {
       DOMAIN_ACCESS_FIELD => array($domain->id()),
       DOMAIN_ACCESS_ALL_FIELD => 1,
     ));
-    $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node2->id()), 'Article node created.');
+    $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
     // Check to see if grants added by domain_node_access_records made it in.
-    $records = db_query('SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid ORDER BY realm', array(':nid' => $node2->id()))->fetchAll();
+    $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid ORDER BY realm';
+    $records = Database::getConnection()
+      ->query($query, array(':nid' => $node2->id()))
+      ->fetchAll();
     $this->assertEqual(count($records), 2, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
     $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');

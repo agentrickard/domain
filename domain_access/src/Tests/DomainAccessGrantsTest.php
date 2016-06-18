@@ -2,7 +2,7 @@
 
 namespace Drupal\domain_access\Tests;
 
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Database\Database;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -42,7 +42,10 @@ class DomainAccessGrantsTest extends DomainTestBase {
    */
   public function testDomainAccessGrants() {
     // The {node_access} table is not emptied properly by the setup.
-    db_delete('node_access')->execute();
+    Database::getConnection()->delete('node_access')->execute();
+
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
     // Assign a node to a random domain.
@@ -54,7 +57,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
       'type' => 'article',
       DOMAIN_ACCESS_FIELD => array($domain->id()),
     ));
-    $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node1->id()), 'Article node created.');
+    $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
 
     // Test the response of the node on each site. Should allow access only to
     // the selected site.
@@ -76,7 +79,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
       DOMAIN_ACCESS_FIELD => array($domain->id()),
       DOMAIN_ACCESS_ALL_FIELD => 1,
     ));
-    $this->assertTrue(\Drupal::entityManager()->getStorage('node')->load($node2->id()), 'Article node created.');
+    $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
     // Test the response of the node on each site. Should allow access on all.
     foreach ($domains as $domain) {
       $path = $domain->getPath() . 'node/' . $node2->id();

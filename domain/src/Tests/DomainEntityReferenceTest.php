@@ -105,7 +105,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $edit["field_domain[{$two}]"] = TRUE;
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
-    $node = \Drupal::entityManager()->getStorage('node')->load(1);
+    $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
     $values = $node->get('field_domain');
 
     // @TODO watch for changes in core that affect this test.
@@ -131,7 +131,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
         'target_type' => 'domain',
       ),
     );
-    $field_storage_config = \Drupal::entityManager()->getStorage('field_storage_config')->create($storage);
+    $field_storage_config = \Drupal::entityTypeManager()->getStorage('field_storage_config')->create($storage);
     $field_storage_config->save();
 
     $field = array(
@@ -145,7 +145,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
         ),
       ),
     );
-    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
     $field_config->save();
 
     // Tell the form system how to behave.

@@ -96,12 +96,14 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     }
     $this->assertRaw('value="_none"', 'Found the _none_ option.');
 
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+
     // Try to post a node, assigned to the second domain.
     $edit['title[0][value]'] = 'Test node';
     $edit["field_domain_source"] = $two;
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
-    $node = \Drupal::entityManager()->getStorage('node')->load(1);
+    $node = $node_storage->load(1);
     // Check that the value is set.
     $value = domain_source_get($node);
     $this->assertTrue($value == $two, 'Node saved with proper source record.');
@@ -117,7 +119,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $edit["field_domain_source"] = '_none';
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
-    $node = \Drupal::entityManager()->getStorage('node')->load(2);
+    $node = $node_storage->load(2);
     // Check that the value is set.
     $value = domain_source_get($node);
     $this->assertNull($value, 'Node saved with proper source record.');

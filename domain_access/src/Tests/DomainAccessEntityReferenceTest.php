@@ -102,7 +102,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $edit["field_domain_access[{$two}]"] = TRUE;
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
-    $node = \Drupal::entityManager()->getStorage('node')->load(1);
+    $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
     // Check that two values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');

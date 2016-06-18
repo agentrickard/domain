@@ -36,6 +36,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
 
     // Test the response of the default home page.
+    /** @var \Drupal\domain\Entity\Domain $domain */
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       if (!isset($alias_domain)) {
         $alias_domain = $domain;

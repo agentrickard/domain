@@ -96,7 +96,7 @@ class DomainValidator implements DomainValidatorInterface {
     }
 
     // Check existing domains.
-    $domains = \Drupal::entityManager()
+    $domains = \Drupal::entityTypeManager()
       ->getStorage('domain')
       ->loadByProperties(array('hostname' => $hostname));
     foreach ($domains as $domain) {
