@@ -20,17 +20,6 @@ class DomainAccessRecordsTest extends DomainTestBase {
   public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
-  }
-
-  /**
    * Creates a node and tests the creation of node access rules.
    */
   public function testDomainAccessRecords() {

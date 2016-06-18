@@ -3,6 +3,7 @@
 namespace Drupal\domain_access\Tests;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Database\Database;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\Entity\Node;
@@ -55,11 +56,6 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->manager = \Drupal::service('domain_access.manager');
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
-
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
   }
 
   /**

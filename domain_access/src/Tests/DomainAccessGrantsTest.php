@@ -31,19 +31,15 @@ class DomainAccessGrantsTest extends DomainTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
+
+    // Ensure node_access table is clear.
+    Database::getConnection()->delete('node_access')->execute();
   }
 
   /**
    * Creates a node and tests the creation of node access rules.
    */
   public function testDomainAccessGrants() {
-    // The {node_access} table is not emptied properly by the setup.
-    Database::getConnection()->delete('node_access')->execute();
-
     $node_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     // Create 5 domains.

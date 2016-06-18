@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_access\Tests;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Url;
 use Drupal\domain\Tests\DomainTestBase;
@@ -26,11 +27,6 @@ class DomainAccessFieldTest extends DomainTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
 
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
