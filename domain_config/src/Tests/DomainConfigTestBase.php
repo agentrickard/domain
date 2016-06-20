@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_config\Tests;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -61,6 +62,61 @@ abstract class DomainConfigTestBase extends DomainTestBase {
 
     $es = \Drupal::entityTypeManager()->getStorage('configurable_language')->load('es');
     $this->assertTrue(!empty($es), 'Created test language.');
+  }
+
+  /**
+   * Generates a list of domains for testing.
+   *
+   * To allow test to work in different environments, we provide custom
+   * machine names so that the configuration can be correctly loaded.
+   *
+   * The rest should be the same as DomainTestBase:: domainCreateTestDomains().
+   *
+   * @param int $count
+   *   The number of domains to create.
+   * @param string|NULL $base_hostname
+   *   The root domain to use for domain creation (e.g. example.com).
+   * @param array $list
+   *   An optional list of subdomains to apply instead of the default set.
+   */
+  public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
+    $original_domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    if (empty($base_hostname)) {
+      $base_hostname = $this->base_hostname;
+    }
+
+    if (empty($list)) {
+      $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
+    }
+    for ($i = 0; $i < $count; $i++) {
+      if (!empty($list[$i])) {
+        if ($i < 11) {
+          $machine_name = $list[$i] . '.example.com';
+          $hostname = $list[$i] . '.' . $base_hostname;
+          $name = ucfirst($list[$i]);
+        }
+        // These domains are not setup and are just for UX testing.
+        else {
+          $hostname = $machine_name = 'test' . $i . '.' . $base_hostname;
+          $name = 'Test ' . $i;
+        }
+      }
+      else {
+        $hostname = $base_hostname;
+        $machine_name = 'example.com';
+        $name = 'Example';
+      }
+      // Create a new domain programmatically.
+      $values = array(
+        'hostname' => $hostname,
+        'name' => $name,
+        'id' => \Drupal::service('domain.creator')->createMachineName($machine_name),
+      );
+      $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
+      $domain->save();
+    }
+    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $this->assertTrue((count($domains) - count($original_domains)) == $count, new FormattableMarkup('Created %count new domains.', array('%count' => $count)));
   }
 
 }

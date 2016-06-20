@@ -60,15 +60,10 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
   private function getHomepages() {
     $homepages = array(
       'example_com' => 'node',
-      'example_com_8080' => 'node',
       'one_example_com' => 'node/1',
-      'one_example_com_8080' => 'node/1',
       'two_example_com' => 'node',
-      'two_example_com_8080' => 'node',
       'three_example_com' => 'node',
-      'three_example_com_8080' => 'node',
       'four_example_com' => 'node/2',
-      'four_example_com_8080' => 'node/2',
     );
     return $homepages;
   }
