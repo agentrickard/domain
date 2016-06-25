@@ -402,9 +402,7 @@ function domain_conf_domain_batch() {
  * Implements hook_domain_delete().
  */
 function domain_conf_domain_delete($domain, $form_values = array()) {
-  db_delete('domain_conf')
-    ->condition('domain_id', $domain['domain_id'])
-    ->execute();
+  domain_conf_data_delete($domain['domain_id']);
   cache_clear_all('variables', 'cache_bootstrap');
 }
 

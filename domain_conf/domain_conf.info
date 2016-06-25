@@ -3,3 +3,5 @@ description = Advanced site configuration options for Domain Access.
 package = Domain Access
 dependencies[] = domain
 core = 7.x
+
+files[] = tests/domain_conf.test

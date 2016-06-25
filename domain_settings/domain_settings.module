@@ -364,23 +364,17 @@ function domain_settings_reset($domain_id) {
   $batch = module_invoke_all('domain_batch');
   $conf = module_invoke_all('domain_conf');
   $list = array_merge(array_keys($batch), array_keys($conf));
+
   // Get the existing data.
-  $result = db_query("SELECT domain_id, settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchObject();
-  if (!empty($result->settings)) {
-    return;
-  }
+  $settings = domain_conf_data_get($domain_id, TRUE);
+
   // Erase the settings by key.
-  $settings = domain_unserialize($result->settings);
   foreach ($list as $item) {
     if (isset($settings[$item])) {
       unset($settings[$item]);
     }
   }
+
   // Write the update.
-  db_update('domain_conf')
-    ->fields(array(
-        'settings' => serialize($settings),
-    ))
-    ->condition('domain_id', $result->domain_id)
-    ->execute();
+  domain_conf_data_set($domain_id, $settings, FALSE);
 }

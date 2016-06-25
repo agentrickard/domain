@@ -28,15 +28,16 @@ function domain_conf_domain_bootstrap_full($domain) {
   }
   // Flag that we have already loaded.
   $check = $domain['domain_id'];
-  $data = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
-  if (!empty($data)) {
+  $settings = domain_conf_data_get($domain['domain_id']);
+  if (!empty($settings)) {
     global $conf;
-    $settings = domain_unserialize($data);
+
     // Overwrite the $conf variables.
     foreach ($settings as $key => $value) {
       if ($value === 'domain-conf-ignore') {
         continue;
       }
+
       // Language handling is a special case.
       if ($key == 'language_default') {
         $table = domain_get_primary_table('system');
@@ -62,6 +63,104 @@ function domain_conf_domain_bootstrap_full($domain) {
         $conf[$key] = $value;
       }
     }
+  }
+}
+
+/**
+ * CRUD utility to retreve domain configuratin data.
+ *
+ * @param int $domain_id
+ *   Domain to fetch configuration for.
+ * @param bool $reset
+ *   Flag to reset the data from cache layers and fetch directly from the DB.
+ *   Defaults to FALSE.
+ *
+ * @return array
+ *   List of domain custom configurations. Empty array when no overrides are
+ *   present.
+ */
+function domain_conf_data_get($domain_id, $reset = FALSE) {
+  // Static cache management.
+  $static_cache = &drupal_static(__FUNCTION__, array());
+  if (!$reset && isset($static_cache[$domain_id])) {
+    return $static_cache[$domain_id];
+  }
+
+  // Used to expose the DB call flag for testing
+  // TODO: Think of better implementation to track query executions.
+  $hit = &drupal_static('domain_conf_data_get_db_hit', FALSE);
+  $hit = TRUE;
+
+  // Fetch data from source.
+  $settings = array();
+  $data = db_select('domain_conf', 'd')
+    ->fields('d', array('settings'))
+    ->condition('domain_id', $domain_id)
+    ->execute()
+    ->fetchField();
+  if (!empty($data)) {
+    $settings = domain_unserialize($data);
+  }
+
+  // Populate cache layers.
+  $static_cache[$domain_id] = $settings;
+
+  return $settings;
+}
+
+/**
+ * CRUD utility to store configurations for a given domain.
+ *
+ * @param int $domain_id
+ *   Domain ID to replace configuration for.
+ * @param array $new_settings
+ *   Array of domain configurations to replace the old one.
+ * @param bool $merge
+ *   Flag, whether to merge the config with the existing one on TRUE (Default)
+ *   or to override it completely on FALSE.
+ */
+function domain_conf_data_set($domain_id, array $new_settings, $merge = TRUE) {
+  if ($merge) {
+    $settings = domain_conf_data_get($domain_id, TRUE);
+    $new_settings = array_merge($settings, $new_settings);
+  }
+  db_merge('domain_conf')
+    ->key(array('domain_id' => $domain_id))
+    ->fields(array(
+      'domain_id' => $domain_id,
+      'settings' => serialize($new_settings),
+    ))
+    ->execute();
+
+  // Update the static cache for any subsequent gets.
+  $static_cache_get = &drupal_static('domain_conf_data_get', array());
+  $static_cache_get[$domain_id] = $new_settings;
+}
+
+/**
+ * Deletes domain specific settings.
+ *
+ * @param int|string $domain_id
+ *   Domain ID to delete configuration for. Use the string 'all' to delete the
+ *   configrations for all domains.
+ */
+function domain_conf_data_delete($domain_id) {
+  $wildcard = $domain_id === 'all';
+
+  // Remove from source.
+  $query = db_delete('domain_conf');
+  if (!$wildcard) {
+    $query->condition('domain_id', (int) $domain_id);
+  }
+  $query->execute();
+
+  // Remove from the static cache for any subsequent gets.
+  $static_cache_get = &drupal_static('domain_conf_data_get', array());
+  if ($wildcard) {
+    $static_cache_get = array();
+  }
+  else {
+    unset($static_cache_get[$domain_id]);
   }
 }
 
@@ -249,14 +348,13 @@ function domain_conf_variable_get($domain_id, $variable = '', $all = FALSE, $res
   if (empty($base)) {
     $base = _domain_conf_load_primary(FALSE);
   }
+
   if (!isset($settings[$domain_id]) || $reset) {
     // Get the current settings for this domain, if any.
-    $data = domain_unserialize(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField());
-    if (empty($data)) {
-      $data = array();
-    }
+    $data = domain_conf_data_get($domain_id, $reset);
     $settings[$domain_id] = array_merge($base, $data);
   }
+
   if ($all) {
     return $settings[$domain_id];
   }
@@ -337,14 +435,12 @@ function _domain_conf_load_primary($unset = FALSE) {
  */
 function domain_conf_delete_variable($domain_id, $variable) {
   // Get the current settings for this domain, if any.
-  $settings = domain_unserialize(db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField());
+  $settings = domain_conf_data_get($domain_id, TRUE);
+
   // Settings found, remove them.
   if (!empty($settings)) {
     unset($settings[$variable]);
-    db_update('domain_conf')
-      ->condition('domain_id', $domain_id)
-      ->fields(array('settings' => serialize($settings)))
-      ->execute();
+    domain_conf_data_set($domain_id, $settings, FALSE);
   }
 }
 
@@ -363,23 +459,9 @@ function domain_conf_delete_variable($domain_id, $variable) {
  *   value blank in order to unset the custom variable.
  */
 function domain_conf_variable_save($domain_id, $variable, $value = NULL) {
-  // Get the current settings for this domain, if any.
-  $serialized = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField();
-  // Settings found, update them.
-  if ($serialized) {
-    $settings = domain_unserialize($serialized);
-    $settings[$variable] = $value;
-    db_update('domain_conf')
-      ->condition('domain_id', $domain_id)
-      ->fields(array('settings' => serialize($settings)))
-      ->execute();
-  }
-  elseif (domain_lookup($domain_id) != -1) {
-    $settings = array($variable => $value);
-    db_insert('domain_conf')
-      ->fields(array('domain_id' => $domain_id, 'settings' => serialize($settings)))
-      ->execute();
-  }
+  $settings = domain_conf_variable_get($domain_id, TRUE);
+  $settings[$variable] = $value;
+  domain_conf_data_set($domain_id, $settings, FALSE);
 }
 
 /**

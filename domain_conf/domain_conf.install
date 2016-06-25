@@ -43,17 +43,17 @@ function domain_conf_update_7000() {
 function domain_conf_update_7001() {
   $changes = domain_conf_d7_variable_changes();
   $domains = db_query("SELECT * FROM {domain}")->FetchAllAssoc('domain_id');
-  $result = db_query("SELECT domain_id, settings FROM {domain_conf}");
+  $result = db_query("SELECT domain_id FROM {domain_conf}");
   foreach ($result as $object) {
     if (!isset($domains[$object->domain_id])) {
       // Remove cruft from the table.
-      db_delete('domain_conf')
-        ->condition('domain_id', $object->domain_id)
-        ->execute();
+      domain_conf_data_delete($object->domain_id);
+      continue;
     }
-    elseif (!empty($object->settings)) {
+
+    $settings = domain_conf_data_get($object->domain_id, TRUE);
+    if (!empty($settings)) {
       // Update the record with the new variables.
-      $settings = unserialize($object->settings);
       foreach ($changes['removed'] as $key) {
         if (isset($settings[$key])) {
           unset($settings[$key]);
@@ -65,10 +65,7 @@ function domain_conf_update_7001() {
           unset($settings[$key]);
         }
       }
-      db_update('domain_conf')
-        ->fields(array('settings' => serialize($settings)))
-        ->condition('domain_id', $object->domain_id)
-        ->execute();
+      domain_conf_data_set($object->domain_id, $settings, FALSE);
     }
   }
   return t('Domain Conf variables updated.');

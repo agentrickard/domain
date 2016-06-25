@@ -838,8 +838,7 @@ function domain_batch_form($form, &$form_state, $action, $batch, $domains) {
         $default[$domain['domain_id']] = $batch['#system_default'];
       }
       // Check for domain-specific settings.
-      $result = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain['domain_id']))->fetchField();
-      $settings = domain_unserialize($result);
+      $settings = domain_conf_data_get($domain['domain_id']);
       if (isset($settings[$action])) {
         $default[$domain['domain_id']] = $settings[$action];
       }

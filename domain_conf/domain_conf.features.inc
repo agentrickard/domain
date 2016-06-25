@@ -59,11 +59,7 @@ function domain_conf_features_export_render($module_name, $data, $export = NULL)
  */
 function domain_conf_prepare_export($machine_name) {
   $domain_id = domain_load_domain_id($machine_name);
-  $variables = array();
-  $data = db_query("SELECT settings FROM {domain_conf} WHERE domain_id = :domain_id", array(':domain_id' => $domain_id))->fetchField();
-  if (!empty($data)) {
-    $variables = domain_unserialize($data);
-  }
+  $variables = domain_conf_data_get($domain_id);
   return $variables;
 }
 
@@ -81,8 +77,7 @@ function domain_conf_features_rebuild($module) {
   if ($defaults = domain_features_load($module, 'domain_conf_default_variables', TRUE)) {
     // Check for hard rebuild/revert.
     if ($wipe = domain_features_wipe_tables($defaults)) {
-      db_delete('domain_conf')
-        ->execute();
+      domain_conf_data_delete('all');
       unset($defaults['wipe-domain-tables']);
     }
     foreach ($defaults as $key => $variables) {
@@ -90,17 +85,14 @@ function domain_conf_features_rebuild($module) {
       if (!$domain_id) {
         continue;
       }
-      // Delete existing conf records.
-      db_delete('domain_conf')
-        ->condition('domain_id', $domain_id)
-        ->execute();
-      // Save the new records.
-      if (!empty($variables)) {
-        $record = array(
-          'domain_id' => $domain_id,
-          'settings' => serialize($variables),
-        );
-        drupal_write_record('domain_conf', $record);
+
+      if (empty($variables)) {
+        // Delete existing conf records.
+        domain_conf_data_delete($domain_id);
+      }
+      else {
+        // Save the new records, oevriding any old ones.
+        domain_conf_data_set($domain_id, $variables, FALSE);
       }
     }
   }
