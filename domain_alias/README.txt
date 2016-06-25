@@ -21,9 +21,8 @@ CONTENTS
 3.2   Updating Aliases
 3.3   Pattern Matching Options
 3.4   Redirecting Aliases
-4.  Domain Alias Switcher Block
-5.  Developer Notes
-5.1   Database Schema
+4.  Developer Notes
+4.1   Database Schema
 
 ----
 1.  Introduction
@@ -108,18 +107,20 @@ Domain Alias requires the Domain Access module be installed and active.
 ----
 3.  Alias Management
 
-The Domain Alias module adds a new column to the Domain List table.  If you
-go to the Domain List at Admin > Build > Domains > Domain List.  You should
-now see an "Aliases" column in your domain list.
+The Domain Alias module adds a new column to the Domain List table.  Go to the
+Domain List at Admin > Structure > Domains (admin/structure/domain). Click on
+edit domain of the desired domain. click on "aliases" tab. You should see the
+aliases on this page.
 
 ----
 3.1  Creating Aliases
 
-To create a new alias, go to the Domain List at Admin > Build > Domains > Domain
-List.  You should see an "Aliases" column in your domain list.
+To create a new alias, go to the Domain List at Admin > Structure > Domains
+(/admin/structure/domain). click on edit domain of the desired domain. Click on
+"Aliases: tab. You should see the aliases on this page.
 
-Click on the 'add alias' link.  You will be presented with a form divided into
-two parts.  The top section, 'Registered aliases for *' will be empty initially.
+On this page You will be presented with a form divided into two parts. The top
+section, 'Registered aliases for *' will be empty initially.
 
 Under 'Add new aliases,' you may add up to five (5) aliases at a time. (If you
 need to add more, enter the first five and save the form.)
@@ -129,14 +130,20 @@ to go to the registered domain for that alias.
 
 Enter the pattern(s) that you wish to match and click 'Save aliases.'
 
+With the advent of Internationalized Domain Names (IDNs), domain servers
+are beginning to recognize non-ASCII domain names. To enable support for
+non-ASCII domain names, you must add the following lines to the bottom
+of your settings.php file:
+
+  // Allow registration of non-ASCII domain strings.
+  $conf['domain_allow_non_ascii'] = TRUE;
+
 ----
 3.2   Updating Aliases
 
-Once you have created a set of aliases, the 'Aliases' column on the Domain List
-will show the current aliases, with a link to 'edit aliases.'
-
-Clicking on this link will show the Edit domain aliases page; this time, the top
-section of the form will show your current registered aliases.
+Once you have created a set of aliases, the 'Aliases' tab on the selected Domain
+edit form(admin/structure/domain/view/[domain_id]/alias)will show the current
+aliases. The top section of the form will show your current registered aliases.
 
 To modify an alias, simply change the pattern text or toggle the redirect
 option.
@@ -190,50 +197,7 @@ you must take care not to set up an infinite redirect loop when configuring your
 aliases.
 
 ----
-4.  Domain Alias Switcher Block
-
-Instead of using the Domain Switcher block provided by Domain Access, Domain
-Alias provides a substitute block for debugging.
-
-The block presents a nested list of domains and aliases, highlighting both the
-currently active domain (in boldface) and the active alias (in italics), if
-applicable.
-
-Note that the block uses string substitution and may write links that fail to
-resolve on your site -- this is intentional and is a DNS issue, not a bug. In
-some cases, the module will write the entry as plain text to avoid such 'dead'
-links. For example:
-
-Your site has the following domains and aliases:
-
--- example.com
-  -- www.example.com
--- one.example.com
-  -- *.example.com
--- foo.one.example.com
-  -- foo.*.example.com
-
-If you send a request to 'bar.example.com' the domain switcher will write
-the following links:
-
--- example.com
-  -- www.example.com
--- one.example.com
-  -- bar.example.com
--- foo.one.example.com
-  -- foo.bar.example.com
-
-If your server is not configured to handle all of the above DNS requests, you
-may get a server error when you click on a link.
-
-NOTE: that this only works with the * wildcard, and assumes that the * represents
-an entire node of the host string.
-
-WARNING: The Domain Alias Switcher block should not be used as a navigation tool
-for normal site visitors. It is provided to site developers to aid in debugging.
-
-----
-5.  Developer Notes
+4.  Developer Notes
 
 For information on the development of Domain Alias, see:
 
@@ -243,7 +207,7 @@ For information on the development of Domain Alias, see:
 
 
 ----
-5.1  Database Schema
+4.1  Database Schema
 
 Installing the module creates a {domain_conf} table that contains:
 
