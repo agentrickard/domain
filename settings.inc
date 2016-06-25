@@ -18,4 +18,14 @@
  * Include bootstrap file and start bootstrap phases.
  */
 include 'domain.bootstrap.inc';
-domain_bootstrap();
+
+// If the module is not installed properly, or Drupal not yet installed, we
+// can explode rather maginificently. Using a try/catch, we can at least fail
+// silently.
+try {
+  domain_bootstrap();
+}
+catch(Exception $e) {
+  // No error logging is available yet, assume we are installing Drupal.
+  // See https://www.drupal.org/node/1559486.
+}
