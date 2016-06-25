@@ -727,8 +727,10 @@ function domain_form_user_form_alter(&$form, &$form_state) {
   }
   else {
     $form['domain'] = array(
-      '#type' => 'value',
-      '#value' => $default
+      'domain_user' => array(
+        '#type' => 'value',
+        '#value' => $default
+      ),
     );
   }
 }
