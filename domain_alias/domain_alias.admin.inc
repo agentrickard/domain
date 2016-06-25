@@ -197,17 +197,17 @@ function _domain_alias_validate($form, $alias, $id, $aliases, $type) {
     }
   }
   // 4) Check that the alias doesn't contain any invalid characters.
-  $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $alias);
-  if ($check == 0) {
-    form_error($form[$type][$id]['pattern'], t('%name contains invalid characters.', array('%name' => $alias)));
+  // Check for valid characters, unless using non-ASCII domains.
+  if (!variable_get('domain_allow_non_ascii', FALSE)) {
+    $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $alias);
+    if ($check == 0) {
+      form_error($form[$type][$id]['pattern'], t('%name contains invalid characters.', array('%name' => $alias)));
+    }
   }
   // 5) Check that the alias is not a direct match for a registered domain.
-  $check = preg_match('/[a-z0-9\.\+\-:]*$/', $alias);
-  if ($check == 1) {
-    $test = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :alias", array(':alias' => $alias))->fetchField();
-    if ($test > 0) {
-      form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record.', array('%name' => $alias)));
-    }
+  $test = db_query("SELECT COUNT(domain_id) FROM {domain} WHERE subdomain = :alias", array(':alias' => $alias))->fetchField();
+  if ($test > 0) {
+    form_error($form[$type][$id]['pattern'], t('%name matches an existing domain record.', array('%name' => $alias)));
   }
   // 6) Check that the alias or a pattern matching the same domain name does not exist.
   $_pattern = _domain_alias_placeholders_to_sql($alias);
