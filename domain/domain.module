@@ -75,3 +75,19 @@ function domain_help($route_name, RouteMatchInterface $route_match) {
       return $output;
   }
 }
+
+/**
+ * Creates a unique numeric domain id.
+ *
+ * @param string $hostname
+ *   The hostname string of the domain.
+ *
+ * @return int
+ *   A unique integer representing the domain.
+ */
+function domain_create_id($hostname) {
+  // We cannot reliably use sequences (1, 2, 3) because those can be different
+  // across environments. Instead, we use the crc32 hash function to create a
+  // uniue numeric id for each domain.
+  return (int) crc32($hostname);
+}

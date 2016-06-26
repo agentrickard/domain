@@ -52,26 +52,12 @@ class DomainCreator implements DomainCreatorInterface {
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
+      // {node_access} still requires a numeric id.
+      'domain_id' => domain_create_id($values['hostname']),
     );
     $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
 
     return $domain;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function createNextId() {
-    $domains = $this->loader->loadMultiple();
-    $max = 0;
-    /** @var \Drupal\domain\Entity\Domain $domain */
-    foreach ($domains as $domain) {
-      $domain_id = $domain->getDomainId();
-      if ($domain_id > $max) {
-        $max = $domain_id;
-      }
-    }
-    return $max + 1;
   }
 
   /**

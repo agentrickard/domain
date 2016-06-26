@@ -173,10 +173,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
-      // {node_access} still requires a numeric id.
-      // @TODO: This is not reliable and creates duplicates.
-      'domain_id' => $creator->createNextId(),
     );
+    // Note that we have not created a domain_id, which is only used for
+    // node access control and will be added on save.
   }
 
   /**
@@ -349,6 +348,15 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $default->is_default = 0;
       $default->save();
     }
+    // Ensures we have a proper domain_id.
+    $this->createDomainId();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createDomainId() {
+    $this->domain_id = domain_create_id($this->getHostname());
   }
 
   /**

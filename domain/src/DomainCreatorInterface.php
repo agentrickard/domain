@@ -21,16 +21,6 @@ interface DomainCreatorInterface {
   public function createDomain(array $values = array());
 
   /**
-   * Creates a numeric id for the domain.
-   *
-   * The node access system still requires numeric keys.
-   *
-   * @return int
-   *   The next domain id.
-   */
-  public function createNextId();
-
-  /**
    * Gets the hostname of the active request.
    *
    * @return string
