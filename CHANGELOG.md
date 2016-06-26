@@ -39,9 +39,13 @@ marked with [x] are considered complete.
 - [x] Provide common views support for attached fields
 - [x] Recreate the Domain Content module with bulk operations
 - [x] Add help text to domain overview screen
-- [ ] Ensure unique numeric ids for use with node access
-- [ ] Provide a user interface for domain overrides
 - [x] Views argument handler to show proper title.
+- [ ] Ensure unique numeric ids for use with node access
+- [ ] Allow non-ascii domains and aliases
+- [ ] The domain_validate hook needs tests
+- [ ] DomainConfigOverrider returns empty $overrides
+- [ ] Invalidate cache on Domain save
+- [ ] Invalidate render cache on Alias save
 
 # Beta
 - [x] Actions for domain operations

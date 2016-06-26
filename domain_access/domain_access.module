@@ -403,25 +403,37 @@ function domain_access_node_type_insert(EntityInterface $entity) {
  *   The entity type being created. Node and user are supported.
  * @param string $bundle
  *   The bundle being created.
+ * @param array $text
+ *   The text to use for the field. Keys are:
+ *   'name' -- the lower-case, human-readable name of the entity.
+ *   'label' -- the form label for the all affiliates field.
+ *   'description' -- the help text for the all affiliates field.
+ *
+ *   If calling this function for entities other than user or node, it is the
+ *   caller's responsibility to provide this text.
+ *
+ * This function is here for convenience during installation. It is not really
+ * an API function. Modules wishing to add fields to non-node entities must
+ * provide their own field storage. See the field storage YML sample in
+ * tests/modules/domain_access_test for an example of field storage definitions.
  *
  * @see domain_access_node_type_insert()
  * @see domain_access_install()
  */
-function domain_access_confirm_fields($entity_type, $bundle) {
+function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
   // We have reports that importing config causes this function to fail.
   try {
-    $text = [
-      'node' => [
-        'type' => 'content',
-        'label' => 'Send to all affiliates',
-        'description' => 'Make this content available on all domains.',
-      ],
-      'user' => [
-        'type' => 'user',
-        'label' => 'Editor for all affiliates',
-        'description' => 'Make this user an editor on all domains.',
-      ],
+    $text['node'] = [
+      'name' => 'content',
+      'label' => 'Send to all affiliates',
+      'description' => 'Make this content available on all domains.',
     ];
+    $text['user'] = [
+      'name' => 'user',
+      'label' => 'Editor for all affiliates',
+      'description' => 'Make this user an editor on all domains.',
+    ];
+
     $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
 
     if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
@@ -431,7 +443,7 @@ function domain_access_confirm_fields($entity_type, $bundle) {
         'label' => 'Domain Access',
         'bundle' => $bundle,
         'required' => TRUE,
-        'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['type'],
+        'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['name'],
         'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
         'settings' => array(
           'handler_settings' => array(
@@ -441,9 +453,8 @@ function domain_access_confirm_fields($entity_type, $bundle) {
       );
       $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
       $field_config->save();
-
     }
-    // Assign the all affiliates field to nodes.
+    // Assign the all affiliates field.
     $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
     if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
       $field = array(

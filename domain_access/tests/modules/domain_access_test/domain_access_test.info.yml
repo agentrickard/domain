@@ -1,0 +1,12 @@
+name: "Domain Access module tests"
+description: "Support module for domain access testing."
+type: module
+package: Testing
+version: VERSION
+core: 8.x
+hidden: TRUE
+
+dependencies:
+  - domain
+  - domain_access
+  - taxonomy
