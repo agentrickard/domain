@@ -20,7 +20,7 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'field_ui', 'user', 'taxonomy');
+  public static $modules = array('domain', 'domain_access', 'domain_access_test', 'field', 'field_ui', 'user', 'taxonomy');
 
   /**
    * {@inheritdoc}
@@ -56,7 +56,6 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
       'label' => 'Send to all affiliates',
       'description' => 'Make this term available on all domains.',
     ];
-    domain_access_confirm_storage('taxonomy_term', 'domain_access');
     domain_access_confirm_fields('taxonomy_term', 'domain_access', $text);
     $this->admin_user = $this->drupalCreateUser(array(
       'bypass node access',

@@ -388,18 +388,6 @@ function domain_access_node_type_insert(EntityInterface $entity) {
 }
 
 /**
- * Creates our field storage for an entity bundle.
- *
- * @param string $entity_type
- *   The entity type being created. Node and user are supported.
- * @param string $bundle
- *   The bundle being created.
- */
-function domain_access_confirm_storage($entity_type, $bundle) {
-
-}
-
-/**
  * Creates our fields for an entity bundle.
  *
  * @param string $entity_type
@@ -414,6 +402,11 @@ function domain_access_confirm_storage($entity_type, $bundle) {
  *
  *   If calling this function for entities other than user or node, it is the
  *   caller's responsibility to provide this text.
+ *
+ * This function is here for convenience during installation. It is not really
+ * an API function. Modules wishing to add fields to non-node entities must
+ * provide their own field storage. See the field storage YML sample in
+ * tests/modules/domain_access_test for an example of field storage definitions.
  *
  * @see domain_access_node_type_insert()
  * @see domain_access_install()
