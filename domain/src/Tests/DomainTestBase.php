@@ -101,14 +101,12 @@ abstract class DomainTestBase extends WebTestBase {
     for ($i = 0; $i < $count; $i++) {
       if (!empty($list[$i])) {
         if ($i < 11) {
-          $hostname = $list[$i] . '.' . $base_hostname;
-          $machine_name = $list[$i] . '.example.com';
+          $hostname = $machine_name = $list[$i] . '.' . $base_hostname;
           $name = ucfirst($list[$i]);
         }
         // These domains are not setup and are just for UX testing.
         else {
-          $hostname = 'test' . $i . '.' . $base_hostname;
-          $machine_name = 'test' . $i . '.example.com';
+          $hostname = $machine_name = 'test' . $i . '.' . $base_hostname;
           $name = 'Test ' . $i;
         }
       }
@@ -123,7 +121,7 @@ abstract class DomainTestBase extends WebTestBase {
         'name' => $name,
         'id' => \Drupal::service('domain.creator')->createMachineName($machine_name),
       );
-      $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
+      $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
       $domain->save();
     }
     $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
@@ -161,7 +159,7 @@ abstract class DomainTestBase extends WebTestBase {
    *   The name of the domain field used to attach to the entity.
    */
   public function addDomainToEntity($entity_type, $entity_id, $id, $field = DOMAIN_ACCESS_FIELD) {
-    if ($entity = \Drupal::entityManager()->getStorage($entity_type)->load($entity_id)) {
+    if ($entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
       $entity->set($field, $id);
       $entity->save();
     }
@@ -182,10 +180,11 @@ abstract class DomainTestBase extends WebTestBase {
 
     // For this to work, we must reset the password to a known value.
     $pass = 'thisissatestpassword';
-    $user = \Drupal::entityManager()->getStorage('user')->load($account->id());
+    /** @var UserInterface $user */
+    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
     $user->setPassword($pass)->save();
     $url = $domain->getPath() . 'user/login';
-    $edit = ['name' => $account->getUsername(), 'pass' => $pass];
+    $edit = ['name' => $account->getAccountName(), 'pass' => $pass];
     $this->drupalPostForm($url, $edit, t('Log in'));
 
     // @see WebTestBase::drupalUserIsLoggedIn()

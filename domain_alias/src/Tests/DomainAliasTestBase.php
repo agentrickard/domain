@@ -47,8 +47,11 @@ abstract class DomainAliasTestBase extends DomainTestBase {
       'redirect' => $redirect,
     );
     // Replicate the logic for creating machine_name patterns.
-    $values['id'] = str_replace(array('*', '.'), '_', $values['pattern']);
-    $alias = \Drupal::entityManager()->getStorage('domain_alias')->create($values);
+    // @see ConfigBase::validate()
+    $machine_name = str_replace(array('?', '<', '>', '"', '\'', '/', '\\'), '', $values['pattern']);
+    $values['id'] = str_replace(array('*', '.', ':'), '_', $machine_name);
+
+    $alias = \Drupal::entityTypeManager()->getStorage('domain_alias')->create($values);
     $alias->save();
 
     return $alias;

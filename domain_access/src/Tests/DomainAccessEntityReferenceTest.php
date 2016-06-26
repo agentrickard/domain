@@ -3,6 +3,7 @@
 namespace Drupal\domain_access\Tests;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Database\Database;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -18,18 +19,6 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
    * @var array
    */
   public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
-  }
 
   /**
    * Tests that the module installed its field correctly.
@@ -102,7 +91,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $edit["field_domain_access[{$two}]"] = TRUE;
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
-    $node = \Drupal::entityManager()->getStorage('node')->load(1);
+    $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
     // Check that two values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');

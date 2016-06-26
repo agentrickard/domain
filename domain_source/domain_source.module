@@ -25,8 +25,9 @@ define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
  */
 function domain_source_confirm_fields($entity_type, $bundle) {
   $id = $entity_type . '.' . $bundle . '.' . DOMAIN_SOURCE_FIELD;
+  $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
 
-  if (!$field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
+  if (!$field = $field_config_storage->load($id)) {
     $field = array(
       'field_name' => DOMAIN_SOURCE_FIELD,
       'entity_type' => $entity_type,
@@ -40,7 +41,7 @@ function domain_source_confirm_fields($entity_type, $bundle) {
         ),
       ),
     );
-    $field_config = \Drupal::entityManager()->getStorage('field_config')->create($field);
+    $field_config = $field_config_storage->create($field);
     $field_config->save();
   }
 
