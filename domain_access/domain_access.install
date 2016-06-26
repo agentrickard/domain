@@ -14,7 +14,8 @@
 function domain_access_install() {
   // Assign domain access to bundles.
   $list['user'] = 'user';
-  $node_types = entity_load_multiple('node_type');
+
+  $node_types = \Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple();
   foreach ($node_types as $type => $info) {
     $list[$type] = 'node';
   }
@@ -28,19 +29,23 @@ function domain_access_install() {
     domain_access_domain_insert($domain);
   }
 }
+
 /**
  * Implements hook_uninstall().
  *
  * Removes access control fields on uninstall.
  */
 function domain_access_uninstall() {
+  $field_storage_config = \Drupal::entityTypeManager()
+    ->getStorage('field_storage_config');
+
   foreach (array('node', 'user') as $type) {
     $id = $type . '.' . DOMAIN_ACCESS_FIELD;
-    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    if ($field = $field_storage_config->load($id)) {
       $field->delete();
     }
     $id = $type . '.' . DOMAIN_ACCESS_ALL_FIELD;
-    if ($field = \Drupal::entityManager()->getStorage('field_storage_config')->load($id)) {
+    if ($field = $field_storage_config->load($id)) {
       $field->delete();
     }
   }

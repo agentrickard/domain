@@ -17,17 +17,12 @@ class DomainAccessAdd extends DomainAccessActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    $ids = $this->configuration['domain_id'];
-    $save = FALSE;
+    $id = $this->configuration['domain_id'];
     $node_domains = \Drupal::service('domain_access.manager')->getAccessValues($entity);
+
     // Add domain assignment if not present.
-    foreach ($ids as $id) {
-      if ($entity !== FALSE && !isset($node_domains[$id])) {
-        $node_domains[$id] = $id;
-        $save = TRUE;
-      }
-    }
-    if ($save) {
+    if ($entity !== FALSE && !isset($node_domains[$id])) {
+      $node_domains[$id] = $id;
       $entity->set(DOMAIN_ACCESS_FIELD, array_keys($node_domains));
       $entity->save();
     }

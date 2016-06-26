@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_access\Tests;
 
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Url;
 use Drupal\domain\Tests\DomainTestBase;
@@ -26,11 +27,6 @@ class DomainAccessFieldTest extends DomainTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
 
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
@@ -101,12 +97,9 @@ class DomainAccessFieldTest extends DomainTestBase {
     $edit['body[0][value]'] = $this->randomMachineName(16);
     $this->drupalPostForm('node/add/article', $edit, t('Save'));
 
-    $failed = $this->assertResponse(500, "Expected 500 until https://www.drupal.org/node/2609252 is fixed");
-    if (!$failed) {
-      // Check that the node exists in the database.
-      $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-      $this->assertTrue($node, 'Node found in database.');
-    }
+    // Check that the node exists in the database.
+    $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
+    $this->assertTrue($node, 'Node found in database.');
 
     // Test a user who can assign users to domains.
     $user4 = $this->drupalCreateUser(array('administer users', 'assign editors to any domain'));
@@ -176,7 +169,6 @@ class DomainAccessFieldTest extends DomainTestBase {
     }
     $this->assertText($label, 'All affiliates field found.');
 
-
     // Test user without access to affiliates field editing their user page.
     $user8 = $this->drupalCreateUser(array('change own username'));
     $this->drupalLogin($user8);
@@ -192,13 +184,10 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertNoText($label, 'All affiliates field not found.');
 
     // Change own username.
-    // The save will fail with an EntityStorageException until
-    // https://www.drupal.org/node/2609252 is fixed.
     $edit = array();
     $edit['name'] = $this->randomMachineName();
 
     $this->drupalPostForm($user_edit_page, $edit, t('Save'));
-    $this->assertResponse(500, "Expected 500 until https://www.drupal.org/node/2609252 is fixed");
   }
 
 }

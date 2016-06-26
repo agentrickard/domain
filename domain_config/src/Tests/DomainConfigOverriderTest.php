@@ -63,6 +63,8 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
    *   The expected name.
    */
   private function expectedName(DomainInterface $domain) {
+    $name = '';
+
     switch ($domain->id()) {
       case 'one_example_com':
       case 'three_example_com':

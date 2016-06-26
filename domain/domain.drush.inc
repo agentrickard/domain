@@ -560,7 +560,7 @@ function drush_domain_machine_name($argument, $machine_name) {
   $machine_name = \Drupal::service('domain.creator')->createMachineName($machine_name);
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    $results = \Drupal::entityManager()
+    $results = \Drupal::entityTypeManager()
       ->getStorage('domain')
       ->loadByProperties(array('machine_name' => $machine_name));
     foreach ($results as $result) {

@@ -53,7 +53,7 @@ class DomainCreator implements DomainCreatorInterface {
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
     );
-    $domain = \Drupal::entityManager()->getStorage('domain')->create($values);
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
 
     return $domain;
   }

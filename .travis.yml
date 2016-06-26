@@ -10,18 +10,18 @@ matrix:
 
 addons:
   hosts:
-    - one.localhost
-    - two.localhost
-    - three.localhost
-    - four.localhost
-    - five.localhost
+    - example.com
+    - one.example.com
+    - two.example.com
+    - three.example.com
+    - four.example.com
+    - five.example.com
 
 cache:
   directories:
     - $HOME/.composer/cache/files
 
 env:
-  - DRUPAL=8.0.x
   - DRUPAL=8.1.x
   - DRUPAL=8.2.x
 
@@ -73,7 +73,11 @@ before_script:
   - nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
 
   # Wait until the web server is responding.
-  - until curl -s localhost:8080; do true; done > /dev/null
+  - until curl -s example.com:8080; do true; done > /dev/null
 
 script:
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://localhost:8080 "domain,domain_access,domain_alias,domain_config,domain_source" | tee /tmp/domain-test-results.txt
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://example.com:8080 domain
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://example.com:8080 domain_access
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://example.com:8080 domain_alias
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://example.com:8080 domain_config
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --php `which php` --url http://example.com:8080 domain_source
