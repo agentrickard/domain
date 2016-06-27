@@ -349,14 +349,20 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $default->save();
     }
     // Ensures we have a proper domain_id.
-    $this->createDomainId();
+    if ($this->isNew()) {
+      $this->createDomainId();
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function createDomainId() {
-    $this->domain_id = domain_create_id($this->getHostname());
+    // We cannot reliably use sequences (1, 2, 3) because those can be different
+    // across environments. Instead, we use the crc32 hash function to create a
+    // unique numeric id for each domain.
+    $id = preg_replace('/[^a-z0-9_]+/', '_', $this->getHostname();
+    $this->domain_id = (int) crc32($id);
   }
 
   /**
