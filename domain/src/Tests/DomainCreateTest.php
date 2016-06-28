@@ -19,7 +19,7 @@ class DomainCreateTest extends DomainTestBase {
 
     // Create a new domain programmatically.
     $domain = \Drupal::service('domain.creator')->createDomain();
-    foreach (array('id', 'name', 'hostname', 'domain_id', 'scheme', 'status', 'weight' , 'is_default') as $key) {
+    foreach (array('id', 'name', 'hostname', 'scheme', 'status', 'weight' , 'is_default') as $key) {
       $property = $domain->get($key);
       $this->assertTrue(isset($property), new FormattableMarkup('New $domain->@key property is set to default value: %value.', array('@key' => $key, '%value' => $property)));
     }
@@ -34,7 +34,7 @@ class DomainCreateTest extends DomainTestBase {
     $this->assertTrue($new_domain->id() == $domain->id(), 'Domain loaded properly.');
 
     // Has domain id been set?
-    $this->assertTrue($new_domain->getDomainId() == 1, 'Domain id set properly.');
+    $this->assertTrue($new_domain->getDomainId(), 'Domain id set properly.');
 
     // Has a UUID been set?
     $this->assertTrue($new_domain->uuid(), 'Entity UUID set properly.');

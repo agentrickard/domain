@@ -165,7 +165,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
     $loader = \Drupal::service('domain.loader');
-    $creator = \Drupal::service('domain.creator');
     $default = $loader->loadDefaultId();
     $domains = $loader->loadMultiple();
     $values += array(
@@ -173,10 +172,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
-      // {node_access} still requires a numeric id.
-      // @TODO: This is not reliable and creates duplicates.
-      'domain_id' => $creator->createNextId(),
     );
+    // Note that we have not created a domain_id, which is only used for
+    // node access control and will be added on save.
   }
 
   /**
@@ -349,6 +347,20 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $default->is_default = 0;
       $default->save();
     }
+    // Ensures we have a proper domain_id.
+    if ($this->isNew()) {
+      $this->createDomainId();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createDomainId() {
+    // We cannot reliably use sequences (1, 2, 3) because those can be different
+    // across environments. Instead, we use the crc32 hash function to create a
+    // unique numeric id for each domain.
+    $this->domain_id = (int) crc32($this->getHostname());
   }
 
   /**

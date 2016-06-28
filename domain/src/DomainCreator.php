@@ -61,22 +61,6 @@ class DomainCreator implements DomainCreatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function createNextId() {
-    $domains = $this->loader->loadMultiple();
-    $max = 0;
-    /** @var \Drupal\domain\Entity\Domain $domain */
-    foreach ($domains as $domain) {
-      $domain_id = $domain->getDomainId();
-      if ($domain_id > $max) {
-        $max = $domain_id;
-      }
-    }
-    return $max + 1;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function createHostname() {
     return $this->negotiator->negotiateActiveHostname();
   }

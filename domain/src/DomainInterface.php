@@ -192,4 +192,9 @@ interface DomainInterface extends ConfigEntityInterface {
    */
   public function getMatchType();
 
+  /**
+   * Creates a unique domain id for this record.
+   */
+  public function createDomainId();
+
 }
