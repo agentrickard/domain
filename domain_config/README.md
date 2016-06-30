@@ -61,4 +61,3 @@ Dependencies
 ============
 
 - Domain
-- The patch from [#2662196 Cache route by Uri and not just Query+Path](https://www.drupal.org/node/2662196)
