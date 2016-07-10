@@ -40,11 +40,14 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
       }
     }
     // 3) Check that the alias doesn't contain any invalid characters.
-    $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $pattern);
-    if ($check == 0) {
-      return $this->t('The pattern contains invalid characters.');
+    // Check for valid characters, unless using non-ASCII domains.
+    $non_ascii = \Drupal::config('domain.settings')->get('allow_non_ascii');
+    if (!$non_ascii) {
+      $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $pattern);
+      if ($check == 0) {
+        return $this->t('The pattern contains invalid characters.');
+      }
     }
-
     // 4) The alias cannot begin or end with a period.
     if (substr($pattern, 0, 1) == '.') {
       $error_list[] = $this->t('The domain must not begin with a dot (.)');

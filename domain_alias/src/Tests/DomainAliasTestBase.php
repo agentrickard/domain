@@ -50,7 +50,6 @@ abstract class DomainAliasTestBase extends DomainTestBase {
     );
     // Replicate the logic for creating machine_name patterns.
     // @see ConfigBase::validate()
-    #$machine_name = str_replace(array('?', '<', '>', '"', '\'', '/', '\\'), '', $values['pattern']);
     $machine_name = strtolower(preg_replace('/[^a-z0-9_]/', '_', $values['pattern']));
     $values['id'] = str_replace(array('*', '.', ':'), '_', $machine_name);
     $alias = \Drupal::entityTypeManager()->getStorage('domain_alias')->create($values);
