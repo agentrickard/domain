@@ -6,7 +6,7 @@ use Drupal\Component\Render\FormattableMarkup;
 /**
  * Tests domain alias record validation.
  *
- * @group domain
+ * @group domain_alias
  */
 class DomainAliasValidatorTest extends DomainAliasTestBase {
 
