@@ -4,11 +4,11 @@ namespace Drupal\domain\Tests;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
- * Tests domain record validation.
+ * Tests domain record HTTP response.
  *
  * @group domain
  */
-class DomainValidatorTest extends DomainTestBase {
+class DomainResponseTest extends DomainTestBase {
 
   /**
    * Tests that a domain response is proper.
