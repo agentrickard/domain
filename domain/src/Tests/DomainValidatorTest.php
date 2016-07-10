@@ -52,6 +52,25 @@ class DomainValidatorTest extends DomainTestBase {
         $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
       }
     }
+    // Test the two configurable options.
+    $config = $this->config('domain.settings');
+    $config->set('www_prefix', true)->save();
+    $config->set('allow_non_ascii', true)->save();
+    // Valid hostnames to test. Valid is the boolean value.
+    $hostnames = [
+      'www.example.com' => 0, // no www-prefix allowed
+      'éxample.com' => 1, // ascii-only allowed.
+    ];
+    foreach ($hostnames as $hostname => $valid) {
+      $domain = $creator->createDomain(['hostname' => $hostname]);
+      $errors = $validator->validate($domain);
+      if ($valid) {
+        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
+      }
+      else {
+        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
+      }
+    }
 
   }
 
