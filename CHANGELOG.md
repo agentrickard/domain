@@ -40,12 +40,12 @@ marked with [x] are considered complete.
 - [x] Recreate the Domain Content module with bulk operations
 - [x] Add help text to domain overview screen
 - [x] Views argument handler to show proper title.
-- [ ] Ensure unique numeric ids for use with node access
+- [x] Ensure unique numeric ids for use with node access
+- [x] Invalidate cache on Domain save
+- [x] Invalidate render cache on Alias save
 - [ ] Allow non-ascii domains and aliases
 - [ ] The domain_validate hook needs tests
 - [ ] DomainConfigOverrider returns empty $overrides
-- [ ] Invalidate cache on Domain save
-- [ ] Invalidate render cache on Alias save
 
 # Beta
 - [x] Actions for domain operations
