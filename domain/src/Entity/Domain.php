@@ -356,6 +356,15 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+    // Invalidate cache tags relevant to domains.
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['rendered', 'url.site']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function createDomainId() {
     // We cannot reliably use sequences (1, 2, 3) because those can be different
     // across environments. Instead, we use the crc32 hash function to create a
