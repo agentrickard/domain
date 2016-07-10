@@ -28,8 +28,7 @@ class DomainInactiveTest extends DomainTestBase {
     // Disable the domain and test for redirect.
     $domain->disable();
     $default = \Drupal::service('domain.loader')->loadDefaultDomain();
-    // Must flush cache.
-    drupal_flush_all_caches();
+    // Our postSave() cache tag clear should allow this to work properly.
     $this->drupalGet($domain->getPath());
 
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
@@ -37,9 +36,9 @@ class DomainInactiveTest extends DomainTestBase {
 
     // Try to access with the proper permission.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));
-    $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
-    // Must flush cache.
+    // Must flush cache because we did not resave the domain.
     drupal_flush_all_caches();
+    $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
     $this->drupalGet($domain->getPath());
     $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the inactive domain with permission.');
   }
