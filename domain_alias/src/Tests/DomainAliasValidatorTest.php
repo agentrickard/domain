@@ -1,23 +1,22 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\domain_alias\Tests;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
- * Tests domain record validation.
+ * Tests domain alias record validation.
  *
  * @group domain
  */
-class DomainValidatorTest extends DomainTestBase {
+class DomainAliasValidatorTest extends DomainAliasTestBase {
 
   /**
    * Tests that a domain hostname validates.
    */
-  public function testDomainValidator() {
+  public function testDomainAliasValidator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
-    $creator = \Drupal::service('domain.creator');
-    $validator = \Drupal::service('domain.validator');
+    $validator = \Drupal::service('domain_alias.validator');
 
     // Create a domain.
     $this->domainCreateTestDomains(1, 'foo.com');
@@ -26,9 +25,9 @@ class DomainValidatorTest extends DomainTestBase {
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = \Drupal::service('domain.loader')->loadByHostname($key);
     $this->assertTrue(!empty($domain), 'Test domain created.');
-
-    // Valid hostnames to test. Valid is the boolean value.
-    $hostnames = [
+//dt Drupal\\domain_alias\\Tests\\DomainAliasValidatorTest c
+    // Valid patterns to test. Valid is the boolean value.
+    $patterns = [
       'localhost' => 1,
       'example.com' => 1,
       'www.example.com' => 1, // see www-prefix test, below.
@@ -42,33 +41,31 @@ class DomainValidatorTest extends DomainTestBase {
       'éxample.com' => 0, // ascii-only.
       'foo.com' => 0, // duplicate.
     ];
-    foreach ($hostnames as $hostname => $valid) {
-      $domain = $creator->createDomain(['hostname' => $hostname]);
-      $errors = $validator->validate($domain);
+    foreach ($patterns as $pattern => $valid) {
+      $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, FALSE);
+      $errors = $validator->validate($alias);
       if ($valid) {
-        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
+        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @pattern passed.', array('@pattern' => $pattern)));
       }
       else {
-        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
+        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @pattern failed.', array('@pattern' => $pattern)));
       }
     }
-    // Test the two configurable options.
+    // Test the configurable option.
     $config = $this->config('domain.settings');
-    $config->set('www_prefix', true)->save();
     $config->set('allow_non_ascii', true)->save();
     // Valid hostnames to test. Valid is the boolean value.
-    $hostnames = [
-      'www.example.com' => 0, // no www-prefix allowed
+    $patterns = [
       'éxample.com' => 1, // ascii-only allowed.
     ];
-    foreach ($hostnames as $hostname => $valid) {
-      $domain = $creator->createDomain(['hostname' => $hostname]);
-      $errors = $validator->validate($domain);
+    foreach ($patterns as $pattern => $valid) {
+      $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, FALSE);
+      $errors = $validator->validate($alias);
       if ($valid) {
-        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
+        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @pattern passed.', array('@pattern' => $pattern)));
       }
       else {
-        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
+        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @pattern failed.', array('@pattern' => $pattern)));
       }
     }
 
