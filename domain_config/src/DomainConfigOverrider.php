@@ -79,7 +79,9 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
       return $overrides;
     }
-    $this->initiateContext();
+    if (empty($this->domain)) {
+      $this->initiateContext();
+    }
     if (!empty($this->domain)) {
       foreach ($names as $name) {
         $config_name = $this->getDomainConfigName($name, $this->domain);
@@ -153,14 +155,20 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * with the locale module.
    */
   protected function initiateContext() {
-    // @TODO: Is this cacheable?
+    // Prevent infinite lookups by caching the request. Since the _construct()
+    // is called for each lookup, this is more efficient.
+    static $context;
+    if ($context) {
+      return;
+    }
+    $context++;
     // Get the language context. Note that injecting the language manager
     // into the service created a circular dependency error, so we load from
     // the core service manager.
     $this->languageManager = \Drupal::languageManager();
     $this->language = $this->languageManager->getCurrentLanguage();
     // Get the domain context.
-    $this->domain = $this->domainNegotiator->getActiveDomain();
+    $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
   }
 
 }

@@ -43,9 +43,10 @@ marked with [x] are considered complete.
 - [x] Ensure unique numeric ids for use with node access
 - [x] Invalidate cache on Domain save
 - [x] Invalidate render cache on Alias save
+- [x] DomainConfigOverrider returns empty $overrides
 - [ ] Allow non-ascii domains and aliases
 - [ ] The domain_validate hook needs tests
-- [ ] DomainConfigOverrider returns empty $overrides
+
 
 # Beta
 - [x] Actions for domain operations
