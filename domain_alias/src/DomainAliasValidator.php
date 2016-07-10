@@ -50,10 +50,10 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
     }
     // 4) The alias cannot begin or end with a period.
     if (substr($pattern, 0, 1) == '.') {
-      $error_list[] = $this->t('The domain must not begin with a dot (.)');
+      return $this->t('The pattern cannot begin with a dot.');
     }
     if (substr($pattern, -1) == '.') {
-      $error_list[] = $this->t('The domain must not end with a dot (.)');
+      return $this->t('The pattern cannot end with a dot.');
     }
 
     // 5) Check that the alias is not a direct match for a registered domain.
