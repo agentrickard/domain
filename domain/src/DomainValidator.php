@@ -99,8 +99,8 @@ class DomainValidator implements DomainValidatorInterface {
     $domains = \Drupal::entityTypeManager()
       ->getStorage('domain')
       ->loadByProperties(array('hostname' => $hostname));
-    foreach ($domains as $domain) {
-      if ($domain->id() != $domain->id()) {
+    foreach ($domains as $match) {
+      if ($match->id() != $domain->id()) {
         $error_list[] = $this->t('The hostname is already registered.');
       }
     }

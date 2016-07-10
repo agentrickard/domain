@@ -12,10 +12,6 @@ class DomainResponseTest extends DomainTestBase {
 
   /**
    * Tests that a domain response is proper.
-   *
-   * @TODO: This class checks for proper responses, and should be moved to a
-   * new class. What we want to test here are the validation rules for creating
-   * a domain.
    */
   public function testDomainResponse() {
     // No domains should exist.
