@@ -11,37 +11,67 @@ use Drupal\Component\Render\FormattableMarkup;
 class DomainValidatorTest extends DomainTestBase {
 
   /**
-   * Tests that a domain response is proper.
-   *
-   * @TODO: This class checks for proper responses, and should be moved to a
-   * new class. What we want to test here are the validation rules for creating
-   * a domain.
+   * Tests that a domain hostname validates.
    */
-  public function testDomainResponse() {
+  public function testDomainValidator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
+    $creator = \Drupal::service('domain.creator');
+    $validator = \Drupal::service('domain.validator');
 
-    // Create a new domain programmatically.
-    $this->domainCreateTestDomains();
-
+    // Create a domain.
+    $this->domainCreateTestDomains(1, 'foo.com');
     // Check the created domain based on it's known id value.
-    $key = 'example_com';
+    $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = \Drupal::service('domain.loader')->load($key);
+    $domain = \Drupal::service('domain.loader')->loadByHostname($key);
+    $this->assertTrue(!empty($domain), 'Test domain created.');
 
-    // Our testing server should be able to access the test PNG file.
-    $this->assertTrue($domain->getResponse() == 200, new FormattableMarkup('Server test for @url passed.', array('@url' => $domain->getPath())));
+    // Valid hostnames to test. Valid is the boolean value.
+    $hostnames = [
+      'localhost' => 1,
+      'example.com' => 1,
+      'www.example.com' => 1, // see www-prefix test, below.
+      'one.example.com' => 1,
+      'example.com:8080' => 1,
+      'example.com::8080' => 0, // only one colon.
+      'example.com:abc' => 0, // no letters after a colon.
+      '.example.com' => 0, // cannot begin with a dot.
+      'example.com.' => 0, // cannot end with a dot.
+      'EXAMPLE.com' => 0, // lowercase only.
+      'éxample.com' => 0, // ascii-only.
+      'foo.com' => 0, // duplicate.
+    ];
+    foreach ($hostnames as $hostname => $valid) {
+      $domain = $creator->createDomain(['hostname' => $hostname]);
+      $errors = $validator->validate($domain);
+      if ($valid) {
+        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
+      }
+      else {
+        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
+      }
+    }
+    // Test the two configurable options.
+    $config = $this->config('domain.settings');
+    $config->set('www_prefix', true)->save();
+    $config->set('allow_non_ascii', true)->save();
+    // Valid hostnames to test. Valid is the boolean value.
+    $hostnames = [
+      'www.example.com' => 0, // no www-prefix allowed
+      'éxample.com' => 1, // ascii-only allowed.
+    ];
+    foreach ($hostnames as $hostname => $valid) {
+      $domain = $creator->createDomain(['hostname' => $hostname]);
+      $errors = $validator->validate($domain);
+      if ($valid) {
+        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
+      }
+      else {
+        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
+      }
+    }
 
-    // Now create a bad domain.
-    $values = array(
-      'hostname' => 'foo.bar',
-      'id' => 'foo_bar',
-      'name' => 'Foo',
-    );
-    $domain = \Drupal::service('domain.creator')->createDomain($values);
-
-    $domain->save();
-    $this->assertTrue($domain->getResponse() == 500, new FormattableMarkup('Server test for @url failed.', array('@url' => $domain->getPath())));
   }
 
 }

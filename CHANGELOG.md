@@ -44,9 +44,9 @@ marked with [x] are considered complete.
 - [x] Invalidate cache on Domain save
 - [x] Invalidate render cache on Alias save
 - [x] DomainConfigOverrider returns empty $overrides
-- [ ] Allow non-ascii domains and aliases
-- [ ] The domain_validate hook needs tests
-
+- [x] Allow non-ascii domains and aliases
+- [x] The domain_validate hook needs tests
+- [ ] Allow partial config loading
 
 # Beta
 - [x] Actions for domain operations

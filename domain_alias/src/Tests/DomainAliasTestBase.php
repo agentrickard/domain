@@ -33,11 +33,13 @@ abstract class DomainAliasTestBase extends DomainTestBase {
    *   An optional alias pattern.
    * @param int $redirect
    *   An optional redirect (301 or 302).
+   * @param boolean $save
+   *   Whether to save the alias or return for validation.
    *
    * @return \Drupal\domain_alias\Entity\DomainAlias
    *   A domain alias entity.
    */
-  public function domainAliasCreateTestAlias(DomainInterface $domain, $pattern = NULL, $redirect = 0) {
+  public function domainAliasCreateTestAlias(DomainInterface $domain, $pattern = NULL, $redirect = 0, $save = TRUE) {
     if (empty($pattern)) {
       $pattern = '*.' . $domain->getHostname();
     }
@@ -48,11 +50,12 @@ abstract class DomainAliasTestBase extends DomainTestBase {
     );
     // Replicate the logic for creating machine_name patterns.
     // @see ConfigBase::validate()
-    $machine_name = str_replace(array('?', '<', '>', '"', '\'', '/', '\\'), '', $values['pattern']);
+    $machine_name = strtolower(preg_replace('/[^a-z0-9_]/', '_', $values['pattern']));
     $values['id'] = str_replace(array('*', '.', ':'), '_', $machine_name);
-
     $alias = \Drupal::entityTypeManager()->getStorage('domain_alias')->create($values);
-    $alias->save();
+    if ($save) {
+      $alias->save();
+    }
 
     return $alias;
   }

@@ -72,7 +72,7 @@ class DomainCreator implements DomainCreatorInterface {
     if (empty($hostname)) {
       $hostname = $this->createHostname();
     }
-    return preg_replace('/[^a-z0-9_]+/', '_', $hostname);
+    return preg_replace('/[^a-z0-9_]/', '_', $hostname);
   }
 
 }

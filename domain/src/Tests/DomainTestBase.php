@@ -101,12 +101,14 @@ abstract class DomainTestBase extends WebTestBase {
     for ($i = 0; $i < $count; $i++) {
       if (!empty($list[$i])) {
         if ($i < 11) {
-          $hostname = $machine_name = $list[$i] . '.' . $base_hostname;
+          $hostname = $list[$i] . '.' . $base_hostname;
+          $machine_name = $list[$i] . '.example.com';
           $name = ucfirst($list[$i]);
         }
         // These domains are not setup and are just for UX testing.
         else {
-          $hostname = $machine_name = 'test' . $i . '.' . $base_hostname;
+          $hostname = 'test' . $i . '.' . $base_hostname;
+          $machine_name = 'test' . $i . '.example.com';
           $name = 'Test ' . $i;
         }
       }
