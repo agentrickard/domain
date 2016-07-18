@@ -45,23 +45,18 @@ langcode: en
 default_langcode: en
 ```
 
-Edit the file to change the site name, as follows:
+An override file should contain only the specific data that you want to override. To override the name, the only line needed is the one beginning ```name:```. The resulting override looks like this:
 
 ```YAML
-uuid: 536db351-7aec-407e-a746-70ba9cc9f190
 name: Three
-mail: admin@example.com
-slogan: ''
-page:
-  403: ''
-  404: ''
-  front: /user
-admin_compact_mode: false
-weight_select_max: 100
-langcode: en
-default_langcode: en
 ```
 
+To override both the name and the slogan:
+
+```YAML
+name: Three
+slogan: 'My site slogan'
+```
 We want this to apply when the domain `three.example.com` is active and English
 is the active language. Therefore, this file would be named
 `domain.config.three_example_com.en.system.site`. If we wanted this file to
