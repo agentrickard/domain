@@ -218,7 +218,12 @@ function domain_access_form_devel_generate_form_user_alter(&$form, &$form_state,
  */
 function domain_access_form_node_form_alter(&$form, FormState $form_state, $form_id) {
   $move_enabled = \Drupal::config('domain_access.settings')->get('node_advanced_tab');
-  if ($move_enabled && isset($form['field_domain_access']) && isset($form['field_domain_access'])) {
+  if (
+    $move_enabled && isset($form['field_domain_access']) &&
+    isset($form['field_domain_access']) &&
+    empty($form['field_domain_access']['#group']) &&
+    empty($form['field_domain_all_affiliates']['#group'])
+  ) {
     // Move to the tabs on the entity form
     $form['field_domain_access']['#group'] = 'domain';
     $form['field_domain_all_affiliates']['#group'] = 'domain';

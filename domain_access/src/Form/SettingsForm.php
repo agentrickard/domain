@@ -33,7 +33,7 @@ class SettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Move Domain Access fields to advanced node settings.'),
       '#default_value' => $config->get('node_advanced_tab'),
-      '#description' => $this->t('When checked the Domain Access fields will be shown as a tab in the advanced settings on node edit form.'),
+      '#description' => $this->t('When checked the Domain Access fields will be shown as a tab in the advanced settings on node edit form. However, if you have placed the fields in a field group already, they will not be moved.'),
     );
     return parent::buildForm($form, $form_state);
   }
