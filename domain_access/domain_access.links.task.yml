@@ -1,10 +1,6 @@
-domain.admin:
-  title: Domain Records
-  route_name: domain.admin
-  parent: domain.admin
+domain_access.admin:
+  title: Domain Access settings
+  route_name: domain_config.admin
+  base_route: domain.admin
 
-entity.domain.edit_form:
-  title: 'Edit'
-  route_name: entity.domain.edit_form
-  parent_id: domain.admin
 
