@@ -442,7 +442,8 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
         'entity_type' => $entity_type,
         'label' => 'Domain Access',
         'bundle' => $bundle,
-        'required' => TRUE,
+        // Users should not be required to be a domain editor.
+        'required' => $entity_type !== 'user',
         'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['name'],
         'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
         'settings' => array(
