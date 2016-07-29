@@ -86,15 +86,14 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $id = $domain->id();
     if (!empty($id)) {
       $this->setActiveDomain($domain);
-    } else {
-      // Fallback to default domain if no match.
-      if ($domain = $this->domainLoader->loadDefaultDomain()) {
-        $this->moduleHandler->alter('domain_request', $domain);
-        $domain->setMatchType(DOMAIN_MATCH_NONE);
-        $id = $domain->id();
-        if (!empty($id)) {
-          $this->setActiveDomain($domain);
-        }
+    }
+    // Fallback to default domain if no match.
+    elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
+      $this->moduleHandler->alter('domain_request', $domain);
+      $domain->setMatchType(DOMAIN_MATCH_NONE);
+      $id = $domain->id();
+      if (!empty($id)) {
+        $this->setActiveDomain($domain);
       }
     }
   }
