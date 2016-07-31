@@ -70,10 +70,6 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       // If the load worked, set an exact match flag for the hook.
       $domain->setMatchType(DOMAIN_MATCH_EXACT);
     }
-    // Fallback to default domain if no match.
-    elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
-      $domain->setMatchType(DOMAIN_MATCH_NONE);
-    }
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
     else {
@@ -90,6 +86,15 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $id = $domain->id();
     if (!empty($id)) {
       $this->setActiveDomain($domain);
+    }
+    // Fallback to default domain if no match.
+    elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
+      $this->moduleHandler->alter('domain_request', $domain);
+      $domain->setMatchType(DOMAIN_MATCH_NONE);
+      $id = $domain->id();
+      if (!empty($id)) {
+        $this->setActiveDomain($domain);
+      }
     }
   }
 
