@@ -45,7 +45,9 @@ langcode: en
 default_langcode: en
 ```
 
-An override file should contain only the specific data that you want to override. To override the name, the only line needed is the one beginning ```name:```. The resulting override looks like this:
+An override file should contain only the specific data that you want to override.
+To override the name, the only line needed is the one beginning ```name:```.
+The resulting override looks like this:
 
 ```YAML
 name: Three
@@ -57,6 +59,10 @@ To override both the name and the slogan:
 name: Three
 slogan: 'My site slogan'
 ```
+
+*Warning: do not copy over the `uuid` value into the new file. Doing so may
+cause the configuration import to fail.*
+
 We want this to apply when the domain `three.example.com` is active and English
 is the active language. Therefore, this file would be named
 `domain.config.three_example_com.en.system.site`. If we wanted this file to
@@ -77,8 +83,11 @@ configuration you're overriding.
 Installation
 ============
 
-Previously the module relied on manually cloning `default.services.yml`
-to change `required_cache_contexts` to:
+If some variable changes are not picked up when the page renders, you may need
+add domain-sensitivity to the site's cache.
+
+To do so, clone  `default.services.yml` to `services.yml` and change the
+`required_cache_contexts` value to:
 
 ```YAML
     required_cache_contexts: ['languages:language_interface', 'theme', 'user.permissions', 'url.site']
