@@ -66,13 +66,10 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   public function setRequestDomain($httpHost, $reset = FALSE) {
     // @TODO: Investigate caching methods.
     $this->setHttpHost($httpHost);
+    // Try to load a direct match.
     if ($domain = $this->domainLoader->loadByHostname($httpHost)) {
       // If the load worked, set an exact match flag for the hook.
       $domain->setMatchType(DOMAIN_MATCH_EXACT);
-    }
-    // Fallback to default domain if no match.
-    elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
-      $domain->setMatchType(DOMAIN_MATCH_NONE);
     }
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
@@ -87,9 +84,16 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $this->moduleHandler->alter('domain_request', $domain);
 
     // We must have registered a valid id, else the request made no match.
-    $id = $domain->id();
-    if (!empty($id)) {
+    if (!empty($domain->id())) {
       $this->setActiveDomain($domain);
+    }
+    // Fallback to default domain if no match.
+    elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
+      $this->moduleHandler->alter('domain_request', $domain);
+      $domain->setMatchType(DOMAIN_MATCH_NONE);
+      if (!empty($domain->id())) {
+        $this->setActiveDomain($domain);
+      }
     }
   }
 
