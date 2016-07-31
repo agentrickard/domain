@@ -46,7 +46,7 @@ marked with [x] are considered complete.
 - [x] DomainConfigOverrider returns empty $overrides
 - [x] Allow non-ascii domains and aliases
 - [x] The domain_validate hook needs tests
-- [ ] Allow partial config loading
+- [x] Allow partial config loading
 
 # Beta
 - [x] Actions for domain operations
