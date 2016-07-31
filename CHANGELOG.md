@@ -1,6 +1,11 @@
 Changelog
 =====
 
+31-JUL-2016 8.x-1.0-alpha1
+
+Status
+====
+
 The 8.x-1.x version is a ground up rewrite of a module originally written for
 Drupal 5.
 
