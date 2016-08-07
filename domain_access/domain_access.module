@@ -111,7 +111,6 @@ function domain_access_node_access_records(NodeInterface $node) {
  * domains.
  */
 function domain_access_node_presave(EntityInterface $node) {
-kint($node);
   domain_access_presave_generate($node);
 }
 
