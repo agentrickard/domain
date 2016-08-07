@@ -96,9 +96,10 @@ class DomainAccessManager implements DomainAccessManagerInterface {
             $item[0]['target_uuid'] = $active->uuid();
           }
         }
+        // This code does not fire, but it should.
         else {
           foreach ($this->getAccessValues($entity) as $id) {
-            $item[]['target_uuid'] = $id;
+            $item[] = $id;
           }
         }
         break;
@@ -120,6 +121,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         if ($entity->isNew()) {
           $item = 0;
         }
+        // This code does not fire, but it should.
         else {
           $item = $this->getAllValue($entity);
         }

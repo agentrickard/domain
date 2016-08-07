@@ -111,6 +111,7 @@ function domain_access_node_access_records(NodeInterface $node) {
  * domains.
  */
 function domain_access_node_presave(EntityInterface $node) {
+kint($node);
   domain_access_presave_generate($node);
 }
 
@@ -594,4 +595,28 @@ function domain_access_domain_delete(EntityInterface $entity) {
   foreach ($actions as $action) {
     $action->delete();
   }
+}
+
+function domain_access_default_form_values(&$form, &$form_state) {
+  // Set domain access default value when the user does not have access
+  // to edit the field. This seems to work fine for all affiliates, which
+  // suggests a core bug.
+  $entity = $form_state->getFormObject()->getEntity();
+  if (!$entity->isNew() &&
+      isset($form['field_domain_access']) &&
+      !$form['field_domain_access']['#access'] &&
+      empty($form['field_domain_access']['widget']['#default_value'])
+     ) {
+    // Set the default values correctly.
+    $values = \Drupal::service('domain_access.manager')->getAccessValues($entity);
+    $form['field_domain_access']['widget']['#default_value'] = array_keys($values);
+  }
+}
+
+function domain_access_form_user_form_alter(&$form, &$form_state, $form_id) {
+  domain_access_default_form_values($form, $form_state);
+}
+
+function domain_access_form_node_form_alter(&$form, &$form_state, $form_id) {
+  domain_access_default_form_values($form, $form_state);
 }

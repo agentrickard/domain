@@ -97,30 +97,4 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
   }
 
-  /**
-   * Test the usage of DomainAccessManager::getDefaultValue().
-   */
-  public function testDomainAccessDefaultValue() {
-    $this->admin_user = $this->drupalCreateUser(array(
-      'bypass node access',
-      'administer content types',
-      'administer node fields',
-      'administer node display',
-      'administer domains',
-      'publish to any domain',
-    ));
-    $this->drupalLogin($this->admin_user);
-
-    // Create 5 domains.
-    $this->domainCreateTestDomains(5);
-
-    // Visit the article field display administration page.
-    $this->drupalGet('node/add/article');
-    $this->assertResponse(200);
-
-    // Check the new field exists on the page.
-    $this->assertText('Domain Access', 'Found the domain field instance.');
-    $this->assertRaw('name="field_domain_access[example_com]" value="example_com" checked="checked"', 'Default domain selected.');
-  }
-
 }
