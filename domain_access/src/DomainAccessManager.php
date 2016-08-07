@@ -90,9 +90,16 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     switch ($entity->getEntityType()->id()) {
       case 'user':
       case 'node':
-        /** @var \Drupal\domain\DomainInterface $active */
-        if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
-          $item[0]['target_uuid'] = $active->uuid();
+        if ($entity->isNew()) {
+          /** @var \Drupal\domain\DomainInterface $active */
+          if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
+            $item[0]['target_uuid'] = $active->uuid();
+          }
+        }
+        else {
+          foreach ($this->getAccessValues($entity) as $id) {
+            $item[]['target_uuid'] = $id;
+          }
         }
         break;
       default:
@@ -110,7 +117,12 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     switch ($entity->getEntityType()) {
       case 'user':
       case 'node':
-        $item = 0;
+        if ($entity->isNew()) {
+          $item = 0;
+        }
+        else {
+          $item = $this->getAllValue($entity);
+        }
         break;
       default:
         break;
