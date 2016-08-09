@@ -2,18 +2,15 @@
 
 namespace Drupal\domain_access\Tests;
 
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Url;
-use Drupal\domain\Tests\DomainTestBase;
-use Drupal\node\Entity\NodeType;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Tests\domain\Functional\DomainBrowserTestBase;
 
 /**
  * Tests the domain access entity reference field type for custom entities.
  *
  * @group domain_access
  */
-class DomainAccessEntityFieldTest extends DomainTestBase {
+class DomainAccessEntityFieldTest extends DomainBrowserTestBase {
 
   /**
    * Modules to enable.

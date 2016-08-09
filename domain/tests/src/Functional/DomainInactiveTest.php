@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
 
@@ -9,7 +9,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @group domain
  */
-class DomainInactiveTest extends DomainTestBase {
+class DomainInactiveTest extends DomainBrowserTestBase {
 
   /**
    * Test inactive domain.

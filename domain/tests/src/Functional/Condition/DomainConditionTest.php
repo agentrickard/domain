@@ -1,15 +1,14 @@
 <?php
 
 namespace Drupal\domain\Tests\Condition;
-
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainBrowserTestBase;
 
 /**
  * Tests the domain condition.
  *
  * @group domain
  */
-class DomainConditionTest extends DomainTestBase {
+class DomainConditionTest extends DomainBrowserTestBase {
 
   /**
    * The condition plugin manager.

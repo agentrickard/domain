@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 use Drupal\Component\Render\FormattableMarkup;
 
 
@@ -9,7 +9,7 @@ use Drupal\Component\Render\FormattableMarkup;
  *
  * @group domain
  */
-class DomainHooksTest extends DomainTestBase {
+class DomainHooksTest extends DomainBrowserTestBase {
 
   /**
    * Modules to enable.

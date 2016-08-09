@@ -1,19 +1,23 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 
 /**
  * Tests the domain record form interface.
  *
  * @group domain
  */
-class DomainFormsTest extends DomainTestBase {
+class DomainFormsTest extends DomainBrowserTestBase {
 
   /**
    * Create, edit and delete a domain via the user interface.
    */
   public function testDomainInterface() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer domains',
+      'create domains'
+    ));
+
     $this->drupalLogin($this->admin_user);
 
     // No domains should exist.
@@ -23,7 +27,8 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet('admin/config/domain');
 
     // Check for the add message.
-    $this->assertText('There is no Domain record yet.', 'Text for no domains found.');
+    $this->assertSession()->pageTextContains('There is no Domain record yet.');
+
     // Visit the add domain administration page.
     $this->drupalGet('admin/config/domain/add');
 
@@ -67,5 +72,4 @@ class DomainFormsTest extends DomainTestBase {
     // No domains should exist.
     $this->domainTableIsEmpty();
   }
-
 }
