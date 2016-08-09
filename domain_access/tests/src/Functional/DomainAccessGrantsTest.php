@@ -3,14 +3,14 @@
 namespace Drupal\domain_access\Tests;
 
 use Drupal\Core\Database\Database;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainBrowserTestBase;
 
 /**
  * Tests the application of domain access grants.
  *
  * @group domain_access
  */
-class DomainAccessGrantsTest extends DomainTestBase {
+class DomainAccessGrantsTest extends DomainBrowserTestBase {
 
   /**
    * The Entity access handler.

@@ -3,14 +3,14 @@
 namespace Drupal\domain_access\Tests;
 
 use Drupal\Core\Database\Database;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainBrowserTestBase;
 
 /**
  * Tests the domain access integration with node_access records.
  *
  * @group domain_access
  */
-class DomainAccessRecordsTest extends DomainTestBase {
+class DomainAccessRecordsTest extends DomainBrowserTestBase {
 
   /**
    * Modules to enable.

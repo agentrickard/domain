@@ -1,18 +1,17 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\DomainInterface;
-use Drupal\simpletest\WebTestBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Component\Utility\Crypt;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
 
 /**
  * Base class with helper methods and setup for domain tests.
  */
-abstract class DomainTestBase extends WebTestBase {
+abstract class DomainBrowserTestBase extends BrowserTestBase {
 
   use StringTranslationTrait;
 
@@ -29,7 +28,12 @@ abstract class DomainTestBase extends WebTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'node');
+  public static $modules = ['domain', 'node'];
+
+  /**
+   * @var \Drupal\user\UserInterface
+   */
+  public $admin_user;
 
   /**
    * {@inheritdoc}
@@ -39,7 +43,10 @@ abstract class DomainTestBase extends WebTestBase {
 
     // Create Basic page and Article node types.
     if ($this->profile != 'standard') {
-      $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
+      $this->drupalCreateContentType(array(
+        'type' => 'article',
+        'name' => 'Article'
+      ));
     }
 
     // Set the base hostname for domains.
@@ -88,7 +95,8 @@ abstract class DomainTestBase extends WebTestBase {
    *   An optional list of subdomains to apply instead of the default set.
    */
   public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
-    $original_domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $original_domains = \Drupal::service('domain.loader')
+      ->loadMultiple(NULL, TRUE);
     if (empty($base_hostname)) {
       $base_hostname = $this->base_hostname;
     }
@@ -96,7 +104,19 @@ abstract class DomainTestBase extends WebTestBase {
     // For proper testing, yours should be set up similarly, but you can pass a
     // $list array to change the default.
     if (empty($list)) {
-      $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
+      $list = array(
+        '',
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+        'eight',
+        'nine',
+        'ten'
+      );
     }
     for ($i = 0; $i < $count; $i++) {
       if (!empty($list[$i])) {
@@ -121,31 +141,16 @@ abstract class DomainTestBase extends WebTestBase {
       $values = array(
         'hostname' => $hostname,
         'name' => $name,
-        'id' => \Drupal::service('domain.creator')->createMachineName($machine_name),
+        'id' => \Drupal::service('domain.creator')
+          ->createMachineName($machine_name),
       );
-      $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
+      $domain = \Drupal::entityTypeManager()
+        ->getStorage('domain')
+        ->create($values);
       $domain->save();
     }
     $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
     $this->assertTrue((count($domains) - count($original_domains)) == $count, new FormattableMarkup('Created %count new domains.', array('%count' => $count)));
-  }
-
-  /**
-   * Returns whether a given user account is logged in.
-   *
-   * @param \Drupal\user\UserInterface $account
-   *   The user account object to check.
-   *
-   * @return bool
-   */
-  protected function drupalUserIsLoggedIn($account) {
-    // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
-    if (!isset($account->session_id)) {
-      return (bool) $account->id();
-    }
-    // The session ID is hashed before being stored in the database.
-    // @see \Drupal\Core\Session\SessionHandler::read()
-    return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
   }
 
   /**
@@ -161,7 +166,10 @@ abstract class DomainTestBase extends WebTestBase {
    *   The name of the domain field used to attach to the entity.
    */
   public function addDomainToEntity($entity_type, $entity_id, $id, $field = DOMAIN_ACCESS_FIELD) {
-    if ($entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
+    if ($entity = \Drupal::entityTypeManager()
+      ->getStorage($entity_type)
+      ->load($entity_id)
+    ) {
       $entity->set($field, $id);
       $entity->save();
     }
@@ -183,21 +191,18 @@ abstract class DomainTestBase extends WebTestBase {
     // For this to work, we must reset the password to a known value.
     $pass = 'thisissatestpassword';
     /** @var UserInterface $user */
-    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
+    $user = \Drupal::entityTypeManager()
+      ->getStorage('user')
+      ->load($account->id());
     $user->setPassword($pass)->save();
     $url = $domain->getPath() . 'user/login';
-    $edit = ['name' => $account->getAccountName(), 'pass' => $pass];
+    $edit = ['name' => $user->getAccountName(), 'pass' => $pass];
     $this->drupalPostForm($url, $edit, t('Log in'));
 
-    // @see WebTestBase::drupalUserIsLoggedIn()
-    if (isset($this->sessionId)) {
-      $account->session_id = $this->sessionId;
-    }
-    $pass = $this->assert($this->drupalUserIsLoggedIn($account), new FormattableMarkup('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
-    if ($pass) {
-      $this->loggedInUser = $account;
-      $this->container->get('current_user')->setAccount($account);
-    }
+    $this->assertSession()->pageTextContains($user->getDisplayName());
+
+    $this->loggedInUser = $user;
+    $this->container->get('current_user')->setAccount($user);
   }
 
 }

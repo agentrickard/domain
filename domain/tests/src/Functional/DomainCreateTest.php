@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
@@ -8,7 +8,7 @@ use Drupal\Component\Render\FormattableMarkup;
  *
  * @group domain
  */
-class DomainCreateTest extends DomainTestBase {
+class DomainCreateTest extends DomainBrowserTestBase {
 
   /**
    * Tests initial domain creation.

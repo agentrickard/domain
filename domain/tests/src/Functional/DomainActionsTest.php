@@ -1,6 +1,7 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
+
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
@@ -8,13 +9,17 @@ use Drupal\Component\Render\FormattableMarkup;
  *
  * @group domain
  */
-class DomainActionsTest extends DomainTestBase {
+class DomainActionsTest extends DomainBrowserTestBase {
 
   /**
    * Tests bulk actions through the domain overview page.
    */
   public function testDomainActions() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));
+    $this->admin_user = $this->drupalCreateUser([
+      'administer domains',
+      'access administration pages'
+    ]);
+
     $this->drupalLogin($this->admin_user);
 
     $path = 'admin/config/domain';
