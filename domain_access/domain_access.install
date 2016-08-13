@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the Domain Access module.
  */
 
+use Drupal\domain\Constants;
+
 /**
  * Implements hook_install().
  *
@@ -40,11 +42,11 @@ function domain_access_uninstall() {
     ->getStorage('field_storage_config');
 
   foreach (array('node', 'user') as $type) {
-    $id = $type . '.' . DOMAIN_ACCESS_FIELD;
+    $id = $type . '.' . Constants::DOMAIN_ACCESS_FIELD;
     if ($field = $field_storage_config->load($id)) {
       $field->delete();
     }
-    $id = $type . '.' . DOMAIN_ACCESS_ALL_FIELD;
+    $id = $type . '.' . Constants::DOMAIN_ACCESS_ALL_FIELD;
     if ($field = $field_storage_config->load($id)) {
       $field->delete();
     }

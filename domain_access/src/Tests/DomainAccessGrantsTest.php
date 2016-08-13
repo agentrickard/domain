@@ -3,6 +3,7 @@
 namespace Drupal\domain_access\Tests;
 
 use Drupal\Core\Database\Database;
+use Drupal\domain\Constants;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -51,7 +52,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // Create an article node.
     $node1 = $this->drupalCreateNode(array(
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => array($domain->id()),
+      Constants::DOMAIN_ACCESS_FIELD => array($domain->id()),
     ));
     $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
 
@@ -72,8 +73,8 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // Create an article node.
     $node2 = $this->drupalCreateNode(array(
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => array($domain->id()),
-      DOMAIN_ACCESS_ALL_FIELD => 1,
+      Constants::DOMAIN_ACCESS_FIELD => array($domain->id()),
+      Constants::DOMAIN_ACCESS_ALL_FIELD => 1,
     ));
     $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
     // Test the response of the node on each site. Should allow access on all.

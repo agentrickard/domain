@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\domain\Constants;
 
 /**
  * Removes a node from a domain.
@@ -24,7 +25,7 @@ class DomainAccessRemove extends DomainAccessActionBase {
     // Remove domain assignment if present.
     if ($entity !== FALSE && isset($node_domains[$id])) {
       unset($node_domains[$id]);
-      $entity->set(DOMAIN_ACCESS_FIELD, array_keys($node_domains));
+      $entity->set(Constants::DOMAIN_ACCESS_FIELD, array_keys($node_domains));
       $entity->save();
     }
   }

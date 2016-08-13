@@ -4,6 +4,7 @@ namespace Drupal\domain_access\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\Constants;
 
 /**
  * Assigns a node to all affiliates.
@@ -20,7 +21,7 @@ class DomainAccessAll extends ActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    $entity->set(DOMAIN_ACCESS_ALL_FIELD, 1);
+    $entity->set(Constants::DOMAIN_ACCESS_ALL_FIELD, 1);
     $entity->save();
   }
 

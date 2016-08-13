@@ -7,16 +7,8 @@
 
 use Drupal\Core\Url;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\Constants;
 use Drupal\Core\Routing\RouteMatchInterface;
-
-/**
- * Defines record matching types when dealing with request alteration.
- *
- * @see hook_domain_request_alter().
- */
-define('DOMAIN_MATCH_NONE', 0);
-define('DOMAIN_MATCH_EXACT', 1);
-define('DOMAIN_MATCH_ALIAS', 2);
 
 /**
  * Implements hook_entity_bundle_info().

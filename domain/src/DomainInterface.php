@@ -175,9 +175,10 @@ interface DomainInterface extends ConfigEntityInterface {
    * @param int $match_type
    *   A numeric constant indicating the type of match derived by the caller.
    *   Use this value to determine if the request needs to be overridden. Valid
-   *   types are DOMAIN_MATCH_NONE, DOMAIN_MATCH_EXACT, DOMAIN_MATCH_ALIAS.
+   *   types are Constants::DOMAIN_MATCH_NONE, Constants::DOMAIN_MATCH_EXACT,
+   *   Constants::DOMAIN_MATCH_ALIAS.
    */
-  public function setMatchType($match_type = DOMAIN_MATCH_EXACT);
+  public function setMatchType($match_type = Constants::DOMAIN_MATCH_EXACT);
 
   /**
    * Gets the type of record match returned by the negotiator.

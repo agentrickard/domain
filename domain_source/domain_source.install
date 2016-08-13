@@ -5,6 +5,8 @@
  * Install, update and uninstall functions for the Domain Access module.
  */
 
+use Drupal\domain\Constants;
+
 /**
  * Implements hook_install().
  *
@@ -30,7 +32,7 @@ function domain_source_install() {
  */
 function domain_source_uninstall() {
   foreach (array('node') as $type) {
-    $id = $type . '.' . DOMAIN_SOURCE_FIELD;
+    $id = $type . '.' . Constants::DOMAIN_SOURCE_FIELD;
     if ($field = \Drupal::entityTypeManager()->getStorage('field_storage_config')->load($id)) {
       $field->delete();
     }
