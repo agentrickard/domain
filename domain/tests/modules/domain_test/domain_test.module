@@ -13,3 +13,39 @@ function domain_test_domain_load(array $domains) {
     $domain->addProperty('foo', 'bar');
   }
 }
+
+/**
+ * Implements hook_domain_request_alter().
+ */
+function domain_test_domain_request_alter(\Drupal\domain\DomainInterface &$domain) {
+  $domain->addProperty('foo1', 'bar1');
+}
+
+/**
+ * Implements hook_domain_operations
+ */
+function domain_test_domain_operations(\Drupal\domain\DomainInterface $domain) {
+  // Add aliases to the list.
+  $domain->addProperty('foo2', 'bar2');
+  return $operations;
+}
+
+/**
+ * Implements hook_domain_validate_alter
+ */
+function domain_test_domain_validate_alter(&$error_list, $hostname) {
+  // Only allow TLDs to be .org for our site.
+  if (substr($hostname, -4) != '.org') {
+    $error_list[] = t('Only .org domains may be registered.');
+  }
+}
+
+/**
+ * Implements hook_domain_references_alter
+ */
+function domain_test_domain_references_alter($query, $account, $context) {
+  if ($context['entity_type'] == 'node' && !$account->hasPermission('edit assigned domains')) {
+    $default = \Drupal::service('domain.loader')->loadDefaultId();
+    $query->condition('id', $default, '<>');
+  }
+}
