@@ -21,7 +21,7 @@ class DomainHooksTest extends DomainTestBase {
   /**
    * Tests domain loading.
    */
-  public function __testHookDomainLoad() {
+  public function testHookDomainLoad() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -48,7 +48,7 @@ class DomainHooksTest extends DomainTestBase {
   /**
    * Tests domain request alter.
    */
-  public function __testHookDomainRequestAlter() {
+  public function testHookDomainRequestAlter() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -65,7 +65,7 @@ class DomainHooksTest extends DomainTestBase {
   /**
    * Tests domain validate alter
    */
-  public function __testHookDomainValidateAlter() {
+  public function testHookDomainValidateAlter() {
     // No domains should exist.
     $this->domainTableIsEmpty();
 
