@@ -94,7 +94,6 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertTrue(count($values) == 1, 'Node saved with one domain record.');
     $allValue = \Drupal::service('domain_access.manager')->getAllValue($node);
-    debug($allValue);
     $this->assertTrue(empty($allValue), 'Not sent to all affiliates.');
 
   }
