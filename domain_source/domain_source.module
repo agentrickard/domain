@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Routing\TrustedRedirectResponse;
 
 /**
  * Defines the name of the source domain field.
@@ -86,4 +88,37 @@ function domain_source_get(EntityInterface $entity) {
     }
   }
   return $source;
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Find forms that contain the domain source field and allow those to handle
+ * redirects properly.
+ */
+function domain_source_form_alter(&$form, &$form_state, $form_id) {
+  $object = $form_state->getFormObject();
+  if (!empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity() && isset($form[DOMAIN_SOURCE_FIELD])) {
+    foreach ($form['actions'] as $key => $element) {
+      if (isset($element['#type']) && $element['#type'] == 'submit') {
+        $form['actions'][$key]['#submit'][] = 'domain_source_form_submit';
+      }
+    }
+  }
+}
+
+/**
+ * Redirect form submissions to other domains.
+ */
+function domain_source_form_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  if ($object = $form_state->getFormObject()) {
+    $url = $object->getEntity()->url();
+  }
+  $redirect_response = new TrustedRedirectResponse($url);
+  $uri = Url::fromUri($url);
+  $uri->setOption('external', FALSE);
+  kint($redirect_response);
+  kint($uri);
+  $form_state->setRedirectUrl($uri);
+  kint($form_state->getRedirect());
 }
