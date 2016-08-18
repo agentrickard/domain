@@ -160,7 +160,7 @@ abstract class DomainTestBase extends WebTestBase {
    * @param string $field
    *   The name of the domain field used to attach to the entity.
    */
-  public function addDomainToEntity($entity_type, $entity_id, $id, $field = Constants::DOMAIN_ACCESS_FIELD) {
+  public function addDomainToEntity($entity_type, $entity_id, $id, $field = DOMAIN_ACCESS_FIELD) {
     if ($entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
       $entity->set($field, $id);
       $entity->save();
