@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
-
 /**
  * Removes an editor from a domain.
  *
