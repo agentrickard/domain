@@ -116,9 +116,5 @@ function domain_source_form_submit(&$form, \Drupal\Core\Form\FormStateInterface 
   }
   $redirect_response = new TrustedRedirectResponse($url);
   $uri = Url::fromUri($url);
-  $uri->setOption('external', FALSE);
-  kint($redirect_response);
-  kint($uri);
-  $form_state->setRedirectUrl($uri);
-  kint($form_state->getRedirect());
+  $form_state->setResponse($uri);
 }

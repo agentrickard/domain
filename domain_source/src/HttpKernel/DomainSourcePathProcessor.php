@@ -56,9 +56,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    */
   public function processOutbound($path, &$options = array(), Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
     static $active_domain;
-    if (isset($request) && $request->getMethod() == 'POST') {
-  #    return;
-    }
+
     if (!isset($active_domain)) {
       // Ensure that the loader has run.
       // In some tests, the kernel event has not.
