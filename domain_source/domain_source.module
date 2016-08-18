@@ -6,7 +6,11 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\domain\Constants;
+
+/**
+ * Defines the name of the source domain field.
+ */
+define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
 
 /**
  * Creates our fields for an entity bundle.
@@ -20,12 +24,12 @@ use Drupal\domain\Constants;
  * @see domain_source_install()
  */
 function domain_source_confirm_fields($entity_type, $bundle) {
-  $id = $entity_type . '.' . $bundle . '.' . Constants::DOMAIN_SOURCE_FIELD;
+  $id = $entity_type . '.' . $bundle . '.' . DOMAIN_SOURCE_FIELD;
   $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
 
   if (!$field = $field_config_storage->load($id)) {
     $field = array(
-      'field_name' => Constants::DOMAIN_SOURCE_FIELD,
+      'field_name' => DOMAIN_SOURCE_FIELD,
       'entity_type' => $entity_type,
       'label' => 'Domain Source',
       'bundle' => $bundle,
@@ -45,7 +49,7 @@ function domain_source_confirm_fields($entity_type, $bundle) {
   // @TODO: This function is deprecated, but using the OO syntax is causing
   // test fails.
   entity_get_form_display($entity_type, $bundle, 'default')
-    ->setComponent(Constants::DOMAIN_SOURCE_FIELD, array(
+    ->setComponent(DOMAIN_SOURCE_FIELD, array(
       'type' => 'options_select',
       'weight' => 40,
     ))
@@ -74,7 +78,7 @@ function domain_source_node_type_insert(EntityInterface $entity) {
  */
 function domain_source_get(EntityInterface $entity) {
   $source = NULL;
-  $value = $entity->get(Constants::DOMAIN_SOURCE_FIELD)->offsetGet(0);
+  $value = $entity->get(DOMAIN_SOURCE_FIELD)->offsetGet(0);
   if (!empty($value)) {
     $target_id = $value->target_id;
     if ($domain = \Drupal::service('domain.loader')->load($target_id)) {

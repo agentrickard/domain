@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain\Constants;
 
 /**
  * Checks the access status of entities based on domain settings.
@@ -24,7 +23,7 @@ interface DomainAccessManagerInterface {
    * @return array
    *   The domain access field values.
    */
-  public function getAccessValues(EntityInterface $entity, $field_name = Constants::DOMAIN_ACCESS_FIELD);
+  public function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD);
 
   /**
    * Get the all affiliates field values from an entity.

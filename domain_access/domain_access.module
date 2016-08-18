@@ -12,7 +12,16 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\Entity\User;
-use Drupal\domain\Constants;
+
+/**
+ * Defines the name of the node access control field.
+ */
+define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
+
+/**
+ * Defines the name of the all affiliates field.
+ */
+define('DOMAIN_ACCESS_ALL_FIELD', 'field_domain_all_affiliates');
 
 /**
  * Implements hook_node_grants().
@@ -42,18 +51,18 @@ function domain_access_node_grants(AccountInterface $account, $op) {
     $grants['domain_id'][] = $id;
     $grants['domain_site'][] = 0;
     if ($user->hasPermission('view unpublished domain content')) {
-      if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value)) {
+      if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
         $grants['domain_unpublished'][] = $id;
       }
     }
   }
   elseif ($op == 'update' && $user->hasPermission('edit domain content')) {
-    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value)) {
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
       $grants['domain_id'][] = $id;
     }
   }
   elseif ($op == 'delete' && $user->hasPermission('delete domain content')) {
-    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value)) {
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
       $grants['domain_id'][] = $id;
     }
   }
@@ -83,7 +92,7 @@ function domain_access_node_access_records(NodeInterface $node) {
       );
     }
   }
-  if (!empty($node->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value) && $node->isPublished()) {
+  if (!empty($node->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $node->isPublished()) {
     $grants[] = array(
       'realm' => 'domain_site',
       'gid' => 0,
@@ -120,12 +129,12 @@ function domain_access_user_presave(EntityInterface $account) {
  */
 function domain_access_presave_generate(EntityInterface $entity) {
   // There is a core bug https://www.drupal.org/node/2609252 that causes a
-  // fatal database errors if the boolean Constants::DOMAIN_ACCESS_ALL_FIELD
-  // is set when a user cannot access the field. See
-  // domain_access_entity_field_access(). To overcome this issue, we cast the
-  // boolean to integer, which prevents the failure.
-  $value = (int) $entity->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value;
-  $entity->set(Constants::DOMAIN_ACCESS_ALL_FIELD, $value);
+  // fatal database errors if the boolean DOMAIN_ACCESS_ALL_FIELD is set when
+  // a user cannot access the field. See domain_access_entity_field_access().
+  // To overcome this issue, we cast the boolean to integer, which prevents the
+  // failure.
+  $value = (int) $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value;
+  $entity->set(DOMAIN_ACCESS_ALL_FIELD, $value);
 
   // Handle devel module settings.
   $exists = \Drupal::moduleHandler()->moduleExists('devel_generate');
@@ -136,19 +145,19 @@ function domain_access_presave_generate(EntityInterface $entity) {
       $selection = array_filter($entity->devel_generate['domain_access']);
       if (isset($selection['random-selection'])) {
         $domains = \Drupal::service('domain.loader')->loadMultiple();
-        $values[Constants::DOMAIN_ACCESS_FIELD] = array_rand($domains, ceil(rand(1, count($domains))));
+        $values[DOMAIN_ACCESS_FIELD] = array_rand($domains, ceil(rand(1, count($domains))));
       }
       else {
-        $values[Constants::DOMAIN_ACCESS_FIELD] = array_keys($selection);
+        $values[DOMAIN_ACCESS_FIELD] = array_keys($selection);
       }
     }
     if (isset($entity->devel_generate['domain_all'])) {
       $selection = $entity->devel_generate['domain_all'];
       if ($selection == 'random-selection') {
-        $values[Constants::DOMAIN_ACCESS_ALL_FIELD] = rand(0, 1);
+        $values[DOMAIN_ACCESS_ALL_FIELD] = rand(0, 1);
       }
       else {
-        $values[Constants::DOMAIN_ACCESS_ALL_FIELD] = ($selection = 'yes' ? 1 : 0);
+        $values[DOMAIN_ACCESS_ALL_FIELD] = ($selection = 'yes' ? 1 : 0);
       }
     }
     foreach ($values as $name => $value) {
@@ -212,7 +221,7 @@ function domain_access_domain_references_alter($query, $account, $context) {
         break;
       }
       elseif ($account->hasPermission('publish to any assigned domain')) {
-        if (!empty($account->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value)) {
+        if (!empty($account->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
           break;
         }
         $allowed = \Drupal::service('domain_access.manager')->getAccessValues($account);
@@ -229,7 +238,7 @@ function domain_access_domain_references_alter($query, $account, $context) {
         // Do nothing.
       }
       elseif ($account->hasPermission('assign domain editors')) {
-        if (!empty($account->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value)) {
+        if (!empty($account->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
           break;
         }
         $allowed = \Drupal::service('domain_access.manager')->getAccessValues($account);
@@ -344,7 +353,7 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
   // The entity the field is attached to.
   $entity = $items->getEntity();
 
-  if ($field_definition->getName() == Constants::DOMAIN_ACCESS_FIELD) {
+  if ($field_definition->getName() == DOMAIN_ACCESS_FIELD) {
     if ($entity instanceof User) {
       $access = AccessResult::allowedIfHasPermissions($account, [
         'assign domain editors',
@@ -366,7 +375,7 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
       return AccessResult::forbidden();
     }
   }
-  elseif ($field_definition->getName() == Constants::DOMAIN_ACCESS_ALL_FIELD) {
+  elseif ($field_definition->getName() == DOMAIN_ACCESS_ALL_FIELD) {
     if ($entity instanceof User) {
       return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));
     }
@@ -425,11 +434,11 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
       'description' => 'Make this user an editor on all domains.',
     ];
 
-    $id = $entity_type . '.' . $bundle . '.' . Constants::DOMAIN_ACCESS_FIELD;
+    $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
 
     if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
       $field = array(
-        'field_name' => Constants::DOMAIN_ACCESS_FIELD,
+        'field_name' => DOMAIN_ACCESS_FIELD,
         'entity_type' => $entity_type,
         'label' => 'Domain Access',
         'bundle' => $bundle,
@@ -447,10 +456,10 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
       $field_config->save();
     }
     // Assign the all affiliates field.
-    $id = $entity_type . '.' . $bundle . '.' . Constants::DOMAIN_ACCESS_ALL_FIELD;
+    $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
     if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
       $field = array(
-        'field_name' => Constants::DOMAIN_ACCESS_ALL_FIELD,
+        'field_name' => DOMAIN_ACCESS_ALL_FIELD,
         'entity_type' => $entity_type,
         'label' => $text[$entity_type]['label'],
         'bundle' => $bundle,
@@ -465,11 +474,11 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
     // @TODO: This function is deprecated, but using the OO syntax is causing
     // test fails.
     entity_get_form_display($entity_type, $bundle, 'default')
-      ->setComponent(Constants::DOMAIN_ACCESS_FIELD, array(
+      ->setComponent(DOMAIN_ACCESS_FIELD, array(
         'type' => 'options_buttons',
         'weight' => 40,
       ))
-      ->setComponent(Constants::DOMAIN_ACCESS_ALL_FIELD, array(
+      ->setComponent(DOMAIN_ACCESS_ALL_FIELD, array(
         'type' => 'boolean_checkbox',
         'settings' => array('display_label' => 1),
         'weight' => 41,
@@ -485,27 +494,27 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
  * Implements hook_views_data_alter().
  */
 function domain_access_views_data_alter(array &$data) {
-  $table = 'node__' . Constants::DOMAIN_ACCESS_FIELD;
-  $data[$table][Constants::DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
-  $data[$table][Constants::DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
-  $data[$table][Constants::DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
+  $table = 'node__' . DOMAIN_ACCESS_FIELD;
+  $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
 
   // Current domain filter.
   $data[$table]['current_all'] = array(
     'title' => t('Current domain'),
     'group' => t('Domain'),
     'filter' => array(
-      'field' => Constants::DOMAIN_ACCESS_FIELD . '_target_id',
+      'field' => DOMAIN_ACCESS_FIELD . '_target_id',
       'id' => 'domain_access_current_all_filter',
       'title' => t('Available on current domain'),
       'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates).'),
     ),
   );
 
-  $table = 'user__' . Constants::DOMAIN_ACCESS_FIELD;
-  $data[$table][Constants::DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
-  $data[$table][Constants::DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
-  $data[$table][Constants::DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
+  $table = 'user__' . DOMAIN_ACCESS_FIELD;
+  $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
+  $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
 }
 
 /**

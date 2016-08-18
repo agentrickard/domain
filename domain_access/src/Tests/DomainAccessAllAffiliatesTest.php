@@ -4,7 +4,6 @@ namespace Drupal\domain_access\Tests;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Database;
-use Drupal\domain\Constants;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -100,7 +99,7 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
     // Check that all affiliates is set.
-    $this->assertTrue(!empty($node->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value), 'Node assigned to all affiliates.');
+    $this->assertTrue(!empty($node->get(DOMAIN_ACCESS_ALL_FIELD)->value), 'Node assigned to all affiliates.');
   }
 
 }

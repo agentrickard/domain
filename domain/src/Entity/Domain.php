@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\domain\Constants;
 use Drupal\domain\DomainInterface;
 
 /**
@@ -464,7 +463,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMatchType($match_type = Constants::DOMAIN_MATCH_EXACT) {
+  public function setMatchType($match_type = DOMAIN_MATCH_EXACT) {
     $this->matchType = $match_type;
   }
 

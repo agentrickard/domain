@@ -4,7 +4,6 @@ namespace Drupal\domain_access\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain\Constants;
 
 /**
  * Removes a user from all affiliates.
@@ -21,7 +20,7 @@ class DomainAccessEditNone extends ActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    $entity->set(Constants::DOMAIN_ACCESS_ALL_FIELD, 0);
+    $entity->set(DOMAIN_ACCESS_ALL_FIELD, 0);
     $entity->save();
   }
 

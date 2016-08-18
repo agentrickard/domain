@@ -3,7 +3,6 @@
 namespace Drupal\domain_access\Tests;
 
 use Drupal\Core\Database\Database;
-use Drupal\domain\Constants;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -35,8 +34,8 @@ class DomainAccessRecordsTest extends DomainTestBase {
     // Create an article node.
     $node1 = $this->drupalCreateNode(array(
       'type' => 'article',
-      Constants::DOMAIN_ACCESS_FIELD => array($domain->id()),
-      Constants::DOMAIN_ACCESS_ALL_FIELD => 0,
+      DOMAIN_ACCESS_FIELD => array($domain->id()),
+      DOMAIN_ACCESS_ALL_FIELD => 0,
     ));
     $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
 
@@ -56,8 +55,8 @@ class DomainAccessRecordsTest extends DomainTestBase {
     // Create another article node.
     $node2 = $this->drupalCreateNode(array(
       'type' => 'article',
-      Constants::DOMAIN_ACCESS_FIELD => array($domain->id()),
-      Constants::DOMAIN_ACCESS_ALL_FIELD => 1,
+      DOMAIN_ACCESS_FIELD => array($domain->id()),
+      DOMAIN_ACCESS_ALL_FIELD => 1,
     ));
     $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
     // Check to see if grants added by domain_node_access_records made it in.

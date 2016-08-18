@@ -4,7 +4,6 @@ namespace Drupal\domain_access;
 
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain\Constants;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -41,7 +40,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * @inheritdoc
    */
-  public function getAccessValues(EntityInterface $entity, $field_name = Constants::DOMAIN_ACCESS_FIELD) {
+  public function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
     // @TODO: static cache.
     $list = array();
     // @TODO In tests, $entity is returning NULL.
@@ -67,7 +66,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * @inheritdoc
    */
   public function getAllValue(EntityInterface $entity) {
-    return $entity->get(Constants::DOMAIN_ACCESS_ALL_FIELD)->value;
+    return $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value;
   }
 
   /**
