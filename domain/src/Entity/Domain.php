@@ -463,7 +463,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMatchType($match_type = DomainNegotiator::DOMAIN_MATCH_EXACT) {
+  public function setMatchType($match_type = \Drupal\domain\DomainNegotiator::DOMAIN_MATCH_EXACT) {
     $this->matchType = $match_type;
   }
 
