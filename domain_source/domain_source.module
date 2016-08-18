@@ -8,6 +8,11 @@
 use Drupal\Core\Entity\EntityInterface;
 
 /**
+ * Defines the name of the source domain field.
+ */
+define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
+
+/**
  * Creates our fields for an entity bundle.
  *
  * @param string $entity_type
