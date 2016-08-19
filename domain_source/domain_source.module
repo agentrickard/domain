@@ -11,7 +11,7 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 /**
  * Defines the name of the source domain field.
  */
-define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
+const DOMAIN_SOURCE_FIELD = 'field_domain_source';
 
 /**
  * Creates our fields for an entity bundle.
