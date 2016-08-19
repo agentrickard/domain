@@ -97,9 +97,11 @@ function domain_source_get(EntityInterface $entity) {
  */
 function domain_source_form_alter(&$form, &$form_state, $form_id) {
   $object = $form_state->getFormObject();
-  if (!empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity() && isset($form[DOMAIN_SOURCE_FIELD])) {
+  // Set up our TrustedRedirect handler for form saves.
+  if (isset($form[DOMAIN_SOURCE_FIELD]) && !empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity()) {
     foreach ($form['actions'] as $key => $element) {
-      if (isset($element['#type']) && $element['#type'] == 'submit') {
+      // Redirect submit handlers, but not the preview button.
+      if ($key != 'preview' && isset($element['#type']) && $element['#type'] == 'submit') {
         $form['actions'][$key]['#submit'][] = 'domain_source_form_submit';
       }
     }
