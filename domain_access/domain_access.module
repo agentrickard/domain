@@ -595,3 +595,41 @@ function domain_access_domain_delete(EntityInterface $entity) {
     $action->delete();
   }
 }
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Find forms that contain the domain access field and allow those to handle
+ * default values properly. Note that here we just care if the form saves an
+ * entity. We then pass that entity to a helper function.
+ *
+ * @see domain_access_default_form_values().
+ */
+function domain_access_form_alter(&$form, &$form_state, $form_id) {
+  if ($object = $form_state->getFormObject() && !empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity()) {
+    domain_access_default_form_values($form, $form_state, $entity);
+  }
+}
+
+/**
+ * Defines default values for domain access field.
+ *
+ * This function is a workaround for a core bug. When the domain access field
+ * is not accessible to some users, the existing values are not preserved.
+ *
+ * @see domain_access_entity_field_access().
+ */
+function domain_access_default_form_values(&$form, &$form_state, $entity) {
+  // Set domain access default value when the user does not have access
+  // to edit the field. This seems to work fine for all affiliates, which
+  // suggests a core bug in entity reference handling.
+  if (!$entity->isNew() &&
+      isset($form['field_domain_access']) &&
+      !$form['field_domain_access']['#access'] &&
+      empty($form['field_domain_access']['widget']['#default_value'])
+     ) {
+    // Set the default values correctly.
+    $values = \Drupal::service('domain_access.manager')->getAccessValues($entity);
+    $form['field_domain_access']['widget']['#default_value'] = array_keys($values);
+  }
+}
