@@ -17,7 +17,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_source', 'field', 'field_ui');
+  public static $modules = array('domain', 'domain_source', 'field', 'field_ui', 'menu_ui', 'block');
 
   /**
    * {@inheritdoc}
@@ -67,6 +67,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
       'administer node fields',
       'administer node display',
       'administer domains',
+      'administer menu',
     ));
     $this->drupalLogin($this->admin_user);
 
@@ -100,7 +101,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
 
     // Try to post a node, assigned to the second domain.
     $edit['title[0][value]'] = 'Test node';
-    $edit["field_domain_source"] = $two;
+    $edit['field_domain_source'] = $two;
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     $this->assertResponse(200);
     $node = $node_storage->load(1);
@@ -112,7 +113,6 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $url = $node->toUrl()->toString();
     $expected_url = $two_path . 'node/1';
     $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
-
 
     // Try to post a node, assigned to no domain.
     $edit['title[0][value]'] = 'Test node';
@@ -128,6 +128,33 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $url = $node->toUrl()->toString();
     $expected_url = base_path() . 'node/2';
     $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
+
+    // Place the menu block.
+    $this->drupalPlaceBlock('system_menu_block:main');
+
+    // Enable main menu as available menu.
+    $edit = array(
+      'menu_options[main]' => 1,
+      'menu_parent' => 'main:',
+    );
+    $this->drupalPostForm('admin/structure/types/manage/article', $edit, t('Save content type'));
+
+    // Create a third node that is assigned to a menu.
+    $edit = array(
+      'title[0][value]' => 'Node 3',
+      'menu[enabled]' => 1,
+      'menu[title]' => 'Test preview',
+      'field_domain_source' => $two,
+    );
+    $this->drupalPostForm('node/add/article', $edit, 'Save');
+    // Test the URL against expectations, and the rendered menu link.
+    $node = $node_storage->load(3);
+    $url = $node->toUrl()->toString();
+    $expected_url = $two_path . 'node/3';
+    $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
+    // Load the page with a menu and check that link.
+    $this->drupalGet('node/3');
+    $this->assertRaw('href="' . $url, 'Menu link rewritten correctly.');
   }
 
 }

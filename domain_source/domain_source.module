@@ -6,11 +6,12 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\TrustedRedirectResponse;
 
 /**
  * Defines the name of the source domain field.
  */
-define('DOMAIN_SOURCE_FIELD', 'field_domain_source');
+const DOMAIN_SOURCE_FIELD = 'field_domain_source';
 
 /**
  * Creates our fields for an entity bundle.
@@ -86,4 +87,43 @@ function domain_source_get(EntityInterface $entity) {
     }
   }
   return $source;
+}
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Find forms that contain the domain source field and allow those to handle
+ * redirects properly.
+ */
+function domain_source_form_alter(&$form, &$form_state, $form_id) {
+  $object = $form_state->getFormObject();
+  // Set up our TrustedRedirect handler for form saves.
+  if (isset($form[DOMAIN_SOURCE_FIELD]) && !empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity()) {
+    foreach ($form['actions'] as $key => $element) {
+      // Redirect submit handlers, but not the preview button.
+      if ($key != 'preview' && isset($element['#type']) && $element['#type'] == 'submit') {
+        $form['actions'][$key]['#submit'][] = 'domain_source_form_submit';
+      }
+    }
+  }
+}
+
+/**
+ * Redirect form submissions to other domains.
+ */
+function domain_source_form_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  // Ensure that we have saved an entity.
+  if ($object = $form_state->getFormObject()) {
+    $url = $object->getEntity()->url();
+  }
+  // Validate that the URL will be considered "external" by Drupal, which means
+  // that a scheme value will be present.
+  if (!empty($url)) {
+    $uri_parts = parse_url($url);
+    // If necessary, issue a TrustedRedirectResponse to the new URL.
+    if (!empty($uri_parts['scheme'])) {
+      $response = new TrustedRedirectResponse($url);
+      $form_state->setResponse($response);
+    }
+  }
 }
