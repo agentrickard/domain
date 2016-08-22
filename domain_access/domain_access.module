@@ -606,7 +606,7 @@ function domain_access_domain_delete(EntityInterface $entity) {
  * @see domain_access_default_form_values().
  */
 function domain_access_form_alter(&$form, &$form_state, $form_id) {
-  if ($object = $form_state->getFormObject() && !empty($object) && $entity = $object->getEntity()) {
+  if ($object = $form_state->getFormObject() && !empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity()) {
     domain_access_default_form_values($form, $form_state, $entity);
   }
 }
