@@ -29,7 +29,8 @@ function hook_domain_load(array $domains) {
  * numeric constant indicating the type of match derived by the caller or by
  * earlier returns of this hook (such as domain_alias_request_alter()).
  * Use this value to determine if the request needs to be overridden. Valid
- * types are DOMAIN_MATCH_NONE, DOMAIN_MATCH_EXACT, DOMAIN_MATCH_ALIAS.
+ * types are DomainNegotiator::DOMAIN_MATCH_NONE,
+ * DomainNegotiator::DOMAIN_MATCH_EXACT, DomainNegotiator::DOMAIN_MATCH_ALIAS.
  *
  * To issue a redirect, as in the case of Domain Alias, set a redirect
  * property to a valid response code (301 or 302).
@@ -39,7 +40,7 @@ function hook_domain_load(array $domains) {
  */
 function hook_domain_request_alter(\Drupal\domain\DomainInterface &$domain) {
   // Add a special case to the example domain.
-  if ($domain->getMatchType() == DOMAIN_MATCH_EXACT && $domain->id() == 'example_com') {
+  if ($domain->getMatchType() == \Drupal\domain\DomainNegotiator::DOMAIN_MATCH_EXACT && $domain->id() == 'example_com') {
     // Do something here.
     $domain->addProperty('foo', 'Bar');
   }

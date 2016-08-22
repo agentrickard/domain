@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
-
 /**
  * Removes a node from a domain.
  *

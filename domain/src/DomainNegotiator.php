@@ -11,6 +11,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class DomainNegotiator implements DomainNegotiatorInterface {
 
   /**
+   * Defines record matching types when dealing with request alteration.
+   *
+   * @see hook_domain_request_alter().
+   */
+  const DOMAIN_MATCH_NONE = 0;
+  const DOMAIN_MATCH_EXACT = 1;
+  const DOMAIN_MATCH_ALIAS = 2;
+
+  /**
    * The HTTP_HOST value of the request.
    */
   protected $httpHost;
@@ -69,7 +78,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // Try to load a direct match.
     if ($domain = $this->domainLoader->loadByHostname($httpHost)) {
       // If the load worked, set an exact match flag for the hook.
-      $domain->setMatchType(DOMAIN_MATCH_EXACT);
+      $domain->setMatchType(self::DOMAIN_MATCH_EXACT);
     }
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
@@ -77,7 +86,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $values = array('hostname' => $httpHost);
       /** @var \Drupal\domain\Entity\DomainInterface $domain */
       $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
-      $domain->setMatchType(DOMAIN_MATCH_NONE);
+      $domain->setMatchType(self::DOMAIN_MATCH_NONE);
     }
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
@@ -90,7 +99,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // Fallback to default domain if no match.
     elseif ($domain = $this->domainLoader->loadDefaultDomain()) {
       $this->moduleHandler->alter('domain_request', $domain);
-      $domain->setMatchType(DOMAIN_MATCH_NONE);
+      $domain->setMatchType(self::DOMAIN_MATCH_NONE);
       if (!empty($domain->id())) {
         $this->setActiveDomain($domain);
       }
