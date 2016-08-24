@@ -81,7 +81,7 @@ marked with [x] are considered complete.
 - [ ] Implement theme functions or twig templates where proper
 - [ ] Tests for all module hooks
 - [ ] Proper tests for domain record validation
-- [ ] Check test logic in testDomainAliasNegotiator()
+- [x] Check test logic in testDomainAliasNegotiator()
 - [ ] Test that sort logic in DomainAliasLoader matches what is documented
 - [ ] Error handling in DomainAliasForm
 - [ ] Error checking in DomainAliasController
