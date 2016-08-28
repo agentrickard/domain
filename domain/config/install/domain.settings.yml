@@ -1,2 +1,3 @@
 allow_non_ascii: false
 www_prefix: false
+login_paths: '/user/login'

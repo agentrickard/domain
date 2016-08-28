@@ -26,14 +26,34 @@ class DomainSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
+    allow_non_ascii: false
+    www_prefix: false
+    login_paths: '/user/login'
+    css_classes: ''
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('domain.settings');
-    $form['node_advanced_tab'] = array(
+    $form['allow_non_ascii'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Move Domain Access fields to advanced node settings.'),
-      '#default_value' => $config->get('node_advanced_tab'),
-      '#description' => $this->t('When checked the Domain Access fields will be shown as a tab in the advanced settings on node edit form. However, if you have placed the fields in a field group already, they will not be moved.'),
+      '#title' => $this->t('Allow non-ASCII characters in domains and aliases.'),
+      '#default_value' => $config->get('allow_non_ascii'),
+      '#description' => $this->t('Domains may be registered with international character sets. Note that not all DNS server respect non-ascii characters.'),
+    );
+    $form['www_prefix'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Ignore www prefix when negotiating domains'),
+      '#default_value' => $config->get('www_prefix'),
+      '#description' => $this->t('Domain negotiation will ignore any www prefixes for all requests.'),
+    );
+    $form['login_paths'] = array(
+      '#type' => 'textarea',
+      '#rows' => 5,
+      '#columns' => 40,
+      '#title' => $this->t('Paths that should be accessible for inactive domains'),
+      '#default_value' => $config->get('login_paths'),
+      '#description' => $this->t('Inactive domains are only accessible to users with permission.
+        Enter any paths that should be accessible, one per line. Normally, only the
+        login path will be allowed.'),
     );
     return parent::buildForm($form, $form_state);
   }
@@ -42,12 +62,24 @@ class DomainSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('domain.settings')
-      ->set('node_advanced_tab', $form_state->getValue('node_advanced_tab'))
-      ->save();
-
+    foreach ($this->settingsKeys() as $key) {
+      $this->config('domain.settings')
+        ->set($key, $form_state->getValue($key));
+    }
+    $this->config('domain.settings')->save();
     parent::submitForm($form, $form_state);
   }
 
+  /**
+   * Returns an array of settings keys.
+   */
+  public function settingsKeys() {
+    return [
+      'allow_non_ascii',
+      'www_prefix',
+      'login_paths',
+      'css_classes',
+    ];
+  }
 
 }
