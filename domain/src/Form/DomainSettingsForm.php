@@ -1,34 +1,34 @@
 <?php
 /**
  * @file
- * Settings form for Domain Access.
+ * Settings form for Domain module.
  */
 
-namespace Drupal\domain_access\Form;
+namespace Drupal\domain\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
-class SettingsForm extends ConfigFormBase {
+class DomainSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'domain_access_settings';
+    return 'domain_settings';
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['domain_access.settings'];
+    return ['domain.settings'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('domain_access.settings');
+    $config = $this->config('domain.settings');
     $form['node_advanced_tab'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Move Domain Access fields to advanced node settings.'),
@@ -42,7 +42,7 @@ class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('domain_access.settings')
+    $this->config('domain.settings')
       ->set('node_advanced_tab', $form_state->getValue('node_advanced_tab'))
       ->save();
 

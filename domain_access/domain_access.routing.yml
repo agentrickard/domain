@@ -2,6 +2,6 @@ domain_access.admin:
   path: '/admin/config/domain/domain_access'
   defaults:
     _title: 'Domain Access settings'
-    _form: '\Drupal\domain_access\Form\SettingsForm'
+    _form: '\Drupal\domain_access\Form\DomainAccessSettingsForm'
   requirements:
     _permission: 'administer domains'
