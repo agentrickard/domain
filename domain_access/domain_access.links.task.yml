@@ -1,6 +1,6 @@
 domain_access.admin:
   title: Domain Access settings
-  route_name: domain_config.admin
+  route_name: domain_access.admin
   base_route: domain.admin
 
 

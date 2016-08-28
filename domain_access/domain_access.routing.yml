@@ -1,4 +1,4 @@
-domain_config.admin:
+domain_access.admin:
   path: '/admin/config/domain/domain_access'
   defaults:
     _title: 'Domain Access settings'
