@@ -41,9 +41,11 @@ class DomainAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function checkPath($path) {
-    $list = explode('/', $path);
-    // @TODO: This list may need to be configurable.
-    if (current($list) == 'user') {
+    $allowed_paths = \Drupal::config('domain.settings')->get('login_paths');
+    if (!empty($allowed_paths)) {
+      $paths = preg_split("(\r\n?|\n)", $allowed_paths);
+    }
+    if (in_array($path, $paths)) {
       return FALSE;
     }
     return TRUE;

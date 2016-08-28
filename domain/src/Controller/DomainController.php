@@ -2,7 +2,7 @@
 
 namespace Drupal\domain\Controller;
 
-use Drupal\core\Url;
+use Drupal\Core\Url;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
