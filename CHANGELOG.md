@@ -72,7 +72,7 @@ marked with [x] are considered complete.
   - [ ] Allow configuration of access-exempt paths for inactive domains
   - [ ] www prefix handling
   - [ ] Add domain-specific CSS classes
-  - [ ] Path matching for URL rewrites?
+  - [x] Path matching for URL rewrites?
   - [ ] Allow non-ascii characters in domains
 - [ ] Recreate the Domain Nav module
 - [ ] Support Tour module
