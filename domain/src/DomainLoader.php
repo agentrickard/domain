@@ -95,6 +95,11 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByHostname($hostname) {
+    // Strip www. off the front?
+    $www = \Drupal::config('domain.settings')->get('www_prefix');
+    if (!empty($www) && substr($hostname, 0, 4) == 'www.') {
+      $hostname = substr($hostname, 4);
+    }
     $result = $this->getStorage()->loadByProperties(array('hostname' => $hostname));
     if (empty($result)) {
       return NULL;

@@ -150,7 +150,13 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     else {
       $httpHost = $_SERVER['HTTP_HOST'];
     }
-    return !empty($httpHost) ? $httpHost : 'localhost';
+    $hostname = !empty($httpHost) ? $httpHost : 'localhost';
+    // Strip www. off the front?
+    $www = \Drupal::config('domain.settings')->get('www_prefix');
+    if (!empty($www) && substr($hostname, 0, 4) == 'www.') {
+      $hostname = substr($hostname, 4);
+    }
+    return $hostname;
   }
 
   /**
