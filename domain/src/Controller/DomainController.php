@@ -69,8 +69,8 @@ class DomainController {
     }
 
     // Return to the invoking page.
-    $url = Url::fromRoute('domain.domain', array(), array('absolute' => TRUE));
-    return new RedirectResponse($url, 302);
+    $url = Url::fromRoute('domain.admin', array(), array('absolute' => TRUE));
+    return new RedirectResponse($url->toString(), 302);
   }
 
 }
