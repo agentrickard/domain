@@ -7,11 +7,11 @@ domain.admin:
   requirements:
     _permission: 'administer domains'
 
-domain_access.admin:
+domain.settings:
   path: '/admin/config/domain/settings'
   defaults:
     _title: 'Domain settings'
-    _form: '\Drupal\domain\Form\SettingsForm'
+    _form: '\Drupal\domain\Form\DomainSettingsForm'
   requirements:
     _permission: 'administer domains'
 

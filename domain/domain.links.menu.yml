@@ -10,3 +10,9 @@ domain.admin_list:
   parent: domain.admin
   description: 'Manage the domain records used by the site.'
   weight: -10
+domain.settings:
+  title: Domain settings
+  route_name: domain.settings
+  parent: domain.admin
+  description: 'Domain module settings'
+  weight: 0

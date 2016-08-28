@@ -1,6 +1,8 @@
 domain.admin:
-  title: Domain Records
+  title: Domain records
   route_name: domain.admin
   base_route: domain.admin
-
-
+domain.settings:
+  title: Domain settings
+  route_name: domain.settings
+  base_route: domain.admin
