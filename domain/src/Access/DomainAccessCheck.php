@@ -4,6 +4,7 @@ namespace Drupal\domain\Access;
 
 use Drupal\Core\Access\AccessCheckInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Symfony\Component\Routing\Route;
@@ -21,13 +22,23 @@ class DomainAccessCheck implements AccessCheckInterface {
   protected $domainNegotiator;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Constructs the object.
    *
    * @param DomainNegotiatorInterface $negotiator
    *   The domain negotiation service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator) {
+  public function __construct(DomainNegotiatorInterface $negotiator, ConfigFactoryInterface $config_factory) {
     $this->domainNegotiator = $negotiator;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -41,7 +52,7 @@ class DomainAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function checkPath($path) {
-    $allowed_paths = \Drupal::config('domain.settings')->get('login_paths');
+    $allowed_paths = $this->configFactory->get('domain.settings')->get('login_paths');
     if (!empty($allowed_paths)) {
       $paths = preg_split("(\r\n?|\n)", $allowed_paths);
     }

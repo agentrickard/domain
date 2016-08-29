@@ -2,6 +2,7 @@
 
 namespace Drupal\domain;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -54,6 +55,13 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   protected $moduleHandler;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Constructs a DomainNegotiator object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -62,11 +70,14 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    *   The module handler.
    * @param \Drupal\domain\DomainLoaderInterface $loader
    *   The Domain loader object.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
    */
-  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainLoaderInterface $loader) {
+  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainLoaderInterface $loader, ConfigFactoryInterface $config_factory) {
     $this->requestStack = $requestStack;
     $this->moduleHandler = $module_handler;
     $this->domainLoader = $loader;
+    $this->configFactory = $config_factory;
   }
 
   /**
@@ -151,12 +162,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $httpHost = $_SERVER['HTTP_HOST'];
     }
     $hostname = !empty($httpHost) ? $httpHost : 'localhost';
-    // Strip www. off the front?
-    $www = \Drupal::config('domain.settings')->get('www_prefix');
-    if (!empty($www) && substr($hostname, 0, 4) == 'www.') {
-      $hostname = substr($hostname, 4);
-    }
-    return $hostname;
+    return $this->domainLoader->prepareHostname($hostname);
   }
 
   /**
