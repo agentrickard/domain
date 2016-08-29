@@ -26,10 +26,6 @@ class DomainSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
-    allow_non_ascii: false
-    www_prefix: false
-    login_paths: '/user/login'
-    css_classes: ''
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('domain.settings');
@@ -78,7 +74,6 @@ class DomainSettingsForm extends ConfigFormBase {
       'allow_non_ascii',
       'www_prefix',
       'login_paths',
-      'css_classes',
     ];
   }
 
