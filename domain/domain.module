@@ -66,3 +66,33 @@ function domain_help($route_name, RouteMatchInterface $route_match) {
       return $output;
   }
 }
+
+/**
+ * Helper function to check if use is assigned to particular domain.
+ *
+ * @param $id
+ *   User id.
+ *
+ * @param \Drupal\domain\DomainInterface $domain
+ *   Domain object.
+ *
+ * @return bool
+ *   Boolean if user is assigned to requested domain
+ */
+function domain_user_has_access($id, DomainInterface $domain) {
+  $user = \Drupal\user\Entity\User::load($id);
+
+  if (\Drupal::moduleHandler()->moduleExists('domain_access')) {
+    $domain_access = $user->field_domain_access->getValue();
+
+    foreach ($domain_access as $value) {
+      if ($domain->id() == $value['target_id']) {
+        return TRUE;
+      }
+    }
+  } else {
+    // Domain access is not enabled. No need to check for assigned domain.
+    return TRUE;
+  }
+  return FALSE;
+}

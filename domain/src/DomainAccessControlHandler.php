@@ -28,12 +28,10 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
     if ($operation == 'create' && $account->hasPermission('create domains')) {
       return AccessResult::allowed();
     }
-    // @TODO: assign users to domains and check.
-    if ($operation == 'update' && $account->hasPermission('edit assigned domains')) {
+    if ($operation == 'update' && $account->hasPermission('edit assigned domains') && domain_user_has_access($account->id(), $entity)) {
       return AccessResult::allowed();
     }
-    // @TODO: assign users to domains and check.
-    if ($operation == 'delete' && $account->hasPermission('delete assigned domains')) {
+    if ($operation == 'delete' && $account->hasPermission('delete assigned domains') && domain_user_has_access($account->id(), $entity)) {
       return AccessResult::allowed();
     }
     return AccessResult::forbidden();
