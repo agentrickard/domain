@@ -6,6 +6,7 @@ use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\domain\DomainAccessControlHandler;
 
 /**
  * User interface for the domain overview screen.
@@ -28,37 +29,43 @@ class DomainListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function getOperations(EntityInterface $entity) {
+    $account = \Drupal::currentUser();
     $operations = parent::getOperations($entity);
     $destination = \Drupal::destination()->getAsArray();
     $default = $entity->isDefault();
     $id = $entity->id();
 
-    // @TODO: permission checks.
-    if ($entity->status() && !$default) {
-      $operations['disable'] = array(
-        'title' => $this->t('Disable'),
-        'url' => Url::fromRoute('domain.inline_action', array('op' => 'disable', 'domain' => $id)),
-        'weight' => 50,
-      );
-    }
-    elseif (!$default) {
-      $operations['enable'] = array(
-        'title' => $this->t('Enable'),
-        'url' => Url::fromRoute('domain.inline_action', array('op' => 'enable', 'domain' => $id)),
-        'weight' => 40,
-      );
-    }
-    if (!$default) {
-      $operations['default'] = array(
-        'title' => $this->t('Make default'),
-        'url' => Url::fromRoute('domain.inline_action', array('op' => 'default', 'domain' => $id)),
-        'weight' => 30,
-      );
-      $operations['delete'] = array(
-        'title' => $this->t('Delete'),
-        'url' => Url::fromRoute('entity.domain.delete_form', array('domain' => $id)),
-        'weight' => 20,
-      );
+    if ($account->hasPermission('edit assigned domains') && domain_user_has_access($account->id(), $entity)) {
+      if ($entity->status() && !$default) {
+        $operations['disable'] = array(
+          'title' => $this->t('Disable'),
+          'url' => Url::fromRoute('domain.inline_action', array(
+            'op' => 'disable',
+            'domain' => $id
+          )),
+          'weight' => 50,
+        );
+      }
+      elseif (!$default) {
+        $operations['enable'] = array(
+          'title' => $this->t('Enable'),
+          'url' => Url::fromRoute('domain.inline_action', array(
+            'op' => 'enable',
+            'domain' => $id
+          )),
+          'weight' => 40,
+        );
+      }
+      if (!$default) {
+        $operations['default'] = array(
+          'title' => $this->t('Make default'),
+          'url' => Url::fromRoute('domain.inline_action', array(
+            'op' => 'default',
+            'domain' => $id
+          )),
+          'weight' => 30,
+        );
+      }
     }
     // @TODO: inject this service?
     $operations += \Drupal::moduleHandler()->invokeAll('domain_operations', array($entity));

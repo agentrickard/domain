@@ -5,7 +5,7 @@ domain.admin:
     _title: 'Domains'
     _title_context: 'With modules'
   requirements:
-    _permission: 'administer domains'
+    _permission: 'access domain list'
 
 domain.settings:
   path: '/admin/config/domain/settings'

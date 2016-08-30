@@ -1,5 +1,7 @@
 administer domains:
   title: 'Administer all domain records'
+access domain list:
+  title: 'Access domain list page'
 access inactive domains:
   title: 'Access inactive domains'
 create domains:
