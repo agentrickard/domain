@@ -1,5 +1,8 @@
-entity.domain.edit_form:
-  title: 'Edit'
-  route_name: entity.domain.edit_form
-  parent_id: domain.admin
-
+domain.admin:
+  title: Domain records
+  route_name: domain.admin
+  base_route: domain.admin
+domain.settings:
+  title: Domain settings
+  route_name: domain.settings
+  base_route: domain.admin

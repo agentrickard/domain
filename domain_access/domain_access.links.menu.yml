@@ -1,0 +1,6 @@
+domain_access.settings:
+  title: Domain Access settings
+  route_name: domain_access.settings
+  parent: domain.admin
+  description: 'Domain Access settings'
+  weight: 10

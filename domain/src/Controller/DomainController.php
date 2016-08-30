@@ -2,7 +2,7 @@
 
 namespace Drupal\domain\Controller;
 
-use Drupal\core\Url;
+use Drupal\Core\Url;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -69,8 +69,8 @@ class DomainController {
     }
 
     // Return to the invoking page.
-    $url = Url::fromRoute('domain.domain', array(), array('absolute' => TRUE));
-    return new RedirectResponse($url, 302);
+    $url = Url::fromRoute('domain.admin', array(), array('absolute' => TRUE));
+    return new RedirectResponse($url->toString(), 302);
   }
 
 }

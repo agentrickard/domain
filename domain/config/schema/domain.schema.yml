@@ -9,6 +9,9 @@ domain.settings:
     www_prefix:
       type: boolean
       label: 'Ignore www prefix when negotiating domains'
+    login_paths:
+      type: text
+      label: 'Paths that should be accessible for inactive domains'
 
 domain.record.*:
   type: config_entity

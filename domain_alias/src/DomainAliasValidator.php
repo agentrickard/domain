@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_alias;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -10,6 +11,25 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 class DomainAliasValidator implements DomainAliasValidatorInterface {
 
   use StringTranslationTrait;
+
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Constructs a DomainLoader object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   *
+   * @see getStorage()
+   */
+  public function __construct(ConfigFactoryInterface $config_factory) {
+    $this->configFactory = $config_factory;
+  }
 
   /**
    * Validates the rules for a domain alias.
@@ -41,7 +61,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
     }
     // 3) Check that the alias doesn't contain any invalid characters.
     // Check for valid characters, unless using non-ASCII domains.
-    $non_ascii = \Drupal::config('domain.settings')->get('allow_non_ascii');
+    $non_ascii = $this->configFactory->get('domain.settings')->get('allow_non_ascii');
     if (!$non_ascii) {
       $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $pattern);
       if ($check == 0) {

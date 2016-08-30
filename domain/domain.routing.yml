@@ -7,6 +7,14 @@ domain.admin:
   requirements:
     _permission: 'administer domains'
 
+domain.settings:
+  path: '/admin/config/domain/settings'
+  defaults:
+    _title: 'Domain settings'
+    _form: '\Drupal\domain\Form\DomainSettingsForm'
+  requirements:
+    _permission: 'administer domains'
+
 entity.domain.add:
   path: '/admin/config/domain/add'
   defaults:

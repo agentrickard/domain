@@ -3,7 +3,7 @@ services:
     class: Drupal\domain\Access\DomainAccessCheck
     tags:
       - { name: access_check }
-    arguments: ['@domain.negotiator']
+    arguments: ['@domain.negotiator', '@config.factory']
   domain.current_domain_context:
     class: Drupal\domain\ContextProvider\CurrentDomainContext
     arguments: ['@domain.negotiator']
@@ -18,12 +18,12 @@ services:
     class: Drupal\domain\DomainLoader
     tags:
       - { name: persist }
-    arguments: ['@config.typed']
+    arguments: ['@config.typed', '@config.factory']
   domain.negotiator:
     class: Drupal\domain\DomainNegotiator
     tags:
       - { name: persist }
-    arguments: ['@request_stack', '@module_handler', '@domain.loader']
+    arguments: ['@request_stack', '@module_handler', '@domain.loader', '@config.factory']
   domain.subscriber:
     class: Drupal\domain\EventSubscriber\DomainSubscriber
     tags:
@@ -33,4 +33,4 @@ services:
     class: Drupal\domain\DomainValidator
     tags:
       - { name: persist }
-    arguments: ['@module_handler']
+    arguments: ['@module_handler', '@config.factory', '@http_client']

@@ -2,9 +2,11 @@
 
 namespace Drupal\domain;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Unicode;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 
 /**
@@ -29,15 +31,27 @@ class DomainValidator implements DomainValidatorInterface {
   protected $httpClient;
 
   /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
    * Constructs a DomainNegotiator object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory.
+   * @param \GuzzleHttp\ClientInterface $http_client
+   *   A Guzzle client object.
    */
-  public function __construct(ModuleHandlerInterface $module_handler) {
+  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client) {
     $this->moduleHandler = $module_handler;
+    $this->configFactory = $config_factory;
     // @TODO: Move to a proper service?
-    $this->httpClient = \Drupal::httpClient();
+    $this->httpClient = $http_client;
   }
 
   /**
@@ -76,7 +90,7 @@ class DomainValidator implements DomainValidatorInterface {
       $error_list[] = $this->t('The domain must not end with a dot (.)');
     }
     // Check for valid characters, unless using non-ASCII domains.
-    $non_ascii = \Drupal::config('domain.settings')->get('allow_non_ascii');
+    $non_ascii = $this->configFactory->get('domain.settings')->get('allow_non_ascii');
     if (!$non_ascii) {
       $pattern = '/^[a-z0-9\.\-:]*$/i';
       if (!preg_match($pattern, $hostname)) {
@@ -91,7 +105,7 @@ class DomainValidator implements DomainValidatorInterface {
     // enabled under global domain settings.
     // Note that www prefix handling must be set explicitly in the UI.
     // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
-    if (\Drupal::config('domain.settings')->get('www_prefix') && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
+    if ($this->configFactory->get('domain.settings')->get('www_prefix') && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
       $error_list[] = $this->t('WWW prefix handling: Domains must be registered without the www. prefix.');
     }
 

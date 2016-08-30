@@ -12,9 +12,20 @@ use Drupal\Core\Session\AccountInterface;
 class DomainInactiveTest extends DomainTestBase {
 
   /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('domain', 'node', 'views');
+
+  /**
    * Test inactive domain.
    */
   public function testInactiveDomain() {
+    // Configure 'node' as front page, else the test loads the login form.
+    $site_config = $this->config('system.site');
+    $site_config->set('page.front', '/node')->save();
+
     // Create three new domains programmatically.
     $this->domainCreateTestDomains(3);
     $domains = \Drupal::service('domain.loader')->loadMultiple();
@@ -33,6 +44,17 @@ class DomainInactiveTest extends DomainTestBase {
 
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
     $this->assertTrue($default->getPath() == $this->getUrl(), 'Redirected an inactive domain to the default domain.');
+
+    // Check to see if the user can login.
+    $url = $domain->getPath() . 'user/login';
+    $this->drupalGet($url);
+    $this->assertResponse(200, 'Request to login on inactive domain allowed.');
+    // Check to see if the user can reset password.
+    $url = $domain->getPath() . 'user/password';
+    $this->drupalGet($url);
+    $this->assertResponse(200, 'Request to reset password on inactive domain allowed.');
+
+    // @TODO: configure more paths and test.
 
     // Try to access with the proper permission.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));

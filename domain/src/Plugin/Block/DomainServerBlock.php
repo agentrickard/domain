@@ -59,6 +59,11 @@ class DomainServerBlock extends DomainBlockBase {
       $this->t('Domain match'),
       $match,
     );
+    $www = \Drupal::config('domain.settings')->get('www_prefix');
+    $rows[] = array(
+      $this->t('Strip www prefix'),
+      !empty($www) ? $this->t('On') : $this->t('Off'),
+    );
     $list = $domain->toArray();
     ksort($list);
     foreach ($list as $key => $value) {
