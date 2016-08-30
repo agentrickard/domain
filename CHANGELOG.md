@@ -69,11 +69,11 @@ marked with [x] are considered complete.
 - [ ] Domain token support
 - [ ] Test cron handling
 - [ ] Module configurations
-  - [ ] Allow configuration of access-exempt paths for inactive domains
-  - [ ] www prefix handling
+  - [x] Allow configuration of access-exempt paths for inactive domains
+  - [x] www prefix handling
   - [ ] Add domain-specific CSS classes
   - [x] Path matching for URL rewrites?
-  - [ ] Allow non-ascii characters in domains
+  - [x] Allow non-ascii characters in domains
 - [ ] Recreate the Domain Nav module
 - [ ] Support Tour module
 - [ ] Allow selective access to domain record editing
