@@ -6,8 +6,10 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\views\Plugin\views\PluginBase;
+use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Drupal\domain\DomainLoader;
+use Drupal\domain\DomainNegotiator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -27,11 +29,18 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
   protected $usesOptions = TRUE;
 
   /**
-   * The role storage.
+   * Domain storage.
    *
    * @var \Drupal\domain\DomainLoader
    */
   protected $domainLoader;
+
+  /**
+   * Domain negotiation.
+   *
+   * @var \Drupal\domain\DomainNegotiator
+   */
+  protected $domainNegotiator;
 
   /**
    * Constructs a Role object.
@@ -42,10 +51,15 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param DomainLoader $domain_loader
+   *   The domain storage loader.
+   * @param DomainNegotiator $domain_negotiator
+   *   The domain negotiator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainLoader $domain_loader) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainLoader $domain_loader, DomainNegotiator $domain_negotiator) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->domainLoader = $domain_loader;
+    $this->domainNegotiator = $domain_negotiator;
   }
 
   /**
@@ -56,7 +70,8 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('domain.loader')
+      $container->get('domain.loader'),
+      $container->get('domain.negotiator')
     );
   }
 
@@ -64,7 +79,9 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    return TRUE;
+    $id = $this->domainNegotiator->getActiveId();
+    $options = array_filter($this->options['domain']);
+    return isset($options[$id]);
   }
 
   /**
@@ -85,7 +102,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
       return $this->t('Multiple domains');
     }
     else {
-      $domains = user_role_names();
+      $domains = $this->domainLoader->loadOptionsList();
       $domain = reset($this->options['domain']);
       return $domains[$domain];
     }
@@ -105,7 +122,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
       '#type' => 'checkboxes',
       '#title' => $this->t('Domain'),
       '#default_value' => $this->options['domain'],
-      '#options' => array_map('\Drupal\Component\Utility\Html::escape', user_role_names()),
+      '#options' => $this->domainLoader->loadOptionsList(),
       '#description' => $this->t('Only the checked domain(s) will be able to access this display.'),
     );
   }
@@ -128,7 +145,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
     $dependencies = parent::calculateDependencies();
 
     foreach (array_keys($this->options['domain']) as $id) {
-      if ($domain = $this->domainStorage->load($id)) {
+      if ($domain = $this->domainLoader->load($id)) {
         $dependencies[$domain->getConfigDependencyKey()][] = $domain->getConfigDependencyName();
       }
     }
