@@ -52,11 +52,11 @@ class DomainAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function checkPath($path) {
-    $allowed_paths = $this->configFactory->get('domain.settings')->get('login_paths');
+    $allowed_paths = $this->configFactory->get('domain.settings')->get('login_paths', '/user/login\r\n/user/password');
     if (!empty($allowed_paths)) {
       $paths = preg_split("(\r\n?|\n)", $allowed_paths);
     }
-    if (in_array($path, $paths)) {
+    if (!empty($paths) && in_array($path, $paths)) {
       return FALSE;
     }
     return TRUE;
