@@ -13,7 +13,11 @@ use Drupal\domain\DomainNegotiatorInterface;
  *
  * You can specify the '_domain' key on route requirements. If you specify a
  * single domain, users with that domain with have access. If you specify multiple
- * ones you can conjunct them with AND by using a "," and with OR by using "+".
+ * ones you can join them by using "+".
+ *
+ * This access checker is separate from the global check used by inactive
+ * domains. It is expressly for use with Views and other systems that need
+ * to add a domain requirement to a specific route.
  */
 class DomainRouteCheck implements AccessInterface {
 
@@ -35,7 +39,7 @@ class DomainRouteCheck implements AccessInterface {
   }
 
   /**
-   * Checks access.
+   * Checks access to a route with a _domain requirement.
    *
    * @param \Symfony\Component\Routing\Route $route
    *   The route to check against.
@@ -44,6 +48,8 @@ class DomainRouteCheck implements AccessInterface {
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
+   *
+   * @see Drupal\domain\Plugin\views\access\Domain.php
    */
   public function access(Route $route, AccountInterface $account) {
     // Requirements just allow strings, so this might be a comma separated list.
