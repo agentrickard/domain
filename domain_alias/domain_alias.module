@@ -57,5 +57,8 @@ function domain_alias_domain_operations(DomainInterface $domain) {
     'url' => Url::fromRoute('domain_alias.admin', array('domain' => $id)),
     'weight' => 60,
   );
+  $loader = \Drupal::service('domain_alias.loader');
+  $patterns = $loader->getPatterns('example.com');
+  kint($patterns);
   return $operations;
 }

@@ -64,21 +64,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByHostname($hostname) {
-    $parts = explode('.', $hostname);
-    $patterns = array($hostname);
-    $patterns[] = $parts[0] . '.*';
-    $count = count($parts);
-    // Build the list of possible matching patterns.
-    for ($i = 0; $i < $count; $i++) {
-      $temp = $parts;
-      $temp[$i] = '*';
-      $patterns[] = implode('.', $temp);
-    }
-    // Pattern lists are sorted based on the fewest wildcards. That gives us
-    // more precise matches first.
-    $patterns[] = '*.' . $hostname;
-    $patterns[] = $hostname . '.*';
-    uasort($patterns, array($this, 'sort'));
+    $patterns = $this->getPatterns($hostname);
     foreach ($patterns as $pattern) {
       if ($alias = $this->loadByPattern($pattern)) {
         return $alias;
@@ -102,11 +88,57 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function sort($a, $b) {
-    // @TODO: Test this logic.
-    if (substr_count($a, '*') > 0) {
+    // Fewer wildcards is a closer match.
+    // A longer string indicates a closer match.
+    if ((substr_count($a, '*') > substr_count($b, '*')) || (strlen($a) < strlen($b))) {
       return 1;
     }
     return 0;
+  }
+
+  /**
+   * Returns an array of eligible matching patterns.
+   *
+   * @param string $hostname
+   *   A hostname string, in the format example.com.
+   *
+   * @return array
+   */
+  public function getPatterns($hostname) {
+    $parts = explode('.', $hostname);
+    $count = count($parts);
+    // Build the list of possible matching patterns.
+    for ($i = 0; $i < $count; $i++) {
+      // Basic replacement of each value.
+      $temp = $parts;
+      $temp[$i] = '*';
+      $patterns[] = implode('.', $temp);
+      // Advanced multi-value wildcards.
+      if (count($temp) > 2 && $i < ($count - 1)) {
+        $temp[$i + 1] = '*';
+        $patterns[] = implode('.', $temp);
+      }
+      if ($count > 3 && $i < ($count - 2)) {
+        $temp[$i + 2] = '*';
+        $patterns[] = implode('.', $temp);
+      }
+      if ($count > 3 && $i < 2) {
+        $temp = $parts;
+        $temp[$i] = '*';
+        $temp[$i + 2] = '*';
+        $patterns[] = implode('.', $temp);
+      }
+      if ($count > 2) {
+        $temp = array_fill(0, $count, '*');
+        $temp[$i] = $parts[$i];
+        $patterns[] = implode('.', $temp);
+      }
+    }
+    // Pattern lists are sorted based on the fewest wildcards. That gives us
+    // more precise matches first.
+    uasort($patterns, array($this, 'sort'));
+    array_unshift($patterns, $hostname);
+    return array_unique($patterns);
   }
 
   /**

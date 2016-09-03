@@ -27,6 +27,11 @@ following patterns.
     example.*
     example.*.*
     example.*.*.*
+    *.com
+    *.example.*
+
+A maximum of three wildcards are supported. At least one element must not be a
+wildcard.
 
 Alias Matching
 ====
@@ -39,10 +44,15 @@ Example request: `one.example.com`
 1. Exact domain record match (`one.example.com`)
 1. Exact alias match (`one.example.com`)
 1. Wildcard match
-   - `*.example.com`
-   - `one.*.com`
-   - `one.example.*`
-   - `one.*`
-   - `one.*.*`
+  - one.example.com
+  - one.example.*
+  - *.example.com
+  - one.*.com
+  - *.example.*
+  - *.*.com
+  - one.*.*,
 
-Note that wildcard matching happens _in the listed order_.
+Note that wildcard matching happens _in the listed order_. The number of
+wildcards is equal to the number of hostname parts minus 1.
+
+See DomainAliasSortTest for the logic.
