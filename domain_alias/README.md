@@ -49,13 +49,13 @@ Example request: `one.example.com`
 1. Exact alias match (`one.example.com`)
 1. Wildcard match
 
-  one.example.com
-  one.example.*
-  *.example.com
-  one.*.com
-  *.example.*
-  *.*.com
-  one.*.*,
+    one.example.com
+    one.example.*
+    *.example.com
+    one.*.com
+    *.example.*
+    *.*.com
+    one.*.*,
 
 Note that wildcard matching happens _in the listed order_. The number of
 wildcards is equal to the number of hostname parts minus 1.
@@ -69,25 +69,25 @@ base hostname are permitted, since port 80 is the default port for HTTP.
 
 For example, a request to example.com:80 will match the following aliases:
 
-  example.com:80
-  example.com
-  example.com:*
-  example.*
-  example.*:80
-  example.*:*
-  *.com
-  *.com:80
-  *.com:*
+    example.com:80
+    example.com
+    example.com:*
+    example.*
+    example.*:80
+    example.*:*
+    *.com
+    *.com:80
+    *.com:*
 
 Whereas a request to example.com:8080 will not match the hostname without a port
 specified.
 
-  example.com:8080
-  example.com:*
-  example.*:8080
-  example.*:*
-  *.com:8080
-  *.com:*
+    example.com:8080
+    example.com:*
+    example.*:8080
+    example.*:*
+    *.com:8080
+    *.com:*
 
 Technical Notes
 ====
