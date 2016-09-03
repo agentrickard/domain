@@ -114,64 +114,108 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
       $parts[] = $ports[1];
     }
     // Build the list of possible matching patterns.
+    $patterns = $this->buildPatterns($parts);
+    // Pattern lists are sorted based on the fewest wildcards. That gives us
+    // more precise matches first.
+    uasort($patterns, array($this, 'sort'));
+    array_unshift($patterns, $hostname);
+
+    // Account for ports.
+    if (isset($ports)) {
+      $patterns = $this->buildPortPatterns($patterns, $hostname);
+    }
+
+    // Return unique patters.
+    return array_unique($patterns);
+  }
+
+  /**
+   * Builds a list of matching patterns.
+   *
+   * @param array $parts
+   *   The hostname of the request, as an array split by dots.
+   *
+   * @return array $patterns
+   *   An array of eligible matching patterns.
+   */
+  private function buildPatterns(array $parts) {
+    $count = count($parts);
     for ($i = 0; $i < $count; $i++) {
       // Basic replacement of each value.
       $temp = $parts;
       $temp[$i] = '*';
       $patterns[] = implode('.', $temp);
       // Advanced multi-value wildcards.
+      // Pattern *.*
       if (count($temp) > 2 && $i < ($count - 1)) {
         $temp[$i + 1] = '*';
         $patterns[] = implode('.', $temp);
       }
+      // Pattern foo.bar.*
       if ($count > 3 && $i < ($count - 2)) {
         $temp[$i + 2] = '*';
         $patterns[] = implode('.', $temp);
       }
+      // Pattern *.foo.*.
       if ($count > 3 && $i < 2) {
         $temp = $parts;
         $temp[$i] = '*';
         $temp[$i + 2] = '*';
         $patterns[] = implode('.', $temp);
       }
+      // Pattern *.foo.*.*
       if ($count > 2) {
         $temp = array_fill(0, $count, '*');
         $temp[$i] = $parts[$i];
         $patterns[] = implode('.', $temp);
       }
     }
-    // Pattern lists are sorted based on the fewest wildcards. That gives us
-    // more precise matches first.
-    uasort($patterns, array($this, 'sort'));
-    array_unshift($patterns, $hostname);
-    // Account for ports.
-    if (isset($ports)) {
-      foreach ($patterns as $index => $pattern) {
-        // Make a pattern for port wildcards.
-        if (substr_count($pattern, ':') < 1) {
-          $new = explode('.', $pattern);
-          $port = (int) array_pop($new);
-          $allow = FALSE;
-          // Do not allow *.* or *:*.
-          foreach ($new as $item) {
-            if ($item != '*') {
-              $allow = TRUE;
-            }
+    return $patterns;
+  }
+
+  /**
+   * Builds a list of matching patterns, including ports.
+   *
+   * @param array $patterns
+   *   An array of eligible matching patterns.
+   * @param string $hostname
+   *   A hostname string, in the format example.com.
+   *
+   * @return array $patterns
+   *   An array of eligible matching patterns, modified by port.
+   */
+  private function buildPortPatterns(array $patterns, $hostname) {
+    foreach ($patterns as $index => $pattern) {
+      // Make a pattern for port wildcards.
+      if (substr_count($pattern, ':') < 1) {
+        $new = explode('.', $pattern);
+        $port = (int) array_pop($new);
+        $allow = FALSE;
+        // Do not allow *.* or *:*.
+        foreach ($new as $item) {
+          if ($item != '*') {
+            $allow = TRUE;
           }
-          if ($allow) {
-            if ($port == 80) {
-              $patterns[] = str_replace(':' . $port, '', $hostname);
-              $patterns[] = implode('.', $new);
-            }
-            $patterns[] = str_replace(':' . $port, ':*', $hostname);
-            $patterns[] = implode('.', $new) . ':' . $port;
-            $patterns[] = implode('.', $new) . ':*';
-          }
-          unset($patterns[$index]);
         }
+        if ($allow) {
+          // For port 80, allow bare hostname matches.
+          if ($port == 80) {
+            // Base hostname with port.
+            $patterns[] = str_replace(':' . $port, '', $hostname);
+            // Base hostname is allowed.
+            $patterns[] = implode('.', $new);
+          }
+          // Base hostname with wildcard port.
+          $patterns[] = str_replace(':' . $port, ':*', $hostname);
+          // Pattern with exact port.
+          $patterns[] = implode('.', $new) . ':' . $port;
+          // Pattern with wildcard port.
+          $patterns[] = implode('.', $new) . ':*';
+        }
+        unset($patterns[$index]);
       }
     }
-    return array_unique($patterns);
+    return $patterns;
   }
 
   /**
