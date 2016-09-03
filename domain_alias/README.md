@@ -29,9 +29,13 @@ following patterns.
     example.*.*.*
     *.com
     *.example.*
+    example.com:8080
+    example.com:*
+    example.*:*
+    *.com:*
 
 A maximum of three wildcards are supported. At least one element must not be a
-wildcard.
+wildcard. Ports may be wildcards as well, but are optional.
 
 Alias Matching
 ====
