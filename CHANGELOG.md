@@ -59,7 +59,7 @@ marked with [x] are considered complete.
 - [x] Replace / inject the storage manager in DomainAliasLoader.
 - [x] Replace / inject the storage manager in DomainLoader.
 - [ ] Write tests for Domain Content.
-- [ ] Views access handler for domain content.
+- [x] Views access handler for domain content.
 - [ ] Restrict Domain Source options using JS
 - [ ] Recreate the Domain Theme module
 - [ ] Advanced drush integration / complete labelled tasks
@@ -80,9 +80,9 @@ marked with [x] are considered complete.
 - [ ] Allow access to actions based on assigned domain permissions
 - [ ] Implement theme functions or twig templates where proper
 - [ ] Tests for all module hooks
-- [ ] Proper tests for domain record validation
+- [x] Proper tests for domain record validation
 - [x] Check test logic in testDomainAliasNegotiator()
-- [ ] Test that sort logic in DomainAliasLoader matches what is documented
+- [x] Test that sort logic in DomainAliasLoader matches what is documented
 - [ ] Error handling in DomainAliasForm
 - [ ] Error checking in DomainAliasController
 - [ ] Deprecated methods in DomainAliasController

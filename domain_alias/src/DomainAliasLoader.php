@@ -107,6 +107,12 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   public function getPatterns($hostname) {
     $parts = explode('.', $hostname);
     $count = count($parts);
+    // Account for ports.
+    if (substr_count($hostname, ':') > 0) {
+      $ports = explode(':', $parts[$count - 1]);
+      $parts[$count - 1] = preg_replace('/:(\d+)/', '', $parts[$count - 1]);
+      $parts[] = $ports[1];
+    }
     // Build the list of possible matching patterns.
     for ($i = 0; $i < $count; $i++) {
       // Basic replacement of each value.
@@ -138,6 +144,33 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
     // more precise matches first.
     uasort($patterns, array($this, 'sort'));
     array_unshift($patterns, $hostname);
+    // Account for ports.
+    if (isset($ports)) {
+      foreach ($patterns as $index => $pattern) {
+        // Make a pattern for port wildcards.
+        if (substr_count($pattern, ':') < 1) {
+          $new = explode('.', $pattern);
+          $port = (int) array_pop($new);
+          $allow = FALSE;
+          // Do not allow *.* or *:*.
+          foreach ($new as $item) {
+            if ($item != '*') {
+              $allow = TRUE;
+            }
+          }
+          if ($allow) {
+            if ($port == 80) {
+              $patterns[] = str_replace(':' . $port, '', $hostname);
+              $patterns[] = implode('.', $new);
+            }
+            $patterns[] = str_replace(':' . $port, ':*', $hostname);
+            $patterns[] = implode('.', $new) . ':' . $port;
+            $patterns[] = implode('.', $new) . ':*';
+          }
+          unset($patterns[$index]);
+        }
+      }
+    }
     return array_unique($patterns);
   }
 

@@ -58,6 +58,25 @@ class DomainAliasSortTest extends DomainAliasTestBase {
         'one.*.*.*',
         '*.two.*.*',
       ],
+      'example.com:80' => [
+        'example.com:80',
+        'example.com',
+        'example.*',
+        'example.com:*',
+        'example.*:80',
+        'example.*:*',
+        '*.com',
+        '*.com:80',
+        '*.com:*',
+      ],
+      'example.com:8080' => [
+        'example.com:8080',
+        'example.com:*',
+        'example.*:8080',
+        'example.*:*',
+        '*.com:8080',
+        '*.com:*',
+      ],
     );
   }
 

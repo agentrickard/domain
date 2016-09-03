@@ -55,4 +55,36 @@ Example request: `one.example.com`
 Note that wildcard matching happens _in the listed order_. The number of
 wildcards is equal to the number of hostname parts minus 1.
 
+Port Matching
+===
+
+Port matching (e.g. example.com:8080) works exactly as hostname matching, with
+one significant change. If the inbound request is on port 80, matches to the
+base hostname are permitted, since port 80 is the default port for HTTP.
+
+For example, a request to example.com:80 will match the following aliases:
+
+  - example.com:80
+  - example.com
+  - example.com:*
+  - example.*
+  - example.*:80
+  - example.*:*
+  - *.com
+  - *.com:80
+  - *.com:*
+
+Whereas a request to example.com:8080 will not match the hostname without a port
+specified.
+
+  - example.com:8080
+  - example.com:*
+  - example.*:8080
+  - example.*:*
+  - *.com:8080
+  - *.com:*
+
+Technical Notes
+====
+
 See DomainAliasSortTest for the logic.
