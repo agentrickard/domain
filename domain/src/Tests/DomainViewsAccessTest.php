@@ -55,6 +55,14 @@ class DomainViewsAccessTest extends DomainTestBase {
         $this->assertNoRaw('admin');
         $this->assertNoRaw($this->user->getUsername());
       }
+      // Test the block on another page.
+      $this->drupalGet($domain->getPath());
+      if (in_array($domain->id(), $allowed)) {
+        $this->assertRaw($this->user->getUsername());
+      }
+      else {
+        $this->assertNoRaw($this->user->getUsername());
+      }
     }
   }
 
