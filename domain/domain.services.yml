@@ -4,6 +4,11 @@ services:
     tags:
       - { name: access_check }
     arguments: ['@domain.negotiator', '@config.factory']
+  access_check.domain_route:
+    class: Drupal\domain\Access\DomainRouteCheck
+    tags:
+      - { name: access_check, applies_to: _domain }
+    arguments: ['@domain.negotiator']
   domain.current_domain_context:
     class: Drupal\domain\ContextProvider\CurrentDomainContext
     arguments: ['@domain.negotiator']
