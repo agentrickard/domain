@@ -3,6 +3,7 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Handles requests for token creation.
@@ -15,6 +16,8 @@ use Drupal\Core\Render\BubbleableMetadata;
  * Token handler for Domain.
  */
 class DomainToken {
+
+  use StringTranslationTrait;
 
   /**
    * The Domain loader.
@@ -47,7 +50,69 @@ class DomainToken {
    * hook_token_info().
    */
   public function getTokenInfo() {
-    $info = [];
+    // Domain token types.
+    $info['types']['domain'] = array(
+      'name' => $this->t('Domains'),
+      'description' => $this->t('Tokens related to domains.'),
+      'needs-data' => 'domain',
+    );
+    // These two types require the Token contrib module.
+    $info['types']['current-domain'] = array(
+      'name' => $this->t('Current domain'),
+      'description' => $this->t('Tokens related to the current domain.'),
+      'type' => 'domain',
+    );
+    $info['types']['default-domain'] = array(
+      'name' => $this->t('Default domain'),
+      'description' => $this->t('Tokens related to the default domain.'),
+      'type' => 'domain',
+    );
+
+    // Domain tokens.
+    $info['tokens']['domain']['id'] = array(
+      'name' => $this->t('Domain id'),
+      'description' => $this->t('The domain ID.'),
+    );
+    $info['tokens']['domain']['machine-name'] = array(
+      'name' => $this->t('Domain machine name'),
+      'description' => $this->t('The domain machine identifier.'),
+    );
+    $info['tokens']['domain']['path'] = array(
+      'name' => $this->t('Domain path'),
+      'description' => $this->t('The base url path for the domain.'),
+    );
+    $info['tokens']['domain']['name'] = array(
+      'name' => $this->t('Domain name'),
+      'description' => $this->t('The domain name.'),
+    );
+    $info['tokens']['domain']['url'] = array(
+      'name' => $this->t('Domain URL'),
+      'description' => $this->t('The domain\'s URL, lower-cased and with only alphanumeric characters.'),
+    );
+    $info['tokens']['domain']['hostname'] = array(
+      'name' => $this->t('Domain hostname'),
+      'description' => $this->t('The domain hostname.'),
+    );
+    $info['tokens']['domain']['scheme'] = array(
+      'name' => $this->t('Domain scheme'),
+      'description' => $this->t('The domain scheme.'),
+    );
+    $info['tokens']['domain']['status'] = array(
+      'name' => $this->t('Domain status'),
+      'description' => $this->t('The domain status.'),
+    );
+    $info['tokens']['domain']['weight'] = array(
+      'name' => $this->t('Domain weight'),
+      'description' => $this->t('The domain weight.'),
+    );
+    $info['tokens']['domain']['is_default'] = array(
+      'name' => $this->t('Domain default'),
+      'description' => $this->t('The domain is the default domain.'),
+    );
+    $info['tokens']['domain']['subdomain'] = array(
+      'name' => $this->t('Subdomain'),
+      'description' => $this->t('The subdomain, lower-cased and with only alphanumeric characters. Only works with *.example.com formats'),
+    );
 
     return $info;
   }
