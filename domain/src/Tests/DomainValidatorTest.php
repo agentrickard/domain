@@ -21,7 +21,7 @@ class DomainValidatorTest extends DomainTestBase {
 
     // Create a domain.
     $this->domainCreateTestDomains(1, 'foo.com');
-    // Check the created domain based on it's known id value.
+    // Check the created domain based on its known id value.
     $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = \Drupal::service('domain.loader')->loadByHostname($key);

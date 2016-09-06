@@ -64,8 +64,8 @@ marked with [x] are considered complete.
 - [ ] Recreate the Domain Theme module
 - [ ] Advanced drush integration / complete labelled tasks
 - [ ] Check domain responses on configuration forms
-- [ ] Handle site name overrides -- perhaps as a new field?
-- [ ] Restore the `domain_grant_all` permission?
+- [x] Handle site name overrides -- perhaps as a new field?
+- [x] Restore the `domain_grant_all` permission?
 - [ ] Domain token support
 - [ ] Test cron handling
 - [ ] Module configurations
