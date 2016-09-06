@@ -94,7 +94,7 @@ marked with [x] are considered complete.
 - [ ] Remove deprecated `entity_get_form_display`
 - [ ] Review drupalUserIsLoggedIn() hack
 - [ ] Review DomainNegotiatorTest for completeness
-- [ ] Review core note in DomainEntityReferenceTest
+- [x] Review core note in DomainEntityReferenceTest
 - [ ] Expand DomainActionsTest
 - [ ] DomainViewBuilder review
 - [ ] Dependency Injection in DomainValidator

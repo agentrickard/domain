@@ -108,7 +108,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
     $values = $node->get('field_domain');
 
-    // @TODO watch for changes in core that affect this test.
+    // Get the expected value count.
     $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
 
   }
