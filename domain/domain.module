@@ -66,3 +66,17 @@ function domain_help($route_name, RouteMatchInterface $route_match) {
       return $output;
   }
 }
+
+/**
+ * Implements hook_token_info().
+ */
+function domain_token_info {
+  return \Drupal::service('domain.token')->getTokenInfo();
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function domain_tokens($type, $tokens, array $data, array $options, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata) {
+  return \Drupal::service('domain.token')->getTokens($type, $tokens, $data, $options, $bubbleable_metadata);
+}
