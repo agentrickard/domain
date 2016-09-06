@@ -93,7 +93,7 @@ marked with [x] are considered complete.
 - [ ] Cache in the DomainAccessManager
 - [ ] Remove deprecated `entity_get_form_display`
 - [ ] Review drupalUserIsLoggedIn() hack
-- [ ] Review DomainNegotiatorTest for completeness
+- [x] Review DomainNegotiatorTest for completeness
 - [x] Review core note in DomainEntityReferenceTest
 - [ ] Expand DomainActionsTest
 - [ ] DomainViewBuilder review

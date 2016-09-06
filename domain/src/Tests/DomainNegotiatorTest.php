@@ -40,12 +40,6 @@ class DomainNegotiatorTest extends DomainTestBase {
       $this->drupalGet($domain->getPath());
       $this->assertRaw($domain->label(), 'Loaded the proper domain.');
     }
-
-    // Revoke the permission change.
-    user_role_revoke_permissions(AccountInterface::ANONYMOUS_ROLE, array('view domain information'));
-
-    // @TODO: Any other testing needed here?
-
   }
 
 }
