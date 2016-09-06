@@ -109,10 +109,6 @@ class DomainToken {
       'name' => $this->t('Domain default'),
       'description' => $this->t('The domain is the default domain.'),
     );
-    $info['tokens']['domain']['subdomain'] = array(
-      'name' => $this->t('Subdomain'),
-      'description' => $this->t('The subdomain, lower-cased and with only alphanumeric characters. Only works with *.example.com formats'),
-    );
 
     return $info;
   }
@@ -121,10 +117,55 @@ class DomainToken {
    * hook_tokens().
    */
   public function getTokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
-    $tokens = [];
+    $url_options = array('absolute' => TRUE);
+    if (isset($options['langcode'])) {
+      $url_options['language'] = \Drupal::languageManager()->getLanguage($options['langcode']);
+      $langcode = $options['langcode'];
+    }
+    else {
+      $langcode = NULL;
+    }
+    $replacements = array();
 
-    return $tokens;
+    $domain = NULL;
+
+    switch ($type) {
+      case 'domain':
+        $domain = $data['domain'];
+        break;
+      case 'current-domain':
+        $domain = $this->negotiator->getActiveDomain();
+        break;
+      case 'default-domain':
+        $domain = $this->loader->loadDefaultDomain();
+        break;
+    }
+
+    if (!empty($domain)) {
+      $callbacks = $this->getCallbacks();
+      foreach ($tokens as $name => $original) {
+        if (isset($callbacks[$name])) {
+          $replacements[$original] = $domain->{$callback}();
+        }
+      }
+    }
+
+    return $replacements;
   }
 
+  private function callbacks() {
+    return [
+      'id' => 'id',
+      'machine-name' => 'id',
+      'path' => 'getPath',
+      'name' => 'label',
+      'hostname' => 'getHostname',
+      'scheme' => 'getScheme',
+      'status' => 'status',
+      'weight' => 'getWeight',
+      'is_default' => 'isDefault',
+      'url' => 'getUrl',
+    ];
+  }
 
 }

@@ -46,16 +46,10 @@ function domain_uri(DomainInterface $domain) {
  * of hook_domain_load() and ensures that our data is present for other modules.
  */
 function domain_entity_load(array $entities, $entity_type) {
-  static $i;
   if ($entity_type == 'domain') {
     foreach ($entities as $domain) {
       $domain->setPath();
       $domain->setUrl();
-    }
-    if (empty($i)) {
-      $info = \Drupal::service('token')->getInfo();
-      kint($info);
-      $i++;
     }
   }
 }
