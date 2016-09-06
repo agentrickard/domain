@@ -47,7 +47,7 @@ class DomainToken {
   }
 
   /**
-   * hook_token_info().
+   * Implements hook_token_info().
    */
   public function getTokenInfo() {
     // Domain token types.
@@ -71,7 +71,7 @@ class DomainToken {
     // Domain tokens.
     $info['tokens']['domain']['id'] = array(
       'name' => $this->t('Domain id'),
-      'description' => $this->t('The domain ID.'),
+      'description' => $this->t('The domain\'s numeric ID.'),
     );
     $info['tokens']['domain']['machine-name'] = array(
       'name' => $this->t('Domain machine name'),
@@ -79,7 +79,7 @@ class DomainToken {
     );
     $info['tokens']['domain']['path'] = array(
       'name' => $this->t('Domain path'),
-      'description' => $this->t('The base url path for the domain.'),
+      'description' => $this->t('The base URL for the domain.'),
     );
     $info['tokens']['domain']['name'] = array(
       'name' => $this->t('Domain name'),
@@ -87,7 +87,7 @@ class DomainToken {
     );
     $info['tokens']['domain']['url'] = array(
       'name' => $this->t('Domain URL'),
-      'description' => $this->t('The domain\'s URL, lower-cased and with only alphanumeric characters.'),
+      'description' => $this->t('The domain\'s URL for the current page request.'),
     );
     $info['tokens']['domain']['hostname'] = array(
       'name' => $this->t('Domain hostname'),
@@ -114,21 +114,14 @@ class DomainToken {
   }
 
   /**
-   * hook_tokens().
+   * Implements hook_tokens().
    */
   public function getTokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
-    $url_options = array('absolute' => TRUE);
-    if (isset($options['langcode'])) {
-      $url_options['language'] = \Drupal::languageManager()->getLanguage($options['langcode']);
-      $langcode = $options['langcode'];
-    }
-    else {
-      $langcode = NULL;
-    }
     $replacements = array();
 
     $domain = NULL;
 
+    // Based on the type, get the proper domain context.
     switch ($type) {
       case 'domain':
         $domain = $data['domain'];
@@ -141,11 +134,13 @@ class DomainToken {
         break;
     }
 
+    // Set the token information.
     if (!empty($domain)) {
       $callbacks = $this->getCallbacks();
       foreach ($tokens as $name => $original) {
         if (isset($callbacks[$name])) {
           $replacements[$original] = $domain->{$callback}();
+          $bubbleable_metadata->addCacheableDependency($domain);
         }
       }
     }
@@ -153,6 +148,13 @@ class DomainToken {
     return $replacements;
   }
 
+  /**
+   * Maps tokens to their entity callbacks.
+   *
+   * We assume that the token will call an instance of DomainInterface.
+   *
+   * @return array
+   */
   private function callbacks() {
     return [
       'id' => 'id',
