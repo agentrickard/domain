@@ -41,6 +41,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * @inheritdoc
    */
   public function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
+    /** @var FieldableEntityInterface $entity */
     // @TODO: static cache.
     $list = array();
     // @TODO In tests, $entity is returning NULL.
@@ -66,6 +67,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * @inheritdoc
    */
   public function getAllValue(EntityInterface $entity) {
+    /** @var FieldableEntityInterface $entity */
     return $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value;
   }
 
