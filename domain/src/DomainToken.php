@@ -155,7 +155,7 @@ class DomainToken {
    *
    * @return array
    */
-  private function getCallbacks() {
+  public function getCallbacks() {
     return [
       'id' => 'getDomainId',
       'machine-name' => 'id',

@@ -40,7 +40,28 @@ class DomainTokenTest extends DomainTestBase {
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
       $this->assertRaw($domain->label(), 'Loaded the proper domain.');
+      $this->assertRaw('Token values', 'Token values printed.');
+      foreach ($this->tokenList() as $token => $callback) {
+        $this->assertRaw("<td>$token</td>", "$token found correctly.");
+        // The URL token is sensitive to the path, which is /user, but that
+        // does not come across when making the callback outside of a request
+        // context.
+        $value = $domain->{$callback}();
+        if ($token == '[domain:url]') {
+          $value = str_replace('user', '', $value);
+        }
+        $this->assertRaw('<td>' . $value . '</td>', 'Value set correctly to ' . $domain->{$callback}());
+      }
     }
+  }
+
+  private function tokenList() {
+    $tokens = [];
+    foreach (\Drupal::service('domain.token')->getCallbacks() as $key => $callback) {
+      $name = "[domain:$key]";
+      $tokens[$name] = $callback;
+    }
+    return $tokens;
   }
 
 }
