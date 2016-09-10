@@ -124,7 +124,12 @@ class DomainToken {
     // Based on the type, get the proper domain context.
     switch ($type) {
       case 'domain':
-        $domain = $data['domain'];
+        if (!empty($data['domain'])) {
+          $domain = $data['domain'];
+        }
+        else {
+          $domain = $this->negotiator->getActiveDomain();
+        }
         break;
       case 'current-domain':
         $domain = $this->negotiator->getActiveDomain();

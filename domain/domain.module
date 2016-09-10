@@ -80,3 +80,16 @@ function domain_token_info() {
 function domain_tokens($type, $tokens, array $data, array $options, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata) {
   return \Drupal::service('domain.token')->getTokens($type, $tokens, $data, $options, $bubbleable_metadata);
 }
+
+
+/**
+ * Implements hook_preprocess_HOOK() for html.html.twig.
+ */
+function domain_preprocess_html(array &$variables) {
+  // Add class to body tag, if set.
+  $config = \Drupal::config('domain.settings');
+  if ($string = $config->get('css_classes')) {
+    $token = \Drupal::token();
+    $variables['attributes']['class'][] = $token->replace($string);
+  }
+}
