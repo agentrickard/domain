@@ -139,7 +139,7 @@ class DomainToken {
       $callbacks = $this->getCallbacks();
       foreach ($tokens as $name => $original) {
         if (isset($callbacks[$name])) {
-          $replacements[$original] = $domain->{$callback}();
+          $replacements[$original] = $domain->{$callbacks[$name]}();
           $bubbleable_metadata->addCacheableDependency($domain);
         }
       }
@@ -155,9 +155,9 @@ class DomainToken {
    *
    * @return array
    */
-  private function callbacks() {
+  private function getCallbacks() {
     return [
-      'id' => 'id',
+      'id' => 'getDomainId',
       'machine-name' => 'id',
       'path' => 'getPath',
       'name' => 'label',
