@@ -29,10 +29,19 @@ class DomainCSSTest extends DomainTestBase {
     // Test the response of the default home page.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
-      $text = '<body class="' . $domain->machine_name . '"';
-      $this->assertRaw($domain->label(), 'Loaded the proper domain.');
+      $text = '<body class="' . $domain->id() . '"';
       $this->assertNoRaw($text, 'No custom CSS present.');
     }
+    // Set the css classes.
+    $config = $this->config('domain.settings');
+    $config->set('css_classes', '[domain:machine-name]-class')->save();
+    // Test the response of the default home page.
+    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+      $this->drupalGet($domain->getPath());
+      $text = '<body class="' . $domain->id() . '-class"';
+      $this->assertRaw($text, 'Custom CSS present.');
+    }
+
   }
 
 }
