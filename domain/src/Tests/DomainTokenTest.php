@@ -50,11 +50,17 @@ class DomainTokenTest extends DomainTestBase {
         if ($token == '[domain:url]') {
           $value = str_replace('user', '', $value);
         }
-        $this->assertRaw('<td>' . $value . '</td>', 'Value set correctly to ' . $domain->{$callback}());
+        $this->assertRaw('<td>' . $value . '</td>', 'Value set correctly to ' . $value);
       }
     }
   }
 
+  /**
+   * Gets the list of tokens and value callbacks used by the test.
+   *
+   * @return array
+   *   An array keyed by token string, with value of expected domain value.
+   */
   private function tokenList() {
     $tokens = [];
     foreach (\Drupal::service('domain.token')->getCallbacks() as $key => $callback) {
