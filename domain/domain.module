@@ -8,6 +8,7 @@
 use Drupal\Core\Url;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Component\Utility\Html;
 
 /**
  * Implements hook_entity_bundle_info().
@@ -90,6 +91,7 @@ function domain_preprocess_html(array &$variables) {
   $config = \Drupal::config('domain.settings');
   if ($string = $config->get('css_classes')) {
     $token = \Drupal::token();
-    $variables['attributes']['class'][] = $token->replace($string);
+    // Prepare the class properly.
+    $variables['attributes']['class'][] = Html::getClass($token->replace($string));
   }
 }

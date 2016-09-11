@@ -2,6 +2,8 @@
 
 namespace Drupal\domain\Tests;
 
+use Drupal\Component\Utility\Html;
+
 /**
  * Tests the domain CSS configuration.
  *
@@ -39,7 +41,7 @@ class DomainCSSTest extends DomainTestBase {
     // Test the response of the default home page.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
-      $text = '<body class="' . $domain->id() . '-class';
+      $text = '<body class="' . Html::getClass($domain->id() . '-class');
       $this->assertNoRaw($text, 'No custom CSS present.');
     }
     // Set the css classes.
@@ -52,7 +54,7 @@ class DomainCSSTest extends DomainTestBase {
       // necessary to add the url.site cache context. See README.md.
       drupal_flush_all_caches();
       $this->drupalGet($domain->getPath());
-      $text = '<body class="' . $domain->id() . '-class';
+      $text = '<body class="' . Html::getClass($domain->id() . '-class');
       $this->assertRaw($text, 'Custom CSS present.' . $text);
     }
   }
