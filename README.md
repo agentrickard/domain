@@ -14,7 +14,7 @@ For a complete feature status list, see [CHANGELOG.md](https://github.com/agentr
 Implementation Notes
 ======
 
-1. Cross-domain logins
+* Cross-domain logins
 
 To use cross-domain logins, you must now set the *cookie_domain* value in
 *sites/default/services.yml*.
@@ -26,7 +26,7 @@ cross-domain login requires the sharing of a top-level domain, so a setting like
 
 See https://www.drupal.org/node/2391871.
 
-1. Trusted host settings
+* Trusted host settings
 
 If using the trusted host security setting in Drupal 8, be sure to add each domain
 and alias to the pattern list. For example:
@@ -41,7 +41,7 @@ $settings['trusted_host_patterns'] = array(
 
 See https://www.drupal.org/node/1992030 for more information.
 
-1. Domains and the cache
+* Domains and caching
 
 If some variable changes are not picked up when the page renders, you may need
 add domain-sensitivity to the site's cache.
