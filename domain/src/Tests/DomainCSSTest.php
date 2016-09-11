@@ -16,6 +16,11 @@ class DomainCSSTest extends DomainTestBase {
    */
   public static $modules = array('domain');
 
+  protected function setUp() {
+    parent::setUp();
+    \Drupal::service('theme_handler')->install(array('bartik'));
+  }
+
   /**
    * Tests the handling of an inbound request.
    */
@@ -26,22 +31,30 @@ class DomainCSSTest extends DomainTestBase {
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(4);
 
+    // The test runner doesn't use a theme that contains the preprocess hook,
+    // so set to use Bartik.
+    $config = $this->config('system.theme');
+    $config->set('default', 'bartik')->save();
+
     // Test the response of the default home page.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
-      $text = '<body class="' . $domain->id() . '"';
+      $text = '<body class="' . $domain->id() . '-class';
       $this->assertNoRaw($text, 'No custom CSS present.');
     }
     // Set the css classes.
     $config = $this->config('domain.settings');
     $config->set('css_classes', '[domain:machine-name]-class')->save();
+
     // Test the response of the default home page.
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+      // The render cache trips up this test. In production, it may be
+      // necessary to add the url.site cache context. See README.md.
+      drupal_flush_all_caches();
       $this->drupalGet($domain->getPath());
-      $text = '<body class="' . $domain->id() . '-class"';
-      $this->assertRaw($text, 'Custom CSS present.');
+      $text = '<body class="' . $domain->id() . '-class';
+      $this->assertRaw($text, 'Custom CSS present.' . $text);
     }
-
   }
 
 }
