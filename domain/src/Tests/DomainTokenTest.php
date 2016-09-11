@@ -50,7 +50,7 @@ class DomainTokenTest extends DomainTestBase {
         if ($token == '[domain:url]') {
           $value = str_replace('user', '', $value);
         }
-        $this->assertRaw('<td>' . $value . '</td>', 'Value set correctly to ' . $value);
+        $this->assertRaw('<td class="domain-token">' . $value . '</td>', 'Value set correctly to ' . $value);
       }
     }
   }

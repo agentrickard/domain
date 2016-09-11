@@ -153,7 +153,8 @@ class DomainServerBlock extends DomainBlockBase {
           $string = "[$key:$name]";
           $rows[] = [
             $string,
-            $token->replace($string, $data),
+            // We add a domain-token class here for testing.
+            ['data' => $token->replace($string, $data), 'class' => 'domain-token'],
           ];
         }
       }
