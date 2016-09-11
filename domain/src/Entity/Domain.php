@@ -74,13 +74,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   protected $domain_id;
 
   /**
-   * The domain record UUID.
-   *
-   * @var string
-   */
-  protected $uuid;
-
-  /**
    * The domain list name (e.g. Drupal).
    *
    * @var string
@@ -93,13 +86,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * @var string
    */
   protected $hostname;
-
-  /**
-   * The domain status.
-   *
-   * @var boolean
-   */
-  protected $status;
 
   /**
    * The domain record sort order.

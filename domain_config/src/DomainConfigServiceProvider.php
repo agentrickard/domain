@@ -15,7 +15,7 @@ use Drupal\domain_config\Routing\DomainRouteProvider;
  *
  * @see https://www.drupal.org/node/2662196#comment-10838164
  */
-class DomainConfigServiceProvider extends ServiceProviderBase implements ServiceModifierInterface {
+class DomainConfigServiceProvider extends ServiceProviderBase {
 
   /**
    * {@inheritdoc}

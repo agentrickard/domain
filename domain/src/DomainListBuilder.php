@@ -13,9 +13,14 @@ use Drupal\Core\Url;
 class DomainListBuilder extends DraggableListBuilder {
 
   /**
+   * Provide class-specific value of $entitiesKey.
+   *
    * {@inheritdoc}
    */
-  protected $entitiesKey = 'domains';
+  public function __construct(\Drupal\Core\Entity\EntityTypeInterface $entity_type, \Drupal\Core\Entity\EntityStorageInterface $storage) {
+    parent::__construct($entity_type, $storage);
+    $this->entitiesKey = 'domains';
+  }
 
   /**
    * {@inheritdoc}
