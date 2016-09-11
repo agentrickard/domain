@@ -130,6 +130,7 @@ class DomainAccessCheckTest extends UnitTestCase {
     return [
       ['/user/1'],
       ['/user/admin'],
+      ['node/1'],
     ];
   }
 
