@@ -14,7 +14,8 @@ For a complete feature status list, see [CHANGELOG.md](https://github.com/agentr
 Implementation Notes
 ======
 
-* Cross-domain logins
+Cross-domain logins
+------
 
 To use cross-domain logins, you must now set the *cookie_domain* value in
 *sites/default/services.yml*.
