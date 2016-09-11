@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\StringTranslation\TranslationManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -51,16 +50,14 @@ class DomainValidator implements DomainValidatorInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translation
    * @param \GuzzleHttp\Client $httpClient
    *   The HTTP client.
    */
-  public function __construct(ConfigFactoryInterface $configFactory, EntityTypeManagerInterface $entityTypeManager, ModuleHandlerInterface $module_handler, TranslationManager $translation, Client $httpClient) {
-    $this->config = $configFactory->get('domain.settings');
-    $this->entityTypeManager = $entityTypeManager;
+  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, Client $http_client, EntityTypeManagerInterface $entity_type_manager) {
     $this->moduleHandler = $module_handler;
-    $this->stringTranslation = $translation;
-    $this->httpClient = $httpClient;
+    $this->config = $config_factory->get('domain.settings');
+    $this->httpClient = $http_client;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**

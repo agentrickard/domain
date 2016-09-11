@@ -55,12 +55,6 @@ class DomainValidatorTest extends UnitTestCase {
     $handler = $mock = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandler')
       ->disableOriginalConstructor()->getMock();
 
-    $translation = $this->getMockBuilder('Drupal\Core\StringTranslation\TranslationManager')
-      ->disableOriginalConstructor()->getMock();
-    $translation->expects(static::any())->method('getStringTranslation')
-      ->willReturn('message');
-    /** @var \Drupal\Core\StringTranslation\TranslationManager $translation */
-
     $response = $this->getMockBuilder('GuzzleHttp\Psr7\Response')
       ->disableOriginalConstructor()
       ->getMock();
@@ -75,7 +69,7 @@ class DomainValidatorTest extends UnitTestCase {
     $client->expects(static::any())->method('get')
       ->will(static::returnValue($response));
 
-    $this->object = new DomainValidator($factory, $manager, $handler, $translation, $client);
+    $this->object = new DomainValidator($handler, $factory, $client, $manager);
   }
 
   /**
