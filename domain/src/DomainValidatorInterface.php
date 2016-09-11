@@ -28,11 +28,13 @@ interface DomainValidatorInterface {
    *
    * @param \Drupal\domain\DomainInterface $domain
    *   A domain record.
+   * @param string $test_path
+   *   A path on the domain to test.
    *
    * @return int
    *   The server response code for the request.
    */
-  public function checkResponse(DomainInterface $domain);
+  public function checkResponse(DomainInterface $domain, $test_path = '');
 
   /**
    * Returns the properties required to create a domain record.
