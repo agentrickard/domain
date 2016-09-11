@@ -30,8 +30,8 @@ class DomainTokenTest extends DomainTestBase {
     $this->domainCreateTestDomains(4);
 
     // Since we cannot read the service request, we place a block
-    // which shows the current domain information.
-    $this->drupalPlaceBlock('domain_server_block');
+    // which shows the current domain token information.
+    $this->drupalPlaceBlock('domain_token_block');
 
     // To get around block access, let the anon user view the block.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('view domain information'));
@@ -40,7 +40,7 @@ class DomainTokenTest extends DomainTestBase {
     foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
       $this->assertRaw($domain->label(), 'Loaded the proper domain.');
-      $this->assertRaw('Token values', 'Token values printed.');
+      $this->assertRaw('<th>Token</th>', 'Token values printed.');
       foreach ($this->tokenList() as $token => $callback) {
         $this->assertRaw("<td>$token</td>", "$token found correctly.");
         // The URL token is sensitive to the path, which is /user, but that
@@ -50,7 +50,7 @@ class DomainTokenTest extends DomainTestBase {
         if ($token == '[domain:url]') {
           $value = str_replace('user', '', $value);
         }
-        $this->assertRaw('<td class="domain-token">' . $value . '</td>', 'Value set correctly to ' . $value);
+        $this->assertRaw('<td>' . $value . '</td>', 'Value set correctly to ' . $value);
       }
     }
   }

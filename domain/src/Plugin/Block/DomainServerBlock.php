@@ -38,7 +38,7 @@ class DomainServerBlock extends DomainBlockBase {
         '#markup' => $this->t('No domain record could be loaded.'),
       );
     }
-    $header = array($this->t('Property'), $this->t('Value'));
+    $header = array($this->t('Server'), $this->t('Value'));
     $rows[] = array(
       $this->t('HTTP_HOST request'),
       Html::escape($_SERVER['HTTP_HOST']),
@@ -85,10 +85,6 @@ class DomainServerBlock extends DomainBlockBase {
         !is_array($value) ? Html::escape($value) : $this->printArray($value),
       );
     }
-    $rows[] = array(
-      ['data' => $this->t('<strong>Token values</strong>'), 'colspan' => 2],
-    );
-    $rows = array_merge($rows, $this->renderTokens($domain));
     return array(
       '#theme' => 'table',
       '#rows' => $rows,
@@ -125,41 +121,6 @@ class DomainServerBlock extends DomainBlockBase {
       '#items' => $items,
     );
     return render($variables);
-  }
-
-  /**
-   * Generates available tokens for printing.
-   *
-   * @param Drupal\domain\DomainInterface $domain
-   *   The active domain request.
-   * @return array
-   *   An array keyed by token name, with value of replacement value.
-   */
-  private function renderTokens(DomainInterface $domain) {
-    $rows = array();
-    $token = \Drupal::token();
-    $tokens = $token->getInfo();
-    // The 'domain' token is supported by core. The others by Token module,
-    // so we cannot assume that Token module is present.
-    $domain_tokens = ['domain', 'current-domain', 'default-domain'];
-    foreach ($domain_tokens as $key) {
-      if (isset($tokens['tokens'][$key])) {
-        $data = [];
-        // Pass domain data to the default handler.
-        if ($key == 'domain') {
-          $data['domain'] = $domain;
-        }
-        foreach ($tokens['tokens'][$key] as $name => $info) {
-          $string = "[$key:$name]";
-          $rows[] = [
-            $string,
-            // We add a domain-token class here for testing.
-            ['data' => $token->replace($string, $data), 'class' => 'domain-token'],
-          ];
-        }
-      }
-    }
-    return $rows;
   }
 
 }
