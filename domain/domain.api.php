@@ -62,7 +62,7 @@ function hook_domain_operations(\Drupal\domain\DomainInterface $domain) {
   $id = $domain->id();
   $operations['domain_alias'] = array(
     'title' => t('Aliases'),
-    'url' => Url::fromRoute('domain_alias.admin', array('domain' => $id)),
+    'url' => \Drupal\Core\Url::fromRoute('domain_alias.admin', array('domain' => $id)),
     'weight' => 60,
   );
   return $operations;
@@ -85,9 +85,8 @@ function hook_domain_operations(\Drupal\domain\DomainInterface $domain) {
  *   Note that this is checked for uniqueness separately. This value is not
  *   modifiable.
  *
- * @return
- *   No return value. Modify $error_list by reference. Return an empty array
- *   or NULL to validate this domain.
+ * No return value. Modify $error_list by reference. Return an empty array
+ * or NULL to validate this domain.
  *
  * @see domain_valid_domain()
  */
@@ -113,8 +112,7 @@ function hook_domain_validate_alter(&$error_list, $hostname) {
  *   - entity_type The type of entity (e.g. node, user) that requested the list.
  *   - bundle The entity subtype (e.g. 'article' or 'page').
  *
- * @return
- *   No return value. Modify the $query object via methods.
+ * No return value. Modify the $query object via methods.
  */
 function hook_domain_references_alter($query, $account, $context) {
   // Remove the default domain from non-admins when editing nodes.
