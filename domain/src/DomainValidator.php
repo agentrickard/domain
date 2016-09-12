@@ -44,13 +44,13 @@ class DomainValidator implements DomainValidatorInterface {
   /**
    * Constructs a DomainNegotiator object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \GuzzleHttp\Client $httpClient
+   * @param \GuzzleHttp\Client $http_client
    *   The HTTP client.
    */
   public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, Client $http_client, EntityTypeManagerInterface $entity_type_manager) {
