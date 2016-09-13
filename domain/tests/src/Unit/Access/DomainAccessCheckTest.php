@@ -29,7 +29,22 @@ class DomainAccessCheckTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
     $this->mockNegotiator = $negotiator;
-    $this->object = new DomainAccessCheck($negotiator);
+
+    $config = $this
+      ->getMockBuilder('Drupal\Core\Config\ImmutableConfig')
+      ->disableOriginalConstructor()->setMethods(['get'])->getMock();
+    $config->expects(static::any())->method('get')
+      ->with('login_paths')
+      ->willReturn("/user/login\n/user/password");
+
+    $configFactory = $this
+      ->getMockBuilder('Drupal\Core\Config\ConfigFactory')
+      ->disableOriginalConstructor()->setMethods(['get'])->getMock();
+    $configFactory->expects(static::any())->method('get')
+      ->willReturn($config);
+    /** @var \Drupal\Core\Config\ConfigFactory $factory */
+
+    $this->object = new DomainAccessCheck($negotiator, $configFactory);
   }
 
   /**
@@ -53,8 +68,7 @@ class DomainAccessCheckTest extends UnitTestCase {
    */
   public function testAppliesFalse($path) {
     $route = $this->getMockBuilder('\Symfony\Component\Routing\Route')
-      ->disableOriginalConstructor()
-      ->getMock();
+      ->disableOriginalConstructor()->getMock();
     $route->expects(static::once())->method('getPath')
       ->willReturn($path);
     static::assertFalse($this->object->applies($route));
@@ -82,7 +96,8 @@ class DomainAccessCheckTest extends UnitTestCase {
    * @todo Find a way to mock AccessResult::allowedIfHasPermissions to complete test
    *
    * If AccessResult::allowedIfHasPermissions cannot be done by mock, then
-   * it will need to be done as a web test case. Maybe an example in comment\Unit\Entity\CommentLockTest
+   * it will need to be done as a web test case. Maybe an example in
+   * comment\Unit\Entity\CommentLockTest
    */
   public function testAccess() {
     $domain = $this->getMockBuilder('\Drupal\domain\DomainInterface')
@@ -99,28 +114,6 @@ class DomainAccessCheckTest extends UnitTestCase {
     $expected = AccessResult::allowed()->setCacheMaxAge(0);
     static::assertEquals($expected, $this->object->access($account));
     static::assertEquals($expected, $this->object->access($account));
-
-
-/*    $manager = $this
-      ->getMockBuilder('\Drupal\Core\Cache\Context\CacheContextsManager')
-      ->disableOriginalConstructor()->getMock();
-    $container = new ContainerBuilder();
-    $container->set('cache_contexts_manager', $manager);
-
-    $account = $this->getMockBuilder('\Drupal\Core\Session\AccountInterface')
-      ->disableOriginalConstructor()->getMock();
-    $account->expects(static::exactly(1))->method('hasPermission')
-      ->willReturn(TRUE);
-    static::assertEquals($expected, $this->object->access($account));
-
-    return;
-    $account = $this->getMockBuilder('\Drupal\Core\Session\AccountInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $account->expects(static::exactly(2))->method('hasPermission')
-      ->willReturn(FALSE);
-    $expected = AccessResult::forbidden()->setCacheMaxAge(0);
-    static::assertEquals($expected, $this->object->access($account));*/
   }
 
   /**
@@ -130,7 +123,7 @@ class DomainAccessCheckTest extends UnitTestCase {
     return [
       ['/user/1'],
       ['/user/admin'],
-      ['node/1'],
+      ['/node/1'],
     ];
   }
 
@@ -139,10 +132,8 @@ class DomainAccessCheckTest extends UnitTestCase {
    */
   public function providerCheckPathFalse() {
     return [
-      ['user/11'],
-      ['user/11/cancel/confirm/timestamp/hash'],
-      ['user/reset/11/timestamp/hash/login'],
-      ['user/reset/11'],
+      ['/user/login'],
+      ['/user/password'],
     ];
   }
 
