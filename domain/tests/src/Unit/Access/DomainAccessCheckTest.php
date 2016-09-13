@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\domain\Unit\Access;
+namespace Drupal\domain\Tests\Unit\Access;
 
 //use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\domain\Access\DomainAccessCheck;
