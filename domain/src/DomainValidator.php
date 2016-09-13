@@ -7,8 +7,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Unicode;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Provides validation of domain strings against RFC standards for hostnames.
@@ -37,7 +37,7 @@ class DomainValidator implements DomainValidatorInterface {
   /**
    * The HTTP client.
    *
-   * @var \GuzzleHttp\Client
+   * @var \GuzzleHttp\ClientInterface
    */
   protected $httpClient;
 
@@ -50,10 +50,10 @@ class DomainValidator implements DomainValidatorInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \GuzzleHttp\Client $http_client
+   * @param \GuzzleHttp\ClientInterface $http_client
    *   The HTTP client.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, Client $http_client, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager) {
     $this->moduleHandler = $module_handler;
     $this->config = $config_factory->get('domain.settings');
     $this->httpClient = $http_client;
@@ -177,10 +177,10 @@ class DomainValidator implements DomainValidatorInterface {
       ($test_path ?: drupal_get_path('module', 'domain') . '/tests/200.png');
     try {
       // GuzzleHttp no longer allows for bogus URL calls.
-      $request = $this->httpClient->get($url);
+      $request = $this->httpClient->request('get', $url);
     }
     // We cannot know which Guzzle Exception class will be returned; be generic.
-    catch (RequestException $e) {
+    catch (GuzzleException $e) {
       watchdog_exception('domain', $e);
       // File a general server failure.
       $domain->setResponse(500);
