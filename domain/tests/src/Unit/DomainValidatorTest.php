@@ -56,18 +56,12 @@ class DomainValidatorTest extends UnitTestCase {
       ->disableOriginalConstructor()->getMock();
 
     $response = $this->getMockBuilder('GuzzleHttp\Psr7\Response')
-      ->disableOriginalConstructor()
-      ->getMock();
+      ->disableOriginalConstructor()->getMock();
     $response->expects(static::any())->method('getStatusCode')
       ->willReturn(200);
 
-    static::assertNotEmpty($response);
-    $client = $this->getMockBuilder('GuzzleHttp\Client')
-      ->setMethods(['get', 'request'])
-      ->disableOriginalConstructor()
-      ->getMock();
-    $client->expects(static::any())->method('get')
-      ->will(static::returnValue($response));
+    $client = $this->getMockBuilder('GuzzleHttp\Client')->setMethods(['request'])
+      ->disableOriginalConstructor()->getMock();
     $client->expects(static::any())->method('request')
       ->will(static::returnValue($response));
 
