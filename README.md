@@ -14,8 +14,21 @@ For a complete feature status list, see [CHANGELOG.md](https://github.com/agentr
 Implementation Notes
 ======
 
+Cross-domain logins
+------
+
 To use cross-domain logins, you must now set the *cookie_domain* value in
-*sites/default/services.yml*. See https://www.drupal.org/node/2391871.
+*sites/default/services.yml*.
+
+To do so, clone  `default.services.yml` to `services.yml` and change the
+`cookie_domain` value to match the root hostname of your sites. Note that
+cross-domain login requires the sharing of a top-level domain, so a setting like
+`*.example.com` will work for all `example.com` subdomains.
+
+See https://www.drupal.org/node/2391871.
+
+Trusted host settings
+------
 
 If using the trusted host security setting in Drupal 8, be sure to add each domain
 and alias to the pattern list. For example:
@@ -29,6 +42,22 @@ $settings['trusted_host_patterns'] = array(
 ```
 
 See https://www.drupal.org/node/1992030 for more information.
+
+Domains and caching
+------
+
+If some variable changes are not picked up when the page renders, you may need
+add domain-sensitivity to the site's cache.
+
+To do so, clone  `default.services.yml` to `services.yml` (if you have not
+already done so) and change the `required_cache_contexts` value to:
+
+```YAML
+    required_cache_contexts: ['languages:language_interface', 'theme', 'user.permissions', 'url.site']
+```
+
+The addition of `url.site` should provide the domain context that the cache
+layer requires.
 
 Contributing
 ====
