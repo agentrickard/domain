@@ -5,6 +5,7 @@ namespace Drupal\domain\Plugin\Block;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\DomainInterface;
 
 /**
  * Provides a server information block for a domain request.
@@ -37,7 +38,7 @@ class DomainServerBlock extends DomainBlockBase {
         '#markup' => $this->t('No domain record could be loaded.'),
       );
     }
-    $header = array($this->t('Property'), $this->t('Value'));
+    $header = array($this->t('Server'), $this->t('Value'));
     $rows[] = array(
       $this->t('HTTP_HOST request'),
       Html::escape($_SERVER['HTTP_HOST']),

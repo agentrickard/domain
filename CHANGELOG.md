@@ -66,12 +66,12 @@ marked with [x] are considered complete.
 - [ ] Check domain responses on configuration forms
 - [x] Handle site name overrides -- perhaps as a new field?
 - [x] Restore the `domain_grant_all` permission?
-- [ ] Domain token support
+- [x] Domain token support
 - [ ] Test cron handling
-- [ ] Module configurations
+- [x] Module configurations
   - [x] Allow configuration of access-exempt paths for inactive domains
   - [x] www prefix handling
-  - [ ] Add domain-specific CSS classes
+  - [x] Add domain-specific CSS classes
   - [x] Path matching for URL rewrites?
   - [x] Allow non-ascii characters in domains
 - [ ] Recreate the Domain Nav module
