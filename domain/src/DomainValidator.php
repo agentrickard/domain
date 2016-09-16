@@ -63,7 +63,6 @@ class DomainValidator implements DomainValidatorInterface {
   /**
    * {@inheritdoc}
    *
-   * @TODO: Verify division into separate methods.
    * @TODO: Do not return Drupal-specific responses.
    */
   public function validate(DomainInterface $domain) {
