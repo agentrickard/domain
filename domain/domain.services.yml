@@ -34,6 +34,11 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@domain.negotiator', '@domain.loader', '@access_check.domain', '@current_user']
+  domain.token:
+    class: Drupal\domain\DomainToken
+    tags:
+      - { name: persist }
+    arguments: ['@domain.loader', '@domain.negotiator']
   domain.validator:
     class: Drupal\domain\DomainValidator
     tags:

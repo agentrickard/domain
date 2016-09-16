@@ -12,6 +12,9 @@ domain.settings:
     login_paths:
       type: text
       label: 'Paths that should be accessible for inactive domains'
+    css_classes:
+      type: text
+      label: 'Custom css classes to apply to the body tag of each domain'
 
 domain.record.*:
   type: config_entity

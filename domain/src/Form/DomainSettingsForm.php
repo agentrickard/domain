@@ -41,12 +41,23 @@ class DomainSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('www_prefix'),
       '#description' => $this->t('Domain negotiation will ignore any www prefixes for all requests.'),
     );
+    // Get the usable tokens for this field.
+    foreach (\Drupal::service('domain.token')->getCallbacks() as $key => $callback) {
+      $patterns[] = "[domain:$key]";
+    }
+    $form['css_classes'] = array(
+      '#type' => 'textfield',
+      '#size' => 80,
+      '#title' => $this->t('Custom CSS classes'),
+      '#default_value' => $config->get('css_classes'),
+      '#description' => $this->t('Enter any CSS classes that should be added to the &lt;body&gt; tag. Available replacement patterns are: ' . implode(', ', $patterns)),
+    );
     $form['login_paths'] = array(
       '#type' => 'textarea',
       '#rows' => 5,
       '#columns' => 40,
       '#title' => $this->t('Paths that should be accessible for inactive domains'),
-      '#default_value' => $config->get('login_paths', '/user/login\r\n/user/password'),
+      '#default_value' => $config->get('login_paths', "/user/login\r\n/user/password"),
       '#description' => $this->t('Inactive domains are only accessible to users with permission.
         Enter any paths that should be accessible, one per line. Normally, only the
         login path will be allowed.'),
@@ -74,6 +85,7 @@ class DomainSettingsForm extends ConfigFormBase {
       'allow_non_ascii',
       'www_prefix',
       'login_paths',
+      'css_classes',
     ];
   }
 
