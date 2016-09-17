@@ -6,6 +6,16 @@
  */
 
 /**
+ * Implements hook_install.
+ *
+ * Installs the domain admin field on users.
+ */
+function domain_install() {
+  // All this should do is set the form settings for our field.
+  domain_confirm_fields('user', 'user');
+}
+
+/**
  * Implements hook_update_N().
  *
  * Installs the domain admin field on users.
