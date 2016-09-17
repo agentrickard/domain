@@ -11,6 +11,11 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Component\Utility\Html;
 
 /**
+ * Defines the name of the node access control field.
+ */
+define('DOMAIN_ADMIN_FIELD', 'field_domain_admin');
+
+/**
  * Implements hook_entity_bundle_info().
  */
 function domain_entity_bundle_info() {
@@ -93,5 +98,68 @@ function domain_preprocess_html(array &$variables) {
     $token = \Drupal::token();
     // Prepare the class properly.
     $variables['attributes']['class'][] = Html::getClass($token->replace($string));
+  }
+}
+
+/**
+ * Creates our fields for an entity bundle.
+ *
+ * @param string $entity_type
+ *   The entity type being created. Node and user are supported.
+ * @param string $bundle
+ *   The bundle being created.
+ * @param array $text
+ *   The text to use for the field. Keys are:
+ *   'name' -- the lower-case, human-readable name of the entity.
+ *   'label' -- the form label for the all affiliates field.
+ *   'description' -- the help text for the all affiliates field.
+ *
+ *   If calling this function for entities other than user or node, it is the
+ *   caller's responsibility to provide this text.
+ *
+ * This function is here for convenience during installation. It is not really
+ * an API function. Modules wishing to add fields to non-node entities must
+ * provide their own field storage. See the field storage YML sample in
+ * tests/modules/domain_access_test for an example of field storage definitions.
+ *
+ * @TODO Update and abstract this function for use by other modules.
+ */
+function domain_confirm_fields($entity_type, $bundle, $text = array()) {
+  // We have reports that importing config causes this function to fail.
+  try {
+
+    $id = $entity_type . '.' . $bundle . '.' . DOMAIN_USER_FIELD;
+
+    if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
+      $field = array(
+        'field_name' => DOMAIN_ADMIN_FIELD,
+        'entity_type' => $entity_type,
+        'label' => 'Domain Administration',
+        'bundle' => $bundle,
+        // Users should not be required to be a domain editor.
+        'required' => $entity_type !== 'user',
+        'description' => 'Select the domains this user may administer',
+        'default_value' => [],
+        'settings' => array(
+          'handler_settings' => array(
+            'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+          ),
+        ),
+      );
+      $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
+      $field_config->save();
+    }
+    // Tell the form system how to behave. Default to radio buttons.
+    // @TODO: This function is deprecated, but using the OO syntax is causing
+    // test fails.
+    entity_get_form_display($entity_type, $bundle, 'default')
+      ->setComponent(DOMAIN_ADMIN_FIELD, array(
+        'type' => 'options_buttons',
+        'weight' => 40,
+      ))
+      ->save();
+  }
+  catch (Exception $e) {
+    \Drupal::logger('domain')->notice('Field installation failed.');
   }
 }
