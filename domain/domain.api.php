@@ -49,6 +49,11 @@ function hook_domain_request_alter(\Drupal\domain\DomainInterface &$domain) {
 /**
  * Adds administrative operations for the domain overview form.
  *
+ * These operations are only available to users who can administer the domain.
+ * That access check happens prior to this hook being called. If your use-case
+ * requires additional permission checking, you should provide it before
+ * returning any values.
+ *
  * @param \Drupal\domain\DomainInterface $domain
  *   A domain record object.
  *

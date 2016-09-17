@@ -6,6 +6,7 @@ use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\domain\DomainAccessControlHandler;
 
 /**
  * User interface for the domain overview screen.
@@ -33,7 +34,13 @@ class DomainListBuilder extends DraggableListBuilder {
     $default = $entity->isDefault();
     $id = $entity->id();
 
-    // @TODO: permission checks.
+    $accessHandler = \Drupal::entityTypeManager()->getAccessControlHandler('domain');
+
+    // If the user cannot edit domains, none of these actions are permitted.
+    $admin = $accessHandler->checkAccess($entity, 'update');
+    if ($admin->isForbidden()) {
+      return $operations;
+    }
     if ($entity->status() && !$default) {
       $operations['disable'] = array(
         'title' => $this->t('Disable'),
@@ -92,6 +99,14 @@ class DomainListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    $accessHandler = \Drupal::entityTypeManager()->getAccessControlHandler('domain');
+
+    // If the user cannot view the domain, none of these actions are permitted.
+    $admin = $accessHandler->checkAccess($entity, 'view');
+    if ($admin->isForbidden()) {
+      return;
+    }
+
     $row['label'] = $this->getLabel($entity);
     $row['hostname'] = array('#markup' => $entity->getLink());
     if ($entity->isActive()) {
@@ -101,6 +116,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $row['status'] = array('#markup' => $entity->status() ? $this->t('Active') : $this->t('Inactive'));
     $row['is_default'] = array('#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No')));
     $row += parent::buildRow($entity);
+    // @TODO: hide for non-admins?
     $row['weight']['#delta'] = count(\Drupal::service('domain.loader')->loadMultiple()) + 1;
     return $row;
   }
@@ -112,6 +128,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $form = parent::buildForm($form, $form_state);
     $form[$this->entitiesKey]['#domains'] = $this->entities;
     $form['actions']['submit']['#value'] = $this->t('Save configuration');
+    // @TODO : $form['actions']['submit']['#access'] =
     return $form;
   }
 

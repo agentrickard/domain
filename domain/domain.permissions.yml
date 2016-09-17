@@ -2,6 +2,8 @@ administer domains:
   title: 'Administer all domain records'
 access inactive domains:
   title: 'Access inactive domains'
+assign domain administrators:
+  title: 'Assign additional administrators to assigned domains'
 create domains:
   title: 'Create domain records'
 edit assigned domains:
