@@ -134,7 +134,7 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
       $field = array(
         'field_name' => DOMAIN_ADMIN_FIELD,
         'entity_type' => $entity_type,
-        'label' => 'Domain Administration',
+        'label' => 'Domain administrator',
         'bundle' => $bundle,
         // Users should not be required to be a domain editor.
         'required' => $entity_type !== 'user',
