@@ -3,8 +3,6 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Config\Entity\DraggableListBuilder;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -15,14 +13,9 @@ use Drupal\Core\Url;
 class DomainListBuilder extends DraggableListBuilder {
 
   /**
-   * Provide class-specific value of $entitiesKey.
-   *
    * {@inheritdoc}
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage) {
-    $this->entitiesKey = 'domains';
-    parent::__construct($entity_type, $storage);
-  }
+  protected $entitiesKey = 'domains';
 
   /**
    * {@inheritdoc}
