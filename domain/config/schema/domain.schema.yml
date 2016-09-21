@@ -33,7 +33,7 @@ domain.record.*:
       type: string
       label: 'Hostname'
     name:
-      type: string
+      type: label
       label: 'Name'
     scheme:
       type: string
