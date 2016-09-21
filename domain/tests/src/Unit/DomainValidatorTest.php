@@ -1,13 +1,18 @@
 <?php
 
+/**
+ * Unit tests for domain record validation.
+ */
+
 namespace Drupal\Tests\domain\Unit;
 
 use Drupal\Tests\UnitTestCase;
 use Drupal\domain\DomainValidator;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Psr7\Request;
 
 /**
- * Tests domain record validation.
- *
+ * @coversDefaultClass \Drupal\domain\DomainValidator
  * @group domain
  */
 class DomainValidatorTest extends UnitTestCase {
@@ -15,8 +20,23 @@ class DomainValidatorTest extends UnitTestCase {
   /** @var \Drupal\domain\DomainValidator */
   private $object;
 
-  /** @var \GuzzleHttp\Client */
-  public $client;
+  /** @var \Drupal\Core\Config\ImmutableConfig */
+  private $config;
+
+  /** @var \PHPUnit_Framework_MockObject_MockObject */
+  private $mockConfig;
+
+  /** @var \Drupal\domain\Entity\Domain */
+  private $domain;
+
+  /** @var \PHPUnit_Framework_MockObject_MockObject */
+  private $mockDomain;
+
+  /** @var \PHPUnit_Framework_MockObject_MockObject */
+  private $mockClient;
+
+  /** @var \PHPUnit_Framework_MockObject_MockObject */
+  private $mockResponse;
 
   /**
    * Set up a service container and SUT (Subject Under Test).
@@ -26,92 +46,156 @@ class DomainValidatorTest extends UnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    /** @var \Drupal\Core\Config\ImmutableConfig $config */
-    $config = $mock = $this->getMockBuilder('Drupal\Core\Config\ImmutableConfig')
+    $handler = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandler')
       ->disableOriginalConstructor()->getMock();
-    $mock->expects(static::any())->method('get')
-      ->willReturnMap([
-        ['allow_non_ascii', FALSE],
-        ['www-prefix', FALSE]
-      ]);
 
-    /** @var \Drupal\Core\Config\ConfigFactory $factory */
-    $factory = $mock = $this->getMockBuilder('Drupal\Core\Config\ConfigFactory')
-      ->disableOriginalConstructor()->getMock();
-    $mock->expects(static::once())->method('get')->willReturn($config);
+    $this->config = $this->mockConfig =
+      $this->getMockBuilder('Drupal\Core\Config\ImmutableConfig')
+        ->disableOriginalConstructor()
+        ->setMethods(['get'])->getMock();
 
-    /** @var \Drupal\Core\Entity\EntityStorageBase $storage */
-    $storage = $mock = $this->getMockBuilder('Drupal\Core\Entity\EntityStorageBase')
+    $configFactory = $this->getMockBuilder('Drupal\Core\Config\ConfigFactory')
       ->disableOriginalConstructor()->getMock();
-    $mock->expects(static::any())->method('loadByProperties')->willReturn(array());
+    $configFactory->expects(static::once())->method('get')
+      ->willReturn($this->config);
 
-    /** @var \Drupal\Core\Entity\EntityTypeManager $manager */
-    $manager = $mock = $this->getMockBuilder('Drupal\Core\Entity\EntityTypeManager')
+    $this->mockResponse = $this->getMockBuilder('GuzzleHttp\Psr7\Response')
       ->disableOriginalConstructor()->getMock();
-    $mock->expects(static::any())->method('getStorage')
+
+    $this->mockClient = $this->getMockBuilder('GuzzleHttp\Client')
+      ->disableOriginalConstructor()->setMethods(['request'])->getMock();
+
+    $domain = $this->getMockBuilder('Drupal\domain\Entity\Domain')
+      ->disableOriginalConstructor()->setMethods(['id'])->getMock();
+    $domain->expects(static::any())->method('id')->willReturn('foo_com');
+
+    $storage = $this->getMockBuilder('Drupal\Core\Entity\EntityStorageBase')
+      ->disableOriginalConstructor()->getMock();
+    $storage->expects(static::any())->method('loadByProperties')
+      ->willReturnCallback(function ($array) use ($domain) {
+        return ($array['hostname'] === 'foo.com') ? array($domain) : array();
+      });
+
+    $manager = $this->getMockBuilder('Drupal\Core\Entity\EntityTypeManager')
+      ->disableOriginalConstructor()->getMock();
+    $manager->expects(static::any())->method('getStorage')
       ->willReturn($storage);
 
-    /** @var \Drupal\Core\Extension\ModuleHandler $handler */
-    $handler = $mock = $this->getMockBuilder('Drupal\Core\Extension\ModuleHandler')
-      ->disableOriginalConstructor()->getMock();
+    $stringTranslation =
+      $this->getMockBuilder('\Drupal\Core\StringTranslation\TranslationManager')
+        ->disableOriginalConstructor()
+        ->setMethods(['translateString'])->getMock();
 
-    $response = $this->getMockBuilder('GuzzleHttp\Psr7\Response')
-      ->disableOriginalConstructor()->getMock();
-    $response->expects(static::any())->method('getStatusCode')
-      ->willReturn(200);
+    $this->domain = $this->mockDomain =
+      $this->getMockBuilder('Drupal\domain\Entity\Domain')
+        ->disableOriginalConstructor()
+        ->setMethods(['getHostname', 'id'])->getMock();
 
-    $client = $this->getMockBuilder('GuzzleHttp\Client')->setMethods(['request'])
-      ->disableOriginalConstructor()->getMock();
-    $client->expects(static::any())->method('request')
-      ->will(static::returnValue($response));
-
-    $this->object = new DomainValidator($handler, $factory, $client, $manager);
+    $this->object = new DomainValidator($handler, $configFactory, $this->mockClient, $manager, $stringTranslation);
   }
 
   /**
-   * @param string $host
-   * @param int $result
+   * @param $nonAscii
+   * @param $prefix
+   * @param $host
+   * @param $expect
    *
-   * @dataProvider provider
+   * @dataProvider providerValidate
    */
-  public function testValidateStaticInspection($host, $result) {
-    /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = $mock = $this->getMockBuilder('Drupal\domain\Entity\Domain')
-      ->disableOriginalConstructor()->getMock();
-    $mock->expects(static::any())->method('getHostname')
+  public function testValidate($nonAscii, $prefix, $host, $expect) {
+    $this->mockConfig->expects(static::exactly(2))->method('get')
+      ->willReturnMap([['allow_non_ascii', $nonAscii], ['www_prefix', $prefix]]);
+    $this->mockDomain->expects(static::once())->method('getHostname')
       ->willReturn($host);
-    $errors = $this->object->validate($domain);
-    static::assertNotEquals((bool) $result, (bool) count($errors));
+    $this->mockDomain->expects(static::any())->method('id')
+      ->willReturn(str_replace('.', '__', $host));
+
+    $errors = $this->object->validate($this->domain);
+    if ($expect) {
+      static::assertInstanceOf('\Drupal\Core\StringTranslation\TranslatableMarkup', $errors);
+    }
+    else {
+      static::assertInternalType('array', $errors);
+      static::assertCount($expect, $errors);
+    }
   }
 
   /**
+   * Data provider for testValidate
    * @return array
    */
-  public function provider() {
+  public function providerValidate() {
     return [
-      ['localhost', 1],
-      ['example.com', 1],
-      ['www.example.com', 1], // see www-prefix test, below.
-      ['one.example.com', 1],
-      ['example.com:8080', 1],
-      // these tests work, but translation service mock is not yet working
-//      ['example.com::8080', 0], // only one colon.
-//      ['example.com:abc', 0], // no letters after a colon.
-//      ['.example.com', 0], // cannot begin with a dot.
-//      ['example.com.', 0], // cannot end with a dot.
-//      ['EXAMPLE.com', 0], // lowercase only.
-//      ['éxample.com', 0], // ascii-only.
-    // this should be moved to a test of the Drupal logic, outside the string tests
-//      ['foo.com', 0], // duplicate.
+      // These are invariant format check on hostname.
+      [FALSE, FALSE, 'localhost',         0],
+      [FALSE, FALSE, 'example.com',       0],
+      [FALSE, FALSE, 'www.example.com',   0], // see www-prefix test, below.
+      [FALSE, FALSE, 'one.example.com',   0],
+      [FALSE, FALSE, 'example.com:8080',  0],
+      [FALSE, FALSE, 'example.com::8080', 1], // only one colon.
+      [FALSE, FALSE, 'example.com:abc',   1], // no letters after a colon.
+      [FALSE, FALSE, '.example.com',      1], // cannot begin with a dot.
+      [FALSE, FALSE, 'example.com.',      1], // cannot end with a dot.
+      [FALSE, FALSE, 'EXAMPLE.com',       1], // lowercase only.
+      // These depend on the module settings.
+      [FALSE, FALSE, 'www.example.com', 0],
+      [FALSE, FALSE,     'example.com', 0],
+      [FALSE,  TRUE, 'www.example.com', 1],
+      [FALSE,  TRUE,     'example.com', 0],
+      [FALSE, FALSE,     'éxample.com', 1],
+      [ TRUE, FALSE,     'éxample.com', 0],
+      [FALSE, FALSE,         'foo.com', 1], // duplicate.
     ];
   }
 
-  public function testCheckResponse() {
+  /**
+   * @param int $statusCode
+   *
+   * @dataProvider providerCheckResponse
+   */
+  public function testCheckResponse($statusCode) {
+    $this->mockClient->expects(static::any())->method('request')
+      ->will(static::returnValue($this->mockResponse));
+    $this->mockResponse->expects(static::any())->method('getStatusCode')
+      ->willReturn($statusCode);
+
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = $mock = $this->getMockBuilder('Drupal\domain\Entity\Domain')
       ->disableOriginalConstructor()->getMock();
-    $mock->expects(static::once())->method('setResponse')->with(200);
+    $mock->expects(static::once())->method('setResponse')->with($statusCode);
     $this->object->checkResponse($domain, 'module/path');
+  }
+
+  /**
+   * Data provider for testCheckResponse.
+   *
+   * @return array
+   */
+  public function providerCheckResponse() {
+    return [
+      [200],
+      [404],
+    ];
+  }
+
+  /**
+   * Test will not work due to use of global function watchdog_exception.
+   *
+   * See https://www.drupal.org/node/2116043
+   * And https://www.drupal.org/node/2595985
+   *
+   * @todo Implement logger service in DomainValidator and enable test.
+   */
+  public function notestCheckResponseException() {
+    $path = 'module/path';
+    $this->mockClient->expects(static::any())->method('request')
+      ->willThrowException(new BadResponseException('test', new Request('get', $path)));
+
+    /** @var \Drupal\domain\Entity\Domain $domain */
+    $domain = $mock = $this->getMockBuilder('Drupal\domain\Entity\Domain')
+      ->disableOriginalConstructor()->getMock();
+    $mock->expects(static::once())->method('setResponse')->with(500);
+    $this->object->checkResponse($domain, $path);
   }
 
   /**

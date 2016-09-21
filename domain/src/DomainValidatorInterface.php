@@ -29,7 +29,7 @@ interface DomainValidatorInterface {
    * @param \Drupal\domain\DomainInterface $domain
    *   A domain record.
    * @param string $test_path
-   *   A path on the domain to test.
+   *   (optional) A path on the domain to test, /domain/tests/200.png if empty.
    *
    * @return int
    *   The server response code for the request.

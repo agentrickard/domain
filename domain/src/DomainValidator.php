@@ -6,6 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Component\Utility\Unicode;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
@@ -52,12 +53,15 @@ class DomainValidator implements DomainValidatorInterface {
    *   The module handler.
    * @param \GuzzleHttp\ClientInterface $http_client
    *   The HTTP client.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface
+   *   The translation manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $translation_manager) {
     $this->moduleHandler = $module_handler;
     $this->config = $config_factory->get('domain.settings');
     $this->httpClient = $http_client;
     $this->entityTypeManager = $entity_type_manager;
+    $this->stringTranslation = $translation_manager;
   }
 
   /**
@@ -72,7 +76,7 @@ class DomainValidator implements DomainValidatorInterface {
     $error_list = $this->staticHostnameValidation($hostname);
 
     // Check for valid characters, unless using non-ASCII domains.
-    if (! $this->config->get('allow_non_ascii') && ! preg_match('/^[a-z0-9:.-]*$/i', $hostname)) {
+    if (!$this->config->get('allow_non_ascii') && !preg_match('/^[a-z0-9:.-]*$/i', $hostname)) {
       $error_list[] = $this->t('Only alphanumeric characters, dashes, and a colon are allowed.');
     }
 
@@ -80,7 +84,7 @@ class DomainValidator implements DomainValidatorInterface {
     // enabled under global domain settings.
     // Note that www prefix handling must be set explicitly in the UI.
     // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
-    if ($this->config->get('www_prefix') && 0 === strpos($hostname, '.www')) {
+    if ($this->config->get('www_prefix') && strpos($hostname, 'www.') === 0) {
       $error_list[] = $this->t('WWW prefix handling: Domains must be registered without the www. prefix.');
     }
 
@@ -102,7 +106,7 @@ class DomainValidator implements DomainValidatorInterface {
     $this->moduleHandler->invokeAll('domain_validate', array($error_list, $hostname));
 
     // Return the errors, if any.
-    if (count($error_list)) {
+    if (!empty($error_list)) {
       return $this->t('The domain string is invalid for %subdomain: @errors', array(
         '%subdomain' => $hostname,
         '@errors' => array(
@@ -180,6 +184,7 @@ class DomainValidator implements DomainValidatorInterface {
     }
     // We cannot know which Guzzle Exception class will be returned; be generic.
     catch (GuzzleException $e) {
+      /** @todo Replace with injected logger https://www.drupal.org/node/2595985 */
       watchdog_exception('domain', $e);
       // File a general server failure.
       $domain->setResponse(500);
