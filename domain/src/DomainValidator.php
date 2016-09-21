@@ -122,7 +122,7 @@ class DomainValidator implements DomainValidatorInterface {
   /**
    * Perform general hostname validation.
    *
-   * None of the checks in this methed are Drupal-specific or are affected by
+   * None of the checks in this method are Drupal-specific or are affected by
    * modules settings. Therefore, it might be possible to replace with a
    * general-purpose external hostname validation process.
    *
