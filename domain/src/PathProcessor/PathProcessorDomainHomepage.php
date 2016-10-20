@@ -43,12 +43,18 @@ class PathProcessorDomainHomepage implements InboundPathProcessorInterface, Outb
 
       /** @var \Drupal\domain\DomainInterface $domain */
       $domain = \Drupal::service('domain.loader')->loadByHostname($hostname);
-      $domain->getHomepage();
 
-      $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', [
-        'node' => $domain->getHomepage()]
-      );
-      $path = $url->toString();
+      if ($domain->isDefault()) {
+        $path = $this->config->get('system.site')->get('page.front');
+
+      } else {
+        $domain->getHomepage();
+
+        $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', [
+            'node' => $domain->getHomepage()]
+        );
+        $path = $url->toString();
+      }
 
       if (empty($path)) {
         throw new NotFoundHttpException();
