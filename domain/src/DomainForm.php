@@ -4,6 +4,7 @@ namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\Node;
 
 /**
  * Base form for domain edit forms.
@@ -80,6 +81,15 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->isDefault(),
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
+    $form['homepage'] = [
+      '#type' => 'entity_autocomplete',
+      '#title' => $this->t('homepage'),
+      '#target_type' => 'node',
+      '#tags' => FALSE,
+      '#default_value' => Node::load($domain->getHomepage()),
+      '#description' => $this->t('Define the homepage'),
+    ];
+
     $required = \Drupal::service('domain.validator')->getRequiredFields();
     foreach ($form as $key => $element) {
       if (in_array($key, $required)) {
