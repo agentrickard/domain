@@ -199,4 +199,14 @@ interface DomainInterface extends ConfigEntityInterface {
    */
   public function createDomainId();
 
+  /**
+   *
+   */
+  public function getHomepage();
+
+  /**
+   *
+   */
+  public function setHomepage($home);
+
 }

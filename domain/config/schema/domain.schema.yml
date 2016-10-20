@@ -47,6 +47,9 @@ domain.record.*:
     is_default:
       type: boolean
       label: 'Default domain'
+    homepage:
+      type: string
+      label: 'Default homepage'
 
 action.configuration.domain_default_action:
   type: action_configuration_default
