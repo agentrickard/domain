@@ -44,10 +44,9 @@ services:
     tags:
       - { name: persist }
     arguments: ['@module_handler', '@config.factory', '@http_client']
-
   domain.path_processor_homepage:
     class: Drupal\domain\PathProcessor\PathProcessorDomainHomepage
     tags:
       - { name: path_processor_inbound, priority: 200 }
       - { name: path_processor_outbound, priority: 200 }
-    arguments: ['@config.factory']
+    arguments: ['@config.factory', '@domain.loader']

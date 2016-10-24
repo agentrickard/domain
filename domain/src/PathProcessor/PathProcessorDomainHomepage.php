@@ -4,11 +4,11 @@ namespace Drupal\domain\PathProcessor;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\domain\DomainLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
-use Drupal\node\Entity\Node;
 
 /**
  * Processes the inbound path by resolving it to the front page if empty.
@@ -24,13 +24,21 @@ class PathProcessorDomainHomepage implements InboundPathProcessorInterface, Outb
   protected $config;
 
   /**
+   * @var DomainLoader
+   */
+  protected $domain;
+
+  /**
    * Constructs a PathProcessorFront object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   A config factory for retrieving the site front page configuration.
+   * @param \Drupal\domain\DomainLoader $domain
+   *   A domain loader service.
    */
-  public function __construct(ConfigFactoryInterface $config) {
+  public function __construct(ConfigFactoryInterface $config, DomainLoader $domain) {
     $this->config = $config;
+    $this->domain = $domain;
   }
 
   /**
@@ -39,21 +47,14 @@ class PathProcessorDomainHomepage implements InboundPathProcessorInterface, Outb
   public function processInbound($path, Request $request) {
 
     if ($path === '/') {
+
       $hostname = $request->getHost();
+      $domain = $this->domain->loadByHostname($hostname);
 
-      /** @var \Drupal\domain\DomainInterface $domain */
-      $domain = \Drupal::service('domain.loader')->loadByHostname($hostname);
-
-      if ($domain->isDefault()) {
+      if (!$domain || $domain->isDefault() || !$domain->getHomepage()) {
         $path = $this->config->get('system.site')->get('page.front');
-
       } else {
-        $domain->getHomepage();
-
-        $url = \Drupal\Core\Url::fromRoute('entity.node.canonical', [
-            'node' => $domain->getHomepage()]
-        );
-        $path = $url->toString();
+        $path = $domain->getHomepage();
       }
 
       if (empty($path)) {
