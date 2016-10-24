@@ -158,13 +158,24 @@ class DomainForm extends EntityForm implements ContainerInjectionInterface {
   /**
    * {@inheritdoc}
    */
-  public function validate(array $form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
     $errors = $this->domainValidator->validate($entity);
     if (!empty($errors)) {
       $form_state->setErrorByName('hostname', $errors);
     }
+
+    if (!$this->pathValidator->isValid($form_state->getValue('homepage'))) {
+      $form_state->setErrorByName('homepage',
+        $this->t("The path '%path' is either invalid or you do not have access to it.", array(
+          '%path' => $form_state->getValue('homepage')
+          )
+        )
+      );
+    }
   }
+
+
 
   /**
    * {@inheritdoc}
@@ -180,8 +191,6 @@ class DomainForm extends EntityForm implements ContainerInjectionInterface {
     $domain->save();
     $form_state->setRedirect('domain.admin');
   }
-
-
 
   /**
    * {@inheritdoc}
