@@ -137,11 +137,11 @@ class DomainForm extends EntityForm implements ContainerInjectionInterface {
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
     $form['homepage'] = [
-      '#type' => 'entity_autocomplete',
+      '#type' => 'textfield',
       '#title' => $this->t('homepage'),
       '#target_type' => 'node',
       '#tags' => FALSE,
-      '#default_value' => Node::load($domain->getHomepage()),
+      '#default_value' => $domain->getHomepage(),
       '#description' => $this->t('Define the homepage'),
     ];
 
