@@ -97,7 +97,7 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadMultipleSorted($ids = NULL) {
-    $domains = $this->loadMultiple();
+    $domains = $this->loadMultiple($ids);
     uasort($domains, array($this, 'sort'));
     return $domains;
   }
