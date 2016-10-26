@@ -98,7 +98,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         }
         // This code does not fire, but it should.
         else {
-          foreach ($this->getAccessValues($entity) as $id) {
+          foreach (self::getAccessValues($entity) as $id) {
             $item[] = $id;
           }
         }
@@ -123,7 +123,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         }
         // This code does not fire, but it should.
         else {
-          $item = $this->getAllValue($entity);
+          $item = self::getAllValue($entity);
         }
         break;
       default:
