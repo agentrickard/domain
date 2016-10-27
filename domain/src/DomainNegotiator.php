@@ -95,7 +95,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // is required for hook_domain_request_alter().
     else {
       $values = array('hostname' => $httpHost);
-      /** @var \Drupal\domain\Entity\DomainInterface $domain */
+      /** @var \Drupal\domain\DomainInterface $domain */
       $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
       $domain->setMatchType(self::DOMAIN_MATCH_NONE);
     }

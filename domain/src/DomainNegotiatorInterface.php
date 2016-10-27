@@ -46,6 +46,8 @@ interface DomainNegotiatorInterface {
 
   /**
    * Gets the id of the active domain.
+   *
+   * @return int|null|string
    */
   public function getActiveId();
 
@@ -55,6 +57,8 @@ interface DomainNegotiatorInterface {
    * This method is an internal method for use by the public getActiveDomain()
    * call. It is responsible for determining the active hostname of the request
    * and then passing that data to the negotiator.
+   *
+   * @return string
    */
   public function negotiateActiveHostname();
 
@@ -66,6 +70,7 @@ interface DomainNegotiatorInterface {
    *
    * @param bool $reset
    *   Reset the internal cache of the active domain.
+   * @return DomainInterface
    */
   public function getActiveDomain($reset = FALSE);
 
