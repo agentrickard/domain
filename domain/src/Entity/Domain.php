@@ -52,6 +52,7 @@ use Drupal\domain\DomainInterface;
  *     "status",
  *     "weight",
  *     "is_default",
+ *     "homepage",
  *   }
  * )
  */
@@ -152,6 +153,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * The type of match returned by the negotiator.
    */
   protected $matchType;
+
+  /**
+   * Homepage for domain.
+   *
+   * @var string
+   */
+  protected $homepage;
 
   /**
    * Overrides Drupal\Core\Entity\Entity:preCreate().
@@ -473,6 +481,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function getMatchType() {
     return $this->matchType;
+  }
+
+  public function getHomepage() {
+    return $this->homepage;
+  }
+
+  public function setHomepage($home) {
+    $this->homepage = $home;
   }
 
 }

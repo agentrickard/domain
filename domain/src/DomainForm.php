@@ -4,11 +4,65 @@ namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\domain\DomainLoader;
+use Drupal\domain\DomainValidator;
+use Drupal\domain\DomainCreator;
+use Drupal\Core\Path\PathValidatorInterface;
 
 /**
  * Base form for domain edit forms.
  */
-class DomainForm extends EntityForm {
+class DomainForm extends EntityForm implements ContainerInjectionInterface {
+
+  /**
+   * @var \Drupal\domain\DomainLoader
+   */
+  protected $domainLoader;
+
+  /**
+   * @var \Drupal\domain\DomainValidator
+   */
+  protected $domainValidator;
+
+  /**
+   * @var \Drupal\domain\DomainCreator
+   */
+  protected $domainCreator;
+
+  /**
+   * @var PathValidatorInterface
+   */
+  protected $pathValidator;
+
+  /**
+   * DomainForm constructor.
+   *
+   * @param \Drupal\domain\DomainValidator $domainValidator
+   * @param \Drupal\domain\DomainLoader $domainLoader
+   * @param \Drupal\domain\DomainCreator $domainCreator
+   * @param PathValidatorInterface $pathValidator
+   */
+  public function __construct(DomainValidator $domainValidator, DomainLoader $domainLoader, DomainCreator $domainCreator, PathValidatorInterface $pathValidator) {
+    $this->domainValidator = $domainValidator;
+    $this->domainLoader = $domainLoader;
+    $this->domainCreator = $domainCreator;
+    $this->pathValidator = $pathValidator;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('domain.validator'),
+      $container->get('domain.loader'),
+      $container->get('domain.creator'),
+      $container->get('path.validator')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -17,12 +71,14 @@ class DomainForm extends EntityForm {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = $this->entity;
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = $this->domainLoader->loadMultiple();
+
     // Create defaults if this is the first domain.
     if (empty($domains)) {
-      $domain->addProperty('hostname', \Drupal::service('domain.creator')->createHostname());
-      $domain->addProperty('name', \Drupal::config('system.site')->get('name'));
+      $domain->addProperty('hostname', $this->domainCreator->createHostname());
+      $domain->addProperty('name', $this->config('system.site')->get('name'));
     }
+
     $form['domain_id'] = array(
       '#type' => 'value',
       '#value' => $domain->getDomainId(),
@@ -70,7 +126,7 @@ class DomainForm extends EntityForm {
     $form['weight'] = array(
       '#type' => 'weight',
       '#title' => $this->t('Weight'),
-      '#delta' => count(\Drupal::service('domain.loader')->loadMultiple()) + 1,
+      '#delta' => count($this->domainLoader->loadMultiple()) + 1,
       '#default_value' => $domain->getWeight(),
       '#description' => $this->t('The sort order for this record. Lower values display first.'),
     );
@@ -80,26 +136,46 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->isDefault(),
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
-    $required = \Drupal::service('domain.validator')->getRequiredFields();
+    $form['homepage'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('homepage'),
+      '#target_type' => 'node',
+      '#tags' => FALSE,
+      '#default_value' => $domain->getHomepage(),
+      '#description' => $this->t('Define the homepage'),
+    ];
+
+    $required = $this->domainValidator->getRequiredFields();
     foreach ($form as $key => $element) {
       if (in_array($key, $required)) {
         $form[$key]['#required'] = TRUE;
       }
     }
+
     return $form;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function validate(array $form, FormStateInterface $form_state) {
+  public function validateForm(array &$form, FormStateInterface $form_state) {
     $entity = $this->buildEntity($form, $form_state);
-    $validator = \Drupal::service('domain.validator');
-    $errors = $validator->validate($entity);
+    $errors = $this->domainValidator->validate($entity);
     if (!empty($errors)) {
       $form_state->setErrorByName('hostname', $errors);
     }
+
+    if (!$this->pathValidator->isValid($form_state->getValue('homepage'))) {
+      $form_state->setErrorByName('homepage',
+        $this->t("The path '%path' is either invalid or you do not have access to it.", array(
+          '%path' => $form_state->getValue('homepage')
+          )
+        )
+      );
+    }
   }
+
+
 
   /**
    * {@inheritdoc}
