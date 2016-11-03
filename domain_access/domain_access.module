@@ -250,6 +250,7 @@ function domain_access_form_node_form_alter(&$form, FormState $form_state, $form
       '#type' => 'value',
       '#value' => $options_diff,
     );
+    // @TODO: All affiliates field.
     // Call our submit function to merge in values.
     // Account for all the submit buttons on the node form.
     $buttons = ['submit', 'publish', 'unpublish'];
