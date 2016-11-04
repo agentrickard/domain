@@ -475,12 +475,4 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $this->matchType;
   }
 
-  /**
-   * This is being fired for some reason if the values are shown on a
-   * content type.
-   */
-  public function isDefaultRevision($new_value = NULL) {
-    return TRUE;
-  }
-
 }
