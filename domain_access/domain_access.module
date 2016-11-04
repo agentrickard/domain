@@ -468,7 +468,7 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
       return AccessResult::forbidden();
     }
   }
-  // @TODO: It looks like this disallows access to the node editing?
+  // Check permissions on the All Affiliates field.
   elseif ($field_definition->getName() == DOMAIN_ACCESS_ALL_FIELD) {
     if ($entity instanceof User) {
       return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));
