@@ -47,27 +47,36 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   /** @var \Drupal\user\UserInterface $user */
   $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
   $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($user);
-  // Grants for view are simple. Use the active domain and all affiliates.
-  // Note that "X to any domain" is a global permission designed for admins.
+
+  // By default, give users access to all their assigned domains.
+  $grants['domain_id'] = array_values($user_domains);
+
+  // If the user can publish to any domain, add the active domain.
+  if ($user->hasPermission('publish to any domain') || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+    $grants['domain_id'][] = $id;
+  }
+
+  // Handle the unpublished content permission.
+  if ($user->hasPermission('view unpublished domain content')) {
+    $grants['domain_unpublished'] = array_values($user_domains);
+    // Include the active domain if allowed.
+    if ($user->hasPermission('publish to any domain') || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+      $grants['domain_unpublished'][] = $id;
+    }
+  }
+
+  // Special case for users with no assigned domains.
+  // @TODO: These options may become configurable.
   if ($op == 'view') {
     $grants['domain_id'][] = $id;
     $grants['domain_site'][] = 0;
     if ($user->hasPermission('view unpublished domain content')) {
-      if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+      if ($user->hasPermission('publish to any domain') || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
         $grants['domain_unpublished'][] = $id;
       }
     }
   }
-  elseif ($op == 'update' && $user->hasPermission('edit domain content')) {
-    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
-      $grants['domain_id'][] = $id;
-    }
-  }
-  elseif ($op == 'delete' && $user->hasPermission('delete domain content')) {
-    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
-      $grants['domain_id'][] = $id;
-    }
-  }
+
   return $grants;
 }
 
