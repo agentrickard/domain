@@ -47,36 +47,27 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   /** @var \Drupal\user\UserInterface $user */
   $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
   $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($user);
-
-  // By default, give users access to all their assigned domains.
-  $grants['domain_id'] = array_values($user_domains);
-
-  // If the user can publish to any domain, add the active domain.
-  if ($user->hasPermission('publish to any domain') || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
-    $grants['domain_id'][] = $id;
-  }
-
-  // Handle the unpublished content permission.
-  if ($user->hasPermission('view unpublished domain content')) {
-    $grants['domain_unpublished'] = array_values($user_domains);
-    // Include the active domain if allowed.
-    if ($user->hasPermission('publish to any domain') || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
-      $grants['domain_unpublished'][] = $id;
-    }
-  }
-
-  // Special case for users with no assigned domains.
-  // @TODO: These options may become configurable.
+  // Grants for view are simple. Use the active domain and all affiliates.
+  // Note that "X to any domain" is a global permission designed for admins.
   if ($op == 'view') {
     $grants['domain_id'][] = $id;
     $grants['domain_site'][] = 0;
     if ($user->hasPermission('view unpublished domain content')) {
-      if ($user->hasPermission('publish to any domain') || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+      if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
         $grants['domain_unpublished'][] = $id;
       }
     }
   }
-
+  elseif ($op == 'update' && $user->hasPermission('edit domain content')) {
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+      $grants['domain_id'][] = $id;
+    }
+  }
+  elseif ($op == 'delete' && $user->hasPermission('delete domain content')) {
+    if ($user->hasPermission('publish to any domain') || in_array($id, $user_domains) || !empty($user->get(DOMAIN_ACCESS_ALL_FIELD)->value)) {
+      $grants['domain_id'][] = $id;
+    }
+  }
   return $grants;
 }
 
@@ -359,35 +350,42 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
 
   $type = $node->bundle();
   $manager = \Drupal::service('domain_access.manager');
+  $allowed = FALSE;
+
+  // In order to access update or delete, the user must be able to View.
+  if ($op == 'view' && $manager->checkEntityAccess($node, $account)) {
+    /** @var \Drupal\user\UserInterface $user */
+    if ($node->isPublished()) {
+      $allowed = TRUE;
+    }
+    elseif ($account->hasPermission('view unpublished domain content')) {
+      $allowed = TRUE;
+    }
+  }
 
   if ($op == 'update') {
     if ($account->hasPermission('update ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+      $allowed = TRUE;
     }
-    if ($account->hasPermission('edit domain content') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+    elseif ($account->hasPermission('edit domain content') && $manager->checkEntityAccess($node, $account)) {
+      $allowed = TRUE;
     }
   }
 
   if ($op == 'delete') {
     if ($account->hasPermission('delete ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+      $allowed = TRUE;
     }
-    if ($account->hasPermission('delete domain content') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+    elseif ($account->hasPermission('delete domain content') && $manager->checkEntityAccess($node, $account)) {
+      $allowed = TRUE;
     }
+  }
+
+  if ($allowed) {
+    return AccessResult::allowed()
+      ->cachePerPermissions()
+      ->cachePerUser()
+      ->addCacheableDependency($node);
   }
 
   // No opinion.
@@ -457,10 +455,7 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
       return AccessResult::forbidden();
     }
   }
-<<<<<<< HEAD
   // Check permissions on the All Affiliates field.
-=======
->>>>>>> parent of 268faf0... Preliminary save code. But access is failing.
   elseif ($field_definition->getName() == DOMAIN_ACCESS_ALL_FIELD) {
     if ($entity instanceof User) {
       return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));
