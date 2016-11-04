@@ -271,7 +271,8 @@ function domain_access_form_node_form_alter(&$form, FormState $form_state, $form
  * @param Drupal\Core\Form\FormStateInterface $form_state
  *   The form state object.
  *
- * @TODO: Move to the manager service?
+ * @return
+ *   No return value. Hidden values are added to the field values directly.
  */
 function domain_access_node_submit(array &$form, FormStateInterface $form_state) {
   $values = $form_state->getValue('domain_access_disallowed');
