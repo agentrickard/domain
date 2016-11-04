@@ -263,6 +263,13 @@ function domain_access_form_node_form_alter(&$form, FormState $form_state, $form
 }
 
 /**
+ * Submit function for handling hidden values.
+ *
+ * @param $form
+ *   The form array.
+ * @param Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state object.
+ *
  * @TODO: Move to the manager service?
  */
 function domain_access_node_submit(array &$form, FormStateInterface $form_state) {
@@ -279,9 +286,16 @@ function domain_access_node_submit(array &$form, FormStateInterface $form_state)
 }
 
 /**
+ * Finds options not accessible to the current user.
+ *
+ * @param Drupal\Core\Form\FormStateInterface $form_state
+ *   The form state object.
+ * @param array $field
+ *   The field element being processed.
+ *
  * @TODO: Move to the manager service?
  */
-function domain_access_disallowed_options($field) {
+function domain_access_disallowed_options(FormStateInterface $form_state, $field) {
   $options = [];
   $manager = \Drupal::service('domain_access.manager');
   $info = $form_state->getBuildInfo();
