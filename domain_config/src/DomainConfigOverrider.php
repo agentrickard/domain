@@ -94,6 +94,14 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
         elseif ($override = $this->storage->read($config_name['domain'])) {
           $overrides[$name] = $override;
         }
+
+        // Apply any settings.php overrides.
+        if (isset($GLOBALS['config'][$config_name['langcode']])) {
+          $overrides[$name] = $GLOBALS['config'][$config_name['langcode']];
+        }
+        elseif (isset($GLOBALS['config'][$config_name['domain']])) {
+          $overrides[$name] = $GLOBALS['config'][$config_name['domain']];
+        }
       }
     }
     return $overrides;
