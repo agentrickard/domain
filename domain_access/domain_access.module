@@ -243,47 +243,9 @@ function domain_access_form_node_form_alter(&$form, FormState $form_state, $form
     ];
   }
   // Add the options hidden from the user silently to the form.
-  $manager = \Drupal::service('domain_access.manager');
-  $options_diff = $manager->disallowedOptions($form_state, $form[DOMAIN_ACCESS_FIELD]);
-  if (!empty($options_diff)) {
-    // @TODO: Potentially show this information to users with permission.
-    $form['domain_access_disallowed'] = array(
-      '#type' => 'value',
-      '#value' => $options_diff,
-    );
-    // Call our submit function to merge in values.
-    // Account for all the submit buttons on the node form.
-    $buttons = ['submit', 'publish', 'unpublish'];
-    foreach ($buttons as $button) {
-      if (isset($form['actions'][$button]['#submit'])) {
-        array_unshift($form['actions'][$button]['#submit'], 'domain_access_node_submit');
-      }
-    }
-  }
-}
-
-/**
- * Submit function for handling hidden values.
- *
- * @param $form
- *   The form array.
- * @param Drupal\Core\Form\FormStateInterface $form_state
- *   The form state object.
- *
- * @return
- *   No return value. Hidden values are added to the field values directly.
- */
-function domain_access_node_submit(array &$form, FormStateInterface $form_state) {
-  $values = $form_state->getValue('domain_access_disallowed');
-  if (!empty($values)) {
-    $info = $form_state->getBuildInfo();
-    $node = $form_state->getFormObject()->getEntity();
-    $entity_values = $form_state->getValue(DOMAIN_ACCESS_FIELD);
-  }
-  foreach ($values as $value) {
-    $entity_values[]['target_id'] = $value;
-  }
-  $form_state->setValue(DOMAIN_ACCESS_FIELD, $entity_values);
+  $manager = \Drupal::service('domain.field_manager');
+  $class = '\\Drupal\\domain_access\\DomainAccessManager';
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ACCESS_FIELD, $class);
 }
 
 /**
