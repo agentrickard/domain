@@ -15,11 +15,11 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class DomainFieldManager {
 
-  public function setFormOptions(array $form, FormStateInterface $form_state, $field, $service) {
+  public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $service) {
     static $fields;
-    $fields[] = $field;
+    $fields[] = $field_name;
     $manager = \Drupal::service($service);
-    $disallowed = $manager->disallowedOptions($form_state, $form[$field]);
+    $disallowed = $manager->disallowedOptions($form_state, $form[$field_name]);
     if (!empty($disallowed)) {
       // @TODO: Potentially show this information to users with permission.
       $form[$field_name . '_disallowed'] = array(
@@ -35,7 +35,7 @@ class DomainFieldManager {
       $buttons = ['preview', 'delete'];
       $submit = '\\Drupal\\domain\\DomainFieldManager::submitEntityForm';
       foreach ($form['actions'] as $key => $action) {
-        if (!in_array($key, $buttons)) {
+        if (!in_array($key, $buttons) && is_array($action)) {
           array_unshift($form['actions'][$key]['#submit'], $submit);
         }
       }
