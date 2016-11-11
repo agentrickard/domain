@@ -221,7 +221,7 @@ function domain_access_form_node_form_alter(&$form, FormState $form_state, $form
   $move_enabled = \Drupal::config('domain_access.settings')->get('node_advanced_tab');
   if (
     $move_enabled && isset($form[DOMAIN_ACCESS_FIELD]) &&
-    isset($form[DOMAIN_ACCESS_FIELD]) &&
+    isset($form[DOMAIN_ACCESS_ALL_FIELD]) &&
     empty($form[DOMAIN_ACCESS_FIELD]['#group']) &&
     empty($form[DOMAIN_ACCESS_ALL_FIELD]['#group'])
   ) {
