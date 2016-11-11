@@ -15,27 +15,28 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class DomainFieldManager {
 
-  public function setFormOptions(array $form, FormStateInterface $form_state, $field, $class) {
+  public function setFormOptions(array $form, FormStateInterface $form_state, $field, $service) {
     static $fields;
     $fields[] = $field;
-    $disallowed = $class->disallowedOptions($form_state, $form[$field]);
+    $manager = \Drupal::service($service);
+    $disallowed = $manager->disallowedOptions($form_state, $form[$field]);
     if (!empty($disallowed)) {
       // @TODO: Potentially show this information to users with permission.
       $form[$field_name . '_disallowed'] = array(
         '#type' => 'value',
         '#value' => $disallowed,
       );
-      $form['domain_hidden_fields'] = = array(
+      $form['domain_hidden_fields'] = array(
         '#type' => 'value',
         '#value' => $fields,
       );
       // Call our submit function to merge in values.
       // Account for all the submit buttons on the node form.
-      $buttons = ['submit', 'publish', 'unpublish'];
-      $submit =  '\\Drupal\\domain\\DomainFieldManager::submitEntityForm';
-      foreach ($buttons as $button) {
-        if (isset($form['actions'][$button]['#submit'])) {
-          array_unshift($form['actions'][$button]['#submit'], $submit);
+      $buttons = ['preview', 'delete'];
+      $submit = '\\Drupal\\domain\\DomainFieldManager::submitEntityForm';
+      foreach ($form['actions'] as $key => $action) {
+        if (!in_array($key, $buttons)) {
+          array_unshift($form['actions'][$key]['#submit'], $submit);
         }
       }
     }
