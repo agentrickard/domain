@@ -54,6 +54,34 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
   }
 
   /**
+   * Tests that domain-specific variable overrides in settings.php works.
+   */
+  public function testDomainConfigOverriderFromSettings() {
+    // Set up overrides.
+    $settings = [];
+    $settings['config']['domain.config.one_example_com.en.system.site']['name'] = (object) [
+      'value' => 'First',
+      'required' => TRUE,
+    ];
+    $settings['config']['domain.config.four_example_com.system.site']['name'] = (object) [
+      'value' => 'Four overridden in settings',
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+
+    // Create four new domains programmatically.
+    $this->domainCreateTestDomains(5);
+    $domains = \Drupal::service('domain.loader')->loadMultiple(['one_example_com', 'four_example_com']);
+
+    $domain_one = $domains['one_example_com'];
+    $this->drupalGet($domain_one->getPath() . 'user/login');
+    $this->assertRaw('<title>Log in | First</title>', 'Found overridden slogan for one.example.com.');
+
+    $domain_four = $domains['four_example_com'];
+    $this->drupalGet($domain_four->getPath() . 'user/login');
+    $this->assertRaw('<title>Log in | Four overridden in settings</title>', 'Found overridden slogan for four.example.com.');
+  }
+  /**
    * Returns the expected site name value from our test configuration.
    *
    * @param DomainInterface $domain
