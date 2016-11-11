@@ -16,6 +16,8 @@ use Drupal\Core\Form\FormStateInterface;
 class DomainFieldManager {
 
   public function setFormOptions(array $form, FormStateInterface $form_state, $field, $class) {
+    static $fields;
+    $fields[] = $field;
     $disallowed = $class->disallowedOptions($form_state, $form[$field]);
     if (!empty($disallowed)) {
       // @TODO: Potentially show this information to users with permission.
@@ -23,9 +25,9 @@ class DomainFieldManager {
         '#type' => 'value',
         '#value' => $disallowed,
       );
-      $form['domain_hidden_field'] = = array(
+      $form['domain_hidden_fields'] = = array(
         '#type' => 'value',
-        '#value' => $field_name,
+        '#value' => $fields,
       );
       // Call our submit function to merge in values.
       // Account for all the submit buttons on the node form.
@@ -52,17 +54,19 @@ class DomainFieldManager {
    *   No return value. Hidden values are added to the field values directly.
    */
   public static function submitEntityForm(array &$form, FormStateInterface $form_state) {
-    $field = $form_state->getValue('domain_hidden_field');
-    $values = $form_state->getValue($field . '_disallowed');
-    if (!empty($values)) {
-      $info = $form_state->getBuildInfo();
-      $node = $form_state->getFormObject()->getEntity();
-      $entity_values = $form_state->getValue($field);
+    $fields = $form_state->getValue('domain_hidden_fields');
+    foreach ($fields as $field) {
+      $values = $form_state->getValue($field . '_disallowed');
+      if (!empty($values)) {
+        $info = $form_state->getBuildInfo();
+        $node = $form_state->getFormObject()->getEntity();
+        $entity_values = $form_state->getValue($field);
+      }
+      foreach ($values as $value) {
+        $entity_values[]['target_id'] = $value;
+      }
+      $form_state->setValue($field, $entity_values);
     }
-    foreach ($values as $value) {
-      $entity_values[]['target_id'] = $value;
-    }
-    $form_state->setValue($field, $entity_values);
   }
 
 }
