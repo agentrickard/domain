@@ -140,8 +140,6 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    *   The form state object.
    * @param array $field
    *   The field element being processed.
-   *
-   * @TODO: Move to the manager service?
    */
   public function disallowedOptions(FormStateInterface $form_state, $field) {
     $options = [];
