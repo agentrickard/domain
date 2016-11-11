@@ -15,7 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class DomainFieldManager {
 
-  public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $service) {
+  public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $service, $hide_on_disallow = FALSE) {
     static $fields;
     $fields[] = $field_name;
     $manager = \Drupal::service($service);
@@ -30,6 +30,9 @@ class DomainFieldManager {
         '#type' => 'value',
         '#value' => $fields,
       );
+      if ($hide_on_disallow) {
+        $form[$field_name]['#access'] = FALSE;
+      }
       // Call our submit function to merge in values.
       // Account for all the submit buttons on the node form.
       $buttons = ['preview', 'delete'];
