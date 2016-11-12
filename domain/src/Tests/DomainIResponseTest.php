@@ -1,14 +1,20 @@
 <?php
 
 namespace Drupal\domain\Tests;
+
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Tests domain record HTTP response.
  *
+ * Note: Class is called DomainIResponseTest on purpose as for some
+ * unexplained reason when it is DomainResponseTest and runs after
+ * DomainNegotiatorTest, it plain fails due to timeout (no matter how high it
+ * gets set in DomainValidator::checkResponse().
+ *
  * @group domain
  */
-class DomainResponseTest extends DomainTestBase {
+class DomainIResponseTest extends DomainTestBase {
 
   /**
    * Tests that a domain response is proper.
