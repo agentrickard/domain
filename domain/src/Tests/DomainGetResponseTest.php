@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\domain\Tests;
+
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
@@ -8,7 +9,7 @@ use Drupal\Component\Render\FormattableMarkup;
  *
  * @group domain
  */
-class DomainResponseTest extends DomainTestBase {
+class DomainGetResponseTest extends DomainTestBase {
 
   /**
    * Tests that a domain response is proper.
