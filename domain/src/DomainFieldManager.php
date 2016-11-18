@@ -15,11 +15,26 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class DomainFieldManager {
 
-  public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $service, $hide_on_disallow = FALSE) {
-    static $fields;
-    $fields[] = $field_name;
-    $manager = \Drupal::service($service);
-    $disallowed = $manager->disallowedOptions($form_state, $form[$field_name]);
+  /**
+   * @var \Drupal\domain\DomainLoaderInterface
+   */
+  protected $loader;
+
+  /**
+   * Constructs a DomainCreator object.
+   *
+   * @param \Drupal\domain\DomainLoaderInterface $loader
+   *   The domain loader.
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
+   *   The domain negotiator.
+   */
+  public function __construct(DomainLoaderInterface $loader) {
+    $this->loader = $loader;
+  }
+
+  public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $hide_on_disallow = FALSE) {
+    $fields = $this->fieldList($field_name);
+    $disallowed = $this->disallowedOptions($form_state, $form[$field_name]);
     if (!empty($disallowed)) {
       // @TODO: Potentially show this information to users with permission.
       $form[$field_name . '_disallowed'] = array(
@@ -36,9 +51,9 @@ class DomainFieldManager {
       // Call our submit function to merge in values.
       // Account for all the submit buttons on the node form.
       $buttons = ['preview', 'delete'];
-      $submit = '\\Drupal\\domain\\DomainFieldManager::submitEntityForm';
+      $submit = $this->getSubmitHandler();
       foreach ($form['actions'] as $key => $action) {
-        if (!in_array($key, $buttons) && is_array($action)) {
+        if (!in_array($key, $buttons) && is_array($action) && !in_array($submit, $form['actions'][$key]['#submit'])) {
           array_unshift($form['actions'][$key]['#submit'], $submit);
         }
       }
@@ -71,6 +86,66 @@ class DomainFieldManager {
       }
       $form_state->setValue($field, $entity_values);
     }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  protected function fieldList($field_name) {
+    static $fields = [];
+    $fields[] = $field_name;
+    return $fields;
+  }
+
+  /**
+   * Finds options not accessible to the current user.
+   *
+   * @param Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
+   * @param array $field
+   *   The field element being processed.
+   */
+  protected function disallowedOptions(FormStateInterface $form_state, $field) {
+    $options = [];
+    $info = $form_state->getBuildInfo();
+    $entity = $form_state->getFormObject()->getEntity();
+    $entity_values = $this->getFieldValues($entity, $field['widget']['#field_name']);
+    if (isset($field['widget']['#options'])) {
+      $options = array_diff_key($entity_values, $field['widget']['#options']);
+    }
+    return array_keys($options);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  protected function getFieldValues($entity, $field_name = DOMAIN_ACCESS_FIELD) {
+    // @TODO: static cache.
+    $list = array();
+    // @TODO In tests, $entity is returning NULL.
+    if (is_null($entity)) {
+      return $list;
+    }
+    // Get the values of an entity.
+    $values = $entity->get($field_name);
+    // Must be at least one item.
+    if (!empty($values)) {
+      foreach ($values as $item) {
+        if ($target = $item->getValue()) {
+          if ($domain = $this->loader->load($target['target_id'])) {
+            $list[$domain->id()] = $domain->getDomainId();
+          }
+        }
+      }
+    }
+    return $list;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  protected function getSubmitHandler() {
+    return '\\Drupal\\domain\\DomainFieldManager::submitEntityForm';
   }
 
 }

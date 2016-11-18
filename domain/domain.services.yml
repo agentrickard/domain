@@ -23,6 +23,7 @@ services:
     class: Drupal\domain\DomainFieldManager
     tags:
       - { name: persist }
+    arguments: ['@domain.loader']
   domain.loader:
     class: Drupal\domain\DomainLoader
     tags:

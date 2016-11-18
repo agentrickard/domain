@@ -3,13 +3,14 @@
 namespace Drupal\domain_source;
 
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainFieldManager;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Checks the access status of entities based on domain settings.
  */
-class DomainSourceManager {
+class DomainSourceFieldManager extends DomainFieldManager {
 
   /**
    * Finds options not accessible to the current user.

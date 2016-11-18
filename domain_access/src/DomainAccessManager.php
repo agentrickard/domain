@@ -133,23 +133,4 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     return $item;
   }
 
-  /**
-   * Finds options not accessible to the current user.
-   *
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state object.
-   * @param array $field
-   *   The field element being processed.
-   */
-  public function disallowedOptions(FormStateInterface $form_state, $field) {
-    $options = [];
-    $info = $form_state->getBuildInfo();
-    $entity = $form_state->getFormObject()->getEntity();
-    $entity_values = $this->getAccessValues($entity);
-    if (isset($field['widget']['#options'])) {
-      $options = array_diff_key($entity_values, $field['widget']['#options']);
-    }
-    return array_keys($options);
-  }
-
 }
