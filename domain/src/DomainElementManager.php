@@ -15,7 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * This class has some similarities to DomainAccessManager, but only cares
  * about form handling. It can be used as a base class by other modules that
- * show/hide domain options. See the DomainSourceFieldManager for a non-default
+ * show/hide domain options. See the DomainSourceElementManager for a non-default
  * implementation.
  */
 class DomainElementManager {

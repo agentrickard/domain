@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Checks the access status of entities based on domain settings.
  */
-class DomainSourceFieldManager extends DomainElementManager {
+class DomainSourceElementManager extends DomainElementManager {
 
   /**
    * Finds options not accessible to the current user.
