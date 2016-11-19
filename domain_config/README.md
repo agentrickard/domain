@@ -80,6 +80,18 @@ Note that, unlike when you exported the item, here you always select "Simple
 configuration" as the configuration type to import, independent of the type of
 configuration you're overriding.
 
+settings.php overrides
+----------------------
+
+For environment-specific or sensitive overrides, use the settings.php method.
+In the above case, add
+`$conf['domain.config.three_example_com.en.system.site']['name'] = "My special site";`
+to your local settings.php file. This will ensure that the `three.example.com`
+domain gets the correct value regardless of other module overrides.
+
+Read more about the "Configuration override system"
+at https://www.drupal.org/node/1928898.
+
 Installation
 ============
 
