@@ -12,6 +12,11 @@ use Drupal\Core\Form\FormStateInterface;
  * we have a base class for handling common use cases. The details of each
  * implementation are generally handled by a subclass and invoked within a
  * hook_form_alter().
+ *
+ * This class has some similarities to DomainAccessManager, but only cares
+ * about form handling. It can be used as a base class by other modules that
+ * show/hide domain options. See the DomainSourceFieldManager for a non-default
+ * implementation.
  */
 class DomainFieldManager {
 

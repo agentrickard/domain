@@ -12,6 +12,9 @@ use Drupal\Core\Session\AccountInterface;
 
 /**
  * Checks the access status of entities based on domain settings.
+ *
+ * @TODO: It is possible that this class may become a subclass of the
+ * DomainFieldManager, however, the use-case is separate as far as I can tell.
  */
 class DomainAccessManager implements DomainAccessManagerInterface {
 
@@ -26,7 +29,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   protected $negotiator;
 
   /**
-   * Constructs a DomainCreator object.
+   * Constructs a DomainAccessManager object.
    *
    * @param \Drupal\domain\DomainLoaderInterface $loader
    *   The domain loader.
