@@ -1,5 +1,5 @@
 services:
-  domain_source.field_manager:
+  domain_source.element_manager:
     class: Drupal\domain_source\DomainSourceFieldManager
     tags:
       - { name: persist }

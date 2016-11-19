@@ -19,8 +19,8 @@ services:
     tags:
       - { name: persist }
     arguments: ['@domain.loader', '@domain.negotiator']
-  domain.field_manager:
-    class: Drupal\domain\DomainFieldManager
+  domain.element_manager:
+    class: Drupal\domain\DomainElementManager
     tags:
       - { name: persist }
     arguments: ['@domain.loader']

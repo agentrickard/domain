@@ -14,7 +14,7 @@ use Drupal\Core\Session\AccountInterface;
  * Checks the access status of entities based on domain settings.
  *
  * @TODO: It is possible that this class may become a subclass of the
- * DomainFieldManager, however, the use-case is separate as far as I can tell.
+ * DomainElementManager, however, the use-case is separate as far as I can tell.
  */
 class DomainAccessManager implements DomainAccessManagerInterface {
 

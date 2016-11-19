@@ -18,7 +18,7 @@ use Drupal\Core\Form\FormStateInterface;
  * show/hide domain options. See the DomainSourceFieldManager for a non-default
  * implementation.
  */
-class DomainFieldManager {
+class DomainElementManager {
 
   /**
    * @var \Drupal\domain\DomainLoaderInterface
@@ -150,7 +150,7 @@ class DomainFieldManager {
    * @inheritdoc
    */
   protected function getSubmitHandler() {
-    return '\\Drupal\\domain\\DomainFieldManager::submitEntityForm';
+    return '\\Drupal\\domain\\DomainElementManager::submitEntityForm';
   }
 
 }
