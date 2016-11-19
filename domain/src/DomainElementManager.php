@@ -90,7 +90,7 @@ class DomainElementManager implements DomainElementManagerInterface {
   /**
    * @inheritdoc
    */
-  protected function disallowedOptions(FormStateInterface $form_state, $field) {
+  public function disallowedOptions(FormStateInterface $form_state, $field) {
     $options = [];
     $info = $form_state->getBuildInfo();
     $entity = $form_state->getFormObject()->getEntity();
@@ -104,7 +104,7 @@ class DomainElementManager implements DomainElementManagerInterface {
   /**
    * @inheritdoc
    */
-  protected function fieldList($field_name) {
+  public function fieldList($field_name) {
     static $fields = [];
     $fields[] = $field_name;
     return $fields;
@@ -113,7 +113,7 @@ class DomainElementManager implements DomainElementManagerInterface {
   /**
    * @inheritdoc
    */
-  protected function getFieldValues($entity, $field_name) {
+  public function getFieldValues($entity, $field_name) {
     // @TODO: static cache.
     $list = array();
     // @TODO In tests, $entity is returning NULL.
@@ -138,7 +138,7 @@ class DomainElementManager implements DomainElementManagerInterface {
   /**
    * @inheritdoc
    */
-  protected function getSubmitHandler() {
+  public function getSubmitHandler() {
     return '\\Drupal\\domain\\DomainElementManager::submitEntityForm';
   }
 

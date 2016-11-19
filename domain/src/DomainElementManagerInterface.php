@@ -60,7 +60,7 @@ interface DomainElementManagerInterface {
    * @param array $field
    *   The field element being processed.
    */
-  protected function disallowedOptions(FormStateInterface $form_state, $field);
+  public function disallowedOptions(FormStateInterface $form_state, $field);
 
   /**
    * Stores a static list of fields that have been disallowed.
@@ -71,7 +71,7 @@ interface DomainElementManagerInterface {
    * @return array
    *   An array of field names.
    */
-  protected function fieldList($field_name);
+  public function fieldList($field_name);
 
   /**
    * Gets the domain entity reference field values from an entity.
@@ -85,7 +85,7 @@ interface DomainElementManagerInterface {
    *   The domain access field values, keyed by id (machine_name) with value of
    *   the numeric domain_id used by node access.
    */
-  protected function getFieldValues($entity, $field_name);
+  public function getFieldValues($entity, $field_name);
 
   /**
    * Returns the default submit handler to be used for a field element.
@@ -100,6 +100,6 @@ interface DomainElementManagerInterface {
    * The base implementat is submitEntityForm, and can be overridden by
    * specific subclasses.
    */
-  protected function getSubmitHandler();
+  public function getSubmitHandler();
 
 }

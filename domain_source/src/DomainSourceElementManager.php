@@ -10,7 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Checks the access status of entities based on domain settings.
  */
-class DomainSourceElementManager extends DomainElementManager implements DomainElementManagerInterface {
+class DomainSourceElementManager extends DomainElementManager {
 
   /**
    * @inheritdoc

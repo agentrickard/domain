@@ -76,17 +76,4 @@ interface DomainAccessManagerInterface {
    */
   public static function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
 
-  /**
-   * Finds options not accessible to the current user.
-   *
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state object.
-   * @param array $field
-   *   The field element being processed.
-   *
-   * @return array
-   *   An array of entity keys not allowed to be changed by this user.
-   */
-  public function disallowedOptions(FormStateInterface $form_state, $field);
-
 }
