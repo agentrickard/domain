@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Allows saving of domain specific configuration through the UI.
+ */
+
+function domain_config_ui_preprocess_page(&$variables) {
+  $route = \Drupal::routeMatch()->getRouteObject();
+  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
+
+  if ($is_admin) {
+    $form = \Drupal::formBuilder()->getForm('Drupal\domain_config_ui\Form\SwitchForm');
+    $variables['page']['content']['domain_config_ui_switch'] = $form;
+  }
+}

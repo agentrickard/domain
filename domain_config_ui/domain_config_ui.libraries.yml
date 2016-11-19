@@ -1,0 +1,5 @@
+drupal.domain_config_ui.admin:
+  version: VERSION
+  css:
+    theme:
+      css/domain_config_ui.admin.css: {}
