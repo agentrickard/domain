@@ -10,17 +10,10 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Checks the access status of entities based on domain settings.
  */
-class DomainSourceElementManager extends DomainElementManager {
+class DomainSourceElementManager extends DomainElementManager implements DomainElementManagerInterface {
 
   /**
-   * Finds options not accessible to the current user.
-   *
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state object.
-   * @param array $field
-   *   The field element being processed.
-   *
-   * @TODO: Move to the manager service?
+   * @inheritdoc
    */
   public function disallowedOptions(FormStateInterface $form_state, $field) {
     $options = [];

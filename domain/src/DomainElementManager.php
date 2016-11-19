@@ -2,7 +2,6 @@
 
 namespace Drupal\domain;
 
-use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -18,7 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
  * show/hide domain options. See the DomainSourceElementManager for a non-default
  * implementation.
  */
-class DomainElementManager {
+class DomainElementManager implements DomainElementManagerInterface {
 
   /**
    * @var \Drupal\domain\DomainLoaderInterface
@@ -26,7 +25,7 @@ class DomainElementManager {
   protected $loader;
 
   /**
-   * Constructs a DomainCreator object.
+   * Constructs a DomainElementManager object.
    *
    * @param \Drupal\domain\DomainLoaderInterface $loader
    *   The domain loader.
@@ -37,6 +36,9 @@ class DomainElementManager {
     $this->loader = $loader;
   }
 
+  /**
+   * @inheritdoc
+   */
   public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $hide_on_disallow = FALSE) {
     $fields = $this->fieldList($field_name);
     $disallowed = $this->disallowedOptions($form_state, $form[$field_name]);
@@ -67,15 +69,7 @@ class DomainElementManager {
   }
 
   /**
-   * Submit function for handling hidden values.
-   *
-   * @param $form
-   *   The form array.
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state object.
-   *
-   * @return
-   *   No return value. Hidden values are added to the field values directly.
+   * @inheritdoc
    */
   public static function submitEntityForm(array &$form, FormStateInterface $form_state) {
     $fields = $form_state->getValue('domain_hidden_fields');
@@ -96,20 +90,6 @@ class DomainElementManager {
   /**
    * @inheritdoc
    */
-  protected function fieldList($field_name) {
-    static $fields = [];
-    $fields[] = $field_name;
-    return $fields;
-  }
-
-  /**
-   * Finds options not accessible to the current user.
-   *
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state object.
-   * @param array $field
-   *   The field element being processed.
-   */
   protected function disallowedOptions(FormStateInterface $form_state, $field) {
     $options = [];
     $info = $form_state->getBuildInfo();
@@ -124,7 +104,16 @@ class DomainElementManager {
   /**
    * @inheritdoc
    */
-  protected function getFieldValues($entity, $field_name = DOMAIN_ACCESS_FIELD) {
+  protected function fieldList($field_name) {
+    static $fields = [];
+    $fields[] = $field_name;
+    return $fields;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  protected function getFieldValues($entity, $field_name) {
     // @TODO: static cache.
     $list = array();
     // @TODO In tests, $entity is returning NULL.
