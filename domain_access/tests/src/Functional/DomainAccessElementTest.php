@@ -37,15 +37,98 @@ class DomainAccessElementTest extends DomainTestBase {
    * Basic test setup.
    */
   public function testDomainAccessElement() {
-    $admin = $this->createDomainAdmin();
-    domain_access_confirm_fields('node', 'article');
+    $admin = $this->drupalCreateUser(array(
+      'bypass node access',
+      'administer content types',
+      'administer node fields',
+      'administer node display',
+      'administer domains',
+      'publish to any domain',
+    ));
     $this->drupalLogin($admin);
 
     $this->drupalGet('node/add/article');
     $this->assertSession()->statusCodeEquals(200);
 
-    $account = $this->drupalCreateUser(array('create article content', 'publish to any assigned domain'));
+    // Set the title, so the node can be saved.
+    $this->fillField('title[0][value]', 'Test node');
 
+    // We expect to find 5 domain options. We set two as selected.
+    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $count = 0;
+    $ids = ['example_com', 'one_example_com', 'two_example_com'];
+    foreach ($domains as $domain) {
+      $locator = DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
+      $this->findField($locator);
+      if (in_array($domain->id(), $ids)) {
+        $this->checkField($locator);
+      }
+    }
+    // Find the all affiliates field.
+    $locator = DOMAIN_ACCESS_ALL_FIELD . '[value]';
+    $this->findField($locator);
+
+    // Set all affiliates to TRUE.
+    $this->checkField($locator);
+
+    // Save the form.
+    $this->pressButton('edit-submit');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $node = $storage->load(1);
+    // Check that two values are set.
+    $manager = \Drupal::service('domain_access.manager');
+    $values = $manager->getAccessValues($node);
+    $this->assert(count($values) == 3, 'Node saved with three domain records.');
+    $value = $manager->getAllValue($node);
+    $this->assert($value == 1, 'Node saved to all affiliates.');
+
+    // Now login as a user with limited rights.
+    $account = $this->drupalCreateUser(array('create article content', 'edit any article content', 'publish to any assigned domain'));
+    $ids = ['example_com', 'one_example_com'];
+    $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ACCESS_FIELD);
+    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
+    $user = $user_storage->load($account->id());
+    $values = $manager->getAccessValues($user);
+    $this->assert(count($values) == 2, 'User saved with two domain records.');
+    $value = $manager->getAllValue($user);
+    $this->assert($value == 0, 'User not saved to all affiliates.');
+
+    $this->drupalLogin($account);
+
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertSession()->statusCodeEquals(200);
+
+    foreach ($domains as $domain) {
+      $locator = DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
+      $this->findField($locator);
+      if ($domain->id() == 'example_com')) {
+        $this->checkField($locator);
+      }
+      elseif ($domain->id() == 'one_example_com')) {
+        $this->uncheckField($locator);
+      }
+
+      else {
+        $this->assertSession()->fieldNotExists($locator);
+      }
+    }
+
+    $locator = DOMAIN_ACCESS_ALL_FIELD . '[value]';
+    $this->assertSession()->fieldNotExists($locator);
+
+    // Save the form.
+    $this->pressButton('edit-submit');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Now, check the node.
+    $node = $storage->load(1);
+    // Check that two values are set.
+    $values = $manager->getAccessValues($node);
+    $this->assert(count($values) == 2, 'Node saved with three domain records.');
+    $value = $manager->getAllValue($node);
+    $this->assert($value == 1, 'Node saved to all affiliates.');
   }
 
 }
