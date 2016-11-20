@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\Entity\User;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines the name of the node access control field.
@@ -219,14 +220,14 @@ function domain_access_form_devel_generate_form_user_alter(&$form, &$form_state,
 function domain_access_form_node_form_alter(&$form, FormState $form_state, $form_id) {
   $move_enabled = \Drupal::config('domain_access.settings')->get('node_advanced_tab');
   if (
-    $move_enabled && isset($form['field_domain_access']) &&
-    isset($form['field_domain_access']) &&
-    empty($form['field_domain_access']['#group']) &&
-    empty($form['field_domain_all_affiliates']['#group'])
+    $move_enabled && isset($form[DOMAIN_ACCESS_FIELD]) &&
+    isset($form[DOMAIN_ACCESS_ALL_FIELD]) &&
+    empty($form[DOMAIN_ACCESS_FIELD]['#group']) &&
+    empty($form[DOMAIN_ACCESS_ALL_FIELD]['#group'])
   ) {
     // Move to the tabs on the entity form
-    $form['field_domain_access']['#group'] = 'domain';
-    $form['field_domain_all_affiliates']['#group'] = 'domain';
+    $form[DOMAIN_ACCESS_FIELD]['#group'] = 'domain';
+    $form[DOMAIN_ACCESS_ALL_FIELD]['#group'] = 'domain';
     $form['domain'] = [
       '#type' => 'details',
       '#title' => t('Domain settings'),
@@ -241,8 +242,16 @@ function domain_access_form_node_form_alter(&$form, FormState $form_state, $form
       '#optional' => TRUE
     ];
   }
+  // Add the options hidden from the user silently to the form.
+  $manager = \Drupal::service('domain.element_manager');
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ACCESS_FIELD);
 }
 
+function domain_access_form_user_form_alter(&$form, &$form_state, $form_id) {
+  // Add the options hidden from the user silently to the form.
+  $manager = \Drupal::service('domain.element_manager');
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ACCESS_FIELD);
+}
 
 /**
  * Implements hook_domain_references_alter().
@@ -311,35 +320,42 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
 
   $type = $node->bundle();
   $manager = \Drupal::service('domain_access.manager');
+  $allowed = FALSE;
+
+  // In order to access update or delete, the user must be able to View.
+  if ($op == 'view' && $manager->checkEntityAccess($node, $account)) {
+    /** @var \Drupal\user\UserInterface $user */
+    if ($node->isPublished()) {
+      $allowed = TRUE;
+    }
+    elseif ($account->hasPermission('view unpublished domain content')) {
+      $allowed = TRUE;
+    }
+  }
 
   if ($op == 'update') {
     if ($account->hasPermission('update ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+      $allowed = TRUE;
     }
-    if ($account->hasPermission('edit domain content') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+    elseif ($account->hasPermission('edit domain content') && $manager->checkEntityAccess($node, $account)) {
+      $allowed = TRUE;
     }
   }
 
   if ($op == 'delete') {
     if ($account->hasPermission('delete ' . $type . ' content on assigned domains') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+      $allowed = TRUE;
     }
-    if ($account->hasPermission('delete domain content') && $manager->checkEntityAccess($node, $account)) {
-      return AccessResult::allowed()
-        ->cachePerPermissions()
-        ->cachePerUser()
-        ->addCacheableDependency($node);
+    elseif ($account->hasPermission('delete domain content') && $manager->checkEntityAccess($node, $account)) {
+      $allowed = TRUE;
     }
+  }
+
+  if ($allowed) {
+    return AccessResult::allowed()
+      ->cachePerPermissions()
+      ->cachePerUser()
+      ->addCacheableDependency($node);
   }
 
   // No opinion.
@@ -409,6 +425,7 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
       return AccessResult::forbidden();
     }
   }
+  // Check permissions on the All Affiliates field.
   elseif ($field_definition->getName() == DOMAIN_ACCESS_ALL_FIELD) {
     if ($entity instanceof User) {
       return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));

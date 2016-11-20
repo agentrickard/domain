@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Defines the name of the source domain field.
@@ -126,4 +127,14 @@ function domain_source_form_submit(&$form, \Drupal\Core\Form\FormStateInterface 
       $form_state->setResponse($response);
     }
   }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
+ */
+function domain_source_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Add the options hidden from the user silently to the form.
+  $manager = \Drupal::service('domain_source.element_manager');
+  $hide = TRUE;
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_SOURCE_FIELD, $hide);
 }
