@@ -123,10 +123,11 @@ class DomainAccessElementTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Now, check the node.
+    $storage->resetCache(array($node->id()));
     $node = $storage->load(1);
     // Check that two values are set.
     $values = $manager->getAccessValues($node);
-    $this->assert(count($values) == 2, 'Node saved with three domain records.');
+    $this->assert(count($values) == 2, 'Node saved with two domain records.');
     $value = $manager->getAllValue($node);
     $this->assert($value == 1, 'Node saved to all affiliates.');
   }
