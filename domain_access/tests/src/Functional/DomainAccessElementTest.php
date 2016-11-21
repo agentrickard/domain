@@ -103,10 +103,10 @@ class DomainAccessElementTest extends DomainTestBase {
     foreach ($domains as $domain) {
       $locator = DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
       $this->findField($locator);
-      if ($domain->id() == 'example_com')) {
+      if ($domain->id() == 'example_com') {
         $this->checkField($locator);
       }
-      elseif ($domain->id() == 'one_example_com')) {
+      elseif ($domain->id() == 'one_example_com') {
         $this->uncheckField($locator);
       }
 
