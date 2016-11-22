@@ -189,5 +189,31 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
 function domain_form_user_form_alter(&$form, &$form_state, $form_id) {
   // Add the options hidden from the user silently to the form.
   $manager = \Drupal::service('domain.element_manager');
-  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD);
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD, TRUE);
+}
+
+/**
+ * Implements hook_domain_references_alter().
+ */
+function domain_domain_references_alter($query, $account, $context) {
+  // Restrict domains by assignment.
+  switch ($context['entity_type']) {
+    case 'user':
+      if ($account->hasPermission('assign editors to any domain')) {
+        // Do nothing.
+      }
+      elseif ($account->hasPermission('assign domain administrators')) {
+        $allowed = \Drupal::service('domain.element_manager')->getFieldValues($account, DOMAIN_ADMIN_FIELD);
+        $query->condition('id', array_keys($allowed), 'IN');
+      }
+      else {
+        // Remove all options.
+        $query->condition('id', '-no-possible-match-');
+      }
+      break;
+
+    default:
+      // No action taken.
+      break;
+  }
 }

@@ -71,22 +71,7 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
    * @TODO: Refactor this code so that it can be shared by other modules.
    */
   public function getAdminValues(EntityInterface $entity, $field_name = DOMAIN_ADMIN_FIELD) {
-    $list = array();
-    // In tests, $entity is returning NULL.
-    if (is_null($entity)) {
-      return $list;
-    }
-    // Get the values of an entity.
-    $values = $entity->get($field_name);
-    // Must be at least one item.
-    if (!empty($values)) {
-      foreach ($values as $item) {
-        if ($target = $item->getValue()) {
-          $list[$target['target_id']] = $target['target_id'];
-        }
-      }
-    }
-    return $list;
+    return \Drupal::service('domain.element_manager')->getFieldValues($user, DOMAIN_ADMIN_FIELD);
   }
 
 }
