@@ -7,10 +7,14 @@ use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
  * Checks the access status of entities based on domain settings.
+ *
+ * @TODO: It is possible that this class may become a subclass of the
+ * DomainElementManager, however, the use-case is separate as far as I can tell.
  */
 class DomainAccessManager implements DomainAccessManagerInterface {
 
@@ -25,7 +29,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   protected $negotiator;
 
   /**
-   * Constructs a DomainCreator object.
+   * Constructs a DomainAccessManager object.
    *
    * @param \Drupal\domain\DomainLoaderInterface $loader
    *   The domain loader.
@@ -98,7 +102,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         }
         // This code does not fire, but it should.
         else {
-          foreach ($this->getAccessValues($entity) as $id) {
+          foreach (self::getAccessValues($entity) as $id) {
             $item[] = $id;
           }
         }
@@ -123,7 +127,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         }
         // This code does not fire, but it should.
         else {
-          $item = $this->getAllValue($entity);
+          $item = self::getAllValue($entity);
         }
         break;
       default:

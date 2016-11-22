@@ -1,4 +1,9 @@
 services:
+  domain_source.element_manager:
+    class: Drupal\domain_source\DomainSourceElementManager
+    tags:
+      - { name: persist }
+    arguments: ['@domain.loader']
   domain_source.path_processor:
     class: Drupal\domain_source\HttpKernel\DomainSourcePathProcessor
     arguments: ['@domain.loader', '@domain.negotiator', '@module_handler']
