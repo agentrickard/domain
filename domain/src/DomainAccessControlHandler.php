@@ -21,7 +21,7 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
     $account = $this->prepareUser($account);
     // Check the global permission.
     if ($account->hasPermission('administer domains')) {
- #     return AccessResult::allowed();
+      return AccessResult::allowed();
     }
     // @TODO: This may not be relevant.
     if ($operation == 'create' && $account->hasPermission('create domains')) {
