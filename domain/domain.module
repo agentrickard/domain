@@ -180,3 +180,14 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
     \Drupal::logger('domain')->notice('Field installation failed.');
   }
 }
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\user\UserForm.
+ *
+ * Handle settings that the user cannot access.
+ */
+function domain_form_user_form_alter(&$form, &$form_state, $form_id) {
+  // Add the options hidden from the user silently to the form.
+  $manager = \Drupal::service('domain.element_manager');
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD);
+}
