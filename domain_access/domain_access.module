@@ -262,7 +262,10 @@ function domain_access_form_user_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_domain_references_alter().
  */
 function domain_access_domain_references_alter($query, $account, $context) {
-  // Restrict domains by assignment.
+  // Restrict domains by editorial assignment.
+  if ($context['field_type'] != 'editor') {
+    return;
+  }
   switch ($context['entity_type']) {
     case 'node':
       if ($account->hasPermission('publish to any domain')) {

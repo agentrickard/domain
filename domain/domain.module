@@ -172,7 +172,7 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
     entity_get_form_display($entity_type, $bundle, 'default')
       ->setComponent(DOMAIN_ADMIN_FIELD, array(
         'type' => 'options_buttons',
-        'weight' => 40,
+        'weight' => 50,
       ))
       ->save();
   }
@@ -197,23 +197,17 @@ function domain_form_user_form_alter(&$form, &$form_state, $form_id) {
  */
 function domain_domain_references_alter($query, $account, $context) {
   // Restrict domains by assignment.
-  switch ($context['entity_type']) {
-    case 'user':
-      if ($account->hasPermission('assign editors to any domain')) {
-        // Do nothing.
-      }
-      elseif ($account->hasPermission('assign domain administrators')) {
-        $allowed = \Drupal::service('domain.element_manager')->getFieldValues($account, DOMAIN_ADMIN_FIELD);
-        $query->condition('id', array_keys($allowed), 'IN');
-      }
-      else {
-        // Remove all options.
-        $query->condition('id', '-no-possible-match-');
-      }
-      break;
-
-    default:
-      // No action taken.
-      break;
+  if ($context['field_type'] == 'admin' && $context['entity_type'] == 'user') {
+    if ($account->hasPermission('administer domains')) {
+      // Do nothing.
+    }
+    elseif ($account->hasPermission('assign domain administrators')) {
+      $allowed = \Drupal::service('domain.element_manager')->getFieldValues($account, DOMAIN_ADMIN_FIELD);
+      $query->condition('id', array_keys($allowed), 'IN');
+    }
+    else {
+      // Remove all options.
+      $query->condition('id', '-no-possible-match-');
+    }
   }
 }

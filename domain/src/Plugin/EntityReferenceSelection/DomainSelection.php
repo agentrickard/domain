@@ -20,6 +20,13 @@ use Drupal\Core\Form\FormStateInterface;
 class DomainSelection extends DefaultSelection {
 
   /**
+   * Sets the context for the alter hook.
+   *
+   * @var string
+   */
+  protected $field_type = 'editor';
+
+  /**
    * {@inheritdoc}
    */
   public function buildEntityQuery($match = NULL, $match_operator = 'CONTAINS') {
@@ -40,6 +47,7 @@ class DomainSelection extends DefaultSelection {
     if (!empty($info->configuration['entity'])) {
       $context['entity_type'] = $info->configuration['entity']->getEntityTypeId();
       $context['bundle'] = $info->configuration['entity']->bundle();
+      $context['field_type'] = $this->field_type;
 
       // Load the current user.
       $account = User::load($this->currentUser->id());
