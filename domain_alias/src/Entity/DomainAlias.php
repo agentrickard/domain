@@ -24,7 +24,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     }
  *   },
  *   config_prefix = "alias",
- *   admin_permission = "administer domains",
+ *   admin_permission = "administer domain aliases",
  *   entity_keys = {
  *     "id" = "id",
  *     "domain_id" = "domain_id",
