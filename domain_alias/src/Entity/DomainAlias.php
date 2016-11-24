@@ -15,7 +15,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   module = "domain_alias",
  *   handlers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
- *     "access" = "Drupal\domain\DomainAccessControlHandler",
+ *     "access" = "Drupal\domain_alias\DomainAliasAccessControlHandler",
  *     "list_builder" = "Drupal\domain_alias\DomainAliasListBuilder",
  *     "form" = {
  *       "default" = "Drupal\domain_alias\DomainAliasForm",
@@ -24,7 +24,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     }
  *   },
  *   config_prefix = "alias",
- *   admin_permission = "administer domains",
+ *   admin_permission = "administer domain aliases",
  *   entity_keys = {
  *     "id" = "id",
  *     "domain_id" = "domain_id",
