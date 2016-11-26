@@ -8,3 +8,12 @@ services:
 
   config.factory:
     alias: domain_config_ui.factory
+
+  domain_config_ui.overrider:
+    class: Drupal\domain_config_ui\DomainConfigUIOverrider
+    tags:
+      - { name: config.factory.override, priority: -150}
+    arguments: ['@domain.negotiator', '@config.storage']
+
+  domain_config.overrider:
+    alias: domain_config_ui.overrider
