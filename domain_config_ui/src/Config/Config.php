@@ -58,12 +58,12 @@ class Config extends CoreConfig {
     }
 
     // If user hasn't specified how to save config, save with original name.
-    if (!isset($_SESSION['domain_config_ui']['config_save_mode']) || $_SESSION['domain_config_ui']['config_save_mode'] == 'all') {
+    if (!isset($_SESSION['domain_config_ui']['config_save_domain']) || $_SESSION['domain_config_ui']['config_save_domain'] == 'all') {
       return $this->name;
     }
 
     // Build prefix and add to front of existing key.
-    if ($domain = \Drupal::service('domain.negotiator')->getActiveDomain(TRUE) ) {
+    if ($domain = \Drupal::service('domain.loader')->load($_SESSION['domain_config_ui']['config_save_domain']) ) {
       $prefix = 'domain.config.' . $domain->id() . '.';
       if ($language = \Drupal::languageManager()->getCurrentLanguage()) {
         $prefix .= $language->getId() . '.';

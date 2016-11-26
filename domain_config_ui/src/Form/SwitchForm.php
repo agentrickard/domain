@@ -16,19 +16,16 @@ class SwitchForm extends FormBase {
    * {@inheritDoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    if (isset($_SESSION['domain_config_ui']['config_save_mode'])) {
-      $selected = $_SESSION['domain_config_ui']['config_save_mode'];
+    if (isset($_SESSION['domain_config_ui']['config_save_domain'])) {
+      $selected = $_SESSION['domain_config_ui']['config_save_domain'];
     }
     else {
-      $selected = $form_state->getValue('config_save_mode');
+      $selected = $form_state->getValue('config_save_domain');
     }
-    $form['config_save_mode'] = array(
+    $form['config_save_domain'] = array(
       '#type' => 'select',
       '#title' => 'Save config for:',
-      '#options' => [
-        'all' => 'All Domains',
-        'current' => 'Current Domain',
-      ],
+      '#options' => \Drupal::service('domain.loader')->loadOptionsList(),
       '#default_value' => $selected,
       '#ajax' => array(
         'callback' => 'Drupal\domain_config_ui\Form\SwitchForm::switchCallback',
@@ -55,6 +52,8 @@ class SwitchForm extends FormBase {
    * @param FormStateInterface $form_state
    */
   public static function switchCallback(array &$form, FormStateInterface $form_state) {
-    $_SESSION['domain_config_ui']['config_save_mode'] = $form_state->getValue('config_save_mode');
+    if ($domain = \Drupal::service('domain.loader')->load($form_state->getValue('config_save_domain'))) {
+      $_SESSION['domain_config_ui']['config_save_domain'] = $form_state->getValue('config_save_domain');
+    }
   }
 }
