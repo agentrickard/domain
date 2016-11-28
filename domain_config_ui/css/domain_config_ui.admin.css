@@ -8,7 +8,7 @@
   width:250px;
 }
 
-#domain-config-ui-switch-form label[for='edit-config-save-mode']{
+#domain-config-ui-switch-form label[for='edit-config-save-domain']{
   float:left;
   padding:0 5px 0 0;
 }
