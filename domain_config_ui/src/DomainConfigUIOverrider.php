@@ -28,7 +28,6 @@ class DomainConfigUIOverrider extends DomainConfigOverrider {
       return parent::getDomainConfigName($name, $domain);
     }
     if ($configDomain = \Drupal::service('domain.loader')->load($_SESSION['domain_config_ui']['config_save_domain'])) {
-      drupal_set_message('domain.config.' . $configDomain->id() . '.' . $this->language->getId() . '.' . $name);
       return [
         'langcode' => 'domain.config.' . $configDomain->id() . '.' . $this->language->getId() . '.' . $name,
         'domain' => 'domain.config.' . $configDomain->id() . '.' . $name,
