@@ -13,10 +13,9 @@ class ConfigFactory extends CoreConfigFactory {
    * @see \Drupal\Core\Config\ConfigFactory::createConfigObject()
    */
   protected function createConfigObject($name, $immutable) {
-    if (!$immutable) {
-      return new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager);
-    }
-    return parent::createConfigObject($name, $immutable);
+    // Always writeable.
+    // @todo load immutable with overrides applied.
+    return parent::createConfigObject($name, FALSE);
   }
 
   /**
