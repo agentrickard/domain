@@ -13,9 +13,10 @@ class ConfigFactory extends CoreConfigFactory {
    * @see \Drupal\Core\Config\ConfigFactory::createConfigObject()
    */
   protected function createConfigObject($name, $immutable) {
-    // Always writeable.
-    // @todo load immutable with overrides applied.
-    return parent::createConfigObject($name, FALSE);
+    if (!$immutable) {
+      return new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager);
+    }
+    return parent::createConfigObject($name, $immutable);
   }
 
   /**
@@ -23,8 +24,39 @@ class ConfigFactory extends CoreConfigFactory {
    * @see \Drupal\Core\Config\ConfigFactory::doLoadMultiple()
    */
   protected function doLoadMultiple(array $names, $immutable = TRUE) {
-    // Load with $immutable set to FALSE to include config overrides.
-    return parent::doLoadMultiple($names, TRUE);
+    // Let parent load multiple load as usual.
+    $list = parent::doLoadMultiple($names, $immutable);
+
+    // Do not apply overrides if configuring 'all' domains.
+    if (!isset($_SESSION['domain_config_ui']['config_save_domain']) || $_SESSION['domain_config_ui']['config_save_domain'] == 'all') {
+      return $list;
+    }
+
+    // Pre-load remaining configuration files.
+    if (!empty($names)) {
+      // Initialise override information.
+      $module_overrides = array();
+      $storage_data = $this->storage->readMultiple($names);
+
+      // Load module overrides so that domain specific config is loaded in admin forms.
+      if (!empty($storage_data)) {
+        // Only get module overrides if we have configuration to override.
+        $module_overrides = $this->loadOverrides($names);
+      }
+
+      foreach ($storage_data as $name => $data) {
+        $cache_key = $this->getConfigCacheKey($name, $immutable);
+
+        if (isset($module_overrides[$name])) {
+          $this->cache[$cache_key]->setModuleOverride($module_overrides[$name]);
+          $list[$name] = $this->cache[$cache_key];
+        }
+
+        $this->propagateConfigOverrideCacheability($cache_key, $name);
+      }
+    }
+
+    return $list;
   }
 
   /**
@@ -32,7 +64,30 @@ class ConfigFactory extends CoreConfigFactory {
    * @see \Drupal\Core\Config\ConfigFactory::doGet()
    */
   protected function doGet($name, $immutable = TRUE) {
-    // Load with $immutable set to FALSE to include config overrides.
-    return parent::doGet($name, TRUE);
+    if ($config = $this->doLoadMultiple(array($name), $immutable)) {
+      return $config[$name];
+    }
+    else {
+      // If the configuration object does not exist in the configuration
+      // storage, create a new object.
+      $config = $this->createConfigObject($name, $immutable);
+
+      // Load module overrides so that domain specific config is loaded in admin forms.
+      $overrides = $this->loadOverrides(array($name));
+      if (isset($overrides[$name])) {
+        $config->setModuleOverride($overrides[$name]);
+      }
+
+      // Apply any settings.php overrides.
+      if ($immutable && isset($GLOBALS['config'][$name])) {
+        $config->setSettingsOverride($GLOBALS['config'][$name]);
+      }
+
+      foreach ($this->configFactoryOverrides as $override) {
+        $config->addCacheableDependency($override->getCacheableMetadata($name));
+      }
+
+      return $config;
+    }
   }
 }

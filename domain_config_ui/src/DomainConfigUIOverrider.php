@@ -10,30 +10,24 @@ use Drupal\domain_config\DomainConfigOverrider;
  */
 class DomainConfigUIOverrider extends DomainConfigOverrider {
   /**
-   * Get configuration name for this current domain being configured.
-   *
-   * It will be the same name with a prefix depending on domain and language:
-   * @code domain.config.DOMAIN_ID.LANGCODE @endcode
-   *
-   * @param string $name
-   *   The name of the config object.
-   * @param \Drupal\domain\DomainInterface $domain
-   *   The domain object.
-   *
-   * @return array
-   *   The domain-language, and domain-specific config names.
+   * {@inheritDoc}
+   * @see \Drupal\domain_config\DomainConfigOverrider::initiateContext()
    */
-  protected function getDomainConfigName($name, DomainInterface $domain) {
-    if (!isset($_SESSION['domain_config_ui']['config_save_domain']) || $_SESSION['domain_config_ui']['config_save_domain'] == 'all') {
-      return parent::getDomainConfigName($name, $domain);
+  protected function initiateContext() {
+    // Prevent infinite lookups by caching the request. Since the _construct()
+    // is called for each lookup, this is more efficient.
+    static $context;
+    if ($context) {
+      return;
     }
-    if ($configDomain = \Drupal::service('domain.loader')->load($_SESSION['domain_config_ui']['config_save_domain'])) {
-      return [
-        'langcode' => 'domain.config.' . $configDomain->id() . '.' . $this->language->getId() . '.' . $name,
-        'domain' => 'domain.config.' . $configDomain->id() . '.' . $name,
-      ];
-    }
-    return parent::getDomainConfigName($name, $domain);
-  }
+    $context++;
 
+    parent::initiateContext();
+
+    // Use the selected domain instead of the active domain.
+    $selected_domain_id = isset($_SESSION['domain_config_ui']['config_save_domain']) ? $_SESSION['domain_config_ui']['config_save_domain'] : 'all';
+    if ($selected_domain_id && $selected_domain = \Drupal::service('domain.loader')->load($selected_domain_id)) {
+      $this->domain = $selected_domain;
+    }
+  }
 }
