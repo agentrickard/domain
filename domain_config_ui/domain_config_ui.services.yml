@@ -9,11 +9,11 @@ services:
   config.factory:
     alias: domain_config_ui.factory
 
-  domain_config_ui.overrider:
-    class: Drupal\domain_config_ui\DomainConfigUIOverrider
+  domain_config_ui.negotiator:
+    class: Drupal\domain_config_ui\DomainConfigUINegotiator
     tags:
-      - { name: config.factory.override, priority: -150}
-    arguments: ['@domain.negotiator', '@config.storage']
+      - { name: persist }
+    arguments: ['@request_stack', '@module_handler', '@domain.loader', '@config.factory']
 
-  domain_config.overrider:
-    alias: domain_config_ui.overrider
+  domain.negotiator:
+    alias: domain_config_ui.negotiator

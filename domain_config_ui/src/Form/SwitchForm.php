@@ -16,8 +16,8 @@ class SwitchForm extends FormBase {
    * {@inheritDoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    if (isset($_SESSION['domain_config_ui']['config_save_domain'])) {
-      $selected = $_SESSION['domain_config_ui']['config_save_domain'];
+    if ($selected_domain = \Drupal::service('domain.negotiator')->getSelectedDomain()) {
+      $selected = $selected_domain->id();
     }
     else {
       $selected = $form_state->getValue('config_save_domain');
@@ -52,11 +52,6 @@ class SwitchForm extends FormBase {
    * @param FormStateInterface $form_state
    */
   public static function switchCallback(array &$form, FormStateInterface $form_state) {
-    if ($domain = \Drupal::service('domain.loader')->load($form_state->getValue('config_save_domain'))) {
-      $_SESSION['domain_config_ui']['config_save_domain'] = $form_state->getValue('config_save_domain');
-    }
-    else {
-      $_SESSION['domain_config_ui']['config_save_domain'] = 'all';
-    }
+    \Drupal::service('domain.negotiator')->setSelectedDomain($form_state->getValue('config_save_domain'));
   }
 }
