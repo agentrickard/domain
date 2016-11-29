@@ -28,7 +28,7 @@ class ConfigFactory extends CoreConfigFactory {
     $list = parent::doLoadMultiple($names, $immutable);
 
     // Do not apply overrides if configuring 'all' domains.
-    if (!isset($_SESSION['domain_config_ui']['config_save_domain']) || $_SESSION['domain_config_ui']['config_save_domain'] == 'all') {
+    if (!\Drupal::service('domain.negotiator')->getSelectedDomainId()) {
       return $list;
     }
 
@@ -64,6 +64,11 @@ class ConfigFactory extends CoreConfigFactory {
    * @see \Drupal\Core\Config\ConfigFactory::doGet()
    */
   protected function doGet($name, $immutable = TRUE) {
+    // Do not apply overrides if configuring 'all' domains.
+    if (!\Drupal::service('domain.negotiator')->getSelectedDomainId()) {
+      return parent::doGet($name, $immutable);
+    }
+
     if ($config = $this->doLoadMultiple(array($name), $immutable)) {
       return $config[$name];
     }
