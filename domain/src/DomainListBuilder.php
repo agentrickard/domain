@@ -41,6 +41,9 @@ class DomainListBuilder extends DraggableListBuilder {
     if ($admin->isForbidden()) {
       return $operations;
     }
+    $account = \Drupal::currentUser();
+    $super_admin = $account->hasPermission('administer domains');
+
     if ($entity->status() && !$default) {
       $operations['disable'] = array(
         'title' => $this->t('Disable'),
@@ -55,12 +58,14 @@ class DomainListBuilder extends DraggableListBuilder {
         'weight' => 40,
       );
     }
-    if (!$default) {
+    if (!$default && $super_admin) {
       $operations['default'] = array(
         'title' => $this->t('Make default'),
         'url' => Url::fromRoute('domain.inline_action', array('op' => 'default', 'domain' => $id)),
         'weight' => 30,
       );
+    }
+    if (!$default && $accessHandler->checkAccess($entity, 'delete')->isAllowed()) {
       $operations['delete'] = array(
         'title' => $this->t('Delete'),
         'url' => Url::fromRoute('entity.domain.delete_form', array('domain' => $id)),
@@ -92,7 +97,12 @@ class DomainListBuilder extends DraggableListBuilder {
     $header['hostname'] = $this->t('Hostname');
     $header['status'] = $this->t('Status');
     $header['is_default'] = $this->t('Default');
-    return $header + parent::buildHeader();
+    $header += parent::buildHeader();
+    $account = \Drupal::currentUser();
+    if (!$account->hasPermission('administer domains')) {
+      unset($header['weight']);
+    }
+    return $header;
   }
 
   /**
@@ -116,8 +126,13 @@ class DomainListBuilder extends DraggableListBuilder {
     $row['status'] = array('#markup' => $entity->status() ? $this->t('Active') : $this->t('Inactive'));
     $row['is_default'] = array('#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No')));
     $row += parent::buildRow($entity);
-    // @TODO: hide for non-admins?
-    $row['weight']['#delta'] = count(\Drupal::service('domain.loader')->loadMultiple()) + 1;
+    $account = \Drupal::currentUser();
+    if (!$account->hasPermission('administer domains')) {
+      unset($row['weight']);
+    }
+    else {
+      $row['weight']['#delta'] = count(\Drupal::service('domain.loader')->loadMultiple()) + 1;
+    }
     return $row;
   }
 
@@ -128,7 +143,12 @@ class DomainListBuilder extends DraggableListBuilder {
     $form = parent::buildForm($form, $form_state);
     $form[$this->entitiesKey]['#domains'] = $this->entities;
     $form['actions']['submit']['#value'] = $this->t('Save configuration');
-    // @TODO : $form['actions']['submit']['#access'] =
+    // Only super-admins may sort domains.
+    $account = \Drupal::currentUser();
+    if (!$account->hasPermission('administer domains')) {
+      $form['actions']['submit']['#access'] = FALSE;
+      unset($form['#tabledrag']);
+    }
     return $form;
   }
 

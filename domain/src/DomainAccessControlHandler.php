@@ -27,11 +27,12 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
     if ($operation == 'create' && $account->hasPermission('create domains')) {
       return AccessResult::allowed();
     }
-    // For other operations, check that the user is a domain admin.
+    // For view, we allow unless the domain is inactive.
     $is_admin = $this->isDomainAdmin($entity, $account);
-    if ($operation == 'view' && $is_admin && ($entity->status() || $account->hasPermission('access inactive domains'))) {
+    if ($operation == 'view' && ($entity->status() || $account->hasPermission('access inactive domains'))) {
       return AccessResult::allowed();
     }
+    // For other operations, check that the user is a domain admin.
     if ($operation == 'update' && $account->hasPermission('edit assigned domains') && $is_admin) {
       return AccessResult::allowed();
     }
