@@ -1,7 +1,7 @@
 Domain Config UI
 ================
 
-This module provides allow configuration to be saved for the current domain being accessed.
+This module allows configuration to be saved for a selected domain.
 
 Dependencies
 ============
