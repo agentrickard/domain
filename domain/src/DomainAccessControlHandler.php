@@ -71,7 +71,7 @@ class DomainAccessControlHandler extends EntityAccessControlHandler {
    * @TODO: Refactor this code so that it can be shared by other modules.
    */
   public function getAdminValues(EntityInterface $entity, $field_name = DOMAIN_ADMIN_FIELD) {
-    return \Drupal::service('domain.element_manager')->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    return \Drupal::service('domain.element_manager')->getFieldValues($entity, $field_name);
   }
 
 }
