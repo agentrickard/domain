@@ -43,20 +43,21 @@ class DomainListBuilder extends DraggableListBuilder {
     }
     $account = \Drupal::currentUser();
     $super_admin = $account->hasPermission('administer domains');
-
-    if ($entity->status() && !$default) {
-      $operations['disable'] = array(
-        'title' => $this->t('Disable'),
-        'url' => Url::fromRoute('domain.inline_action', array('op' => 'disable', 'domain' => $id)),
-        'weight' => 50,
-      );
-    }
-    elseif (!$default) {
-      $operations['enable'] = array(
-        'title' => $this->t('Enable'),
-        'url' => Url::fromRoute('domain.inline_action', array('op' => 'enable', 'domain' => $id)),
-        'weight' => 40,
-      );
+    if ($account->hasPermission('access inactive domains')) {
+      if ($entity->status() && !$default) {
+        $operations['disable'] = array(
+          'title' => $this->t('Disable'),
+          'url' => Url::fromRoute('domain.inline_action', array('op' => 'disable', 'domain' => $id)),
+          'weight' => 50,
+        );
+      }
+      elseif (!$default) {
+        $operations['enable'] = array(
+          'title' => $this->t('Enable'),
+          'url' => Url::fromRoute('domain.inline_action', array('op' => 'enable', 'domain' => $id)),
+          'weight' => 40,
+        );
+      }
     }
     if (!$default && $super_admin) {
       $operations['default'] = array(
