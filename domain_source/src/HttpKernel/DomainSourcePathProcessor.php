@@ -133,8 +133,10 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
             break;
           }
         }
+        // Get Node path if alias.
+        $node_path = \Drupal::service('path.alias_manager')->getPathByAlias($path);
         // Look! We're using arg() in Drupal 8 because we have to.
-        $args = explode('/', $path);
+        $args = explode('/', $node_path);
         if (isset($args[$i])) {
           $entity = \Drupal::entityTypeManager()->getStorage($type)->load($args[$i]);
         }
