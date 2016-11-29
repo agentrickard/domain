@@ -37,7 +37,7 @@ class DomainConfigUINegotiator extends DomainNegotiator {
    * Get the selected domain ID.
    */
   public function getSelectedDomainId() {
-    return !empty($_SESSION['domain_config_ui']['config_save_domain']) ? $_SESSION['domain_config_ui']['config_save_domain'] : NULL;
+    return !empty($_SESSION['domain_config_ui']['config_save_domain']) ? $_SESSION['domain_config_ui']['config_save_domain'] : '';
   }
 
   /**
@@ -50,7 +50,7 @@ class DomainConfigUINegotiator extends DomainNegotiator {
       $_SESSION['domain_config_ui']['config_save_domain'] = $domain_id;
     }
     else {
-      $_SESSION['domain_config_ui']['config_save_domain'] = 'all';
+      $_SESSION['domain_config_ui']['config_save_domain'] = '';
     }
   }
 }
