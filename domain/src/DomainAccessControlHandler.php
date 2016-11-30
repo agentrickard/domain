@@ -106,25 +106,8 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
    */
   public function isDomainAdmin(EntityInterface $entity, AccountInterface $account) {
     $user = $this->userStorage->load($account->id());
-    $user_domains = $this->getAdminValues($user);
+    $user_domains = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
     return isset($user_domains[$entity->id()]);
-  }
-
-  /**
-   * Gets the values of a domain field from an entity.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity to retrieve field data from.
-   * @param string $field_name
-   *   The name of the field that holds our data.
-   *
-   * @return array
-   *   An array keyed by domain entity id.
-   *
-   * @TODO: Refactor this code so that it can be shared by other modules.
-   */
-  public function getAdminValues(EntityInterface $entity, $field_name = DOMAIN_ADMIN_FIELD) {
-    return $this->domainElementManager->getFieldValues($entity, $field_name);
   }
 
 }
