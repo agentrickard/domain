@@ -6,6 +6,7 @@ domain_alias.admin:
     _title_context: 'With modules'
   requirements:
     _entity_access: domain.update
+    _permission: 'view domain aliases'
 
 entity.domain_alias.edit_form:
   path: '/admin/config/domain/alias/edit/{domain_alias}'

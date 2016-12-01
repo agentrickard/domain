@@ -56,20 +56,26 @@ function hook_domain_request_alter(\Drupal\domain\DomainInterface &$domain) {
  *
  * @param \Drupal\domain\DomainInterface $domain
  *   A domain record object.
+ * @param \Drupal\Core\Session\AccountInterface $account
+ *   The user account performing the operation.
  *
  * @return array
  *   An array of operations which uses a unique string key and requires the
  *   elements 'title' and 'url'; the 'query' value is optional, and used
  *   for link-actions with tokens
  */
-function hook_domain_operations(\Drupal\domain\DomainInterface $domain) {
-  // Add aliases to the list.
-  $id = $domain->id();
-  $operations['domain_alias'] = array(
-    'title' => t('Aliases'),
-    'url' => \Drupal\Core\Url::fromRoute('domain_alias.admin', array('domain' => $id)),
-    'weight' => 60,
-  );
+function hook_domain_operations(\Drupal\domain\DomainInterface $domain, \Drupal\Core\Session\AccountInterface $account) {
+  $operations = [];
+  // Check permissions.
+  if ($account->hasPermission('view domain aliases') || $account->hasPermission('administer domain aliases')) {
+    // Add aliases to the list.
+    $id = $domain->id();
+    $operations['domain_alias'] = array(
+      'title' => t('Aliases'),
+      'url' => Url::fromRoute('domain_alias.admin', array('domain' => $id)),
+      'weight' => 60,
+    );
+  }
   return $operations;
 }
 

@@ -167,7 +167,7 @@ class DomainListBuilder extends DraggableListBuilder {
         'weight' => 20,
       );
     }
-    $operations += $this->moduleHandler->invokeAll('domain_operations', array($entity));
+    $operations += $this->moduleHandler->invokeAll('domain_operations', array($entity, $this->currentUser));
     foreach ($operations as $key => $value) {
       if (isset($value['query']['token'])) {
         $operations[$key]['query'] += $destination;

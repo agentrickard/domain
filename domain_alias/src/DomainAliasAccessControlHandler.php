@@ -20,7 +20,6 @@ class DomainAliasAccessControlHandler extends EntityAccessControlHandler {
   public function checkAccess(EntityInterface $entity, $operation, AccountInterface $account = NULL) {
     $account = $this->prepareUser($account);
     // Check the global permission.
-    kint($entity);
     if ($account->hasPermission('administer domain aliases')) {
       return AccessResult::allowed();
     }
