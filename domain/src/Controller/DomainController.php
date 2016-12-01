@@ -4,8 +4,9 @@ namespace Drupal\domain\Controller;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Url;
-use Drupal\domain\DomainInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\DomainInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -83,8 +84,7 @@ class DomainController {
    *
    * @return \Drupal\Core\Access\AccessResult
    */
-  public static function viewDomainList() {
-    $account = \Drupal::currentUser();
+  public static function viewDomainList(AccountInterface $account) {
     if ($account->hasPermission('administer domains') || $account->hasPermission('view domain list')) {
       return AccessResult::allowed();
     }

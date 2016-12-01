@@ -137,7 +137,7 @@ class DomainListBuilder extends DraggableListBuilder {
     }
 
     $super_admin = $this->currentUser->hasPermission('administer domains');
-    if ($this->currentUser->hasPermission('access inactive domains')) {
+    if ($super_admin || $this->currentUser->hasPermission('access inactive domains')) {
       if ($entity->status() && !$default) {
         $operations['disable'] = array(
           'title' => $this->t('Disable'),
