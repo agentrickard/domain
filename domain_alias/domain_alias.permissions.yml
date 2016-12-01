@@ -1,7 +1,5 @@
 administer domain aliases:
   title: 'Administer all domain aliases'
-administer assigned domain aliases:
-  title: 'Administer aliases for assigned domains'
 create domain aliases:
   title: 'Create domain aliases'
 edit domain aliases:

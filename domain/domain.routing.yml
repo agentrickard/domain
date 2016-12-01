@@ -23,7 +23,7 @@ entity.domain.add:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: "create domains"
+    _entity_create_access: domain
 
 entity.domain.edit_form:
   path: '/admin/config/domain/edit/{domain}'
