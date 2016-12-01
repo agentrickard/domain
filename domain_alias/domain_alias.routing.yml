@@ -30,5 +30,5 @@ domain_alias.add:
     _controller: '\Drupal\domain_alias\Controller\DomainAliasController::addAlias'
     _title: 'Add domain alias'
   requirements:
-    _permission: 'create domain aliases'
     _entity_access: domain.update
+    _permission: 'create domain aliases'
