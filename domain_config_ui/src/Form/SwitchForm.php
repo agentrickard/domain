@@ -16,6 +16,10 @@ class SwitchForm extends FormBase {
    * {@inheritDoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    // Only allow access to domain administrators.
+    $form['#access'] = $this->currentUser()->hasPermission('administer domains');
+
+    // Add domain switch select field.
     if ($selected_domain = \Drupal::service('domain.negotiator')->getSelectedDomain()) {
       $selected = $selected_domain->id();
     }
