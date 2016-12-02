@@ -2,10 +2,8 @@
 
 namespace Drupal\domain\Controller;
 
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\DomainInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -73,22 +71,6 @@ class DomainController {
     // Return to the invoking page.
     $url = Url::fromRoute('domain.admin', array(), array('absolute' => TRUE));
     return new RedirectResponse($url->toString(), 302);
-  }
-
-  /**
-   * Handles route permissions on the domain list page.
-   *
-   * This method probably doesn't belong here, but we don't have a simple means
-   * for checking OR behavior on a route. Since this controller has no
-   * dependencies, it is ideal for a static callback.
-   *
-   * @return \Drupal\Core\Access\AccessResult
-   */
-  public static function viewDomainList(AccountInterface $account) {
-    if ($account->hasPermission('administer domains') || $account->hasPermission('view domain list')) {
-      return AccessResult::allowed();
-    }
-    return AccessResult::forbidden();
   }
 
 }

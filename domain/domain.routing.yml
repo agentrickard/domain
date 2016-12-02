@@ -5,7 +5,7 @@ domain.admin:
     _title: 'Domains'
     _title_context: 'With modules'
   requirements:
-    _custom_access: 'Drupal\domain\Controller\DomainController::viewDomainList'
+    _custom_access: 'Drupal\domain\Access\DomainListCheck::viewDomainList'
 
 domain.settings:
   path: '/admin/config/domain/settings'
