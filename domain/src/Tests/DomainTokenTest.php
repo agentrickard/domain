@@ -49,6 +49,9 @@ class DomainTokenTest extends DomainTestBase {
         $value = $domain->{$callback}();
         if ($token == '[domain:url]') {
           $value = str_replace('user', '', $value);
+          if (substr($value, -1) != '/') {
+            $value .= '/';
+          }
         }
         $this->assertRaw('<td>' . $value . '</td>', 'Value set correctly to ' . $value);
       }
