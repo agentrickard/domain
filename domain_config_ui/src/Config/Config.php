@@ -3,6 +3,7 @@
 namespace Drupal\domain_config_ui\Config;
 
 use Drupal\Core\Config\Config as CoreConfig;
+use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Extend core Config class to save domain specific configuration.
@@ -14,6 +15,21 @@ class Config extends CoreConfig {
   const GLOBAL_CONFIG = [
     'core.extension',
   ];
+
+  /**
+   * The Domain negotiator.
+   *
+   * @var \Drupal\domain\DomainNegotiatorInterface
+   */
+  protected $domainNegotiator;
+
+  /**
+   * Set the Domain negotiator.
+   * @param DomainNegotiatorInterface $domain_negotiator
+   */
+  public function setDomainNegotiator(DomainNegotiatorInterface $domain_negotiator) {
+    $this->domainNegotiator = $domain_negotiator;
+  }
 
   /**
    * {@inheritdoc}
@@ -62,7 +78,7 @@ class Config extends CoreConfig {
     }
 
     // Build prefix and add to front of existing key.
-    if ($selected_domain = \Drupal::service('domain.negotiator')->getSelectedDomain()) {
+    if ($selected_domain = $this->domainNegotiator->getSelectedDomain()) {
       $prefix = 'domain.config.' . $selected_domain->id() . '.';
       if ($language = \Drupal::languageManager()->getCurrentLanguage()) {
         $prefix .= $language->getId() . '.';

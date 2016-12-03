@@ -3,20 +3,39 @@ namespace Drupal\domain_config_ui\Config;
 
 use Drupal\Core\Config\ConfigFactory as CoreConfigFactory;
 use Drupal\domain_config_ui\Config\Config;
+use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Overrides Drupal\Core\Config\ConfigFactory in order to use our own Config class.
  */
 class ConfigFactory extends CoreConfigFactory {
   /**
+   * The Domain negotiator.
+   *
+   * @var \Drupal\domain\DomainNegotiatorInterface
+   */
+  protected $domainNegotiator;
+
+  /**
    * {@inheritDoc}
    * @see \Drupal\Core\Config\ConfigFactory::createConfigObject()
    */
   protected function createConfigObject($name, $immutable) {
     if (!$immutable) {
-      return new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager);
+      $config = new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager);
+      // Pass the negotiator to the Config object.
+      $config->setDomainNegotiator($this->domainNegotiator);
+      return $config;
     }
     return parent::createConfigObject($name, $immutable);
+  }
+
+  /**
+   * Set the Domain negotiator.
+   * @param DomainNegotiatorInterface $domain_negotiator
+   */
+  public function setDomainNegotiator(DomainNegotiatorInterface $domain_negotiator) {
+    $this->domainNegotiator = $domain_negotiator;
   }
 
   /**
@@ -28,7 +47,7 @@ class ConfigFactory extends CoreConfigFactory {
     $list = parent::doLoadMultiple($names, $immutable);
 
     // Do not apply overrides if configuring 'all' domains.
-    if (!\Drupal::service('domain.negotiator')->getSelectedDomainId()) {
+    if (!$this->domainNegotiator->getSelectedDomainId()) {
       return $list;
     }
 
@@ -65,7 +84,7 @@ class ConfigFactory extends CoreConfigFactory {
    */
   protected function doGet($name, $immutable = TRUE) {
     // Do not apply overrides if configuring 'all' domains.
-    if (!\Drupal::service('domain.negotiator')->getSelectedDomainId()) {
+    if (!$this->domainNegotiator->getSelectedDomainId()) {
       return parent::doGet($name, $immutable);
     }
 
