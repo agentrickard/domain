@@ -52,8 +52,12 @@ class Config extends CoreConfig {
    * Get the domain config name.
    */
   protected function getDomainConfigName() {
+    // Get default global config and allow other modules to alter.
+    $global_config = self::GLOBAL_CONFIG;
+    \Drupal::moduleHandler()->alter('domain_config_global_config', $global_config);
+
     // Return original name if reserved as global configuration.
-    if (in_array($this->name, self::GLOBAL_CONFIG)) {
+    if (in_array($this->name, $global_config)) {
       return $this->name;
     }
 

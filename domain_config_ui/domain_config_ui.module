@@ -5,6 +5,9 @@
  * Allows saving of domain specific configuration through the UI.
  */
 
+/**
+ * Implements hook_preprocess_page().
+ */
 function domain_config_ui_preprocess_page(&$variables) {
   $route = \Drupal::routeMatch()->getRouteObject();
   $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
