@@ -102,11 +102,6 @@ class ConfigFactory extends CoreConfigFactory {
         $config->setModuleOverride($overrides[$name]);
       }
 
-      // Apply any settings.php overrides.
-      if ($immutable && isset($GLOBALS['config'][$name])) {
-        $config->setSettingsOverride($GLOBALS['config'][$name]);
-      }
-
       foreach ($this->configFactoryOverrides as $override) {
         $config->addCacheableDependency($override->getCacheableMetadata($name));
       }
