@@ -6,10 +6,6 @@
  */
 
 function domain_config_ui_preprocess_page(&$variables) {
-  if (!\Drupal::currentUser()->hasPermission('administer domains')) {
-    return;
-  }
-
   $route = \Drupal::routeMatch()->getRouteObject();
   $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
 
