@@ -38,10 +38,7 @@ class DomainConfigUINegotiator extends DomainNegotiator {
    */
   public function getSelectedDomainId() {
     // Return selected domain ID on admin paths only.
-    $route = \Drupal::routeMatch()->getRouteObject();
-    if (\Drupal::service('router.admin_context')->isAdminRoute($route)) {
-      return !empty($_SESSION['domain_config_ui']['config_save_domain']) ? $_SESSION['domain_config_ui']['config_save_domain'] : '';
-    }
+    return !empty($_SESSION['domain_config_ui']['config_save_domain']) ? $_SESSION['domain_config_ui']['config_save_domain'] : '';
   }
 
   /**
