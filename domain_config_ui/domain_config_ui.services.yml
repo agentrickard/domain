@@ -1,14 +1,4 @@
 services:
-  domain_config_ui.factory:
-    class: Drupal\domain_config_ui\Config\ConfigFactory
-    tags:
-      - { name: event_subscriber }
-      - { name: service_collector, tag: 'config.factory.override', call: addOverride }
-    arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
-
-  config.factory:
-    alias: domain_config_ui.factory
-
   domain_config_ui.negotiator:
     class: Drupal\domain_config_ui\DomainConfigUINegotiator
     tags:
@@ -17,3 +7,15 @@ services:
 
   domain.negotiator:
     alias: domain_config_ui.negotiator
+
+  domain_config_ui.factory:
+    class: Drupal\domain_config_ui\Config\ConfigFactory
+    tags:
+      - { name: event_subscriber }
+      - { name: service_collector, tag: 'config.factory.override', call: addOverride }
+    arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
+    calls:
+      - [setDomainNegotiator, ['@domain.negotiator']]
+
+  config.factory:
+    alias: domain_config_ui.factory
