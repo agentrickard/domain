@@ -46,8 +46,8 @@ class ConfigFactory extends CoreConfigFactory {
     // Let parent load multiple load as usual.
     $list = parent::doLoadMultiple($names, $immutable);
 
-    // Do not apply overrides if configuring 'all' domains.
-    if (!$this->domainNegotiator->getSelectedDomainId()) {
+    // Do not apply overrides if configuring 'all' domains or config is immutable.
+    if (!$this->domainNegotiator->getSelectedDomainId() || $immutable) {
       return $list;
     }
 
@@ -83,8 +83,8 @@ class ConfigFactory extends CoreConfigFactory {
    * @see \Drupal\Core\Config\ConfigFactory::doGet()
    */
   protected function doGet($name, $immutable = TRUE) {
-    // Do not apply overrides if configuring 'all' domains.
-    if (!$this->domainNegotiator->getSelectedDomainId()) {
+    // Do not apply overrides if configuring 'all' domains or config is immutable.
+    if (!$this->domainNegotiator->getSelectedDomainId() || $immutable) {
       return parent::doGet($name, $immutable);
     }
 
