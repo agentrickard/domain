@@ -78,7 +78,7 @@ class Config extends CoreConfig {
     // Return original name if reserved as global configuration.
     foreach ($global_config as $config_name) {
       // Convert config_name into into regex.
-      // Escapes regex all syntax, but keeps * wildcard.
+      // Escapes regex syntax, but keeps * wildcards.
       $pattern = '/^' . str_replace('\*', '.*', preg_quote($config_name, '/')) . '$/';
       if (preg_match($pattern, $this->name)) {
         return $this->name;
