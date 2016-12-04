@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain;
+namespace Drupal\domain_alias;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
