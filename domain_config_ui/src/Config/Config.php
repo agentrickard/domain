@@ -11,9 +11,12 @@ use Drupal\domain\DomainNegotiatorInterface;
 class Config extends CoreConfig {
   /**
    * List of config that should always be saved globally.
+   * Use * for wildcards.
    */
   const GLOBAL_CONFIG = [
     'core.extension',
+    'domain.record.*',
+    'domain_alias.*',
   ];
 
   /**
@@ -73,8 +76,13 @@ class Config extends CoreConfig {
     \Drupal::moduleHandler()->alter('domain_config_global_config', $global_config);
 
     // Return original name if reserved as global configuration.
-    if (in_array($this->name, $global_config)) {
-      return $this->name;
+    foreach ($global_config as $config_name) {
+      // Convert config_name into into regex.
+      // Escapes regex all syntax, but keeps * wildcard.
+      $pattern = '/^' . str_replace('\*', '.*', preg_quote($config_name, '/')) . '$/';
+      if (preg_match($pattern, $this->name)) {
+        return $this->name;
+      }
     }
 
     // Build prefix and add to front of existing key.
