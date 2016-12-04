@@ -4,6 +4,7 @@ namespace Drupal\domain_config_ui\Config;
 use Drupal\Core\Config\ConfigFactory as CoreConfigFactory;
 use Drupal\domain_config_ui\Config\Config;
 use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\domain_config\DomainConfigOverrider;
 
 /**
  * Overrides Drupal\Core\Config\ConfigFactory in order to use our own Config class.
@@ -59,8 +60,8 @@ class ConfigFactory extends CoreConfigFactory {
 
       // Load module overrides so that domain specific config is loaded in admin forms.
       if (!empty($storage_data)) {
-        // Only get module overrides if we have configuration to override.
-        $module_overrides = $this->loadOverrides($names);
+        // Only get domain overrides if we have configuration to override.
+        $module_overrides = $this->loadDomainOverrides($names);
       }
 
       foreach ($storage_data as $name => $data) {
@@ -96,8 +97,8 @@ class ConfigFactory extends CoreConfigFactory {
       // storage, create a new object.
       $config = $this->createConfigObject($name, $immutable);
 
-      // Load module overrides so that domain specific config is loaded in admin forms.
-      $overrides = $this->loadOverrides(array($name));
+      // Load domain overrides so that domain specific config is loaded in admin forms.
+      $overrides = $this->loadDomainOverrides(array($name));
       if (isset($overrides[$name])) {
         $config->setModuleOverride($overrides[$name]);
       }
@@ -108,5 +109,25 @@ class ConfigFactory extends CoreConfigFactory {
 
       return $config;
     }
+  }
+
+/**
+   * Get arbitrary overrides for the named configuration objects from Domain module.
+   *
+   * @param array $names
+   *   The names of the configuration objects to get overrides for.
+   *
+   * @return array
+   *   An array of overrides keyed by the configuration object name.
+   */
+  protected function loadDomainOverrides(array $names) {
+    $overrides = array();
+    foreach ($this->configFactoryOverrides as $override) {
+      // Only return domain overrides.
+      if ($override instanceof DomainConfigOverrider) {
+        $overrides = $override->loadOverrides($names);
+      }
+    }
+    return $overrides;
   }
 }
