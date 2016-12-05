@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Domain module.
+ */
+
+/**
+ * Update domain id to new value.
+ */
+function domain_update_8001(&$sandbox) {
+  // Load all domains and update the id.
+  $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
+  foreach ($domains as $domain) {
+    /** @var $domain \Drupal\domain\Entity\Domain */
+    $domain->createDomainId();
+    $domain->save();
+  }
+  // Trigger permissions rebuild action.
+  node_access_needs_rebuild(TRUE);
+}
