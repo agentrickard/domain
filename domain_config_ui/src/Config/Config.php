@@ -13,7 +13,7 @@ class Config extends CoreConfig {
    * List of config that should always be saved globally.
    * Use * for wildcards.
    */
-  const GLOBAL_CONFIG = [
+  protected $disallowedConfig = [
     'core.extension',
     'domain.record.*',
     'domain_alias.*',
@@ -71,12 +71,12 @@ class Config extends CoreConfig {
    * Get the domain config name.
    */
   protected function getDomainConfigName() {
-    // Get default global config and allow other modules to alter.
-    $global_config = self::GLOBAL_CONFIG;
-    \Drupal::moduleHandler()->alter('domain_config_global_config', $global_config);
+    $disallowed = $this->disallowedConfig;
+    // Get default disallowed config and allow other modules to alter.
+    \Drupal::moduleHandler()->alter('domain_config_disallowed', $disallowed);
 
     // Return original name if reserved as global configuration.
-    foreach ($global_config as $config_name) {
+    foreach ($disallowed as $config_name) {
       // Convert config_name into into regex.
       // Escapes regex syntax, but keeps * wildcards.
       $pattern = '/^' . str_replace('\*', '.*', preg_quote($config_name, '/')) . '$/';
@@ -88,6 +88,7 @@ class Config extends CoreConfig {
     // Build prefix and add to front of existing key.
     if ($selected_domain = $this->domainNegotiator->getSelectedDomain()) {
       $prefix = 'domain.config.' . $selected_domain->id() . '.';
+      // @TODO: Allow selection of language.
       if ($language = \Drupal::languageManager()->getCurrentLanguage()) {
         $prefix .= $language->getId() . '.';
       }
