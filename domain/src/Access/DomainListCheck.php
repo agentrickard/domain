@@ -19,7 +19,7 @@ class DomainListCheck {
    * @return \Drupal\Core\Access\AccessResult
    */
   public static function viewDomainList(AccountInterface $account) {
-    if ($account->hasPermission('administer domains') || $account->hasPermission('view domain list')) {
+    if ($account->hasPermission('administer domains') || $account->hasPermission('view domain list') || $account->hasPermission('view assigned domains')) {
       return AccessResult::allowed();
     }
     return AccessResult::forbidden();

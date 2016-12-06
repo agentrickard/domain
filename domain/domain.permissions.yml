@@ -12,7 +12,9 @@ delete assigned domains:
   title: 'Delete assigned domain records'
 use domain switcher block:
   title: 'Access the domain switcher block'
+view assigned domains:
+  title: 'View assigned domains'
 view domain list:
-  title: 'View the list of registered domains'
+  title: 'View all registered domains'
 view domain information:
   title: 'View debugging information for domain handling'
