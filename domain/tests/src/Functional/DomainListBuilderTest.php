@@ -63,6 +63,31 @@ class DomainListBuilderTest extends DomainTestBase {
 
     $this->drupalGet('admin/config/domain');
     $this->assertSession()->statusCodeEquals(200);
+
+    // Check that links are printed.
+    $path = 'admin/config/domain/';
+    $this->drupalGet($path);
+    foreach ($this->getDomains() as $domain) {
+      $href = 'admin/config/domain/edit/' . $domain->id();
+      if (in_array($domain->id(), $ids)) {
+        $this->assertSession()->linkByHrefExists($href, 0, 'Link found');
+      }
+      else {
+        $this->assertSession()->linkByHrefNotExists($href, 'Link not found');
+      }
+    }
+
+    // Check access to the pages/routes.
+    foreach ($this->getDomains() as $domain) {
+      $path = 'admin/config/domain/edit/' . $domain->id();
+      $this->drupalGet($path);
+      if (in_array($domain->id(), $ids)) {
+        $this->assertSession()->statusCodeEquals(200);
+      }
+      else {
+        $this->assertSession()->statusCodeEquals(403);
+      }
+    }
   }
 
 }
