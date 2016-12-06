@@ -11,6 +11,16 @@ Operations are not yet supported.
 
 For a complete feature status list, see [CHANGELOG.md](https://github.com/agentrickard/domain/blob/8.x-1.x/CHANGELOG.md)
 
+Alpha release updates
+------
+
+A limited set of updates are provided for major architecture changes during the
+alpha release.
+
+You can run these updates by enabling the `domain_alpha` module and running
+Drupal's database updates.
+
+
 Implementation Notes
 ======
 
