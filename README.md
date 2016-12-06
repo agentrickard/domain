@@ -20,9 +20,7 @@ alpha release.
 You can run these updates by enabling the `domain_alpha` module and running
 Drupal's database updates. The updates and affected versions are:
 
-* Update 8001: Affects versions of Alpha6 or lower. Does not affect installs
-made after 06-DEC-2016.
-
+* Update 8001: Affects versions of Alpha6 or lower.
 
 Implementation Notes
 ======
