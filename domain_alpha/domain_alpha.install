@@ -8,14 +8,23 @@
 /**
  * Update domain id to new value.
  */
-function domain_alpha_update_8000(&$sandbox) {
+function domain_alpha_update_8001(&$sandbox) {
   // Load all domains and update the id.
+  $rebuld = FALSE;
   $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
   foreach ($domains as $domain) {
+    // Check to see if this update is needed.
     /** @var $domain \Drupal\domain\Entity\Domain */
+    $id = $domain->getDomainId();
     $domain->createDomainId();
-    $domain->save();
+    $new_id = $domain->getDomainId();
+    if ($id != $new_id) {
+      $domain->save();
+      $rebuild = TRUE;
+    }
   }
-  // Trigger permissions rebuild action.
-  node_access_needs_rebuild(TRUE);
+  if ($rebuild) {
+    // Trigger permissions rebuild action.
+    node_access_needs_rebuild(TRUE);
+  }
 }
