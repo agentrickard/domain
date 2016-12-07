@@ -131,8 +131,8 @@ class DomainListBuilder extends DraggableListBuilder {
     $id = $entity->id();
 
     // If the user cannot edit domains, none of these actions are permitted.
-    $admin = $this->accessHandler->checkAccess($entity, 'update');
-    if ($admin->isForbidden()) {
+    $access = $this->accessHandler->checkAccess($entity, 'update');
+    if ($access->isForbidden()) {
       return $operations;
     }
 
