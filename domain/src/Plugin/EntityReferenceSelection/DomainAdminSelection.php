@@ -15,7 +15,7 @@ use Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection
  *   weight = 1
  * )
  */
-class DomainSelection extends DomainSelectionSelection {
+class DomainAdminSelection extends DomainSelection {
 
   /**
    * Sets the context for the alter hook.
