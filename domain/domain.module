@@ -197,7 +197,7 @@ function domain_form_user_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_domain_references_alter().
  */
 function domain_domain_references_alter($query, $account, $context) {
-  // Restrict domains by assignment.
+  // Restrict domains by assignment, being sure only to act on the admin field.
   if ($context['field_type'] == 'admin' && $context['entity_type'] == 'user') {
     if ($account->hasPermission('administer domains')) {
       // Do nothing.
