@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Pre-release update hooks for Domain modules.
+ */
+
+/**
+ * Update domain id to new value.
+ */
+function domain_alpha_update_8001(&$sandbox) {
+  // Set the node_access rebuild flag. Only update if an id changes.
+  $rebuild = FALSE;
+  // Load all domains and update the id, if necessary.
+  $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
+  foreach ($domains as $domain) {
+    /** @var $domain \Drupal\domain\Entity\Domain */
+    // Existing id.
+    $id = $domain->getDomainId();
+    // New id.
+    $domain->createDomainId();
+    $new_id = $domain->getDomainId();
+    // Check to see if this update is needed.
+    if ($id != $new_id) {
+      $domain->save();
+      $rebuild = TRUE;
+    }
+  }
+  if ($rebuild) {
+    // Trigger permissions rebuild action.
+    node_access_needs_rebuild(TRUE);
+  }
+}

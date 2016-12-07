@@ -370,7 +370,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     // across environments. Instead, we use the crc32 hash function to create a
     // unique numeric id for each domain. In some systems (Windows?) we have
     // reports of crc32 returning a negative number. Issue #2794047.
-    $this->domain_id = abs((int) crc32($this->getHostname()));
+    $this->domain_id = abs((int) crc32($this->id()));
   }
 
   /**
