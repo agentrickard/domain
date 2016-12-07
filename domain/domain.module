@@ -132,18 +132,19 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
 
     $storage_id = $entity_type . '.' . DOMAIN_ADMIN_FIELD;
     if (!$storage = \Drupal::entityTypeManager()->getStorage('field_storage_config')->load($storage_id)) {
-      $new_field_storage['id'] = $storage_id;
-      $new_field_storage['field_name'] = DOMAIN_ADMIN_FIELD;
-      $new_field_storage['type'] = 'entity_reference';
-      $new_field_storage['dependencies'] = ['domain' , 'user'];
-      $new_field_storage['entity_type'] = 'user';
-      $new_field_storage['cardinality'] = -1;
-      $new_field_storage['module'] = 'entity_reference';
-      $new_field_storage['settings']['target_type'] = 'domain';
+      $field_storage = [
+        'id' = $storage_id,
+        'field_name' = DOMAIN_ADMIN_FIELD,
+        'type' = 'entity_reference',
+        'dependencies' = 'domain' , 'user',
+        'entity_type' = 'user',
+        'cardinality' = -1,
+        'module' = 'entity_reference',
+        'settings''target_type' = 'domain',
+      ];
+      $field_storage = FieldStorageConfig::create($new_field_storage);
 
-      $new_field_storage = FieldStorageConfig::create($new_field_storage);
-
-      $new_field_storage->save();
+      $field_storage->save();
     }
 
     $id = $storage_id = $entity_type . '.' . $bundle . '.' . DOMAIN_ADMIN_FIELD;
