@@ -140,7 +140,7 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
         'entity_type' => 'user',
         'cardinality' => -1,
         'module' => 'entity_reference',
-        'settings''target_type' => 'domain',
+        'settings' => ['target_type' => 'domain'],
       ];
       $field_storage = FieldStorageConfig::create($new_field_storage);
 
@@ -158,11 +158,11 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
         'required' => $entity_type !== 'user',
         'description' => 'Select the domains this user may administer',
         'default_value' => [],
-        'settings' => array(
-          'handler_settings' => array(
-            'sort' => array('field' => 'weight', 'direction' => 'ASC'),
-          ),
-        ),
+        'settings' => [
+          'handler_settings' => [
+            'sort' => ['field' => 'weight', 'direction' => 'ASC'],
+          ],
+        ],
       );
       $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
       $field_config->save();
