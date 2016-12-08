@@ -4,13 +4,13 @@
  * Allows saving of domain specific configuration through the UI.
  */
 
-use Drupal\Core\Form\FormBuilder;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\RedirectCommand;
-use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Implements hook_form_alter().
@@ -19,8 +19,10 @@ use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
  * @param FormStateInterface $form_state
  */
 function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
-  // Only alter config forms.
-  if (!($form_state->getFormObject() instanceof ConfigFormBase)) {
+  // Only alter config forms that can have a config factory and are on an admin path.
+  $route = \Drupal::routeMatch()->getRouteObject();
+  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
+  if (!$is_admin || !method_exists($form_state->getFormObject(), 'setConfigFactory')) {
     return;
   }
 
@@ -37,7 +39,7 @@ function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
   $form['config_save_domain'] = array(
     '#type' => 'select',
     '#weight' => -10,
-    '#title' => 'Save config for:',
+    '#title' => 'Domain',
     '#options' => array_merge(['' => 'All Domains'], \Drupal::service('domain.loader')->loadOptionsList()),
     '#default_value' => $selected,
     '#ajax' => array(
@@ -46,8 +48,17 @@ function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
     ),
   );
 
+  // Add a message below the form to remind the administrator which domain they are currently configuring.
   if ($selected_domain) {
-    $form['actions']['submit']['#value'] = t('Save configuration for :domain', [':domain' => $selected_domain->label()]);
+    $message = new TranslatableMarkup('Configuration will be saved for @domain', array(
+      '@domain' => $selected_domain->label(),
+    ));
+    $form['domain_message'] = array(
+      '#markup' => new FormattableMarkup('<div class="messages messages--warning">@message</div>', array(
+        '@message' => $message,
+      )),
+      '#weight' => 1000,
+    );
   }
 }
 
