@@ -20,7 +20,7 @@ function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
   // Only alter config forms that can have a config factory and are on an admin path.
   $route = \Drupal::routeMatch()->getRouteObject();
   $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
-  if (!$is_admin || !method_exists($form_state->getFormObject(), 'setConfigFactory')) {
+  if (!$is_admin || !domain_config_ui_form_is_allowed($form)) {
     return;
   }
 
@@ -58,6 +58,21 @@ function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
       '#weight' => 1000,
     );
   }
+}
+
+/**
+ * Checks if provided form can be used to save domain specic configuration.
+ *
+ * @param array $form
+ * @return boolean
+ */
+function domain_config_ui_form_is_allowed($form) {
+  $allowed = array(
+    'system_site_information_settings',
+    'system_themes_admin_form',
+  );
+  \Drupal::moduleHandler()->alter('domain_config_form_allowed', $allowed);
+  return in_array($form['#form_id'], $allowed);
 }
 
 /**

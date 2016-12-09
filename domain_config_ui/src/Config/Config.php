@@ -10,13 +10,12 @@ use Drupal\domain\DomainNegotiatorInterface;
  */
 class Config extends CoreConfig {
   /**
-   * List of config that should always be saved globally.
+   * List of config that can be saved for a specific domain.
    * Use * for wildcards.
    */
-  protected $disallowedConfig = [
-    'core.extension',
-    'domain.record.*',
-    'domain_alias.*',
+  protected $allowedConfig = [
+    'system.site',
+    'system.theme*',
   ];
 
   /**
@@ -71,18 +70,22 @@ class Config extends CoreConfig {
    * Get the domain config name.
    */
   protected function getDomainConfigName() {
-    $disallowed = $this->disallowedConfig;
-    // Get default disallowed config and allow other modules to alter.
-    \Drupal::moduleHandler()->alter('domain_config_disallowed', $disallowed);
+    // Get default allowed config and allow other modules to alter.
+    $allowed = $this->allowedConfig;
+    \Drupal::moduleHandler()->alter('domain_config_allowed', $allowed);
 
-    // Return original name if reserved as global configuration.
-    foreach ($disallowed as $config_name) {
+    // Return original name if reserved not allowed.
+    $is_allowed = FALSE;
+    foreach ($allowed as $config_name) {
       // Convert config_name into into regex.
       // Escapes regex syntax, but keeps * wildcards.
       $pattern = '/^' . str_replace('\*', '.*', preg_quote($config_name, '/')) . '$/';
       if (preg_match($pattern, $this->name)) {
-        return $this->name;
+        $is_allowed = TRUE;
       }
+    }
+    if (!$is_allowed) {
+      return $this->name;
     }
 
     // Build prefix and add to front of existing key.
