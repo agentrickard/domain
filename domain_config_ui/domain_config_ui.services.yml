@@ -4,6 +4,8 @@ services:
     tags:
       - { name: persist }
     arguments: ['@request_stack', '@module_handler', '@domain.loader', '@config.factory']
+    calls:
+      - [setDomainConfigOverrider, ['@domain_config.overrider']]
 
   domain.negotiator:
     alias: domain_config_ui.negotiator

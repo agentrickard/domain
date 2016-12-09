@@ -176,7 +176,15 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $this->languageManager = \Drupal::languageManager();
     $this->language = $this->languageManager->getCurrentLanguage();
     // Get the domain context.
-    $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
+    $this->setDomain($this->domainNegotiator->getActiveDomain(TRUE));
   }
 
+  /**
+   * Set the domain context.
+   *
+   * @param DomainInterface $domain
+   */
+  public function setDomain(DomainInterface $domain) {
+    $this->domain = $domain;
+  }
 }

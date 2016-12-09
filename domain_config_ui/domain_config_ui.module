@@ -6,9 +6,7 @@
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\RedirectCommand;
-use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Render\FormattableMarkup;
 
@@ -72,20 +70,10 @@ function domain_config_ui_domain_switch_form_callback($form, FormStateInterface 
   // Switch the current domain.
   \Drupal::service('domain.negotiator')->setSelectedDomain($form_state->getValue('config_save_domain'));
 
-  // Extract requesting page URI from ajax URI.
-  // Copied from Drupal\Core\Form\FormBuilder::buildFormAction().
-  $request_uri = \Drupal::service('request_stack')->getMasterRequest()->getRequestUri();
-  // Prevent cross site requests via the Form API by using an absolute URL
-  // when the request uri starts with multiple slashes.
-  if (strpos($request_uri, '//') === 0) {
-    $request_uri = $request->getUri();
-  }
-  $parsed = UrlHelper::parse($request_uri);
-  unset($parsed['query']['ajax_form'], $parsed['query'][MainContentViewSubscriber::WRAPPER_FORMAT]);
-  $request_uri = $parsed['path'] . ($parsed['query'] ? ('?' . UrlHelper::buildQuery($parsed['query'])) : '');
-
-  // Reload the page to get new form values.
+  // Reset form with selected domain configuration.
+  $form_state->setUserInput([]);
+  $new_form = \Drupal::formBuilder()->rebuildForm($form['#form_id'], $form_state, $form);
   $response = new AjaxResponse();
-  $response->addCommand(new RedirectCommand($request_uri));
+  $response->addCommand(new ReplaceCommand('.' . str_replace('_', '-', $form['#form_id']), $new_form));
   return $response;
 }

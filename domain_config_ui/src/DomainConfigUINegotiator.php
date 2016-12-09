@@ -3,11 +3,17 @@
 namespace Drupal\domain_config_ui;
 
 use Drupal\domain\DomainNegotiator;
+use Drupal\domain_config\DomainConfigOverrider;
 
 /**
  * {@inheritdoc}
  */
 class DomainConfigUINegotiator extends DomainNegotiator {
+  /**
+   * @var DomainConfigOverrider
+   */
+  protected $domainConfigOverrider;
+
   /**
    * Determine the active domain.
    */
@@ -48,10 +54,23 @@ class DomainConfigUINegotiator extends DomainNegotiator {
    */
   public function setSelectedDomain($domain_id) {
     if ($domain = $this->domainLoader->load($domain_id)) {
+      // Set session for subsequent request.
       $_SESSION['domain_config_ui']['config_save_domain'] = $domain_id;
+      // Switch active domain now so that selected domain configuration can be loaded immediatly.
+      // This is primarily for switching domain with AJAX request.
+      $this->domainConfigOverrider->setDomain($domain);
     }
     else {
       $_SESSION['domain_config_ui']['config_save_domain'] = '';
     }
+  }
+
+  /**
+   * Set the domain config overrider.
+   *
+   * @param DomainConfigOverrider $domain_config_overrider
+   */
+  public function setDomainConfigOverrider(DomainConfigOverrider $domain_config_overrider) {
+    $this->domainConfigOverrider = $domain_config_overrider;
   }
 }
