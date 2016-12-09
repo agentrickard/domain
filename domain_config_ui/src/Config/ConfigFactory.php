@@ -111,7 +111,7 @@ class ConfigFactory extends CoreConfigFactory {
     }
   }
 
-/**
+  /**
    * Get arbitrary overrides for the named configuration objects from Domain module.
    *
    * @param array $names

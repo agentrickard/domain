@@ -178,15 +178,16 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // the core service manager.
     $this->languageManager = \Drupal::languageManager();
     $this->language = $this->languageManager->getCurrentLanguage();
-
-    // The same issue is true for the domainNegotiator.
-    $this->domainNegotiator = \Drupal::service('domain.negotiator');
     // Get the domain context.
-    $this->domain = $this->domainNegotiator->getActiveDomain();
-    // If we have fired too early in the bootstrap, we must force the routine to run.
-    if (empty($this->domain)) {
-      $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
-    }
+    $this->setDomain($this->domainNegotiator->getActiveDomain(TRUE));
   }
 
+  /**
+   * Set the domain context.
+   *
+   * @param DomainInterface $domain
+   */
+  public function setDomain(DomainInterface $domain) {
+    $this->domain = $domain;
+  }
 }
