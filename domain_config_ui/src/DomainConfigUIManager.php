@@ -105,14 +105,6 @@ class DomainConfigUIManager {
   }
 
   /**
-   * Set the domain loader.
-   * @param DomainLoaderInterface $domain_loader
-   */
-  public function setDomainLoader(DomainLoaderInterface $domain_loader) {
-    $this->domainLoader = $domain_loader;
-  }
-
-  /**
    * Get the selected domain.
    */
   public function getSelectedDomain() {
