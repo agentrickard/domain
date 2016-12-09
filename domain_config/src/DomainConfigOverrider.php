@@ -181,4 +181,5 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // Get the domain context.
     $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
   }
+
 }
