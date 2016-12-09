@@ -1,14 +1,7 @@
 services:
-  domain_config_ui.negotiator:
-    class: Drupal\domain_config_ui\DomainConfigUINegotiator
-    tags:
-      - { name: persist }
-    arguments: ['@request_stack', '@module_handler', '@domain.loader', '@config.factory']
-    calls:
-      - [setDomainConfigOverrider, ['@domain_config.overrider']]
-
-  domain.negotiator:
-    alias: domain_config_ui.negotiator
+  domain_config_ui.manager:
+    class: Drupal\domain_config_ui\DomainConfigUIManager
+    arguments: ['@config.storage', '@domain.loader', '@language_manager']
 
   domain_config_ui.factory:
     class: Drupal\domain_config_ui\Config\ConfigFactory
@@ -17,7 +10,7 @@ services:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
     calls:
-      - [setDomainNegotiator, ['@domain.negotiator']]
+      - [setDomainConfigUIManager, ['@domain_config_ui.manager']]
 
   config.factory:
     alias: domain_config_ui.factory

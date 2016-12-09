@@ -3,7 +3,7 @@
 namespace Drupal\domain_config_ui\Config;
 
 use Drupal\Core\Config\Config as CoreConfig;
-use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\domain_config_ui\DomainConfigUIManager;
 
 /**
  * Extend core Config class to save domain specific configuration.
@@ -19,18 +19,18 @@ class Config extends CoreConfig {
   ];
 
   /**
-   * The Domain negotiator.
+   * The Domain config UI manager.
    *
-   * @var \Drupal\domain\DomainNegotiatorInterface
+   * @var DomainConfigUIManager
    */
-  protected $domainNegotiator;
+  protected $domainConfigUIManager;
 
   /**
-   * Set the Domain negotiator.
-   * @param DomainNegotiatorInterface $domain_negotiator
+   * Set the Domain config UI manager.
+   * @param DomainConfigUIManager $domain_config_ui_manager
    */
-  public function setDomainNegotiator(DomainNegotiatorInterface $domain_negotiator) {
-    $this->domainNegotiator = $domain_negotiator;
+  public function setDomainConfigUIManager($domain_config_ui_manager) {
+    $this->domainConfigUIManager = $domain_config_ui_manager;
   }
 
   /**
@@ -88,17 +88,7 @@ class Config extends CoreConfig {
       return $this->name;
     }
 
-    // Build prefix and add to front of existing key.
-    if ($selected_domain = $this->domainNegotiator->getSelectedDomain()) {
-      $prefix = 'domain.config.' . $selected_domain->id() . '.';
-      // @TODO: Allow selection of language.
-      if ($language = \Drupal::languageManager()->getCurrentLanguage()) {
-        $prefix .= $language->getId() . '.';
-      }
-      return $prefix . $this->name;
-    }
-
-    // Return current name by default.
-    return $this->name;
+    // Return selected config name.
+    return $this->domainConfigUIManager->getSelectedConfigName($this->name);
   }
 }

@@ -3,19 +3,18 @@ namespace Drupal\domain_config_ui\Config;
 
 use Drupal\Core\Config\ConfigFactory as CoreConfigFactory;
 use Drupal\domain_config_ui\Config\Config;
-use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain_config\DomainConfigOverrider;
+use Drupal\domain_config_ui\DomainConfigUIManager;
 
 /**
  * Overrides Drupal\Core\Config\ConfigFactory in order to use our own Config class.
  */
 class ConfigFactory extends CoreConfigFactory {
   /**
-   * The Domain negotiator.
+   * The Domain config UI manager.
    *
-   * @var \Drupal\domain\DomainNegotiatorInterface
+   * @var DomainConfigUIManager
    */
-  protected $domainNegotiator;
+  protected $domainConfigUIManager;
 
   /**
    * {@inheritDoc}
@@ -24,19 +23,20 @@ class ConfigFactory extends CoreConfigFactory {
   protected function createConfigObject($name, $immutable) {
     if (!$immutable) {
       $config = new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager);
-      // Pass the negotiator to the Config object.
-      $config->setDomainNegotiator($this->domainNegotiator);
+      // Pass the UI manager to the Config object.
+      $config->setDomainConfigUIManager($this->domainConfigUIManager);
       return $config;
     }
     return parent::createConfigObject($name, $immutable);
   }
 
   /**
-   * Set the Domain negotiator.
-   * @param DomainNegotiatorInterface $domain_negotiator
+   * Set the Domain config UI manager.
+   *
+   * @param DomainConfigUIManager $domain_config_ui_manager
    */
-  public function setDomainNegotiator(DomainNegotiatorInterface $domain_negotiator) {
-    $this->domainNegotiator = $domain_negotiator;
+  public function setDomainConfigUIManager($domain_config_ui_manager) {
+    $this->domainConfigUIManager = $domain_config_ui_manager;
   }
 
   /**
@@ -48,14 +48,14 @@ class ConfigFactory extends CoreConfigFactory {
     $list = parent::doLoadMultiple($names, $immutable);
 
     // Do not apply overrides if configuring 'all' domains or config is immutable.
-    if (!$this->domainNegotiator->getSelectedDomainId() || $immutable) {
+    if (empty($this->domainConfigUIManager) || !$this->domainConfigUIManager->getSelectedDomainId() || $immutable) {
       return $list;
     }
 
     // Pre-load remaining configuration files.
     if (!empty($names)) {
       // Initialise override information.
-      $module_overrides = array();
+      $module_overrides = [];
       $storage_data = $this->storage->readMultiple($names);
 
       // Load module overrides so that domain specific config is loaded in admin forms.
@@ -85,11 +85,11 @@ class ConfigFactory extends CoreConfigFactory {
    */
   protected function doGet($name, $immutable = TRUE) {
     // Do not apply overrides if configuring 'all' domains or config is immutable.
-    if (!$this->domainNegotiator->getSelectedDomainId() || $immutable) {
+    if (empty($this->domainConfigUIManager) || !$this->domainConfigUIManager->getSelectedDomainId() || $immutable) {
       return parent::doGet($name, $immutable);
     }
 
-    if ($config = $this->doLoadMultiple(array($name), $immutable)) {
+    if ($config = $this->doLoadMultiple([$name], $immutable)) {
       return $config[$name];
     }
     else {
@@ -98,7 +98,7 @@ class ConfigFactory extends CoreConfigFactory {
       $config = $this->createConfigObject($name, $immutable);
 
       // Load domain overrides so that domain specific config is loaded in admin forms.
-      $overrides = $this->loadDomainOverrides(array($name));
+      $overrides = $this->loadDomainOverrides([$name]);
       if (isset($overrides[$name])) {
         $config->setModuleOverride($overrides[$name]);
       }
@@ -121,13 +121,6 @@ class ConfigFactory extends CoreConfigFactory {
    *   An array of overrides keyed by the configuration object name.
    */
   protected function loadDomainOverrides(array $names) {
-    $overrides = array();
-    foreach ($this->configFactoryOverrides as $override) {
-      // Only return domain overrides.
-      if ($override instanceof DomainConfigOverrider) {
-        $overrides = $override->loadOverrides($names);
-      }
-    }
-    return $overrides;
+    return $this->domainConfigUIManager->loadOverrides($names);
   }
 }
