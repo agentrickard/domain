@@ -16,6 +16,8 @@ class ConfigFactory extends CoreConfigFactory {
   protected $allowedDomainConfig = [
     'system.site',
     'system.theme*',
+    '*.theme.*',
+    '*.settings',
     'node.settings',
   ];
 
