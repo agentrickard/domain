@@ -23,7 +23,13 @@ function domain_config_ui_preprocess_page(&$variables) {
   $content = [
     'domain_config_ui_switch' => $form,
   ];
+
   $variables['page']['content'] = array_merge($content, $variables['page']['content']);
+
+  // Add a message below the form to remind the administrator which domain they are currently configuring.
+  if ($warning_message = domain_config_ui_save_warning_message()) {
+    $variables['page']['content']['domain_config_ui_switch_warning'] = $warning_message;
+  }
 }
 
 /**
@@ -74,12 +80,23 @@ function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
   ];
 
   // Add a message below the form to remind the administrator which domain they are currently configuring.
+  if ($warning_message = domain_config_ui_save_warning_message()) {
+    $form['domain_message'] = $warning_message;
+  }
+}
+
+/**
+ * Helper to generate the markup for the domain save warning message.
+ */
+function domain_config_ui_save_warning_message() {
+  $selected_domain = \Drupal::service('domain_config_ui.manager')->getSelectedDomain();
   if ($selected_domain) {
+    $selected_language = \Drupal::service('domain_config_ui.manager')->getSelectedLanguage();
     $message = new TranslatableMarkup('Configuration will be saved for @domain @language', [
       '@domain' => $selected_domain->label(),
       '@language' => $selected_language ? '(' . $selected_language->getName() . ')' : '',
     ]);
-    $form['domain_message'] = [
+    return [
       '#markup' => new FormattableMarkup('<div class="messages messages--warning">@message</div>', [
         '@message' => $message,
       ]),
