@@ -114,6 +114,7 @@ function domain_config_ui_save_warning_message() {
 function domain_config_ui_form_is_allowed($form) {
   $allowed = [
     'system_site_information_settings',
+    'system_theme_settings',
   ];
   \Drupal::moduleHandler()->alter('domain_config_form_allowed', $allowed);
   return in_array($form['#form_id'], $allowed);
