@@ -16,6 +16,7 @@ class Config extends CoreConfig {
   protected $allowedConfig = [
     'system.site',
     'system.theme*',
+    'node.settings',
   ];
 
   /**
