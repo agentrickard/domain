@@ -10,6 +10,16 @@ use Drupal\domain_config_ui\DomainConfigUIManager;
  */
 class ConfigFactory extends CoreConfigFactory {
   /**
+   * List of config that can be saved for a specific domain.
+   * Use * for wildcards.
+   */
+  protected $allowedDomainConfig = [
+    'system.site',
+    'system.theme*',
+    'node.settings',
+  ];
+
+  /**
    * The Domain config UI manager.
    *
    * @var DomainConfigUIManager
@@ -17,11 +27,35 @@ class ConfigFactory extends CoreConfigFactory {
   protected $domainConfigUIManager;
 
   /**
+   * Helper to check if config is allowed to be saved for domain.
+   *
+   * @param string $name
+   */
+  protected function isAllowedDomainConfig($name) {
+    // Get default allowed config and allow other modules to alter.
+    $allowed = $this->allowedDomainConfig;
+    \Drupal::moduleHandler()->alter('domain_config_allowed', $allowed);
+
+    // Return original name if reserved not allowed.
+    $is_allowed = FALSE;
+    foreach ($allowed as $config_name) {
+      // Convert config_name into into regex.
+      // Escapes regex syntax, but keeps * wildcards.
+      $pattern = '/^' . str_replace('\*', '.*', preg_quote($config_name, '/')) . '$/';
+      if (preg_match($pattern, $name)) {
+        $is_allowed = TRUE;
+      }
+    }
+
+    return $is_allowed;
+  }
+
+  /**
    * {@inheritDoc}
    * @see \Drupal\Core\Config\ConfigFactory::createConfigObject()
    */
   protected function createConfigObject($name, $immutable) {
-    if (!$immutable) {
+    if (!$immutable && $this->isAllowedDomainConfig($name)) {
       $config = new Config($name, $this->storage, $this->eventDispatcher, $this->typedConfigManager);
       // Pass the UI manager to the Config object.
       $config->setDomainConfigUIManager($this->domainConfigUIManager);
@@ -48,7 +82,7 @@ class ConfigFactory extends CoreConfigFactory {
     $list = parent::doLoadMultiple($names, $immutable);
 
     // Do not apply overrides if configuring 'all' domains or config is immutable.
-    if (empty($this->domainConfigUIManager) || !$this->domainConfigUIManager->getSelectedDomainId() || $immutable) {
+    if (empty($this->domainConfigUIManager) || !$this->domainConfigUIManager->getSelectedDomainId() || !$this->isAllowedDomainConfig(current($names))) {
       return $list;
     }
 
@@ -85,7 +119,7 @@ class ConfigFactory extends CoreConfigFactory {
    */
   protected function doGet($name, $immutable = TRUE) {
     // Do not apply overrides if configuring 'all' domains or config is immutable.
-    if (empty($this->domainConfigUIManager) || !$this->domainConfigUIManager->getSelectedDomainId() || $immutable) {
+    if (empty($this->domainConfigUIManager) || !$this->domainConfigUIManager->getSelectedDomainId() || !$this->isAllowedDomainConfig($name)) {
       return parent::doGet($name, $immutable);
     }
 

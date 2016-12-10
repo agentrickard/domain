@@ -11,6 +11,22 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
+ * Implements hook_preprocess_page().
+ */
+function domain_config_ui_preprocess_page(&$variables) {
+  if (!domain_config_ui_route_is_admin() || !domain_config_ui_route_is_allowed()) {
+    return;
+  }
+
+  // Add domain switch form that will reload the page to top of content region.
+  $form = \Drupal::formBuilder()->getForm('Drupal\domain_config_ui\Form\SwitchForm');
+  $content = [
+    'domain_config_ui_switch' => $form,
+  ];
+  $variables['page']['content'] = array_merge($content, $variables['page']['content']);
+}
+
+/**
  * Implements hook_form_alter().
  *
  * @param array $form
@@ -18,9 +34,7 @@ use Drupal\Component\Render\FormattableMarkup;
  */
 function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
   // Only alter config forms that can have a config factory and are on an admin path.
-  $route = \Drupal::routeMatch()->getRouteObject();
-  $is_admin = \Drupal::service('router.admin_context')->isAdminRoute($route);
-  if (!$is_admin || !domain_config_ui_form_is_allowed($form)) {
+  if (!domain_config_ui_route_is_admin() || !domain_config_ui_form_is_allowed($form)) {
     return;
   }
 
@@ -83,10 +97,33 @@ function domain_config_ui_form_alter(&$form, FormStateInterface $form_state) {
 function domain_config_ui_form_is_allowed($form) {
   $allowed = [
     'system_site_information_settings',
-    'system_themes_admin_form',
   ];
   \Drupal::moduleHandler()->alter('domain_config_form_allowed', $allowed);
   return in_array($form['#form_id'], $allowed);
+}
+
+/**
+ * Checks if provided path should have a domain switch form added to the top of the page.
+ *
+ * @return boolean
+ */
+function domain_config_ui_route_is_allowed() {
+  $allowed = [
+    '/admin/appearance',
+  ];
+  \Drupal::moduleHandler()->alter('domain_config_route_allowed', $allowed);
+  $route = \Drupal::routeMatch()->getRouteObject();
+  return in_array($route->getPath(), $allowed);
+}
+
+/**
+ * Checks if route is admin.
+ *
+ * @return boolean
+ */
+function domain_config_ui_route_is_admin() {
+  $route = \Drupal::routeMatch()->getRouteObject();
+  return \Drupal::service('router.admin_context')->isAdminRoute($route);
 }
 
 /**

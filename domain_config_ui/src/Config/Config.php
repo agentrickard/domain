@@ -10,16 +10,6 @@ use Drupal\domain_config_ui\DomainConfigUIManager;
  */
 class Config extends CoreConfig {
   /**
-   * List of config that can be saved for a specific domain.
-   * Use * for wildcards.
-   */
-  protected $allowedConfig = [
-    'system.site',
-    'system.theme*',
-    'node.settings',
-  ];
-
-  /**
    * The Domain config UI manager.
    *
    * @var DomainConfigUIManager
@@ -71,25 +61,8 @@ class Config extends CoreConfig {
    * Get the domain config name.
    */
   protected function getDomainConfigName() {
-    // Get default allowed config and allow other modules to alter.
-    $allowed = $this->allowedConfig;
-    \Drupal::moduleHandler()->alter('domain_config_allowed', $allowed);
-
-    // Return original name if reserved not allowed.
-    $is_allowed = FALSE;
-    foreach ($allowed as $config_name) {
-      // Convert config_name into into regex.
-      // Escapes regex syntax, but keeps * wildcards.
-      $pattern = '/^' . str_replace('\*', '.*', preg_quote($config_name, '/')) . '$/';
-      if (preg_match($pattern, $this->name)) {
-        $is_allowed = TRUE;
-      }
-    }
-    if (!$is_allowed) {
-      return $this->name;
-    }
-
     // Return selected config name.
     return $this->domainConfigUIManager->getSelectedConfigName($this->name);
   }
+
 }
