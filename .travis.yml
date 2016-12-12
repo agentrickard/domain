@@ -40,7 +40,10 @@ notifications:
 before_install:
   # Remove Xdebug. Not an issue for PHP 7.
   - phpenv config-rm xdebug.ini || true
+  # Try to increase default timeout.
+  - echo 'default_socket_timeout = 120' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
+  # Update composer.
   - composer self-update
 
   # Install Drush.
