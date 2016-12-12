@@ -87,6 +87,6 @@ script:
   - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "Simpletest" --php `which php` --url http://example.com:8080 domain_alias
   - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_alias
   - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "Simpletest" --php `which php` --url http://example.com:8080 domain_config
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
+  #- php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
   - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "Simpletest" --php `which php` --url http://example.com:8080 domain_source
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
+  #- php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
