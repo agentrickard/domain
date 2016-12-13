@@ -231,4 +231,13 @@ abstract class DomainTestBase extends BrowserTestBase {
     $this->getSession()->getPage()->selectFieldOption($locator, $value, $multiple);
   }
 
+  /**
+   * Returns an uncached list of all domains.
+   *
+   * @return array
+   *   An array of domain entities.
+   */
+  public function getDomains() {
+    return \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+  }
 }

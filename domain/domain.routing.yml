@@ -5,7 +5,7 @@ domain.admin:
     _title: 'Domains'
     _title_context: 'With modules'
   requirements:
-    _permission: 'administer domains'
+    _custom_access: 'Drupal\domain\Access\DomainListCheck::viewDomainList'
 
 domain.settings:
   path: '/admin/config/domain/settings'
@@ -23,7 +23,7 @@ entity.domain.add:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: "create domains"
+    _entity_create_access: domain
 
 entity.domain.edit_form:
   path: '/admin/config/domain/edit/{domain}'

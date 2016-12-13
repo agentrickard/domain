@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Domain Access module.
+ */
+
+/**
+ * Implements hook_install.
+ *
+ * Installs the domain admin field on users.
+ */
+function domain_install() {
+  // All this should do is set the form settings for our field.
+  domain_confirm_fields('user', 'user');
+}
+
+/**
+ * Implements hook_update_N().
+ *
+ * Installs the domain admin field on users.
+ */
+function domain_update_8001() {
+  domain_confirm_fields('user', 'user');
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Removes domain admin field on uninstall.
+ */
+function domain_uninstall() {
+  $field_storage_config = \Drupal::entityTypeManager()
+    ->getStorage('field_storage_config');
+
+  $id = $type . '.' . DOMAIN_ADMIN_FIELD;
+  if ($field = $field_storage_config->load($id)) {
+    $field->delete();
+  }
+}

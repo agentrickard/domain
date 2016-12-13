@@ -83,8 +83,8 @@ marked with [x] are considered complete.
   - [x] Allow non-ascii characters in domains
 - [ ] Recreate the Domain Nav module
 - [ ] Support Tour module
-- [ ] Allow selective access to domain record editing
-- [ ] Allow access to actions based on assigned domain permissions
+- [x] Allow selective access to domain record editing
+- [x] Allow access to actions based on assigned domain permissions
 - [ ] Implement theme functions or twig templates where proper
 - [ ] Tests for all module hooks
 - [x] Proper tests for domain record validation
@@ -107,9 +107,9 @@ marked with [x] are considered complete.
 - [ ] Dependency Injection in DomainValidator
 - [ ] Caching strategies in DomainNegotiator
 - [ ] Caching strategies in DomainConfigOverrides
-- [ ] Inject the module handler service in DomainListBuilder::getOperations()
+- [x] Inject the module handler service in DomainListBuilder::getOperations()
 - [ ] `drush_domain_generate_domains()` has odd counting logic
-- [ ] Separate permissions for Domain Alias
+- [x] Separate permissions for Domain Alias
 - [ ] Check loader logic in the DomainSource PathProcessor
 - [ ] Check loader logic in Domain Access node_access
 - [ ] Check id logic in Domain Alias list controller

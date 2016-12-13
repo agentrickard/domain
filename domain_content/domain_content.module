@@ -2,15 +2,14 @@
 
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * Implements hook_domain_operations().
  */
-function domain_content_domain_operations(DomainInterface $domain) {
+function domain_content_domain_operations(DomainInterface $domain, AccountInterface $account) {
   $operations = array();
 
-  // Add content to the list.
-  $account = \Drupal::currentUser();
   // Advanced grants for edit/delete require permissions.
   $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
   $allowed = \Drupal::service('domain_access.manager')->getAccessValues($user);

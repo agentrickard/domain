@@ -25,7 +25,7 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = \Drupal::service('domain.loader')->loadByHostname($key);
     $this->assertTrue(!empty($domain), 'Test domain created.');
-//dt Drupal\\domain_alias\\Tests\\DomainAliasValidatorTest c
+
     // Valid patterns to test. Valid is the boolean value.
     $patterns = [
       'localhost' => 1,
