@@ -40,6 +40,11 @@ class DomainElementManager implements DomainElementManagerInterface {
    * @inheritdoc
    */
   public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $hide_on_disallow = FALSE) {
+    // There are cases, such as Entity Browser, where the form is partially
+    // invoked, but without our fields.
+    if (!isset($form[$field_name])) {
+      return $form;
+    }
     $fields = $this->fieldList($field_name);
     $disallowed = $this->disallowedOptions($form_state, $form[$field_name]);
     if (!empty($disallowed)) {
