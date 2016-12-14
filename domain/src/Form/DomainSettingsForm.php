@@ -69,11 +69,11 @@ class DomainSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $config = $this->config('domain.settings');
     foreach ($this->settingsKeys() as $key) {
-      $this->config('domain.settings')
-        ->set($key, $form_state->getValue($key));
+      $config->set($key, $form_state->getValue($key));
     }
-    $this->config('domain.settings')->save();
+    $config->save();
     parent::submitForm($form, $form_state);
   }
 
