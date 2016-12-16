@@ -8,8 +8,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Tests the domain record actions.
- *
+ * @coversDefaultClass \Drupal\domain\Access\DomainAccessCheck
  * @group domain
  */
 class DomainAccessCheckTest extends UnitTestCase {
@@ -22,6 +21,8 @@ class DomainAccessCheckTest extends UnitTestCase {
 
   /**
    * {@inheritdoc}
+   *
+   * @covers \Drupal\domain\Access\DomainAccessCheck::__construct
    */
   public function setUp() {
     parent::setUp();
@@ -51,6 +52,7 @@ class DomainAccessCheckTest extends UnitTestCase {
    * @param string $path
    *
    * @dataProvider providerCheckPathTrue
+   * @covers \Drupal\domain\Access\DomainAccessCheck::applies
    */
   public function testAppliesTrue($path) {
     $route = $this->getMockBuilder('\Symfony\Component\Routing\Route')
@@ -65,6 +67,7 @@ class DomainAccessCheckTest extends UnitTestCase {
    * @param string $path
    *
    * @dataProvider providerCheckPathFalse
+   * @covers \Drupal\domain\Access\DomainAccessCheck::applies
    */
   public function testAppliesFalse($path) {
     $route = $this->getMockBuilder('\Symfony\Component\Routing\Route')
@@ -78,6 +81,7 @@ class DomainAccessCheckTest extends UnitTestCase {
    * @param string $path
    *
    * @dataProvider providerCheckPathTrue
+   * @covers \Drupal\domain\Access\DomainAccessCheck::checkPath
    */
   public function testCheckPathTrue($path) {
     static::assertTrue($this->object->checkPath($path));
@@ -87,6 +91,7 @@ class DomainAccessCheckTest extends UnitTestCase {
    * @param string $path
    *
    * @dataProvider providerCheckPathFalse
+   * @covers \Drupal\domain\Access\DomainAccessCheck::checkPath
    */
   public function testCheckPathFalse($path) {
     static::assertFalse($this->object->checkPath($path));
@@ -98,6 +103,8 @@ class DomainAccessCheckTest extends UnitTestCase {
    * If AccessResult::allowedIfHasPermissions cannot be done by mock, then
    * it will need to be done as a web test case. Maybe an example in
    * comment\Unit\Entity\CommentLockTest
+   *
+   * @covers \Drupal\domain\Access\DomainAccessCheck::access
    */
   public function testAccess() {
     $domain = $this->getMockBuilder('\Drupal\domain\DomainInterface')
@@ -118,6 +125,7 @@ class DomainAccessCheckTest extends UnitTestCase {
 
   /**
    * @return array
+   * @covers \Drupal\domain\Access\DomainAccessCheck::checkPath
    */
   public function providerCheckPathTrue() {
     return [
@@ -129,6 +137,7 @@ class DomainAccessCheckTest extends UnitTestCase {
 
   /**
    * @return array
+   * @covers \Drupal\domain\Access\DomainAccessCheck::checkPath
    */
   public function providerCheckPathFalse() {
     return [
