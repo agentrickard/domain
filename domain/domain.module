@@ -142,9 +142,9 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
         'module' => 'entity_reference',
         'settings' => ['target_type' => 'domain'],
       ];
-      $field_storage = FieldStorageConfig::create($new_field_storage);
+      $field_storage_config = FieldStorageConfig::create($field_storage);
 
-      $field_storage->save();
+      $field_storage_config->save();
     }
 
     $id = $storage_id = $entity_type . '.' . $bundle . '.' . DOMAIN_ADMIN_FIELD;
