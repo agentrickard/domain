@@ -79,7 +79,8 @@ function domain_access_node_access_records(NodeInterface $node) {
   // Create grants for each translation of the node. See the report at
   // https://www.drupal.org/node/2825419 for the logic here. Note that right
   // now, grants may not be the same for all languages.
-  foreach ($node->getTranslationLanguages() as $langcode => $language) {
+  $translations = $node->getTranslationLanguages();
+  foreach ($translations as $langcode => $language) {
     $translation = $node->getTranslation($langcode);
     // If there are no domains set, use the current one.
     $domains = \Drupal::service('domain_access.manager')->getAccessValues($translation);
@@ -114,7 +115,7 @@ function domain_access_node_access_records(NodeInterface $node) {
     // Because of language translation, we must save a record for each language.
     // Note that the gid of 1 is never allowed for domain_site in
     // domain_node_grants().
-    else {
+    elseif (count($translations) > 1) {
       $grants[] = array(
         'realm' => 'domain_site',
         'gid' => 1,
