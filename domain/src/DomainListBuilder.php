@@ -177,7 +177,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $default = $this->domainLoader->loadDefaultDomain();
 
     // Deleting the site default domain is not allowed.
-    if ($id == $default->id()) {
+    if ($default && $id == $default->id()) {
       unset($operations['delete']);
     }
     return $operations;
