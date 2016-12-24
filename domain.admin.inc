@@ -552,7 +552,7 @@ function domain_form_validate($form, &$form_state) {
 function domain_form_submit($form, &$form_state) {
   $values = domain_values_from_form_state($form_state);
   // Set the proper message.
-  if (!empty($values['domain_id']) || $values['domain_id'] == 0) {
+  if (!empty($values['domain_id'])) {
     $message = t('Domain record updated.');
   }
   else {
