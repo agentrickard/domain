@@ -517,7 +517,6 @@ function hook_domain_ignore() {
  *  -- domain
  *  -- domain_alias
  *  -- domain_conf
- *  -- domain_prefix
  *
  * If you create a custom module, it must be registered with the Domain
  * Bootstrap Process. To register, you must:
@@ -570,7 +569,7 @@ function hook_domain_bootstrap_lookup($domain) {
  * Allows modules to execute code before Drupal's hook_boot().
  *
  * This hook can be used to modify drupal's variables system or prefix database
- * tables, as used in the modules domain_conf and domain_prefix.
+ * tables, as used in the module domain_conf.
  *
  * Note: Because this function is usually called VERY early, many Drupal
  * functions or modules won't be loaded yet.
@@ -611,7 +610,6 @@ function hook_domain_bootstrap_full($domain) {
  * Look at Domain Prefix for best practices implementation. In Domain
  * Prefix, we only include this function if we know it is necessary.
  *
- * @see domain_prefix_init()
  * @see hook_url_outbound_alter()
  *
  * @param $domain_id
