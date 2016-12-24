@@ -289,7 +289,7 @@ function domain_alias_list($domain_id, $reset = FALSE) {
   $result = &drupal_static(__FUNCTION__ . '_result');
   // Query the db for aliases.
   if (!isset($result) || $reset) {
-    $result = db_query("SELECT domain_id, alias_id, pattern, redirect FROM {domain_alias}", array(), array('fetch' => PDO::FETCH_ASSOC))->FetchAll();
+    $result = db_query("SELECT domain_id, alias_id, pattern, redirect FROM {domain_alias} ORDER BY domain_id, alias_id", array(), array('fetch' => PDO::FETCH_ASSOC))->FetchAll();
   }
   if (!isset($aliases[$domain_id]) || $reset) {
     $aliases[$domain_id] = array();
