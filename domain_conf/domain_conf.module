@@ -443,7 +443,7 @@ function domain_conf_delete_variable($domain_id, $variable) {
  *   value blank in order to unset the custom variable.
  */
 function domain_conf_variable_save($domain_id, $variable, $value = NULL) {
-  $settings = domain_conf_variable_get($domain_id, TRUE);
+  $settings = domain_conf_data_get($domain_id, TRUE);
   $settings[$variable] = $value;
   domain_conf_data_set($domain_id, $settings, FALSE);
 }
