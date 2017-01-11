@@ -12,7 +12,7 @@
  */
 function domain_install() {
   // All this should do is set the form settings for our field.
-  #domain_confirm_fields('user', 'user', 'default:domain_admin');
+  domain_confirm_fields('user', 'user', 'domain:domain');
 }
 
 /**
@@ -21,7 +21,7 @@ function domain_install() {
  * Installs the domain admin field on users.
  */
 function domain_update_8001() {
-  domain_confirm_fields('user', 'user', 'default:domain_admin');
+  domain_confirm_fields('user', 'user', 'domain:domain');
 }
 
 /**
