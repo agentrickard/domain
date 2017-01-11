@@ -49,7 +49,7 @@ class DomainRouteCheck implements AccessInterface {
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    *
-   * @see Drupal\domain\Plugin\views\access\Domain.php
+   * @see \Drupal\domain\Plugin\views\access\Domain
    */
   public function access(Route $route, AccountInterface $account) {
     // Requirements just allow strings, so this might be a comma separated list.
