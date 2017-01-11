@@ -47,7 +47,9 @@ class DomainElementManager implements DomainElementManagerInterface {
     }
     $fields = $this->fieldList($field_name);
     $disallowed = $this->disallowedOptions($form_state, $form[$field_name]);
-    if (!empty($disallowed)) {
+
+    // Check for domains the user cannot access or the absence of any options.
+    if (!empty($disallowed) || empty($form[$field_name]['widget']['#options'])) {
       // @TODO: Potentially show this information to users with permission.
       $form[$field_name . '_disallowed'] = array(
         '#type' => 'value',
