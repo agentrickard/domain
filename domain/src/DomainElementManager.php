@@ -47,9 +47,10 @@ class DomainElementManager implements DomainElementManagerInterface {
     }
     $fields = $this->fieldList($field_name);
     $disallowed = $this->disallowedOptions($form_state, $form[$field_name]);
+    $empty = empty($form[$field_name]['widget']['#options']);
 
     // Check for domains the user cannot access or the absence of any options.
-    if (!empty($disallowed) || empty($form[$field_name]['widget']['#options'])) {
+    if (!empty($disallowed) || $empty) {
       // @TODO: Potentially show this information to users with permission.
       $form[$field_name . '_disallowed'] = array(
         '#type' => 'value',
@@ -59,7 +60,7 @@ class DomainElementManager implements DomainElementManagerInterface {
         '#type' => 'value',
         '#value' => $fields,
       );
-      if ($hide_on_disallow) {
+      if ($hide_on_disallow || $empty) {
         $form[$field_name]['#access'] = FALSE;
       }
       // Call our submit function to merge in values.
@@ -72,6 +73,7 @@ class DomainElementManager implements DomainElementManagerInterface {
         }
       }
     }
+
     return $form;
   }
 
@@ -90,7 +92,11 @@ class DomainElementManager implements DomainElementManagerInterface {
       foreach ($values as $value) {
         $entity_values[]['target_id'] = $value;
       }
-      $form_state->setValue($field, $entity_values);
+      // Prevent a fatal error caused by passing a NULL value.
+      // See https://www.drupal.org/node/2841962.
+      if (!empty($entity_values)) {
+        $form_state->setValue($field, $entity_values);
+      }
     }
   }
 
