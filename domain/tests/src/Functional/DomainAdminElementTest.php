@@ -43,8 +43,11 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->drupalGet('admin/people/create');
     $this->assertSession()->statusCodeEquals(200);
 
-    // Set the title, so the node can be saved.
+    // Create a user through the form.
+    $this->fillField('name', 'testuser');
     $this->fillField('mail', 'test@example.com');
+    $this->fillField('pass[pass1]', 'test');
+    $this->fillField('pass[pass2]', 'test');
 
     // We expect to find 5 domain options. We set two as selected.
     $domains = \Drupal::service('domain.loader')->loadMultiple();
@@ -63,21 +66,23 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     $storage = \Drupal::entityTypeManager()->getStorage('user');
-    $user = $storage->load(2);
+    $user = $storage->load(3);
     // Check that two values are set.
     $manager = \Drupal::service('domain.element_manager');
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
-  #  $this->assert(count($values) == 3, 'User saved with three domain records.');
+    $this->assert(count($values) == 3, 'User saved with three domain records.');
 
     // Now login as a user with limited rights.
-    $account = $this->drupalCreateUser(array('administer users', 'assign domain administrators'));
+    $account = $this->drupalCreateUser(array(
+      'administer users',
+      'assign domain administrators',
+    ));
     $ids = ['example_com', 'one_example_com'];
     $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ADMIN_FIELD);
-    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
-    $user = $user_storage->load($account->id());
-    $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
-  #  $this->assert(count($values) == 2, 'User saved with two domain records.');
-
+    $tester = $storage->load($account->id());
+    $values = $manager->getFieldValues($tester, DOMAIN_ADMIN_FIELD);
+    $this->assert(count($values) == 2, 'User saved with two domain records.');
+    $storage->resetCache(array($account->id()));
     $this->drupalLogin($account);
 
     $this->drupalGet('user/' . $user->id() . '/edit');
@@ -92,7 +97,6 @@ class DomainAdminElementTest extends DomainTestBase {
       elseif ($domain->id() == 'one_example_com') {
         $this->uncheckField($locator);
       }
-
       else {
         $this->assertSession()->fieldNotExists($locator);
       }
@@ -104,10 +108,32 @@ class DomainAdminElementTest extends DomainTestBase {
 
     // Now, check the node.
     $storage->resetCache(array($user->id()));
-    $user = $storage->load(2);
+    $user = $storage->load($user->id());
     // Check that two values are set.
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
-#    $this->assert(count($values) == 2, 'User saved with two domain records.');
+    $this->assert(count($values) == 2, 'User saved with two domain records.');
+
+    // Test the case presented in https://www.drupal.org/node/2841962.
+    $config = \Drupal::configFactory()->getEditable('user.settings');
+    $config->set('verify_mail', 0);
+    $config->set('register', USER_REGISTER_VISITORS);
+    $config->save();
+    $this->drupalLogout();
+    $this->drupalGet('user/register');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->responseNotContains('Domain administrator');
+    foreach ($domains as $domain) {
+      $locator = DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
+      $this->assertSession()->fieldNotExists($locator);
+    }
+    // Create a user through the form.
+    $this->fillField('name', 'testuser2');
+    $this->fillField('mail', 'test2@example.com');
+    $this->fillField('pass[pass1]', 'test');
+    $this->fillField('pass[pass2]', 'test');
+    // Save the form.
+    $this->pressButton('edit-submit');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
 }

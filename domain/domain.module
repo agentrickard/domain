@@ -193,7 +193,7 @@ function domain_confirm_fields($entity_type, $bundle, $handler = 'default:domain
 function domain_form_user_form_alter(&$form, &$form_state, $form_id) {
   // Add the options hidden from the user silently to the form.
   $manager = \Drupal::service('domain.element_manager');
-  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD, TRUE);
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD);
 }
 
 /**
