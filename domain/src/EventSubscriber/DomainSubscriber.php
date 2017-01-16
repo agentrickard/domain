@@ -74,22 +74,20 @@ class DomainSubscriber implements EventSubscriberInterface {
    *
    * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
    *   The Event to process.
+   *
+   * @see domain_alias_domain_request_alter
    */
   public function onKernelRequestDomain(GetResponseEvent $event) {
-    $redirect = FALSE;
     // Negotiate the request and set domain context.
     /** @var \Drupal\domain\DomainInterface $domain */
     if ($domain = $this->domainNegotiator->getActiveDomain(TRUE)) {
       $domain_url = $domain->getUrl();
       if ($domain_url) {
-        $redirect_type = $domain->getRedirect();
+        $redirect_status = $domain->getRedirect();
         $path = trim($event->getRequest()->getPathInfo(), '/');
         // If domain negotiation asked for a redirect, issue it.
-        if (!is_null($redirect_type)) {
-          $redirect = TRUE;
-        }
+        if (is_null($redirect_status) && $this->accessCheck->checkPath($path)) {
         // Else check for active domain or inactive access.
-        elseif ($this->accessCheck->checkPath($path)) {
           /** @var \Drupal\Core\Access\AccessResult $access */
           $access = $this->accessCheck->access($this->account);
           // If the access check fails, reroute to the default domain.
@@ -99,14 +97,13 @@ class DomainSubscriber implements EventSubscriberInterface {
             /** @var \Drupal\domain\DomainInterface $default */
             $default = $this->domainLoader->loadDefaultDomain();
             $domain_url = $default->getUrl();
-            $redirect = TRUE;
-            $redirect_type = 302;
+            $redirect_status = 302;
           }
         }
       }
-      if ($redirect) {
+      if (isset($redirect_status)) {
         // Pass a redirect if necessary.
-        $response = new TrustedRedirectResponse($domain_url, $redirect_type);
+        $response = new TrustedRedirectResponse($domain_url, $redirect_status);
         $event->setResponse($response);
       }
     }
