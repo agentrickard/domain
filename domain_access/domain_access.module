@@ -16,14 +16,14 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Defines the name of the node access control field.
+ * The name of the node access control field.
  */
-define('DOMAIN_ACCESS_FIELD', 'field_domain_access');
+const DOMAIN_ACCESS_FIELD = 'field_domain_access';
 
 /**
- * Defines the name of the all affiliates field.
+ * The name of the all affiliates field.
  */
-define('DOMAIN_ACCESS_ALL_FIELD', 'field_domain_all_affiliates');
+const DOMAIN_ACCESS_ALL_FIELD = 'field_domain_all_affiliates';
 
 /**
  * Implements hook_node_grants().

@@ -12,9 +12,9 @@ use Drupal\Component\Utility\Html;
 use Drupal\field\Entity\FieldStorageConfig;
 
 /**
- * Defines the name of the node access control field.
+ * The name of the node access control field.
  */
-define('DOMAIN_ADMIN_FIELD', 'field_domain_admin');
+const DOMAIN_ADMIN_FIELD = 'field_domain_admin';
 
 /**
  * Implements hook_entity_bundle_info().
