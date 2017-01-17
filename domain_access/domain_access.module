@@ -76,32 +76,55 @@ function domain_access_node_grants(AccountInterface $account, $op) {
  */
 function domain_access_node_access_records(NodeInterface $node) {
   $grants = array();
-  // If there are no domains set, use the current one.
-  $domains = \Drupal::service('domain_access.manager')->getAccessValues($node);
-  /** @var \Drupal\domain\DomainInterface $active */
-  if (empty($domains) && $active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
-    $domains[$active->id()] = $active->getDomainId();
-  }
-  foreach ($domains as $id => $domainId) {
-    /** @var \Drupal\domain\DomainInterface $domain */
-    if ($domain = \Drupal::service('domain.loader')->load($id)) {
+  // Create grants for each translation of the node. See the report at
+  // https://www.drupal.org/node/2825419 for the logic here. Note that right
+  // now, grants may not be the same for all languages.
+  $translations = $node->getTranslationLanguages();
+  foreach ($translations as $langcode => $language) {
+    $translation = $node->getTranslation($langcode);
+    // If there are no domains set, use the current one.
+    $domains = \Drupal::service('domain_access.manager')->getAccessValues($translation);
+    /** @var \Drupal\domain\DomainInterface $active */
+    if (empty($domains) && $active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
+      $domains[$active->id()] = $active->getDomainId();
+    }
+    foreach ($domains as $id => $domainId) {
+      /** @var \Drupal\domain\DomainInterface $domain */
+      if ($domain = \Drupal::service('domain.loader')->load($id)) {
+        $grants[] = array(
+          'realm' => ($translation->isPublished()) ? 'domain_id' : 'domain_unpublished',
+          'gid' => $domain->getDomainId(),
+          'grant_view' => 1,
+          'grant_update' => 1,
+          'grant_delete' => 1,
+          'langcode' => $langcode,
+        );
+      }
+    }
+    // Set the domain_site grant.
+    if (!empty($translation->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $translation->isPublished()) {
       $grants[] = array(
-        'realm' => ($node->isPublished()) ? 'domain_id' : 'domain_unpublished',
-        'gid' => $domain->getDomainId(),
+        'realm' => 'domain_site',
+        'gid' => 0,
         'grant_view' => 1,
-        'grant_update' => 1,
-        'grant_delete' => 1,
+        'grant_update' => 0,
+        'grant_delete' => 0,
+        'langcode' => $langcode,
       );
     }
-  }
-  if (!empty($node->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $node->isPublished()) {
-    $grants[] = array(
-      'realm' => 'domain_site',
-      'gid' => 0,
-      'grant_view' => 1,
-      'grant_update' => 0,
-      'grant_delete' => 0,
-    );
+    // Because of language translation, we must save a record for each language.
+    // Note that the gid of 1 is never allowed for domain_site in
+    // domain_node_grants().
+    elseif (count($translations) > 1) {
+      $grants[] = array(
+        'realm' => 'domain_site',
+        'gid' => 1,
+        'grant_view' => 1,
+        'grant_update' => 0,
+        'grant_delete' => 0,
+        'langcode' => $langcode,
+      );
+    }
   }
   return $grants;
 }
