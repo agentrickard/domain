@@ -109,6 +109,9 @@ function domain_preprocess_html(array &$variables) {
  *   The entity type being created. Node and user are supported.
  * @param string $bundle
  *   The bundle being created.
+ * @param string $handler
+ *   The entity reference form widget to use. Defaults to 'default:domain'.
+ *   See hook_domain_references_alter() for details.
  * @param array $text
  *   The text to use for the field. Keys are:
  *   'name' -- the lower-case, human-readable name of the entity.
@@ -125,9 +128,8 @@ function domain_preprocess_html(array &$variables) {
  *
  * @TODO Update and abstract this function for use by other modules.
  */
-function domain_confirm_fields($entity_type, $bundle, $text = array()) {
+function domain_confirm_fields($entity_type, $bundle, $handler = 'default:domain', $text = array()) {
   // We have reports that importing config causes this function to fail.
-
   try {
 
     $storage_id = $entity_type . '.' . DOMAIN_ADMIN_FIELD;
@@ -159,6 +161,7 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
         'description' => 'Select the domains this user may administer',
         'default_value' => [],
         'settings' => [
+          'handler' => $handler,
           'handler_settings' => [
             'sort' => ['field' => 'weight', 'direction' => 'ASC'],
           ],
@@ -190,7 +193,7 @@ function domain_confirm_fields($entity_type, $bundle, $text = array()) {
 function domain_form_user_form_alter(&$form, &$form_state, $form_id) {
   // Add the options hidden from the user silently to the form.
   $manager = \Drupal::service('domain.element_manager');
-  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD, TRUE);
+  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD);
 }
 
 /**

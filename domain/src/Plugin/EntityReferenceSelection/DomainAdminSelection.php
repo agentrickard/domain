@@ -2,16 +2,17 @@
 
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
-use Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection
+use Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection;
 
 /**
  * Provides entity reference selections for the domain entity type.
  *
  * @EntityReferenceSelection(
- *   id = "default:domain_admin",
+ *   id = "domain:domain",
  *   label = @Translation("Domain administrator selection"),
+ *   base_plugin_label = @Translation("Domain administrator"),
  *   entity_types = {"domain"},
- *   group = "default",
+ *   group = "domain",
  *   weight = 1
  * )
  */
