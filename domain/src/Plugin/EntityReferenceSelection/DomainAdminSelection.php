@@ -13,7 +13,7 @@ use Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection;
  *   base_plugin_label = @Translation("Domain administrator"),
  *   entity_types = {"domain"},
  *   group = "domain",
- *   weight = 1
+ *   weight = 5
  * )
  */
 class DomainAdminSelection extends DomainSelection {

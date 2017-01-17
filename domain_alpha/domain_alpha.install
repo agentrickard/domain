@@ -51,3 +51,21 @@ function domain_alpha_update_8001(&$sandbox) {
 function domain_alpha_update_8002(&$sandbox) {
   domain_alpha_update_8001($sandbox);
 }
+
+/**
+ * Set the Domain Admin field to use the proper plugin.
+ */
+function domain_alpha_update_8003(&$sandbox) {
+  $id = 'user.user.field_domain_admin';
+  $storage = \Drupal::entityTypeManager()->getStorage('field_config');
+  if ($field = $storage->load($id)) {
+    $new_field = $field->toArray();
+    if ($new_field['settings']['handler'] != 'domain:domain') {
+      $new_field['settings']['handler'] = 'domain:domain';
+      $field_config = $storage->create($new_field);
+      $field_config->original = $field;
+      $field_config->enforceIsNew(FALSE);
+      $field_config->save();
+    }
+  }
+}
