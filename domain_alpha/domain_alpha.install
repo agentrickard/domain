@@ -6,6 +6,17 @@
  */
 
 /**
+ * Implements hook_install().
+ *
+ * We accidentally released the 8001 update, which will not run on a fresh install. So
+ * lets for it to run now.
+ */
+function domain_alpha_install() {
+  $sandbox = array();
+  domain_alpha_update_8001($sandbox);
+}
+
+/**
  * Update domain id to new value.
  */
 function domain_alpha_update_8001(&$sandbox) {
@@ -30,4 +41,13 @@ function domain_alpha_update_8001(&$sandbox) {
     // Trigger permissions rebuild action.
     node_access_needs_rebuild(TRUE);
   }
+}
+
+/**
+ * Provide a new update for 8001, for users who never ran 8001.
+ *
+ * See https://github.com/agentrickard/domain/issues/310.
+ */
+function domain_alpha_update_8002(&$sandbox) {
+  domain_alpha_update_8001($sandbox);
 }
