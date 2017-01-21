@@ -2468,8 +2468,23 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#title' => t('Domain access options'),
       '#collapsible' => TRUE,
       '#collapsed' => variable_get('domain_collapse_options', 0),
-      '#group' => variable_get('domain_vertical_tab', 0) ? 'additional_settings' : '',
     );
+    // Display in vertical tab group, if required
+    if (variable_get('domain_vertical_tab', 0)) {
+      $form['domain']['#group'] = 'additional_settings';
+      $form['domain']['#attributes'] = array(
+        'class' => array('domain-access-options-form'),
+      );
+      $form['domain']['#attached'] = array(
+        'js' => array(
+          drupal_get_path('module', 'domain') . '/domain.node.js',
+          array(
+            'data' => array('domain' => array('fieldType' => $format)),
+            'type' => 'setting',
+          ),
+        ),
+      );
+    }
     $form['domain']['domain_site'] = array(
       '#type' => 'checkbox',
       '#title' => t('Send to all affiliates'),
@@ -2563,8 +2578,17 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             '#title' => t('Affiliate publishing options'),
             '#collapsible' => TRUE,
             '#collapsed' => variable_get('domain_collapse_options', 0),
-            '#group' => variable_get('domain_vertical_tab', 0) ? 'additional_settings' : '',
           );
+          // Display in vertical tab group, if required
+          if (variable_get('domain_vertical_tab', 0)) {
+            $form['domain']['#group'] = 'additional_settings';
+            $form['domain']['#attributes'] = array(
+              'class' => array('domain-access-options-form'),
+            );
+            $form['domain']['#attached'] = array(
+              'js' => array(drupal_get_path('module', 'domain') . '/domain.node.js'),
+            );
+          }
           // We must preserve publishing options that the user cannot access, but only for
           // existing nodes.
           if (!empty($form['#node']->nid)) {
