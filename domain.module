@@ -2467,7 +2467,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
       '#type' => 'fieldset',
       '#title' => t('Domain access options'),
       '#collapsible' => TRUE,
-      '#collapsed' => FALSE,
+      '#collapsed' => variable_get('domain_collapse_options', 0),
       '#group' => variable_get('domain_vertical_tab', 0) ? 'additional_settings' : '',
     );
     $form['domain']['domain_site'] = array(
@@ -2562,7 +2562,7 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             '#type' => 'fieldset',
             '#title' => t('Affiliate publishing options'),
             '#collapsible' => TRUE,
-            '#collapsed' => FALSE,
+            '#collapsed' => variable_get('domain_collapse_options', 0),
             '#group' => variable_get('domain_vertical_tab', 0) ? 'additional_settings' : '',
           );
           // We must preserve publishing options that the user cannot access, but only for

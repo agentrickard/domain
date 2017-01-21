@@ -214,6 +214,14 @@ function domain_configure_form($form, &$form_state, $user_submitted = FALSE) {
     '#options' => array(t('No'), t('Yes')),
     '#description' => t('Present the domain form options in a vertical tab.')
   );
+  $form['domain_collapse_options'] = array(
+    '#type' => 'radios',
+    '#title' => t('Collapse domain form options'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('domain_collapse_options', 0),
+    '#options' => array(t('No'), t('Yes')),
+    '#description' => t('When not displayed in a vertical tab, collapse the domain form options fieldset.')
+  );
   $form['domain_select_format'] = array(
     '#type' => 'select',
     '#title' => t('Domain selection format'),
