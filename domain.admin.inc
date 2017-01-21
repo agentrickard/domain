@@ -724,7 +724,7 @@ function domain_batch_list($batch) {
   $rows = array();
   foreach ($batch as $key => $value) {
     if (!isset($value['#module'])) {
-      $value['#module'] = t('Other');
+      $batch[$key]['#module'] = t('Other');
     }
   }
   uasort($batch, 'domain_batch_sort');
