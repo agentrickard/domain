@@ -303,7 +303,6 @@ function domain_settings_initialize() {
   if (isset($base_url)) {
     // Parse fixed base URL from settings.php.
     $parts = parse_url($base_url);
-    $http_protocol = $parts['scheme'];
     if (!isset($parts['path'])) {
       $parts['path'] = '';
     }
@@ -328,8 +327,6 @@ function domain_settings_initialize() {
       $base_path = '/';
     }
   }
-  $base_secure_url = str_replace('http://', 'https://', $base_url);
-  $base_insecure_url = str_replace('https://', 'http://', $base_url);
 
   if ($cookie_domain) {
     // If the user specifies the cookie domain, also use it for session name.
