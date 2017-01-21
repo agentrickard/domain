@@ -41,7 +41,7 @@ See http://drupal.org/node/199846 for the history of this module.
 
 The Domain Strict module comes with the Domain Access download.
 
-To install, you simply enable the module at Admin > Build > Modules.
+To install, you simply enable the module at Admin > Modules.
 
 No database tables are installed and the module itself has no
 configuration options.

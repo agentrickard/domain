@@ -540,8 +540,8 @@ access rule grants you permission, it cannot be taken away.
 ----
 4.  Module Configuration
 
-The settings for Domain Access are listed under Site Building.  The path is
-'admin/build/domain'.
+The settings for Domain Access are listed under Structure.  The path is
+'admin/structure/domain'.
 
 ----
 4.1   Default Domain Settings

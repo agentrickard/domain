@@ -115,7 +115,7 @@ the menu items together.
 The designed use-case of the menu is for use as Primary or Secondary links.  To
 enable this feature, use the following steps:
 
-  - Go to 'admin/build/menu'
+  - Go to 'admin/structure/menu'
   - Find the Navigation => Domain menu item.
   - Enable the menu item.
   - Assign the menu item to Primary or Secondary links, as desired.
@@ -132,8 +132,8 @@ for this module, you may edit the following line at the top of the module:
 
 If you set this value to FALSE before you install the module, the menu items
 will not be created.  If you have already installed the module, you may also set
-this value to FALSE and then navigate to 'admin/build/menu'.  Note that updated
-module releases will always reset this value to TRUE.
+this value to FALSE and then navigate to 'admin/structure/menu'.  Note that
+updated module releases will always reset this value to TRUE.
 
 ----
 4.  Developer Notes

@@ -55,7 +55,7 @@ If you wish for users with the 'edit domain content' permission to access the
 Domain Content interface, you must enable the 'Use access control for
 editors' option under Advanced Settings on the Domains configuration page:
 
-  Administer > Site Building > Domains
+  Structure > Domains
 
 ----
 2.1 Permissions
