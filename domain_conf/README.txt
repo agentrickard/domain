@@ -70,7 +70,7 @@ Domain Conf requires the Domain Access module be installed and active.
 ----
 2.2   Configuration Options
 
-When active, the Domain Conf module provides a 'settings' link next to each
+When active, the Domain Conf module provides a 'settings' tab when editing an
 entry in your Domain Access list (found at path 'admin/structure/domain').
 
 For each registered domain, you have the option of saving settings that will
