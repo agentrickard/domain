@@ -4155,6 +4155,15 @@ function domain_url_filter_tips($filter, $format, $long) {
 }
 
 /**
+ * Implements hook_metatag_page_cache_cid_parts_alter().
+ */
+function domain_metatag_page_cache_cid_parts_alter(&$cid_parts) {
+  // Make Metatag cache domain specific.
+  $_domain = domain_get_domain();
+  $cid_parts['domain_id'] = $_domain['domain_id'];
+}
+
+/**
  * Returns all domain module tokens in a human-readable array.
  *
  * The array key is the token string (without brackets) and the value is the
