@@ -3,6 +3,7 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Generic base class for handling hidden field options.
@@ -18,6 +19,8 @@ use Drupal\Core\Form\FormStateInterface;
  * implementation.
  */
 class DomainElementManager implements DomainElementManagerInterface {
+
+  use StringTranslationTrait;
 
   /**
    * @var \Drupal\domain\DomainLoaderInterface
@@ -62,6 +65,9 @@ class DomainElementManager implements DomainElementManagerInterface {
       );
       if ($hide_on_disallow || $empty) {
         $form[$field_name]['#access'] = FALSE;
+      }
+      elseif (!empty($disallowed)) {
+        $form[$field_name]['widget']['#description'] .= $this->listDisallowed($disallowed);
       }
       // Call our submit function to merge in values.
       // Account for all the submit buttons on the node form.
@@ -153,6 +159,30 @@ class DomainElementManager implements DomainElementManagerInterface {
    */
   public function getSubmitHandler() {
     return '\\Drupal\\domain\\DomainElementManager::submitEntityForm';
+  }
+
+  /**
+   * Lists the disallowed domains in the user interface.
+   *
+   * @param array $disallowed
+   *   An array of domain ids.
+   *
+   * @return string
+   *   A string suitable for display.
+   */
+  public function listDisallowed(array $disallowed) {
+    $domains = $this->loader->loadMultiple($disallowed);
+    // @TODO: Proper theme function here.
+    $string = $this->t('The following domains are currently assigned and cannot be changed:');
+    foreach ($domains as $domain) {
+      $items[] = $domain->label();
+    }
+    $build = array(
+      '#theme' => 'item_list',
+      '#items' => $items,
+    );
+    $string .= render($build);
+    return '<div class="disallowed">' . $string . '</div>';
   }
 
 }

@@ -66,10 +66,10 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Check for the form options.
     foreach ($domains as $domain) {
       if ($domain->id() == $active_domain) {
-        $this->assertText($domain->label(), 'Domain form item found.');
+        $this->assertRaw('>' . $domain->label() . '</label>', 'Domain form item found.');
       }
       else {
-        $this->assertNoText($domain->label(), 'Domain form item not found.');
+        $this->assertNoRaw('>' . $domain->label() . '</label>', 'Domain form item not found.');
       }
     }
     $this->assertNoText($label, 'All affiliates field not found.');
@@ -127,10 +127,10 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Check for the form options.
     foreach ($domains as $domain) {
       if ($domain->id() == $active_domain) {
-        $this->assertText($domain->label(), 'Domain form item found.');
+        $this->assertRaw('>' . $domain->label() . '</label>', 'Domain form item found.');
       }
       else {
-        $this->assertNoText($domain->label(), 'Domain form item not found.');
+        $this->assertNoRaw('>' . $domain->label() . '</label>', 'Domain form item not found.');
       }
     }
 
