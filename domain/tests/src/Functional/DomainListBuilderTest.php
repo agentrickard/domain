@@ -82,7 +82,7 @@ class DomainListBuilderTest extends DomainTestBase {
       }
       else {
         $this->assertSession()->linkByHrefNotExists($href, 'Link not found');
-        $this->assertSession()->assertNoEscaped($domain->label());
+        $this->assertSession()->assertEscaped($domain->label());
       }
     }
 

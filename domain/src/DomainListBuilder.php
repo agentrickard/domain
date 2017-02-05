@@ -305,8 +305,9 @@ class DomainListBuilder extends DraggableListBuilder {
 
     // If the user cannot administer domains, we must filter the query further by
     // assigned IDs. We don't have to check permissions here, because that is handled by
-    // the route system and buildRow().
-    if (!$this->currentUser->hasPermission('administer domains')) {
+    // the route system and buildRow(). There are two permissions that allow users to view
+    // the entire list.
+    if (!$this->currentUser->hasPermission('administer domains') && !$this->currentUser->hasPermission('view domain list')) {
       $user = $this->userStorage->load($this->currentUser->id());
       $allowed = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
       $query->condition('id', array_keys($allowed), 'IN');
