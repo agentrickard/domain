@@ -69,6 +69,16 @@ class DomainListBuilder extends DraggableListBuilder {
   protected $domainLoader;
 
   /**
+   * The number of entities to list per page.
+   *
+   * DraggableListBuilder sets this to FALSE, which cancels any pagination. Restore the
+   * default value from EntityListBuilder.
+   *
+   * @var int|false
+   */
+  protected $limit = 50;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
@@ -250,4 +260,45 @@ class DomainListBuilder extends DraggableListBuilder {
     drupal_set_message($this->t('Configuration saved.'));
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Builds the entity listing as a form with pagination. This method overrides both
+   * Drupal\Core\Config\Entity\DraggableListBuilder::render() and
+   * Drupal\Core\Entity\EntityListBuilder::render().
+   */
+  public function render() {
+    // Build the default form, which includes weights.
+    $form = $this->formBuilder()->getForm($this);
+
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $form['pager'] = array(
+        '#type' => 'pager',
+      );
+    }
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Loads entity IDs using a pager sorted by the entity weight. The default behavior when
+   * using a limit is to sort by id.
+   *
+   * See Drupal\Core\Entity\EntityListBuilder::getEntityIds()
+   *
+   * @return array
+   *   An array of entity IDs.
+   */
+  protected function getEntityIds() {
+    $query = $this->getStorage()->getQuery()
+      ->sort($this->entityType->getKey('weight'));
+
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $query->pager($this->limit);
+    }
+    return $query->execute();
+  }
 }
