@@ -129,8 +129,11 @@ class DomainAdminElementTest extends DomainTestBase {
     // Create a user through the form.
     $this->fillField('name', 'testuser2');
     $this->fillField('mail', 'test2@example.com');
-    $this->fillField('pass[pass1]', 'test');
-    $this->fillField('pass[pass2]', 'test');
+    // In 8.3, this field is not present?
+    if (!empty($this->findField('pass[pass1]'))) {
+      $this->fillField('pass[pass1]', 'test');
+      $this->fillField('pass[pass2]', 'test');
+    }
     // Save the form.
     $this->pressButton('edit-submit');
     $this->assertSession()->statusCodeEquals(200);
