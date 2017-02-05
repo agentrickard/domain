@@ -80,7 +80,7 @@ abstract class DomainTestBase extends BrowserTestBase {
       elseif (!empty($list[$i])) {
         $hostname = $list[$i] . '.' . $base_hostname;
         $machine_name = $list[$i] . '.example.com';
-        $name = ucfirst($list[$i]);
+        $name = 'Test ' . ucfirst($list[$i]);
       }
       // These domains are not setup and are just for UX testing.
       else {
@@ -237,5 +237,16 @@ abstract class DomainTestBase extends BrowserTestBase {
    */
   public function getDomains() {
     return \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+  }
+
+  /**
+   * Returns an uncached list of all domains, sorted by weight.
+   *
+   * @return array
+   *   An array of domain entities.
+   */
+  public function getDomainsSorted() {
+    \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    return \Drupal::service('domain.loader')->loadMultipleSorted();
   }
 }
