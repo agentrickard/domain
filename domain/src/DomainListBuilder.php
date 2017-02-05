@@ -14,6 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\domain\DomainAccessControlHandler;
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainElementManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -89,7 +90,8 @@ class DomainListBuilder extends DraggableListBuilder {
       $container->get('redirect.destination'),
       $container->get('entity_type.manager'),
       $container->get('module_handler'),
-      $container->get('domain.loader')
+      $container->get('domain.loader'),
+      $container->get('domain.element_manager')
     );
   }
 
@@ -110,8 +112,10 @@ class DomainListBuilder extends DraggableListBuilder {
    *   The module handler.
    * @param \Drupal\domain\DomainLoaderInterface $domain_loader
    *   The domain loader.
+   * @param \Drupal\domain\DomainElementManager $domain_element_manager
+   *   The domain field element manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainLoaderInterface $domain_loader) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainLoaderInterface $domain_loader, DomainElementManager $domain_element_manager) {
     parent::__construct($entity_type, $storage);
     $this->entityTypeId = $entity_type->id();
     $this->storage = $storage;
@@ -122,6 +126,8 @@ class DomainListBuilder extends DraggableListBuilder {
     $this->accessHandler = $this->entityTypeManager->getAccessControlHandler('domain');
     $this->moduleHandler = $module_handler;
     $this->domainLoader = $domain_loader;
+    $this->domainElementManager = $domain_element_manager;
+    $this->userStorage = $this->entityTypeManager->getStorage('user');
   }
 
   /**
@@ -286,6 +292,8 @@ class DomainListBuilder extends DraggableListBuilder {
    * Loads entity IDs using a pager sorted by the entity weight. The default behavior when
    * using a limit is to sort by id.
    *
+   * We also have to limit by assigned domains of the active user.
+   *
    * See Drupal\Core\Entity\EntityListBuilder::getEntityIds()
    *
    * @return array
@@ -294,6 +302,15 @@ class DomainListBuilder extends DraggableListBuilder {
   protected function getEntityIds() {
     $query = $this->getStorage()->getQuery()
       ->sort($this->entityType->getKey('weight'));
+
+    // If the user cannot administer domains, we must filter the query further by
+    // assigned IDs. We don't have to check permissions here, because that is handled by
+    // the route system and buildRow().
+    if (!$this->currentUser->hasPermission('administer domains')) {
+      $user = $this->userStorage->load($this->currentUser->id());
+      $allowed = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+      $query->condition('id', array_keys($allowed), 'IN');
+    }
 
     // Only add the pager if a limit is specified.
     if ($this->limit) {
