@@ -138,7 +138,7 @@ function domain_confirm_fields($entity_type, $bundle, $handler = 'default:domain
         'id' => $storage_id,
         'field_name' => DOMAIN_ADMIN_FIELD,
         'type' => 'entity_reference',
-        'dependencies' => ['domain', 'user'],
+        'dependencies' => array('modules' => ['domain', 'user']),
         'entity_type' => 'user',
         'cardinality' => -1,
         'module' => 'entity_reference',
