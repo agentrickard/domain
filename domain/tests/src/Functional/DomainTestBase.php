@@ -72,23 +72,21 @@ abstract class DomainTestBase extends BrowserTestBase {
       $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
     }
     for ($i = 0; $i < $count; $i++) {
-      if (!empty($list[$i])) {
-        if ($i < 11) {
-          $hostname = $list[$i] . '.' . $base_hostname;
-          $machine_name = $list[$i] . '.example.com';
-          $name = ucfirst($list[$i]);
-        }
-        // These domains are not setup and are just for UX testing.
-        else {
-          $hostname = 'test' . $i . '.' . $base_hostname;
-          $machine_name = 'test' . $i . '.example.com';
-          $name = 'Test ' . $i;
-        }
-      }
-      else {
+      if ($i === 0) {
         $hostname = $base_hostname;
         $machine_name = 'example.com';
         $name = 'Example';
+      }
+      elseif (!empty($list[$i])) {
+        $hostname = $list[$i] . '.' . $base_hostname;
+        $machine_name = $list[$i] . '.example.com';
+        $name = 'Test ' . ucfirst($list[$i]);
+      }
+      // These domains are not setup and are just for UX testing.
+      else {
+        $hostname = 'test' . $i . '.' . $base_hostname;
+        $machine_name = 'test' . $i . '.example.com';
+        $name = 'Test ' . $i;
       }
       // Create a new domain programmatically.
       $values = array(
@@ -239,5 +237,16 @@ abstract class DomainTestBase extends BrowserTestBase {
    */
   public function getDomains() {
     return \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+  }
+
+  /**
+   * Returns an uncached list of all domains, sorted by weight.
+   *
+   * @return array
+   *   An array of domain entities.
+   */
+  public function getDomainsSorted() {
+    \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    return \Drupal::service('domain.loader')->loadMultipleSorted();
   }
 }

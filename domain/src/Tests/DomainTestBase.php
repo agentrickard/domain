@@ -99,23 +99,21 @@ abstract class DomainTestBase extends WebTestBase {
       $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
     }
     for ($i = 0; $i < $count; $i++) {
-      if (!empty($list[$i])) {
-        if ($i < 11) {
-          $hostname = $list[$i] . '.' . $base_hostname;
-          $machine_name = $list[$i] . '.example.com';
-          $name = ucfirst($list[$i]);
-        }
-        // These domains are not setup and are just for UX testing.
-        else {
-          $hostname = 'test' . $i . '.' . $base_hostname;
-          $machine_name = 'test' . $i . '.example.com';
-          $name = 'Test ' . $i;
-        }
-      }
-      else {
+      if ($i === 0) {
         $hostname = $base_hostname;
         $machine_name = 'example.com';
         $name = 'Example';
+      }
+      elseif (!empty($list[$i])) {
+        $hostname = $list[$i] . '.' . $base_hostname;
+        $machine_name = $list[$i] . '.example.com';
+        $name = ucfirst($list[$i]);
+      }
+      // These domains are not setup and are just for UX testing.
+      else {
+        $hostname = 'test' . $i . '.' . $base_hostname;
+        $machine_name = 'test' . $i . '.example.com';
+        $name = 'Test ' . $i;
       }
       // Create a new domain programmatically.
       $values = array(

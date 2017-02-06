@@ -14,6 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\domain\DomainAccessControlHandler;
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainElementManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -69,6 +70,16 @@ class DomainListBuilder extends DraggableListBuilder {
   protected $domainLoader;
 
   /**
+   * The number of entities to list per page.
+   *
+   * DraggableListBuilder sets this to FALSE, which cancels any pagination. Restore the
+   * default value from EntityListBuilder.
+   *
+   * @var int|false
+   */
+  protected $limit = 50;
+
+  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
@@ -79,7 +90,8 @@ class DomainListBuilder extends DraggableListBuilder {
       $container->get('redirect.destination'),
       $container->get('entity_type.manager'),
       $container->get('module_handler'),
-      $container->get('domain.loader')
+      $container->get('domain.loader'),
+      $container->get('domain.element_manager')
     );
   }
 
@@ -100,8 +112,10 @@ class DomainListBuilder extends DraggableListBuilder {
    *   The module handler.
    * @param \Drupal\domain\DomainLoaderInterface $domain_loader
    *   The domain loader.
+   * @param \Drupal\domain\DomainElementManager $domain_element_manager
+   *   The domain field element manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainLoaderInterface $domain_loader) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainLoaderInterface $domain_loader, DomainElementManager $domain_element_manager) {
     parent::__construct($entity_type, $storage);
     $this->entityTypeId = $entity_type->id();
     $this->storage = $storage;
@@ -112,6 +126,8 @@ class DomainListBuilder extends DraggableListBuilder {
     $this->accessHandler = $this->entityTypeManager->getAccessControlHandler('domain');
     $this->moduleHandler = $module_handler;
     $this->domainLoader = $domain_loader;
+    $this->domainElementManager = $domain_element_manager;
+    $this->userStorage = $this->entityTypeManager->getStorage('user');
   }
 
   /**
@@ -250,4 +266,57 @@ class DomainListBuilder extends DraggableListBuilder {
     drupal_set_message($this->t('Configuration saved.'));
   }
 
+  /**
+   * {@inheritdoc}
+   *
+   * Builds the entity listing as a form with pagination. This method overrides both
+   * Drupal\Core\Config\Entity\DraggableListBuilder::render() and
+   * Drupal\Core\Entity\EntityListBuilder::render().
+   */
+  public function render() {
+    // Build the default form, which includes weights.
+    $form = $this->formBuilder()->getForm($this);
+
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $form['pager'] = array(
+        '#type' => 'pager',
+      );
+    }
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Loads entity IDs using a pager sorted by the entity weight. The default behavior when
+   * using a limit is to sort by id.
+   *
+   * We also have to limit by assigned domains of the active user.
+   *
+   * See Drupal\Core\Entity\EntityListBuilder::getEntityIds()
+   *
+   * @return array
+   *   An array of entity IDs.
+   */
+  protected function getEntityIds() {
+    $query = $this->getStorage()->getQuery()
+      ->sort($this->entityType->getKey('weight'));
+
+    // If the user cannot administer domains, we must filter the query further by
+    // assigned IDs. We don't have to check permissions here, because that is handled by
+    // the route system and buildRow(). There are two permissions that allow users to view
+    // the entire list.
+    if (!$this->currentUser->hasPermission('administer domains') && !$this->currentUser->hasPermission('view domain list')) {
+      $user = $this->userStorage->load($this->currentUser->id());
+      $allowed = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+      $query->condition('id', array_keys($allowed), 'IN');
+    }
+
+    // Only add the pager if a limit is specified.
+    if ($this->limit) {
+      $query->pager($this->limit);
+    }
+    return $query->execute();
+  }
 }
