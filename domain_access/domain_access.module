@@ -475,7 +475,11 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
  * Creates our fields when new node types are created.
  */
 function domain_access_node_type_insert(EntityInterface $entity) {
-  domain_access_confirm_fields('node', $entity->id());
+  /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+  if (!$entity->isSyncing()) {
+    // Do not fire hook when config sync in progress.
+    domain_access_confirm_fields('node', $entity->id());
+  }
 }
 
 /**
@@ -603,6 +607,11 @@ function domain_access_views_data_alter(array &$data) {
  * Implements hook_ENTITY_TYPE_insert().
  */
 function domain_access_domain_insert($entity) {
+  /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+  if ($entity->isSyncing()) {
+    // Do not fire hook when config sync in progress.
+    return;
+  }
   $id = 'domain_access_add_action.' . $entity->id();
   $controller = \Drupal::entityTypeManager()->getStorage('action');
   if (!$controller->load($id)) {
