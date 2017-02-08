@@ -4,6 +4,9 @@ dependencies:
   module:
     - domain
     - user
+  enforced:
+    module:
+      - domain_access
 id: user.field_domain_all_affiliates
 field_name: field_domain_all_affiliates
 entity_type: user

@@ -29,24 +29,3 @@ function domain_access_install() {
     domain_access_domain_insert($domain);
   }
 }
-
-/**
- * Implements hook_uninstall().
- *
- * Removes access control fields on uninstall.
- */
-function domain_access_uninstall() {
-  $field_storage_config = \Drupal::entityTypeManager()
-    ->getStorage('field_storage_config');
-
-  foreach (array('node', 'user') as $type) {
-    $id = $type . '.' . DOMAIN_ACCESS_FIELD;
-    if ($field = $field_storage_config->load($id)) {
-      $field->delete();
-    }
-    $id = $type . '.' . DOMAIN_ACCESS_ALL_FIELD;
-    if ($field = $field_storage_config->load($id)) {
-      $field->delete();
-    }
-  }
-}

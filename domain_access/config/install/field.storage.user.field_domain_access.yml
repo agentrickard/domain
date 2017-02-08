@@ -4,6 +4,9 @@ dependencies:
   module:
     - domain
     - user
+  enforced:
+    module:
+      - domain_access
 id: user.field_domain_access
 field_name: field_domain_access
 entity_type: user

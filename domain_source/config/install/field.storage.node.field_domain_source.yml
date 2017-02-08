@@ -4,6 +4,9 @@ dependencies:
   module:
     - domain
     - node
+  enforced:
+    module:
+      - domain_source
 id: node.field_domain_source
 field_name: field_domain_source
 entity_type: node

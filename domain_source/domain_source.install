@@ -23,16 +23,3 @@ function domain_source_install() {
     domain_source_confirm_fields($entity_type, $bundle);
   }
 }
-/**
- * Implements hook_uninstall().
- *
- * Removes source domain fields on uninstall.
- */
-function domain_source_uninstall() {
-  foreach (array('node') as $type) {
-    $id = $type . '.' . DOMAIN_SOURCE_FIELD;
-    if ($field = \Drupal::entityTypeManager()->getStorage('field_storage_config')->load($id)) {
-      $field->delete();
-    }
-  }
-}
