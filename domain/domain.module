@@ -17,19 +17,6 @@ use Drupal\field\Entity\FieldStorageConfig;
 const DOMAIN_ADMIN_FIELD = 'field_domain_admin';
 
 /**
- * Implements hook_entity_bundle_info().
- */
-function domain_entity_bundle_info() {
-  $bundles['domain']['domain'] = array(
-    'label' => t('Domain record'),
-    'admin' => array(
-      'real path' => 'admin/config/domain',
-    ),
-  );
-  return $bundles;
-}
-
-/**
  * Entity URI callback.
  *
  * @param \Drupal\domain\DomainInterface $domain
