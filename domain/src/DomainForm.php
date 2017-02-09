@@ -4,11 +4,39 @@ namespace Drupal\domain;
 
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base form for domain edit forms.
  */
 class DomainForm extends EntityForm {
+
+  /**
+   * The domain entity storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $storage;
+
+  /**
+   * Constructs a DomainForm object.
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   The entity type manager.
+   */
+  public function __construct(EntityStorageInterface $storage) {
+    $this->storage = $storage;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity_type.manager')->getStorage('domain')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -40,7 +68,7 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->id(),
       '#machine_name' => array(
         'source' => array('hostname'),
-        'exists' => '\Drupal\domain\Entity\Domain::load',
+        'exists' => array($this->storage, 'load'),
       ),
     );
     $form['name'] = array(
