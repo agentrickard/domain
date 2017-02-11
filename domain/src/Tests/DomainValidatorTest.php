@@ -16,7 +16,6 @@ class DomainValidatorTest extends DomainTestBase {
   public function testDomainValidator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
-    $creator = \Drupal::service('domain.creator');
     $validator = \Drupal::service('domain.validator');
 
     // Create a domain.
@@ -43,8 +42,7 @@ class DomainValidatorTest extends DomainTestBase {
       'foo.com' => 0, // duplicate.
     ];
     foreach ($hostnames as $hostname => $valid) {
-      $domain = $creator->createDomain(['hostname' => $hostname]);
-      $errors = $validator->validate($domain);
+      $errors = $validator->validate($hostname);
       if ($valid) {
         $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
       }
@@ -62,8 +60,7 @@ class DomainValidatorTest extends DomainTestBase {
       'éxample.com' => 1, // ascii-only allowed.
     ];
     foreach ($hostnames as $hostname => $valid) {
-      $domain = $creator->createDomain(['hostname' => $hostname]);
-      $errors = $validator->validate($domain);
+      $errors = $validator->validate($hostname);
       if ($valid) {
         $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
       }

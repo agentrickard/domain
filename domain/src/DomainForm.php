@@ -5,6 +5,7 @@ namespace Drupal\domain;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,13 +21,43 @@ class DomainForm extends EntityForm {
   protected $storage;
 
   /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * The domain validator.
+   *
+   * @var \Drupal\domain\DomainValidatorInterface
+   */
+  protected $validator;
+
+  /**
+   * The domain creator.
+   *
+   * @var \Drupal\domain\DomainCreatorInterface
+   */
+  protected $creator;
+
+  /**
    * Constructs a DomainForm object.
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity type manager.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
+   * @param \Drupal\domain\DomainValidatorInterface $validator
+   *   The domain validator.
+   * @param \Drupal\domain\DomainCreatorInterface $creator
+   *   The domain creator.
    */
-  public function __construct(EntityStorageInterface $storage) {
+  public function __construct(EntityStorageInterface $storage, RendererInterface $renderer, DomainValidatorInterface $validator,DomainCreatorInterface $creator) {
     $this->storage = $storage;
+    $this->renderer = $renderer;
+    $this->validator = $validator;
+    $this->creator = $creator;
   }
 
   /**
@@ -34,7 +65,10 @@ class DomainForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')->getStorage('domain')
+      $container->get('entity_type.manager')->getStorage('domain'),
+      $container->get('renderer'),
+      $container->get('domain.validator'),
+      $container->get('domain.creator')
     );
   }
 
@@ -45,11 +79,11 @@ class DomainForm extends EntityForm {
     $form = parent::form($form, $form_state);
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = $this->entity;
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $count_existing = $this->storage->getQuery()->count()->execute();
     // Create defaults if this is the first domain.
-    if (empty($domains)) {
-      $domain->addProperty('hostname', \Drupal::service('domain.creator')->createHostname());
-      $domain->addProperty('name', \Drupal::config('system.site')->get('name'));
+    if (!$count_existing) {
+      $domain->addProperty('hostname', $this->creator->createHostname());
+      $domain->addProperty('name', $this->config('system.site')->get('name'));
     }
     $form['domain_id'] = array(
       '#type' => 'value',
@@ -98,7 +132,7 @@ class DomainForm extends EntityForm {
     $form['weight'] = array(
       '#type' => 'weight',
       '#title' => $this->t('Weight'),
-      '#delta' => count(\Drupal::service('domain.loader')->loadMultiple()) + 1,
+      '#delta' => $count_existing + 1,
       '#default_value' => $domain->getWeight(),
       '#description' => $this->t('The sort order for this record. Lower values display first.'),
     );
@@ -108,7 +142,7 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->isDefault(),
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
-    $required = \Drupal::service('domain.validator')->getRequiredFields();
+    $required = $this->validator->getRequiredFields();
     foreach ($form as $key => $element) {
       if (in_array($key, $required)) {
         $form[$key]['#required'] = TRUE;
@@ -120,12 +154,26 @@ class DomainForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
-  public function validate(array $form, FormStateInterface $form_state) {
-    $entity = $this->buildEntity($form, $form_state);
-    $validator = \Drupal::service('domain.validator');
-    $errors = $validator->validate($entity);
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    /** @var \Drupal\domain\DomainInterface $entity */
+    $entity = $this->entity;
+    $hostname = $entity->getHostname();
+    $errors = $this->validator->validate($hostname);
     if (!empty($errors)) {
-      $form_state->setErrorByName('hostname', $errors);
+      // Render errors to display as message.
+      $message = [
+        '#theme' => 'item_list',
+        '#items' => $errors,
+      ];
+      $message = $this->renderer->renderPlain($message);
+      $form_state->setErrorByName('hostname', $message);
+    }
+    elseif ($entity->isNew()) {
+      // Validate if the same hostname exists.
+      $existing = $this->storage->loadByProperties(['hostname' => $hostname]);
+      if ($existing) {
+        $form_state->setErrorByName('hostname', $this->t('The hostname is already registered.'));
+      }
     }
   }
 
@@ -134,22 +182,13 @@ class DomainForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $domain = $this->entity;
-    if ($domain->isNew()) {
+    $status = $domain->save();
+    if ($status == SAVED_NEW) {
       drupal_set_message($this->t('Domain record created.'));
     }
     else {
       drupal_set_message($this->t('Domain record updated.'));
     }
-    $domain->save();
-    $form_state->setRedirect('domain.admin');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function delete(array &$form, FormStateInterface $form_state) {
-    $domain = $this->entity;
-    $domain->delete();
     $form_state->setRedirect('domain.admin');
   }
 

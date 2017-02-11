@@ -3,6 +3,7 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Unicode;
@@ -38,6 +39,13 @@ class DomainValidator implements DomainValidatorInterface {
   protected $configFactory;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs a DomainNegotiator object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -46,22 +54,21 @@ class DomainValidator implements DomainValidatorInterface {
    *   The config factory.
    * @param \GuzzleHttp\ClientInterface $http_client
    *   A Guzzle client object.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client) {
+  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager) {
     $this->moduleHandler = $module_handler;
     $this->configFactory = $config_factory;
     // @TODO: Move to a proper service?
     $this->httpClient = $http_client;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @TODO: Divide this into separate methods. Do not return Drupal-specific
-   * responses.
    */
-  public function validate(DomainInterface $domain) {
-    $hostname = $domain->getHostname();
+  public function validate($hostname) {
     $error_list = array();
     // Check for at least one dot or the use of 'localhost'.
     // Note that localhost can specify a port.
@@ -90,7 +97,8 @@ class DomainValidator implements DomainValidatorInterface {
       $error_list[] = $this->t('The domain must not end with a dot (.)');
     }
     // Check for valid characters, unless using non-ASCII domains.
-    $non_ascii = $this->configFactory->get('domain.settings')->get('allow_non_ascii');
+    $config = $this->configFactory->get('domain.settings');
+    $non_ascii = $config->get('allow_non_ascii');
     if (!$non_ascii) {
       $pattern = '/^[a-z0-9\.\-:]*$/i';
       if (!preg_match($pattern, $hostname)) {
@@ -105,34 +113,14 @@ class DomainValidator implements DomainValidatorInterface {
     // enabled under global domain settings.
     // Note that www prefix handling must be set explicitly in the UI.
     // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
-    if ($this->configFactory->get('domain.settings')->get('www_prefix') && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
+    if ($config->get('www_prefix') && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
       $error_list[] = $this->t('WWW prefix handling: Domains must be registered without the www. prefix.');
     }
 
-    // Check existing domains.
-    $domains = \Drupal::entityTypeManager()
-      ->getStorage('domain')
-      ->loadByProperties(array('hostname' => $hostname));
-    foreach ($domains as $match) {
-      if ($match->id() != $domain->id()) {
-        $error_list[] = $this->t('The hostname is already registered.');
-      }
-    }
     // Allow modules to alter this behavior.
-    \Drupal::moduleHandler()->invokeAll('domain_validate', array($error_list, $hostname));
+    $this->moduleHandler->invokeAll('domain_validate', array($error_list, $hostname));
 
-    // Return the errors, if any.
-    if (!empty($error_list)) {
-      return $this->t('The domain string is invalid for %subdomain: @errors', array(
-        '%subdomain' => $hostname,
-        '@errors' => array(
-          '#theme' => 'item_list',
-          '#items' => $error_list,
-        ),
-      ));
-    }
-
-    return array();
+    return $error_list;
   }
 
   /**
