@@ -2,6 +2,7 @@
 
 namespace Drupal\domain;
 
+use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -168,12 +169,12 @@ class DomainForm extends EntityForm {
       $message = $this->renderer->renderPlain($message);
       $form_state->setErrorByName('hostname', $message);
     }
-    elseif ($entity->isNew()) {
-      // Validate if the same hostname exists.
-      $existing = $this->storage->loadByProperties(['hostname' => $hostname]);
-      if ($existing) {
-        $form_state->setErrorByName('hostname', $this->t('The hostname is already registered.'));
-      }
+    // Validate if the same hostname exists.
+    // Do not use domain loader because it may change hostname.
+    $existing = $this->storage->loadByProperties(['hostname' => $hostname]);
+    $existing = reset($existing);
+    if ($existing && $existing->id() != $entity->id()) {
+      $form_state->setErrorByName('hostname', $this->t('The hostname is already registered.'));
     }
   }
 
@@ -181,8 +182,7 @@ class DomainForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $domain = $this->entity;
-    $status = $domain->save();
+    $status = parent::save($form, $form_state);
     if ($status == SAVED_NEW) {
       drupal_set_message($this->t('Domain record created.'));
     }
