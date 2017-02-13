@@ -69,3 +69,24 @@ function domain_alpha_update_8003(&$sandbox) {
     }
   }
 }
+
+/**
+ * Make all affiliates default value configurable.
+ */
+function domain_alpha_update_8004() {
+  $config = \Drupal::configFactory();
+  $field_name = '.' . DOMAIN_ACCESS_ALL_FIELD;
+  // Iterate over all node & user fields.
+  foreach (['node', 'user'] as $type) {
+    foreach ($config->listAll('field.field.' . $type . '.') as $field_id) {
+      if (substr($field_id, -strlen($field_name)) === $field_name) {
+        $field = $config->getEditable($field_id);
+        if ($field->get('default_value_callback') === 'Drupal\domain_access\DomainAccessManager::getDefaultAllValue') {
+          $field
+            ->clear('default_value_callback')
+            ->save(TRUE);
+        }
+      }
+    }
+  }
+}

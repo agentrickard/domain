@@ -522,7 +522,8 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
 
     $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
 
-    if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
+    $field_storage = \Drupal::entityTypeManager()->getStorage('field_config');
+    if (!$field = $field_storage->load($id)) {
       $field = array(
         'field_name' => DOMAIN_ACCESS_FIELD,
         'entity_type' => $entity_type,
@@ -538,12 +539,12 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
           ),
         ),
       );
-      $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
+      $field_config = $field_storage->create($field);
       $field_config->save();
     }
     // Assign the all affiliates field.
     $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
-    if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
+    if (!$field = $field_storage->load($id)) {
       $field = array(
         'field_name' => DOMAIN_ACCESS_ALL_FIELD,
         'entity_type' => $entity_type,
@@ -551,9 +552,8 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
         'bundle' => $bundle,
         'required' => FALSE,
         'description' => $text[$entity_type]['description'],
-        'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultAllValue',
       );
-      $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
+      $field_config = $field_storage->create($field);
       $field_config->save();
     }
     // Tell the form system how to behave. Default to radio buttons.

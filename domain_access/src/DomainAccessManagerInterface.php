@@ -63,17 +63,4 @@ interface DomainAccessManagerInterface {
    */
   public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
 
-  /**
-   * Get the default all affiliates value for an entity.
-   *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
-   *   The entity being created.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $definition
-   *   The field being created.
-   *
-   * @return array
-   *   The default all affiliates value(s).
-   */
-  public static function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
-
 }
