@@ -85,7 +85,7 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadMultiple($ids = NULL, $reset = FALSE) {
+  public function loadMultiple(array $ids = NULL, $reset = FALSE) {
     $controller = $this->getStorage();
     if ($reset) {
       $controller->resetCache($ids);
@@ -96,7 +96,7 @@ class DomainLoader implements DomainLoaderInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadMultipleSorted($ids = NULL) {
+  public function loadMultipleSorted(array $ids = NULL) {
     $domains = $this->loadMultiple($ids);
     uasort($domains, array($this, 'sort'));
     return $domains;
@@ -145,16 +145,12 @@ class DomainLoader implements DomainLoaderInterface {
   }
 
   /**
-   * Removes www. from a hostname, if set.
-   *
-   * @param string $hostname
-   *   A hostname.
-   * @return string
+   * {@inheritdoc}
    */
   public function prepareHostname($hostname) {
-    // Strip www. off the front?
-    $www = $this->configFactory->get('domain.settings')->get('www_prefix');
-    if (!empty($www) && substr($hostname, 0, 4) == 'www.') {
+    // Strip www. prefix off the hostname.
+    $ignore_www = $this->configFactory->get('domain.settings')->get('www_prefix');
+    if ($ignore_www && substr($hostname, 0, 4) == 'www.') {
       $hostname = substr($hostname, 4);
     }
     return $hostname;

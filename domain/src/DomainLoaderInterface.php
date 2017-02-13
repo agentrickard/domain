@@ -1,12 +1,6 @@
 <?php
 
-/**
- * @file
- * Definition of Drupal\domain\DomainLoaderInterface.
- */
-
 namespace Drupal\domain;
-
 
 /**
  * Supplies loader methods for common domain requests.
@@ -21,16 +15,16 @@ interface DomainLoaderInterface {
    * @param bool $reset
    *   Indicates that the entity cache should be reset.
    *
-   * @return DomainInterface
-   *   A Drupal\domain\DomainInterface object | NULL.
+   * @return \Drupal\domain\DomainInterface|null
+   *   A domain record or NULL.
    */
   public function load($id, $reset = FALSE);
 
   /**
    * Gets the default domain object.
    *
-   * @return \Drupal\domain\DomainInterface | NULL
-   *   The default domain object or NULL.
+   * @return \Drupal\domain\DomainInterface|null
+   *   The default domain record or NULL.
    */
   public function loadDefaultDomain();
 
@@ -50,10 +44,10 @@ interface DomainLoaderInterface {
    * @param bool $reset
    *   Indicates that the entity cache should be reset.
    *
-   * @return array
-   *   An array of Drupal\domain\DomainInterface objects.
+   * @return \Drupal\domain\DomainInterface[]
+   *   An array of domain records.
    */
-  public function loadMultiple($ids = NULL, $reset = FALSE);
+  public function loadMultiple(array $ids = NULL, $reset = FALSE);
 
   /**
    * Loads multiple domains and sorts by weight.
@@ -61,10 +55,10 @@ interface DomainLoaderInterface {
    * @param array $ids
    *   An optional array of specific ids to load.
    *
-   * @return array
-   *   An array of Drupal\domain\DomainInterface objects.
+   * @return \Drupal\domain\DomainInterface[]
+   *   An array of domain records.
    */
-  public function loadMultipleSorted($ids = NULL);
+  public function loadMultipleSorted(array $ids = NULL);
 
   /**
    * Loads a domain record by hostname lookup.
@@ -72,7 +66,7 @@ interface DomainLoaderInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return \Drupal\domain\DomainInterface | NULL
+   * @return \Drupal\domain\DomainInterface|null
    *   The domain record or NULL.
    */
   public function loadByHostname($hostname);
@@ -107,5 +101,16 @@ interface DomainLoaderInterface {
    *   An array representing the field schema of the object.
    */
   public function loadSchema();
+
+  /**
+   * Removes www. prefix from a hostname, if set.
+   *
+   * @param string $hostname
+   *   A hostname.
+   *
+   * @return string
+   *   The cleaned hostname.
+   */
+  public function prepareHostname($hostname);
 
 }
