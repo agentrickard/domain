@@ -8,6 +8,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiator;
 
 /**
  * Defines the domain entity.
@@ -18,10 +19,8 @@ use Drupal\domain\DomainInterface;
  *   module = "domain",
  *   handlers = {
  *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
- *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "access" = "Drupal\domain\DomainAccessControlHandler",
  *     "list_builder" = "Drupal\domain\DomainListBuilder",
- *     "view_builder" = "Drupal\domain\DomainViewBuilder",
  *     "form" = {
  *       "default" = "Drupal\domain\DomainForm",
  *       "edit" = "Drupal\domain\DomainForm",
@@ -35,6 +34,7 @@ use Drupal\domain\DomainInterface;
  *     "domain_id" = "domain_id",
  *     "label" = "name",
  *     "uuid" = "uuid",
+ *     "status" = "status",
  *     "weight" = "weight"
  *   },
  *   links = {
@@ -69,16 +69,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * The domain record ID.
    *
-   * @var integer
+   * @var int
    */
   protected $domain_id;
-
-  /**
-   * The domain record UUID.
-   *
-   * @var string
-   */
-  protected $uuid;
 
   /**
    * The domain list name (e.g. Drupal).
@@ -95,23 +88,16 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   protected $hostname;
 
   /**
-   * The domain status.
-   *
-   * @var boolean
-   */
-  protected $status;
-
-  /**
    * The domain record sort order.
    *
-   * @var integer
+   * @var int
    */
   protected $weight;
 
   /**
    * Indicates the default domain.
    *
-   * @var boolean
+   * @var bool
    */
   protected $is_default;
 
@@ -139,38 +125,36 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * The domain record http response test (e.g. 200), a calculated value.
    *
-   * @var integer
+   * @var int
    */
   protected $response = NULL;
 
   /**
    * The redirect method to use, if needed.
+   *
+   * @var int|null
    */
   protected $redirect = NULL;
 
   /**
    * The type of match returned by the negotiator.
+   *
+   * @var int
    */
   protected $matchType;
 
   /**
-   * Overrides Drupal\Core\Entity\Entity:preCreate().
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage_controller
-   *   The entity storage object.
-   * @param mixed[] $values
-   *   An array of values to set, keyed by property name. If the entity type has
-   *   bundles the bundle key has to be specified.
+   * {@inheritdoc}
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
     $loader = \Drupal::service('domain.loader');
     $default = $loader->loadDefaultId();
-    $domains = $loader->loadMultiple();
+    $count = $storage_controller->getQuery()->count()->execute();
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
       'status' => 1,
-      'weight' => count($domains) + 1,
+      'weight' => $count + 1,
       'is_default' => (int) empty($default),
     );
     // Note that we have not created a domain_id, which is only used for
@@ -182,7 +166,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function isActive() {
     $negotiator = \Drupal::service('domain.negotiator');
-    /** @var DomainInterface $domain */
+    /** @var self $domain */
     $domain = $negotiator->getActiveDomain();
     if (empty($domain)) {
       return FALSE;
@@ -219,7 +203,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function saveDefault() {
     if (!$this->isDefault()) {
       // Swap the current default.
-      /** @var DomainInterface $default */
+      /** @var self $default */
       if ($default = \Drupal::service('domain.loader')->loadDefaultDomain()) {
         $default->is_default = 0;
         $default->save();
@@ -234,7 +218,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::enable().
+   * {@inheritdoc}
    */
   public function enable() {
     $this->setStatus(TRUE);
@@ -242,7 +226,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::disable().
+   * {@inheritdoc}
    */
   public function disable() {
     if (!$this->isDefault()) {
@@ -329,15 +313,12 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::preSave().
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage_controller
-   *   The entity storage object.
+   * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage_controller) {
     // Sets the default domain properly.
     $loader = \Drupal::service('domain.loader');
-    /** @var DomainInterface $default */
+    /** @var self $default */
     $default = $loader->loadDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
@@ -464,7 +445,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMatchType($match_type = \Drupal\domain\DomainNegotiator::DOMAIN_MATCH_EXACT) {
+  public function setMatchType($match_type = DomainNegotiator::DOMAIN_MATCH_EXACT) {
     $this->matchType = $match_type;
   }
 
@@ -475,11 +456,4 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $this->matchType;
   }
 
- /**
-  * This is being fired for some reason if the values are shown on a
-  * content type.
-  */
-  public function isDefaultRevision($new_value = NULL) {
-    return TRUE;
-  }
 }
