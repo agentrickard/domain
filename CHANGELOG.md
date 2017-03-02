@@ -92,7 +92,7 @@ marked with [x] are considered complete.
 - [x] Test that sort logic in DomainAliasLoader matches what is documented
 - [ ] Error handling in DomainAliasForm
 - [ ] Error checking in DomainAliasController
-- [ ] Deprecated methods in DomainAliasController
+- [x] Deprecated methods in DomainAliasController
 - [ ] Error reporting in `domain_alias_domain_request_alter()`
 - [ ] Ensure completeness of DomainAccessPermissionsTest
 - [ ] Check module setup behavior in tests
