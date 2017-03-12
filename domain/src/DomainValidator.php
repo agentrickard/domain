@@ -3,11 +3,13 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Component\Utility\Unicode;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Provides validation of domain strings against RFC standards for hostnames.
@@ -15,6 +17,16 @@ use GuzzleHttp\Exception\RequestException;
 class DomainValidator implements DomainValidatorInterface {
 
   use StringTranslationTrait;
+
+  /**
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $config;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
   /**
    * The module handler.
@@ -26,100 +38,72 @@ class DomainValidator implements DomainValidatorInterface {
   /**
    * The HTTP client.
    *
-   * @var \GuzzleHttp\Client
+   * @var \GuzzleHttp\ClientInterface
    */
   protected $httpClient;
 
   /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
-
-  /**
    * Constructs a DomainNegotiator object.
    *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
    * @param \GuzzleHttp\ClientInterface $http_client
-   *   A Guzzle client object.
+   *   The HTTP client.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface
+   *   The translation manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client) {
+  public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $translation_manager) {
     $this->moduleHandler = $module_handler;
-    $this->configFactory = $config_factory;
-    // @TODO: Move to a proper service?
+    $this->config = $config_factory->get('domain.settings');
     $this->httpClient = $http_client;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->stringTranslation = $translation_manager;
   }
 
   /**
    * {@inheritdoc}
    *
-   * @TODO: Divide this into separate methods. Do not return Drupal-specific
-   * responses.
+   * @TODO: Do not return Drupal-specific responses.
    */
   public function validate(DomainInterface $domain) {
     $hostname = $domain->getHostname();
-    $error_list = array();
-    // Check for at least one dot or the use of 'localhost'.
-    // Note that localhost can specify a port.
-    $localhost_check = explode(':', $hostname);
-    if (substr_count($hostname, '.') == 0 && $localhost_check[0] != 'localhost') {
-      $error_list[] = $this->t('At least one dot (.) is required, except when using <em>localhost</em>.');
-    }
-    // Check for one colon only.
-    if (substr_count($hostname, ':') > 1) {
-      $error_list[] = $this->t('Only one colon (:) is allowed.');
-    }
-    // If a colon, make sure it is only followed by numbers.
-    elseif (substr_count($hostname, ':') == 1) {
-      $parts = explode(':', $hostname);
-      $port = (int) $parts[1];
-      if (strcmp($port, $parts[1])) {
-        $error_list[] = $this->t('The port protocol must be an integer.');
-      }
-    }
-    // The domain cannot begin or end with a period.
-    if (substr($hostname, 0, 1) == '.') {
-      $error_list[] = $this->t('The domain must not begin with a dot (.)');
-    }
-    // The domain cannot begin or end with a period.
-    if (substr($hostname, -1) == '.') {
-      $error_list[] = $this->t('The domain must not end with a dot (.)');
-    }
+
+    // First, do generalized hostname validation.
+    $error_list = $this->staticHostnameValidation($hostname);
+
     // Check for valid characters, unless using non-ASCII domains.
-    $non_ascii = $this->configFactory->get('domain.settings')->get('allow_non_ascii');
-    if (!$non_ascii) {
-      $pattern = '/^[a-z0-9\.\-:]*$/i';
-      if (!preg_match($pattern, $hostname)) {
-        $error_list[] = $this->t('Only alphanumeric characters, dashes, and a colon are allowed.');
-      }
+    if (!$this->config->get('allow_non_ascii') && !preg_match('/^[a-z0-9:.-]*$/i', $hostname)) {
+      $error_list[] = $this->t('Only alphanumeric characters, dashes, and a colon are allowed.');
     }
-    // Check for lower case.
-    if ($hostname != Unicode::strtolower($hostname)) {
-      $error_list[] = $this->t('Only lower-case characters are allowed.');
-    }
+
     // Check for 'www' prefix if redirection / handling is
     // enabled under global domain settings.
     // Note that www prefix handling must be set explicitly in the UI.
     // See http://drupal.org/node/1529316 and http://drupal.org/node/1783042
-    if ($this->configFactory->get('domain.settings')->get('www_prefix') && (substr($hostname, 0, strpos($hostname, '.')) == 'www')) {
+    if ($this->config->get('www_prefix') && strpos($hostname, 'www.') === 0) {
       $error_list[] = $this->t('WWW prefix handling: Domains must be registered without the www. prefix.');
     }
 
     // Check existing domains.
-    $domains = \Drupal::entityTypeManager()
-      ->getStorage('domain')
-      ->loadByProperties(array('hostname' => $hostname));
-    foreach ($domains as $match) {
-      if ($match->id() != $domain->id()) {
-        $error_list[] = $this->t('The hostname is already registered.');
+    try {
+      $domains = $this->entityTypeManager->getStorage('domain')
+        ->loadByProperties(array('hostname' => $hostname));
+      foreach ($domains as $match) {
+        if ($match->id() !== $domain->id()) {
+          $error_list[] = $this->t('The hostname is already registered.');
+        }
       }
     }
+    catch (\Exception $e) {
+      $error_list[] = $this->t('Could not open domain storage');
+    }
+
     // Allow modules to alter this behavior.
-    \Drupal::moduleHandler()->invokeAll('domain_validate', array($error_list, $hostname));
+    $this->moduleHandler->invokeAll('domain_validate', array($error_list, $hostname));
 
     // Return the errors, if any.
     if (!empty($error_list)) {
@@ -136,16 +120,71 @@ class DomainValidator implements DomainValidatorInterface {
   }
 
   /**
+   * Perform general hostname validation.
+   *
+   * None of the checks in this method are Drupal-specific or are affected by
+   * modules settings. Therefore, it might be possible to replace with a
+   * general-purpose external hostname validation process.
+   *
+   * @param string $hostname
+   *   The host name.
+   * @return array
+   *   Any errors detected by static inspection.
+   */
+  private function staticHostnameValidation($hostname) {
+    $errors = array();
+
+    $parts = explode(':', $hostname);
+
+    // Check for at least one dot or the use of 'localhost'.
+    // Note that localhost can specify a port.
+    if ($parts[0] !== 'localhost' && substr_count($hostname, '.') === 0) {
+      $errors[] = $this->t('At least one dot (.) is required, except when using <em>localhost</em>.');
+    }
+
+    // Check for one colon only.
+    if (count($parts) > 2) {
+      $errors[] = $this->t('Only one colon (:) is allowed.');
+    }
+    // If a colon, make sure it is only followed by numbers.
+    elseif (count($parts) === 2) {
+      $port = (int) $parts[1];
+      if (strcmp($port, $parts[1])) {
+        $errors[] = $this->t('The port protocol must be an integer.');
+      }
+    }
+
+    // The domain cannot begin or end with a period.
+    if (0 === strpos($hostname, '.')) {
+      $errors[] = $this->t('The domain must not begin with a dot (.)');
+    }
+
+    // The domain cannot begin or end with a period.
+    if (substr($hostname, -1) === '.') {
+      $errors[] = $this->t('The domain must not end with a dot (.)');
+    }
+
+    // Check for lower case.
+    if ($hostname !== Unicode::strtolower($hostname)) {
+      $errors[] = $this->t('Only lower-case characters are allowed.');
+    }
+
+    return $errors;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function checkResponse(DomainInterface $domain) {
-    $url = $domain->getPath() . drupal_get_path('module', 'domain') . '/tests/200.png';
+  public function checkResponse(DomainInterface $domain, $test_path = '') {
+    $url = $domain->getPath() .
+      ($test_path ?: drupal_get_path('module', 'domain') . '/tests/200.png');
     try {
       // GuzzleHttp no longer allows for bogus URL calls.
-      $request = $this->httpClient->get($url);
+      $request = $this->httpClient->request('get', $url);
     }
     // We cannot know which Guzzle Exception class will be returned; be generic.
-    catch (RequestException $e) {
+    catch (GuzzleException $e) {
+      /** @todo Replace with injected logger https://www.drupal.org/node/2595985 */
       watchdog_exception('domain', $e);
       // File a general server failure.
       $domain->setResponse(500);
