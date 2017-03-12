@@ -119,7 +119,7 @@ class DomainValidator implements DomainValidatorInterface {
       }
     }
     // Allow modules to alter this behavior.
-    \Drupal::moduleHandler()->invokeAll('domain_validate', array($error_list, $hostname));
+    $this->moduleHandler->alter('domain_validate', $error_list, $hostname);
 
     // Return the errors, if any.
     if (!empty($error_list)) {
