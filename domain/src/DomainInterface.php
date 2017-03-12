@@ -13,6 +13,7 @@ interface DomainInterface extends ConfigEntityInterface {
    * Detects if the current domain is the active domain.
    *
    * @return bool
+   *   TRUE if domain enabled, FALSE otherwise.
    */
   public function isActive();
 
@@ -20,6 +21,7 @@ interface DomainInterface extends ConfigEntityInterface {
    * Detects if the current domain is the default domain.
    *
    * @return bool
+   *   TRUE if domain set as default, FALSE otherwise.
    */
   public function isDefault();
 
@@ -27,6 +29,7 @@ interface DomainInterface extends ConfigEntityInterface {
    * Detects if the domain uses https for links.
    *
    * @return bool
+   *   TRUE if domain protocol is HTTPS, FALSE otherwise.
    */
   public function isHttps();
 
@@ -124,7 +127,7 @@ interface DomainInterface extends ConfigEntityInterface {
   /**
    * Returns the redirect status of the current domain.
    *
-   * @return integer | NULL
+   * @return int|null
    *   If numeric, the type of redirect to issue (301 or 302).
    */
   public function getRedirect();
