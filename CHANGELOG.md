@@ -68,7 +68,7 @@ marked with [x] are considered complete.
 - [ ] Write tests for Domain Content.
 - [x] Views access handler for domain content.
 - [ ] Restrict Domain Source options using JS
-- [ ] Recreate the Domain Theme module
+- [o] Recreate the Domain Theme module -- see https://www.drupal.org/project/domain_theme_switch
 - [ ] Advanced drush integration / complete labelled tasks
 - [ ] Check domain responses on configuration forms
 - [x] Handle site name overrides -- perhaps as a new field?
@@ -103,8 +103,8 @@ marked with [x] are considered complete.
 - [x] Review DomainNegotiatorTest for completeness
 - [x] Review core note in DomainEntityReferenceTest
 - [ ] Expand DomainActionsTest
-- [ ] DomainViewBuilder review
-- [ ] Dependency Injection in DomainValidator
+- [x] DomainViewBuilder review
+- [x] Dependency Injection in DomainValidator
 - [ ] Caching strategies in DomainNegotiator
 - [ ] Caching strategies in DomainConfigOverrides
 - [x] Inject the module handler service in DomainListBuilder::getOperations()
