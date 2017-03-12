@@ -324,7 +324,7 @@ function domain_content_form() {
   $destination = drupal_get_destination();
   $options = array();
   foreach ($nodes as $node) {
-    $l_options = $node->language != LANGUAGE_NONE ? array('language' => $languages[$node->language]) : array();
+    $l_options = (!empty($node->language) && $node->language != LANGUAGE_NONE) ? array('language' => $languages[$node->language]) : array();
     $options[$node->nid] = array(
       'title' => array(
         'data' => array(
@@ -342,7 +342,7 @@ function domain_content_form() {
       'changed' => format_date($node->changed, 'short'),
     );
     if ($multilanguage) {
-      $options[$node->nid]['language'] = $node->language == LANGUAGE_NONE ? t('Language neutral') : t($languages[$node->language]->name);
+      $options[$node->nid]['language'] = (empty($node->language) || $node->language == LANGUAGE_NONE) ? t('Language neutral') : t($languages[$node->language]->name);
     }
     // Build a list of all the accessible operations for the current node.
     $operations = array();
