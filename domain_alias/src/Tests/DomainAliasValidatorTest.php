@@ -34,6 +34,7 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
       '*.example.com' => 1,
       'one.example.com' => 1,
       'example.com:8080' => 1,
+      'foobar' => 0, // must have a dot or be localhost
       '*.*.example.com' => 0, // only one wildcard.
       'example.com::8080' => 0, // only one colon.
       'example.com:abc' => 0, // no letters after a colon.
