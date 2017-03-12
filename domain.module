@@ -2588,6 +2588,8 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             $form['domain']['#attached'] = array(
               'js' => array(drupal_get_path('module', 'domain') . '/domain.node.js'),
             );
+            $format = domain_select_format();
+            drupal_add_js(array('domain' => array('fieldType' => $format)), 'setting');
           }
           // We must preserve publishing options that the user cannot access, but only for
           // existing nodes.
