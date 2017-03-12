@@ -90,8 +90,8 @@ marked with [x] are considered complete.
 - [x] Proper tests for domain record validation
 - [x] Check test logic in testDomainAliasNegotiator()
 - [x] Test that sort logic in DomainAliasLoader matches what is documented
-- [ ] Error handling in DomainAliasForm
-- [ ] Error checking in DomainAliasController
+- [x] Error handling in DomainAliasForm
+- [x] Error checking in DomainAliasController
 - [ ] Deprecated methods in DomainAliasController
 - [ ] Error reporting in `domain_alias_domain_request_alter()`
 - [ ] Ensure completeness of DomainAccessPermissionsTest
