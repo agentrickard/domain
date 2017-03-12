@@ -113,27 +113,4 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     return $item;
   }
 
-  /**
-   * @inheritdoc
-   */
-  public static function getDefaultAllValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
-    // @TODO: This may become configurable.
-    $item = 0;
-    switch ($entity->getEntityType()) {
-      case 'user':
-      case 'node':
-        if ($entity->isNew()) {
-          $item = 0;
-        }
-        // This code does not fire, but it should.
-        else {
-          $item = self::getAllValue($entity);
-        }
-        break;
-      default:
-        break;
-    }
-    return $item;
-  }
-
 }
