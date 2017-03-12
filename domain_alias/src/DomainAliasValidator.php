@@ -43,12 +43,19 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
   public function validate(DomainAliasInterface $alias) {
     $pattern = $alias->getPattern();
 
-    // 1) Check that the alias only has one wildcard.
+    // 1) Check for at least one dot or the use of 'localhost'.
+    // Note that localhost can specify a port.
+    $localhost_check = explode(':', $pattern);
+    if (substr_count($pattern, '.') == 0 && $localhost_check[0] != 'localhost') {
+      return $this->t('At least one dot (.) is required, except when using <em>localhost</em>.');
+    }
+
+    // 2) Check that the alias only has one wildcard.
     $count = substr_count($pattern, '*') + substr_count($pattern, '?');
     if ($count > 1) {
       return $this->t('You may only have one wildcard character in each alias.');
     }
-    // 2) Only one colon allowed, and it must be followed by an integer.
+    // 3) Only one colon allowed, and it must be followed by an integer.
     $count = substr_count($pattern, ':');
     if ($count > 1) {
       return $this->t('You may only have one colon ":" character in each alias.');
@@ -59,7 +66,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
         return $this->t('A colon may only be followed by an integer indicating the proper port.');
       }
     }
-    // 3) Check that the alias doesn't contain any invalid characters.
+    // 4) Check that the alias doesn't contain any invalid characters.
     // Check for valid characters, unless using non-ASCII domains.
     $non_ascii = $this->configFactory->get('domain.settings')->get('allow_non_ascii');
     if (!$non_ascii) {
@@ -68,7 +75,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
         return $this->t('The pattern contains invalid characters.');
       }
     }
-    // 4) The alias cannot begin or end with a period.
+    // 5) The alias cannot begin or end with a period.
     if (substr($pattern, 0, 1) == '.') {
       return $this->t('The pattern cannot begin with a dot.');
     }
@@ -76,12 +83,12 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
       return $this->t('The pattern cannot end with a dot.');
     }
 
-    // 5) Check that the alias is not a direct match for a registered domain.
+    // 6) Check that the alias is not a direct match for a registered domain.
     $check = preg_match('/[a-z0-9\.\+\-:]*$/', $pattern);
     if ($check == 1 && \Drupal::service('domain.loader')->loadByHostname($pattern)) {
       return $this->t('The pattern matches an existing domain record.');
     }
-    // 6) Check that the alias is unique across all records.
+    // 7) Check that the alias is unique across all records.
     if ($alias_check = \Drupal::service('domain_alias.loader')->loadByPattern($pattern)) {
       /** @var \Drupal\domain_alias\DomainAliasInterface $alias_check */
       if ($alias_check->id() != $alias->id()) {
