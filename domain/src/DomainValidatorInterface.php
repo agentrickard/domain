@@ -10,13 +10,13 @@ interface DomainValidatorInterface {
   /**
    * Validates the hostname for a domain.
    *
-   * @param \Drupal\domain\DomainInterface $domain
-   *   A domain record.
+   * @param string $hostname
+   *   A hostname to validate.
    *
    * @return array
    *   An array of validation errors. An empty array indicates a valid domain.
    */
-  public function validate(DomainInterface $domain);
+  public function validate($hostname);
 
   /**
    * Tests that a domain responds correctly.

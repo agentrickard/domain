@@ -312,17 +312,17 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
 /**
  * Adds a new domain.
  *
- * @param $hostname
+ * @param string $hostname
  *   The domain name to register.
- * @param $name
+ * @param string $name
  *   The name to use for this domain.
- *
- * @return
- *   The domain created or an error message.
  */
 function drush_domain_add($hostname, $name) {
-  $start_weight = count(\Drupal::service('domain.loader')->loadMultiple()) + 1;
+  $records_count = \Drupal::entityTypeManager()->getStorage('domain')->getQuery()->count()->execute();
+  $start_weight = $records_count + 1;
   $hostname = strtolower($hostname);
+  /** @var \Drupal\domain\DomainCreatorInterface $creator */
+  $creator = \Drupal::service('domain.creator');
   $values = array(
     'hostname' => $hostname,
     'name' => $name,
@@ -330,9 +330,9 @@ function drush_domain_add($hostname, $name) {
     'scheme' => (!drush_get_option('https')) ? 'http' : 'https',
     'weight' => ($weight = drush_get_option('weight')) ? $weight : $start_weight + 1,
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
-    'id' => \Drupal::service('domain.creator')->createMachineName($hostname),
+    'id' => $creator->createMachineName($hostname),
   );
-  $domain = \Drupal::service('domain.creator')->createDomain($values);
+  $domain = $creator->createDomain($values);
   /* TODO: Fix this check.
   if (!empty($domain->is_default)) {
     $domain->checkResponse();
@@ -343,18 +343,25 @@ function drush_domain_add($hostname, $name) {
 }
 
 /**
- * Validates the domain add script.
+ * Validates the domain add command arguments.
  *
- * @param $hostname
+ * @param string $hostname
  *   The domain name to register.
- * @param $name
+ * @param string $name
  *   The name to use for this domain.
+ *
+ * @return bool
+ *   TRUE when validation passed, FALSE otherwise.
  */
 function drush_domain_add_validate($hostname, $name) {
-  $error = domain_drush_validate_domain($hostname);
-  if (!empty($error)) {
-    return drush_set_error('domain', $error);
+  $errors = domain_drush_validate_domain($hostname);
+  if (!empty($errors)) {
+    return drush_set_error('domain', $errors);
   }
+  elseif (\Drupal::service('domain.loader')->loadByHostname($hostname)) {
+    return drush_set_error('domain', dt('The hostname is already registered.'));
+  }
+  return TRUE;
 }
 
 /**
@@ -379,20 +386,15 @@ function domain_drush_create(DomainInterface $domain) {
  * @param $hostname
  *   The domain name to validate for syntax and uniqueness.
  *
- * @return
+ * @return array
  *   An array of errors encountered.
  *
  * @see domain_validate()
  */
 function domain_drush_validate_domain($hostname) {
-  return;
-  // TODO: Restore this validation.
-  $error = domain_validate($hostname);
-  $output = '';
-  foreach ($error as $msg) {
-    $output .= $msg;
-  }
-  return $output;
+  /** @var \Drupal\domain\DomainValidatorInterface $validator */
+  $validator = \Drupal::service('domain.validator');
+  return $validator->validate($hostname);
 }
 
 /**

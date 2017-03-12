@@ -2,6 +2,8 @@
 
 namespace Drupal\domain\Tests;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Config\ConfigValueException;
+use Drupal\domain\Entity\Domain;
 
 /**
  * Tests domain record validation.
@@ -16,7 +18,6 @@ class DomainValidatorTest extends DomainTestBase {
   public function testDomainValidator() {
     // No domains should exist.
     $this->domainTableIsEmpty();
-    $creator = \Drupal::service('domain.creator');
     $validator = \Drupal::service('domain.validator');
 
     // Create a domain.
@@ -40,17 +41,30 @@ class DomainValidatorTest extends DomainTestBase {
       'example.com.' => 0, // cannot end with a dot.
       'EXAMPLE.com' => 0, // lowercase only.
       'éxample.com' => 0, // ascii-only.
-      'foo.com' => 0, // duplicate.
     ];
     foreach ($hostnames as $hostname => $valid) {
-      $domain = $creator->createDomain(['hostname' => $hostname]);
-      $errors = $validator->validate($domain);
+      $errors = $validator->validate($hostname);
       if ($valid) {
         $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
       }
       else {
         $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
       }
+    }
+    // Test duplicate hostname creation.
+    $test_hostname = 'foo.com';
+    $test_domain = Domain::create([
+      'hostname' => $test_hostname,
+      'name' => 'Test domain',
+      'id' => 'test_domain',
+    ]);
+    try {
+      $test_domain->save();
+      $this->fail('Duplicate hostname validation');
+    }
+    catch (ConfigValueException $e) {
+      $expected_message = "The hostname ($test_hostname) is already registered.";
+      $this->assertEqual($expected_message, $e->getMessage());
     }
     // Test the two configurable options.
     $config = $this->config('domain.settings');
@@ -62,8 +76,7 @@ class DomainValidatorTest extends DomainTestBase {
       'éxample.com' => 1, // ascii-only allowed.
     ];
     foreach ($hostnames as $hostname => $valid) {
-      $domain = $creator->createDomain(['hostname' => $hostname]);
-      $errors = $validator->validate($domain);
+      $errors = $validator->validate($hostname);
       if ($valid) {
         $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
       }

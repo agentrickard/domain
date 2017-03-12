@@ -2,6 +2,7 @@
 
 namespace Drupal\domain\Entity;
 
+use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Link;
@@ -329,13 +330,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   }
 
   /**
-   * Overrides Drupal\Core\Config\Entity\ConfigEntityBase::preSave().
-   *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage_controller
-   *   The entity storage object.
+   * {@inheritdoc}
    */
-  public function preSave(EntityStorageInterface $storage_controller) {
+  public function preSave(EntityStorageInterface $storage) {
+    parent::preSave($storage);
+    // @todo Move default domain logic to form level or to post save.
     // Sets the default domain properly.
+    /** @var \Drupal\domain\DomainLoaderInterface $loader */
     $loader = \Drupal::service('domain.loader');
     /** @var DomainInterface $default */
     $default = $loader->loadDefaultDomain();
@@ -350,6 +351,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     // Ensures we have a proper domain_id.
     if ($this->isNew()) {
       $this->createDomainId();
+    }
+    // Prevent duplicate hostname.
+    $hostname = $this->getHostname();
+    // Do not use domain loader because it may change hostname.
+    $existing = $storage->loadByProperties(['hostname' => $hostname]);
+    $existing = reset($existing);
+    if ($existing && $this->id() != $existing->id()) {
+      throw new ConfigValueException("The hostname ($hostname) is already registered.");
     }
   }
 
