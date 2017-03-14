@@ -38,7 +38,7 @@ function domain_content_domain_operations(DomainInterface $domain, AccountInterf
  * Implements hook_requirements.
  */
 function domain_content_requirements($phase) {
-  $requirements = array();
+  $requirements = [];
   $allow = TRUE;
   if ($phase == 'install') {
     $list['user'] = 'user';
@@ -51,10 +51,12 @@ function domain_content_requirements($phase) {
       $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
       if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
         $allow = FALSE;
+        break;
       }
       $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
       if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
         $allow = FALSE;
+        break;
       }
     }
   }
