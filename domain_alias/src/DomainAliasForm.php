@@ -2,13 +2,49 @@
 
 namespace Drupal\domain_alias;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\domain_alias\DomainAliasValidatorInterface;
 
 /**
  * Base form controller for domain alias edit forms.
  */
 class DomainAliasForm extends EntityForm {
+
+  /**
+   * @var \Drupal\domain\DomainAliasValidatorInterface
+   */
+  protected $validator;
+
+  /**
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $config;
+
+  /**
+   * Constructs a DomainAliasForm object.
+   *
+   * @param \Drupal\domain\DomainAliasValidatorInterface $validator
+   *   The domain alias validator.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface
+   *   The configuration factory service.
+   */
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config) {
+    $this->validator = $validator;
+    $this->config = $config;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('domain_alias.validator'),
+      $container->get('config.factory')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -44,6 +80,12 @@ class DomainAliasForm extends EntityForm {
       '#default_value' => $alias->getRedirect(),
       '#description' => $this->t('Redirect status'),
     );
+    $form['environment'] = array(
+      '#type' => 'select',
+      '#options' => $this->environmentOptions(),
+      '#default_value' => $alias->getEnvironment(),
+      '#description' => $this->t('Server environment'),
+    );
 
     return parent::form($form, $form_state);
   }
@@ -63,11 +105,30 @@ class DomainAliasForm extends EntityForm {
   }
 
   /**
+   * Returns a list of valid environement options for the form.
+   *
+   * @return array
+   *   A list of valid environment options.
+   */
+  public function environmentOptions() {
+    $environments = $this->config->get('domain_alias')->get('environments');
+    if (empty($environments)) {
+      $environments = [
+        'default',
+        'local',
+        'development',
+        'staging',
+        'production',
+      ];
+    }
+    return $environments;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $validator = \Drupal::service('domain_alias.validator');
-    $errors = $validator->validate($this->entity);
+    $errors = $this->validator->validate($this->entity);
     if (!empty($errors)) {
       $form_state->setErrorByName('pattern', $errors);
     }

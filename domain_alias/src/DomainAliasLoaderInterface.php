@@ -57,6 +57,18 @@ interface DomainAliasLoaderInterface {
    */
   public function loadByPattern($pattern);
 
+
+  /**
+   * Loads a domain alias record by environment lookup.
+   *
+   * @param string $environment
+   *   A environment string, e.g. 'default' or 'local'.
+   *
+   * @return array
+   *   An array of \Drupal\domain_alias\DomainAliasInterface objects.
+   */
+  public function loadByEnvironment($environment);
+
   /**
    * Sorts aliases by wildcard to float exact matches to the top.
    *

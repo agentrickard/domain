@@ -19,3 +19,6 @@ domain_alias.alias.*:
     redirect:
       type: integer
       label: 'Redirect'
+    environment:
+      type: string
+      label: 'Environment'

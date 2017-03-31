@@ -87,6 +87,17 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   /**
    * {@inheritdoc}
    */
+  public function loadByEnvironment($environment) {
+    $result = $this->getStorage()->loadByProperties(array('environment' => $environment));
+    if (empty($result)) {
+      return NULL;
+    }
+    return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function sort($a, $b) {
     // Fewer wildcards is a closer match.
     // A longer string indicates a closer match.
