@@ -111,6 +111,7 @@ class DomainAliasForm extends EntityForm {
    *   A list of valid environment options.
    */
   public function environmentOptions() {
+    // @TODO: possibly move this method.
     $environments = $this->config->get('domain_alias')->get('environments');
     if (empty($environments)) {
       $environments = [
