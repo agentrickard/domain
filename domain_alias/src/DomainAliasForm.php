@@ -121,6 +121,8 @@ class DomainAliasForm extends EntityForm {
         'staging'
       ];
     }
+    $environments = array_combine($environments, $environments);
+    kint($environments);
     return $environments;
   }
 
@@ -142,11 +144,11 @@ class DomainAliasForm extends EntityForm {
     $alias = $this->entity;
     $edit_link = $alias->toLink($this->t('Edit'), 'edit-form')->toString();
     if ($alias->save() == SAVED_NEW) {
-      drupal_set_message($this->t('Created new domain alias %name.', array('%name' => $alias->label())));
+      drupal_set_message($this->t('Created new domain alias.'));
       $this->logger('domain_alias')->notice('Created new domain alias %name.', array('%name' => $alias->label(), 'link' => $edit_link));
     }
     else {
-      drupal_set_message($this->t('Updated domain alias %name.'), array('%name' => $alias->label()));
+      drupal_set_message($this->t('Updated domain alias.'));
       $this->logger('domain_alias')->notice('Updated domain alias %name.', array('%name' => $alias->label(), 'link' => $edit_link));
     }
     $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainId()));

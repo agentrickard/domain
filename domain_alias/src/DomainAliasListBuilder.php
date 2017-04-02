@@ -24,6 +24,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
   public function buildHeader() {
     $header['label'] = $this->t('Pattern');
     $header['redirect'] = $this->t('Redirect');
+    $header['environment'] = $this->t('Environment');
     return $header + parent::buildHeader();
   }
 
@@ -36,6 +37,7 @@ class DomainAliasListBuilder extends ConfigEntityListBuilder {
     $row['label'] = $entity->label();
     $redirect = $entity->getRedirect();
     $row['redirect'] = empty($redirect) ? $this->t('None') : $redirect;
+    $row['environment'] = $entity->getEnvironment();
     $row += parent::buildRow($entity);
 
     return $row;

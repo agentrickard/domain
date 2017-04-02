@@ -30,6 +30,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "domain_id" = "domain_id",
  *     "label" = "pattern",
  *     "uuid" = "uuid",
+ *     "environment" = "environment",
  *   },
  *   links = {
  *     "delete-form" = "/admin/config/domain/alias/delete/{domain_alias}",
@@ -40,6 +41,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "domain_id",
  *     "pattern",
  *     "redirect",
+ *     "environment",
  *   }
  * )
  */
@@ -98,7 +100,7 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
    * {@inheritdoc}
    */
   public function getEnvironment() {
-    return $this->environment;
+    return !empty($this->environment) ? $this->environment : 'default';
   }
 
   /**
