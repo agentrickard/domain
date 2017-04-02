@@ -78,13 +78,13 @@ class DomainAliasForm extends EntityForm {
       '#type' => 'select',
       '#options' => $this->redirectOptions(),
       '#default_value' => $alias->getRedirect(),
-      '#description' => $this->t('Redirect status'),
+      '#description' => $this->t('Set an optional redirect directive when this alias is invoked.'),
     );
     $form['environment'] = array(
       '#type' => 'select',
       '#options' => $this->environmentOptions(),
       '#default_value' => $alias->getEnvironment(),
-      '#description' => $this->t('Server environment'),
+      '#description' => $this->t('Creates matched sets of aliases for use during development.'),
     );
 
     return parent::form($form, $form_state);
@@ -118,8 +118,7 @@ class DomainAliasForm extends EntityForm {
         'default',
         'local',
         'development',
-        'staging',
-        'production',
+        'staging'
       ];
     }
     return $environments;

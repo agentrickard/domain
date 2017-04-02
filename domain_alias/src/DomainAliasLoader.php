@@ -3,6 +3,7 @@
 namespace Drupal\domain_alias;
 
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\domain\DomainInterface;
 
 /**
  * Alias loader utility class.
@@ -77,7 +78,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByPattern($pattern) {
-    $result = $this->getStorage()->loadByProperties(array('pattern' => $pattern));
+    $result = $this->getStorage()->loadByProperties(['pattern' => $pattern]);
     if (empty($result)) {
       return NULL;
     }
@@ -88,11 +89,22 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByEnvironment($environment) {
-    $result = $this->getStorage()->loadByProperties(array('environment' => $environment));
+    $result = $this->getStorage()->loadByProperties(['environment' => $environment]);
     if (empty($result)) {
       return NULL;
     }
     return $result;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadByEnvironmentMatch(DomainInterface $domain, $environment) {
+    $result = $this->getStorage()->loadByProperties(['domain_id' => $domain->id(), 'environment' => $envorinment]);
+    if (empty($result)) {
+      return NULL;
+    }
+    return current($result);
   }
 
   /**
