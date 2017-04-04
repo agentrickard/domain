@@ -32,10 +32,12 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   }
   // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
+  $alias_loader = \Drupal::service('domain_alias.loader');
+  $domain_loader = \Drupal::service('domain.loader');
   /** @var \Drupal\domain_alias\Entity\DomainAlias $alias */
-  if ($alias = \Drupal::service('domain_alias.loader')->loadByHostname($hostname)) {
+  if ($alias = $alias_loader->loadByHostname($hostname)) {
     /** @var \Drupal\domain\Entity\Domain $domain */
-    if ($domain = \Drupal::service('domain.loader')->load($alias->getDomainId())) {
+    if ($domain = $domain_loader->load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias);
       $domain->setMatchType(DomainNegotiator::DOMAIN_MATCH_ALIAS);
       $redirect = $alias->getRedirect();
@@ -66,45 +68,29 @@ function domain_alias_domain_operations(DomainInterface $domain, AccountInterfac
 }
 
 /**
- * Implements hook_domain_source_alter().
+ * Implements hook_ENTITY_TYPE_load().
  */
-function domain_alias_domain_source_alter($source, $path, $options) {
-  static $active, $environment;
-  $loader = \Drupal::service('domain_alias.loader');
+function domain_alias_domain_load($entities) {
   $negotiator = \Drupal::service('domain.negotiator');
-  if (is_null($negotiator->getActiveDomain())) {
+  $active = $negotiator->getActiveDomain();
+  // Do nothing if no domain is active.
+  if (is_null($active)) {
     return;
   }
-  if (!isset($active)) {
-    $active = $negotiator->getActiveDomain();
-    if (isset($active->alias)) {
-      $environment = $active->alias->getEnvironment();
-    }
-  }
-  if (!empty($source) && $active->getMatchType() == DomainNegotiator::DOMAIN_MATCH_ALIAS) {
-    if ($environment == 'default') {
-      return;
-    }
-    elseif ($match = $loader->loadByEnvironmentMatch($source, $environment)) {
-      $pattern = $match->getPattern();
-      if (substr_count($pattern, '*') > 0) {
-        // fancy handling.
-       # kint($active);
-       # kint($pattern);
-      }
-      else {
-        // Set the pattern as the link hostname.
-        $source->setHostname($pattern);
-        $source->setPath();
+  else {
+    $loader = \Drupal::service('domain_alias.loader');
+    if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
+      foreach ($entities as $id => $domain) {
+        if ($environment_alias = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
+          // @TODO: handle wildcard patterns.
+          $pattern = $environment_alias->getPattern();
+          if (substr_count($pattern, '*' < 1)) {
+            $domain->setHostname($pattern);
+            $domain->setPath();
+            $domain->setUrl();
+          }
+        }
       }
     }
   }
-}
-
-/**
- * Implements hook_domain_source_path_alter().
- */
-function domain_alias_domain_source_path_alter($source, $path, $options) {
-  // Our callback here does the same thing as above.
-  domain_alias_domain_source_alter($source, $path, $options);
 }
