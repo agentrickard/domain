@@ -84,7 +84,7 @@ function domain_alias_domain_load($entities) {
         if ($environment_alias = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
           // @TODO: handle wildcard patterns.
           $pattern = $environment_alias->getPattern();
-          if (substr_count($pattern, '*' < 1)) {
+          if (substr_count($pattern, '*') < 1) {
             $domain->setHostname($pattern);
             $domain->setPath();
             $domain->setUrl();
