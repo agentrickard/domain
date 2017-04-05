@@ -70,6 +70,8 @@ already done so) and change the `required_cache_contexts` value to:
 The addition of `url.site` should provide the domain context that the cache
 layer requires.
 
+For developers, see also the information in the Domain Alias README.
+
 Contributing
 ====
 

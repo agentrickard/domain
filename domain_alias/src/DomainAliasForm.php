@@ -118,7 +118,8 @@ class DomainAliasForm extends EntityForm {
         'default',
         'local',
         'development',
-        'staging'
+        'staging',
+        'testing'
       ];
     }
     $environments = array_combine($environments, $environments);
