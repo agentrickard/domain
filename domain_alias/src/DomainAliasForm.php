@@ -6,6 +6,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain_alias\DomainAliasLoaderInterface;
 use Drupal\domain_alias\DomainAliasValidatorInterface;
 
 /**
@@ -24,16 +26,32 @@ class DomainAliasForm extends EntityForm {
   protected $config;
 
   /**
+   * @var \Drupal\domain\DomainLoaderInterface $loader
+   */
+  protected $domainLoader;
+
+  /**
+   * @var \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
+   */
+  protected $aliasLoader;
+
+  /**
    * Constructs a DomainAliasForm object.
    *
    * @param \Drupal\domain\DomainAliasValidatorInterface $validator
    *   The domain alias validator.
    * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The configuration factory service.
+   * @param \Drupal\domain\DomainLoaderInterface $loader
+   *   The domain loader.
+   * @param \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
+   *   The alias loader.
    */
-  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config) {
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, DomainLoaderInterface $loader, DomainAliasLoaderInterface $alias_loader) {
     $this->validator = $validator;
     $this->config = $config;
+    $this->domainLoader = $loader;
+    $this->aliasLoader = $alias_loader;
   }
 
   /**
@@ -42,7 +60,9 @@ class DomainAliasForm extends EntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('domain_alias.validator'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('domain.loader'),
+      $container->get('domain_alias.loader')
     );
   }
 
@@ -80,12 +100,43 @@ class DomainAliasForm extends EntityForm {
       '#default_value' => $alias->getRedirect(),
       '#description' => $this->t('Set an optional redirect directive when this alias is invoked.'),
     );
+    $environments = $this->environmentOptions();
     $form['environment'] = array(
       '#type' => 'select',
-      '#options' => $this->environmentOptions(),
+      '#options' => $environments,
       '#default_value' => $alias->getEnvironment(),
       '#description' => $this->t('Creates matched sets of aliases for use during development.'),
     );
+
+    $form['environment_help'] = [
+      '#type' => 'details',
+      '#open' => FALSE,
+      '#collapsed' => TRUE,
+      '#title' => $this->t('Environment list'),
+    ];
+
+    $domains = $this->domainLoader->loadMultiple();
+    $rows = [];
+    foreach ($domains as $domain) {
+      $row = [];
+      $row[] = $domain->getHostname();
+      foreach ($environments as $environment) {
+        $matches = $this->aliasLoader->loadByEnvironmentMatch($domain, $environment);
+        $match_output = '';
+        foreach ($matches as $match) {
+          // @TODO: better handling of arrays.
+          $match_output .= $match->getPattern();
+        }
+        $row[] = $match_output;
+      }
+      $rows[] = $row;
+    }
+
+    $form['environment_help']['table'] = [
+      '#type' => 'table',
+      '#header' => array_merge([$this->t('Domains')], $environments),
+      '#rows' => $rows,
+    ];
 
     return parent::form($form, $form_state);
   }
