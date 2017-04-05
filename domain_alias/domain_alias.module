@@ -74,10 +74,13 @@ function domain_alias_domain_load($entities) {
   static $enabled;
   // We can only perform meaningful actions if url.site is a cache context. Otherwise,
   // the render process ignores our changes.
-  $required_cache_contexts = \Drupal::getContainer()->getParameter('renderer.config')['required_cache_contexts'];
-  if ($enabled === FALSE || (!in_array('url.site', $required_cache_contexts) && !in_array('url', $required_cache_contexts))) {
-    $enabled = FALSE;
-    return;
+  if (!isset($enabled)) {
+    $required_cache_contexts = \Drupal::getContainer()->getParameter('renderer.config')['required_cache_contexts'];
+    if (!in_array('url.site', $required_cache_contexts) && !in_array('url', $required_cache_contexts)) {
+      $enabled = FALSE;
+      return;
+    }
+    $enabled = TRUE;
   }
 
   // We cannot run before the negotiator service has fired.
