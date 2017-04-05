@@ -119,6 +119,7 @@ class DomainAliasForm extends EntityForm {
     $rows = [];
     foreach ($domains as $domain) {
       $row = [];
+      // @TODO: access checking.
       $row[] = $domain->getHostname();
       foreach ($environments as $environment) {
         $matches = $this->aliasLoader->loadByEnvironmentMatch($domain, $environment);
