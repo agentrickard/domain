@@ -122,8 +122,6 @@ class DomainAliasForm extends EntityForm {
         'testing'
       ];
     }
-    $environments = array_combine($environments, $environments);
-    kint($environments);
     return $environments;
   }
 
