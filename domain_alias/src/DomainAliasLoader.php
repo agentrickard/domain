@@ -102,9 +102,9 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   public function loadByEnvironmentMatch(DomainInterface $domain, $environment) {
     $result = $this->getStorage()->loadByProperties(['domain_id' => $domain->id(), 'environment' => $environment]);
     if (empty($result)) {
-      return NULL;
+      return [];
     }
-    return current($result);
+    return $result;
   }
 
   /**

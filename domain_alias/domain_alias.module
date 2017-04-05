@@ -93,14 +93,16 @@ function domain_alias_domain_load($entities) {
   $loader = \Drupal::service('domain_alias.loader');
   if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
     foreach ($entities as $id => $domain) {
-      if ($environment_alias = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
+      if ($environment_aliases = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
         // Wildcard patterns are not allowed.
         // @TODO: Note that in the UI.
-        $pattern = $environment_alias->getPattern();
-        if (substr_count($pattern, '*') < 1) {
-          $domain->setHostname($pattern);
-          $domain->setPath();
-          $domain->setUrl();
+        foreach($environment_aliases as $environment_alias) {
+          $pattern = $environment_alias->getPattern();
+          if (substr_count($pattern, '*') < 1) {
+            $domain->setHostname($pattern);
+            $domain->setPath();
+            $domain->setUrl();
+          }
         }
       }
     }

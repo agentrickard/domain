@@ -79,8 +79,8 @@ interface DomainAliasLoaderInterface {
    * @param string $environment
    *   An environment string, e.g. 'default' or 'local'.
    *
-   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
-   *   A matching domain alias record for the specified environment.
+   * @return array
+   *   An array of \Drupal\domain_alias\DomainAliasInterface objects.
    */
   public function loadByEnvironmentMatch(DomainInterface $domain, $environment);
 
