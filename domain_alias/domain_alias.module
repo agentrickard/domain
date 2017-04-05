@@ -71,24 +71,36 @@ function domain_alias_domain_operations(DomainInterface $domain, AccountInterfac
  * Implements hook_ENTITY_TYPE_load().
  */
 function domain_alias_domain_load($entities) {
+  static $enabled;
+  // We can only perform meaningful actions if url.site is a cache context. Otherwise,
+  // the render process ignores our changes.
+  $required_cache_contexts = \Drupal::getContainer()->getParameter('renderer.config')['required_cache_contexts'];
+  if ($enabled === FALSE || (!in_array('url.site', $required_cache_contexts) && !in_array('url', $required_cache_contexts))) {
+    $enabled = FALSE;
+    return;
+  }
+
+  // We cannot run before the negotiator service has fired.
   $negotiator = \Drupal::service('domain.negotiator');
   $active = $negotiator->getActiveDomain();
+
   // Do nothing if no domain is active.
   if (is_null($active)) {
     return;
   }
-  else {
-    $loader = \Drupal::service('domain_alias.loader');
-    if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
-      foreach ($entities as $id => $domain) {
-        if ($environment_alias = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
-          // @TODO: handle wildcard patterns.
-          $pattern = $environment_alias->getPattern();
-          if (substr_count($pattern, '*') < 1) {
-            $domain->setHostname($pattern);
-            $domain->setPath();
-            $domain->setUrl();
-          }
+
+  // Load and rewrite environement-specific aliases.
+  $loader = \Drupal::service('domain_alias.loader');
+  if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
+    foreach ($entities as $id => $domain) {
+      if ($environment_alias = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
+        // Wildcard patterns are not allowed.
+        // @TODO: Note that in the UI.
+        $pattern = $environment_alias->getPattern();
+        if (substr_count($pattern, '*') < 1) {
+          $domain->setHostname($pattern);
+          $domain->setPath();
+          $domain->setUrl();
         }
       }
     }
