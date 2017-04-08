@@ -46,7 +46,7 @@ and alias to the pattern list. For example:
 
 ```
 $settings['trusted_host_patterns'] = array(
-  '^*\.example\.com$',
+  '^.+\.example\.org$',
   '^myexample\.com$',
   '^localhost$',
 );
