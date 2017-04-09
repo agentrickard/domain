@@ -79,15 +79,18 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
 
     // To get around block access, let the anon user view the block.
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
+    // For a non-aliased request, the url list should be normal.
     $this->drupalGet($domain->getPath());
     foreach ($domains as $domain) {
       $this->assertSession()->assertEscaped($domain->getHostname());
       $this->assertSession()->linkByHrefExists($domain->getPath(), 0, 'Link found');
     }
-    $this->drupalGet('http://' . $alias->getPattern());
+    // For an aliased request, the list should be aliased.
+    $url = $domain->getScheme() . $alias->getPattern();
+    $this->drupalGet($url);
     foreach ($matches as $match) {
       $this->assertSession()->assertEscaped($match->getPattern());
-      $this->assertSession()->linkByHrefExists('http://' . $match->getPattern(), 0, 'Link found');
+      $this->assertSession()->linkByHrefExists($domain->getScheme() . $match->getPattern(), 0, 'Link found');
     }
   }
 
