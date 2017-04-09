@@ -120,7 +120,6 @@ class DomainAliasForm extends EntityForm {
       '#default_value' => $alias->getEnvironment(),
       '#description' => $this->t('Map the alias to a development environment. Note that wilcard aliases cannot be mapped. If unsure, use "default".'),
     );
-
     $form['environment_help'] = [
       '#type' => 'details',
       '#open' => FALSE,
@@ -190,7 +189,7 @@ class DomainAliasForm extends EntityForm {
    *   A list of valid environment options.
    */
   public function environmentOptions() {
-    $list = $this->config->get('domain_alias')->get('environments');
+    $list = $this->config->get('domain_alias.settings')->get('environments');
     foreach ($list as $item) {
       $environments[$item] = $item;
     }
