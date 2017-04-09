@@ -4,8 +4,10 @@ namespace Drupal\domain_alias;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\domain\DomainAccessControlHandler;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain_alias\DomainAliasLoaderInterface;
 use Drupal\domain_alias\DomainAliasValidatorInterface;
@@ -26,6 +28,13 @@ class DomainAliasForm extends EntityForm {
   protected $config;
 
   /**
+   * The domain entity access control handler.
+   *
+   * @var \Drupal\domain\DomainAccessControlHandler
+   */
+  protected $accessHandler;
+
+  /**
    * @var \Drupal\domain\DomainLoaderInterface $loader
    */
   protected $domainLoader;
@@ -42,14 +51,17 @@ class DomainAliasForm extends EntityForm {
    *   The domain alias validator.
    * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The configuration factory service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\domain\DomainLoaderInterface $loader
    *   The domain loader.
    * @param \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
    *   The alias loader.
    */
-  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, DomainLoaderInterface $loader, DomainAliasLoaderInterface $alias_loader) {
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainLoaderInterface $loader, DomainAliasLoaderInterface $alias_loader) {
     $this->validator = $validator;
     $this->config = $config;
+    $this->accessHandler = $entity_type_manager->getAccessControlHandler('domain');
     $this->domainLoader = $loader;
     $this->aliasLoader = $alias_loader;
   }
@@ -61,6 +73,7 @@ class DomainAliasForm extends EntityForm {
     return new static(
       $container->get('domain_alias.validator'),
       $container->get('config.factory'),
+      $container->get('entity_type.manager'),
       $container->get('domain.loader'),
       $container->get('domain_alias.loader')
     );
@@ -105,7 +118,7 @@ class DomainAliasForm extends EntityForm {
       '#type' => 'select',
       '#options' => $environments,
       '#default_value' => $alias->getEnvironment(),
-      '#description' => $this->t('Creates matched sets of aliases for use during development.'),
+      '#description' => $this->t('Map the alias to a development environment. Note that wilcard aliases cannot be mapped. If unsure, use "default".'),
     );
 
     $form['environment_help'] = [
@@ -113,29 +126,43 @@ class DomainAliasForm extends EntityForm {
       '#open' => FALSE,
       '#collapsed' => TRUE,
       '#title' => $this->t('Environment list'),
+      '#description' => $this->t('The table below shows the registered aliases for each environment.'),
     ];
 
-    $domains = $this->domainLoader->loadMultiple();
+    $domains = $this->domainLoader->loadMultipleSorted();
     $rows = [];
     foreach ($domains as $domain) {
+      // If the user cannot edit the domain, then don't show in the list.
+      $access = $this->accessHandler->checkAccess($domain, 'update');
+      if ($access->isForbidden()) {
+        continue;
+      }
       $row = [];
       // @TODO: access checking.
-      $row[] = $domain->getHostname();
+      $row[] = $domain->label();
       foreach ($environments as $environment) {
+        $match_output = [];
+        if ($environment == 'default') {
+          $match_output[] = $domain->getHostname();
+        }
         $matches = $this->aliasLoader->loadByEnvironmentMatch($domain, $environment);
-        $match_output = '';
+
         foreach ($matches as $match) {
           // @TODO: better handling of arrays.
-          $match_output .= $match->getPattern();
+          $match_output[] = $match->getPattern();
         }
-        $row[] = $match_output;
+        $output = [
+          '#items' => $match_output,
+          '#theme' => 'item_list',
+        ];
+        $row[] = \Drupal::service('renderer')->render($output);
       }
       $rows[] = $row;
     }
 
     $form['environment_help']['table'] = [
       '#type' => 'table',
-      '#header' => array_merge([$this->t('Domains')], $environments),
+      '#header' => array_merge([$this->t('Domain')], $environments),
       '#rows' => $rows,
     ];
 
@@ -163,7 +190,6 @@ class DomainAliasForm extends EntityForm {
    *   A list of valid environment options.
    */
   public function environmentOptions() {
-    // @TODO: possibly move this method.
     $list = $this->config->get('domain_alias')->get('environments');
     if (empty($list)) {
       $list = [
