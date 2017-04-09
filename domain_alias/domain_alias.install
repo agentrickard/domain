@@ -6,6 +6,23 @@
  */
 
 /**
+ * Implements hook_install().
+ */
+function domain_alias_install() {
+  // Set the default environments variable.
+  domain_alias_set_environments();
+}
+
+/**
+ * Sets the default set of environments.
+ */
+function domain_alias_set_environments() {
+  $config = \Drupal::service('config.factory')->getEditable('domain_alias.settings');
+  // Set and save new message value.
+  $config->set('environments', ['default', 'local', 'development', 'staging', 'testing'])->save();
+}
+
+/**
  * Updates domain_alias schema.
  */
 function domain_alias_update_8001() {
@@ -18,7 +35,6 @@ function domain_alias_update_8001() {
  * Adds domain_alias environment settings.
  */
 function domain_alias_update_8002() {
-  $config = \Drupal::service('config.factory')->getEditable('domain_alias.settings');
-  // Set and save new message value.
-  $config->set('environments', ['default', 'local', 'development', 'staging', 'testing'])->save();
+  // Set the default environments variable.
+  domain_alias_set_environments();
 }

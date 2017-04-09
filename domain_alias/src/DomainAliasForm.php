@@ -191,15 +191,6 @@ class DomainAliasForm extends EntityForm {
    */
   public function environmentOptions() {
     $list = $this->config->get('domain_alias')->get('environments');
-    if (empty($list)) {
-      $list = [
-        'default',
-        'local',
-        'development',
-        'staging',
-        'testing'
-      ];
-    }
     foreach ($list as $item) {
       $environments[$item] = $item;
     }
