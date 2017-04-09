@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Domain Alias module.
+ */
+
+/**
+ * Updates domain_alias schema.
+ */
+function domain_alias_update_8001() {
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  // Regenerate entity type indexes.
+  $manager->updateEntityType($manager->getEntityType('domain_alias'));
+}
