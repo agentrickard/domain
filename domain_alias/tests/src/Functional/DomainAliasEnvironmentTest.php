@@ -42,7 +42,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     foreach ($domains as $domain) {
       $values = [
         'domain_id' => $domain->id(),
-        'pattern' => array_shift($patterns) . $domain->getPort(),
+        'pattern' => array_shift($patterns),
         'redirect' => 0,
         'environment' => 'local',
       ];
@@ -55,7 +55,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     $match = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($match) == 1, 'One environment match loaded');
     $alias = current($match);
-    $this->assert($alias->getPattern() == 'five.example.com' . $domain->getPort(), 'Proper pattern match loaded.');
+    $this->assert($alias->getPattern() == 'five.example.com', 'Proper pattern match loaded.');
 
     // Set one alias to a different environment
     $alias->set('environment', 'testing')->save();
@@ -70,7 +70,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($matches) == 1, 'One environment match loaded');
     $alias = current($matches);
-    $this->assert($alias->getPattern() == 'four.example.com' . $domain->getPort(), 'Proper pattern match loaded.');
+    $this->assert($alias->getPattern() == 'four.example.com', 'Proper pattern match loaded.');
 
     // Now load a page and check things.
     // Since we cannot read the service request, we place a block
@@ -90,7 +90,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     $this->drupalGet($url);
     foreach ($matches as $match) {
       $this->assertSession()->assertEscaped($match->getPattern());
-      $this->assertSession()->linkByHrefExists($domain->getScheme() . $match->getPattern() . $domain->getPort(), 0, 'Link found');
+      $this->assertSession()->linkByHrefExists($domain->getScheme() . $match->getPattern(), 0, 'Link found');
     }
   }
 
