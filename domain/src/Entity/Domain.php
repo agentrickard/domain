@@ -468,4 +468,20 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $this->matchType;
   }
 
+  /**
+   * Find the port used for testing.
+   *
+   * @param \Drupal\domain\DomainInterface $domain
+   *   A domain entity.
+   *
+   * @return An optional port string (e.g. ':8080');
+   */
+  public function getPort() {
+    $ports = explode(':', $this->getHostname());
+    if (isset($ports[1])) {
+      return ':' . $ports[1];
+    }
+    return '';
+  }
+
 }
