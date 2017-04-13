@@ -72,6 +72,7 @@ function domain_alias_domain_operations(DomainInterface $domain, AccountInterfac
  */
 function domain_alias_domain_load($entities) {
   static $enabled;
+  $enabled = TRUE;
   // We can only perform meaningful actions if url.site is a cache context. Otherwise,
   // the render process ignores our changes.
   if (!isset($enabled)) {
