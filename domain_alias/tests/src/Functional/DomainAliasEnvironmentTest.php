@@ -93,7 +93,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     foreach ($matches as $match) {
       $this->assertSession()->assertEscaped($match->getPattern());
       $path = $domain->getScheme() . $match->getPattern();
-      $this->assertSession()->linkByHrefExists($path, 0, 'Link found: ' . $path);
+      $this->assertSession()->linkByHrefExists($domain->getPath(), 0, 'Link found: ' . $path);
     }
   }
 
