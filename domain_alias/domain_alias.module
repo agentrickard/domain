@@ -102,6 +102,9 @@ function domain_alias_domain_load($entities) {
         foreach($environment_aliases as $environment_alias) {
           $pattern = $environment_alias->getPattern();
           if (substr_count($pattern, '*') < 1) {
+            // Add a canonical property.
+            $domain->setCanonical();
+            // Overriide the domain hostname and path.
             $domain->setHostname($pattern);
             $domain->setPath();
             $domain->setUrl();

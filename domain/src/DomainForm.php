@@ -95,7 +95,7 @@ class DomainForm extends EntityForm {
       '#title' => $this->t('Hostname'),
       '#size' => 40,
       '#maxlength' => 80,
-      '#default_value' => $domain->getHostname(),
+      '#default_value' => $domain->getCanonical(),
       '#description' => $this->t('The canonical hostname, using the full <em>subdomain.example.com</em> format. Leave off the http:// and the trailing slash and do not include any paths.<br />If this domain uses a custom http(s) port, you should specify it here, e.g.: <em>subdomain.example.com:1234</em><br />The hostname may contain only lowercase alphanumeric characters, dots, dashes, and a colon (if using alternative ports).'),
     );
     $form['id'] = array(

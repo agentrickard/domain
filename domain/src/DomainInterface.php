@@ -212,4 +212,17 @@ interface DomainInterface extends ConfigEntityInterface {
    */
   public function createDomainId();
 
+  /**
+   * Retrieves the canonical (registered) hostname for the domaim.
+   *
+   * @return string
+   *   A hostname string.
+   */
+  public function getCanonical();
+
+  /**
+   * Sets the canonical (registered) hostname for the domaim.
+   */
+  public function setCanonical($hostname = NULL);
+
 }
