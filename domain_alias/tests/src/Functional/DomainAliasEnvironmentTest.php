@@ -90,6 +90,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     // For an aliased request, the list should be aliased.
     $url = $domain->getScheme() . $alias->getPattern() . $domain->getPort();
     $this->drupalGet($url);
+    var_dump($domain->getPath());
     foreach ($matches as $match) {
       $this->assertSession()->assertEscaped($match->getPattern());
       $path = $domain->getScheme() . $match->getPattern();
