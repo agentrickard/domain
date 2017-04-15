@@ -37,7 +37,8 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
   public function testDomainAliasEnvironments() {
     $domain_loader = \Drupal::service('domain.loader');
     $alias_loader = \Drupal::service('domain_alias.loader');
-    $domains = $domain_loader->loadMultiple(NULL, TRUE);
+    $domains = $domain_loader->loadMultipleSorted(NULL, TRUE);
+    // Our patterns should map to example.com, one.example.com, two.example.com.
     $patterns = ['three.example.com', 'four.example.com', 'five.example.com'];
     foreach ($domains as $domain) {
       $values = [
@@ -81,20 +82,17 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
     // For a non-aliased request, the url list should be normal.
     $this->drupalGet($domain->getPath());
-    // Reload the domains without cache.
-    $domains = $domain_loader->loadMultiple(NULL, TRUE);
     foreach ($domains as $domain) {
       $this->assertSession()->assertEscaped($domain->getHostname());
       $this->assertSession()->linkByHrefExists($domain->getPath(), 0, 'Link found: ' . $domain->getPath());
     }
-    // For an aliased request, the list should be aliased.
+    // For an aliased request (four.example.com), the list should be aliased.
     $url = $domain->getScheme() . $alias->getPattern() . $domain->getPort();
     $this->drupalGet($url);
-    var_dump($domain->getPath());
     foreach ($matches as $match) {
       $this->assertSession()->assertEscaped($match->getPattern());
-      $path = $domain->getScheme() . $match->getPattern();
-      $this->assertSession()->linkByHrefExists($domain->getPath(), 0, 'Link found: ' . $path);
+      $path = $domain->getScheme() . $match->getPattern() . $domain->getPort();
+      $this->assertSession()->linkByHrefExists($path, 0, 'Link found: ' . $path);
     }
   }
 
