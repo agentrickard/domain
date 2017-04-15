@@ -97,17 +97,30 @@ function domain_alias_domain_load($entities) {
   if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
     foreach ($entities as $id => $domain) {
       if ($environment_aliases = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
-        // Wildcard patterns are not allowed.
-        // @TODO: Note that in the UI.
         foreach($environment_aliases as $environment_alias) {
           $pattern = $environment_alias->getPattern();
+          // Add a canonical property.
+          $domain->setCanonical();
+          // Override the domain hostname and path. We always prefer a string match.
           if (substr_count($pattern, '*') < 1) {
-            // Add a canonical property.
-            $domain->setCanonical();
-            // Overriide the domain hostname and path.
             $domain->setHostname($pattern);
             $domain->setPath();
             $domain->setUrl();
+            break;
+          }
+          else {
+            // Do a wildcard replacement based on the current request.
+            // @TODO: This doesn't handle ports right now.
+            $request = $negotiator->negotiateActiveHostname();
+            $search = explode('.', $pattern);
+            $replace = explode('.', $request);
+            $pattern = str_replace($search, $replace, $pattern);
+            // Do not let the domain loop back on itself.
+            if ($pattern != $domain->getCanonical()) {
+              $domain->setHostname($pattern);
+              $domain->setPath();
+              $domain->setUrl();
+            }
           }
         }
       }

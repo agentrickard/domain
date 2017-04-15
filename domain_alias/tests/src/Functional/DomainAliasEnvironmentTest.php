@@ -39,7 +39,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     $alias_loader = \Drupal::service('domain_alias.loader');
     $domains = $domain_loader->loadMultipleSorted(NULL, TRUE);
     // Our patterns should map to example.com, one.example.com, two.example.com.
-    $patterns = ['three.example.com', 'four.example.com', 'five.example.com'];
+    $patterns = ['*.example.com', 'four.example.com', 'five.example.com'];
     foreach ($domains as $domain) {
       $values = [
         'domain_id' => $domain->id(),

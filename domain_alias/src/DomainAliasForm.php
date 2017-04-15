@@ -118,7 +118,7 @@ class DomainAliasForm extends EntityForm {
       '#type' => 'select',
       '#options' => $environments,
       '#default_value' => $alias->getEnvironment(),
-      '#description' => $this->t('Map the alias to a development environment. Note that wilcard aliases cannot be mapped. If unsure, use "default".'),
+      '#description' => $this->t('Map the alias to a development environment.'),
     );
     $form['environment_help'] = [
       '#type' => 'details',
@@ -137,17 +137,14 @@ class DomainAliasForm extends EntityForm {
         continue;
       }
       $row = [];
-      // @TODO: access checking.
       $row[] = $domain->label();
       foreach ($environments as $environment) {
         $match_output = [];
         if ($environment == 'default') {
-          $match_output[] = $domain->getHostname();
+          $match_output[] = $domain->getCanonical();
         }
         $matches = $this->aliasLoader->loadByEnvironmentMatch($domain, $environment);
-
         foreach ($matches as $match) {
-          // @TODO: better handling of arrays.
           $match_output[] = $match->getPattern();
         }
         $output = [
