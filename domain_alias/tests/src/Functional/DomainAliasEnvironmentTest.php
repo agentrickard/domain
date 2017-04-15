@@ -92,7 +92,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     $this->drupalGet($url);
     foreach ($matches as $match) {
       $this->assertSession()->assertEscaped($match->getPattern());
-      $path = $domain->getScheme() . $match->getPattern() . $domain->getPort();
+      $path = $domain->getScheme() . $match->getPattern();
       $this->assertSession()->linkByHrefExists($path, 0, 'Link found: ' . $path);
     }
   }
