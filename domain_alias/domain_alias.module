@@ -110,11 +110,29 @@ function domain_alias_domain_load($entities) {
           }
           else {
             // Do a wildcard replacement based on the current request.
-            // @TODO: This doesn't handle ports right now.
             $request = $negotiator->negotiateActiveHostname();
+            // First, check for a wildcard port.
+            if (substr_count($pattern, ':*') > 0) {
+              // Do not replace ports unless they are nonstandard. See
+              // \Symfony\Component\HttpFoundation\Request\getHttpHost().
+              if (substr_count($request, ':') > 0) {
+                $search = explode(':', $pattern);
+                $replace = explode(':', $request);
+                if (!empty($search[1]) && !empty($replace[1])) {
+                  $pattern = str_replace(':' . $search[1], ':' . $replace[1], $pattern);
+                }
+              }
+              // If no port wildcard, then remove the port entirely.
+              else {
+                $pattern = str_replace(':*', '', $pattern);
+              }
+            }
             $search = explode('.', $pattern);
             $replace = explode('.', $request);
-            $pattern = str_replace($search, $replace, $pattern);
+            // This routine only works if the hostnames match length.
+            if (count($search) == count($replace)) {
+              $pattern = str_replace($search, $replace, $pattern);
+            }
             // Do not let the domain loop back on itself.
             if ($pattern != $domain->getCanonical()) {
               $domain->setHostname($pattern);
