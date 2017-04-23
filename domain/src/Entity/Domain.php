@@ -340,6 +340,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if ($this->isNew()) {
       $this->createDomainId();
     }
+    // Prevent duplicate hostname.
+    $hostname = $this->getHostname();
+    // Do not use domain loader because it may change hostname.
+    $existing = $storage->loadByProperties(['hostname' => $hostname]);
+    $existing = reset($existing);
+    if ($existing && $this->getDomainId() != $existing->getDomainId()) {
+      throw new ConfigValueException("The hostname ($hostname) is already registered.");
+    }
   }
 
   /**
