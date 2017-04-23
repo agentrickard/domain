@@ -19,9 +19,11 @@ class DomainAccessPermissions {
     $permissions = array(
       'assign domain editors' => array(
         'title' => $this->t('Assign additional editors to assigned domains'),
+        'restrict access' => TRUE,
       ),
       'assign editors to any domain' => array(
         'title' => $this->t('Assign additional editors to any domains'),
+        'restrict access' => TRUE,
       ),
       'publish to any domain' => array(
         'title' => $this->t('Publish to any domain'),
@@ -40,6 +42,7 @@ class DomainAccessPermissions {
       ),
       'view unpublished domain content' => array(
         'title' => $this->t('View unpublished content on assigned domains'),
+        'restrict access' => TRUE,
       ),
     );
 

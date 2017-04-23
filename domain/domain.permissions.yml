@@ -1,20 +1,30 @@
 administer domains:
   title: 'Administer all domain records'
+  description: 'View, create, edit, and delete domain records. Allows all permissions for the module.'
+  restrict access: true
 access inactive domains:
   title: 'Access inactive domains'
+  description: 'Access domain URLs for domains marked as inactive.'
+  restrict access: true
 assign domain administrators:
   title: 'Assign additional administrators to assigned domains'
+  restrict access: true
 create domains:
   title: 'Create domain records'
+  restrict access: true
 edit assigned domains:
   title: 'Edit assigned domain records'
+  restrict access: true
 delete assigned domains:
   title: 'Delete assigned domain records'
+  restrict access: true
 use domain switcher block:
   title: 'Access the domain switcher block'
+  restrict access: true
 view assigned domains:
-  title: 'View assigned domains'
+  title: 'View assigned domains in the administration list'
 view domain list:
-  title: 'View all registered domains'
+  title: 'View all registered domains in the administration list'
 view domain information:
   title: 'View debugging information for domain handling'
+  restrict access: true
