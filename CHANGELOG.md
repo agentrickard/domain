@@ -10,6 +10,7 @@ Changelog
 06-DEC-2016 Adds the domain_alpha module to handle critical pre-release updates.
 13-DEC-2016 8.x-1.0-alpha7
 12-MAR-2017 8.x-1.0-alpha8
+23-APR-2017 8.x-1.0-alpha9
 
 Status
 ====
