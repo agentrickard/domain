@@ -113,13 +113,12 @@ function domain_access_node_access_records(NodeInterface $node) {
       );
     }
     // Because of language translation, we must save a record for each language.
-    // Note that the gid of 1 is never allowed for domain_site in
-    // domain_node_grants().
-    elseif (count($translations) > 1) {
+    // even if that record adds no permissions, as this one does.
+    else {
       $grants[] = array(
         'realm' => 'domain_site',
         'gid' => 1,
-        'grant_view' => 1,
+        'grant_view' => 0,
         'grant_update' => 0,
         'grant_delete' => 0,
         'langcode' => $langcode,
