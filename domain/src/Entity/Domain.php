@@ -363,6 +363,23 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    foreach ($entities as $entity) {
+      $actions = $storage->loadMultiple([
+        'domain_default_action.' . $entity->id(),
+        'domain_delete_action.' . $entity->id(),
+        'domain_disable_action.' . $entity->id(),
+        'domain_enable_action.' . $entity->id(),
+      ]);
+     foreach ($actions as $action) {
+        $action->delete();
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function createDomainId() {
     // We cannot reliably use sequences (1, 2, 3) because those can be different
     // across environments. Instead, we use the crc32 hash function to create a
