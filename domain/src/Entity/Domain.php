@@ -323,7 +323,6 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
-    // @todo Move default domain logic to form level or to post save.
     // Sets the default domain properly.
     /** @var \Drupal\domain\DomainLoaderInterface $loader */
     $loader = \Drupal::service('domain.loader');
@@ -332,7 +331,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!$default) {
       $this->is_default = 1;
     }
-    elseif ($this->is_default && $default->id() != $this->id()) {
+    elseif ($this->is_default && $default->getDomainId() != $this->getDomainId()) {
       // Swap the current default.
       $default->is_default = 0;
       $default->save();
@@ -346,7 +345,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     // Do not use domain loader because it may change hostname.
     $existing = $storage->loadByProperties(['hostname' => $hostname]);
     $existing = reset($existing);
-    if ($existing && $this->id() != $existing->id()) {
+    if ($existing && $this->getDomainId() != $existing->getDomainId()) {
       throw new ConfigValueException("The hostname ($hostname) is already registered.");
     }
   }

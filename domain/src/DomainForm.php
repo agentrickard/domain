@@ -173,7 +173,9 @@ class DomainForm extends EntityForm {
     // Do not use domain loader because it may change hostname.
     $existing = $this->storage->loadByProperties(['hostname' => $hostname]);
     $existing = reset($existing);
-    if ($existing && $existing->id() != $entity->id()) {
+    // If we have already registered a hostname, make sure we don't create a duplicate.
+    // We cannot check id() here, as the machine name is editable.
+    if ($existing && $existing->getDomainId() != $entity->getDomainId()) {
       $form_state->setErrorByName('hostname', $this->t('The hostname is already registered.'));
     }
   }
