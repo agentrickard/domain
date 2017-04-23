@@ -45,7 +45,7 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
       'foo.com' => 0, // duplicate.
     ];
     foreach ($patterns as $pattern => $valid) {
-      $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, FALSE);
+      $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);
       $errors = $validator->validate($alias);
       if ($valid) {
         $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @pattern passed.', array('@pattern' => $pattern)));
@@ -62,7 +62,7 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
       'éxample.com' => 1, // ascii-only allowed.
     ];
     foreach ($patterns as $pattern => $valid) {
-      $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, FALSE);
+      $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);
       $errors = $validator->validate($alias);
       if ($valid) {
         $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @pattern passed.', array('@pattern' => $pattern)));

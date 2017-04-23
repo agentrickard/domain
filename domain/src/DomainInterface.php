@@ -198,8 +198,31 @@ interface DomainInterface extends ConfigEntityInterface {
   public function getMatchType();
 
   /**
+   * Find the port used for the domain.
+   *
+   * @param \Drupal\domain\DomainInterface $domain
+   *   A domain entity.
+   *
+   * @return An optional port string (e.g. ':8080') or an empty string;
+   */
+  public function getPort();
+
+  /**
    * Creates a unique domain id for this record.
    */
   public function createDomainId();
+
+  /**
+   * Retrieves the canonical (registered) hostname for the domaim.
+   *
+   * @return string
+   *   A hostname string.
+   */
+  public function getCanonical();
+
+  /**
+   * Sets the canonical (registered) hostname for the domaim.
+   */
+  public function setCanonical($hostname = NULL);
 
 }

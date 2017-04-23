@@ -32,11 +32,13 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   }
   // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
+  $alias_loader = \Drupal::service('domain_alias.loader');
+  $domain_loader = \Drupal::service('domain.loader');
   /** @var \Drupal\domain_alias\Entity\DomainAlias $alias */
-  if ($alias = \Drupal::service('domain_alias.loader')->loadByHostname($hostname)) {
+  if ($alias = $alias_loader->loadByHostname($hostname)) {
     /** @var \Drupal\domain\Entity\Domain $domain */
-    if ($domain = \Drupal::service('domain.loader')->load($alias->getDomainId())) {
-      $domain->addProperty('alias', $alias->getPattern());
+    if ($domain = $domain_loader->load($alias->getDomainId())) {
+      $domain->addProperty('alias', $alias);
       $domain->setMatchType(DomainNegotiator::DOMAIN_MATCH_ALIAS);
       $redirect = $alias->getRedirect();
       if (!empty($redirect)) {
@@ -63,4 +65,83 @@ function domain_alias_domain_operations(DomainInterface $domain, AccountInterfac
     );
   }
   return $operations;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_load().
+ */
+function domain_alias_domain_load($entities) {
+  static $enabled;
+  // We can only perform meaningful actions if url.site is a cache context. Otherwise,
+  // the render process ignores our changes.
+  if (!isset($enabled)) {
+    $required_cache_contexts = \Drupal::getContainer()->getParameter('renderer.config')['required_cache_contexts'];
+    if (!in_array('url.site', $required_cache_contexts) && !in_array('url', $required_cache_contexts)) {
+      $enabled = FALSE;
+      return;
+    }
+    $enabled = TRUE;
+  }
+
+  // We cannot run before the negotiator service has fired.
+  $negotiator = \Drupal::service('domain.negotiator');
+  $active = $negotiator->getActiveDomain();
+
+  // Do nothing if no domain is active.
+  if (is_null($active)) {
+    return;
+  }
+
+  // Load and rewrite environement-specific aliases.
+  $loader = \Drupal::service('domain_alias.loader');
+  if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
+    foreach ($entities as $id => $domain) {
+      if ($environment_aliases = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
+        foreach($environment_aliases as $environment_alias) {
+          $pattern = $environment_alias->getPattern();
+          // Add a canonical property.
+          $domain->setCanonical();
+          // Override the domain hostname and path. We always prefer a string match.
+          if (substr_count($pattern, '*') < 1) {
+            $domain->setHostname($pattern);
+            $domain->setPath();
+            $domain->setUrl();
+            break;
+          }
+          else {
+            // Do a wildcard replacement based on the current request.
+            $request = $negotiator->negotiateActiveHostname();
+            // First, check for a wildcard port.
+            if (substr_count($pattern, ':*') > 0) {
+              // Do not replace ports unless they are nonstandard. See
+              // \Symfony\Component\HttpFoundation\Request\getHttpHost().
+              if (substr_count($request, ':') > 0) {
+                $search = explode(':', $pattern);
+                $replace = explode(':', $request);
+                if (!empty($search[1]) && !empty($replace[1])) {
+                  $pattern = str_replace(':' . $search[1], ':' . $replace[1], $pattern);
+                }
+              }
+              // If no port wildcard, then remove the port entirely.
+              else {
+                $pattern = str_replace(':*', '', $pattern);
+              }
+            }
+            $search = explode('.', $pattern);
+            $replace = explode('.', $request);
+            // This routine only works if the hostnames match length.
+            if (count($search) == count($replace)) {
+              $pattern = str_replace($search, $replace, $pattern);
+            }
+            // Do not let the domain loop back on itself.
+            if ($pattern != $domain->getCanonical()) {
+              $domain->setHostname($pattern);
+              $domain->setPath();
+              $domain->setUrl();
+            }
+          }
+        }
+      }
+    }
+  }
 }

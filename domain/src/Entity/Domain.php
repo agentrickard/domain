@@ -145,6 +145,11 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   protected $matchType;
 
   /**
+   * The canonical hostname for the domain.
+   */
+  protected $canonical;
+
+  /**
    * {@inheritdoc}
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
@@ -409,7 +414,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $url = Url::fromUri($this->getPath(), $options);
     }
 
-    return Link::fromTextAndUrl($this->getHostname(), $url)->toString();
+    return Link::fromTextAndUrl($this->getCanonical(), $url)->toString();
   }
 
   /**
@@ -466,6 +471,39 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function getMatchType() {
     return $this->matchType;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPort() {
+    $ports = explode(':', $this->getHostname());
+    if (isset($ports[1])) {
+      return ':' . $ports[1];
+    }
+    return '';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setCanonical($hostname = NULL) {
+    if (is_null($hostname)) {
+      $this->canonical = $this->getHostname();
+    }
+    else {
+      $this->canonical = $hostname;
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCanonical() {
+    if (empty($this->canonical)) {
+      $this->setCanonical();
+    }
+    return $this->canonical;
   }
 
 }

@@ -2,6 +2,8 @@
 
 namespace Drupal\domain_alias;
 
+use Drupal\domain\DomainInterface;
+
 /**
  * Supplies loader methods for common domain_alias requests.
  */
@@ -56,6 +58,31 @@ interface DomainAliasLoaderInterface {
    *   The domain alias record given a pattern string.
    */
   public function loadByPattern($pattern);
+
+
+  /**
+   * Loads an array of domain alias record by environment lookup.
+   *
+   * @param string $environment
+   *   An environment string, e.g. 'default' or 'local'.
+   *
+   * @return array
+   *   An array of \Drupal\domain_alias\DomainAliasInterface objects.
+   */
+  public function loadByEnvironment($environment);
+
+  /**
+   * Loads a domain alias record by pattern lookup.
+   *
+   * @param \Drupal\domain\DomainInterface $domain
+   *   A domain entity.
+   * @param string $environment
+   *   An environment string, e.g. 'default' or 'local'.
+   *
+   * @return array
+   *   An array of \Drupal\domain_alias\DomainAliasInterface objects.
+   */
+  public function loadByEnvironmentMatch(DomainInterface $domain, $environment);
 
   /**
    * Sorts aliases by wildcard to float exact matches to the top.

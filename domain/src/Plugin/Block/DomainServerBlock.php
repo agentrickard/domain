@@ -50,7 +50,7 @@ class DomainServerBlock extends DomainBlockBase {
     if (!$check) {
       // Specific check for Domain Alias.
       if (isset($domain->alias)) {
-        $match = $this->t('ALIAS: Using alias %id', array('%id' => $domain->alias));
+        $match = $this->t('ALIAS: Using alias %id', array('%id' => $domain->alias->getPattern()));
       }
       else {
         $match = $this->t('FALSE: Using default domain.');

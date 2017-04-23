@@ -89,6 +89,89 @@ specified.
     *.com:8080
     *.com:*
 ```
+
+Development Workflow
+====
+
+Aliases can be used to support development across different environments, with unique
+URLs. To support this feature, there is now an `environment` field for each alias. The
+default environment list is:
+
+* default
+* local
+* development
+* staging
+* testing
+
+This list may be overridden by setting the `domain_alias.environments` configuration in
+settings.php.
+
+The operation of these environments is as follows:
+
+* If alias matching the environment is `default`, no changes occur.
+* Else, matching aliases are loaded for all domains, so that links are rewritten to be
+specific to the specified environment. (See `domain_alias_domain_load()` for the logic.)
+
+For instance, consider the following configuration. Your site's canonical domains are:
+
+* example.com
+* foo.example.com
+* bar.example.com
+
+When developing locally, developers use `.local` instead of `.com`. These should be
+aliased to each domain as set as the `local` environment.
+
+* example.local > alias to example.com
+* foo.example.local > alias to foo.example.com
+* bar.example.local > alias to bar.example.com
+
+When pushing changes to the cloud, we use a development server. These are tied to a
+specific cloud host (dev.mycloud.com). You can alias these to the `development`
+environment.
+
+* example.dev.mycloud.com > alias to example.com
+* foo.example.dev.mycloud.com > alias to foo.example.com
+* bar.example.dev.mycloud.com > alias to bar.example.com
+
+The pattern can repeat for each of the environments listed above. The intended use of the
+default set of environments is:
+
+* default -- indicates a canonical URL. No changes will be made.
+* local -- for local development environments.
+* development -- for a development integration server (such as those provided by Acquia and
+Pantheon)
+* staging -- for a pre-deployment server (such as those provided by Acquia and
+Pantheon)
+* testing -- for continuous integration services (such as TravisCI or CircleCI).
+
+None of these environments are required. You may safely set all aliases to default if
+your workflow does not span multiple server environments.
+
+How does it work?
+----
+
+This feature works by mapping each alias to an environment. If the active request matches
+an alias that is set as an environment other than `default`, then matching environment
+aliases are loaded for each domain. If a match is found, the `hostname` value for each
+domain is overwritten.
+
+This overwrite affects the base path and request url that Domain module (and Domain Source)
+use for writing links.
+
+Because the environments are specific to hostnames, this feature will only work if the
+site's cache recognizes `url.site` as a required cache context. Without that, the render
+system will cache the output of a request incorrectly.
+
+Configuration
+----
+
+To use this feature, the following steps must be followed:
+
+* `url.site` must be added as a required_cache_context to your `services.yml` file.
+* Aliases must be mapped to a server environment. At least one alias per environment
+cannot include a wildcard character.
+* All aliases should be listed as part of `trusted_host_settings` in `settings.php`.
+
 Technical Notes
 ====
 

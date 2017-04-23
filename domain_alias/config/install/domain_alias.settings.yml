@@ -1,0 +1,6 @@
+environments:
+  - default
+  - local
+  - development
+  - staging
+  - testing
