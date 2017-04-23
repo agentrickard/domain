@@ -364,6 +364,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * {@inheritdoc}
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
     foreach ($entities as $entity) {
       $actions = $storage->loadMultiple([
         'domain_default_action.' . $entity->id(),
