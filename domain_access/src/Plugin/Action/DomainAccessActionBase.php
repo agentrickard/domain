@@ -62,7 +62,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
       '#type' => 'checkboxes',
       '#title' => t('Domain'),
       '#options' => $domains,
-      '#default_value' => $this->configuration['id'],
+      '#default_value' => $this->configuration['domain_id'],
       '#required' => TRUE,
     );
     return $form;
