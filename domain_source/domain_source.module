@@ -84,6 +84,11 @@ function domain_source_node_type_insert(EntityInterface $entity) {
  */
 function domain_source_get(EntityInterface $entity) {
   $source = NULL;
+
+  if (!isset($entity->{DOMAIN_SOURCE_FIELD})) {
+    return $source;
+  }
+
   $value = $entity->get(DOMAIN_SOURCE_FIELD)->offsetGet(0);
   if (!empty($value)) {
     $target_id = $value->target_id;

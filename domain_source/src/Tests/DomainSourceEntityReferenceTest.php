@@ -155,6 +155,27 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Load the page with a menu and check that link.
     $this->drupalGet('node/3');
     $this->assertRaw('href="' . $url, 'Menu link rewritten correctly.');
+
+    // Remove the field from the node type and make sure nothing breaks.
+    // See https://www.drupal.org/node/2892612
+    $id = 'node.article.field_domain_source';
+    if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
+      $bundle_path = 'admin/structure/types/manage/article';
+      $this->drupalGet("$bundle_path/fields/$id/delete");
+      // Submit confirmation form.
+      $this->drupalPostForm(NULL, [], t('Delete'));
+    }
+    // Visit the article field display administration page.
+    $this->drupalGet('node/add/article');
+    $this->assertResponse(200);
+    // Try to post a node, assigned to no domain.
+    $edit2['title[0][value]'] = 'Test node';
+    $this->drupalPostForm('node/add/article', $edit2, 'Save');
+    // Test the URL against expectations, and the rendered menu link.
+    $node = $node_storage->load(4);
+    $url = $node->toUrl()->toString();
+    $expected_url = '/node/4';
+    $this->assertTrue($expected_url == $url, 'No URL rewrite performed.');
   }
 
 }
