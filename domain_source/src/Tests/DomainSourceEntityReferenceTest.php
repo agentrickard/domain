@@ -160,10 +160,9 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // See https://www.drupal.org/node/2892612
     $id = 'node.article.field_domain_source';
     if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
-      $bundle_path = 'admin/structure/types/manage/article';
-      $this->drupalGet("$bundle_path/fields/$id/delete");
-      // Submit confirmation form.
-      $this->drupalPostForm(NULL, [], t('Delete'));
+      $field->delete();
+      field_purge_batch(10, $field->uuid());
+      drupal_flush_all_caches();
     }
     // Visit the article field display administration page.
     $this->drupalGet('node/add/article');
