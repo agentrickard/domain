@@ -119,6 +119,26 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Validate form submissions.
+ */
+function domain_source_form_validate($element, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $values = $form_state->getValues();
+  // This is only run if Domain Access is present.
+  $access_values = $values[DOMAIN_ACCESS_FIELD];
+  $source_value = current($values[DOMAIN_SOURCE_FIELD]);
+  // If no value is selected, that's acceptable. Else run through a check.
+  $source_set = empty($source_value);
+  foreach ($access_values as $value) {
+    if ($value == $source_value) {
+      $source_set = TRUE;
+    }
+  }
+  if (!$source_set) {
+    $form_state->setError($element, t('The source domain must be selected as a publishing option.'));
+  }
+}
+
+/**
  * Redirect form submissions to other domains.
  */
 function domain_source_form_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
@@ -146,4 +166,8 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
   $manager = \Drupal::service('domain_source.element_manager');
   $hide = TRUE;
   $form = $manager->setFormOptions($form, $form_state, DOMAIN_SOURCE_FIELD, $hide);
+  // Add validation if Domain Access is installed.
+  if (defined('DOMAIN_ACCESS_FIELD') && isset($form[DOMAIN_ACCESS_FIELD])) {
+    $form[DOMAIN_SOURCE_FIELD]['#element_validate'] = array('domain_source_form_validate');
+  }
 }
