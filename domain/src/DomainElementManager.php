@@ -52,6 +52,12 @@ class DomainElementManager implements DomainElementManagerInterface {
     $disallowed = $this->disallowedOptions($form_state, $form[$field_name]);
     $empty = empty($form[$field_name]['widget']['#options']);
 
+    // If the domain form element is set as a group, and the field is not assigned to
+    // another group, then move it. See domain_access_form_node_form_alter().
+    if (isset($form['domain']) && !isset($form[$field_name]['#group'])) {
+      $form[$field_name]['#group'] = 'domain';
+    }
+
     // Check for domains the user cannot access or the absence of any options.
     if (!empty($disallowed) || $empty) {
       // @TODO: Potentially show this information to users with permission.
