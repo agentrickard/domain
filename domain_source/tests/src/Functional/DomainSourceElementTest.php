@@ -30,7 +30,7 @@ class DomainSourceElementTest extends DomainTestBase {
   /**
    * Basic test setup.
    */
-  public function testDomainAccessElement() {
+  public function testDomainSourceElement() {
     $admin = $this->drupalCreateUser(array(
       'bypass node access',
       'administer content types',
@@ -65,64 +65,29 @@ class DomainSourceElementTest extends DomainTestBase {
     // Set all affiliates to TRUE.
     $this->checkField($locator);
 
-    // Save the form.
-    $this->pressButton('edit-submit');
-    $this->assertSession()->statusCodeEquals(200);
-
-    $storage = \Drupal::entityTypeManager()->getStorage('node');
-    $node = $storage->load(1);
-    // Check that two values are set.
-    $manager = \Drupal::service('domain_access.manager');
-    $values = $manager->getAccessValues($node);
-    $this->assert(count($values) == 3, 'Node saved with three domain records.');
-    $value = $manager->getAllValue($node);
-    $this->assert($value == 1, 'Node saved to all affiliates.');
-
-    // Now login as a user with limited rights.
-    $account = $this->drupalCreateUser(array('create article content', 'edit any article content', 'publish to any assigned domain'));
-    $ids = ['example_com', 'one_example_com'];
-    $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ACCESS_FIELD);
-    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
-    $user = $user_storage->load($account->id());
-    $values = $manager->getAccessValues($user);
-    $this->assert(count($values) == 2, 'User saved with two domain records.');
-    $value = $manager->getAllValue($user);
-    $this->assert($value == 0, 'User not saved to all affiliates.');
-
-    $this->drupalLogin($account);
-
-    $this->drupalGet('node/' . $node->id() . '/edit');
-    $this->assertSession()->statusCodeEquals(200);
-
-    foreach ($domains as $domain) {
-      $locator = DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
-      $this->findField($locator);
-      if ($domain->id() == 'example_com') {
-        $this->checkField($locator);
-      }
-      elseif ($domain->id() == 'one_example_com') {
-        $this->uncheckField($locator);
-      }
-
-      else {
-        $this->assertSession()->fieldNotExists($locator);
-      }
-    }
-
-    $locator = DOMAIN_ACCESS_ALL_FIELD . '[value]';
-    $this->assertSession()->fieldNotExists($locator);
+    // Find the Domain Source field.
+    $locator = DOMAIN_SOURCE_FIELD;
+    $this->findField($locator);
+    // Set it to one_example_com.
+    $this->selectFieldOption($locator, 'one_example_com');
 
     // Save the form.
     $this->pressButton('edit-submit');
     $this->assertSession()->statusCodeEquals(200);
 
-    // Now, check the node.
-    $storage->resetCache(array($node->id()));
-    $node = $storage->load(1);
-    // Check that two values are set.
-    $values = $manager->getAccessValues($node);
-    $this->assert(count($values) == 2, 'Node saved with two domain records.');
-    $value = $manager->getAllValue($node);
-    $this->assert($value == 1, 'Node saved to all affiliates.');
+    // Edit the node.
+    $this->drupalGet('node/1/edit');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Set the domain source field to an unselected domain.
+    $this->selectFieldOption($locator, 'three_example_com');
+
+    // Save the form.
+    $this->pressButton('edit-submit');
+    $this->assertSession()->assertEscaped('The source domain must be selected as a publishing option.');
+
+    // Check the URL.
+    $url = $this->geturl();
+    $this->assert(strpos($url, 'node/1/edit') > 0, 'Form not submitted.');
   }
 }
