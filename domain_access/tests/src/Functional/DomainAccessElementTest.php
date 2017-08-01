@@ -24,11 +24,6 @@ class DomainAccessElementTest extends DomainTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
-
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
   }
