@@ -26,8 +26,8 @@ env:
     - PATH="$PATH:$HOME/.composer/vendor/bin"
 
   matrix:
-    - DRUPAL=8.2.x
     - DRUPAL=8.3.x
+    - DRUPAL=8.4.x
 
 mysql:
   database: domain
@@ -89,4 +89,4 @@ script:
   - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "Simpletest" --php `which php` --url http://example.com:8080 domain_config
   #- php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
   - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "Simpletest" --php `which php` --url http://example.com:8080 domain_source
-  #- php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
+  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
