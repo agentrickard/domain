@@ -595,11 +595,17 @@ function domain_access_views_data_alter(array &$data) {
       'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates).'),
     ),
   );
+  // Since domains are not stored in the database, relationships cannot be used.
+  unset($data[$table][DOMAIN_ACCESS_FIELD]['relationship']);
 
+  // Set the user data.
   $table = 'user__' . DOMAIN_ACCESS_FIELD;
   $data[$table][DOMAIN_ACCESS_FIELD]['field']['id'] = 'domain_access_field';
   $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['filter']['id'] = 'domain_access_filter';
   $data[$table][DOMAIN_ACCESS_FIELD . '_target_id']['argument']['id'] = 'domain_access_argument';
+
+  // Since domains are not stored in the database, relationships cannot be used.
+  unset($data[$table][DOMAIN_ACCESS_FIELD]['relationship']);
 }
 
 /**

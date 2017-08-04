@@ -69,3 +69,12 @@ function domain_content_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function domain_source_views_data_alter(array &$data) {
+  $table = 'node__' . DOMAIN_SOURCE_FIELD;
+  // Since domains are not stored in the database, relationships cannot be used.
+  unset($data[$table][DOMAIN_SOURCE_FIELD]['relationship']);
+}
