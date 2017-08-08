@@ -46,7 +46,7 @@ class DomainValidator implements DomainValidatorInterface {
   protected $entityTypeManager;
 
   /**
-   * Constructs a DomainNegotiator object.
+   * Constructs a DomainValidator object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
