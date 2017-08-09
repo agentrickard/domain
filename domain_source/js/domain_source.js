@@ -2,7 +2,7 @@
  * @file
  * Attaches behaviors for the Domain Source module.
  *
- * If Domain Access is present, we show.hide selected publishing domains. This approach
+ * If Domain Access is present, we show/hide selected publishing domains. This approach
  * currently only works with a select field.
  */
 (function ($) {
