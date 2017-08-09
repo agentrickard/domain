@@ -15,32 +15,44 @@
    */
   Drupal.behaviors.domainSourceAllowed = {
     attach: function () {
+
+      // Get the initial setting so that it can be reset.
+      var initialOption = $("#edit-field-domain-source").val();
+
+      // Onload, fire initial show/hide.
+      getDomains();
+
       // Get the domains selected by the domain access field.
-      var getDomains = function() {
+      function getDomains() {
         var domains = new Array();
-        $( "#edit-field-domain-access :checked" ).each(function(index, obj) {
+        $("#edit-field-domain-access :checked").each(function(index, obj) {
           domains.push(obj.value);
         });
         setOptions(domains);
       }
 
-      // Onload, fire initial settings.
-      getDomains();
-
-     // Based on selected domains, show/hide the selection options.
-     function setOptions(domains) {
-        $( "#edit-field-domain-source option" ).each(function(index, obj) {
+      // Based on selected domains, show/hide the selection options.
+      function setOptions(domains) {
+        $("#edit-field-domain-source option").each(function(index, obj) {
           if (jQuery.inArray(obj.value, domains) == -1 && obj.value != '_none') {
+            // If the current selection is removed, reset the selection to _none.
+            if ($("#edit-field-domain-source").val() == obj.value) {
+              $("#edit-field-domain-source").val('_none');
+            }
             $("#edit-field-domain-source option[value=" + obj.value + "]").hide();
           }
           else {
             $("#edit-field-domain-source option[value=" + obj.value + "]").show();
+            // If we reselected the initial value, reset the select option.
+            if (obj.value == initialOption) {
+              $("#edit-field-domain-source").val(obj.value);
+            }
           }
         });
       }
 
       // When the selections change, recalculate the select options.
-      $( "#edit-field-domain-access" ).on( "click", getDomains );
+      $( "#edit-field-domain-access" ).on( "change", getDomains );
     }
   };
 
