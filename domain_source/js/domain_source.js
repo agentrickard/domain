@@ -35,7 +35,6 @@
         });
       }
 
-
       $( "#edit-field-domain-access input" ).on( "click", getDomains );
       $( "#edit-field-domain-access option" ).on( "click", getDomains );
     }
