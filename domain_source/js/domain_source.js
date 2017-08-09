@@ -12,14 +12,17 @@
    */
   Drupal.behaviors.domainSourceAllowed = {
     attach: function () {
-      var countChecked = function() {
+      var getDomains = function() {
         var domains = new Array();
         $( "#edit-field-domain-access input:checked" ).each(function(index, obj) {
           domains.push(obj.value);
         });
+        $( "#edit-field-domain-access option:checked" ).each(function(index, obj) {
+          domains.push(obj.value);
+        });
         setOptions(domains);
       }
-      countChecked();
+      getDomains();
 
      function setOptions(domains) {
         $( "#edit-field-domain-source option" ).each(function(index, obj) {
@@ -33,7 +36,8 @@
       }
 
 
-      $( "#edit-field-domain-access input" ).on( "click", countChecked );
+      $( "#edit-field-domain-access input" ).on( "click", getDomains );
+      $( "#edit-field-domain-access option" ).on( "click", getDomains );
     }
   };
 
