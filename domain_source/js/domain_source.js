@@ -1,6 +1,9 @@
 /**
  * @file
  * Attaches behaviors for the Domain Source module.
+ *
+ * If Domain Access is present, we show.hide selected publishing domains. This approach
+ * currently only works with a select field.
  */
 (function ($) {
 
@@ -12,18 +15,19 @@
    */
   Drupal.behaviors.domainSourceAllowed = {
     attach: function () {
+      // Get the domains selected by the domain access field.
       var getDomains = function() {
         var domains = new Array();
-        $( "#edit-field-domain-access input:checked" ).each(function(index, obj) {
-          domains.push(obj.value);
-        });
-        $( "#edit-field-domain-access option:checked" ).each(function(index, obj) {
+        $( "#edit-field-domain-access :checked" ).each(function(index, obj) {
           domains.push(obj.value);
         });
         setOptions(domains);
       }
+
+      // Onload, fire initial settings.
       getDomains();
 
+     // Based on selected domains, show/hide the selection options.
      function setOptions(domains) {
         $( "#edit-field-domain-source option" ).each(function(index, obj) {
           if (jQuery.inArray(obj.value, domains) == -1 && obj.value != '_none') {
@@ -35,8 +39,8 @@
         });
       }
 
-      $( "#edit-field-domain-access input" ).on( "click", getDomains );
-      $( "#edit-field-domain-access option" ).on( "click", getDomains );
+      // When the selections change, recalculate the select options.
+      $( "#edit-field-domain-access" ).on( "click", getDomains );
     }
   };
 

@@ -169,6 +169,9 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
   // Add validation if Domain Access is installed.
   if (defined('DOMAIN_ACCESS_FIELD') && isset($form[DOMAIN_ACCESS_FIELD])) {
     $form[DOMAIN_SOURCE_FIELD]['#element_validate'] = array('domain_source_form_validate');
-    $form['#attached']['library'][] = 'domain_source/drupal.domain_source';
+    // If using a select field, load the JS to show/hide options.
+    if ($form[DOMAIN_SOURCE_FIELD]['widget']['#type'] == 'select') {
+      $form['#attached']['library'][] = 'domain_source/drupal.domain_source';
+    }
   }
 }
