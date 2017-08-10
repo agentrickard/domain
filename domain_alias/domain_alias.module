@@ -55,7 +55,11 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
 function domain_alias_domain_operations(DomainInterface $domain, AccountInterface $account) {
   $operations = [];
   // Check permissions.
-  if ($account->hasPermission('view domain aliases') || $account->hasPermission('administer domain aliases')) {
+  // @TODO: We're really trying to call DomainAliasAccessControlHandler::access() here.
+  // There may be a better way to handle that.
+  $user = \Drupal::service('entity_type.manager')->getStorage('user')->load($account->id());
+  $user_domains = \Drupal::service('domain.element_manager')->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+  if ($account->hasPermission('administer domain aliases') || (isset($user_domains[$domain->id()]) && $account->hasPermission('view domain aliases'))) {
     // Add aliases to the list.
     $id = $domain->id();
     $operations['domain_alias'] = array(

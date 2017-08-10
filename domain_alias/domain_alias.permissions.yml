@@ -2,13 +2,13 @@ administer domain aliases:
   title: 'Administer all domain aliases'
   restrict access: true
 create domain aliases:
-  title: 'Create domain aliases'
+  title: 'Create domain aliases for assigned domains'
   restrict access: true
 edit domain aliases:
-  title: 'Edit domain aliases'
+  title: 'Edit domain aliases for assigned domains'
   restrict access: true
 delete domain aliases:
-  title: 'Delete domain aliases'
+  title: 'Delete domain aliases for assigned domains'
   restrict access: true
 view domain aliases:
   title: 'View aliases for assigned domains'

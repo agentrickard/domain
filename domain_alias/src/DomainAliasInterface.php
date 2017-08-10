@@ -26,6 +26,14 @@ interface DomainAliasInterface extends ConfigEntityInterface {
   public function getDomainId();
 
   /**
+   * Get the parent domain entity for an alias record.
+   *
+   * @return \Drupal\domain\Entity\Domain
+   *   The parent domain for the alias record or NULL if not set.
+   */
+  public function getDomain();
+
+  /**
    * Get the redirect value (301|302|NULL) for an alias record.
    *
    * @return int
