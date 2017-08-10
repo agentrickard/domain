@@ -69,7 +69,7 @@ marked with [x] are considered complete.
 - [x] Replace / inject the storage manager in DomainLoader.
 - [ ] Write tests for Domain Content.
 - [x] Views access handler for domain content.
-- [ ] Restrict Domain Source options using JS
+- [x] Restrict Domain Source options using JS
 - [o] Recreate the Domain Theme module -- see https://www.drupal.org/project/domain_theme_switch
 - [ ] Advanced drush integration / complete labelled tasks
 - [ ] Check domain responses on configuration forms
@@ -101,7 +101,7 @@ marked with [x] are considered complete.
 - [x] Make all affiliates default value configurable
 - [ ] Cache in the DomainAccessManager
 - [ ] Remove deprecated `entity_get_form_display`
-- [ ] Review drupalUserIsLoggedIn() hack
+- [x] Review drupalUserIsLoggedIn() hack
 - [x] Review DomainNegotiatorTest for completeness
 - [x] Review core note in DomainEntityReferenceTest
 - [ ] Expand DomainActionsTest
