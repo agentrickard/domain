@@ -138,7 +138,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    * {@inheritdoc}
    */
   public function getActiveDomain($reset = FALSE) {
-    if ($reset) {
+    if ($reset || !isset($this->domain)) {
       $this->negotiateActiveDomain();
     }
     return $this->domain;

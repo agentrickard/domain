@@ -336,11 +336,7 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   static $active_domain;
   if (!isset($active_domain)) {
     // Ensure that the loader has run. In some tests, the kernel event has not.
-    $active = \Drupal::service('domain.negotiator')->getActiveDomain();
-    if (empty($active)) {
-      $active = \Drupal::service('domain.negotiator')->getActiveDomain(TRUE);
-    }
-    $active_domain = $active;
+    $active_domain = \Drupal::service('domain.negotiator')->getActiveDomain();
   }
   // Check to see that we have a valid active domain.
   // Without one, we cannot assert an opinion about access.
@@ -354,7 +350,6 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
 
   // In order to access update or delete, the user must be able to View.
   if ($op == 'view' && $manager->checkEntityAccess($node, $account)) {
-    /** @var \Drupal\user\UserInterface $user */
     if ($node->isPublished()) {
       $allowed = TRUE;
     }
