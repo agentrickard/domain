@@ -23,7 +23,8 @@ class DomainAliasController extends ControllerBase {
     // The entire purpose of this controller is to add the values from
     // the parent domain entity.
     $values['domain_id'] = $domain->id();
-    // @TODO: ensure that this value is present in all cases.
+
+    // Create the stub alias with reference to the parent domain.
     $alias = $this->entityTypeManager()->getStorage('domain_alias')->create($values);
 
     return $this->entityFormBuilder()->getForm($alias);
