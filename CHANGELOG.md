@@ -112,8 +112,8 @@ marked with [x] are considered complete.
 - [x] Inject the module handler service in DomainListBuilder::getOperations()
 - [x] `drush_domain_generate_domains()` has odd counting logic
 - [x] Separate permissions for Domain Alias
-- [ ] Check loader logic in the DomainSource PathProcessor
-- [ ] Check loader logic in Domain Access node_access
+- [x] Check loader logic in the DomainSource PathProcessor
+- [x] Check loader logic in Domain Access node_access
 - [x] Check id logic in Domain Alias list controller
 
 # Final
