@@ -114,7 +114,7 @@ marked with [x] are considered complete.
 - [x] Separate permissions for Domain Alias
 - [ ] Check loader logic in the DomainSource PathProcessor
 - [ ] Check loader logic in Domain Access node_access
-- [ ] Check id logic in Domain Alias list controller
+- [x] Check id logic in Domain Alias list controller
 
 # Final
 - [ ] Security review

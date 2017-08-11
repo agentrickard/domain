@@ -7,6 +7,7 @@
 
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiator;
+use Drupal\domain\DomainAccessControlHandler;
 use Drupal\Core\Url;
 use Drupal\Core\Session\AccountInterface;
 
@@ -54,13 +55,13 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
  */
 function domain_alias_domain_operations(DomainInterface $domain, AccountInterface $account) {
   $operations = [];
-  // Check permissions.
-  if ($account->hasPermission('view domain aliases') || $account->hasPermission('administer domain aliases')) {
-    // Add aliases to the list.
-    $id = $domain->id();
+  // Check permissions. The user must be a super-admin or assigned to the domain.
+  $is_domain_admin = $domain->access('update', $account);
+  if ($account->hasPermission('administer domain aliases') || ($is_domain_admin && $account->hasPermission('view domain aliases'))) {
+    // Add aliases to the list of operations.
     $operations['domain_alias'] = array(
       'title' => t('Aliases'),
-      'url' => Url::fromRoute('domain_alias.admin', array('domain' => $id)),
+      'url' => Url::fromRoute('domain_alias.admin', array('domain' => $domain->id())),
       'weight' => 60,
     );
   }
