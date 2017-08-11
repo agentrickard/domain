@@ -257,19 +257,18 @@ function drush_domain_generate_domains($primary = 'example.com') {
       $prepared[] = $value;
     }
   }
-  // Add any test domains.
-  if ($count > 15 || empty($prepared)) {
-    // @TODO fix this logic.
-    $start = 1;
-    $j = count($prepared);
-    for ($i = $start + 1; $j <= $count; $i++) {
-      $prepared[] = 'test' . $i . '.' . $primary;
-      $j++;
-    }
+  // Add any test domains that have numeric prefixes. We don't expect these URLs to work,
+  // and mainly use these for testing the user interface.
+  $needed = $count - count($prepared);
+  for ($i = 1; $i <= $needed; $i++) {
+    $prepared[] = 'test' . $i . '.' . $primary;
   }
+
   // Get the initial item weight for sorting.
   $start_weight = count($domains);
   $prepared = array_slice($prepared, 0, $count);
+
+  // Create the domains.
   foreach ($prepared as $key => $item) {
     $hostname = strtolower($item);
     $values = array(

@@ -110,7 +110,7 @@ marked with [x] are considered complete.
 - [ ] Caching strategies in DomainNegotiator
 - [ ] Caching strategies in DomainConfigOverrides
 - [x] Inject the module handler service in DomainListBuilder::getOperations()
-- [ ] `drush_domain_generate_domains()` has odd counting logic
+- [x] `drush_domain_generate_domains()` has odd counting logic
 - [x] Separate permissions for Domain Alias
 - [ ] Check loader logic in the DomainSource PathProcessor
 - [ ] Check loader logic in Domain Access node_access
