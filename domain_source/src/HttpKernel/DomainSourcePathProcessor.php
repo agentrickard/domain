@@ -58,13 +58,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     static $active_domain;
 
     if (!isset($active_domain)) {
-      // Ensure that the loader has run.
-      // In some tests, the kernel event has not.
-      $active = \Drupal::service('domain.negotiator')->getActiveDomain();
-      if (empty($active)) {
-        $active = \Drupal::service('domain.negotiator')->getActiveDomain(TRUE);
-      }
-      $active_domain = $active;
+      $active_domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     }
 
     // Only act on valid internal paths and when a domain loads.
