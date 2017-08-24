@@ -8,6 +8,13 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
 /**
  * Tests domain hooks documented in domain.api.php.
  *
+ * Note that the other hooks are covered by functional tests, since they involve UI
+ * elements.
+ *
+ * @see DomainReferencesTest
+ * @see DomainListBuilderTes
+ * @see DomainAliasNegotiatorTest
+ *
  * @group domain
  */
 class DomainHookTest extends DomainTestBase {
