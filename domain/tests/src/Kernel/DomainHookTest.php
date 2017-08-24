@@ -40,4 +40,20 @@ class DomainHookTest extends DomainTestBase {
     // External hooks.
     $this->assertTrue($domain->foo == 'bar', 'The foo property was set to <em>bar</em> by hook_domain_load.');
   }
+
+  /**
+   * Tests domain validation.
+   */
+  public function testHookDomainValidate() {
+    $validator = \Drupal::service('domain.validator');
+    // Test a good domain.
+    $errors = $validator->validate('example.com');
+    $this->assertEmpty($errors, 'No errors returned for example.com');
+
+    // Test our hook implementation.
+    $errors = $validator->validate('fail.example.com');
+    $this->assertNotEmpty($errors, 'Errors returned for fail.example.com');
+    $this->assertTrue(current($errors) == 'Fail.example.com cannot be registered', 'Error message returned correctly.');
+
+  }
 }

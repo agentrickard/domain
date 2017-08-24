@@ -118,7 +118,7 @@ class DomainValidator implements DomainValidatorInterface {
     }
 
     // Allow modules to alter this behavior.
-    $this->moduleHandler->invokeAll('domain_validate', array($error_list, $hostname));
+    $this->moduleHandler->alter('domain_validate', $error_list, $hostname);
 
     return $error_list;
   }
