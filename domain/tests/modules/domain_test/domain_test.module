@@ -5,6 +5,8 @@
  * Domain hook test module.
  */
 
+use Drupal\Core\Url;
+
 /**
  * Implements hook_domain_load().
  */

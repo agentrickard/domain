@@ -18,6 +18,7 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
  * @group domain
  */
 class DomainHookTest extends DomainTestBase {
+
   /**
    * Modules to enable.
    *
@@ -26,17 +27,26 @@ class DomainHookTest extends DomainTestBase {
   public static $modules = array('domain', 'domain_test');
 
   /**
-   * Tests domain loading.
+   * Domain id key.
    */
-  public function testHookDomainLoad() {
+  public $key = 'example_com';
+
+  /**
+   * Test setup.
+   */
+  protected function setUp() {
+    parent::setUp();
 
     // Create a domain.
     $this->domainCreateTestDomains();
+  }
 
-    // Check the created domain based on it's known id value.
-    $key = 'example_com';
-
-    $domain = \Drupal::service('domain.loader')->load($key);
+  /**
+   * Tests domain loading.
+   */
+  public function testHookDomainLoad() {
+    // Check the created domain based on its known id value.
+    $domain = \Drupal::service('domain.loader')->load($this->key);
 
     // Internal hooks.
     $path = $domain->getPath();
@@ -54,7 +64,7 @@ class DomainHookTest extends DomainTestBase {
   public function testHookDomainValidate() {
     $validator = \Drupal::service('domain.validator');
     // Test a good domain.
-    $errors = $validator->validate('example.com');
+    $errors = $validator->validate('one.example.com');
     $this->assertEmpty($errors, 'No errors returned for example.com');
 
     // Test our hook implementation.
@@ -67,16 +77,26 @@ class DomainHookTest extends DomainTestBase {
    * Tests domain request alteration.
    */
   public function testHookDomainRequestAlter() {
-
-    // Create a domain.
-    $this->domainCreateTestDomains();
-
     // Set the request.
     $negotiator = \Drupal::service('domain.negotiator');
     $negotiator->setRequestDomain($this->base_hostname);
 
     $domain = $negotiator->getActiveDomain();
     $this->assertTrue($domain->foo1 == 'bar1', 'The foo1 property was set to <em>bar1</em> by hook_domain_request_alter');
-
   }
+
+  /**
+   * Tests domain operations hook.
+   */
+  public function testHookDomainOperations() {
+    $domain = \Drupal::service('domain.loader')->load($this->key);
+
+    // Set the request.
+    $current_user = \Drupal::service('current_user');
+    $module_handler = \Drupal::service('module_handler');
+    $operations = $module_handler->invokeAll('domain_operations', array($domain, $current_user));
+
+    $this->assertTrue(isset($operations['domain_test']), 'Domain test operation loaded.');
+  }
+
 }
