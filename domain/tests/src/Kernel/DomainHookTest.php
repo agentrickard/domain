@@ -61,6 +61,22 @@ class DomainHookTest extends DomainTestBase {
     $errors = $validator->validate('fail.example.com');
     $this->assertNotEmpty($errors, 'Errors returned for fail.example.com');
     $this->assertTrue(current($errors) == 'Fail.example.com cannot be registered', 'Error message returned correctly.');
+  }
+
+  /**
+   * Tests domain request alteration.
+   */
+  public function testHookDomainRequestAlter() {
+
+    // Create a domain.
+    $this->domainCreateTestDomains();
+
+    // Set the request.
+    $negotiator = \Drupal::service('domain.negotiator');
+    $negotiator->setRequestDomain($this->base_hostname);
+
+    $domain = $negotiator->getActiveDomain();
+    $this->assertTrue($domain->foo1 == 'bar1', 'The foo1 property was set to <em>bar1</em> by hook_domain_request_alter');
 
   }
 }
