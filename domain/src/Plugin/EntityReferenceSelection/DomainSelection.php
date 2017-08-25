@@ -3,7 +3,7 @@
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
 use Drupal\user\Entity\User;
-use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
+use \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -17,7 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   weight = 1
  * )
  */
-class DomainSelection extends DefaultSelection {
+class DomainSelection extends SelectionPluginBase {
 
   /**
    * Sets the context for the alter hook.

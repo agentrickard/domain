@@ -17,9 +17,8 @@ default_value: {  }
 default_value_callback: ''
 settings:
   handler: 'domain:domain'
-  handler_settings:
-    target_bundles: null
-    sort:
-      field: weight
-      direction: ASC
+  target_bundles: null
+  sort:
+    field: weight
+    direction: ASC
 field_type: entity_reference
