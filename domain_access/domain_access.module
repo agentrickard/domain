@@ -533,9 +533,9 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
         'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['name'],
         'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
         'settings' => array(
-          'handler_settings' => array(
-            'sort' => array('field' => 'weight', 'direction' => 'ASC'),
-          ),
+          'handler' => 'default:domain',
+          'target_bundles' => NULL,
+          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
         ),
       );
       $field_config = $field_storage->create($field);

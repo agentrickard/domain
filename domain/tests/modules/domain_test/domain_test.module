@@ -13,3 +13,13 @@ function domain_test_domain_load(array $domains) {
     $domain->addProperty('foo', 'bar');
   }
 }
+
+/**
+ * Implements hook_domain_validate_alter().
+ */
+function domain_test_domain_validate_alter(&$error_list, $hostname) {
+  // Deliberate test fail.
+  if ($hostname == 'fail.example.com') {
+    $error_list[] = 'Fail.example.com cannot be registered';
+  }
+}
