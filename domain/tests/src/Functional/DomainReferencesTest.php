@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests behavior for hook_domain_references_alter().
@@ -12,7 +12,9 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
  *
  * @group domain
  */
-class DomainReferencesTest extends DomainTestBase {
+class DomainReferencesTest extends BrowserTestBase {
+
+  use DomainTestTrait;
 
   /**
    * Modules to enable.

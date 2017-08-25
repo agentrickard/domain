@@ -18,6 +18,9 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
  * @group domain
  */
 class DomainHookTest extends DomainTestBase {
+
+  use DomainTestTrait;
+
   /**
    * Modules to enable.
    *

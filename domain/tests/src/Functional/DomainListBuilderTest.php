@@ -2,14 +2,16 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests behavior for the domain list builder.
  *
  * @group domain
  */
-class DomainListBuilderTest extends DomainTestBase {
+class DomainListBuilderTest extends BrowserTestBase {
+
+  use DomainTestTrait;
 
   /**
    * Modules to enable.

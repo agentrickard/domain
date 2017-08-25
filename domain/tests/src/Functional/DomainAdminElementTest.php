@@ -2,14 +2,16 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Tests behavior for the domain admin field element.
  *
  * @group domain
  */
-class DomainAdminElementTest extends DomainTestBase {
+class DomainAdminElementTest extends BrowserTestBase {
+
+  use DomainTestTrait;
 
   /**
    * Modules to enable.

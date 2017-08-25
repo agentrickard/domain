@@ -8,7 +8,10 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\user\UserInterface;
 use Drupal\domain\DomainInterface;
 
-abstract class DomainTestBase extends BrowserTestBase {
+/**
+ * Contains helper classes for tests to set up various configuration.
+ */
+trait DomainTestTrait {
 
   /**
    * Sets a base hostname for running tests.
