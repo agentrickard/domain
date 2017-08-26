@@ -88,7 +88,7 @@ marked with [x] are considered complete.
 - [x] Allow selective access to domain record editing
 - [x] Allow access to actions based on assigned domain permissions
 - [ ] Implement theme functions or twig templates where proper
-- [ ] Tests for all module hooks
+- [x] Tests for all module hooks
 - [x] Proper tests for domain record validation
 - [x] Check test logic in testDomainAliasNegotiator()
 - [x] Test that sort logic in DomainAliasLoader matches what is documented
