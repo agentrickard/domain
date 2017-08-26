@@ -32,6 +32,21 @@ class DomainHookTest extends DomainTestBase {
   public $key = 'example_com';
 
   /**
+   * The domain loader service.
+   */
+  public $domainLoader;
+
+  /**
+   * The current user service.
+   */
+  public $currentUser;
+
+  /**
+   * The mondule handler service.
+   */
+  public $moduleHandler;
+
+  /**
    * Test setup.
    */
   protected function setUp() {
@@ -39,6 +54,11 @@ class DomainHookTest extends DomainTestBase {
 
     // Create a domain.
     $this->domainCreateTestDomains();
+
+    // Get the services.
+    $this->domainLoader = \Drupal::service('domain.loader');
+    $this->currentUser = \Drupal::service('current_user');
+    $this->moduleHandler = \Drupal::service('module_handler');
   }
 
   /**
@@ -46,7 +66,7 @@ class DomainHookTest extends DomainTestBase {
    */
   public function testHookDomainLoad() {
     // Check the created domain based on its known id value.
-    $domain = \Drupal::service('domain.loader')->load($this->key);
+    $domain = $this->domainLoader->load($this->key);
 
     // Internal hooks.
     $path = $domain->getPath();
@@ -67,7 +87,7 @@ class DomainHookTest extends DomainTestBase {
     $errors = $validator->validate('one.example.com');
     $this->assertEmpty($errors, 'No errors returned for example.com');
 
-    // Test our hook implementation.
+    // Test our hook implementation, which denies fail.example.com explicitly.
     $errors = $validator->validate('fail.example.com');
     $this->assertNotEmpty($errors, 'Errors returned for fail.example.com');
     $this->assertTrue(current($errors) == 'Fail.example.com cannot be registered', 'Error message returned correctly.');
@@ -81,6 +101,7 @@ class DomainHookTest extends DomainTestBase {
     $negotiator = \Drupal::service('domain.negotiator');
     $negotiator->setRequestDomain($this->base_hostname);
 
+    // Check that the property was added by our hook.
     $domain = $negotiator->getActiveDomain();
     $this->assertTrue($domain->foo1 == 'bar1', 'The foo1 property was set to <em>bar1</em> by hook_domain_request_alter');
   }
@@ -89,14 +110,48 @@ class DomainHookTest extends DomainTestBase {
    * Tests domain operations hook.
    */
   public function testHookDomainOperations() {
-    $domain = \Drupal::service('domain.loader')->load($this->key);
+    $domain = $this->domainLoader->load($this->key);
 
     // Set the request.
-    $current_user = \Drupal::service('current_user');
-    $module_handler = \Drupal::service('module_handler');
-    $operations = $module_handler->invokeAll('domain_operations', array($domain, $current_user));
+    $operations = $this->moduleHandler->invokeAll('domain_operations', array($domain, $this->currentUser));
 
+    // Test that our operations were added by the hook.
     $this->assertTrue(isset($operations['domain_test']), 'Domain test operation loaded.');
+  }
+
+  /**
+   * Tests domain references alter hook.
+   */
+  public function testHookDomainReferencesAlter() {
+    $domain = $this->domainLoader->load($this->key);
+
+    // Set the request.
+    $manager = \Drupal::service('entity.manager');
+    $target_type = 'domain';
+
+    // Build a node entity selection query.
+    $query = $manager->getStorage($target_type)->getQuery();
+    $context = [
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'field_type' => 'editor',
+    ];
+
+    // Run the alteration, which should add metadata to the query for nodes.
+    $this->moduleHandler->alter('domain_references', $query, $this->currentUser, $context);
+    $this->assertTrue($query->getMetaData('domain_test') == 'Test string', 'Domain test query altered.');
+
+    // Build a user entity selection query.
+    $query = $manager->getStorage($target_type)->getQuery();
+    $context = [
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'field_type' => 'admin',
+    ];
+
+    // Run the alteration, which does not add metadata for user queries.
+    $this->moduleHandler->alter('domain_references', $query, $this->currentUser, $context);
+    $this->assertEmpty($query->getMetaData('domain_test'), 'Domain test query not altered.');
   }
 
 }
