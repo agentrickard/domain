@@ -11,7 +11,6 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\user\Entity\User;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -434,35 +433,35 @@ function domain_access_entity_field_access($operation, FieldDefinitionInterface 
   $entity = $items->getEntity();
 
   if ($field_definition->getName() == DOMAIN_ACCESS_FIELD) {
-    if ($entity instanceof User) {
+    if ($entity instanceof AccountInterface) {
       $access = AccessResult::allowedIfHasPermissions($account, [
         'assign domain editors',
         'assign editors to any domain',
       ], 'OR');
     }
-    else {
+    elseif ($entity instanceof NodeInterface) {
       // Treat any other entity as content.
       $access = AccessResult::allowedIfHasPermissions($account, [
         'publish to any domain',
         'publish to any assigned domain',
       ], 'OR');
     }
-
     // allowedIfHasPermissions returns allowed() or neutral().
     // In this case, we want it to be forbidden,
     // if user doesn't have the permissions above.
-    if (!$access->isAllowed()) {
+    if (isset($access) && !$access->isAllowed()) {
       return AccessResult::forbidden();
     }
   }
   // Check permissions on the All Affiliates field.
   elseif ($field_definition->getName() == DOMAIN_ACCESS_ALL_FIELD) {
-    if ($entity instanceof User) {
+    if ($entity instanceof AccountInterface) {
       return AccessResult::forbiddenIf(!$account->hasPermission('assign editors to any domain'));
     }
-
-    // Treat any other entity as content.
-    return AccessResult::forbiddenIf(!$account->hasPermission('publish to any domain'));
+    elseif ($entity instanceof NodeInterface) {
+      // Treat any other entity as content.
+      return AccessResult::forbiddenIf(!$account->hasPermission('publish to any domain'));
+    }
   }
 
   return AccessResult::neutral();
