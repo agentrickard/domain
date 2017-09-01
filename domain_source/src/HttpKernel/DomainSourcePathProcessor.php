@@ -122,7 +122,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       $links = $entityType->getLinkTemplates();
 
       // Check that the route pattern is an entity template.
-      if (in_array($route_path, $links)) {
+      if ($route_path == $links['canonical']) {
         $parts = explode('/', $route_path);
         $i = 0;
         foreach ($parts as $part) {
