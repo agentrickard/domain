@@ -39,8 +39,13 @@ function domain_source_confirm_fields($entity_type, $bundle) {
       'description' => 'Select the canonical domain for this content.',
       'settings' => array(
         'handler' => 'default:domain',
+        // Handler_settings are deprecated but seem to be necessary here.
+        'handler_settings' => [
+          'target_bundles' => NULL,
+          'sort' => ['field' => 'weight', 'direction' => 'ASC'],
+        ],
         'target_bundles' => NULL,
-        'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+        'sort' => ['field' => 'weight', 'direction' => 'ASC'],
       ),
     );
     $field_config = $field_config_storage->create($field);

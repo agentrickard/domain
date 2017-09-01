@@ -533,8 +533,13 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
         'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
         'settings' => array(
           'handler' => 'default:domain',
+          // Handler_settings are deprecated but seem to be necessary here.
+          'handler_settings' => [
+            'target_bundles' => NULL,
+            'sort' => ['field' => 'weight', 'direction' => 'ASC'],
+          ],
           'target_bundles' => NULL,
-          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
+          'sort' => ['field' => 'weight', 'direction' => 'ASC'],
         ),
       );
       $field_config = $field_storage->create($field);
