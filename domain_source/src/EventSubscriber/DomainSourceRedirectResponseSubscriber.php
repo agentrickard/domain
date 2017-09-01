@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain\EventSubscriber;
+namespace Drupal\domain_source\EventSubscriber;
 
 use Drupal\Component\HttpFoundation\SecuredRedirectResponse;
 use Drupal\Core\Routing\LocalRedirectResponse;
@@ -12,7 +12,7 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 /**
  * Allows manipulation of the response object when performing a redirect.
  */
-class DomainRedirectResponseSubscriber extends RedirectResponseSubscriber {
+class DomainSourceRedirectResponseSubscriber extends RedirectResponseSubscriber {
 
   /**
    * Allows manipulation of the response object when performing a redirect.
@@ -39,9 +39,8 @@ class DomainRedirectResponseSubscriber extends RedirectResponseSubscriber {
         }
       }
     }
-    // Domain overrides core's functionality which causes an exception on
-    // external redirects. This is because domain access induces heavy conflict with
-    // this core functionality in some scenarios, especially with multilingual content.
+    // Domain source overrides core's functionality which causes an exception on
+    // external redirects, especially with multilingual content.
     if (($response->getStatusCode() == 301 || $response->getStatusCode() == 302) && !($response instanceof SecuredRedirectResponse)) {
       // SecuredRedirectResponse is an abstract class that requires a
       // concrete implementation. Default to TrustedRedirectResponse.
