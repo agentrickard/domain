@@ -5,6 +5,7 @@ namespace Drupal\domain_source\HttpKernel;
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Symfony\Component\HttpFoundation\Request;
@@ -122,7 +123,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       $links = $entityType->getLinkTemplates();
 
       // Check that the route pattern is an entity template.
-      if ($route_path == $links['canonical']) {
+      if (in_array($route_path, $links)) {
         $parts = explode('/', $route_path);
         $i = 0;
         foreach ($parts as $part) {
@@ -142,7 +143,25 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
         }
       }
     }
+    // For translatable entities, make sure we are loading the proper translation.
+    // This seems to be unreliable if we let core $entity->get(FIELD_NAME) handle it.
+    if (!empty($entity) && $entity->isTranslatable()) {
+      $langcode = NULL;
+      if (!empty($options['language'])) {
+        $langcode = $options['language']->getId();
+      }
+      else {
+        $language = \Drupal::languageManager()->getCurrentLanguage();
+        if ($language->getId() != LanguageInterface::LANGCODE_DEFAULT) {
+          $langcode = $language->getId();
+        }
+      }
+      if (!empty($langcode) && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
+        return $translation;
+      }
+    }
     return $entity;
   }
 
 }
+
