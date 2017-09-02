@@ -8,6 +8,7 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -72,13 +73,36 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     if (empty($active_domain) || empty($path) || !empty($options['external'])) {
       return $path;
     }
+
+    // Set the default source information.
     $source = NULL;
     $options['active_domain'] = $active_domain;
 
-    $entity = $this->getEntity($path, $options, 'node');
+    // Get the current language.
+    $langcode = NULL;
+    if (!empty($options['language'])) {
+      $langcode = $options['language']->getId();
+    }
 
+    // Load the entity to check, which right now only cares about nodes.
+    if (isset($options['entity_type']) && $options['entity_type'] == 'node') {
+      $entity = $options['entity'];
+    }
+    else {
+      $alias = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
+      $url = Url::fromUserInput($alias);
+      if ($url->getRouteName() == 'entity.node.canonical') {
+        $parameters = $url->getRouteParameters();
+        if (isset($parameters['node'])) {
+          $entity = \Drupal::entityTypeManager()->getStorage('node')->load($parameters['node']);
+        }
+      }
+    }
     // One hook for nodes.
     if (!empty($entity)) {
+      if (!empty($langcode) && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
+        $entity = $translation;
+      }
       if ($target_id = domain_source_get($entity)) {
         $source = $this->loader->load($target_id);
       }
@@ -109,7 +133,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    *
    * @return $entity|NULL
    */
-  public static function getEntity($path, $options, $type = 'node') {
+  public static function getEntity($path, $options, $type = 'node', $langcode = NULL) {
     $entity = NULL;
     if (isset($options['entity_type']) && $options['entity_type'] == $type) {
       $entity = $options['entity'];
@@ -135,10 +159,10 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
           }
         }
         // Get Node path if alias.
-        $node_path = \Drupal::service('path.alias_manager')->getPathByAlias($path);
+        $node_path = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
         // Look! We're using arg() in Drupal 8 because we have to.
         $args = explode('/', $node_path);
-        if (isset($args[$i])) {
+        if (isset($args[$i]) && Url::fromUserInput($node_path)->getRouteName() == 'entity.node.canonical') {
           $entity = \Drupal::entityTypeManager()->getStorage($type)->load($args[$i]);
         }
       }
