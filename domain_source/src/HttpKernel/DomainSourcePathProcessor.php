@@ -90,7 +90,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     else {
       $alias = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
-      $url = Url::fromUserInput($alias);
+      $url = Url::fromUserInput($alias, $options);
       if ($url->getRouteName() == 'entity.node.canonical') {
         $parameters = $url->getRouteParameters();
         if (isset($parameters['node'])) {
