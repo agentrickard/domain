@@ -10,7 +10,7 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
  *
  * @group domain_source
  */
-class DomainSourceUrlTests extends DomainTestBase {
+class DomainSourceUrlTest extends DomainTestBase {
 
   /**
    * Modules to enable.
