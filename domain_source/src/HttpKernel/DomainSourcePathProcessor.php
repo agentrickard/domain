@@ -83,23 +83,35 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     if (!empty($options['language'])) {
       $langcode = $options['language']->getId();
     }
+    // Get the URL object for this request.
+    $alias = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
+    $url = Url::fromUserInput($alias, $options);
 
-    // Load the entity to check, which right now only cares about nodes.
-    if (isset($options['entity_type']) && $options['entity_type'] == 'node') {
+    // Load the entity to check
+    if (!empty($options['entity'])) {
       $entity = $options['entity'];
     }
     else {
-      $alias = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
-      $url = Url::fromUserInput($alias, $options);
-      if ($url->getRouteName() == 'entity.node.canonical') {
-        $parameters = $url->getRouteParameters();
-        if (isset($parameters['node'])) {
-          $entity = \Drupal::entityTypeManager()->getStorage('node')->load($parameters['node']);
+      $parameters = $url->getRouteParameters();
+      if (!empty($parameters)) {
+        try {
+          $entity_type = key($parameters);
+          $repository = \Drupal::service('entity_type.repository');
+          $types = $repository->getEntityTypeLabels('content');
+          $entity_types = array_flip(array_keys($types['Content']));
+          $manager = \Drupal::entityTypeManager();
+          if (!empty($entity_type) && isset($entity_types[$entity_type])) {
+            $storage = $manager->getDefinition($entity_type);
+            $entity = $manager->getStorage($entity_type)->load($parameters[$entity_type]);
+          }
+        }
+        catch(Exception $e) {
+          // @TODO error capture.
         }
       }
     }
-    // One hook for nodes.
-    if (!empty($entity)) {
+    // One hook for entities.
+    if (!empty($entity) && $this->allowedRoute($url->getRouteName())) {
       if (!empty($langcode) && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
         $entity = $translation;
       }
@@ -185,6 +197,10 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       }
     }
     return $entity;
+  }
+
+  public function allowedRoute($name) {
+    return TRUE;
   }
 
 }
