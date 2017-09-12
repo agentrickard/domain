@@ -1,0 +1,4 @@
+domain_source.settings:
+  title: Domain Source settings
+  route_name: domain_source.settings
+  base_route: domain.admin

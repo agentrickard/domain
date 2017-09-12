@@ -1,0 +1,10 @@
+domain_source.settings:
+  type: config_object
+  label: 'Domain Source settings'
+  mapping:
+    exclude_routes:
+      type: sequence
+      label: 'Disable link rewrites for specific entity routes.'
+      sequence:
+        type: string
+        label: 'Route'

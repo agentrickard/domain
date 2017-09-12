@@ -1,0 +1,6 @@
+domain_source.settings:
+  title: Domain Source settings
+  route_name: domain_source.settings
+  parent: domain.admin
+  description: 'Domain Source settings'
+  weight: 15
