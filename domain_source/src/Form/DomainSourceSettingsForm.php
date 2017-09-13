@@ -27,6 +27,10 @@ class DomainSourceSettingsForm extends ConfigFormBase {
     $manager = \Drupal::entityTypeManager();
     $routes = $manager->getDefinition('node')->getLinkTemplates();
     foreach ($routes as $route => $path) {
+      // Some parts of the system prepend drupal:, which the routing
+      // system doesn't use. The routing system also uses underscores instead
+      // of dashes. Because Drupal.
+      $route = str_replace(['-', 'drupal:'], ['_', ''], $route);
       $options[$route] = $route;
     }
     $config = $this->config('domain_source.settings');

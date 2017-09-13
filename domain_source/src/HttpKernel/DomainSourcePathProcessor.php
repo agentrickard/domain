@@ -171,11 +171,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     $config = \Drupal::config('domain_source.settings');
     $exclude = array_flip($config->get('exclude_routes', []));
     $parts = explode('.', $name);
-    // The %$#@!#@ route names are munged in different parts of the
-    // system. The entity keys use dashes, and the routing system
-    // uses underscores, so an exact match isn't possible.
-    $route_name = str_replace('_', '-', end($parts));
-
+    $route_name = end($parts);
     // Config is stored as an array. Empty items are not excluded.
     return !isset($exclude[$route_name]);
   }
