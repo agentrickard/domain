@@ -87,31 +87,24 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     $alias = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
     $url = Url::fromUserInput($alias, $options);
 
-    // Load the entity to check
-    if (!empty($options['entity'])) {
-      $entity = $options['entity'];
-    }
-    else {
-      $parameters = $url->getRouteParameters();
-      if (!empty($parameters)) {
-        try {
-          $entity_type = key($parameters);
-          $repository = \Drupal::service('entity_type.repository');
-          $types = $repository->getEntityTypeLabels('content');
-          $entity_types = array_flip(array_keys($types['Content']));
-          $manager = \Drupal::entityTypeManager();
-          if (!empty($entity_type) && isset($entity_types[$entity_type])) {
-            $storage = $manager->getDefinition($entity_type);
-            $entity = $manager->getStorage($entity_type)->load($parameters[$entity_type]);
-          }
-        }
-        catch(Exception $e) {
-          // @TODO error capture.
+    // Check the route, if available. Entities can be configured to
+    // only rewrite specific routes.
+    if ($this->allowedRoute($url->getRouteName())) {
+      // Load the entity to check
+      if (!empty($options['entity'])) {
+        $entity = $options['entity'];
+      }
+      else {
+        // @TODO: Move this to the getEntity() method.
+        $parameters = $url->getRouteParameters();
+        if (!empty($parameters)) {
+          $entity = $this->getEntity($parameters);
         }
       }
     }
     // One hook for entities.
-    if (!empty($entity) && $this->allowedRoute($url->getRouteName())) {
+    if (!empty($entity)) {
+      // Enmsure we send the right translation.
       if (!empty($langcode) && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
         $entity = $translation;
       }
@@ -134,73 +127,57 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   }
 
   /**
-   * Derive entity data from a given path.
+   * Derive entity data from a given route's parameters.
    *
-   * @param $path
-   *   The drupal path, e.g. /node/2.
-   * @param $options array
-   *   The options passed to the path processor.
-   * @param $type
-   *   The entity type to check.
+   * @param $parameters
+   *   An array of route parameters.
    *
    * @return $entity|NULL
    */
-  public static function getEntity($path, $options, $type = 'node', $langcode = NULL) {
+  public static function getEntity($parameters) {
     $entity = NULL;
-    if (isset($options['entity_type']) && $options['entity_type'] == $type) {
-      $entity = $options['entity'];
-    }
-    elseif (isset($options['route'])) {
-      // Derive the route pattern and check that it maps to the expected entity
-      // type.
-      $route_path = $options['route']->getPath();
-      $entityManager = \Drupal::entityTypeManager();
-      $entityType = $entityManager->getDefinition($type);
-      $links = $entityType->getLinkTemplates();
-
-      // Check that the route pattern is an entity template.
-      if (in_array($route_path, $links)) {
-        $parts = explode('/', $route_path);
-        $i = 0;
-        foreach ($parts as $part) {
-          if (!empty($part)) {
-            $i++;
-          }
-          if ($part == '{' . $type . '}') {
-            break;
-          }
-        }
-        // Get Node path if alias.
-        $node_path = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
-        // Look! We're using arg() in Drupal 8 because we have to.
-        $args = explode('/', $node_path);
-        if (isset($args[$i]) && Url::fromUserInput($node_path)->getRouteName() == 'entity.node.canonical') {
-          $entity = \Drupal::entityTypeManager()->getStorage($type)->load($args[$i]);
-        }
+    try {
+      $entity_type = key($parameters);
+      // @TODO: Load statically / inject.
+      $repository = \Drupal::service('entity_type.repository');
+      $types = $repository->getEntityTypeLabels('content');
+      $entity_types = array_flip(array_keys($types['Content']));
+      // @TODO: Load statically / inject.
+      $manager = \Drupal::entityTypeManager();
+      if (!empty($entity_type) && isset($entity_types[$entity_type])) {
+        $storage = $manager->getDefinition($entity_type);
+        $entity = $manager->getStorage($entity_type)->load($parameters[$entity_type]);
       }
     }
-    // For translatable entities, make sure we are loading the proper translation.
-    // This seems to be unreliable if we let core $entity->get(FIELD_NAME) handle it.
-    if (!empty($entity) && $entity->isTranslatable()) {
-      $langcode = NULL;
-      if (!empty($options['language'])) {
-        $langcode = $options['language']->getId();
-      }
-      else {
-        $language = \Drupal::languageManager()->getCurrentLanguage();
-        if ($language->getId() != LanguageInterface::LANGCODE_DEFAULT) {
-          $langcode = $language->getId();
-        }
-      }
-      if (!empty($langcode) && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
-        return $translation;
-      }
+    catch(Exception $e) {
+      // @TODO error capture.
     }
     return $entity;
   }
 
+  /**
+   * Checks that a route's common name is not disallowed.
+   *
+   * Looks at the name (e.g. canonical) of the route without regard for
+   * the entity type.
+   *
+   * @parameter $name
+   *   The route name being checked.
+   *
+   * @return boolean
+   */
   public function allowedRoute($name) {
-    return TRUE;
+    // @TODO: Load statically / inject.
+    $config = \Drupal::config('domain_source.settings');
+    $exclude = array_flip($config->get('exclude_routes', []));
+    $parts = explode('.', $name);
+    // The %$#@!#@ route names are munged in different parts of the
+    // system. The entity keys use dashes, and the routing system
+    // uses underscores, so an exact match isn't possible.
+    $route_name = str_replace('_', '-', end($parts));
+
+    // Config is stored as an array. Empty items are not excluded.
+    return !isset($exclude[$route_name]);
   }
 
 }
