@@ -76,6 +76,13 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   protected $excludedRoutes;
 
   /**
+   * The active domain request.
+   *
+   * @var Drupal\domain\DomainInterface
+   */
+  protected $activeDomain;
+
+  /**
    * Constructs a DomainSourcePathProcessor object.
    *
    * @param \Drupal\domain\DomainLoaderInterface $loader
@@ -104,17 +111,8 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processOutbound($path, &$options = array(), Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
-    static $active_domain;
-
-    if (!isset($active_domain)) {
-      // Ensure that the loader has run.
-      // In some tests, the kernel event has not.
-      $active = $this->negotiator->getActiveDomain();
-      if (empty($active)) {
-        $active = $this->negotiator->getActiveDomain(TRUE);
-      }
-      $active_domain = $active;
-    }
+    // Load the active domain.
+    $active_domain = $this->getActiveDomain();
 
     // Only act on valid internal paths and when a domain loads.
     if (empty($active_domain) || empty($path) || !empty($options['external'])) {
@@ -142,7 +140,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
         $entity = $options['entity'];
       }
       else {
-        // @TODO: Move this to the getEntity() method.
         $parameters = $url->getRouteParameters();
         if (!empty($parameters)) {
           $entity = $this->getEntity($parameters);
@@ -158,6 +155,8 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       if ($target_id = domain_source_get($entity)) {
         $source = $this->loader->load($target_id);
       }
+      $options['entity'] = $entity;
+      $options['entity_type'] = $entity->getEntityTypeId();
       $this->moduleHandler->alter('domain_source', $source, $path, $options);
     }
     // One for other, because the latter is resource-intensive.
@@ -205,7 +204,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * @return boolean
    */
   public function allowedRoute($name) {
-    // @TODO: Load statically / inject.
     $excluded = $this->getExcludedRoutes();
     $parts = explode('.', $name);
     $route_name = end($parts);
@@ -242,5 +240,22 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     return $this->excludedRoutes;
   }
 
+  /**
+   * Gets the settings for domain source path rewrites.
+   *
+   * @return array
+   */
+  public function getActiveDomain() {
+    if (!isset($this->activeDomain)) {
+      // Ensure that the loader has run.
+      // In some tests, the kernel event has not.
+      $active = $this->negotiator->getActiveDomain();
+      if (empty($active)) {
+        $active = $this->negotiator->getActiveDomain(TRUE);
+      }
+      $this->activeDomain = $active;
+    }
+    return $this->activeDomain;
+  }
 }
 

@@ -6,15 +6,18 @@
  */
 
 /**
- * Allows modules to specify the target domain for a node.
+ * Allows modules to specify the target domain for an entity.
  *
  * There is no return value for this hook. Modify $source by reference by
  * loading a valid domain record or set $source = NULL to discard an existing
- * $source value and not rewrite the path. *
+ * $source value and not rewrite the path.
  *
- * Note that $options['entity'] is the node for the path request and
- * $options['entity_type'] is the type of entity. These values have already
- * been verified before this hook is called.
+ * Note that $options['entity'] is the entity for the path request and
+ * $options['entity_type'] is the type of entity (e.g. 'node').
+ * These values have already been verified before this hook is called.
+ *
+ * If the entity's path is a translation, the requested translation of the
+ * entity will be passed as the $entity value.
  *
  * @param \Drupal\domain\Entity\Domain|NULL &$source
  *   A domain object or NULL if not set.
@@ -32,14 +35,11 @@ function hook_domain_source_alter(&$source, $path, $options) {
 /**
  * Allows modules to specify the target link for a Drupal path.
  *
- * Note: This hook is not meant to be used for node paths, which
+ * Note: This hook is not meant to be used for node or entity paths, which
  * are handled by hook_domain_source_alter(). This hook is split
  * from hook_domain_source_alter() for better performance.
  *
- * Note that hook_domain_source_alter() only applies to nodes. It is possible
- * that other entities may be passed here.  If set, $options['entity'] is the
- * entity for the path request and $options['entity_type'] is its type.
- * These values have _not_ been verified before this hook is called.
+ * Note that hook_domain_source_alter() only paths that are not content entities.
  *
  * Currently, no modules in the package implement this hook.
  *
