@@ -8,7 +8,9 @@ use Drupal\Core\Cache\CacheableResponseTrait;
 use Drupal\Core\Routing\CacheableSecuredRedirectResponse;
 use Drupal\Core\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Http\TrustedHostsRequestFactory;
 
 /**
  * Provides a redirect response which understands domain URLs are local to the install.
@@ -95,6 +97,12 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
       throw new \InvalidArgumentException('A path was passed when a fully qualified domain was expected.');
     }
 
+    // Check that the host name is registered with trusted hosts.
+    $trusted = $this->checkTrustedHost($url_parts['host']);
+    if (!$trusted) {
+      return FALSE;
+    }
+
     // Check that the requested $url is registered.
     $negotiator = \Drupal::service('domain.negotiator');
     $registered_domain = $negotiator->isRegisteredDomain($url_parts['host']);
@@ -110,4 +118,17 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
     }
   }
 
+  public function checkTrustedHost($host) {
+    try {
+      $request_factory = new TrustedHostsRequestFactory($host);
+
+      Request::setFactory([
+        $request_factory,
+        'createRequest',
+      ]);
+    } catch (\UnexpectedValueException $e) {
+      return FALSE;
+    }
+    return TRUE;
+  }
 }
