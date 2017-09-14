@@ -44,6 +44,7 @@ class DomainSourceUrlTest extends DomainTestBase {
     $route_parameters = ['node' => 1];
     $uri = 'entity:' . $path;
     $uri_path = '/' . $path;
+    $options = [];
 
     // Get the link using Url::fromRoute().
     $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
