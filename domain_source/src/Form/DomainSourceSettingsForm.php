@@ -26,6 +26,7 @@ class DomainSourceSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $manager = \Drupal::entityTypeManager();
     $routes = $manager->getDefinition('node')->getLinkTemplates();
+
     foreach ($routes as $route => $path) {
       // Some parts of the system prepend drupal:, which the routing
       // system doesn't use. The routing system also uses underscores instead
