@@ -84,6 +84,12 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    *   The domain negotiator.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface
+   *   The entity type manager.
+   * @param \Drupal\Core\Path\AliasManagerInterface
+   *   The path alias manager.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface
+   *   The config factory.
    */
   public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
     $this->loader = $loader;
@@ -92,7 +98,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     $this->typeManager = $type_manager;
     $this->aliasManager = $alias_manager;
     $this->configFactory = $config_factory;
-
   }
 
   /**
@@ -236,5 +241,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     return $this->excludedRoutes;
   }
+
 }
 
