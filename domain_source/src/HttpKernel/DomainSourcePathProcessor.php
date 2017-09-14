@@ -4,6 +4,9 @@ namespace Drupal\domain_source\HttpKernel;
 
 use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Path\AliasManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
@@ -38,6 +41,41 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   protected $moduleHandler;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $typeManager;
+
+  /**
+   * The path alias manager.
+   *
+   * @var \Drupal\Core\Path\AliasManagerInterface
+   */
+  protected $aliasManager;
+
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * An array of content entity types.
+   *
+   * @var array
+   */
+  protected $entityTypes;
+
+  /**
+   * An array of routes exclusion settings, keyed by route.
+   *
+   * @var array
+   */
+  protected $excludedRoutes;
+
+  /**
    * Constructs a DomainSourcePathProcessor object.
    *
    * @param \Drupal\domain\DomainLoaderInterface $loader
@@ -47,10 +85,14 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
-  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler) {
+  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
     $this->loader = $loader;
     $this->negotiator = $negotiator;
     $this->moduleHandler = $module_handler;
+    $this->typeManager = $type_manager;
+    $this->aliasManager = $alias_manager;
+    $this->configFactory = $config_factory;
+
   }
 
   /**
@@ -62,9 +104,9 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     if (!isset($active_domain)) {
       // Ensure that the loader has run.
       // In some tests, the kernel event has not.
-      $active = \Drupal::service('domain.negotiator')->getActiveDomain();
+      $active = $this->negotiator->getActiveDomain();
       if (empty($active)) {
-        $active = \Drupal::service('domain.negotiator')->getActiveDomain(TRUE);
+        $active = $this->negotiator->getActiveDomain(TRUE);
       }
       $active_domain = $active;
     }
@@ -84,7 +126,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       $langcode = $options['language']->getId();
     }
     // Get the URL object for this request.
-    $alias = \Drupal::service('path.alias_manager')->getPathByAlias($path, $langcode);
+    $alias = $this->aliasManager->getPathByAlias($path, $langcode);
     $url = Url::fromUserInput($alias, $options);
 
     // Check the route, if available. Entities can be configured to
@@ -134,23 +176,14 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    *
    * @return $entity|NULL
    */
-  public static function getEntity($parameters) {
+  public function getEntity($parameters) {
     $entity = NULL;
-    try {
-      $entity_type = key($parameters);
-      // @TODO: Load statically / inject.
-      $repository = \Drupal::service('entity_type.repository');
-      $types = $repository->getEntityTypeLabels('content');
-      $entity_types = array_flip(array_keys($types['Content']));
-      // @TODO: Load statically / inject.
-      $manager = \Drupal::entityTypeManager();
+    $entity_type = key($parameters);
+    $entity_types = $this->getEntityTypes();
+    foreach ($parameters as $entity_type => $value) {
       if (!empty($entity_type) && isset($entity_types[$entity_type])) {
-        $storage = $manager->getDefinition($entity_type);
-        $entity = $manager->getStorage($entity_type)->load($parameters[$entity_type]);
+        $entity = $this->typeManager->getStorage($entity_type)->load($value);
       }
-    }
-    catch(Exception $e) {
-      // @TODO error capture.
     }
     return $entity;
   }
@@ -168,13 +201,40 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    */
   public function allowedRoute($name) {
     // @TODO: Load statically / inject.
-    $config = \Drupal::config('domain_source.settings');
-    $exclude = array_flip($config->get('exclude_routes', []));
+    $excluded = $this->getExcludedRoutes();
     $parts = explode('.', $name);
     $route_name = end($parts);
     // Config is stored as an array. Empty items are not excluded.
-    return !isset($exclude[$route_name]);
+    return !isset($excluded[$route_name]);
   }
 
+  /**
+   * Gets an array of content entity types, keyed by type.
+   *
+   * @return array
+   */
+  public function getEntityTypes() {
+    if (!isset($this->entityTypes)) {
+      foreach ($this->typeManager->getDefinitions() as $type => $definition) {
+        if ($definition->getGroup() == 'content') {
+          $this->entityTypes[$type] = $type;
+        }
+      }
+    }
+    return $this->entityTypes;
+  }
+
+  /**
+   * Gets the settings for domain source path rewrites.
+   *
+   * @return array
+   */
+  public function getExcludedRoutes() {
+    if (!isset($this->excludedRoutes)) {
+      $config = $this->configFactory->get('domain_source.settings');
+      $this->excludedRoutes = array_flip($config->get('exclude_routes', []));
+    }
+    return $this->excludedRoutes;
+  }
 }
 
