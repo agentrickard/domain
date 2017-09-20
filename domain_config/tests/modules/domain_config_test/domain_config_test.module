@@ -1,6 +1,10 @@
 <?php
 
+use Drupal\domain\DomainInterface;
+
 /**
- * @file
- * Domain config test module.
+ * Implements hook_domain_request_alter().
  */
+function domain_config_test_domain_request_alter(DomainInterface &$domain) {
+  $domain->addProperty('config_test', 'aye');
+}
