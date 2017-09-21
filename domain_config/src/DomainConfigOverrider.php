@@ -54,6 +54,13 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   protected $languageManager;
 
   /**
+   * Indicates that the request context is set.
+   *
+   * @var boolean
+   */
+  protected $contextSet;
+
+  /**
    * Constructs a DomainConfigSubscriber object.
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
@@ -79,7 +86,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
       return $overrides;
     }
-    if (empty($this->domain)) {
+    if (empty($this->contextSet)) {
       $this->initiateContext();
     }
     if (!empty($this->domain)) {
@@ -165,18 +172,20 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   protected function initiateContext() {
     // Prevent infinite lookups by caching the request. Since the _construct()
     // is called for each lookup, this is more efficient.
-    static $context;
-    if ($context) {
-      return;
-    }
-    $context++;
+    $this->contextSet = TRUE;
+
     // Get the language context. Note that injecting the language manager
     // into the service created a circular dependency error, so we load from
     // the core service manager.
     $this->languageManager = \Drupal::languageManager();
     $this->language = $this->languageManager->getCurrentLanguage();
+
     // Get the domain context.
-    $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
+    $this->domain = $this->domainNegotiator->getActiveDomain();
+    // If we have fired too early in the bootstrap, we must force the routine to run.
+    if (empty($this->domain)) {
+      $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
+    }
   }
 
 }
