@@ -24,7 +24,7 @@ class DomainConfigAlterHookTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_config', 'domain_config_test');
+  public static $modules = array('domain', 'domain_config', 'domain_config_test', 'domain_config_middleware_test');
 
   /**
    * Domain id key.
@@ -69,7 +69,7 @@ class DomainConfigAlterHookTest extends DomainTestBase {
 
     // Check that the property was added by our hook.
     $domain = $this->negotiator->getActiveDomain();
-    $this->assertTrue($domain->config_test == 'aye', 'The config_test property was set to <em>aye</em> by hook_domain_request_alter');
+    $this->assertTrue($domain->get('config_test') == 'aye', 'The config_test property was set to <em>aye</em> by hook_domain_request_alter');
   }
 
 }

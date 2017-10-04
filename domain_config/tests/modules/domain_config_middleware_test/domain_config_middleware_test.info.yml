@@ -1,0 +1,11 @@
+name: "Domain config middleware module tests"
+description: "Support module for domain config middleware response testing."
+type: module
+package: Testing
+version: VERSION
+core: 8.x
+hidden: TRUE
+
+dependencies:
+  - domain
+  - domain_config
