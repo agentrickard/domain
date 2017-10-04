@@ -155,7 +155,9 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function getCacheableMetadata($name) {
-    $this->initiateContext();
+    if (empty($this->contextSet)) {
+      $this->initiateContext();
+    }
     $metadata = new CacheableMetadata();
     if (!empty($this->domain)) {
       $metadata->addCacheContexts(['url.site', 'languages:language_interface']);
