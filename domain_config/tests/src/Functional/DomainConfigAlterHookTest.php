@@ -63,13 +63,6 @@ class DomainConfigAlterHookTest extends DomainTestBase {
     $hooks = $this->moduleHandler->getImplementations('domain_request_alter');
     $this->assertCount(1, $hooks, 'One hook implementation found.');
 
-    // Set the request.
-    $this->negotiator->setRequestDomain($this->base_hostname);
-
-    // Check that the property was added by our hook.
-    $domain = $this->negotiator->getActiveDomain();
-    $this->assertEquals('aye', $domain->get('config_test'), 'The config_test property was set to <m>aye</m> by hook_domain_request_alter');
-
     // Assert that the hook is also called on a request with a HTTP Middleware
     // that requests config thus triggering an early hook invocation (before
     // modules are loaded by the kernel).
