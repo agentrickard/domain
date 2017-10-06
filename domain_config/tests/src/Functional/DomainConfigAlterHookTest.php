@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\domain_config\Kernel;
+namespace Drupal\Tests\domain_config\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
@@ -24,7 +24,7 @@ class DomainConfigAlterHookTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_config', 'domain_config_test');
+  public static $modules = array('domain', 'domain_config', 'domain_config_test', 'domain_config_middleware_test');
 
   /**
    * Domain id key.
@@ -59,17 +59,15 @@ class DomainConfigAlterHookTest extends DomainTestBase {
    * Tests domain request alteration.
    */
   public function testHookDomainRequestAlter() {
-
     // Check for the count of hook implementations.
     $hooks = $this->moduleHandler->getImplementations('domain_request_alter');
-    $this->assertTrue(count($hooks) == 1, 'One hook implementation found.');
+    $this->assertCount(1, $hooks, 'One hook implementation found.');
 
-    // Set the request.
-    $this->negotiator->setRequestDomain($this->base_hostname);
-
-    // Check that the property was added by our hook.
-    $domain = $this->negotiator->getActiveDomain();
-    $this->assertTrue($domain->config_test == 'aye', 'The config_test property was set to <em>aye</em> by hook_domain_request_alter');
+    // Assert that the hook is also called on a request with a HTTP Middleware
+    // that requests config thus triggering an early hook invocation (before
+    // modules are loaded by the kernel).
+    $this->drupalGet('<front>');
+    $this->assertEquals('invoked', $this->drupalGetHeader('X-Domain-Config-Test-page-attachments-hook'));
   }
 
 }

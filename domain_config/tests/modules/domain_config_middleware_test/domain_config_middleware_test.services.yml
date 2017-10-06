@@ -1,0 +1,8 @@
+services:
+  domain_config_test.middleware:
+    class: Drupal\domain_config_middleware_test\Middleware
+    arguments: ['@config.factory']
+    tags:
+      # Ensure to come before page caching, so you don't serve cached pages to
+      # banned users.
+      - { name: http_middleware, priority: 250 }
