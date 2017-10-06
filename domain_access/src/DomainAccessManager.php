@@ -44,7 +44,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * @inheritdoc
    */
-  public function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
+  public static function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
     // @TODO: static cache.
     $list = array();
     // @TODO In tests, $entity is returning NULL.
@@ -57,7 +57,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     if (!empty($values)) {
       foreach ($values as $item) {
         if ($target = $item->getValue()) {
-          if ($domain = $this->loader->load($target['target_id'])) {
+          if ($domain = \Drupal::entityTypeManager()->getStorage('domain')->load($target['target_id'])) {
             $list[$domain->id()] = $domain->getDomainId();
           }
         }
