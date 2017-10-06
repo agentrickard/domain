@@ -49,6 +49,8 @@ class DomainFormsTest extends DomainTestBase {
 
     // Update the record.
     $edit['name'] = 'Foo';
+    // Unset the machine id, which cannot be edited.
+    unset($edit['id']);
     $this->drupalPostForm($editUrl, $edit, $this->t('Save'));
 
     // Check that the update succeeded.
