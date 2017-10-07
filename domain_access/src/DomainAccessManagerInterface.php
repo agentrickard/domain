@@ -24,7 +24,7 @@ interface DomainAccessManagerInterface {
    * @return array
    *   The domain access field values.
    */
-  public function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD);
+  public static function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD);
 
   /**
    * Get the all affiliates field values from an entity.
