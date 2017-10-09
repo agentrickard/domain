@@ -56,6 +56,10 @@ class DomainInactiveTest extends DomainTestBase {
 
     // @TODO: configure more paths and test.
 
+    // @TODO: Check against trusted host patterns.
+
+    // @TODO: Write a Domain Source redirect test against trusted hsot patterns.
+
     // Try to access with the proper permission.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));
     // Must flush cache because we did not resave the domain.
