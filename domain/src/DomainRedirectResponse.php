@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Http\TrustedHostsRequestFactory;
+use Drupal\Core\Site\Settings;
 
 /**
  * Provides a redirect response which understands domain URLs are local to the install.
@@ -29,6 +30,20 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
    * @var \Drupal\Core\Routing\RequestContext
    */
   protected $requestContext;
+
+  /**
+   * The trusted host patterns.
+   *
+   * @var array
+   */
+  protected static $trustedHostPatterns;
+
+  /**
+   * The trusted hosts matched by the settings.
+   *
+   * @var array
+   */
+  protected static $trustedHosts;
 
   /**
    * {@inheritdoc}
@@ -76,7 +91,7 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
    *
    * This method replaces the logic in
    * Drupal\Component\Utility\UrlHelper::externalIsLocal(). Since that class is not
-   * directly replaceable, we have to replace it.
+   * directly extendable, we have to replace it.
    *
    * @param string $url
    *   A string containing an external URL, such as "http://example.com/foo".
@@ -98,7 +113,7 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
     }
 
     // Check that the host name is registered with trusted hosts.
-    $trusted = $this->checkTrustedHost($url_parts['host']);
+    $trusted = self::checkTrustedHost($url_parts['host']);
     if (!$trusted) {
       return FALSE;
     }
@@ -118,17 +133,42 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
     }
   }
 
-  public function checkTrustedHost($host) {
-    try {
-      $request_factory = new TrustedHostsRequestFactory($host);
-
-      Request::setFactory([
-        $request_factory,
-        'createRequest',
-      ]);
-    } catch (\UnexpectedValueException $e) {
-      return FALSE;
+  /**
+   * Checks that a host is registered with trusted_host_patterns.
+   *
+   * This method is cribbed from Symfony's Request::getHost() method.
+   *
+   * @param string $host
+   *   The hostname to check.
+   *
+   * @return bool
+   *   TRUE if the hostname matches the trusted_host_patterns.
+   */
+  public static function checkTrustedHost($host) {
+    if (!isset(self::$trustedHostPatterns)) {
+      self::$trustedHostPatterns = Settings::get('trusted_host_patterns', []);
     }
+    // Trim and remove port number from host. Host is lowercase as per RFC 952/2181
+    $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
+
+    // In the original Symfony code, hostname validation runs here. We have removed that
+    // portion because Domains are already validated on creation.
+
+    if (count(self::$trustedHostPatterns) > 0) {
+      // To avoid host header injection attacks, you should provide a list of trusted host patterns
+      if (in_array($host, self::$trustedHosts)) {
+        return TRUE;
+      }
+      foreach (self::$trustedHostPatterns as $pattern) {
+        if (preg_match($pattern, $host)) {
+          self::$trustedHosts[] = $host;
+          return TRUE;
+        }
+      }
+      throw new \UnexpectedValueException(sprintf('Untrusted Host "%s"', $host));
+    }
+    // In cases where trusted_host_patterns are not set, allow all. This is flagged as a
+    // security issue by Drupal core in the Reports UI.
     return TRUE;
   }
 }

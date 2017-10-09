@@ -5,6 +5,7 @@ namespace Drupal\domain\EventSubscriber;
 use Drupal\domain\Access\DomainAccessCheck;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainRedirectResponse;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -103,7 +104,13 @@ class DomainSubscriber implements EventSubscriberInterface {
       }
       if (isset($redirect_status)) {
         // Pass a redirect if necessary.
-        $response = new TrustedRedirectResponse($domain_url, $redirect_status);
+        if (DomainRedirectResponse::checkTrustedHost($domain_url)) {
+          $response = new TrustedRedirectResponse($domain_url, $redirect_status);
+        }
+        else {
+          $response = new Response();
+          $response->setStatusCode(404);
+        }
         $event->setResponse($response);
       }
     }
