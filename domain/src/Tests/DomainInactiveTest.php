@@ -70,7 +70,7 @@ class DomainInactiveTest extends DomainTestBase {
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
-    $this->drupalGet('http://foo.example.com');
+    $this->drupalGet('http://three.' . $this->base_hostname);
     $this->assertRaw('The provided host name is not valid for this server.');
     $this->drupalGet($domain->getPath());
     $this->assertResponse(200, 'Request to trusted domain allowed.');
