@@ -25,7 +25,7 @@ class DomainSourceUrlTest extends DomainTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Create 5 domains.
+    // Create 2 domains.
     DomainTestBase::domainCreateTestDomains(2);
   }
 
