@@ -54,12 +54,6 @@ class DomainInactiveTest extends DomainTestBase {
     $this->drupalGet($url);
     $this->assertResponse(200, 'Request to reset password on inactive domain allowed.');
 
-    // @TODO: configure more paths and test.
-
-    // @TODO: Check against trusted host patterns.
-
-    // @TODO: Write a Domain Source redirect test against trusted hsot patterns.
-
     // Try to access with the proper permission.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));
     // Must flush cache because we did not resave the domain.
@@ -67,6 +61,19 @@ class DomainInactiveTest extends DomainTestBase {
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
     $this->drupalGet($domain->getPath());
     $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the inactive domain with permission.');
+
+    // Check against trusted host patterns.
+    $settings['settings']['trusted_host_patterns'] = (object) [
+      'value' => ['^' . $this->base_hostname . '$',
+                  '^one.' . $this->base_hostname . '$',
+                  '^two.' . $this->base_hostname . '$'],
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+    $this->drupalGet('http://foo.example.com');
+    $this->assertRaw('The provided host name is not valid for this server.');
+    $this->drupalGet($domain->getPath());
+    $this->assertResponse(200, 'Request to trusted domain allowed.');
   }
 
 }
