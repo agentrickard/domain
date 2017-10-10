@@ -8,6 +8,7 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\domain\DomainRedirectResponse;
 
 /**
  * Defines the name of the source domain field.
@@ -155,10 +156,13 @@ function domain_source_form_submit(&$form, \Drupal\Core\Form\FormStateInterface 
   // that a scheme value will be present.
   if (!empty($url)) {
     $uri_parts = parse_url($url);
-    // If necessary, issue a TrustedRedirectResponse to the new URL.
-    if (!empty($uri_parts['scheme'])) {
-      $response = new TrustedRedirectResponse($url);
-      $form_state->setResponse($response);
+    // If necessary and secure, issue a TrustedRedirectResponse to the new URL.
+    if (!empty($uri_parts['host'])) {
+      // Pass a redirect if necessary.
+      if (DomainRedirectResponse::checkTrustedHost($uri_parts['host'])) {
+        $response = new TrustedRedirectResponse($url);
+        $form_state->setResponse($response);
+      }
     }
   }
 }
