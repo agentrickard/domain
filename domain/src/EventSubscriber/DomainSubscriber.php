@@ -82,13 +82,14 @@ class DomainSubscriber implements EventSubscriberInterface {
     // Negotiate the request and set domain context.
     /** @var \Drupal\domain\DomainInterface $domain */
     if ($domain = $this->domainNegotiator->getActiveDomain(TRUE)) {
+      $hostname = $domain->getHostname();
       $domain_url = $domain->getUrl();
       if ($domain_url) {
         $redirect_status = $domain->getRedirect();
         $path = trim($event->getRequest()->getPathInfo(), '/');
         // If domain negotiation asked for a redirect, issue it.
         if (is_null($redirect_status) && $this->accessCheck->checkPath($path)) {
-        // Else check for active domain or inactive access.
+          // Else check for active domain or inactive access.
           /** @var \Drupal\Core\Access\AccessResult $access */
           $access = $this->accessCheck->access($this->account);
           // If the access check fails, reroute to the default domain.
@@ -99,12 +100,13 @@ class DomainSubscriber implements EventSubscriberInterface {
             $default = $this->domainLoader->loadDefaultDomain();
             $domain_url = $default->getUrl();
             $redirect_status = 302;
+            $hostname = $default->getHostname();
           }
         }
       }
       if (isset($redirect_status)) {
         // Pass a redirect if necessary.
-        if (DomainRedirectResponse::checkTrustedHost($domain_url)) {
+        if (DomainRedirectResponse::checkTrustedHost($hostname)) {
           $response = new TrustedRedirectResponse($domain_url, $redirect_status);
         }
         else {
