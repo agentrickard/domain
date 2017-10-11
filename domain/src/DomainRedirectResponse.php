@@ -147,6 +147,7 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
   public static function checkTrustedHost($host) {
     if (!isset(self::$trustedHostPatterns)) {
       self::$trustedHostPatterns = Settings::get('trusted_host_patterns', []);
+      self::$trustedHosts = [];
     }
     // Trim and remove port number from host. Host is lowercase as per RFC 952/2181
     $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
