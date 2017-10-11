@@ -48,11 +48,12 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
     $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
     $this->assertTrue($url == $expected, 'fromRoute');
 
-    // Set the trusted host patterns, but exclude one domain.
+    // Set up two additional domains.
+    $domain2 = $domains['two_example_com'];
+
     // Check against trusted host patterns.
     $settings['settings']['trusted_host_patterns'] = (object) [
-      'value' => ['^' . $this->base_hostname . '$',
-                  '^two.' . $this->base_hostname . '$'],
+      'value' => ['^' . preg_quote($domain2->getHostname()) . '$'],
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
@@ -61,12 +62,10 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
     $this->assertRaw('The provided host name is not valid for this server.');
 
     // Now switch the node to a domain that is trusted.
-    $id2 = 'two_example_com';
-    $node->{DOMAIN_SOURCE_FIELD} = $id2;
+    $node->{DOMAIN_SOURCE_FIELD} = $domain2->id();
     $node->save();
     // Get the link using Url::fromRoute().
-    $source = $domains[$id2];
-    $expected = $source->getPath() . $path;
+    $expected = $domain2->getPath() . $path;
     $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
     // Assert that the URL is what we expect.
     $this->assertTrue($url == $expected, 'fromRoute');
