@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Sets the domain context for an http request.
@@ -104,7 +105,7 @@ class DomainSubscriber implements EventSubscriberInterface {
           }
         }
       }
-      if (isset($redirect_status)) {
+      if (!empty($redirect_status)) {
         // Pass a redirect if necessary.
         if (DomainRedirectResponse::checkTrustedHost($hostname)) {
           $response = new TrustedRedirectResponse($domain_url, $redirect_status);

@@ -60,7 +60,6 @@ class DomainInactiveTest extends DomainTestBase {
     drupal_flush_all_caches();
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
     $this->drupalGet($domain->getPath());
-    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the inactive domain with permission.');
 
     // Check against trusted host patterns.
     $settings['settings']['trusted_host_patterns'] = (object) [
@@ -72,8 +71,10 @@ class DomainInactiveTest extends DomainTestBase {
     $this->writeSettings($settings);
     $this->drupalGet('http://three.' . $this->base_hostname);
     $this->assertRaw('The provided host name is not valid for this server.');
+    // Test a trusted host.
     $this->drupalGet($domain->getPath());
-    $this->assertResponse(200, 'Request to trusted domain allowed.' . $domain->getPath());
+    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the inactive domain with permission.');
+    $this->assertResponse(200, 'Request to trusted host allowed.');
   }
 
 }
