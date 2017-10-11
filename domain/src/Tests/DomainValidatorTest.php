@@ -67,9 +67,10 @@ class DomainValidatorTest extends DomainTestBase {
       $this->assertEqual($expected_message, $e->getMessage());
     }
     // Test the two configurable options.
-    $config = $this->config('domain.settings');
-    $config->set('www_prefix', true)->save();
-    $config->set('allow_non_ascii', true)->save();
+    $config = \Drupal::configFactory()->getEditable('domain.settings');
+    $config->set('www_prefix', TRUE)->save();
+    $config->set('allow_non_ascii', TRUE)->save();
+    drupal_flush_all_caches();
     // Valid hostnames to test. Valid is the boolean value.
     $hostnames = [
       'www.example.com' => 0, // no www-prefix allowed
