@@ -111,8 +111,8 @@ class DomainSubscriber implements EventSubscriberInterface {
           $response = new TrustedRedirectResponse($domain_url, $redirect_status);
         }
         else {
-          $response = new Response();
-          $response->setStatusCode(404);
+          // If the redirect is not to a registered hostname, reject the request.
+          $response = new Response('The provided host name is not a valid redirect.', 401);
         }
         $event->setResponse($response);
       }

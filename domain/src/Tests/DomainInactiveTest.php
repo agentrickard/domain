@@ -78,17 +78,17 @@ class DomainInactiveTest extends DomainTestBase {
     user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('access inactive domains'));
 
     $domain2->saveDefault();
-    drupal_flush_all_caches();
+
     // Test the trusted host, which should redirect to default.
     $this->drupalGet($domain->getPath());
-    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Redirected from the inactive domain.');
+    $this->assertTrue($domain2->getPath() == $this->getUrl(), 'Redirected from the inactive domain.');
     $this->assertResponse(200, 'Request to trusted host allowed.');
 
     // Test another inactive domain that is not trusted.
     // Disable the domain and test for redirect.
     $domain3->saveDefault();
     $this->drupalGet($domain->getPath());
-    $this->assertRaw('The provided host name is not valid for this server.');
+    $this->assertRaw('The provided host name is not a valid redirect.');
   }
 
 }

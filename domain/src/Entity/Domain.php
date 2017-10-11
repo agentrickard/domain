@@ -357,6 +357,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     parent::postSave($storage, $update);
     // Invalidate cache tags relevant to domains.
     \Drupal::service('cache_tags.invalidator')->invalidateTags(['rendered', 'url.site']);
+    // Clear the cache.
+    drupal_flush_all_caches();
   }
 
   /**
@@ -375,6 +377,10 @@ class Domain extends ConfigEntityBase implements DomainInterface {
         $action->delete();
       }
     }
+    // Invalidate cache tags relevant to domains.
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['rendered', 'url.site']);
+    // Clear the cache.
+    drupal_flush_all_caches();
   }
 
   /**

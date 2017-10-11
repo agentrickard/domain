@@ -142,11 +142,16 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
    *   The hostname to check.
    *
    * @return bool
-   *   TRUE if the hostname matches the trusted_host_patterns.
+   *   TRUE if the hostname matches the trusted_host_patterns. FALSE otherwise.
+   *   It is the caller's responsibility to deal with this result securely.
    */
   public static function checkTrustedHost($host) {
+    // See Request::setTrustedHosts();
     if (!isset(self::$trustedHostPatterns)) {
-      self::$trustedHostPatterns = Settings::get('trusted_host_patterns', []);
+      self::$trustedHostPatterns = array_map(function ($hostPattern) {
+          return sprintf('#%s#i', $hostPattern);
+      }, Settings::get('trusted_host_patterns', []));
+      // Reset the trusted host match array.
       self::$trustedHosts = [];
     }
     // Trim and remove port number from host. Host is lowercase as per RFC 952/2181
@@ -154,7 +159,6 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
 
     // In the original Symfony code, hostname validation runs here. We have removed that
     // portion because Domains are already validated on creation.
-
     if (count(self::$trustedHostPatterns) > 0) {
       // To avoid host header injection attacks, you should provide a list of trusted host patterns
       if (in_array($host, self::$trustedHosts)) {
@@ -166,7 +170,7 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
           return TRUE;
         }
       }
-      throw new \UnexpectedValueException(sprintf('Untrusted Host "%s"', $host));
+      return FALSE;
     }
     // In cases where trusted_host_patterns are not set, allow all. This is flagged as a
     // security issue by Drupal core in the Reports UI.
