@@ -68,8 +68,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
     }
     // 4) Check that the alias doesn't contain any invalid characters.
     // Check for valid characters, unless using non-ASCII domains.
-    // @TODO: In the DomainAliasValidatorTest, the configFactory object is not working.
-    $non_ascii = \Drupal::configFactory()->get('domain.settings')->get('allow_non_ascii');
+    $non_ascii = $this->configFactory->get('domain.settings')->get('allow_non_ascii');
     if (!$non_ascii) {
       $check = preg_match('/^[a-z0-9\.\+\-\*\?:]*$/', $pattern);
       if ($check == 0) {

@@ -97,8 +97,7 @@ class DomainValidator implements DomainValidatorInterface {
       $error_list[] = $this->t('The domain must not end with a dot (.)');
     }
     // Check for valid characters, unless using non-ASCII domains.
-    // @TODO: In the DomainValidatorTest, the configFactory object is not working.
-    $config = \Drupal::configFactory()->get('domain.settings');
+    $config = $this->configFactory->get('domain.settings');
     $non_ascii = $config->get('allow_non_ascii');
     if (!$non_ascii) {
       $pattern = '/^[a-z0-9\.\-:]*$/i';
