@@ -154,6 +154,7 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
       // Reset the trusted host match array.
       self::$trustedHosts = [];
     }
+
     // Trim and remove port number from host. Host is lowercase as per RFC 952/2181
     $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
 

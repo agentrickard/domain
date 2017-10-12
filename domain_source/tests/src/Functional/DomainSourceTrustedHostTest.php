@@ -53,7 +53,7 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
 
     // Check against trusted host patterns.
     $settings['settings']['trusted_host_patterns'] = (object) [
-      'value' => ['^' . preg_quote($domain2->getHostname()) . '$'],
+      'value' => ['^' . $this->prepareTrustedHostname($domain2->getHostname()) . '$'],
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
