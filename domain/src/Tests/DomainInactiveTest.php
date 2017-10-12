@@ -84,6 +84,9 @@ class DomainInactiveTest extends DomainTestBase {
     $this->assertTrue($domain2->getPath() == $this->getUrl(), 'Redirected from the inactive domain.');
     $this->assertResponse(200, 'Request to trusted host allowed.');
 
+    // The redirect is cached, so we must flush cache to test again.
+    drupal_flush_all_caches();
+
     // Test another inactive domain that is not trusted.
     // Disable the domain and test for redirect.
     $domain3->saveDefault();
