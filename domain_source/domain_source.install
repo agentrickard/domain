@@ -12,6 +12,11 @@
  * files because we have an unknown number of node types.
  */
 function domain_source_install() {
+  if (\Drupal::isConfigSyncing()) {
+    // Configuration is assumed to already be checked by the config importer
+    // validation events.
+    return;
+  }
   // Assign domain source to bundles.
   $list = array();
   $node_types = \Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple();

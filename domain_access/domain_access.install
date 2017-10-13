@@ -12,6 +12,11 @@
  * files because we have an unknown number of node types.
  */
 function domain_access_install() {
+  if (\Drupal::isConfigSyncing()) {
+    // Configuration is assumed to already be checked by the config importer
+    // validation events.
+    return;
+  }
   // Assign domain access to bundles.
   $list['user'] = 'user';
 
