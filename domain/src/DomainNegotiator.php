@@ -186,4 +186,29 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     return $this->httpHost;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function isRegisteredDomain($hostname) {
+    // Direct hostname match always passes.
+    if ($domain = $this->domainLoader->loadByHostname($hostname)) {
+      return TRUE;
+    }
+    // Check for registered alias matches.
+    $values = array('hostname' => $httpHost);
+    /** @var \Drupal\domain\Entity\DomainInterface $domain */
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
+    $domain->setMatchType(self::DOMAIN_MATCH_NONE);
+
+    // Now check with modules (like Domain Alias) that register alternate
+    // lookup systems with the main module.
+    $this->moduleHandler->alter('domain_request', $domain);
+
+    // We must have registered a valid id, else the request made no match.
+    if (!empty($domain->id())) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }

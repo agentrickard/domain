@@ -16,23 +16,15 @@ services:
       - { name: 'context_provider' }
   domain.creator:
     class: Drupal\domain\DomainCreator
-    tags:
-      - { name: persist }
     arguments: ['@domain.loader', '@domain.negotiator']
   domain.element_manager:
     class: Drupal\domain\DomainElementManager
-    tags:
-      - { name: persist }
     arguments: ['@domain.loader']
   domain.loader:
     class: Drupal\domain\DomainLoader
-    tags:
-      - { name: persist }
     arguments: ['@config.typed', '@config.factory']
   domain.negotiator:
     class: Drupal\domain\DomainNegotiator
-    tags:
-      - { name: persist }
     arguments: ['@request_stack', '@module_handler', '@domain.loader', '@config.factory']
   domain.subscriber:
     class: Drupal\domain\EventSubscriber\DomainSubscriber
@@ -41,11 +33,7 @@ services:
     arguments: ['@domain.negotiator', '@domain.loader', '@access_check.domain', '@current_user']
   domain.token:
     class: Drupal\domain\DomainToken
-    tags:
-      - { name: persist }
     arguments: ['@domain.loader', '@domain.negotiator']
   domain.validator:
     class: Drupal\domain\DomainValidator
-    tags:
-      - { name: persist }
     arguments: ['@module_handler', '@config.factory', '@http_client', '@entity_type.manager']

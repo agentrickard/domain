@@ -68,8 +68,9 @@ class DomainValidatorTest extends DomainTestBase {
     }
     // Test the two configurable options.
     $config = $this->config('domain.settings');
-    $config->set('www_prefix', true)->save();
-    $config->set('allow_non_ascii', true)->save();
+    $config->set('www_prefix', true);
+    $config->set('allow_non_ascii', true);
+    $config->save();
     // Valid hostnames to test. Valid is the boolean value.
     $hostnames = [
       'www.example.com' => 0, // no www-prefix allowed

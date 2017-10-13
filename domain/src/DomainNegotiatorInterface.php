@@ -78,4 +78,14 @@ interface DomainNegotiatorInterface {
    */
   public function getActiveDomain($reset = FALSE);
 
+  /**
+   * Checks that a URL's hostname is registered as a valid domain or alias.
+   *
+   * @param string $hostname
+   *   A string representing the hostname of the request (e.g. example.com).
+   *
+   * @return boolean
+   */
+  public function isRegisteredDomain($hostname);
+
 }

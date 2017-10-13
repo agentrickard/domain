@@ -198,4 +198,18 @@ abstract class DomainTestBase extends WebTestBase {
     }
   }
 
+  /**
+   * Converts a domain hostname to a trusted host pattern.
+   *
+   * @param $hostname
+   *   A hostname string.
+   *
+   * @return
+   *   A regex-safe hostname, without delimiters.
+   */
+  public function prepareTrustedHostname($hostname) {
+    $hostname = strtolower(preg_replace('/:\d+$/', '', trim($hostname)));
+    return preg_quote($hostname);
+  }
+
 }

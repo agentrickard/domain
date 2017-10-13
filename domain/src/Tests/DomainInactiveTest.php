@@ -3,6 +3,7 @@
 namespace Drupal\domain\Tests;
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\user\RoleInterface;
 
 /**
  * Tests the access rules and redirects for inactive domains.
@@ -26,12 +27,12 @@ class DomainInactiveTest extends DomainTestBase {
     $site_config = $this->config('system.site');
     $site_config->set('page.front', '/node')->save();
 
-    // Create three new domains programmatically.
-    $this->domainCreateTestDomains(3);
+    // Create four new domains programmatically.
+    $this->domainCreateTestDomains(4);
     $domains = \Drupal::service('domain.loader')->loadMultiple();
 
-    // Grab the last domain for testing.
-    $domain = end($domains);
+    // Grab a known domain for testing.
+    $domain = $domains['two_example_com'];
     $this->drupalGet($domain->getPath());
     $this->assertTrue($domain->status(), 'Tested domain is set to active.');
     $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the active domain.');
@@ -54,15 +55,43 @@ class DomainInactiveTest extends DomainTestBase {
     $this->drupalGet($url);
     $this->assertResponse(200, 'Request to reset password on inactive domain allowed.');
 
-    // @TODO: configure more paths and test.
-
     // Try to access with the proper permission.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));
     // Must flush cache because we did not resave the domain.
     drupal_flush_all_caches();
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
     $this->drupalGet($domain->getPath());
-    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the inactive domain with permission.');
+
+    // Set up two additional domains.
+    $domain2 = $domains['one_example_com'];
+    $domain3 = $domains['three_example_com'];
+
+    // Check against trusted host patterns.
+    $settings['settings']['trusted_host_patterns'] = (object) [
+      'value' => ['^' . $this->prepareTrustedHostname($domain->getHostname()) . '$',
+                  '^' . $this->prepareTrustedHostname($domain2->getHostname()) . '$'],
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
+
+    // Revoke the permission change.
+    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('access inactive domains'));
+
+    $domain2->saveDefault();
+
+    // Test the trusted host, which should redirect to default.
+    $this->drupalGet($domain->getPath());
+    $this->assertTrue($domain2->getPath() == $this->getUrl(), 'Redirected from the inactive domain.');
+    $this->assertResponse(200, 'Request to trusted host allowed.');
+
+    // The redirect is cached, so we must flush cache to test again.
+    drupal_flush_all_caches();
+
+    // Test another inactive domain that is not trusted.
+    // Disable the domain and test for redirect.
+    $domain3->saveDefault();
+    $this->drupalGet($domain->getPath());
+    $this->assertRaw('The provided host name is not a valid redirect.');
   }
 
 }

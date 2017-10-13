@@ -1,0 +1,7 @@
+domain_source.settings:
+  path: '/admin/config/domain/domain_source'
+  defaults:
+    _title: 'Domain Source settings'
+    _form: '\Drupal\domain_source\Form\DomainSourceSettingsForm'
+  requirements:
+    _permission: 'administer domains'
