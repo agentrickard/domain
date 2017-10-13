@@ -84,8 +84,15 @@ function domain_preprocess_html(array &$variables) {
   $config = \Drupal::config('domain.settings');
   if ($string = $config->get('css_classes')) {
     $token = \Drupal::token();
-    // Prepare the class properly.
-    $variables['attributes']['class'][] = Html::getClass($token->replace($string));
+    // Prepare the classes proparly, with one class per string.
+    $classes = explode(' ', trim($string));
+    foreach ($classes as $class) {
+      // Ensure no leading or trailing space.
+      $class = trim($class);
+      if (!empty($class)) {
+        $variables['attributes']['class'][] = Html::getClass($token->replace($class));
+      }
+    }
   }
 }
 

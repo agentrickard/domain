@@ -57,6 +57,20 @@ class DomainCSSTest extends DomainTestBase {
       $text = '<body class="' . Html::getClass($domain->id() . '-class');
       $this->assertRaw($text, 'Custom CSS present.' . $text);
     }
+
+    // Set the css classes.
+    $config = $this->config('domain.settings');
+    $config->set('css_classes', '[domain:machine-name]-class [domain:name]-class')->save();
+    // Test the response of the default home page.
+    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+      // The render cache trips up this test. In production, it may be
+      // necessary to add the url.site cache context. See README.md.
+      drupal_flush_all_caches();
+      $this->drupalGet($domain->getPath());
+      $text = '<body class="' . Html::getClass($domain->id() . '-class') . ' ' . Html::getClass($domain->label() . '-class');
+      $this->assertRaw($text, 'Custom CSS present.' . $text);
+    }
+
   }
 
 }
