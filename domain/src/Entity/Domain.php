@@ -388,8 +388,30 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     // unique numeric id for each domain. In some systems (Windows?) we have
     // reports of crc32 returning a negative number. Issue #2794047.
     // If we don't use hash(), then crc32() returns different results for 32- and 64-bit
-    // systems. See #2908236.
-    $this->domain_id = abs(hexdec(hash('crc32', $this->id())));
+    // systems. On 32-bit systems, the number returned may also be too large for PHP.
+    // See #2908236.
+    $id = hash('crc32', $this->id());
+    $id = abs(hexdec(substr($id, 0, -2)));
+    $this->createNumericId($id);
+  }
+
+  /**
+   * Creates a unique numeric id for use in the {node_access} table.
+   *
+   * @param integer $id
+   *   An integer to ue as the numeric id.
+   */
+  public function createNumericId($id) {
+    // Ensure that this value is unique.
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
+    $result = $storage->loadByProperties(array('domain_id' => $id));
+    if (empty($result)) {
+      $this->domain_id = $id;
+    }
+    else {
+      $id++;
+      $this->createNumericId($id);
+    }
   }
 
   /**
