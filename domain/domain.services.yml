@@ -3,7 +3,7 @@ services:
     class: Drupal\domain\Access\DomainAccessCheck
     tags:
       - { name: access_check }
-    arguments: ['@domain.negotiator', '@config.factory']
+    arguments: ['@domain.negotiator', '@config.factory', '@path.matcher']
   access_check.domain_route:
     class: Drupal\domain\Access\DomainRouteCheck
     tags:
