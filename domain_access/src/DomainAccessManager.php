@@ -52,7 +52,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
       return $list;
     }
     // Get the values of an entity.
-    $values = $entity->get($field_name);
+    $values = $entity->hasField($field_name) ? $entity->get($field_name) : NULL;
     // Must be at least one item.
     if (!empty($values)) {
       foreach ($values as $item) {
