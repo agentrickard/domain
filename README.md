@@ -74,6 +74,12 @@ To do so, clone  `default.services.yml` to `services.yml` and change the
 cross-domain login requires the sharing of a top-level domain, so a setting like
 `*.example.com` will work for all `example.com` subdomains.
 
+Example:
+
+```
+cookie_domain: '.example.com'
+```
+
 See https://www.drupal.org/node/2391871.
 
 Cross-Site HTTP requests (CORS)
