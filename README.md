@@ -93,7 +93,7 @@ particularly entity references, when the AJAX request goes to another domain.
 This feature is not enabled by default because there are security consequences. See
 https://www.drupal.org/node/2715637 for more information and instructions.
 
-To enable CORS for all sites, copy `default.services.yml` to `services.yml` and enable
+To enable CORS for all domains, copy `default.services.yml` to `services.yml` and enable
 the following lines:
 
 ```
