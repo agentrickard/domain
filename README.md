@@ -76,6 +76,43 @@ cross-domain login requires the sharing of a top-level domain, so a setting like
 
 See https://www.drupal.org/node/2391871.
 
+Cross-Site HTTP requests (CORS)
+------
+As of Drupal 8.2, it's possible to allow a particular site to enable CORS for responses
+served by Drupal.
+
+In the case of Domain, allowing CORS may remove AJAX errors caused when using some forms,
+particularly entity references, when the AJAX request goes to another domain.
+
+This feature is not enabled by default because there are security consequences. See
+https://www.drupal.org/node/2715637 for more information and instructions.
+
+To enable CORS for all sites, copy `default.services.yml` to `services.yml` and enable
+the following lines:
+
+```
+   # Configure Cross-Site HTTP requests (CORS).
+   # Read https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+   # for more information about the topic in general.
+   # Note: By default the configuration is disabled.
+  cors.config:
+    enabled: false
+    # Specify allowed headers, like 'x-allowed-header'.
+    allowedHeaders: []
+    # Specify allowed request methods, specify ['*'] to allow all possible ones.
+    allowedMethods: []
+    # Configure requests allowed from specific origins.
+    allowedOrigins: ['*']
+    # Sets the Access-Control-Expose-Headers header.
+    exposedHeaders: false
+    # Sets the Access-Control-Max-Age header.
+    maxAge: false
+    # Sets the Access-Control-Allow-Credentials header.
+    supportsCredentials: false
+```
+
+The key here is setting `enabled` to `false`.
+
 Trusted host settings
 ------
 
