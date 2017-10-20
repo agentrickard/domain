@@ -46,7 +46,14 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
         $domain->setRedirect($redirect);
       }
     }
-    // @TODO: error capture?
+    else {
+      // If the domain did not load, report an error.
+      \Drupal::logger('domain_alias')->error('Found matching alias %alias for host request %hostname, but failed to load matching domain with id %id.',
+       ['%alias' => $alias->getPattern(),
+        '%hostname' => $hostname,
+        '%id' => $alias->getDomainId(),
+       ]);
+    }
   }
 }
 
