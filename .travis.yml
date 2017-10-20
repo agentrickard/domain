@@ -26,8 +26,8 @@ env:
     - PATH="$PATH:$HOME/.composer/vendor/bin"
 
   matrix:
-    - DRUPAL=8.3.x
     - DRUPAL=8.4.x
+    - DRUPAL=8.5.x
 
 mysql:
   database: domain
