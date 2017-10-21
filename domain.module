@@ -2585,11 +2585,16 @@ function domain_form_alter(&$form, &$form_state, $form_id) {
             $form['domain']['#attributes'] = array(
               'class' => array('domain-access-options-form'),
             );
-            $form['domain']['#attached'] = array(
-              'js' => array(drupal_get_path('module', 'domain') . '/domain.node.js'),
-            );
             $format = domain_select_format();
-            drupal_add_js(array('domain' => array('fieldType' => $format)), 'setting');
+            $form['domain']['#attached'] = array(
+              'js' => array(
+                drupal_get_path('module', 'domain') . '/domain.node.js',
+                array(
+                  'data' => array('domain' => array('fieldType' => $format)),
+                  'type' => 'setting',
+                ),
+              ),
+            );
           }
           // We must preserve publishing options that the user cannot access, but only for
           // existing nodes.
