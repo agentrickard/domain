@@ -17,7 +17,7 @@ class DomainAccessSaveTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'user');
+  public static $modules = ['domain', 'domain_access', 'field', 'user'];
 
   /**
    * {@inheritdoc}
@@ -34,14 +34,14 @@ class DomainAccessSaveTest extends DomainTestBase {
    */
   public function testDomainAccessSave() {
     // Save a node programatically.
-    $node = Node::create(array(
+    $node = Node::create([
       'type' => 'article',
       'title' => 'Test node',
       'uid' => '1',
       'status' => 1,
       DOMAIN_ACCESS_FIELD => ['example_com'],
       DOMAIN_ACCESS_ALL_FIELD => 1,
-    ));
+    ]);
     $node->save();
 
     // Load the node.
@@ -56,14 +56,14 @@ class DomainAccessSaveTest extends DomainTestBase {
     $this->assert($value == 1, 'Node saved to all affiliates.');
 
     // Save a node with different values.
-    $node = Node::create(array(
+    $node = Node::create([
       'type' => 'article',
       'title' => 'Test node',
       'uid' => '1',
       'status' => 1,
       DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com'],
       DOMAIN_ACCESS_ALL_FIELD => 0,
-    ));
+    ]);
     $node->save();
 
     // Load and check the node.
