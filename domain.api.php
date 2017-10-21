@@ -254,7 +254,19 @@ function hook_domain_warning() {
  */
 function hook_domain_source_alter(&$source, $nid) {
   // Taken from the Domain Source module
-  $source = domain_source_lookup($nid);
+  $source_id = domain_source_lookup($nid);
+  // If FALSE returned, no source is defined.
+  if (!$source_id) {
+    return;
+  }
+  // DOMAIN_SOURCE_USE_ACTIVE is the status for 'Use active domain.'
+  if ($source_id == DOMAIN_SOURCE_USE_ACTIVE) {
+    $source = domain_get_domain();
+  }
+  // The source_id always returns a valid domain.
+  else {
+    $source = domain_lookup($source_id);
+  }
 }
 
 /**
