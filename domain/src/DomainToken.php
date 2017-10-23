@@ -2,6 +2,7 @@
 
 namespace Drupal\domain;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
@@ -36,13 +37,13 @@ class DomainToken {
   /**
    * Constructs a DomainToken object.
    *
-   * @param \Drupal\domain\DomainStorageInterface $domain_storage
-   *   The Domain storage handler.
+   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    */
-  public function __construct(DomainStorageInterface $domain_storage, DomainNegotiatorInterface $negotiator) {
-    $this->domainStorage = $domain_storage;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, DomainNegotiatorInterface $negotiator) {
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
     $this->negotiator = $negotiator;
   }
 
@@ -135,7 +136,7 @@ class DomainToken {
         $domain = $this->negotiator->getActiveDomain();
         break;
       case 'default-domain':
-        $domain = $this->loader->loadDefaultDomain();
+        $domain = $this->domainStorage->loadDefaultDomain();
         break;
     }
 

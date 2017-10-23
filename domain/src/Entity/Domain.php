@@ -154,7 +154,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $domain_storage = \Drupal::service('domain.storage');
+    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
     $default = $domain_storage->loadDefaultId();
     $count = $storage_controller->getQuery()->count()->execute();
     $values += array(
@@ -210,7 +210,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!$this->isDefault()) {
       // Swap the current default.
       /** @var self $default */
-      if ($default = \Drupal::service('domain.storage')->loadDefaultDomain()) {
+      if ($default = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain()) {
         $default->is_default = 0;
         $default->save();
       }
@@ -325,7 +325,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     parent::preSave($storage);
     // Sets the default domain properly.
     /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
-    $domain_storage = \Drupal::service('domain.storage');
+    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
     /** @var self $default */
     $default = $domain_storage->loadDefaultDomain();
     if (!$default) {

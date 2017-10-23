@@ -53,8 +53,6 @@ class DomainAliasForm extends EntityForm {
    *   The configuration factory service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\domain\DomainStorageInterface $domain_storage
-   *   The Domain storage handler.
    * @param \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
    *   The alias loader.
    */
@@ -62,7 +60,7 @@ class DomainAliasForm extends EntityForm {
     $this->validator = $validator;
     $this->config = $config;
     $this->accessHandler = $entity_type_manager->getAccessControlHandler('domain');
-    $this->domainStorage = $domain_storage;
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
     $this->aliasLoader = $alias_loader;
   }
 
@@ -74,7 +72,6 @@ class DomainAliasForm extends EntityForm {
       $container->get('domain_alias.validator'),
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
-      $container->get('domain.storage'),
       $container->get('domain_alias.loader')
     );
   }

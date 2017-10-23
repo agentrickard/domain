@@ -6,6 +6,7 @@ use Drupal\domain\Access\DomainAccessCheck;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainRedirectResponse;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -51,16 +52,16 @@ class DomainSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator service.
-   * @param \Drupal\domain\DomainStorageInterface $domain_storage
-   *   The Domain storage handler.
+   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\domain\Access\DomainAccessCheck $access_check
    *   The access check interface.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user account.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, DomainStorageInterface $domain_storage, DomainAccessCheck $access_check, AccountInterface $account) {
+  public function __construct(DomainNegotiatorInterface $negotiator, EntityTypeManagerInterface $entity_type_manager, DomainAccessCheck $access_check, AccountInterface $account) {
     $this->domainNegotiator = $negotiator;
-    $this->domainStorage = $domain_storage;
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
     $this->accessCheck = $access_check;
     $this->account = $account;
   }

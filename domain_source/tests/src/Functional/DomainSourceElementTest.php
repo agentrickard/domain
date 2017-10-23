@@ -48,7 +48,7 @@ class DomainSourceElementTest extends DomainTestBase {
     $this->fillField('title[0][value]', 'Test node');
 
     // We expect to find 5 domain options. We set two as selected.
-    $domains = \Drupal::service('domain.storage')->loadMultiple();
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
     $count = 0;
     $ids = ['example_com', 'one_example_com', 'two_example_com'];
     foreach ($domains as $domain) {

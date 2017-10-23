@@ -70,7 +70,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('domain.storage'),
+      $container->get('entity_type.manager')->getStorage('domain'),
       $container->get('domain.negotiator')
     );
   }

@@ -29,7 +29,7 @@
  */
 function hook_domain_source_alter(&$source, $path, $options) {
   // Always link to the default domain.
-  $source = \Drupal::service('domain.storage')->loadDefaultDomain();
+  $source = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain();
 }
 
 /**
@@ -59,6 +59,6 @@ function hook_domain_source_path_alter(&$source, $path, $options) {
   // Always make admin links go to the primary domain.
   $parts = explode('/', $path);
   if (isset($parts[0]) && $parts[0] == 'admin') {
-    $source = \Drupal::service('domain.storage')->loadDefaultDomain();
+    $source = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain();
   }
 }

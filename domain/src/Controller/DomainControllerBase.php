@@ -37,22 +37,22 @@ class DomainControllerBase extends ControllerBase {
    *
    * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
    *   The storage controller.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager.
    */
-  public function __construct(EntityStorageInterface $entity_storage, EntityTypeManagerInterface $entity_manager) {
+  public function __construct(EntityStorageInterface $entity_storage, EntityTypeManagerInterface $entity_type_manager) {
     $this->entityStorage = $entity_storage;
-    $this->entityManager = $entity_manager;
+    $this->entityManager = $entity_type_manager;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    $entity_manager = $container->get('entity_type.manager');
+    $entity_type_manager = $container->get('entity_type.manager');
     return new static(
-      $entity_manager->getStorage('domain'),
-      $entity_manager
+      $entity_type_manager->getStorage('domain'),
+      $entity_type_manager
     );
   }
 

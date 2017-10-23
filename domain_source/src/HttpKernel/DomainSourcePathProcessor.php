@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_source\HttpKernel;
 
-use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -18,13 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Processes the outbound path using path alias lookups.
  */
 class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
-
-  /**
-   * The Domain storage handler.
-   *
-   * @var \Drupal\domain\DomainStorageInterface $domain_storage
-   */
-  protected $domainStorage;
 
   /**
    * The Domain negotiator.
@@ -85,8 +77,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   /**
    * Constructs a DomainSourcePathProcessor object.
    *
-   * @param \Drupal\domain\DomainStorageInterface $domain_storage
-   *   The Domain storage handler.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -98,8 +88,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The config factory.
    */
-  public function __construct(DomainStorageInterface $domain_storage, DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
-    $this->domainStorage = $domain_storage;
+  public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
     $this->negotiator = $negotiator;
     $this->moduleHandler = $module_handler;
     $this->typeManager = $type_manager;

@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_access;
 
-use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -31,13 +30,10 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * Constructs a DomainAccessManager object.
    *
-   * @param \Drupal\domain\DomainStorageInterface $domain_storage
-   *   The Domain storage handler.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    */
-  public function __construct(DomainStorageInterface $domain_storage, DomainNegotiatorInterface $negotiator) {
-    $this->domainStorage = $domain_storage;
+  public function __construct(DomainNegotiatorInterface $negotiator) {
     $this->negotiator = $negotiator;
   }
 

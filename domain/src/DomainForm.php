@@ -5,9 +5,9 @@ namespace Drupal\domain;
 use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\domain\DomainStorageInterface;
 
 /**
  * Base form for domain edit forms.
@@ -36,29 +36,19 @@ class DomainForm extends EntityForm {
   protected $validator;
 
   /**
-   * The domain creator.
-   *
-   * @var \Drupal\domain\DomainStorageInterface
-   */
-  protected $creator;
-
-  /**
    * Constructs a DomainForm object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity type manager.
+   * @param \Drupal\domain\DomainStorageInterface $storage
+   *   The domain storage manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    * @param \Drupal\domain\DomainValidatorInterface $validator
    *   The domain validator.
-   * @param \Drupal\domain\DomainStorageInterface $creator
-   *   The domain creator.
    */
-  public function __construct(EntityStorageInterface $storage, RendererInterface $renderer, DomainValidatorInterface $validator,DomainStorageInterface $creator) {
+  public function __construct(DomainStorageInterface $storage, RendererInterface $renderer, DomainValidatorInterface $validator) {
     $this->storage = $storage;
     $this->renderer = $renderer;
     $this->validator = $validator;
-    $this->creator = $creator;
   }
 
   /**
@@ -68,8 +58,7 @@ class DomainForm extends EntityForm {
     return new static(
       $container->get('entity_type.manager')->getStorage('domain'),
       $container->get('renderer'),
-      $container->get('domain.validator'),
-      $container->get('domain.storage')
+      $container->get('domain.validator')
     );
   }
 
@@ -84,7 +73,7 @@ class DomainForm extends EntityForm {
     // Create defaults if this is the first domain.
     $count_existing = $this->storage->getQuery()->count()->execute();
     if (!$count_existing) {
-      $domain->addProperty('hostname', $this->creator->createHostname());
+      $domain->addProperty('hostname', $this->storage->createHostname());
       $domain->addProperty('name', $this->config('system.site')->get('name'));
     }
     $form['domain_id'] = array(

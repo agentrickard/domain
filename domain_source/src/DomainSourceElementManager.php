@@ -2,9 +2,7 @@
 
 namespace Drupal\domain_source;
 
-use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainElementManager;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**

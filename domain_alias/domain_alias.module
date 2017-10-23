@@ -34,7 +34,7 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
   $alias_loader = \Drupal::service('domain_alias.loader');
-  $domain_storage = \Drupal::service('domain.storage');
+  $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
   /** @var \Drupal\domain_alias\Entity\DomainAlias $alias */
   if ($alias = $alias_loader->loadByHostname($hostname)) {
     /** @var \Drupal\domain\Entity\Domain $domain */

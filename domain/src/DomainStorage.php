@@ -50,7 +50,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    * @see getStorage()
    */
   public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, TypedConfigManagerInterface $typed_config) {
-    parent::__construct($entity_type);
+    parent::__construct($entity_type, $config_factory, $uuid_service, $language_manager);
     $this->configFactory = $config_factory;
     $this->uuidService = $uuid_service;
     $this->languageManager = $language_manager;

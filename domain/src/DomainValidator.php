@@ -147,7 +147,7 @@ class DomainValidator implements DomainValidatorInterface {
    * {@inheritdoc}
    */
   public function getRequiredFields() {
-    return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
+    return array('hostname', 'name', 'scheme', 'status', 'weight');
   }
 
 }

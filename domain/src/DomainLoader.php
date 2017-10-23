@@ -9,6 +9,7 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
  * Loads Domain records.
  * @deprecated
  *  This class will be removed before the 8.1.0 release.
+ *  Use DomainStorage instead, loaded through the EntityTypeManager.
  */
 class DomainLoader implements DomainLoaderInterface {
 

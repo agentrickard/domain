@@ -86,7 +86,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $this->assertText('Domain test field', 'Found the domain field instance.');
 
     // We expect to find 5 domain options.
-    $domains = \Drupal::service('domain.storage')->loadMultiple();
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
       $this->assertRaw($string, new FormattableMarkup('Found the %domain option.', array('%domain' => $domain->label())));

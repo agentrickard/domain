@@ -3,6 +3,7 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -68,15 +69,15 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    *   The request stack object.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\domain\DomainStorageInterface $domain_storage
-   *   The Domain storage handler object.
+   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, DomainStorageInterface $domain_storage, ConfigFactoryInterface $config_factory) {
+  public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory) {
     $this->requestStack = $requestStack;
     $this->moduleHandler = $module_handler;
-    $this->domainStorage = $domain_storage;
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
     $this->configFactory = $config_factory;
   }
 
