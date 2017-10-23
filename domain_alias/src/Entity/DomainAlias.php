@@ -62,13 +62,6 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
   protected $domain_id;
 
   /**
-   * The domain alias record UUID.
-   *
-   * @var string
-   */
-  protected $uuid;
-
-  /**
    * The domain alias record pattern.
    *
    * @var string
