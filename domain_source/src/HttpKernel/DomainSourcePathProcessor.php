@@ -75,25 +75,31 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   protected $activeDomain;
 
   /**
+   * @var \Drupal\domain\DomainStorageInterface
+   */
+  protected $domainStorage;
+
+  /**
    * Constructs a DomainSourcePathProcessor object.
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Path\AliasManagerInterface
    *   The path alias manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The config factory.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
+  public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
     $this->negotiator = $negotiator;
     $this->moduleHandler = $module_handler;
-    $this->typeManager = $type_manager;
+    $this->typeManager = $entity_type_manager;
     $this->aliasManager = $alias_manager;
     $this->configFactory = $config_factory;
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
   }
 
   /**
@@ -142,7 +148,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
         $entity = $translation;
       }
       if ($target_id = domain_source_get($entity)) {
-        $source = $this->loader->load($target_id);
+        $source = $this->domainStorage->load($target_id);
       }
       $options['entity'] = $entity;
       $options['entity_type'] = $entity->getEntityTypeId();
