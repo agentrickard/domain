@@ -41,7 +41,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $prefixes = ['two', 'three'];
     // Test the response of each home page.
     /** @var \Drupal\domain\Entity\Domain $domain */
-    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+    foreach (\Drupal::service('domain.storage')->loadMultiple() as $domain) {
       $alias_domains[] = $domain;
       $this->drupalGet($domain->getPath());
       $this->assertRaw($domain->label(), 'Loaded the proper domain.');
@@ -76,7 +76,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     }
     // Test a wildcard alias.
     // @TODO: Refactor this test to merge with the above.
-    $alias_domain = \Drupal::service('domain.loader')->loadDefaultDomain();
+    $alias_domain = \Drupal::service('domain.storage')->loadDefaultDomain();
     $pattern = '*.' . $this->base_hostname;
     $this->domainAliasCreateTestAlias($alias_domain, $pattern);
     $alias = \Drupal::service('domain_alias.loader')->loadByPattern($pattern);

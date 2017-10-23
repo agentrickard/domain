@@ -33,7 +33,7 @@ class DomainSwitcherBlock extends DomainBlockBase {
     $active_domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     $items = array();
     /** @var \Drupal\domain\DomainInterface $domain */
-    foreach (\Drupal::service('domain.loader')->loadMultipleSorted() as $domain) {
+    foreach (\Drupal::service('domain.storage')->loadMultipleSorted() as $domain) {
       $string = $domain->getLink();
       if (!$domain->status()) {
         $string .= '*';

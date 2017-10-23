@@ -29,7 +29,7 @@ class DomainInactiveTest extends DomainTestBase {
 
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(4);
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
 
     // Grab a known domain for testing.
     $domain = $domains['two_example_com'];
@@ -39,7 +39,7 @@ class DomainInactiveTest extends DomainTestBase {
 
     // Disable the domain and test for redirect.
     $domain->disable();
-    $default = \Drupal::service('domain.loader')->loadDefaultDomain();
+    $default = \Drupal::service('domain.storage')->loadDefaultDomain();
     // Our postSave() cache tag clear should allow this to work properly.
     $this->drupalGet($domain->getPath());
 

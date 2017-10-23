@@ -39,7 +39,7 @@ abstract class DomainTestBase extends BrowserTestBase {
     parent::setUp();
 
     // Set the base hostname for domains.
-    $this->base_hostname = \Drupal::service('domain.creator')->createHostname();
+    $this->base_hostname = \Drupal::service('domain.storage')->createHostname();
   }
 
   /**
@@ -61,7 +61,7 @@ abstract class DomainTestBase extends BrowserTestBase {
    *   An optional list of subdomains to apply instead of the default set.
    */
   public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
-    $original_domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $original_domains = \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
     if (empty($base_hostname)) {
       $base_hostname = $this->base_hostname;
     }
@@ -92,12 +92,12 @@ abstract class DomainTestBase extends BrowserTestBase {
       $values = array(
         'hostname' => $hostname,
         'name' => $name,
-        'id' => \Drupal::service('domain.creator')->createMachineName($machine_name),
+        'id' => \Drupal::service('domain.storage')->createMachineName($machine_name),
       );
       $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
       $domain->save();
     }
-    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
     $this->assertTrue((count($domains) - count($original_domains)) == $count, new FormattableMarkup('Created %count new domains.', array('%count' => $count)));
   }
 
@@ -236,7 +236,7 @@ abstract class DomainTestBase extends BrowserTestBase {
    *   An array of domain entities.
    */
   public function getDomains() {
-    return \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    return \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
   }
 
   /**
@@ -246,8 +246,8 @@ abstract class DomainTestBase extends BrowserTestBase {
    *   An array of domain entities.
    */
   public function getDomainsSorted() {
-    \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
-    return \Drupal::service('domain.loader')->loadMultipleSorted();
+    \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
+    return \Drupal::service('domain.storage')->loadMultipleSorted();
   }
 
   /**

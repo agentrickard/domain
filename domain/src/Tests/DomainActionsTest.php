@@ -30,11 +30,11 @@ class DomainActionsTest extends DomainTestBase {
     $this->assertResponse(200);
 
     // Test the domains.
-    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
     $this->assertTrue(count($domains) == 4, 'Four domain records found.');
 
     // Check the default domain.
-    $default = \Drupal::service('domain.loader')->loadDefaultId();
+    $default = \Drupal::service('domain.storage')->loadDefaultId();
     $key = 'example_com';
     $this->assertTrue($default == $key, 'Default domain set correctly.');
 

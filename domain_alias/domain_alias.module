@@ -34,11 +34,11 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
   $alias_loader = \Drupal::service('domain_alias.loader');
-  $domain_loader = \Drupal::service('domain.loader');
+  $domain_storage = \Drupal::service('domain.storage');
   /** @var \Drupal\domain_alias\Entity\DomainAlias $alias */
   if ($alias = $alias_loader->loadByHostname($hostname)) {
     /** @var \Drupal\domain\Entity\Domain $domain */
-    if ($domain = $domain_loader->load($alias->getDomainId())) {
+    if ($domain = $domain_storage->load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias);
       $domain->setMatchType(DomainNegotiator::DOMAIN_MATCH_ALIAS);
       $redirect = $alias->getRedirect();

@@ -7,7 +7,7 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
-use Drupal\domain\DomainLoader;
+use Drupal\domain\domainStorage;
 use Drupal\domain\DomainNegotiator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -31,9 +31,9 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
   /**
    * Domain storage.
    *
-   * @var \Drupal\domain\DomainLoader
+   * @var \Drupal\domain\domainStorage
    */
-  protected $domainLoader;
+  protected $domainStorage;
 
   /**
    * Domain negotiation.
@@ -51,14 +51,14 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param DomainLoader $domain_loader
+   * @param domainStorage $domain_storage
    *   The domain storage loader.
    * @param DomainNegotiator $domain_negotiator
    *   The domain negotiator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainLoader $domain_loader, DomainNegotiator $domain_negotiator) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, domainStorage $domain_storage, DomainNegotiator $domain_negotiator) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->domainLoader = $domain_loader;
+    $this->domainStorage = $domain_storage;
     $this->domainNegotiator = $domain_negotiator;
   }
 
@@ -70,7 +70,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('domain.loader'),
+      $container->get('domain.storage'),
       $container->get('domain.negotiator')
     );
   }
@@ -102,7 +102,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
       return $this->t('Multiple domains');
     }
     else {
-      $domains = $this->domainLoader->loadOptionsList();
+      $domains = $this->domainStorage->loadOptionsList();
       $domain = reset($this->options['domain']);
       return $domains[$domain];
     }
@@ -122,7 +122,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
       '#type' => 'checkboxes',
       '#title' => $this->t('Domain'),
       '#default_value' => $this->options['domain'],
-      '#options' => $this->domainLoader->loadOptionsList(),
+      '#options' => $this->domainStorage->loadOptionsList(),
       '#description' => $this->t('Only the checked domain(s) will be able to access this display.'),
     );
   }
@@ -145,7 +145,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
     $dependencies = parent::calculateDependencies();
 
     foreach (array_keys($this->options['domain']) as $id) {
-      if ($domain = $this->domainLoader->load($id)) {
+      if ($domain = $this->domainStorage->load($id)) {
         $dependencies[$domain->getConfigDependencyKey()][] = $domain->getConfigDependencyName();
       }
     }

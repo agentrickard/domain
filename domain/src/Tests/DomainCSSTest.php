@@ -39,7 +39,7 @@ class DomainCSSTest extends DomainTestBase {
     $config->set('default', 'bartik')->save();
 
     // Test the response of the default home page.
-    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+    foreach (\Drupal::service('domain.storage')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
       $text = '<body class="' . Html::getClass($domain->id() . '-class');
       $this->assertNoRaw($text, 'No custom CSS present.');
@@ -49,7 +49,7 @@ class DomainCSSTest extends DomainTestBase {
     $config->set('css_classes', '[domain:machine-name]-class')->save();
 
     // Test the response of the default home page.
-    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+    foreach (\Drupal::service('domain.storage')->loadMultiple() as $domain) {
       // The render cache trips up this test. In production, it may be
       // necessary to add the url.site cache context. See README.md.
       drupal_flush_all_caches();
@@ -62,7 +62,7 @@ class DomainCSSTest extends DomainTestBase {
     $config = $this->config('domain.settings');
     $config->set('css_classes', '[domain:machine-name]-class [domain:name]-class')->save();
     // Test the response of the default home page.
-    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+    foreach (\Drupal::service('domain.storage')->loadMultiple() as $domain) {
       // The render cache trips up this test. In production, it may be
       // necessary to add the url.site cache context. See README.md.
       drupal_flush_all_caches();

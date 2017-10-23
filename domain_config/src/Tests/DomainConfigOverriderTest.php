@@ -20,7 +20,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(5);
     // Get the domain list.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     // Except for the default domain, the page title element should match what
     // is in the override files.
     // With a language context, based on how we have our files setup, we
@@ -71,7 +71,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
 
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(5);
-    $domains = \Drupal::service('domain.loader')->loadMultiple(['one_example_com', 'four_example_com']);
+    $domains = \Drupal::service('domain.storage')->loadMultiple(['one_example_com', 'four_example_com']);
 
     $domain_one = $domains['one_example_com'];
     $this->drupalGet($domain_one->getPath() . 'user/login');

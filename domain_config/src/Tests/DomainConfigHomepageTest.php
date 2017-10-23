@@ -31,7 +31,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(5);
     // Get the domain list.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     $this->drupalCreateNode(array(
       'type' => 'article',
       'title' => 'Node 1',

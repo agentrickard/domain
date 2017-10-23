@@ -32,9 +32,9 @@ class DomainHookTest extends DomainTestBase {
   public $key = 'example_com';
 
   /**
-   * The domain loader service.
+   * The Domain storage handler service.
    */
-  public $domainLoader;
+  public $domainStorage;
 
   /**
    * The current user service.
@@ -56,7 +56,7 @@ class DomainHookTest extends DomainTestBase {
     $this->domainCreateTestDomains();
 
     // Get the services.
-    $this->domainLoader = \Drupal::service('domain.loader');
+    $this->domainStorage = \Drupal::service('domain.storage');
     $this->currentUser = \Drupal::service('current_user');
     $this->moduleHandler = \Drupal::service('module_handler');
   }
@@ -66,7 +66,7 @@ class DomainHookTest extends DomainTestBase {
    */
   public function testHookDomainLoad() {
     // Check the created domain based on its known id value.
-    $domain = $this->domainLoader->load($this->key);
+    $domain = $this->domainStorage->load($this->key);
 
     // Internal hooks.
     $path = $domain->getPath();
@@ -110,7 +110,7 @@ class DomainHookTest extends DomainTestBase {
    * Tests domain operations hook.
    */
   public function testHookDomainOperations() {
-    $domain = $this->domainLoader->load($this->key);
+    $domain = $this->domainStorage->load($this->key);
 
     // Set the request.
     $operations = $this->moduleHandler->invokeAll('domain_operations', array($domain, $this->currentUser));
@@ -123,7 +123,7 @@ class DomainHookTest extends DomainTestBase {
    * Tests domain references alter hook.
    */
   public function testHookDomainReferencesAlter() {
-    $domain = $this->domainLoader->load($this->key);
+    $domain = $this->domainStorage->load($this->key);
 
     // Set the request.
     $manager = \Drupal::service('entity.manager');

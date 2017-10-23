@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\domain\DomainAccessControlHandler;
-use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainStorageInterface;
 use Drupal\domain_alias\DomainAliasLoaderInterface;
 use Drupal\domain_alias\DomainAliasValidatorInterface;
 
@@ -35,9 +35,9 @@ class DomainAliasForm extends EntityForm {
   protected $accessHandler;
 
   /**
-   * @var \Drupal\domain\DomainLoaderInterface $loader
+   * @var \Drupal\domain\DomainStorageInterface $domain_storage
    */
-  protected $domainLoader;
+  protected $domainStorage;
 
   /**
    * @var \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
@@ -53,16 +53,16 @@ class DomainAliasForm extends EntityForm {
    *   The configuration factory service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The Domain storage handler.
    * @param \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
    *   The alias loader.
    */
-  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainLoaderInterface $loader, DomainAliasLoaderInterface $alias_loader) {
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainStorageInterface $domain_storage, DomainAliasLoaderInterface $alias_loader) {
     $this->validator = $validator;
     $this->config = $config;
     $this->accessHandler = $entity_type_manager->getAccessControlHandler('domain');
-    $this->domainLoader = $loader;
+    $this->domainStorage = $domain_storage;
     $this->aliasLoader = $alias_loader;
   }
 
@@ -74,7 +74,7 @@ class DomainAliasForm extends EntityForm {
       $container->get('domain_alias.validator'),
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
-      $container->get('domain.loader'),
+      $container->get('domain.storage'),
       $container->get('domain_alias.loader')
     );
   }
@@ -128,7 +128,7 @@ class DomainAliasForm extends EntityForm {
       '#description' => $this->t('The table below shows the registered aliases for each environment.'),
     ];
 
-    $domains = $this->domainLoader->loadMultipleSorted();
+    $domains = $this->domainStorage->loadMultipleSorted();
     $rows = [];
     foreach ($domains as $domain) {
       // If the user cannot edit the domain, then don't show in the list.

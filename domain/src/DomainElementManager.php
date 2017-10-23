@@ -23,20 +23,20 @@ class DomainElementManager implements DomainElementManagerInterface {
   use StringTranslationTrait;
 
   /**
-   * @var \Drupal\domain\DomainLoaderInterface
+   * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $loader;
+  protected $domain_storage;
 
   /**
    * Constructs a DomainElementManager object.
    *
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The Domain storage handler.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    */
-  public function __construct(DomainLoaderInterface $loader) {
-    $this->loader = $loader;
+  public function __construct(DomainStorageInterface $domain_storage) {
+    $this->loader = $domain_storage;
   }
 
   /**

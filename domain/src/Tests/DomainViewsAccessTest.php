@@ -29,7 +29,7 @@ class DomainViewsAccessTest extends DomainTestBase {
   public function testInactiveDomain() {
     // Create five new domains programmatically.
     $this->domainCreateTestDomains(5);
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     // Enable the views.
     $this->enableViewsTestModule();
     // Create a user. To test the area output was more difficult, so we just

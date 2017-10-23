@@ -26,7 +26,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
     // Assign a node to a random domain.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     $active_domain = array_rand($domains, 1);
     $domain = $domains[$active_domain];
     $node_storage = \Drupal::entityTypeManager()->getStorage('node');

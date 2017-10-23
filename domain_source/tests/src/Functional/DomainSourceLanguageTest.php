@@ -63,7 +63,7 @@ class DomainSourceLanguageTest extends DomainTestBase {
 
     // Variables for our tests.
     $path = 'node/1';
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     $source = $domains[$id];
     $expected = $source->getPath() . $path;
     $route_name = 'entity.node.canonical';

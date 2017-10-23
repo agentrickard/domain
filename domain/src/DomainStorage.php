@@ -1,0 +1,195 @@
+<?php
+
+namespace Drupal\domain;
+
+use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Config\Entity\ConfigEntityStorage;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\domain\DomainStorageInterface;
+
+/**
+ * Loads Domain records.
+ */
+class DomainStorage extends ConfigEntityStorage implements DomainStorageInterface {
+
+  /**
+   * The typed config handler.
+   *
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   */
+  protected $typedConfig;
+
+  /**
+   * The Domain negotiator.
+   *
+   * @var \Drupal\domain\DomainNegotiatorInterface $negotiator
+   */
+  protected $negotiator;
+
+  /**
+   * Constructs a DomainStorage object.
+   *
+   * Trying to inject the storage manager throws an exception.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
+   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   *   The UUID service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   *   The typed config handler.
+   *
+   * @see getStorage()
+   */
+  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, TypedConfigManagerInterface $typed_config) {
+    parent::__construct($entity_type);
+    $this->configFactory = $config_factory;
+    $this->uuidService = $uuid_service;
+    $this->languageManager = $language_manager;
+    $this->typedConfig = $typed_config;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('config.factory'),
+      $container->get('uuid'),
+      $container->get('language_manager'),
+      $container->get('config.typed')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadSchema() {
+    $fields = $this->typedConfig->getDefinition('domain.record.*');
+    return isset($fields['mapping']) ? $fields['mapping'] : array();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadDefaultId() {
+    $result = $this->loadDefaultDomain();
+    if (!empty($result)) {
+      return $result->id();
+    }
+    return NULL;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadDefaultDomain() {
+    $result = $this->loadByProperties(array('is_default' => TRUE));
+    if (!empty($result)) {
+      return current($result);
+    }
+    return NULL;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadMultipleSorted(array $ids = NULL) {
+    $domains = $this->loadMultiple($ids);
+    uasort($domains, array($this, 'sort'));
+    return $domains;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadByHostname($hostname) {
+    $hostname = $this->prepareHostname($hostname);
+    $result = $this->loadByProperties(array('hostname' => $hostname));
+    if (empty($result)) {
+      return NULL;
+    }
+    return current($result);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function loadOptionsList() {
+    $list = array();
+    foreach ($this->loadMultipleSorted() as $id => $domain) {
+      $list[$id] = $domain->label();
+    }
+    return $list;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sort(DomainInterface $a, DomainInterface $b) {
+    return $a->getWeight() > $b->getWeight();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareHostname($hostname) {
+    // Strip www. prefix off the hostname.
+    $ignore_www = $this->configFactory->get('domain.settings')->get('www_prefix');
+    if ($ignore_www && substr($hostname, 0, 4) == 'www.') {
+      $hostname = substr($hostname, 4);
+    }
+    return $hostname;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function create(array $values = []) {
+    $default = $this->loadDefaultId();
+    $domains = $this->loadMultiple();
+    if (empty($values)) {
+      $values['hostname'] = $this->createHostname();
+      $values['name'] = \Drupal::config('system.site')->get('name');
+      $values['id'] = $this->createMachineName($values['hostname']);
+    }
+    $values += array(
+      'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
+      'status' => 1,
+      'weight' => count($domains) + 1,
+      'is_default' => (int) empty($default),
+    );
+    $domain = parent::create($values);
+
+    return $domain;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createHostname() {
+    // We cannot inject  the negotiator due to dependencies.
+    return \Drupal::service('domain.negotiator')->negotiateActiveHostname();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createMachineName($hostname = NULL) {
+    if (empty($hostname)) {
+      $hostname = $this->createHostname();
+    }
+    return preg_replace('/[^a-z0-9_]/', '_', $hostname);
+  }
+
+}

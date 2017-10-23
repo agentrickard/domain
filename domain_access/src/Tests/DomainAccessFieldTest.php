@@ -47,7 +47,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertResponse(200, 'Article creation found.');
 
     // Check for the form options.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertText($domain->label(), 'Domain form item found.');
     }
@@ -163,7 +163,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertResponse(200, $type->id() . ' creation found.');
 
     // Check for the form options.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertText($domain->label(), 'Domain form item found.');
     }
@@ -176,7 +176,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $user_edit_page = 'user/' . $user8->id() . '/edit';
     $this->drupalGet($user_edit_page);
     // Check for the form options.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('domain.storage')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertNoText($domain->label(), 'Domain form item not found.');
     }

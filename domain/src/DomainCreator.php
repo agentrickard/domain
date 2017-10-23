@@ -6,6 +6,9 @@ namespace Drupal\domain;
  * Creates new domain records.
  *
  * This class is a helper that replaces legacy procedural code.
+ *
+ * @deprecated
+ *  This class will be removed before the 8.1.0 release.
  */
 class DomainCreator implements DomainCreatorInterface {
 

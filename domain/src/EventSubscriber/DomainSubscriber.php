@@ -4,7 +4,7 @@ namespace Drupal\domain\EventSubscriber;
 
 use Drupal\domain\Access\DomainAccessCheck;
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainRedirectResponse;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
@@ -26,11 +26,11 @@ class DomainSubscriber implements EventSubscriberInterface {
   protected $domainNegotiator;
 
   /**
-   * The domain loader service.
+   * The Domain storage handler service.
    *
-   * @var \Drupal\domain\DomainLoaderInterface
+   * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $domainLoader;
+  protected $domainStorage;
 
   /**
    * The core access check service.
@@ -51,16 +51,16 @@ class DomainSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator service.
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The Domain storage handler.
    * @param \Drupal\domain\Access\DomainAccessCheck $access_check
    *   The access check interface.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user account.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, DomainLoaderInterface $loader, DomainAccessCheck $access_check, AccountInterface $account) {
+  public function __construct(DomainNegotiatorInterface $negotiator, DomainStorageInterface $domain_storage, DomainAccessCheck $access_check, AccountInterface $account) {
     $this->domainNegotiator = $negotiator;
-    $this->domainLoader = $loader;
+    $this->domainStorage = $domain_storage;
     $this->accessCheck = $access_check;
     $this->account = $account;
   }
@@ -98,7 +98,7 @@ class DomainSubscriber implements EventSubscriberInterface {
           // We insist on Allowed.
           if (!$access->isAllowed()) {
             /** @var \Drupal\domain\DomainInterface $default */
-            $default = $this->domainLoader->loadDefaultDomain();
+            $default = $this->domainStorage->loadDefaultDomain();
             $domain_url = $default->getUrl();
             $redirect_status = 302;
             $hostname = $default->getHostname();

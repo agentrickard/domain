@@ -38,7 +38,7 @@ class DomainForm extends EntityForm {
   /**
    * The domain creator.
    *
-   * @var \Drupal\domain\DomainCreatorInterface
+   * @var \Drupal\domain\DomainStorageInterface
    */
   protected $creator;
 
@@ -51,10 +51,10 @@ class DomainForm extends EntityForm {
    *   The renderer.
    * @param \Drupal\domain\DomainValidatorInterface $validator
    *   The domain validator.
-   * @param \Drupal\domain\DomainCreatorInterface $creator
+   * @param \Drupal\domain\DomainStorageInterface $creator
    *   The domain creator.
    */
-  public function __construct(EntityStorageInterface $storage, RendererInterface $renderer, DomainValidatorInterface $validator,DomainCreatorInterface $creator) {
+  public function __construct(EntityStorageInterface $storage, RendererInterface $renderer, DomainValidatorInterface $validator,DomainStorageInterface $creator) {
     $this->storage = $storage;
     $this->renderer = $renderer;
     $this->validator = $validator;
@@ -69,7 +69,7 @@ class DomainForm extends EntityForm {
       $container->get('entity_type.manager')->getStorage('domain'),
       $container->get('renderer'),
       $container->get('domain.validator'),
-      $container->get('domain.creator')
+      $container->get('domain.storage')
     );
   }
 

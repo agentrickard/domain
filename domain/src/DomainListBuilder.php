@@ -13,7 +13,7 @@ use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\domain\DomainAccessControlHandler;
-use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainElementManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -63,11 +63,11 @@ class DomainListBuilder extends DraggableListBuilder {
   protected $moduleHandler;
 
   /**
-   * The domain loader.
+   * The Domain storage handler.
    *
-   * @var \Drupal\domain\DomainLoaderInterface
+   * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $domainLoader;
+  protected $domainStorage;
 
   /**
    * The number of entities to list per page.
@@ -90,7 +90,7 @@ class DomainListBuilder extends DraggableListBuilder {
       $container->get('redirect.destination'),
       $container->get('entity_type.manager'),
       $container->get('module_handler'),
-      $container->get('domain.loader'),
+      $container->get('domain.storage'),
       $container->get('domain.element_manager')
     );
   }
@@ -110,12 +110,12 @@ class DomainListBuilder extends DraggableListBuilder {
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\domain\DomainLoaderInterface $domain_loader
-   *   The domain loader.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The Domain storage handler.
    * @param \Drupal\domain\DomainElementManager $domain_element_manager
    *   The domain field element manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainLoaderInterface $domain_loader, DomainElementManager $domain_element_manager) {
+  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainStorageInterface $domain_storage, DomainElementManager $domain_element_manager) {
     parent::__construct($entity_type, $storage);
     $this->entityTypeId = $entity_type->id();
     $this->storage = $storage;
@@ -125,7 +125,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $this->entityTypeManager = $entity_type_manager;
     $this->accessHandler = $this->entityTypeManager->getAccessControlHandler('domain');
     $this->moduleHandler = $module_handler;
-    $this->domainLoader = $domain_loader;
+    $this->domainStorage = $domain_storage;
     $this->domainElementManager = $domain_element_manager;
     $this->userStorage = $this->entityTypeManager->getStorage('user');
   }
@@ -190,7 +190,7 @@ class DomainListBuilder extends DraggableListBuilder {
       }
     }
     /** @var DomainInterface $default */
-    $default = $this->domainLoader->loadDefaultDomain();
+    $default = $this->domainStorage->loadDefaultDomain();
 
     // Deleting the site default domain is not allowed.
     if ($default && $id == $default->id()) {
@@ -238,7 +238,7 @@ class DomainListBuilder extends DraggableListBuilder {
       unset($row['weight']);
     }
     else {
-      $row['weight']['#delta'] = count($this->domainLoader->loadMultiple()) + 1;
+      $row['weight']['#delta'] = count($this->domainStorage->loadMultiple()) + 1;
     }
     return $row;
   }

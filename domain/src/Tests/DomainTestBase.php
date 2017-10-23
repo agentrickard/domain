@@ -43,16 +43,16 @@ abstract class DomainTestBase extends WebTestBase {
     }
 
     // Set the base hostname for domains.
-    $this->base_hostname = \Drupal::service('domain.creator')->createHostname();
+    $this->base_hostname = \Drupal::service('domain.storage')->createHostname();
   }
 
   /**
    * Reusable test function for checking initial / empty table status.
    */
   public function domainTableIsEmpty() {
-    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
     $this->assertTrue(empty($domains), 'No domains have been created.');
-    $default_id = \Drupal::service('domain.loader')->loadDefaultId();
+    $default_id = \Drupal::service('domain.storage')->loadDefaultId();
     $this->assertTrue(empty($default_id), 'No default domain has been set.');
   }
 
@@ -61,7 +61,7 @@ abstract class DomainTestBase extends WebTestBase {
    */
   public function domainPostValues() {
     $edit = array();
-    $domain = \Drupal::service('domain.creator')->createDomain();
+    $domain = \Drupal::service('domain.storage')->createDomain();
     $required = \Drupal::service('domain.validator')->getRequiredFields();
     foreach ($required as $key) {
       $edit[$key] = $domain->get($key);
@@ -88,7 +88,7 @@ abstract class DomainTestBase extends WebTestBase {
    *   An optional list of subdomains to apply instead of the default set.
    */
   public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
-    $original_domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $original_domains = \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
     if (empty($base_hostname)) {
       $base_hostname = $this->base_hostname;
     }
@@ -119,12 +119,12 @@ abstract class DomainTestBase extends WebTestBase {
       $values = array(
         'hostname' => $hostname,
         'name' => $name,
-        'id' => \Drupal::service('domain.creator')->createMachineName($machine_name),
+        'id' => \Drupal::service('domain.storage')->createMachineName($machine_name),
       );
       $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
       $domain->save();
     }
-    $domains = \Drupal::service('domain.loader')->loadMultiple(NULL, TRUE);
+    $domains = \Drupal::service('domain.storage')->loadMultiple(NULL, TRUE);
     $this->assertTrue((count($domains) - count($original_domains)) == $count, new FormattableMarkup('Created %count new domains.', array('%count' => $count)));
   }
 

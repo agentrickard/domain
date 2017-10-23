@@ -20,11 +20,11 @@ class DomainToken {
   use StringTranslationTrait;
 
   /**
-   * The Domain loader.
+   * The Domain storage handler.
    *
-   * @var \Drupal\domain\DomainLoaderInterface $loader
+   * @var \Drupal\domain\DomainStorageInterface $domainStorage
    */
-  protected $loader;
+  protected $domainStorage;
 
   /**
    * The Domain negotiator.
@@ -36,13 +36,13 @@ class DomainToken {
   /**
    * Constructs a DomainToken object.
    *
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The Domain storage handler.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    */
-  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator) {
-    $this->loader = $loader;
+  public function __construct(DomainStorageInterface $domain_storage, DomainNegotiatorInterface $negotiator) {
+    $this->domainStorage = $domain_storage;
     $this->negotiator = $negotiator;
   }
 
