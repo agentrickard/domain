@@ -135,12 +135,13 @@ function domain_alias_domain_load($entities) {
                 $pattern = str_replace(':*', '', $pattern);
               }
             }
-            $search = explode('.', $pattern);
-            $replace = explode('.', $request);
-            // This routine only works if the hostnames match length.
-            if (count($search) == count($replace)) {
-              $pattern = str_replace($search, $replace, $pattern);
+
+            $replacements = ['.' => '\.', '*' => '(.+?)'];
+            $regex = '/^' . strtr($active->alias->getPattern(), $replacements) . '$/';
+            if (preg_match($regex, $request, $matches) && isset($matches[1])) {
+              $pattern = str_replace('*', $matches[1], $pattern);
             }
+
             // Do not let the domain loop back on itself.
             if ($pattern != $domain->getCanonical()) {
               $domain->setHostname($pattern);

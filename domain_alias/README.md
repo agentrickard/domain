@@ -58,7 +58,8 @@ Example request: `one.example.com`
     one.*.*,
 ```
 Note that wildcard matching happens _in the listed order_. The number of
-wildcards is equal to the number of hostname parts minus 1.
+wildcards is equal to the number of hostname parts minus 1. That is, you cannot register
+an alias that is all wildcards.
 
 Port Matching
 ===
@@ -138,10 +139,10 @@ default set of environments is:
 
 * default -- indicates a canonical URL. No changes will be made.
 * local -- for local development environments.
-* development -- for a development integration server (such as those provided by Acquia and
-Pantheon)
-* staging -- for a pre-deployment server (such as those provided by Acquia and
-Pantheon)
+* development -- for a development integration server (such as those provided by Acquia,
+Pantheon, and Platform.sh)
+* staging -- for a pre-deployment server (such as those provided by Acquia, Panthon, and
+Platform.sh)
 * testing -- for continuous integration services (such as TravisCI or CircleCI).
 
 None of these environments are required. You may safely set all aliases to default if
@@ -168,11 +169,14 @@ Configuration
 To use this feature, the following steps must be followed:
 
 * `url.site` must be added as a required_cache_context to your `services.yml` file.
-* Aliases must be mapped to a server environment. At least one alias per environment
-cannot include a wildcard character.
+* Aliases must be mapped to a server environment. Default value is `default`.
 * All aliases should be listed as part of `trusted_host_settings` in `settings.php`.
 
 Technical Notes
 ====
 
-See DomainAliasSortTest for the logic.
+The matching follows an explicit sort order shown in DomainAliasSortTest.
+
+The code will attempt to match domains of different lengths when doing wildcard
+matching in an environment. That is, an alias to `example.*` assigned to `local` should
+return `example.local` if the active domain is `one.example.local`, assigned to `local`.
