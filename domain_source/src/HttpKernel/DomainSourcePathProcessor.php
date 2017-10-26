@@ -37,7 +37,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $typeManager;
+  protected $entityTypeManager;
 
   /**
    * The path alias manager.
@@ -96,7 +96,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
     $this->negotiator = $negotiator;
     $this->moduleHandler = $module_handler;
-    $this->typeManager = $entity_type_manager;
+    $this->entityTypeManager = $entity_type_manager;
     $this->aliasManager = $alias_manager;
     $this->configFactory = $config_factory;
     $this->domainStorage = $entity_type_manager->getStorage('domain');
@@ -181,7 +181,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     $entity_types = $this->getEntityTypes();
     foreach ($parameters as $entity_type => $value) {
       if (!empty($entity_type) && isset($entity_types[$entity_type])) {
-        $entity = $this->typeManager->getStorage($entity_type)->load($value);
+        $entity = $this->entityTypeManager->getStorage($entity_type)->load($value);
       }
     }
     return $entity;
@@ -213,7 +213,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    */
   public function getEntityTypes() {
     if (!isset($this->entityTypes)) {
-      foreach ($this->typeManager->getDefinitions() as $type => $definition) {
+      foreach ($this->entityTypeManager->getDefinitions() as $type => $definition) {
         if ($definition->getGroup() == 'content') {
           $this->entityTypes[$type] = $type;
         }
