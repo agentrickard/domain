@@ -23,6 +23,13 @@ class DomainElementManager implements DomainElementManagerInterface {
 
   use StringTranslationTrait;
 
+ /**
+  * The entity type manager
+  *
+  * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+  */
+  protected $entityTypeManager;
+
   /**
    * @var \Drupal\domain\DomainStorageInterface
    */
@@ -35,6 +42,7 @@ class DomainElementManager implements DomainElementManagerInterface {
    *  The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
     $this->domainStorage = $entity_type_manager->getStorage('domain');
   }
 
