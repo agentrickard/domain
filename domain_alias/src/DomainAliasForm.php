@@ -67,7 +67,7 @@ class DomainAliasForm extends EntityForm {
    * @param \Drupal\domain\DomainStorageInterface $domain_storage
    *   The domain storage manager.
    */
-  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainStorageInterface $domain_storage, DomainAliasLoaderInterface $alias_loader, DomainStorageInterface $domain_storage) {
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainAliasLoaderInterface $alias_loader, DomainStorageInterface $domain_storage) {
     $this->validator = $validator;
     $this->config = $config;
     $this->entityTypeManager = $entity_type_manager;
