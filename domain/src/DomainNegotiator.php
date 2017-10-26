@@ -34,11 +34,18 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   protected $domain;
 
   /**
-   * The loader class.
+   * The domain storage class.
    *
    * @var \Drupal\domain\DomainStorageInterface
    */
   protected $domainStorage;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
   /**
    * The request stack object.
@@ -77,7 +84,8 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   public function __construct(RequestStack $requestStack, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory) {
     $this->requestStack = $requestStack;
     $this->moduleHandler = $module_handler;
-    $this->domainStorage = $entity_type_manager->getStorage('domain');
+    $this->entityTypeManager = $entity_type_manager;
+    $this->domainStorage = $this->entityTypeManager->getStorage('domain');
     $this->configFactory = $config_factory;
   }
 
@@ -97,7 +105,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     else {
       $values = array('hostname' => $httpHost);
       /** @var \Drupal\domain\Entity\DomainInterface $domain */
-      $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
+      $domain = $this->domainStorage->create($values);
       $domain->setMatchType(self::DOMAIN_MATCH_NONE);
     }
 
@@ -198,7 +206,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // Check for registered alias matches.
     $values = array('hostname' => $httpHost);
     /** @var \Drupal\domain\Entity\DomainInterface $domain */
-    $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
+    $domain = $this->domainStorage->create($values);
     $domain->setMatchType(self::DOMAIN_MATCH_NONE);
 
     // Now check with modules (like Domain Alias) that register alternate
