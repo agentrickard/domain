@@ -6,6 +6,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\domain\DomainStorageInterface;
 
 /**
  * Sets a base class for injecting domain information into controllers.
@@ -21,28 +22,28 @@ class DomainControllerBase extends ControllerBase {
   /**
    * The entity storage.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorage
+   * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $entityStorage;
+  protected $domainStorage;
 
   /**
    * The entity manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * Constructs a new DomainControllerBase.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $entity_storage
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
    *   The storage controller.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity manager.
    */
-  public function __construct(EntityStorageInterface $entity_storage, EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityStorage = $entity_storage;
-    $this->entityManager = $entity_type_manager;
+  public function __construct(DomainStorageInterface $domain_storage, EntityTypeManagerInterface $entity_type_manager) {
+    $this->domainStorage = $domain_storage;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
