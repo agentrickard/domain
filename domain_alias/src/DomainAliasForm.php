@@ -35,6 +35,13 @@ class DomainAliasForm extends EntityForm {
   protected $accessHandler;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * @var \Drupal\domain\DomainStorageInterface $domain_storage
    */
   protected $domainStorage;
@@ -55,13 +62,19 @@ class DomainAliasForm extends EntityForm {
    *   The entity type manager.
    * @param \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
    *   The alias loader.
+   * @param \Drupal\domain\DomainAccessControlHandler
+   *   The domain access control handler.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The domain storage manager.
    */
-  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainStorageInterface $domain_storage, DomainAliasLoaderInterface $alias_loader) {
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainStorageInterface $domain_storage, DomainAliasLoaderInterface $alias_loader, DomainStorageInterface $domain_storage) {
     $this->validator = $validator;
     $this->config = $config;
-    $this->accessHandler = $entity_type_manager->getAccessControlHandler('domain');
-    $this->domainStorage = $entity_type_manager->getStorage('domain');
+    $this->entityTypeManager = $entity_type_manager;
     $this->aliasLoader = $alias_loader;
+    $this->domainStorage = $domain_storage;
+    // Not loaded directly since it is not an interface.
+    $this->accessHandler = $this->entityTypeManager->getAccessControlHandler('domain');
   }
 
   /**
@@ -72,7 +85,8 @@ class DomainAliasForm extends EntityForm {
       $container->get('domain_alias.validator'),
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
-      $container->get('domain_alias.loader')
+      $container->get('domain_alias.loader'),
+      $container->get('entity_type.manager')->getStorage('domain')
     );
   }
 
