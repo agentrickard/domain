@@ -27,6 +27,13 @@ class DomainSubscriber implements EventSubscriberInterface {
   protected $domainNegotiator;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * The Domain storage handler service.
    *
    * @var \Drupal\domain\DomainStorageInterface
@@ -61,7 +68,8 @@ class DomainSubscriber implements EventSubscriberInterface {
    */
   public function __construct(DomainNegotiatorInterface $negotiator, EntityTypeManagerInterface $entity_type_manager, DomainAccessCheck $access_check, AccountInterface $account) {
     $this->domainNegotiator = $negotiator;
-    $this->domainStorage = $entity_type_manager->getStorage('domain');
+    $this->entityTypeManager = $entity_type_manager;
+    $this->domainStorage = $this->entityTypeManager->getStorage('domain');
     $this->accessCheck = $access_check;
     $this->account = $account;
   }
