@@ -14,15 +14,9 @@ services:
     arguments: ['@domain.negotiator']
     tags:
       - { name: 'context_provider' }
-  domain.creator:
-    class: Drupal\domain\DomainCreator
-    arguments: ['@domain.loader', '@domain.negotiator']
   domain.element_manager:
     class: Drupal\domain\DomainElementManager
     arguments: ['@entity_type.manager']
-  domain.loader:
-    class: Drupal\domain\DomainLoader
-    arguments: ['@config.typed', '@config.factory']
   domain.negotiator:
     class: Drupal\domain\DomainNegotiator
     arguments: ['@request_stack', '@module_handler', '@entity_type.manager', '@config.factory']
@@ -37,3 +31,11 @@ services:
   domain.validator:
     class: Drupal\domain\DomainValidator
     arguments: ['@module_handler', '@config.factory', '@http_client', '@entity_type.manager']
+  # @deprecated and will be removed for 8.x-1.0 release.
+  domain.creator:
+    class: Drupal\domain\DomainCreator
+    arguments: ['@domain.loader', '@domain.negotiator']
+  # @deprecated and will be removed for 8.x-1.0 release.
+  domain.loader:
+    class: Drupal\domain\DomainLoader
+    arguments: ['@config.typed', '@config.factory']

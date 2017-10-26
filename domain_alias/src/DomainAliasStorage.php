@@ -2,15 +2,20 @@
 
 namespace Drupal\domain_alias;
 
+use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Config\Entity\ConfigEntityStorage;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\domain\DomainInterface;
 
 /**
  * Alias loader utility class.
- * @deprecated
- *  This class will be removed before the 8.1.0 release.
  */
-class DomainAliasLoader implements DomainAliasLoaderInterface {
+class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStorageInterface {
 
   /**
    * The typed config handler.
@@ -20,17 +25,38 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   protected $typedConfig;
 
   /**
-   * Constructs a DomainAliasLoader object.
+   * Constructs a DomainAliasStorage object.
    *
-   * Trying to inject the storage manager throws an exception.
-   *
+   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   *   The entity type definition.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
+   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   *   The UUID service.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed config handler.
-   *
-   * @see getStorage()
    */
-  public function __construct(TypedConfigManagerInterface $typed_config) {
+  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, TypedConfigManagerInterface $typed_config) {
+    parent::__construct($entity_type, $config_factory, $uuid_service, $language_manager);
+    $this->configFactory = $config_factory;
+    $this->uuidService = $uuid_service;
+    $this->languageManager = $language_manager;
     $this->typedConfig = $typed_config;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
+    return new static(
+      $entity_type,
+      $container->get('config.factory'),
+      $container->get('uuid'),
+      $container->get('language_manager'),
+      $container->get('config.typed')
+    );
   }
 
   /**
@@ -39,28 +65,6 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   public function loadSchema() {
     $fields = $this->typedConfig->getDefinition('domain_alias.alias.*');
     return isset($fields['mapping']) ? $fields['mapping'] : array();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function load($id, $reset = FALSE) {
-    $controller = $this->getStorage();
-    if ($reset) {
-      $controller->resetCache(array($id));
-    }
-    return $controller->load($id);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function loadMultiple($ids = NULL, $reset = FALSE) {
-    $controller = $this->getStorage();
-    if ($reset) {
-      $controller->resetCache($ids);
-    }
-    return $controller->loadMultiple($ids);
   }
 
   /**
@@ -80,7 +84,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByPattern($pattern) {
-    $result = $this->getStorage()->loadByProperties(['pattern' => $pattern]);
+    $result = $this->loadByProperties(['pattern' => $pattern]);
     if (empty($result)) {
       return NULL;
     }
@@ -91,7 +95,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByEnvironment($environment) {
-    $result = $this->getStorage()->loadByProperties(['environment' => $environment]);
+    $result = $this->loadByProperties(['environment' => $environment]);
     if (empty($result)) {
       return NULL;
     }
@@ -102,7 +106,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
    * {@inheritdoc}
    */
   public function loadByEnvironmentMatch(DomainInterface $domain, $environment) {
-    $result = $this->getStorage()->loadByProperties(['domain_id' => $domain->id(), 'environment' => $environment]);
+    $result = $this->loadByProperties(['domain_id' => $domain->id(), 'environment' => $environment]);
     if (empty($result)) {
       return [];
     }
@@ -241,18 +245,6 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
       }
     }
     return $patterns;
-  }
-
-  /**
-   * Loads the storage controller.
-   *
-   * We use the loader very early in the request cycle. As a result, if we try
-   * to inject the storage container, we hit a circular dependency. Using this
-   * method at least keeps our code easier to update.
-   */
-  protected function getStorage() {
-    $storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
-    return $storage;
   }
 
 }

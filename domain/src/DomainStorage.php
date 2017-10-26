@@ -25,13 +25,6 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
   protected $typedConfig;
 
   /**
-   * The Domain negotiator.
-   *
-   * @var \Drupal\domain\DomainNegotiatorInterface $negotiator
-   */
-  protected $negotiator;
-
-  /**
    * Constructs a DomainStorage object.
    *
    * Trying to inject the storage manager throws an exception.
@@ -46,8 +39,6 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    *   The language manager.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed config handler.
-   *
-   * @see getStorage()
    */
   public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, TypedConfigManagerInterface $typed_config) {
     parent::__construct($entity_type, $config_factory, $uuid_service, $language_manager);

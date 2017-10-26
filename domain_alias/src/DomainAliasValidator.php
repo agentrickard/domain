@@ -3,6 +3,7 @@
 namespace Drupal\domain_alias;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -20,15 +21,35 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
   protected $configFactory;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\domain_alias\DomainAliasStorageInterface $alias_loader
+   */
+  protected $aliasStorage;
+
+  /**
+   * @var \Drupal\domain\DomainStorageInterface $domain_storage
+   */
+  protected $domainStorage;
+
+  /**
    * Constructs a domainStorage object.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   *
-   * @see getStorage()
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
+  public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->configFactory = $config_factory;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->aliasStorage = $this->entityTypeManager->getStorage('domain_alias');
+    $this->domainStorage = $this->entityTypeManager->getStorage('domain');
   }
 
   /**
@@ -85,11 +106,11 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
 
     // 6) Check that the alias is not a direct match for a registered domain.
     $check = preg_match('/[a-z0-9\.\+\-:]*$/', $pattern);
-    if ($check == 1 && \Drupal::service('entity_type.manager')->getStorage('domain')->loadByHostname($pattern)) {
+    if ($check == 1 && $this->domainStorage->loadByHostname($pattern)) {
       return $this->t('The pattern matches an existing domain record.');
     }
     // 7) Check that the alias is unique across all records.
-    if ($alias_check = \Drupal::service('domain_alias.loader')->loadByPattern($pattern)) {
+    if ($alias_check = $this->aliasStorage->loadByPattern($pattern)) {
       /** @var \Drupal\domain_alias\DomainAliasInterface $alias_check */
       if ($alias_check->id() != $alias->id()) {
         return $this->t('The pattern already exists.');
