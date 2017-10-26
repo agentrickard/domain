@@ -21,6 +21,13 @@ class DomainToken {
   use StringTranslationTrait;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * The Domain storage handler.
    *
    * @var \Drupal\domain\DomainStorageInterface $domainStorage
@@ -43,7 +50,8 @@ class DomainToken {
    *   The domain negotiator.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, DomainNegotiatorInterface $negotiator) {
-    $this->domainStorage = $entity_type_manager->getStorage('domain');
+    $this->entityTypeManager = $entity_type_manager;
+    $this->domainStorage = $this->entityTypeManager->getStorage('domain');
     $this->negotiator = $negotiator;
   }
 
