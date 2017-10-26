@@ -100,7 +100,7 @@ class DomainListBuilder extends DraggableListBuilder {
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class.
+   *   The entity storage class. Should be \Drupal\domain\DomainStorageInterface.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The active user account.
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $destination
@@ -115,7 +115,7 @@ class DomainListBuilder extends DraggableListBuilder {
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainElementManager $domain_element_manager) {
     parent::__construct($entity_type, $storage);
     $this->entityTypeId = $entity_type->id();
-    $this->storage = $storage;
+    $this->domainStorage = $storage;
     $this->entityType = $entity_type;
     $this->currentUser = $account;
     $this->destinationHandler = $destination_handler;
@@ -186,7 +186,7 @@ class DomainListBuilder extends DraggableListBuilder {
       }
     }
     /** @var DomainInterface $default */
-    $default = $this->storage->loadDefaultDomain();
+    $default = $this->domainStorage->loadDefaultDomain();
 
     // Deleting the site default domain is not allowed.
     if ($default && $id == $default->id()) {
@@ -234,7 +234,7 @@ class DomainListBuilder extends DraggableListBuilder {
       unset($row['weight']);
     }
     else {
-      $row['weight']['#delta'] = count($this->storage->loadMultiple()) + 1;
+      $row['weight']['#delta'] = count($this->domainStorage->loadMultiple()) + 1;
     }
     return $row;
   }
