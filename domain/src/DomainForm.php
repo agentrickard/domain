@@ -20,7 +20,7 @@ class DomainForm extends EntityForm {
    *
    * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $domain_storage;
+  protected $domainStorage;
 
   /**
    * The renderer.
