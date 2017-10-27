@@ -85,7 +85,7 @@ class DomainListBuilder extends DraggableListBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('current_user'),
       $container->get('redirect.destination'),
       $container->get('entity_type.manager'),
@@ -99,8 +99,8 @@ class DomainListBuilder extends DraggableListBuilder {
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity storage class. Should be \Drupal\domain\DomainStorageInterface.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The domain storage class.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The active user account.
    * @param \Drupal\Core\Routing\RedirectDestinationInterface $destination
@@ -112,10 +112,10 @@ class DomainListBuilder extends DraggableListBuilder {
    * @param \Drupal\domain\DomainElementManager $domain_element_manager
    *   The domain field element manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainElementManager $domain_element_manager) {
-    parent::__construct($entity_type, $storage);
+  public function __construct(EntityTypeInterface $entity_type, DomainStorageInterface $domain_storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainElementManager $domain_element_manager) {
+    parent::__construct($entity_type, $domain_storage);
     $this->entityTypeId = $entity_type->id();
-    $this->domainStorage = $storage;
+    $this->domainStorage = $domain_storage;
     $this->entityType = $entity_type;
     $this->currentUser = $account;
     $this->destinationHandler = $destination_handler;

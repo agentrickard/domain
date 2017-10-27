@@ -42,7 +42,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    */
   public static function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
     // @TODO: static cache.
-    $list = array();
+    $list = [];
     // @TODO In tests, $entity is returning NULL.
     if (is_null($entity)) {
       return $list;

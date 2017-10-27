@@ -50,10 +50,9 @@ class DomainControllerBase extends ControllerBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    $entity_type_manager = $container->get('entity_type.manager');
     return new static(
-      $entity_type_manager->getStorage('domain'),
-      $entity_type_manager
+      $container->get('entity_type.manager')->getStorage('domain'),
+      $container->get('entity_type.manager')
     );
   }
 

@@ -16,6 +16,8 @@ class DomainFormsTest extends DomainTestBase {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
     $this->drupalLogin($this->admin_user);
 
+    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+
     // No domains should exist.
     $this->domainTableIsEmpty();
 
@@ -32,11 +34,11 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
 
     // Did it save correctly?
-    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
     $default_id = $storage->loadDefaultId();
     $this->assertTrue(!empty($default_id), 'Domain record saved via form.');
 
     // Does it load correctly?
+    $storage->resetCache([$default_id]);
     $new_domain = $storage->load($default_id);
     $this->assertTrue($new_domain->id() == $default_id, 'Domain loaded properly.');
 
@@ -52,7 +54,8 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalPostForm($editUrl, $edit, $this->t('Save'));
 
     // Check that the update succeeded.
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($default_id, TRUE);
+    $storage->resetCache([$default_id]);
+    $domain = $storage->load($default_id);
     $this->assertTrue($domain->label() == 'Foo', 'Domain record updated via form.');
 
     // Visit the delete domain administration page.
@@ -61,7 +64,8 @@ class DomainFormsTest extends DomainTestBase {
 
     // Delete the record.
     $this->drupalPostForm($deleteUrl, array(), $this->t('Delete'));
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($default_id, TRUE);
+    $storage->resetCache([$default_id]);
+    $domain = $storage->load($default_id);
     $this->assertTrue(empty($domain), 'Domain record deleted.');
 
     // No domains should exist.

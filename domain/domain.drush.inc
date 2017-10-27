@@ -320,8 +320,8 @@ function drush_domain_add($hostname, $name) {
   $records_count = \Drupal::entityTypeManager()->getStorage('domain')->getQuery()->count()->execute();
   $start_weight = $records_count + 1;
   $hostname = strtolower($hostname);
-  /** @var \Drupal\domain\DomainStorageInterface $creator */
-  $creator = \Drupal::service('entity_type.manager')->getStorage('domain');
+  /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
+  $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
   $values = array(
     'hostname' => $hostname,
     'name' => $name,
@@ -329,9 +329,9 @@ function drush_domain_add($hostname, $name) {
     'scheme' => (!drush_get_option('https')) ? 'http' : 'https',
     'weight' => ($weight = drush_get_option('weight')) ? $weight : $start_weight + 1,
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
-    'id' => $creator->createMachineName($hostname),
+    'id' => $domain_storage->createMachineName($hostname),
   );
-  $domain = $creator->create($values);
+  $domain = $domain_storage->create($values);
   /* TODO: Fix this check.
   if (!empty($domain->is_default)) {
     $domain->checkResponse();

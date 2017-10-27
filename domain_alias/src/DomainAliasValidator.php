@@ -28,12 +28,12 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
   protected $entityTypeManager;
 
   /**
-   * @var \Drupal\domain_alias\DomainAliasStorageInterface $alias_loader
+   * @var \Drupal\domain_alias\DomainAliasStorageInterface
    */
   protected $aliasStorage;
 
   /**
-   * @var \Drupal\domain\DomainStorageInterface $domain_storage
+   * @var \Drupal\domain\DomainStorageInterface
    */
   protected $domainStorage;
 

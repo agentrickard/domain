@@ -324,10 +324,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
     // Sets the default domain properly.
-    /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
     /** @var self $default */
-    $default = $domain_storage->loadDefaultDomain();
+    $default = $storage->loadDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
     }
