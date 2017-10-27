@@ -35,13 +35,17 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     // To get around block access, let the anon user view the block.
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
 
+    // Set the storage handles.
+    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+
     // Set known prefixes that work with our tests. This will give us domains
     // 'example.com' and 'one.example.com' aliased to 'two.example.com' and
     // 'three.example.com'.
     $prefixes = ['two', 'three'];
     // Test the response of each home page.
     /** @var \Drupal\domain\Entity\Domain $domain */
-    foreach (\Drupal::service('domain.loader')->loadMultiple() as $domain) {
+    foreach ($domain_storage->loadMultiple() as $domain) {
       $alias_domains[] = $domain;
       $this->drupalGet($domain->getPath());
       $this->assertRaw($domain->label(), 'Loaded the proper domain.');
@@ -54,7 +58,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
       // Set a known pattern.
       $pattern = $prefix . '.' . $this->base_hostname;
       $this->domainAliasCreateTestAlias($alias_domain, $pattern);
-      $alias = \Drupal::service('domain_alias.loader')->loadByPattern($pattern);
+      $alias = $alias_storage->loadByPattern($pattern);
       // Set the URL for the request. Note that this is not saved, it is just
       // URL generation.
       $alias_domain->set('hostname', $pattern);
@@ -76,10 +80,10 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     }
     // Test a wildcard alias.
     // @TODO: Refactor this test to merge with the above.
-    $alias_domain = \Drupal::service('domain.loader')->loadDefaultDomain();
+    $alias_domain = $domain_storage->loadDefaultDomain();
     $pattern = '*.' . $this->base_hostname;
     $this->domainAliasCreateTestAlias($alias_domain, $pattern);
-    $alias = \Drupal::service('domain_alias.loader')->loadByPattern($pattern);
+    $alias = $alias_storage->loadByPattern($pattern);
     // Set the URL for the request. Note that this is not saved, it is just
     // URL generation.
     $alias_domain->set('hostname', 'four.' . $this->base_hostname);

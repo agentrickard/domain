@@ -33,12 +33,12 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   }
   // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
-  $alias_loader = \Drupal::service('domain_alias.loader');
-  $domain_loader = \Drupal::service('domain.loader');
+  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+  $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
   /** @var \Drupal\domain_alias\Entity\DomainAlias $alias */
-  if ($alias = $alias_loader->loadByHostname($hostname)) {
+  if ($alias = $alias_storage->loadByHostname($hostname)) {
     /** @var \Drupal\domain\Entity\Domain $domain */
-    if ($domain = $domain_loader->load($alias->getDomainId())) {
+    if ($domain = $domain_storage->load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias);
       $domain->setMatchType(DomainNegotiator::DOMAIN_MATCH_ALIAS);
       $redirect = $alias->getRedirect();
@@ -101,10 +101,10 @@ function domain_alias_domain_load($entities) {
   }
 
   // Load and rewrite environement-specific aliases.
-  $loader = \Drupal::service('domain_alias.loader');
+  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
   if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
     foreach ($entities as $id => $domain) {
-      if ($environment_aliases = $loader->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
+      if ($environment_aliases = $alias_storage->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
         foreach($environment_aliases as $environment_alias) {
           $pattern = $environment_alias->getPattern();
           // Add a canonical property.

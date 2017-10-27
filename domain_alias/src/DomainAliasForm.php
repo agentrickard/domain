@@ -8,8 +8,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\domain\DomainAccessControlHandler;
-use Drupal\domain\DomainLoaderInterface;
-use Drupal\domain_alias\DomainAliasLoaderInterface;
+use Drupal\domain\DomainStorageInterface;
+use Drupal\domain_alias\DomainAliasStorageInterface;
 use Drupal\domain_alias\DomainAliasValidatorInterface;
 
 /**
@@ -35,14 +35,21 @@ class DomainAliasForm extends EntityForm {
   protected $accessHandler;
 
   /**
-   * @var \Drupal\domain\DomainLoaderInterface $loader
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $domainLoader;
+  protected $entityTypeManager;
 
   /**
-   * @var \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
+   * @var \Drupal\domain\DomainStorageInterface $domain_storage
    */
-  protected $aliasLoader;
+  protected $domainStorage;
+
+  /**
+   * @var \Drupal\domain_alias\DomainAliasStorageInterface $alias_loader
+   */
+  protected $aliasStorage;
 
   /**
    * Constructs a DomainAliasForm object.
@@ -53,17 +60,21 @@ class DomainAliasForm extends EntityForm {
    *   The configuration factory service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
-   * @param \Drupal\domain_alias\DomainAliasLoaderInterface $alias_loader
-   *   The alias loader.
+   * @param \Drupal\domain_alias\DomainAliasStorageInterface $alias_storage
+   *   The alias storage.
+   * @param \Drupal\domain\DomainAccessControlHandler
+   *   The domain access control handler.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The domain storage manager.
    */
-  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainLoaderInterface $loader, DomainAliasLoaderInterface $alias_loader) {
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainAliasStorageInterface $alias_storage, DomainStorageInterface $domain_storage) {
     $this->validator = $validator;
     $this->config = $config;
-    $this->accessHandler = $entity_type_manager->getAccessControlHandler('domain');
-    $this->domainLoader = $loader;
-    $this->aliasLoader = $alias_loader;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->aliasStorage = $alias_storage;
+    $this->domainStorage = $domain_storage;
+    // Not loaded directly since it is not an interface.
+    $this->accessHandler = $this->entityTypeManager->getAccessControlHandler('domain');
   }
 
   /**
@@ -74,8 +85,8 @@ class DomainAliasForm extends EntityForm {
       $container->get('domain_alias.validator'),
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
-      $container->get('domain.loader'),
-      $container->get('domain_alias.loader')
+      $container->get('entity_type.manager')->getStorage('domain_alias'),
+      $container->get('entity_type.manager')->getStorage('domain')
     );
   }
 
@@ -128,7 +139,7 @@ class DomainAliasForm extends EntityForm {
       '#description' => $this->t('The table below shows the registered aliases for each environment.'),
     ];
 
-    $domains = $this->domainLoader->loadMultipleSorted();
+    $domains = $this->domainStorage->loadMultipleSorted();
     $rows = [];
     foreach ($domains as $domain) {
       // If the user cannot edit the domain, then don't show in the list.
@@ -143,7 +154,7 @@ class DomainAliasForm extends EntityForm {
         if ($environment == 'default') {
           $match_output[] = $domain->getCanonical();
         }
-        $matches = $this->aliasLoader->loadByEnvironmentMatch($domain, $environment);
+        $matches = $this->aliasStorage->loadByEnvironmentMatch($domain, $environment);
         foreach ($matches as $match) {
           $match_output[] = $match->getPattern();
         }

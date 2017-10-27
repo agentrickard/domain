@@ -63,13 +63,10 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * Constructs a DomainConfigSubscriber object.
    *
-   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
-   *   The domain negotiator service.
    * @param \Drupal\Core\Config\StorageInterface $storage
    *   The configuration storage engine.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, StorageInterface $storage) {
-    $this->domainNegotiator = $negotiator;
+  public function __construct(StorageInterface $storage) {
     $this->storage = $storage;
   }
 
@@ -182,6 +179,8 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $this->languageManager = \Drupal::languageManager();
     $this->language = $this->languageManager->getCurrentLanguage();
 
+    // The same issue is true for the domainNegotiator.
+    $this->domainNegotiator = \Drupal::service('domain.negotiator');
     // Get the domain context.
     $this->domain = $this->domainNegotiator->getActiveDomain();
     // If we have fired too early in the bootstrap, we must force the routine to run.

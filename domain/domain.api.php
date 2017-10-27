@@ -132,7 +132,7 @@ function hook_domain_validate_alter(&$error_list, $hostname) {
 function hook_domain_references_alter($query, $account, $context) {
   // Remove the default domain from non-admins when editing nodes.
   if ($context['entity_type'] == 'node' && $context['field_type'] == 'editor' && !$account->hasPermission('edit assigned domains')) {
-    $default = \Drupal::service('domain.loader')->loadDefaultId();
+    $default = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultId();
     $query->condition('id', $default, '<>');
   }
 }

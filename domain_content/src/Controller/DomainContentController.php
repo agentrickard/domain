@@ -30,7 +30,7 @@ class DomainContentController extends ControllerBase {
       ];
     }
     // Loop through domains.
-    $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
       if ($account->hasPermission('publish to any domain') || $this->allowAccess($account, $domain, $permission)) {
@@ -61,7 +61,7 @@ class DomainContentController extends ControllerBase {
       ];
     }
     // Loop through domains.
-    $domains = \Drupal::service('domain.loader')->loadMultipleSorted();
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
       if ($account->hasPermission('assign editors to any domain') || $this->allowAccess($account, $domain, $permission)) {

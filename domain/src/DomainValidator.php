@@ -60,7 +60,6 @@ class DomainValidator implements DomainValidatorInterface {
   public function __construct(ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager) {
     $this->moduleHandler = $module_handler;
     $this->configFactory = $config_factory;
-    // @TODO: Move to a proper service?
     $this->httpClient = $http_client;
     $this->entityTypeManager = $entity_type_manager;
   }
@@ -147,7 +146,7 @@ class DomainValidator implements DomainValidatorInterface {
    * {@inheritdoc}
    */
   public function getRequiredFields() {
-    return array('hostname', 'name', 'id', 'scheme', 'status', 'weight');
+    return array('hostname', 'name', 'scheme', 'status', 'weight');
   }
 
 }

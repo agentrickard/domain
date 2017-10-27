@@ -65,7 +65,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // Note that these are hook_node_access() rules. Node Access system tests
     // are in DomainAccessRecordsTest.
     // We expect to find 5 domain options. Set two for later use.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       if (!isset($one)) {
         $one = $domain->id();

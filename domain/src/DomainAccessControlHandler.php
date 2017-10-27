@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\DomainElementManagerInterface;
+use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,6 +36,8 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
 
   /**
    * The user storage manager.
+   *
+   * @var \Drupal\user\UserStorageInterface
    */
   protected $userStorage;
 
@@ -47,12 +50,14 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
    *   The entity type manager.
    * @param \Drupal\domain\DomainElementManagerInterface $domain_element_manager
    *   The domain field element manager.
+   * @param \Drupal\user\UserStorageInterface $user_storage
+   *   The user storage manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, DomainElementManagerInterface $domain_element_manager) {
+  public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, DomainElementManagerInterface $domain_element_manager, UserStorageInterface $user_storage) {
     parent::__construct($entity_type);
     $this->entityTypeManager = $entity_type_manager;
     $this->domainElementManager = $domain_element_manager;
-    $this->userStorage = $this->entityTypeManager->getStorage('user');
+    $this->userStorage = $user_storage;
   }
 
   /**
@@ -62,7 +67,8 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
     return new static(
       $entity_type,
       $container->get('entity_type.manager'),
-      $container->get('domain.element_manager')
+      $container->get('domain.element_manager'),
+      $container->get('entity_type.manager')->getStorage('user')
     );
   }
 

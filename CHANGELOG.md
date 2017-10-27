@@ -66,7 +66,7 @@ marked with [x] are considered complete.
 - [x] Actions for domain operations
 - [x] Drush support for domain operations
 - [x] Replace / inject the storage manager in DomainAliasLoader.
-- [x] Replace / inject the storage manager in DomainLoader.
+- [x] Replace / inject the storage manager in domainStorage.
 - [ ] Write tests for Domain Content.
 - [x] Views access handler for domain content.
 - [x] Restrict Domain Source options using JS

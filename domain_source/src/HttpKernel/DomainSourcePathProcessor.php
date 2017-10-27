@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_source\HttpKernel;
 
-use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -18,13 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
  * Processes the outbound path using path alias lookups.
  */
 class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
-
-  /**
-   * The Domain loader.
-   *
-   * @var \Drupal\domain\DomainLoaderInterface $loader
-   */
-  protected $loader;
 
   /**
    * The Domain negotiator.
@@ -45,7 +37,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $typeManager;
+  protected $entityTypeManager;
 
   /**
    * The path alias manager.
@@ -83,28 +75,31 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   protected $activeDomain;
 
   /**
+   * @var \Drupal\domain\DomainStorageInterface
+   */
+  protected $domainStorage;
+
+  /**
    * Constructs a DomainSourcePathProcessor object.
    *
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Path\AliasManagerInterface
    *   The path alias manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface
    *   The config factory.
    */
-  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
-    $this->loader = $loader;
+  public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
     $this->negotiator = $negotiator;
     $this->moduleHandler = $module_handler;
-    $this->typeManager = $type_manager;
+    $this->entityTypeManager = $entity_type_manager;
     $this->aliasManager = $alias_manager;
     $this->configFactory = $config_factory;
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
   }
 
   /**
@@ -153,7 +148,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
         $entity = $translation;
       }
       if ($target_id = domain_source_get($entity)) {
-        $source = $this->loader->load($target_id);
+        $source = $this->domainStorage->load($target_id);
       }
       $options['entity'] = $entity;
       $options['entity_type'] = $entity->getEntityTypeId();
@@ -186,7 +181,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     $entity_types = $this->getEntityTypes();
     foreach ($parameters as $entity_type => $value) {
       if (!empty($entity_type) && isset($entity_types[$entity_type])) {
-        $entity = $this->typeManager->getStorage($entity_type)->load($value);
+        $entity = $this->entityTypeManager->getStorage($entity_type)->load($value);
       }
     }
     return $entity;
@@ -218,7 +213,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    */
   public function getEntityTypes() {
     if (!isset($this->entityTypes)) {
-      foreach ($this->typeManager->getDefinitions() as $type => $definition) {
+      foreach ($this->entityTypeManager->getDefinitions() as $type => $definition) {
         if ($definition->getGroup() == 'content') {
           $this->entityTypes[$type] = $type;
         }

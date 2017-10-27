@@ -18,7 +18,7 @@ class DomainAccessFilter extends InOperator {
     // @TODO: filter this list.
     if (!isset($this->valueOptions)) {
       $this->valueTitle = $this->t('Domains');
-      $this->valueOptions = \Drupal::service('domain.loader')->loadOptionsList();
+      $this->valueOptions = \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList();
     }
     return $this->valueOptions;
   }

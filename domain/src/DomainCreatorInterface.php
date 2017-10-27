@@ -4,6 +4,8 @@ namespace Drupal\domain;
 
 /**
  * Handles the creation of new domain records.
+ * @deprecated
+ *  This interface will be removed before the 8.1.0 release.
  */
 interface DomainCreatorInterface {
 
