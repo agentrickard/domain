@@ -6,3 +6,4 @@ version: VERSION
 core: 8.x
 dependencies:
   - domain
+  - node
