@@ -47,7 +47,7 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
   }
 
   /**
-   * Tests domain loading.
+   * Tests alias deletion on domain deletion.
    */
   public function testDomainDelete() {
     $domains = $this->domainStorage->loadMultiple();
@@ -74,7 +74,7 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
     $alias = $this->aliasStorage->loadByPattern($patterns[$id]);
     $this->assertTrue(empty($alias), 'Alias deleted properly');
 
-    // Check the remaining domain.
+    // Check the remaining domain, which should still have an alias.
     $domain = $this->domainStorage->load('example_com');
     $alias = $this->aliasStorage->loadByPattern($patterns[$domain->id()]);
     $this->assertTrue(!empty($alias), 'Alias retained properly');
