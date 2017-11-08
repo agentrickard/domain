@@ -5,6 +5,7 @@
  * Maps multiple host requests to a single domain record.
  */
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiator;
 use Drupal\domain\DomainAccessControlHandler;
@@ -152,5 +153,16 @@ function domain_alias_domain_load($entities) {
         }
       }
     }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function domain_alias_domain_delete(EntityInterface $entity) {
+  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+  $properties = ['domain_id' => $entity->id()];
+  foreach ($alias_storage->loadByProperties($properties) as $alias) {
+    $alias->delete();
   }
 }
