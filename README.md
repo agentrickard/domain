@@ -72,7 +72,7 @@ To use cross-domain logins, you must now set the *cookie_domain* value in
 To do so, clone  `default.services.yml` to `services.yml` and change the
 `cookie_domain` value to match the root hostname of your sites. Note that
 cross-domain login requires the sharing of a top-level domain, so a setting like
-`*.example.com` will work for all `example.com` subdomains.
+`.example.com` will work for all `example.com` subdomains.
 
 Example:
 
