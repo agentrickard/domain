@@ -1,9 +1,12 @@
 Domain
 ======
 
-Domain module for Drupal port to Drupal 8.
+The Domain module suite lets you share users, content, and configuration across a group of domains from a single installation and database.
 
-**What can you do with this module?** Share users, content, and configuration across a group of sites from a single installation and database. 
+Current Status
+======
+
+Domain module for Drupal port to Drupal 8, under active development.
 
 Active branch is 8-x.1-x. Begin any forks from there.
 
