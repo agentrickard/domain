@@ -19,36 +19,36 @@ For a complete feature status list, see [CHANGELOG.md](https://github.com/agentr
 Included modules
 -------
 
-* Domain
+* *Domain*
   The core module. Domain provides means for registering multiple domains within a
   single Drupal installation. It allows users to be assigned as domain administrators,
   provides a Block and Views display context, and creates a default entity reference
   field for use by other modules.
 
-* Domain Access
+* *Domain Access*
   Provides node access controls based on domains. (This module contains much of the
   Drupal 7 functionality). It allows users to be assigned as editors of content per-domain,
   sets content visibility rules, and provides Views integration for content.
 
-* Domain Alias
+* *Domain Alias*
   Allows multiple hostnames to be pointed to a single registered domain. These aliases
   can include wildcards (such as *.example.com) and may be configured to redirect to
   their canonical domain. Domain Alias also allows developers to register aliases per
   `environment`, so that different hosts are used consistently across development
   environments. See the README file for Domain Alias for more information.
 
-* Domain Alpha
+* *Domain Alpha*
   Provides limited alpha-to-alpha updates. Recommended.
 
-* Domain Config
+* *Domain Config*
   Provides a means for changing configuration settings on a per-domain basis. See the
   README for Domain Config for more information.
 
-* Domain Content
+* *Domain Content*
   Provides content overview pages on a per-domain basis, so that editors may review
   content assigned to specific domains. This module is a series of Views.
 
-* Domain Source
+* *Domain Source*
   Allows content to be assigned a canonical domain when writing URLs. Domain Source will
   ensure that content that appears on multiple domains always links to one URL. See
   the module's README for more information.
