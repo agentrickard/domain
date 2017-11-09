@@ -4,7 +4,7 @@ Domain
 The Domain module suite lets you share users, content, and configuration across a group of domains from a single installation and database.
 
 Current Status
-======
+------
 
 Domain module for Drupal port to Drupal 8, under active development.
 
