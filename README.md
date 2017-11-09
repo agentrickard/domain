@@ -3,6 +3,8 @@ Domain
 
 Domain module for Drupal port to Drupal 8.
 
+**What can you do with this module?** Share users, content, and configuration across a group of sites from a single installation and database. 
+
 Active branch is 8-x.1-x. Begin any forks from there.
 
 The underlying API is stable, and it's currently usable for access control.
