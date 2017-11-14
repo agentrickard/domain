@@ -52,9 +52,8 @@ class DomainReferencesTest extends DomainTestBase {
     $this->fillField('pass[pass1]', 'test');
     $this->fillField('pass[pass2]', 'test');
 
-    // We expect to find 5 domain options. We set two as selected.
+    // We expect to find 5 domain options. We set three as selected.
     $domains = \Drupal::service('domain.loader')->loadMultiple();
-    $count = 0;
     $ids = ['example_com', 'one_example_com', 'two_example_com'];
     foreach ($domains as $domain) {
       $locator = DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
@@ -76,10 +75,13 @@ class DomainReferencesTest extends DomainTestBase {
 
     $storage = \Drupal::entityTypeManager()->getStorage('user');
     $user = $storage->load(3);
-    // Check that two values are set.
+    // Check that three values are set.
     $manager = \Drupal::service('domain.element_manager');
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 3, 'User saved with three domain records.');
+    // Check that no access fields are set.
+    $values = $manager->getFieldValues($user, DOMAIN_ACCESS_FIELD);
+    $this->assert(count($values) == 0, 'User saved with no domain records.');
 
     // Now login as a user with limited rights.
     $account = $this->drupalCreateUser(array(
@@ -91,9 +93,14 @@ class DomainReferencesTest extends DomainTestBase {
     $tester = $storage->load($account->id());
     $values = $manager->getFieldValues($tester, DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 2, 'User saved with two domain records.');
+    // Check that no access fields are set.
+    $values = $manager->getFieldValues($user, DOMAIN_ACCESS_FIELD);
+    $this->assert(count($values) == 0, 'User saved with no domain records.');
+
     $storage->resetCache(array($account->id()));
     $this->drupalLogin($account);
 
+    // Now edit user 3 with limited rights.
     $this->drupalGet('user/' . $user->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -128,6 +135,9 @@ class DomainReferencesTest extends DomainTestBase {
     // Check that two values are set.
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 2, 'User saved with two domain records.');
+    // Check that no access fields are set.
+    $values = $manager->getFieldValues($user, DOMAIN_ACCESS_FIELD);
+    $this->assert(count($values) == 0, 'User saved with no domain records.');
 
     // Now login as a user with different limited rights.
     $account = $this->drupalCreateUser(array(
@@ -148,6 +158,7 @@ class DomainReferencesTest extends DomainTestBase {
     $storage->resetCache(array($account->id()));
     $this->drupalLogin($account);
 
+    // Now edit the user as someone with limited rights.
     $this->drupalGet('user/' . $user->id() . '/edit');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -189,7 +200,7 @@ class DomainReferencesTest extends DomainTestBase {
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 2, 'User saved with two domain records.');
     $values = $manager->getFieldValues($user, DOMAIN_ACCESS_FIELD);
-    $this->assert(count($values) == 3, 'User saved with three domain records.');
+    $this->assert(count($values) == 2, 'User saved with two domain records.'. var_dump($values));
 
   }
 
