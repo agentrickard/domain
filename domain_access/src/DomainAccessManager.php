@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_access;
 
-use Drupal\domain\DomainLoaderInterface;
 use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -19,9 +18,9 @@ use Drupal\Core\Session\AccountInterface;
 class DomainAccessManager implements DomainAccessManagerInterface {
 
   /**
-   * @var \Drupal\domain\DomainLoaderInterface
+   * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $loader;
+  protected $domainStorage;
 
   /**
    * @var \Drupal\domain\DomainNegotiatorInterface
@@ -31,13 +30,10 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * Constructs a DomainAccessManager object.
    *
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
    */
-  public function __construct(DomainLoaderInterface $loader, DomainNegotiatorInterface $negotiator) {
-    $this->loader = $loader;
+  public function __construct(DomainNegotiatorInterface $negotiator) {
     $this->negotiator = $negotiator;
   }
 

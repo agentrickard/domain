@@ -98,7 +98,7 @@ function domain_source_get(EntityInterface $entity) {
   $value = $entity->get(DOMAIN_SOURCE_FIELD)->offsetGet(0);
   if (!empty($value)) {
     $target_id = $value->target_id;
-    if ($domain = \Drupal::service('domain.loader')->load($target_id)) {
+    if ($domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($target_id)) {
       $source = $domain->id();
     }
   }

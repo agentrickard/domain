@@ -31,7 +31,7 @@ class DomainHooksTest extends DomainTestBase {
     // Check the created domain based on it's known id value.
     $key = 'example_com';
 
-    $domain = \Drupal::service('domain.loader')->load($key);
+    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($key);
 
     // Internal hooks.
     $path = $domain->getPath();

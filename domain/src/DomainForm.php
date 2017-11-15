@@ -4,10 +4,11 @@ namespace Drupal\domain;
 
 use Drupal\Core\Config\ConfigValueException;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\domain\DomainStorageInterface;
 
 /**
  * Base form for domain edit forms.
@@ -17,9 +18,9 @@ class DomainForm extends EntityForm {
   /**
    * The domain entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $storage;
+  protected $domainStorage;
 
   /**
    * The renderer.
@@ -35,30 +36,30 @@ class DomainForm extends EntityForm {
    */
   protected $validator;
 
-  /**
-   * The domain creator.
-   *
-   * @var \Drupal\domain\DomainCreatorInterface
-   */
-  protected $creator;
+ /**
+  * The entity type manager
+  *
+  * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+  */
+  protected $entityTypeManager;
 
   /**
    * Constructs a DomainForm object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
-   *   The entity type manager.
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
+   *   The domain storage manager.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    * @param \Drupal\domain\DomainValidatorInterface $validator
    *   The domain validator.
-   * @param \Drupal\domain\DomainCreatorInterface $creator
-   *   The domain creator.
+   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *  The entity type manager.
    */
-  public function __construct(EntityStorageInterface $storage, RendererInterface $renderer, DomainValidatorInterface $validator,DomainCreatorInterface $creator) {
-    $this->storage = $storage;
+  public function __construct(DomainStorageInterface $domain_storage, RendererInterface $renderer, DomainValidatorInterface $validator, EntityTypeManagerInterface $entity_type_manager) {
+    $this->domainStorage = $domain_storage;
     $this->renderer = $renderer;
     $this->validator = $validator;
-    $this->creator = $creator;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -69,7 +70,7 @@ class DomainForm extends EntityForm {
       $container->get('entity_type.manager')->getStorage('domain'),
       $container->get('renderer'),
       $container->get('domain.validator'),
-      $container->get('domain.creator')
+      $container->get('entity_type.manager')
     );
   }
 
@@ -82,9 +83,9 @@ class DomainForm extends EntityForm {
     $domain = $this->entity;
 
     // Create defaults if this is the first domain.
-    $count_existing = $this->storage->getQuery()->count()->execute();
+    $count_existing = $this->domainStorage->getQuery()->count()->execute();
     if (!$count_existing) {
-      $domain->addProperty('hostname', $this->creator->createHostname());
+      $domain->addProperty('hostname', $this->domainStorage->createHostname());
       $domain->addProperty('name', $this->config('system.site')->get('name'));
     }
     $form['domain_id'] = array(
@@ -105,7 +106,7 @@ class DomainForm extends EntityForm {
       '#disabled' => !empty($domain->id()),
       '#machine_name' => array(
         'source' => array('hostname'),
-        'exists' => array($this->storage, 'load'),
+        'exists' => array($this->domainStorage, 'load'),
       ),
     );
     $form['name'] = array(
@@ -173,7 +174,7 @@ class DomainForm extends EntityForm {
     }
     // Validate if the same hostname exists.
     // Do not use domain loader because it may change hostname.
-    $existing = $this->storage->loadByProperties(['hostname' => $hostname]);
+    $existing = $this->domainStorage->loadByProperties(['hostname' => $hostname]);
     $existing = reset($existing);
     // If we have already registered a hostname, make sure we don't create a duplicate.
     // We cannot check id() here, as the machine name is editable.

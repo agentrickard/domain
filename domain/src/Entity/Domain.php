@@ -19,7 +19,7 @@ use Drupal\domain\DomainNegotiator;
  *   label = @Translation("Domain record"),
  *   module = "domain",
  *   handlers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
+ *     "storage" = "Drupal\domain\DomainStorage",
  *     "access" = "Drupal\domain\DomainAccessControlHandler",
  *     "list_builder" = "Drupal\domain\DomainListBuilder",
  *     "form" = {
@@ -154,8 +154,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $loader = \Drupal::service('domain.loader');
-    $default = $loader->loadDefaultId();
+    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $default = $domain_storage->loadDefaultId();
     $count = $storage_controller->getQuery()->count()->execute();
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
@@ -210,7 +210,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!$this->isDefault()) {
       // Swap the current default.
       /** @var self $default */
-      if ($default = \Drupal::service('domain.loader')->loadDefaultDomain()) {
+      if ($default = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain()) {
         $default->is_default = 0;
         $default->save();
       }
@@ -324,10 +324,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function preSave(EntityStorageInterface $storage) {
     parent::preSave($storage);
     // Sets the default domain properly.
-    /** @var \Drupal\domain\DomainLoaderInterface $loader */
-    $loader = \Drupal::service('domain.loader');
     /** @var self $default */
-    $default = $loader->loadDefaultDomain();
+    $default = $storage->loadDefaultDomain();
     if (!$default) {
       $this->is_default = 1;
     }

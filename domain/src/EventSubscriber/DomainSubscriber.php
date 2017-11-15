@@ -4,8 +4,9 @@ namespace Drupal\domain\EventSubscriber;
 
 use Drupal\domain\Access\DomainAccessCheck;
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain\DomainLoaderInterface;
+use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainRedirectResponse;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -26,11 +27,18 @@ class DomainSubscriber implements EventSubscriberInterface {
   protected $domainNegotiator;
 
   /**
-   * The domain loader service.
+   * The entity type manager.
    *
-   * @var \Drupal\domain\DomainLoaderInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $domainLoader;
+  protected $entityTypeManager;
+
+  /**
+   * The Domain storage handler service.
+   *
+   * @var \Drupal\domain\DomainStorageInterface
+   */
+  protected $domainStorage;
 
   /**
    * The core access check service.
@@ -51,16 +59,17 @@ class DomainSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator service.
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
+   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\domain\Access\DomainAccessCheck $access_check
    *   The access check interface.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The current user account.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, DomainLoaderInterface $loader, DomainAccessCheck $access_check, AccountInterface $account) {
+  public function __construct(DomainNegotiatorInterface $negotiator, EntityTypeManagerInterface $entity_type_manager, DomainAccessCheck $access_check, AccountInterface $account) {
     $this->domainNegotiator = $negotiator;
-    $this->domainLoader = $loader;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->domainStorage = $this->entityTypeManager->getStorage('domain');
     $this->accessCheck = $access_check;
     $this->account = $account;
   }
@@ -98,7 +107,7 @@ class DomainSubscriber implements EventSubscriberInterface {
           // We insist on Allowed.
           if (!$access->isAllowed()) {
             /** @var \Drupal\domain\DomainInterface $default */
-            $default = $this->domainLoader->loadDefaultDomain();
+            $default = $this->domainStorage->loadDefaultDomain();
             $domain_url = $default->getUrl();
             $redirect_status = 302;
             $hostname = $default->getHostname();

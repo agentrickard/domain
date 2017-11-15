@@ -35,9 +35,9 @@ class DomainAliasWildcardTest extends DomainTestBase {
    * Test for environment matching.
    */
   public function testDomainAliasWildcards() {
-    $domain_loader = \Drupal::service('domain.loader');
-    $alias_loader = \Drupal::service('domain_alias.loader');
-    $domains = $domain_loader->loadMultipleSorted(NULL, TRUE);
+    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $alias_loader = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domains = $domain_storage->loadMultipleSorted(NULL, TRUE);
     // Our patterns should map to example.com, one.example.com, two.example.com.
     $patterns = ['example.*', 'four.example.*', 'five.example.*'];
     foreach ($domains as $domain) {
@@ -59,7 +59,7 @@ class DomainAliasWildcardTest extends DomainTestBase {
     $this->assert($alias->getPattern() == 'five.example.*', 'Proper pattern match loaded.');
 
     // Test the environment matcher. $domain here is one.example.com
-    $domain = $domain_loader->load('example_com');
+    $domain = $domain_storage->load('example_com');
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($matches) == 1, 'One environment match loaded');
     $alias = current($matches);

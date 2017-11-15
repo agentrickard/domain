@@ -25,7 +25,7 @@ class DomainValidatorTest extends DomainTestBase {
     // Check the created domain based on its known id value.
     $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = \Drupal::service('domain.loader')->loadByHostname($key);
+    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->loadByHostname($key);
     $this->assertTrue(!empty($domain), 'Test domain created.');
 
     // Valid hostnames to test. Valid is the boolean value.

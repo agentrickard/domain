@@ -14,7 +14,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *   label = @Translation("Domain alias"),
  *   module = "domain_alias",
  *   handlers = {
- *     "storage" = "Drupal\Core\Config\Entity\ConfigEntityStorage",
+ *     "storage" = "Drupal\domain_alias\DomainAliasStorage",
  *     "access" = "Drupal\domain_alias\DomainAliasAccessControlHandler",
  *     "list_builder" = "Drupal\domain_alias\DomainAliasListBuilder",
  *     "form" = {

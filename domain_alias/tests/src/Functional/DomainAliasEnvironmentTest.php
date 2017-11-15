@@ -35,9 +35,9 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
    * Test for environment matching.
    */
   public function testDomainAliasEnvironments() {
-    $domain_loader = \Drupal::service('domain.loader');
-    $alias_loader = \Drupal::service('domain_alias.loader');
-    $domains = $domain_loader->loadMultipleSorted(NULL, TRUE);
+    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $alias_loader = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domains = $domain_storage->loadMultipleSorted(NULL, TRUE);
     // Our patterns should map to example.com, one.example.com, two.example.com.
     $patterns = ['*.example.com', 'four.example.com', 'five.example.com'];
     foreach ($domains as $domain) {
@@ -67,7 +67,7 @@ class DomainAliasEnvironmentTest extends DomainTestBase {
     $this->assert(count($matches) == 0, 'No environment matches loaded');
 
     // Test the environment matcher. $domain here is one.example.com
-    $domain = $domain_loader->load('one_example_com');
+    $domain = $domain_storage->load('one_example_com');
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($matches) == 1, 'One environment match loaded');
     $alias = current($matches);

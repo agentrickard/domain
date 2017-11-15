@@ -2,40 +2,13 @@
 
 namespace Drupal\domain_alias;
 
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 use Drupal\domain\DomainInterface;
 
 /**
- * Supplies loader methods for common domain_alias requests.
- * @deprecated
- *  This interface will be removed before the 8.1.0 release.
+ * Supplies storage methods for common domain_alias requests.
  */
-interface DomainAliasLoaderInterface {
-
-  /**
-   * Loads a single alias.
-   *
-   * @param string $id
-   *   A domain_alias id to load.
-   * @param bool $reset
-   *   Indicates that the entity cache should be reset.
-   *
-   * @return DomainAliasInterface
-   *   A Drupal\domain_alias\DomainAliasInterface object | NULL.
-   */
-  public function load($id, $reset = FALSE);
-
-  /**
-   * Loads multiple aliases.
-   *
-   * @param array $ids
-   *   An optional array of specific ids to load.
-   * @param bool $reset
-   *   Indicates that the entity cache should be reset.
-   *
-   * @return array
-   *   An array of Drupal\domain_alias\DomainAliasInterface objects.
-   */
-  public function loadMultiple($ids = NULL, $reset = FALSE);
+interface DomainAliasStorageInterface extends ConfigEntityStorageInterface {
 
   /**
    * Loads a domain alias record by hostname lookup.
@@ -60,7 +33,6 @@ interface DomainAliasLoaderInterface {
    *   The domain alias record given a pattern string.
    */
   public function loadByPattern($pattern);
-
 
   /**
    * Loads an array of domain alias record by environment lookup.

@@ -1,4 +1,4 @@
 services:
   domain_access.manager:
     class: Drupal\domain_access\DomainAccessManager
-    arguments: ['@domain.loader', '@domain.negotiator']
+    arguments: ['@domain.negotiator']

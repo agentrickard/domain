@@ -4,6 +4,7 @@ namespace Drupal\domain;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Generic base class for handling hidden field options.
@@ -22,21 +23,27 @@ class DomainElementManager implements DomainElementManagerInterface {
 
   use StringTranslationTrait;
 
+ /**
+  * The entity type manager
+  *
+  * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+  */
+  protected $entityTypeManager;
+
   /**
-   * @var \Drupal\domain\DomainLoaderInterface
+   * @var \Drupal\domain\DomainStorageInterface
    */
-  protected $loader;
+  protected $domainStorage;
 
   /**
    * Constructs a DomainElementManager object.
    *
-   * @param \Drupal\domain\DomainLoaderInterface $loader
-   *   The domain loader.
-   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
-   *   The domain negotiator.
+   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *  The entity type manager.
    */
-  public function __construct(DomainLoaderInterface $loader) {
-    $this->loader = $loader;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+    $this->entityTypeManager = $entity_type_manager;
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
   }
 
   /**
@@ -152,7 +159,7 @@ class DomainElementManager implements DomainElementManagerInterface {
     if (!empty($values)) {
       foreach ($values as $item) {
         if ($target = $item->getValue()) {
-          if ($domain = $this->loader->load($target['target_id'])) {
+          if ($domain = $this->domainStorage->load($target['target_id'])) {
             $list[$domain->id()] = $domain->getDomainId();
           }
         }
@@ -178,7 +185,7 @@ class DomainElementManager implements DomainElementManagerInterface {
    *   A string suitable for display.
    */
   public function listDisallowed(array $disallowed) {
-    $domains = $this->loader->loadMultiple($disallowed);
+    $domains = $this->domainStorage->loadMultiple($disallowed);
     // @TODO: Proper theme function here.
     $string = $this->t('The following domains are currently assigned and cannot be changed:');
     foreach ($domains as $domain) {

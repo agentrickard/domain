@@ -2,25 +2,12 @@
 
 namespace Drupal\domain;
 
-/**
- * Supplies loader methods for common domain requests.
- * @deprecated
- *  This interface will be removed before the 8.1.0 release.
- */
-interface DomainLoaderInterface {
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
 
-  /**
-   * Loads a single domains.
-   *
-   * @param int $id
-   *   A domain id to load.
-   * @param bool $reset
-   *   Indicates that the entity cache should be reset.
-   *
-   * @return \Drupal\domain\DomainInterface|null
-   *   A domain record or NULL.
-   */
-  public function load($id, $reset = FALSE);
+/**
+ * Provides an interface for domain entity storage.
+ */
+interface DomainStorageInterface extends ConfigEntityStorageInterface {
 
   /**
    * Gets the default domain object.
@@ -37,19 +24,6 @@ interface DomainLoaderInterface {
    *   The id of the default domain or FALSE if none is set.
    */
   public function loadDefaultId();
-
-  /**
-   * Loads multiple domains.
-   *
-   * @param array $ids
-   *   An optional array of specific ids to load.
-   * @param bool $reset
-   *   Indicates that the entity cache should be reset.
-   *
-   * @return \Drupal\domain\DomainInterface[]
-   *   An array of domain records.
-   */
-  public function loadMultiple(array $ids = NULL, $reset = FALSE);
 
   /**
    * Loads multiple domains and sorts by weight.
@@ -114,5 +88,27 @@ interface DomainLoaderInterface {
    *   The cleaned hostname.
    */
   public function prepareHostname($hostname);
+
+  /**
+   * Gets the hostname of the active request.
+   *
+   * @return string
+   *   The hostname string of the current request.
+   */
+  public function createHostname();
+
+  /**
+   * Creates a machine-name string from the hostname.
+   *
+   * This string is the primary key of the entity.
+   *
+   * @param string $hostname
+   *   The hostname of the domain record. If empty, the current request will be
+   *   used.
+   *
+   * @return string
+   *   A string containing A-Z, a-z, 0-9, and _ characters.
+   */
+  public function createMachineName($hostname = NULL);
 
 }

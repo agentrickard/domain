@@ -45,7 +45,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
     // Assign a node to a random domain.
-    $domains = \Drupal::service('domain.loader')->loadMultiple();
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
     $active_domain = array_rand($domains, 1);
     $domain = $domains[$active_domain];
     // Create an article node.

@@ -46,7 +46,7 @@ class DomainConditionTest extends DomainTestBase {
     $this->domainCreateTestDomains(5);
 
     // Get two sample domains.
-    $this->domains = \Drupal::service('domain.loader')->loadMultiple();
+    $this->domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
     $this->test_domain = array_shift($this->domains);
     $this->not_domain = array_shift($this->domains);
   }
