@@ -66,7 +66,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * @inheritdoc
    */
   public function getAllValue(EntityInterface $entity) {
-    return $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value;
+    return $entity->hasField(DOMAIN_ACCESS_ALL_FIELD) ? $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
   }
 
   /**
@@ -86,25 +86,19 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * @inheritdoc
    */
   public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
-    $item = array();
-    switch ($entity->getEntityType()->id()) {
-      case 'user':
-      case 'node':
-        if ($entity->isNew()) {
-          /** @var \Drupal\domain\DomainInterface $active */
-          if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
-            $item[0]['target_uuid'] = $active->uuid();
-          }
-        }
-        // This code does not fire, but it should.
-        else {
-          foreach (self::getAccessValues($entity) as $id) {
-            $item[] = $id;
-          }
-        }
-        break;
-      default:
-        break;
+    $item = [];
+    if (!$entity->isNew()) {
+      // If set, ensure we do not drop existing data.
+      foreach (self::getAccessValues($entity) as $id) {
+        $item[] = $id;
+      }
+    }
+    // When creating a new entity, populate if required.
+    elseif ($entity->getFieldDefinition(DOMAIN_ACCESS_FIELD)->isRequired()) {
+      /** @var \Drupal\domain\DomainInterface $active */
+      if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
+        $item[0]['target_uuid'] = $active->uuid();
+      }
     }
     return $item;
   }

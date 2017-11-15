@@ -102,6 +102,7 @@ class DomainElementManager implements DomainElementManagerInterface {
   public static function submitEntityForm(array &$form, FormStateInterface $form_state) {
     $fields = $form_state->getValue('domain_hidden_fields');
     foreach ($fields as $field) {
+      $entity_values = [];
       $values = $form_state->getValue($field . '_disallowed');
       if (!empty($values)) {
         $info = $form_state->getBuildInfo();
@@ -147,7 +148,7 @@ class DomainElementManager implements DomainElementManagerInterface {
    */
   public function getFieldValues($entity, $field_name) {
     // @TODO: static cache.
-    $list = array();
+    $list = [];
     // @TODO In tests, $entity is returning NULL.
     if (is_null($entity)) {
       return $list;
