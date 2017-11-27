@@ -258,7 +258,14 @@ class DomainListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
+    // Do not let the form reorder domain weights incorrectly.
+    $i = 1;
+    foreach ($form_state->getValue('domains') as $id => $value) {
+      // Save the weight values of each entity.
+      $this->entities[$id]->set('weight', $i);
+      $this->entities[$id]->save();
+      $i++;
+    }
     drupal_set_message($this->t('Configuration saved.'));
   }
 
