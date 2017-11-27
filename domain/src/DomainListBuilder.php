@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -233,9 +234,7 @@ class DomainListBuilder extends DraggableListBuilder {
     if (!$this->currentUser->hasPermission('administer domains')) {
       unset($row['weight']);
     }
-    else {
-      $row['weight']['#delta'] = count($this->domainStorage->loadMultiple()) + 1;
-    }
+
     return $row;
   }
 
@@ -251,6 +250,13 @@ class DomainListBuilder extends DraggableListBuilder {
       $form['actions']['submit']['#access'] = FALSE;
       unset($form['#tabledrag']);
     }
+    // Delta is set after each row is loaded.
+    $count = count($this->domainStorage->loadMultiple()) + 1;
+    foreach (Element::children($form['domains']) as $key) {
+      if (isset($form['domains'][$key]['weight'])) {
+        $form['domains'][$key]['weight']['#delta'] = $count;
+      }
+    }
     return $form;
   }
 
@@ -265,7 +271,9 @@ class DomainListBuilder extends DraggableListBuilder {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Do not let the form reorder domain weights incorrectly.
     $i = 1;
-    foreach ($form_state->getValue('domains') as $id => $value) {
+    $domains = $form_state->getValue('domains');
+    uasort($domains, [$this, 'sortByWeight']);
+    foreach ($domains as $id => $value) {
       // Save the weight values of each entity.
       $this->entities[$id]->set('weight', $i);
       // Do not allow accidental hostname rewrites.
@@ -274,6 +282,16 @@ class DomainListBuilder extends DraggableListBuilder {
       $i++;
     }
     drupal_set_message($this->t('Configuration saved.'));
+  }
+
+  /**
+   * Internal sort method for form weights.
+   */
+  private function sortByWeight($a, $b) {
+    if ($a['weight'] < $b['weight']) {
+      return 0;
+    }
+    return 1;
   }
 
   /**
