@@ -256,6 +256,11 @@ class DomainListBuilder extends DraggableListBuilder {
 
   /**
    * {@inheritdoc}
+   *
+   * Overrides the parent method to prevent saving bad data.
+   *
+   * @link https://www.drupal.org/project/domain/issues/2925798
+   * @link https://www.drupal.org/project/domain/issues/2925629
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Do not let the form reorder domain weights incorrectly.
@@ -263,6 +268,8 @@ class DomainListBuilder extends DraggableListBuilder {
     foreach ($form_state->getValue('domains') as $id => $value) {
       // Save the weight values of each entity.
       $this->entities[$id]->set('weight', $i);
+      // Do not allow accidental hostname rewrites.
+      $this->entities[$id]->set('hostname', $this->entities[$id]->getCanonical());
       $this->entities[$id]->save();
       $i++;
     }
