@@ -64,7 +64,7 @@ class DomainAliasListHostnameTest extends DomainTestBase {
     $match = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($match) == 1, 'One environment match loaded');
     $alias = current($match);
-    $this->assert($alias->getPattern() == 'five.' $base, 'Proper pattern match loaded.');
+    $this->assert($alias->getPattern() == 'five.' . $base, 'Proper pattern match loaded.');
 
     $admin = $this->drupalCreateUser(array(
       'bypass node access',
