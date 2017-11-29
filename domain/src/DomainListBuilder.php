@@ -270,9 +270,14 @@ class DomainListBuilder extends DraggableListBuilder {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     // Do not let the form reorder domain weights incorrectly.
-    $i = 1;
+    // Check for pagination to set our base value.
+    $page = \Drupal::request()->query->get('page');
+    $offset = $page * $this->limit;
+    $i = 1 + $offset;
+    // Sort the domains from this form.
     $domains = $form_state->getValue('domains');
     uasort($domains, [$this, 'sortByWeight']);
+    // Set the proper values.
     foreach ($domains as $id => $value) {
       // Save the weight values of each entity.
       $this->entities[$id]->set('weight', $i);
