@@ -280,11 +280,16 @@ class DomainListBuilder extends DraggableListBuilder {
     // Set the proper values.
     foreach ($domains as $id => $value) {
       // Save the weight values of each entity.
-      $this->entities[$id]->set('weight', $i);
+      if (($value['weight'] > ($offset + $this->limit) || $value['weight'] < $offset) && $this->entities[$id]->get('weight') != $value['weight']) {
+        $this->entities[$id]->set('weight', $value['weight']);
+      }
+      else {
+        $this->entities[$id]->set('weight', $i);
+        $i++;
+      }
       // Do not allow accidental hostname rewrites.
       $this->entities[$id]->set('hostname', $this->entities[$id]->getCanonical());
       $this->entities[$id]->save();
-      $i++;
     }
     drupal_set_message($this->t('Configuration saved.'));
   }

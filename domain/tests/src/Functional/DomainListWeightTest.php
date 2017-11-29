@@ -24,23 +24,24 @@ class DomainListWeightTest extends DomainTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Create 10 domains.
-    $this->domainCreateTestDomains(10);
+    // Create 60 domains. We paginate at 50.
+    $this->domainCreateTestDomains(60);
   }
 
   /**
    * Basic test setup.
    */
   public function testDomainWeight() {
-    // Test the default sort values. Should be 1 to 10.
+    // Test the default sort values. Should be 1 to 60.
     $domains = $this->getDomainsSorted();
     $i = 1;
     foreach ($domains as $domain) {
       $this->assert($domain->getWeight() == $i, 'Weight set to ' . $i);
       $i++;
     }
-    // The last domain should be nine_example_com.
-    $this->assert($domain->id() == 'nine_example_com', 'Last domain is nine' . $domain->id());
+    // The last domain should be test59_example_com.
+    $this->assert($domain->id() == 'test59_example_com', 'Last domain is test59');
+    $domains_old = $domains;
 
     $admin = $this->drupalCreateUser(array(
       'bypass node access',
@@ -54,9 +55,9 @@ class DomainListWeightTest extends DomainTestBase {
     $this->drupalGet('admin/config/domain');
     $this->assertSession()->statusCodeEquals(200);
 
-    // Set one weight to 11.
+    // Set one weight to 61.
     $locator = 'edit-domains-one-example-com-weight';
-    $this->fillField($locator, 11);
+    $this->fillField($locator, 61);
 
     // Save the form.
     $this->pressButton('edit-submit');
@@ -64,10 +65,58 @@ class DomainListWeightTest extends DomainTestBase {
     $domains = $this->getDomainsSorted();
     $i = 1;
     foreach ($domains as $domain) {
-      $this->assert($domain->getWeight() == $i, 'Weight set to ' . $i);
+      // Weights should be the same one page 1 except for the one we changed.
+      if ($domain->id() == 'one_example_com') {
+        $this->assert($domain->getWeight() == 61, 'Weight set to 61 ' . $domain->getWeight());
+      }
+      elseif ($domain->getWeight() < 50) {
+        $this->assert($domain->getWeight() == $i, 'Weight set to ' . $i . $domain->getWeight());
+      }
+      // These values should not change.
+      else {
+        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight(). 'Weights unchanged');
+      }
       $i++;
     }
     // The last domain should be one_example_com.
-    $this->assert($domain->id() == 'one_example_com', 'Last domain is one'  . $domain->id());
+    $this->assert($domain->id() == 'one_example_com', 'Last domain is one');
+
+    // Go to page two.
+    $this->clickLink('Next');
+    $this->assertSession()->statusCodeEquals(200);
+    // Set one weight to 2.
+    $locator = 'edit-domains-one-example-com-weight';
+    $this->fillField($locator, 2);
+    // Save the form.
+    $this->pressButton('edit-submit');
+
+    $this->drupalGet('admin/config/domain');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Go to page two.
+    $this->clickLink('Next');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Check the domain sort order.
+    $domains = $this->getDomainsSorted();
+    $i = 1;
+    foreach ($domains as $domain) {
+      if ($domain->id() == 'one_example_com') {
+       $this->assert($domain->getWeight() == 2, 'Weight set to 2');
+      }
+      elseif ($domain->getWeight() < 51) {
+        $this->assert($domain->getWeight() == $i, 'Weight set to ' . $i);
+        $i++;
+      }
+      elseif ($domain->getWeight() == 51) {
+        $this->assert($domain->getWeight() == 51, 'Two domains weighted 51.');
+      }
+      // These values should decrease by 1.
+      else {
+        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight() - 1, 'Weights decreased by 1');
+      }
+    }
+    // The last domain should be test59_example_com.
+    $this->assert($domain->id() == 'test59_example_com', 'Last domain is test59' . $domain->id());
   }
 }

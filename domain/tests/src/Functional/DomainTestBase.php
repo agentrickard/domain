@@ -236,7 +236,8 @@ abstract class DomainTestBase extends BrowserTestBase {
    *   An array of domain entities.
    */
   public function getDomains() {
-    return \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple(NULL, TRUE);
+    \Drupal::service('entity_type.manager')->getStorage('domain')->resetCache();
+    return \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
   }
 
   /**
@@ -246,7 +247,7 @@ abstract class DomainTestBase extends BrowserTestBase {
    *   An array of domain entities.
    */
   public function getDomainsSorted() {
-    \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple(NULL, TRUE);
+    \Drupal::service('entity_type.manager')->getStorage('domain')->resetCache();
     return \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
   }
 
