@@ -269,30 +269,17 @@ class DomainListBuilder extends DraggableListBuilder {
    * @link https://www.drupal.org/project/domain/issues/2925629
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Do not let the form reorder domain weights incorrectly.
-    // Check for pagination to set our base value.
-    $page = \Drupal::request()->query->get('page');
-    $offset = $page * $this->limit;
-    $i = 1 + $offset;
-    // Sort the domains from this form.
-    $domains = $form_state->getValue('domains');
-    uasort($domains, [$this, 'sortByWeight']);
-    // Set the proper values.
-    foreach ($domains as $id => $value) {
-      // Save the weight values of each entity.
-      if (($value['weight'] > ($offset + $this->limit) || $value['weight'] < $offset) && $this->entities[$id]->get('weight') != $value['weight']) {
-        $this->entities[$id]->set('weight', $value['weight']);
+    foreach ($form_state->getValue($this->entitiesKey) as $id => $value) {
+      if (isset($this->entities[$id]) && $this->entities[$id]->get($this->weightKey) != $value['weight']) {
+        // Reset weight properly.
+        $this->entities[$id]->set($this->weightKey, $value['weight']);
+        // Do not allow accidental hostname rewrites.
+        $this->entities[$id]->set('hostname', $this->entities[$id]->getCanonical());
+        $this->entities[$id]->save();
       }
-      else {
-        $this->entities[$id]->set('weight', $i);
-        $i++;
-      }
-      // Do not allow accidental hostname rewrites.
-      $this->entities[$id]->set('hostname', $this->entities[$id]->getCanonical());
-      $this->entities[$id]->save();
     }
-    drupal_set_message($this->t('Configuration saved.'));
   }
+
 
   /**
    * Internal sort method for form weights.

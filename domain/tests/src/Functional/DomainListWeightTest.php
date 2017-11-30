@@ -69,10 +69,6 @@ class DomainListWeightTest extends DomainTestBase {
       if ($domain->id() == 'one_example_com') {
         $this->assert($domain->getWeight() == 61, 'Weight set to 61 ' . $domain->getWeight());
       }
-      elseif ($domain->getWeight() < 50) {
-        $this->assert($domain->getWeight() == $i, 'Weight set to ' . $i . $domain->getWeight());
-      }
-      // These values should not change.
       else {
         $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight(). 'Weights unchanged');
       }
@@ -102,18 +98,10 @@ class DomainListWeightTest extends DomainTestBase {
     $i = 1;
     foreach ($domains as $domain) {
       if ($domain->id() == 'one_example_com') {
-       $this->assert($domain->getWeight() == 2, 'Weight set to 2');
+        $this->assert($domain->getWeight() == 2, 'Weight set to 2');
       }
-      elseif ($domain->getWeight() < 51) {
-        $this->assert($domain->getWeight() == $i, 'Weight set to ' . $i);
-        $i++;
-      }
-      elseif ($domain->getWeight() == 51) {
-        $this->assert($domain->getWeight() == 51, 'Two domains weighted 51.');
-      }
-      // These values should decrease by 1.
       else {
-        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight() - 1, 'Weights decreased by 1');
+        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight(). 'Weights unchanged');
       }
     }
     // The last domain should be test59_example_com.
