@@ -50,6 +50,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet($editUrl);
 
     // Update the record.
+    $edit = [];
     $edit['name'] = 'Foo';
     $this->drupalPostForm($editUrl, $edit, $this->t('Save'));
 

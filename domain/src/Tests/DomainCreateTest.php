@@ -18,7 +18,9 @@ class DomainCreateTest extends DomainTestBase {
     $this->domainTableIsEmpty();
 
     // Create a new domain programmatically.
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->create();
+    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $domain = $storage->create();
+    $domain->set('id', $storage->createMachineName($domain->getHostname()));
     foreach (array('id', 'name', 'hostname', 'scheme', 'status', 'weight' , 'is_default') as $key) {
       $property = $domain->get($key);
       $this->assertTrue(isset($property), new FormattableMarkup('New $domain->@key property is set to default value: %value.', array('@key' => $key, '%value' => $property)));
@@ -26,11 +28,11 @@ class DomainCreateTest extends DomainTestBase {
     $domain->save();
 
     // Did it save correctly?
-    $default_id = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultId();
+    $default_id = $storage->loadDefaultId();
     $this->assertTrue(!empty($default_id), 'Default domain has been set.');
 
     // Does it load correctly?
-    $new_domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($default_id);
+    $new_domain = $storage->load($default_id);
     $this->assertTrue($new_domain->id() == $domain->id(), 'Domain loaded properly.');
 
     // Has domain id been set?
@@ -41,7 +43,7 @@ class DomainCreateTest extends DomainTestBase {
 
     // Delete the domain.
     $domain->delete();
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($default_id, TRUE);
+    $domain = $storage->load($default_id, TRUE);
     $this->assertTrue(empty($domain), 'Domain record deleted.');
 
     // No domains should exist.

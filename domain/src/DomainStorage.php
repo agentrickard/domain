@@ -152,7 +152,6 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
     if (empty($values)) {
       $values['hostname'] = $this->createHostname();
       $values['name'] = \Drupal::config('system.site')->get('name');
-      $values['id'] = $this->createMachineName($values['hostname']);
     }
     $values += array(
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
