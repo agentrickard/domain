@@ -212,10 +212,12 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       /** @var self $default */
       if ($default = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain()) {
         $default->is_default = 0;
+        $default->setHostname($default->getCanonical());
         $default->save();
       }
       // Save the new default.
       $this->is_default = 1;
+      $this->setHostname($this->getCanonical());
       $this->save();
     }
     else {
@@ -228,6 +230,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function enable() {
     $this->setStatus(TRUE);
+    $this->setHostname($this->getCanonical());
     $this->save();
   }
 
@@ -237,6 +240,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function disable() {
     if (!$this->isDefault()) {
       $this->setStatus(FALSE);
+      $this->setHostname($this->getCanonical());
       $this->save();
     }
     else {
@@ -250,6 +254,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function saveProperty($name, $value) {
     if (isset($this->{$name})) {
       $this->{$name} = $value;
+      $this->setHostname($this->getCanonical());
       $this->save();
       drupal_set_message($this->t('The @key attribute was set to @value for domain @hostname.', array(
         '@key' => $name,

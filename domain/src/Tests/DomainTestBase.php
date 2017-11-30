@@ -66,6 +66,7 @@ abstract class DomainTestBase extends WebTestBase {
     foreach ($required as $key) {
       $edit[$key] = $domain->get($key);
     }
+    $edit['id'] = \Drupal::service('entity_type.manager')->getStorage('domain')->createMachineName($edit['hostname']);
     return $edit;
   }
 

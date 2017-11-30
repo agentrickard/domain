@@ -102,7 +102,7 @@ class DomainForm extends EntityForm {
     );
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $domain->id(),
+      '#default_value' => !empty($domain->id()) ? $domain->id() : '',
       '#disabled' => !empty($domain->id()),
       '#machine_name' => array(
         'source' => array('hostname'),

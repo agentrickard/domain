@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -233,9 +234,7 @@ class DomainListBuilder extends DraggableListBuilder {
     if (!$this->currentUser->hasPermission('administer domains')) {
       unset($row['weight']);
     }
-    else {
-      $row['weight']['#delta'] = count($this->domainStorage->loadMultiple()) + 1;
-    }
+
     return $row;
   }
 
@@ -251,15 +250,45 @@ class DomainListBuilder extends DraggableListBuilder {
       $form['actions']['submit']['#access'] = FALSE;
       unset($form['#tabledrag']);
     }
+    // Delta is set after each row is loaded.
+    $count = count($this->domainStorage->loadMultiple()) + 1;
+    foreach (Element::children($form['domains']) as $key) {
+      if (isset($form['domains'][$key]['weight'])) {
+        $form['domains'][$key]['weight']['#delta'] = $count;
+      }
+    }
     return $form;
   }
 
   /**
    * {@inheritdoc}
+   *
+   * Overrides the parent method to prevent saving bad data.
+   *
+   * @link https://www.drupal.org/project/domain/issues/2925798
+   * @link https://www.drupal.org/project/domain/issues/2925629
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
-    drupal_set_message($this->t('Configuration saved.'));
+    foreach ($form_state->getValue($this->entitiesKey) as $id => $value) {
+      if (isset($this->entities[$id]) && $this->entities[$id]->get($this->weightKey) != $value['weight']) {
+        // Reset weight properly.
+        $this->entities[$id]->set($this->weightKey, $value['weight']);
+        // Do not allow accidental hostname rewrites.
+        $this->entities[$id]->set('hostname', $this->entities[$id]->getCanonical());
+        $this->entities[$id]->save();
+      }
+    }
+  }
+
+
+  /**
+   * Internal sort method for form weights.
+   */
+  private function sortByWeight($a, $b) {
+    if ($a['weight'] < $b['weight']) {
+      return 0;
+    }
+    return 1;
   }
 
   /**
