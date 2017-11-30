@@ -1,7 +1,8 @@
 <?php
 
-namespace Drupal\domain\Tests;
-use Drupal\Component\Render\FormattableMarkup;
+namespace Drupal\Tests\domain\Functional;
+
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain record actions.
@@ -19,9 +20,6 @@ class DomainActionsTest extends DomainTestBase {
 
     $path = 'admin/config/domain';
 
-    // No domains should exist.
-    $this->domainTableIsEmpty();
-
     // Create test domains.
     $this->domainCreateTestDomains(4);
 
@@ -30,23 +28,24 @@ class DomainActionsTest extends DomainTestBase {
     $this->assertResponse(200);
 
     // Test the domains.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple(NULL, TRUE);
+    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $domains = $storage->loadMultiple(NULL, TRUE);
     $this->assertTrue(count($domains) == 4, 'Four domain records found.');
 
     // Check the default domain.
-    $default = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultId();
+    $default = $storage->loadDefaultId();
     $key = 'example_com';
     $this->assertTrue($default == $key, 'Default domain set correctly.');
 
     // Test some text on the page.
     foreach ($domains as $domain) {
       $name = $domain->label();
-      $this->assertText($name, new FormattableMarkup('@name found on overview page.', array('@name' => $name)));
+      $this->assertText($name, 'Name found properly.');
     }
     // @TODO: Test the list of actions.
     $actions = array('delete', 'disable', 'default');
     foreach ($actions as $action) {
-      $this->assertRaw("/domain/{$action}/", new FormattableMarkup('@action action found.', array('@action' => $action)));
+      $this->assertRaw("/domain/{$action}/", 'Actions found properly.');
     }
     // @TODO: Disable a domain and test the enable link.
 
