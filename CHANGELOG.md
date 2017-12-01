@@ -11,6 +11,7 @@ Changelog
 13-DEC-2016 8.x-1.0-alpha7
 12-MAR-2017 8.x-1.0-alpha8
 23-APR-2017 8.x-1.0-alpha9
+01-DEC-2017 8.x-1.0-alpha10
 
 Status
 ====
@@ -95,7 +96,7 @@ marked with [x] are considered complete.
 - [x] Error handling in DomainAliasForm
 - [x] Error checking in DomainAliasController
 - [x] Deprecated methods in DomainAliasController
-- [ ] Error reporting in `domain_alias_domain_request_alter()`
+- [x] Error reporting in `domain_alias_domain_request_alter()`
 - [ ] Ensure completeness of DomainAccessPermissionsTest
 - [x] Check module setup behavior in tests
 - [x] Make all affiliates default value configurable
@@ -104,7 +105,7 @@ marked with [x] are considered complete.
 - [x] Review drupalUserIsLoggedIn() hack
 - [x] Review DomainNegotiatorTest for completeness
 - [x] Review core note in DomainEntityReferenceTest
-- [ ] Expand DomainActionsTest
+- [x] Expand DomainActionsTest
 - [x] DomainViewBuilder review
 - [x] Dependency Injection in DomainValidator
 - [ ] Caching strategies in DomainNegotiator
@@ -120,5 +121,5 @@ marked with [x] are considered complete.
 - [ ] Security review
 - [ ] Provide an upgrade path from 6.x
 - [ ] Provide an upgrade path from 7.x-3.x
-- [ ] Remove calls to deprecated methods / classes
+- [x] Remove calls to deprecated methods / classes
 - [ ] Remove unnecessary use statements
