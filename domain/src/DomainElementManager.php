@@ -87,7 +87,7 @@ class DomainElementManager implements DomainElementManagerInterface {
       $buttons = ['preview', 'delete'];
       $submit = $this->getSubmitHandler();
       foreach ($form['actions'] as $key => $action) {
-        if (!in_array($key, $buttons) && is_array($action) && !in_array($submit, $form['actions'][$key]['#submit'])) {
+        if (!in_array($key, $buttons) && isset($form['actions'][$key]['#submit']) && !in_array($submit, $form['actions'][$key]['#submit'])) {
           array_unshift($form['actions'][$key]['#submit'], $submit);
         }
       }
