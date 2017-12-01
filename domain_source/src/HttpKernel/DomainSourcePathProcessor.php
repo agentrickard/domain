@@ -129,7 +129,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
 
     // Check the route, if available. Entities can be configured to
     // only rewrite specific routes.
-    if ($this->allowedRoute($url->getRouteName())) {
+    if ($url->isRouted() && $this->allowedRoute($url->getRouteName())) {
       // Load the entity to check
       if (!empty($options['entity'])) {
         $entity = $options['entity'];
@@ -230,7 +230,13 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   public function getExcludedRoutes() {
     if (!isset($this->excludedRoutes)) {
       $config = $this->configFactory->get('domain_source.settings');
-      $this->excludedRoutes = array_flip($config->get('exclude_routes', []));
+      $routes = $config->get('exclude_routes');
+      if (is_array($routes)) {
+        $this->excludedRoutes = array_flip($routes);
+      }
+      else {
+        $this->excludedRoutes = [];
+      }
     }
     return $this->excludedRoutes;
   }
