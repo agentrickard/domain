@@ -171,6 +171,10 @@ new domains are created.
  domains are either restricted (inactive) or fail to load. This value can be
  reassigned after domains are created.
 
+Domain records are *configuration entities*, which means they are not stored in
+the database nor accessible to Views by default. They are, however, exportable
+as part of your configuration.
+
 Domains and caching
 ------
 
