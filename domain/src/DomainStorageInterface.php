@@ -111,4 +111,14 @@ interface DomainStorageInterface extends ConfigEntityStorageInterface {
    */
   public function createMachineName($hostname = NULL);
 
+  /**
+   * Returns the default http/https scheme for the site.
+   *
+   * This function helps us account for variable schemes across environments.
+   *
+   * @return $scheme
+   *   A string representation of s scheme (http|https).
+   */
+  public function getDefaultScheme();
+
 }

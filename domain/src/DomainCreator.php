@@ -51,7 +51,7 @@ class DomainCreator implements DomainCreatorInterface {
       $values['name'] = \Drupal::config('system.site')->get('name');
     }
     $values += array(
-      'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
+      'scheme' => \Drupal::service('entity_type.manager')->getStorage('domain')->getDefaultScheme(),
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),

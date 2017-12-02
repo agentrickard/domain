@@ -154,7 +154,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
       $values['name'] = \Drupal::config('system.site')->get('name');
     }
     $values += array(
-      'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
+      'scheme' => $this->getDefaultScheme(),
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
@@ -180,6 +180,26 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
       $hostname = $this->createHostname();
     }
     return preg_replace('/[^a-z0-9_]/', '_', $hostname);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultScheme() {
+    // Use the foundation request if possible/
+    $request = \Drupal::request();
+    if (!empty($request)) {
+      $scheme = $request->getScheme();
+    }
+    // Else use the server variable.
+    elseif (!empty($_SERVER['https'])) {
+      $scheme = 'https';
+    }
+    // Else fall through to default.
+    else {
+      $scheme = 'http';
+    }
+    return $scheme;
   }
 
 }
