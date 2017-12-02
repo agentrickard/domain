@@ -154,7 +154,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
       $values['name'] = \Drupal::config('system.site')->get('name');
     }
     $values += array(
-      'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
+      'scheme' => \Drupal::request()->getScheme(),
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),

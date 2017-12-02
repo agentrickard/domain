@@ -422,12 +422,22 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public function getScheme($add_suffix = TRUE) {
     $scheme = $this->scheme;
-    if ($scheme != 'https') {
+    if ($scheme == 'variable') {
+      $scheme = \Drupal::request()->getScheme();
+    }
+    elseif ($scheme != 'https') {
       $scheme = 'http';
     }
     $scheme .= ($add_suffix) ? '://' : '';
 
     return $scheme;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRawScheme() {
+    return $this->scheme;
   }
 
   /**

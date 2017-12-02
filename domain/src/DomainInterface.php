@@ -77,7 +77,9 @@ interface DomainInterface extends ConfigEntityInterface {
   public function getUrl();
 
   /**
-   * Returns the scheme for a domain record.
+   * Returns the active scheme for a domain record.
+   *
+   * This method is to be used when generating URLs.
    *
    * @param bool $add_suffix
    *   Tells the method to return :// after the string.
@@ -86,6 +88,17 @@ interface DomainInterface extends ConfigEntityInterface {
    *   Returns a valid scheme (http or https), with or without the suffix.
    */
   public function getScheme($add_suffix = TRUE);
+
+  /**
+   * Returns the stored scheme value for a domain record.
+   *
+   * This method is to be used with forms and when saving domain records. It
+   * returns the raw value (http|https|variable) of the domain's default scheme.
+   *
+   * @return string
+   *   Returns a stored scheme default (http|https|variable) for the record.
+   */
+  public function getRawScheme();
 
   /**
    * Retrieves the value of the response test.

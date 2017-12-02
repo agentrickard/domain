@@ -122,9 +122,9 @@ class DomainForm extends EntityForm {
     $form['scheme'] = array(
       '#type' => 'radios',
       '#title' => $this->t('Domain URL scheme'),
-      '#options' => array('http' => 'http://', 'https' => 'https://'),
-      '#default_value' => $domain->getScheme($add_suffix),
-      '#description' => $this->t('This URL scheme will be used when writing links and redirects to this domain and its resources.'),
+      '#options' => array('http' => 'http://', 'https' => 'https://', 'variable' => 'Variable'),
+      '#default_value' => $domain->getRawScheme(),
+      '#description' => $this->t('This URL scheme will be used when writing links and redirects to this domain and its resources. Selecting <strong>Variable</strong> will inherit the current scheme of the web request.'),
     );
     $form['status'] = array(
       '#type' => 'radios',
