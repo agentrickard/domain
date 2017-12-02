@@ -423,7 +423,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function getScheme($add_suffix = TRUE) {
     $scheme = $this->scheme;
     if ($scheme == 'variable') {
-      $scheme = \Drupal::request()->getScheme();
+      $scheme = \Drupal::service('entity_type.manager')->getStorage('domain')->getDefaultScheme();
     }
     elseif ($scheme != 'https') {
       $scheme = 'http';
