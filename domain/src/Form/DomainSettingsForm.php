@@ -31,7 +31,7 @@ class DomainSettingsForm extends ConfigFormBase {
     $config = $this->config('domain.settings');
     $form['allow_non_ascii'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('Allow non-ASCII characters in domains and aliases.'),
+      '#title' => $this->t('Allow non-ASCII characters in domains and aliases'),
       '#default_value' => $config->get('allow_non_ascii'),
       '#description' => $this->t('Domains may be registered with international character sets. Note that not all DNS server respect non-ascii characters.'),
     );
