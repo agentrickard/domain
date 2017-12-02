@@ -92,6 +92,11 @@ function domain_alias_domain_load($entities) {
     $enabled = TRUE;
   }
 
+  // Do nothing if we are on the domain admin page.
+  if (Drupal::routeMatch()->getRouteName() == 'domain.admin') {
+    return;
+  }
+
   // We cannot run before the negotiator service has fired.
   $negotiator = \Drupal::service('domain.negotiator');
   $active = $negotiator->getActiveDomain();
