@@ -56,7 +56,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Test a user who can access some domain settings.
     $user2 = $this->drupalCreateUser(array('create article content', 'publish to any assigned domain'));
     $active_domain = array_rand($domains, 1);
-    $this->addDomainToEntity('user', $user2->id(), $active_domain);
+    $this->addDomainsToEntity('user', $user2->id(), $active_domain, DOMAIN_ACCESS_FIELD);
     $this->drupalLogin($user2);
 
     // Visit the article creation page.
@@ -117,7 +117,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Test a user who can assign users to some domains.
     $user5 = $this->drupalCreateUser(array('administer users', 'assign domain editors'));
     $active_domain = array_rand($domains, 1);
-    $this->addDomainToEntity('user', $user5->id(), $active_domain);
+    $this->addDomainsToEntity('user', $user5->id(), $active_domain, DOMAIN_ACCESS_FIELD);
     $this->drupalLogin($user5);
 
     // Visit the account creation page.

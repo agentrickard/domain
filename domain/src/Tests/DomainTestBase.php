@@ -45,7 +45,7 @@ abstract class DomainTestBase extends WebTestBase {
     }
 
     // Set the base hostname for domains.
-    $this->base_hostname = \Drupal::service('entity_type.manager')->getStorage('domain')->createHostname();
+    $this->setBaseHostname();
   }
 
   /**

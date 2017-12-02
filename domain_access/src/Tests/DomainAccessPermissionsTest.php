@@ -84,7 +84,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       'edit domain content',
       'delete domain content',
     ));
-    $this->addDomainToEntity('user', $domain_user1->id(), $two);
+    $this->addDomainsToEntity('user', $domain_user1->id(), $two, DOMAIN_ACCESS_FIELD);
     $domain_user1 = $user_storage->load($domain_user1->id());
     $assigned = $this->manager->getAccessValues($domain_user1);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
@@ -117,7 +117,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       'update page content on assigned domains',
       'delete page content on assigned domains',
     ));
-    $this->addDomainToEntity('user', $domain_user3->id(), $two);
+    $this->addDomainsToEntity('user', $domain_user3->id(), $two, DOMAIN_ACCESS_FIELD);
     $domain_user3 = $user_storage->load($domain_user3->id());
     $assigned = $this->manager->getAccessValues($domain_user3);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
@@ -151,8 +151,8 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       'update page content on assigned domains',
       'delete page content on assigned domains',
     ));
-    $this->addDomainToEntity('user', $domain_user4->id(), $two);
-    $this->addDomainToEntity('user', $domain_user4->id(), 1, DOMAIN_ACCESS_ALL_FIELD);
+    $this->addDomainsToEntity('user', $domain_user4->id(), $two, DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $domain_user4->id(), 1, DOMAIN_ACCESS_ALL_FIELD);
     $domain_user4 = $user_storage->load($domain_user4->id());
     $assigned = $this->manager->getAccessValues($domain_user4);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
@@ -181,7 +181,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
 
     // Tests create permissions. Any content on assigned domains.
     $domain_user5 = $this->drupalCreateUser(array('access content', 'create domain content'));
-    $this->addDomainToEntity('user', $domain_user5->id(), $two);
+    $this->addDomainsToEntity('user', $domain_user5->id(), $two, DOMAIN_ACCESS_FIELD);
     $domain_user5 = $user_storage->load($domain_user5->id());
     $assigned = $this->manager->getAccessValues($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
@@ -200,7 +200,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     }
     // Tests create permissions. Page content on assigned domains.
     $domain_user5 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
-    $this->addDomainToEntity('user', $domain_user5->id(), $two);
+    $this->addDomainsToEntity('user', $domain_user5->id(), $two, DOMAIN_ACCESS_FIELD);
     $domain_user5 = $user_storage->load($domain_user5->id());
     $assigned = $this->manager->getAccessValues($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
