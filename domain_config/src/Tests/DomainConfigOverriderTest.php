@@ -17,7 +17,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
   public function testDomainConfigOverrider() {
     // No domains should exist.
     $this->domainTableIsEmpty();
-    // Create four new domains programmatically.
+    // Create five new domains programmatically.
     $this->domainCreateTestDomains(5);
     // Get the domain list.
     $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
@@ -28,18 +28,10 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     // - example.com name = 'Drupal' for English, 'Drupal' for Spanish.
     // - one.example.com name = 'One' for English, 'Drupal' for Spanish.
     // - two.example.com name = 'Two' for English, 'Dos' for Spanish.
-    // - three.example.com name = 'Three' for English, 'Drupal' for Spanish.
+    // - three.example.com name = 'Drupal' for English, 'Drupal' for Spanish.
     // - four.example.com name = 'Four' for English, 'Four' for Spanish.
     foreach ($domains as $domain) {
       // Test the login page, because our default homepages do not exist.
-      $path = $domain->getPath() . 'user/login';
-      $this->drupalGet($path);
-      if ($domain->isDefault()) {
-        $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
-      }
-      else {
-        $this->assertRaw('<title>Log in | ' . $domain->label() . '</title>', 'Loaded the proper site name.');
-      }
       foreach ($this->langcodes as $langcode => $language) {
         $path = $domain->getPath() . $langcode . '/user/login';
         $this->drupalGet($path);
@@ -47,7 +39,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
           $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
         }
         else {
-          $this->assertRaw('<title>Log in | ' . $this->expectedName($domain) . '</title>', 'Loaded the proper site name.');
+          $this->assertRaw('<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>', 'Loaded the proper site name.' . '<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>');
         }
       }
     }
@@ -69,7 +61,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     ];
     $this->writeSettings($settings);
 
-    // Create four new domains programmatically.
+    // Create five new domains programmatically.
     $this->domainCreateTestDomains(5);
     $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple(['one_example_com', 'four_example_com']);
 
@@ -86,21 +78,26 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
    *
    * @param DomainInterface $domain
    *   The Domain object.
+   * @param $langcode
+   *   A two-digit language code.
    *
    * @return string
    *   The expected name.
    */
-  private function expectedName(DomainInterface $domain) {
+  private function expectedName(DomainInterface $domain, $langcode = NULL) {
     $name = '';
 
     switch ($domain->id()) {
       case 'one_example_com':
-      case 'three_example_com':
-        $name = 'Drupal';
+        $name = ($langcode == 'es') ? 'Drupal' : 'One';
         break;
 
       case 'two_example_com':
-        $name = 'Dos';
+        $name = ($langcode == 'es') ? 'Dos' : 'Two';
+        break;
+
+      case 'three_example_com':
+        $name = 'Drupal';
         break;
 
       case 'four_example_com':
