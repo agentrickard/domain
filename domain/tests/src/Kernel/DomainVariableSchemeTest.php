@@ -2,14 +2,17 @@
 
 namespace Drupal\Tests\domain\Kernel;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\domain\Functional\DomainTestTrait;
 
 /**
  * Tests the ability to set a variable scheme on a domain.
  *
  * @group domain
  */
-class DomainVariableSchemeTest extends DomainTestBase {
+class DomainVariableSchemeTest extends KernelTestBase {
+
+  use DomainTestTrait;
 
   /**
    * Modules to enable.
