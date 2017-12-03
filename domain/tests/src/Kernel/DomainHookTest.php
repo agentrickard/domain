@@ -3,7 +3,8 @@
 namespace Drupal\Tests\domain\Kernel;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\domain\Functional\DomainTestTrait;
 
 /**
  * Tests domain hooks documented in domain.api.php.
@@ -17,14 +18,16 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
  *
  * @group domain
  */
-class DomainHookTest extends DomainTestBase {
+class DomainHookTest extends KernelTestBase {
+
+  use DomainTestTrait;
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_test');
+  public static $modules = array('domain', 'domain_test', 'user', 'node');
 
   /**
    * Domain id key.
