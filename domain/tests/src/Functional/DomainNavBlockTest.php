@@ -28,7 +28,7 @@ class DomainNavBlockTest extends DomainTestBase {
     $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
 
     // Place the nav block.
-    $this->drupalPlaceBlock('domain_nav_block');
+    $block = $this->drupalPlaceBlock('domain_nav_block');
 
     // Let the anon user view the block.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('use domain nav block'));
@@ -64,5 +64,24 @@ class DomainNavBlockTest extends DomainTestBase {
     foreach ($domains as $id => $domain) {
       $this->findLink($domain->label());
     }
+
+    // Now update the configuration and test again.
+    $this->config('block.block.' . $block->id())
+      ->set('settings.link_options', 'active')
+      ->save();
+
+    // Load the the login page.
+    $this->drupalGet('user/login');
+    // Confirm domain links.
+    foreach ($domains as $id => $domain) {
+      $this->findLink($domain->label());
+      $this->assertRaw($domain->buildUrl('/user/login'));
+    }
+
+    // Now update the configuration and test again.
+    $this->config('block.block.' . $block->id())
+      ->set('settings.link_options', 'home')
+      ->set('settings.link_theme', 'default')
+      ->save();
   }
 }

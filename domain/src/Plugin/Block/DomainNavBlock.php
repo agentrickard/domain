@@ -20,12 +20,13 @@ class DomainNavBlock extends DomainBlockBase {
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
+    $defaults = $this->defaultConfiguration();
     $elements['link_options'] = [
       '#title' => $this->t('Link paths'),
       '#type' => 'radios',
       '#required' => TRUE,
       '#options' => ['active' => $this->t('Link to active url'), 'home' => $this->t('Link to site home page')],
-      '#default_value' => !empty($this->configuration['link_options']) ? $this->configuration['link_options'] : 'active',
+      '#default_value' => !empty($this->configuration['link_options']) ? $this->configuration['link_options'] : $defaults['link_options'],
       '#description' => $this->t('Determines how links to each domain will be written. Note that some paths may not be accessible on all domains.'),
     ];
     $options = array(
@@ -36,7 +37,7 @@ class DomainNavBlock extends DomainBlockBase {
     $elements['link_theme'] = array(
       '#type' => 'radios',
       '#title' => t('Link theme'),
-      '#default_value' => !empty($this->configuration['link_theme']) ? $this->configuration['link_theme'] : 'default',
+      '#default_value' => !empty($this->configuration['link_theme']) ? $this->configuration['link_theme'] : $defaults['link_theme'],
       '#options' => $options,
       '#description' => $this->t('Select how to display the block output.'),
     );
@@ -71,20 +72,44 @@ class DomainNavBlock extends DomainBlockBase {
     $active_domain = \Drupal::service('domain.negotiator')->getActiveDomain();
     $access_handler = \Drupal::service('entity_type.manager')->getAccessControlHandler('domain');
     $account = \Drupal::currentUser();
-    $current_path = TRUE;
+
+    // Get the settings.
+    $settings = [];
+    $defaults = $this->defaultConfiguration();
+    foreach (['link_options', 'link_theme'] as $element) {
+      if (isset($this->configuration[$element])) {
+        $settings[$element] = $this->configuration[$element];
+      }
+      else {
+        $settings[$element] = $defaults[$element];
+      }
+    }
+
+    // Determine the visible domain list.
     $items = [];
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach (\Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted() as $domain) {
-      $current_path = ($this->configuration['link_options'] == 'active');
+      $current_path = ($settings['link_options'] == 'active');
       $string = $domain->getLink($current_path);
-      if ($domain->access('view', $account)) {
+      if ($domain->status() || $account->hasPermission('access inactive domains')) {
         $items[] = array('#markup' => $string);
       }
     }
+
     return array(
       '#theme' => 'item_list',
       '#items' => $items,
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration() {
+    return [
+      'link_options' => 'home',
+      'link_theme' => 'default',
+    ];
   }
 
 }
