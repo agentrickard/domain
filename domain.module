@@ -3597,6 +3597,9 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
  * Checks to see if the webserver returns a valid response
  * for a request to a domain.
  *
+ * If the domain_skip_domain_check variable is not 0, the response will
+ * be assumed to be valid and a warning will be set using drupal_set_message().
+ *
  * @param $domain
  *   An array containing the record from the {domain} table.
  * @param $drush
@@ -3604,25 +3607,21 @@ function domain_alter_node_query(QueryAlterableInterface $query, $type) {
  *
  * @return
  *   A translated string indicating the error message or FALSE if the response
- *   is 200 "found".
+ *   is 200 "found" or if the domain_skip_domain_check variable is not 0.
  */
 function domain_check_response($domain, $drush = FALSE) {
+  // t() function name is different whether we are using drush or not.
+  $t = empty($drush) ? 't' : 'dt';
   if (variable_get('domain_skip_domain_check', 0)) {
-    return t('Domain response checks have been disabled. Saving an incorrect domain may affect your site.');
+    drupal_set_message($t('Domain response checks have been disabled. Saving an incorrect domain may affect your site.'), 'warning', FALSE);
+    return FALSE;
   }
   $url = domain_get_path($domain) . drupal_get_path('module', 'domain') . '/tests/200.png';
   $response = drupal_http_request($url, array('method' => 'HEAD', 'absolute' => TRUE));
   if ($response->code != 200) {
-    if (empty($drush)) {
-      return t('%server is not responding as expected and may not be configured correctly at the server level. Server code !code was returned.',
-        array('%server' => $url, '!code' => $response->code)
-      );
-    }
-    else {
-      return dt('!server is not responding as expected and may not be configured correctly at the server level. Server code !code was returned.',
-        array('!server' => $url, '!code' => $response->code)
-      );
-    }
+    return $t('!server is not responding as expected and may not be configured correctly at the server level. Server code !code was returned.',
+      array('!server' => $url, '!code' => $response->code)
+    );
   }
   return FALSE;
 }
