@@ -71,6 +71,9 @@ block.settings.domain_nav_block:
     link_theme:
       type: string
       label: 'Link theme'
+    link_label:
+      type: string
+      label: 'Link text'
 
 condition.plugin.domain:
   type: condition.plugin

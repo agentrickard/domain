@@ -68,20 +68,30 @@ class DomainNavBlockTest extends DomainTestBase {
     // Now update the configuration and test again.
     $this->config('block.block.' . $block->id())
       ->set('settings.link_options', 'active')
+      ->set('settings.link_label', 'hostname')
       ->save();
 
     // Load the the login page.
     $this->drupalGet('user/login');
     // Confirm domain links.
     foreach ($domains as $id => $domain) {
-      $this->findLink($domain->label());
+      $this->findLink($domain->getHostname());
       $this->assertRaw($domain->buildUrl('/user/login'));
     }
 
     // Now update the configuration and test again.
     $this->config('block.block.' . $block->id())
       ->set('settings.link_options', 'home')
-      ->set('settings.link_theme', 'default')
+      ->set('settings.link_theme', 'menu')
+      ->set('settings.link_label', 'url')
       ->save();
+
+    // Load the the login page.
+    $this->drupalGet('user/login');
+    // Confirm domain links.
+    foreach ($domains as $id => $domain) {
+      $this->findLink($domain->getPath());
+      $this->assertRaw($domain->getPath());
+    }
   }
 }
