@@ -184,3 +184,80 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
     }
   }
 }
+
+/**
+ * Implements hook_views_data_alter.
+ */
+function domain_source_views_data_alter(array &$data) {
+  $table = 'node__' . DOMAIN_SOURCE_FIELD;
+  $data[$table][DOMAIN_SOURCE_FIELD]['field']['id'] = 'domain_source';
+  $data[$table][DOMAIN_SOURCE_FIELD . '_target_id']['filter']['id'] = 'domain_source';
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add options for domain source when using Devel Generate.
+ */
+function domain_source_form_devel_generate_form_content_alter(&$form, &$form_state, $form_id) {
+  // Add our element to the Devel generate form.
+  $list = ['_derive' => t('Derive from domain selection')];
+  $list += \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList();
+  $form['domain_source'] = array(
+    '#title' => t('Domain source'),
+    '#type' => 'checkboxes',
+    '#options' => $list,
+    '#weight' => 4,
+    '#multiple' => TRUE,
+    '#size' => count($list) > 5 ? 5 : count($list),
+    '#default_value' => ['_derive'],
+    '#description' => t('Sets the source domain for created nodes.'),
+  );
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * Fires only if Devel Generate module is present, to assign test nodes to
+ * domains.
+ */
+function domain_source_node_presave(EntityInterface $node) {
+  domain_source_presave_generate($node);
+}
+
+/**
+ * Handles presave operations for devel generate.
+ */
+function domain_source_presave_generate(EntityInterface $entity) {
+  // Handle devel module settings.
+  $exists = \Drupal::moduleHandler()->moduleExists('devel_generate');
+  $values = [];
+  $selections = [];
+  if ($exists && isset($entity->devel_generate)) {
+    // If set by the form.
+    if (isset($entity->devel_generate['domain_access'])) {
+      $selection = array_filter($entity->devel_generate['domain_access']);
+      if (isset($selection['random-selection'])) {
+        $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+        $selections = array_rand($domains, ceil(rand(1, count($domains))));
+      }
+      else {
+        $selections = array_keys($selection);
+      }
+    }
+    if (isset($entity->devel_generate['domain_source'])) {
+      $selection = $entity->devel_generate['domain_source'];
+      if ($selection == '_derive') {
+        if (!empty($selections)) {
+          $values[DOMAIN_SOURCE_FIELD] = current($selections);
+        }
+        else {
+          $values[DOMAIN_SOURCE_FIELD] = NULL;
+        }
+      }
+      foreach ($values as $name => $value) {
+        $entity->set($name, $value);
+      }
+    }
+  }
+}
