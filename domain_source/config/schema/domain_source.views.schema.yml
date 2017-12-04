@@ -1,0 +1,9 @@
+views.field.domain_source:
+  type: views_field
+  label: 'Domain source'
+views.filter.domain_source:
+  type: views.filter.in_operator
+  label: 'Domain source'
+views.filter_value.domain_source:
+  type: views.filter_value.in_operator
+  label: 'Domain source'
