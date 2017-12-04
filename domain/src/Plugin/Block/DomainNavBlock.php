@@ -135,8 +135,15 @@ class DomainNavBlock extends DomainBlockBase {
             'in_active_trail' => FALSE,
           ];
         }
+        elseif ($settings['link_theme'] == 'select') {
+          $items[] = [
+            'label' => $label,
+            'url' => $url->toString(),
+            'active' => $domain->isActive(),
+          ];
+        }
         else {
-          $items[] = array('#markup' => Link::fromTextAndUrl($label, $url)->toString());
+          $items[] = ['#markup' => Link::fromTextAndUrl($label, $url)->toString()];
         }
       }
     }
@@ -144,7 +151,7 @@ class DomainNavBlock extends DomainBlockBase {
     // Set the proper theme.
     switch ($settings['link_theme']) {
       case 'select':
-        $theme = 'new_theme';
+        $theme = 'domain_nav_block';
         break;
       case 'menus':
         $theme = 'menu';
@@ -155,10 +162,10 @@ class DomainNavBlock extends DomainBlockBase {
         break;
     }
 
-    return array(
+    return [
       '#theme' => $theme,
       '#items' => $items,
-    );
+    ];
   }
 
   /**
