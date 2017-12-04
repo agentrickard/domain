@@ -10,7 +10,7 @@ use Drupal\Core\Session\AccountInterface;
  *
  * @Block(
  *   id = "domain_switcher_block",
- *   admin_label = @Translation("Domain switcher")
+ *   admin_label = @Translation("Domain switcher (for admins and testing)")
  * )
  */
 class DomainSwitcherBlock extends DomainBlockBase {
