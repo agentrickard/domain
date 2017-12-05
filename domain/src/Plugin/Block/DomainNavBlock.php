@@ -189,6 +189,12 @@ class DomainNavBlock extends DomainBlockBase {
 
   /**
    * Gets the configuration for the block, loading defaults if not set.
+   *
+   * @param $key
+   *   The setting key to retrieve, a string
+   *
+   * @return
+   *.  The setting value, a string.
    */
   public function getSetting($key) {
     if (isset($this->settings[$key])) {
@@ -199,7 +205,7 @@ class DomainNavBlock extends DomainBlockBase {
       $this->settings[$key] = $this->configuration[$key];
     }
     else {
-      $this->settings[$key] = $value;
+      $this->settings[$key] = $defaults[$key];
     }
     return $this->settings[$key];
   }
