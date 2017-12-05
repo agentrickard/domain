@@ -84,7 +84,7 @@ marked with [x] are considered complete.
   - [x] Add domain-specific CSS classes
   - [x] Path matching for URL rewrites?
   - [x] Allow non-ascii characters in domains
-- [ ] Recreate the Domain Nav module
+- [x] Recreate the Domain Nav module
 - [ ] Support Tour module
 - [x] Allow selective access to domain record editing
 - [x] Allow access to actions based on assigned domain permissions
