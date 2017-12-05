@@ -61,6 +61,20 @@ action.configuration.domain_enable_action:
   type: action_configuration_default
   label: 'Enable domain record'
 
+block.settings.domain_nav_block:
+  type: block_settings
+  label: 'Domain navigation block'
+  mapping:
+    link_options:
+      type: string
+      label: 'Link paths'
+    link_theme:
+      type: string
+      label: 'Link theme'
+    link_label:
+      type: string
+      label: 'Link text'
+
 condition.plugin.domain:
   type: condition.plugin
   mapping:
@@ -68,3 +82,4 @@ condition.plugin.domain:
       type: sequence
       sequence:
         type: string
+

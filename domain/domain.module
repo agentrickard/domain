@@ -126,3 +126,28 @@ function domain_domain_references_alter($query, $account, $context) {
     }
   }
 }
+
+/**
+ * Implements hook_theme().
+ */
+function domain_theme() {
+  return [
+    'domain_nav_block' => [
+      'render element' => 'items',
+    ],
+  ];
+}
+
+/**
+ * Prepares variables for block templates.
+ *
+ * Default template: domain-nav-block.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - items: An array of labels and urls for use in the list.
+ *     Properties used: 'label', 'url', 'active'
+ */
+function template_preprocess_domain_nav_block(&$variables) {
+  $variables['items'] = $variables['items']['#items'];
+}

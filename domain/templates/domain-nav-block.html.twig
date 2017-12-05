@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Custom theme implementation for a select-and-go menu list.
+ *
+ * Available variables:
+ * - items: A list of items containing an array of strings.
+ *  - label: the label text
+ *  - url: the link url string
+ *  - active: indicates if the domain is currently active.
+ *
+ * @ingroup themeable
+ */
+#}
+{%- if items -%}
+  <form class="domain-list" action="">
+    <div class="domain-pointless-validator-class">
+      <select onchange="if (this.value) location.href=this.value;">
+        <option value="#">Jump to...</option>
+        {%- for item in items -%}
+          {%- set selected = "" -%}
+          {%- if item.active == true -%}
+            {%- set selected = "selected" -%}
+          {%- endif -%}
+          <option value="{{ item.url }}" {{ selected }} >{{ item.label }}</option>
+        {%- endfor -%}
+      </select>
+    </div>
+  </form>
+{%- else -%}
+  {{- empty -}}
+{%- endif -%}

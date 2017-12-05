@@ -18,6 +18,8 @@ edit assigned domains:
 delete assigned domains:
   title: 'Delete assigned domain records'
   restrict access: true
+use domain nav block:
+  title: 'Access the domain navigation block'
 use domain switcher block:
   title: 'Access the domain switcher block'
   restrict access: true
