@@ -6,7 +6,7 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Database;
 use Drupal\domain\Tests\DomainTestBase;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
 use Drupal\user\RoleInterface;
 
 /**
@@ -187,6 +187,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
+    // @TODO: This login part needs to work in Functional or Kernel testing.
     foreach ($domains as $domain) {
       $this->domainLogin($domain, $domain_user5);
       $url = $domain->getPath() . 'node/add/page';
@@ -199,15 +200,16 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       }
     }
     // Tests create permissions. Page content on assigned domains.
-    $domain_user5 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
-    $this->addDomainsToEntity('user', $domain_user5->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user5 = $user_storage->load($domain_user5->id());
-    $assigned = $this->manager->getAccessValues($domain_user5);
+    $domain_user6 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
+    $this->addDomainsToEntity('user', $domain_user6->id(), $two, DOMAIN_ACCESS_FIELD);
+    $domain_user6 = $user_storage->load($domain_user6->id());
+    $assigned = $this->manager->getAccessValues($domain_user6);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
+    // @TODO: This login part needs to work in Functional or Kernel testing.
     foreach ($domains as $domain) {
-      $this->domainLogin($domain, $domain_user5);
+      $this->domainLogin($domain, $domain_user6);
       $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
       if ($domain->id() == $two) {
@@ -231,12 +233,12 @@ class DomainAccessPermissionsTest extends DomainTestBase {
    *   and account, with each key as the name of an operation (e.g. 'view',
    *   'delete') and each value a Boolean indicating whether access to that
    *   operation should be granted.
-   * @param \Drupal\node\Entity\Node $node
+   * @param \Drupal\node\Entity\NodeInterface $node
    *   The node object to check.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account for which to check access.
    */
-  public function assertNodeAccess(array $ops, Node $node, AccountInterface $account) {
+  public function assertNodeAccess(array $ops, NodeInterface $node, AccountInterface $account) {
     foreach ($ops as $op => $result) {
       $this->assertEqual($result, $this->accessHandler->access($node, $op, $account), $this->nodeAccessAssertMessage($op, $result));
     }
