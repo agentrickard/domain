@@ -19,6 +19,23 @@ use Drupal\Core\Url;
 class DomainNavBlock extends DomainBlockBase {
 
   /**
+   * An array of settings.
+   */
+  public $settings = [];
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    // By default, all domain blocks are per-url. This block, though, can be
+    // cached by url.site if we are printing the homepage path, not the request.
+    if ($this->getSetting('link_options') == 'home') {
+      return ['url.site'];
+    }
+    return ['url'];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function blockForm($form, FormStateInterface $form_state) {
@@ -87,21 +104,9 @@ class DomainNavBlock extends DomainBlockBase {
     $access_handler = \Drupal::service('entity_type.manager')->getAccessControlHandler('domain');
     $account = \Drupal::currentUser();
 
-    // Get the settings.
-    $settings = [];
-    $defaults = $this->defaultConfiguration();
-    foreach (array_keys($this->defaultConfiguration()) as $element) {
-      if (isset($this->configuration[$element])) {
-        $settings[$element] = $this->configuration[$element];
-      }
-      else {
-        $settings[$element] = $defaults[$element];
-      }
-    }
-
     // Determine the visible domain list.
     $items = [];
-    $add_path = ($settings['link_options'] == 'active');
+    $add_path = ($this->getSetting('link_options') == 'active');
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach (\Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted() as $domain) {
       // Set the URL.
@@ -114,15 +119,15 @@ class DomainNavBlock extends DomainBlockBase {
       }
       // Set the label text.
       $label = $domain->label();
-      if ($settings['link_label'] == 'hostname') {
+      if ($this->getSetting('link_label') == 'hostname') {
         $label = $domain->getHostname();
       }
-      elseif ($settings['link_label'] == 'url') {
+      elseif ($this->getSetting('link_label') == 'url') {
         $label = $domain->getPath();
       }
       // Handles menu links.
       if ($domain->status() || $account->hasPermission('access inactive domains')) {
-        if ($settings['link_theme'] == 'menus') {
+        if ($this->getSetting('link_theme') == 'menus') {
           // @TODO: active trail isn't working properly, likely because this
           // isn't really a menu.
           $items[] = [
@@ -135,7 +140,7 @@ class DomainNavBlock extends DomainBlockBase {
             'in_active_trail' => FALSE,
           ];
         }
-        elseif ($settings['link_theme'] == 'select') {
+        elseif ($this->getSetting('link_theme') == 'select') {
           $items[] = [
             'label' => $label,
             'url' => $url->toString(),
@@ -149,7 +154,7 @@ class DomainNavBlock extends DomainBlockBase {
     }
 
     // Set the proper theme.
-    switch ($settings['link_theme']) {
+    switch ($this->getSetting('link_theme')) {
       case 'select':
         $theme = 'domain_nav_block';
         break;
@@ -177,6 +182,23 @@ class DomainNavBlock extends DomainBlockBase {
       'link_theme' => 'ul',
       'link_label' => 'name',
     ];
+  }
+
+  /**
+   * Gets the configuration for the block, loading defaults if not set.
+   */
+  public function getSetting($key) {
+    if (isset($this->settings[$key])) {
+      return $this->settings[$key];
+    }
+    $defaults = $this->defaultConfiguration();
+    if (isset($this->configuration[$key])) {
+      $this->settings[$key] = $this->configuration[$key];
+    }
+    else {
+      $this->settings[$key] = $value;
+    }
+    return $this->settings[$key];
   }
 
 }
