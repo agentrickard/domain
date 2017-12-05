@@ -133,11 +133,11 @@ class DomainNavBlock extends DomainBlockBase {
           $items[] = [
             'title' => $label,
             'url' => $url,
-            'attributes' => $domain->isActive() ? ['classes' => ['menu-item--active-trail']] : [],
+            'attributes' => [],
             'below' => [],
             'is_expanded' => FALSE,
             'is_collapsed' => FALSE,
-            'in_active_trail' => FALSE,
+            'in_active_trail' => $domain->isActive(),
           ];
         }
         elseif ($this->getSetting('link_theme') == 'select') {
@@ -156,21 +156,24 @@ class DomainNavBlock extends DomainBlockBase {
     // Set the proper theme.
     switch ($this->getSetting('link_theme')) {
       case 'select':
-        $theme = 'domain_nav_block';
+        $build['#theme'] = 'domain_nav_block';
+        $build['items'] = $items;
         break;
       case 'menus':
-        $theme = 'menu';
+        // Map the $items params to what menu.html.twig expects.
+        $build['#items'] = $items;
+        $build['#menu_name'] = 'domain-nav';
+        $build['#sorted'] = TRUE;
+        $build['#theme'] = 'menu__' . strtr($build['#menu_name'], '-', '_');
         break;
       case 'ul':
       default:
-        $theme = 'item_list';
+        $build['#theme'] = 'item_list';
+        $build['#items'] = $items;
         break;
     }
 
-    return [
-      '#theme' => $theme,
-      '#items' => $items,
-    ];
+    return $build;
   }
 
   /**
