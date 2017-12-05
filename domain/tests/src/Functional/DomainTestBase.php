@@ -2,10 +2,9 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\user\UserInterface;
 use Drupal\domain\DomainInterface;
 
 abstract class DomainTestBase extends BrowserTestBase {

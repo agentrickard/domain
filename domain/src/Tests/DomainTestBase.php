@@ -99,5 +99,4 @@ abstract class DomainTestBase extends WebTestBase {
     }
   }
 
-
 }
