@@ -1,6 +1,8 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
+
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain record form interface.
@@ -52,7 +54,7 @@ class DomainFormsTest extends DomainTestBase {
     // Update the record.
     $edit = [];
     $edit['name'] = 'Foo';
-    $this->drupalPostForm($editUrl, $edit, $this->t('Save'));
+    $this->drupalPostForm($editUrl, $edit, 'Save');
 
     // Check that the update succeeded.
     $storage->resetCache([$default_id]);
@@ -64,7 +66,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet($deleteUrl);
 
     // Delete the record.
-    $this->drupalPostForm($deleteUrl, array(), $this->t('Delete'));
+    $this->drupalPostForm($deleteUrl, array(), 'Delete');
     $storage->resetCache([$default_id]);
     $domain = $storage->load($default_id);
     $this->assertTrue(empty($domain), 'Domain record deleted.');

@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain\DomainInterface;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain token handler.
