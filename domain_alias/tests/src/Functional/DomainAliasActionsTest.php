@@ -3,6 +3,7 @@
 namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
 
 /**
  * Tests the domain record actions on environments.

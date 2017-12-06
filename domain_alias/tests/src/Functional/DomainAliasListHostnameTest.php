@@ -4,6 +4,7 @@ namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
 
 /**
  * Tests behavior for environment loading on the overview page.

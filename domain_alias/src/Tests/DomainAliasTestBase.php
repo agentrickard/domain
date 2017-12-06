@@ -3,7 +3,7 @@
 namespace Drupal\domain_alias\Tests;
 
 use Drupal\domain\Tests\DomainTestBase;
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestTrait;
+use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
 
 /**
  * Base class and helper methods for testing domain aliases.

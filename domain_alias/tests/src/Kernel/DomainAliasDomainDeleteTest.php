@@ -4,7 +4,7 @@ namespace Drupal\Tests\domain_alias\Kernel;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\domain\Functional\DomainTestBase;
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestTrait;
+use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
 
 /**
  * Tests that aliases are deleted on domain delete.
