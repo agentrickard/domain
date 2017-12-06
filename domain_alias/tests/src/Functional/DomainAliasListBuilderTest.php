@@ -2,15 +2,14 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests behavior for the domain list builder.
  *
  * @group domain_alias
  */
-class DomainAliasListBuilderTest extends DomainTestBase {
+class DomainAliasListBuilderTest extends DomainAliasTestBase {
 
   /**
    * Modules to enable.

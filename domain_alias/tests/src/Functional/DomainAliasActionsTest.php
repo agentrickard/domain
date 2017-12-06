@@ -2,17 +2,14 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests the domain record actions on environments.
  *
  * @group domain_alias
  */
-class DomainAliasActionsTest extends DomainTestBase {
-
-  use DomainAliasTestTrait;
+class DomainAliasActionsTest extends DomainAliasTestBase {
 
   /**
    * Modules to enable.

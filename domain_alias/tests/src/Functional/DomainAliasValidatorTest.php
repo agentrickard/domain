@@ -1,7 +1,8 @@
 <?php
 
-namespace Drupal\domain_alias\Tests;
-use Drupal\Component\Render\FormattableMarkup;
+namespace Drupal\Tests\domain_alias\Functional;
+
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests domain alias record validation.
@@ -48,10 +49,10 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
       $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);
       $errors = $validator->validate($alias);
       if ($valid) {
-        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @pattern passed.', array('@pattern' => $pattern)));
+        $this->assertTrue(empty($errors), 'Validation test success.');
       }
       else {
-        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @pattern failed.', array('@pattern' => $pattern)));
+        $this->assertTrue(!empty($errors), 'Validation test success.');
       }
     }
     // Test the configurable option.
@@ -65,13 +66,12 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
       $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);
       $errors = $validator->validate($alias);
       if ($valid) {
-        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @pattern passed.', array('@pattern' => $pattern)));
+        $this->assertTrue(empty($errors), 'Validation test success.');
       }
       else {
-        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @pattern failed.', array('@pattern' => $pattern)));
+        $this->assertTrue(!empty($errors), 'Validation test success.');
       }
     }
-
   }
 
 }

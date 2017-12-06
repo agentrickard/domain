@@ -3,24 +3,14 @@
 namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
-use Drupal\Tests\domain\Functional\DomainTestBase;
-use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests behavior for environment loading on the overview page.
  *
  * @group domain_alias
  */
-class DomainAliasListHostnameTest extends DomainTestBase {
-
-  use DomainAliasTestTrait;
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = array('domain', 'domain_alias', 'user');
+class DomainAliasListHostnameTest extends DomainAliasTestBase {
 
   /**
    * {@inheritdoc}

@@ -3,17 +3,14 @@
 namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
-use Drupal\Tests\domain\Functional\DomainTestBase;
-use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests behavior for the domain alias wildcard match handler.
  *
  * @group domain_alias
  */
-class DomainAliasWildcardTest extends DomainTestBase {
-
-  use DomainAliasTestTrait;
+class DomainAliasWildcardTest extends DomainAliasTestBase {
 
   /**
    * Modules to enable.
