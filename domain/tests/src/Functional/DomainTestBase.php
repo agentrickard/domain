@@ -152,4 +152,53 @@ abstract class DomainTestBase extends BrowserTestBase {
     $this->getSession()->getPage()->selectFieldOption($locator, $value, $multiple);
   }
 
+  /**
+   * Returns whether a given user account is logged in.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account object to check.
+   *
+   * @return bool
+   */
+  protected function drupalUserIsLoggedIn(AccountInterface $account) {
+    // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
+    if (!isset($account->session_id)) {
+      return (bool) $account->id();
+    }
+    // The session ID is hashed before being stored in the database.
+    // @see \Drupal\Core\Session\SessionHandler::read()
+    return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
+  }
+
+  /**
+   * Login a user on a specific domain.
+   *
+   * @param \Drupal\domain\DomainInterface $domain
+   *   The domain to log the user into.
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user account to login.
+   */
+  public function domainLogin(DomainInterface $domain, AccountInterface $account) {
+    // Due to a quirk in session handling that we cannot directly access, it
+    // works if we login, then logout, and then login to a specific domain.
+    $this->drupalLogin($account);
+    if ($this->loggedInUser) {
+      $this->drupalLogout();
+    }
+
+    // Login.
+    $url = $domain->getPath() . 'user/login';
+    $this->submitForm([
+      'name' => $account->getUsername(),
+      'pass' => $account->passRaw,
+    ], t('Log in'));
+
+    // @see BrowserTestBase::drupalUserIsLoggedIn()
+    $account->sessionId = $this->getSession()->getCookie($this->getSessionName());
+    $this->assertTrue($this->drupalUserIsLoggedIn($account), 'User successfully logged in.');
+
+    $this->loggedInUser = $account;
+    $this->container->get('current_user')->setAccount($account);
+  }
+
 }

@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\domain_access\Tests;
+namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Database\Database;
-use Drupal\domain\Tests\DomainTestBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\user\RoleInterface;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain access integration with node_access callbacks.
@@ -178,6 +178,21 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       'delete' => TRUE,
     ), $domain_node6, $domain_user4);
 
+  }
+
+  public function testDomainAccessCreatePermissions() {
+    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
+    // We expect to find 5 domain options. Set two for later use.
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    foreach ($domains as $domain) {
+      if (!isset($one)) {
+        $one = $domain->id();
+        continue;
+      }
+      if (!isset($two)) {
+        $two = $domain->id();
+      }
+    }
     // Tests create permissions. Any content on assigned domains.
     $domain_account5 = $this->drupalCreateUser(array('access content', 'create domain content'));
     $this->addDomainsToEntity('user', $domain_account5->id(), $two, DOMAIN_ACCESS_FIELD);
@@ -186,7 +201,6 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
-    // @TODO: This login part needs to work in Functional or Kernel testing.
     foreach ($domains as $domain) {
       $this->domainLogin($domain, $domain_account5);
       $url = $domain->getPath() . 'node/add/page';
@@ -198,17 +212,31 @@ class DomainAccessPermissionsTest extends DomainTestBase {
         $this->assertResponse(403);
       }
     }
-    // Tests create permissions. Page content on assigned domains.
-    $domain_account6 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
-    $this->addDomainsToEntity('user', $domain_account6->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user6 = $user_storage->load($domain_account6->id());
-    $assigned = $this->manager->getAccessValues($domain_user6);
+  }
+
+  public function testDomainAccessLimitedCreatePermissions() {
+    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
+    // We expect to find 5 domain options. Set two for later use.
+    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    foreach ($domains as $domain) {
+      if (!isset($one)) {
+        $one = $domain->id();
+        continue;
+      }
+      if (!isset($two)) {
+        $two = $domain->id();
+      }
+    }
+    // Tests create permissions. Any content on assigned domains.
+    $domain_account5 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
+    $this->addDomainsToEntity('user', $domain_account5->id(), $two, DOMAIN_ACCESS_FIELD);
+    $domain_user5 = $user_storage->load($domain_account5->id());
+    $assigned = $this->manager->getAccessValues($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
-    // @TODO: This login part needs to work in Functional or Kernel testing.
     foreach ($domains as $domain) {
-      $this->domainLogin($domain, $domain_account6);
+      $this->domainLogin($domain, $domain_account5);
       $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
       if ($domain->id() == $two) {
@@ -217,12 +245,9 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       else {
         $this->assertResponse(403);
       }
-      $url = $domain->getPath() . 'node/add/article';
-      $this->drupalGet($url);
-      $this->assertResponse(403);
     }
-
   }
+
 
   /**
    * Asserts that node access correctly grants or denies access.
