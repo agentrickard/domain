@@ -8,7 +8,7 @@ use Drupal\simpletest\WebTestBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Crypt;
 use Drupal\user\UserInterface;
-use Drupal\Tests\domain\Functional\DomainTestTrait;
+use Drupal\Tests\domain\Traits\DomainTestTrait;
 
 /**
  * Base class with helper methods and setup for domain tests.

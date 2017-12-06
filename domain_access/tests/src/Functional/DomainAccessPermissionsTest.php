@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain_access\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Database\Database;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeInterface;
 use Drupal\user\RoleInterface;
@@ -31,6 +29,20 @@ class DomainAccessPermissionsTest extends DomainTestBase {
   protected $manager;
 
   /**
+   * An array of domains created for the tests.
+   *
+   * @var \Drupal\domain\DomainInterface $domains
+   */
+  protected $domains;
+
+  /**
+   * The user storage handler.
+   *
+   * @var Drupal\user\UserStorageInterface $userStorage.
+   */
+  protected $userStorage;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -54,8 +66,10 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     }
     $this->accessHandler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
     $this->manager = \Drupal::service('domain_access.manager');
+    $this->userStorage = \Drupal::entityTypeManager()->getStorage('user');
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
+    $this->domains = $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
   }
 
   /**
@@ -65,8 +79,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // Note that these are hook_node_access() rules. Node Access system tests
     // are in DomainAccessRecordsTest.
     // We expect to find 5 domain options. Set two for later use.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
-    foreach ($domains as $domain) {
+    foreach ($this->domains as $domain) {
       if (!isset($one)) {
         $one = $domain->id();
         continue;
@@ -76,8 +89,6 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       }
     }
 
-    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
-
     // Assign our user to domain $two. Test on $one and $two.
     $domain_user1 = $this->drupalCreateUser(array(
       'access content',
@@ -85,7 +96,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       'delete domain content',
     ));
     $this->addDomainsToEntity('user', $domain_user1->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user1 = $user_storage->load($domain_user1->id());
+    $domain_user1 = $this->userStorage->load($domain_user1->id());
     $assigned = $this->manager->getAccessValues($domain_user1);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
@@ -117,7 +128,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       'delete page content on assigned domains',
     ));
     $this->addDomainsToEntity('user', $domain_user3->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user3 = $user_storage->load($domain_user3->id());
+    $domain_user3 = $this->userStorage->load($domain_user3->id());
     $assigned = $this->manager->getAccessValues($domain_user3);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
@@ -152,7 +163,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     ));
     $this->addDomainsToEntity('user', $domain_user4->id(), $two, DOMAIN_ACCESS_FIELD);
     $this->addDomainsToEntity('user', $domain_user4->id(), 1, DOMAIN_ACCESS_ALL_FIELD);
-    $domain_user4 = $user_storage->load($domain_user4->id());
+    $domain_user4 = $this->userStorage->load($domain_user4->id());
     $assigned = $this->manager->getAccessValues($domain_user4);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
@@ -181,10 +192,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
   }
 
   public function testDomainAccessCreatePermissions() {
-    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
-    // We expect to find 5 domain options. Set two for later use.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
-    foreach ($domains as $domain) {
+    foreach ($this->domains as $domain) {
       if (!isset($one)) {
         $one = $domain->id();
         continue;
@@ -196,12 +204,12 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // Tests create permissions. Any content on assigned domains.
     $domain_account5 = $this->drupalCreateUser(array('access content', 'create domain content'));
     $this->addDomainsToEntity('user', $domain_account5->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user5 = $user_storage->load($domain_account5->id());
+    $domain_user5 = $this->userStorage->load($domain_account5->id());
     $assigned = $this->manager->getAccessValues($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
-    foreach ($domains as $domain) {
+    foreach ($this->domains as $domain) {
       $this->domainLogin($domain, $domain_account5);
       $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
@@ -215,10 +223,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
   }
 
   public function testDomainAccessLimitedCreatePermissions() {
-    $user_storage = \Drupal::entityTypeManager()->getStorage('user');
-    // We expect to find 5 domain options. Set two for later use.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
-    foreach ($domains as $domain) {
+    foreach ($this->domains as $domain) {
       if (!isset($one)) {
         $one = $domain->id();
         continue;
@@ -230,12 +235,12 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     // Tests create permissions. Any content on assigned domains.
     $domain_account5 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
     $this->addDomainsToEntity('user', $domain_account5->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user5 = $user_storage->load($domain_account5->id());
+    $domain_user5 = $this->userStorage->load($domain_account5->id());
     $assigned = $this->manager->getAccessValues($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
-    foreach ($domains as $domain) {
+    foreach ($this->domains as $domain) {
       $this->domainLogin($domain, $domain_account5);
       $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
@@ -264,34 +269,8 @@ class DomainAccessPermissionsTest extends DomainTestBase {
    */
   public function assertNodeAccess(array $ops, NodeInterface $node, AccountInterface $account) {
     foreach ($ops as $op => $result) {
-      $this->assertEqual($result, $this->accessHandler->access($node, $op, $account), $this->nodeAccessAssertMessage($op, $result));
+      $this->assertEqual($result, $this->accessHandler->access($node, $op, $account), 'Expected result returned.');
     }
-  }
-
-  /**
-   * Constructs an assert message to display which node access was tested.
-   *
-   * @param string $operation
-   *   The operation to check access for.
-   * @param bool $result
-   *   Whether access should be granted or not.
-   * @param string|null $langcode
-   *   (optional) The language code indicating which translation of the node
-   *   to check. If NULL, the untranslated (fallback) access is checked.
-   *
-   * @return string
-   *   An assert message string which contains information in plain English
-   *   about the node access permission test that was performed.
-   */
-  public function nodeAccessAssertMessage($operation, $result, $langcode = NULL) {
-    return new FormattableMarkup(
-      'Node access returns @result with operation %op, language code %langcode.',
-      array(
-        '@result' => $result ? 'true' : 'false',
-        '%op' => $operation,
-        '%langcode' => !empty($langcode) ? $langcode : 'empty',
-      )
-    );
   }
 
 }

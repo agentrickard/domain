@@ -6,6 +6,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\domain\DomainInterface;
+use Drupal\Tests\domain\Traits\DomainTestTrait;
 
 abstract class DomainTestBase extends BrowserTestBase {
 
