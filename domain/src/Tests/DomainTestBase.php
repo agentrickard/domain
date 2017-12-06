@@ -79,13 +79,9 @@ abstract class DomainTestBase extends WebTestBase {
       $this->drupalLogout();
     }
 
-    // For this to work, we must reset the password to a known value.
-    $pass = 'thisissatestpassword';
-    /** @var UserInterface $user */
-    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
-    $user->setPassword($pass)->save();
+    // Login.
     $url = $domain->getPath() . 'user/login';
-    $edit = ['name' => $account->getAccountName(), 'pass' => $pass];
+    $edit = ['name' => $account->getAccountName(), 'pass' => $account->passRaw];
     $this->drupalPostForm($url, $edit, t('Log in'));
 
     // @see WebTestBase::drupalUserIsLoggedIn()

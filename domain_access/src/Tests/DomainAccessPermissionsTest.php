@@ -89,7 +89,6 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $assigned = $this->manager->getAccessValues($domain_user1);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
-
     // Assign one node to default domain, and one to our test domain.
     $domain_node1 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_FIELD => [$one]));
     $domain_node2 = $this->drupalCreateNode(array('type' => 'page', DOMAIN_ACCESS_FIELD => [$two]));
@@ -180,16 +179,16 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     ), $domain_node6, $domain_user4);
 
     // Tests create permissions. Any content on assigned domains.
-    $domain_user5 = $this->drupalCreateUser(array('access content', 'create domain content'));
-    $this->addDomainsToEntity('user', $domain_user5->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user5 = $user_storage->load($domain_user5->id());
+    $domain_account5 = $this->drupalCreateUser(array('access content', 'create domain content'));
+    $this->addDomainsToEntity('user', $domain_account5->id(), $two, DOMAIN_ACCESS_FIELD);
+    $domain_user5 = $user_storage->load($domain_account5->id());
     $assigned = $this->manager->getAccessValues($domain_user5);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
     // @TODO: This login part needs to work in Functional or Kernel testing.
     foreach ($domains as $domain) {
-      $this->domainLogin($domain, $domain_user5);
+      $this->domainLogin($domain, $domain_account5);
       $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
       if ($domain->id() == $two) {
@@ -200,16 +199,16 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       }
     }
     // Tests create permissions. Page content on assigned domains.
-    $domain_user6 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
-    $this->addDomainsToEntity('user', $domain_user6->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user6 = $user_storage->load($domain_user6->id());
+    $domain_account6 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
+    $this->addDomainsToEntity('user', $domain_account6->id(), $two, DOMAIN_ACCESS_FIELD);
+    $domain_user6 = $user_storage->load($domain_account6->id());
     $assigned = $this->manager->getAccessValues($domain_user6);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
     // @TODO: This login part needs to work in Functional or Kernel testing.
     foreach ($domains as $domain) {
-      $this->domainLogin($domain, $domain_user6);
+      $this->domainLogin($domain, $domain_account6);
       $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
       if ($domain->id() == $two) {
