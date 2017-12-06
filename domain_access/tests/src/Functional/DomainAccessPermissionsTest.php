@@ -233,15 +233,15 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       }
     }
     // Tests create permissions. Any content on assigned domains.
-    $domain_account5 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
-    $this->addDomainsToEntity('user', $domain_account5->id(), $two, DOMAIN_ACCESS_FIELD);
-    $domain_user5 = $this->userStorage->load($domain_account5->id());
-    $assigned = $this->manager->getAccessValues($domain_user5);
+    $domain_account6 = $this->drupalCreateUser(array('access content', 'create page content on assigned domains'));
+    $this->addDomainsToEntity('user', $domain_account6->id(), $two, DOMAIN_ACCESS_FIELD);
+    $domain_user6 = $this->userStorage->load($domain_account6->id());
+    $assigned = $this->manager->getAccessValues($domain_user6);
     $this->assertTrue(count($assigned) == 1, 'User assigned to one domain.');
     $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
     // This test is domain sensitive.
     foreach ($this->domains as $domain) {
-      $this->domainLogin($domain, $domain_account5);
+      $this->domainLogin($domain, $domain_account6);
       $url = $domain->getPath() . 'node/add/page';
       $this->drupalGet($url);
       if ($domain->id() == $two) {
