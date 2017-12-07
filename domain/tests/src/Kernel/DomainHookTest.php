@@ -4,7 +4,7 @@ namespace Drupal\Tests\domain\Kernel;
 
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\domain\Trait\DomainTestTrait;
+use Drupal\Tests\domain\Traits\DomainTestTrait;
 
 /**
  * Tests domain hooks documented in domain.api.php.
