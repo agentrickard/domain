@@ -3,16 +3,14 @@
 namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
-use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests behavior for the domain alias environment handler.
  *
  * @group domain_alias
  */
-class DomainAliasEnvironmentTest extends DomainTestBase {
-
-  use DomainAliasTestTrait;
+class DomainAliasEnvironmentTest extends DomainAliasTestBase {
 
   /**
    * Modules to enable.

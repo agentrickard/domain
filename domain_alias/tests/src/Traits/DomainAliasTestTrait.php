@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\domain_alias\Functional;
+namespace Drupal\Tests\domain_alias\Traits;
 
 use Drupal\domain\DomainInterface;
 

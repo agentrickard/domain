@@ -1,12 +1,9 @@
 <?php
 
-namespace Drupal\domain_access\Tests;
+namespace Drupal\Tests\domain_access\Functional;
 
-use Drupal\Core\Database\Database;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Url;
-use Drupal\domain\Tests\DomainTestBase;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain access entity reference field type.
@@ -39,7 +36,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $label = 'Send to all affiliates';
 
     // Test a user who can access all domain settings.
-    $user1 = $this->drupalCreateUser(array('create article content', 'publish to any domain'));
+    $user1 = $this->drupalCreateUser(['create article content', 'publish to any domain']);
     $this->drupalLogin($user1);
 
     // Visit the article creation page.
@@ -54,7 +51,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertText($label, 'All affiliates field found.');
 
     // Test a user who can access some domain settings.
-    $user2 = $this->drupalCreateUser(array('create article content', 'publish to any assigned domain'));
+    $user2 = $this->drupalCreateUser(['create article content', 'publish to any assigned domain']);
     $active_domain = array_rand($domains, 1);
     $this->addDomainsToEntity('user', $user2->id(), $active_domain, DOMAIN_ACCESS_FIELD);
     $this->drupalLogin($user2);

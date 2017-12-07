@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\domain\Tests\Condition;
+namespace Drupal\Tests\domain\Functional\Condition;
 
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain condition.

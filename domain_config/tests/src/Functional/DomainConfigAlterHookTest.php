@@ -2,22 +2,12 @@
 
 namespace Drupal\Tests\domain_config\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests for https://www.drupal.org/node/2896434#comment-12265088.
  *
  * @group domain_config
  */
-class DomainConfigAlterHookTest extends DomainTestBase {
-
-  /**
-   * Disable config schema checking.
-   *
-   * Domain Config actually duplicates schemas provided by other modules,
-   * so it cannot define its own.
-   */
-  protected $strictConfigSchema = FALSE;
+class DomainConfigAlterHookTest extends DomainConfigTestBase {
 
   /**
    * Modules to enable.

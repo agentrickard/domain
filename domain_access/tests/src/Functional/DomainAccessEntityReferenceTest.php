@@ -1,10 +1,8 @@
 <?php
 
-namespace Drupal\domain_access\Tests;
+namespace Drupal\Tests\domain_access\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Database\Database;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain access entity reference field type.
@@ -75,7 +73,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, new FormattableMarkup('Found the %domain option.', array('%domain' => $domain->label())));
+      $this->assertRaw($string, 'Found the domain option.');
       if (!isset($one)) {
         $one = $domain->id();
         continue;

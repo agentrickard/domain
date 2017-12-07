@@ -1,8 +1,9 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain negotiation manager.

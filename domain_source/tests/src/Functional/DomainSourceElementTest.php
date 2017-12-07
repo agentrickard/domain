@@ -10,6 +10,7 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
  * @group domain_source
  */
 class DomainSourceElementTest extends DomainTestBase {
+
   /**
    * Modules to enable.
    *

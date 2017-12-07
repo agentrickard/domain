@@ -1,7 +1,8 @@
 <?php
 
-namespace Drupal\domain\Tests;
-use Drupal\Component\Render\FormattableMarkup;
+namespace Drupal\Tests\domain\Functional;
+
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain record creation API.
@@ -23,7 +24,7 @@ class DomainCreateTest extends DomainTestBase {
     $domain->set('id', $storage->createMachineName($domain->getHostname()));
     foreach (array('id', 'name', 'hostname', 'scheme', 'status', 'weight' , 'is_default') as $key) {
       $property = $domain->get($key);
-      $this->assertTrue(isset($property), new FormattableMarkup('New $domain->@key property is set to default value: %value.', array('@key' => $key, '%value' => $property)));
+      $this->assertTrue(isset($property), 'Property loaded');
     }
     $domain->save();
 

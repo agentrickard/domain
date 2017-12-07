@@ -1,16 +1,11 @@
 <?php
 
-namespace Drupal\domain_config\Tests;
+namespace Drupal\Tests\domain_config\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Helper test methods for Domain Config testing.
- *
- * @deprecated
- *  This class will be removed before the 8.1.0 release.
- *  Use DomainStorage instead, loaded through the EntityTypeManager.
  */
 abstract class DomainConfigTestBase extends DomainTestBase {
 
