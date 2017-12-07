@@ -18,7 +18,7 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
       'access domain content editors',
       'publish to any domain',
       'assign editors to any domain',
-      ]);
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Base Urls for our views.
@@ -74,7 +74,8 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
         $this->assertResponse(200);
       }
     }
-
   }
 
 }
+
+// dt domain_content Drupal\\Tests\\domain_content\\Functional\\DomainContentPermissionsTest

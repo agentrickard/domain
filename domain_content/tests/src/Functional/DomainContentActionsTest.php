@@ -15,3 +15,4 @@ class DomainContentActionsTest extends DomainContentTestBase {
 
 }
 
+// dt domain_content Drupal\\Tests\\domain_content\\Functional\\DomainContentActionsTest
