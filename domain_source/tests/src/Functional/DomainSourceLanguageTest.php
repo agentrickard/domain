@@ -2,9 +2,9 @@
 
 namespace Drupal\Tests\domain_source\Functional;
 
+use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
-use Drupal\Core\Url;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
