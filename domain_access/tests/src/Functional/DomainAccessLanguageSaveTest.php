@@ -3,8 +3,6 @@
 namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
-use Drupal\node\Entity\Node;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
@@ -42,8 +40,9 @@ class DomainAccessLanguageSaveTest extends DomainTestBase {
    * Basic test setup.
    */
   public function testDomainAccessSave() {
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
     // Save a node programatically.
-    $node = Node::create([
+    $node = $storage->create([
       'type' => 'article',
       'title' => 'Test node',
       'uid' => '1',
@@ -54,7 +53,6 @@ class DomainAccessLanguageSaveTest extends DomainTestBase {
     $node->save();
 
     // Load the node.
-    $storage = \Drupal::entityTypeManager()->getStorage('node');
     $node = $storage->load(1);
 
     // Check that two values are set properly.

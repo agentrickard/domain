@@ -1,8 +1,9 @@
 <?php
 
-namespace Drupal\domain_alias\Tests;
+namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests domain alias request negotiation.
@@ -16,7 +17,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'block');
+  public static $modules = array('domain', 'domain_alias', 'user', 'block');
 
   /**
    * Tests the handling of aliased requests.

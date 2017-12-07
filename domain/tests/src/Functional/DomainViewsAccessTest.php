@@ -1,6 +1,8 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
+
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain access plugin for Views.

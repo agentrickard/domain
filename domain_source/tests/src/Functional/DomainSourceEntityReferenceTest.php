@@ -1,9 +1,8 @@
 <?php
 
-namespace Drupal\domain_source\Tests;
+namespace Drupal\Tests\domain_source\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain source entity reference field type.
@@ -18,18 +17,6 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
    * @var array
    */
   public static $modules = array('domain', 'domain_source', 'field', 'field_ui', 'menu_ui', 'block');
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_source');
-    domain_source_install();
-  }
 
   /**
    * Tests that the module installed its field correctly.
@@ -85,7 +72,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, new FormattableMarkup('Found the %domain option.', array('%domain' => $domain->label())));
+      $this->assertRaw($string, 'Found the domain option.');
       if (!isset($one)) {
         $one = $domain->id();
         continue;

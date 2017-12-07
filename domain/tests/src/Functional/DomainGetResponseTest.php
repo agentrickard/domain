@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests domain record HTTP response.
@@ -27,7 +27,7 @@ class DomainGetResponseTest extends DomainTestBase {
     $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($key);
 
     // Our testing server should be able to access the test PNG file.
-    $this->assertTrue($domain->getResponse() == 200, new FormattableMarkup('Server test for @url passed.', array('@url' => $domain->getPath())));
+    $this->assertTrue($domain->getResponse() == 200, 'Server returned a 200 response.');
 
     // Now create a bad domain.
     $values = array(
@@ -38,7 +38,7 @@ class DomainGetResponseTest extends DomainTestBase {
     $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->create($values);
 
     $domain->save();
-    $this->assertTrue($domain->getResponse() == 500, new FormattableMarkup('Server test for @url failed.', array('@url' => $domain->getPath())));
+    $this->assertTrue($domain->getResponse() == 500, 'Server test returned a 500 response.');
   }
 
 }

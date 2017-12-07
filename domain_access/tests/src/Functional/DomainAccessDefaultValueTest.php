@@ -1,10 +1,8 @@
 <?php
 
-namespace Drupal\domain_access\Tests;
+namespace Drupal\Tests\domain_access\Functional;
 
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Database\Database;
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain access handling of default field values.

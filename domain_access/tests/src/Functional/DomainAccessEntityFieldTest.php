@@ -1,12 +1,9 @@
 <?php
 
-namespace Drupal\domain_access\Tests;
+namespace Drupal\Tests\domain_access\Functional;
 
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Core\Url;
-use Drupal\domain\Tests\DomainTestBase;
-use Drupal\node\Entity\NodeType;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain access entity reference field type for custom entities.
@@ -27,11 +24,6 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
    */
   protected function setUp() {
     parent::setUp();
-
-    // Run the install hook.
-    // @TODO: figure out why this is necessary.
-    module_load_install('domain_access');
-    domain_access_install();
 
     // Create 5 domains.
     $this->domainCreateTestDomains(5);

@@ -1,16 +1,12 @@
 <?php
 
-namespace Drupal\domain_alias\Tests;
+namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\domain\Tests\DomainTestBase;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
 
 /**
  * Base class and helper methods for testing domain aliases.
- *
- * @deprecated
- *  This class will be removed before the 8.1.0 release.
- *  Use DomainStorage instead, loaded through the EntityTypeManager.
  */
 abstract class DomainAliasTestBase extends DomainTestBase {
 

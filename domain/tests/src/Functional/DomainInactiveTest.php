@@ -1,9 +1,10 @@
 <?php
 
-namespace Drupal\domain\Tests;
+namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\RoleInterface;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the access rules and redirects for inactive domains.

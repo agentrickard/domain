@@ -97,7 +97,7 @@ marked with [x] are considered complete.
 - [x] Error checking in DomainAliasController
 - [x] Deprecated methods in DomainAliasController
 - [x] Error reporting in `domain_alias_domain_request_alter()`
-- [ ] Ensure completeness of DomainAccessPermissionsTest
+- [x] Ensure completeness of DomainAccessPermissionsTest
 - [x] Check module setup behavior in tests
 - [x] Make all affiliates default value configurable
 - [ ] Cache in the DomainAccessManager

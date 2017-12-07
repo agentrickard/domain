@@ -8,10 +8,14 @@ use Drupal\simpletest\WebTestBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Component\Utility\Crypt;
 use Drupal\user\UserInterface;
-use Drupal\Tests\domain\Functional\DomainTestTrait;
+use Drupal\Tests\domain\Traits\DomainTestTrait;
 
 /**
  * Base class with helper methods and setup for domain tests.
+ *
+ * @deprecated
+ *  This class will be removed before the 8.1.0 release.
+ *  Use DomainStorage instead, loaded through the EntityTypeManager.
  */
 abstract class DomainTestBase extends WebTestBase {
 
@@ -79,13 +83,9 @@ abstract class DomainTestBase extends WebTestBase {
       $this->drupalLogout();
     }
 
-    // For this to work, we must reset the password to a known value.
-    $pass = 'thisissatestpassword';
-    /** @var UserInterface $user */
-    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
-    $user->setPassword($pass)->save();
+    // Login.
     $url = $domain->getPath() . 'user/login';
-    $edit = ['name' => $account->getAccountName(), 'pass' => $pass];
+    $edit = ['name' => $account->getAccountName(), 'pass' => $account->passRaw];
     $this->drupalPostForm($url, $edit, t('Log in'));
 
     // @see WebTestBase::drupalUserIsLoggedIn()
@@ -98,6 +98,5 @@ abstract class DomainTestBase extends WebTestBase {
       $this->container->get('current_user')->setAccount($account);
     }
   }
-
 
 }

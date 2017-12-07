@@ -1,6 +1,8 @@
 <?php
 
-namespace Drupal\domain_alias\Tests;
+namespace Drupal\Tests\domain_alias\Functional;
+
+use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests domain alias request sorting.

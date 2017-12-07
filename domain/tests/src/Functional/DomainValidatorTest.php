@@ -1,9 +1,9 @@
 <?php
 
-namespace Drupal\domain\Tests;
-use Drupal\Component\Render\FormattableMarkup;
+namespace Drupal\Tests\domain\Functional;
+
 use Drupal\Core\Config\ConfigValueException;
-use Drupal\domain\Entity\Domain;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests domain record validation.
@@ -19,13 +19,14 @@ class DomainValidatorTest extends DomainTestBase {
     // No domains should exist.
     $this->domainTableIsEmpty();
     $validator = \Drupal::service('domain.validator');
+    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
 
     // Create a domain.
     $this->domainCreateTestDomains(1, 'foo.com');
     // Check the created domain based on its known id value.
     $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->loadByHostname($key);
+    $domain = $storage->loadByHostname($key);
     $this->assertTrue(!empty($domain), 'Test domain created.');
 
     // Valid hostnames to test. Valid is the boolean value.
@@ -45,15 +46,15 @@ class DomainValidatorTest extends DomainTestBase {
     foreach ($hostnames as $hostname => $valid) {
       $errors = $validator->validate($hostname);
       if ($valid) {
-        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
+        $this->assertTrue(empty($errors), 'Validation correct with no errors.');
       }
       else {
-        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
+        $this->assertTrue(!empty($errors), 'Validation correct with proper errors.');
       }
     }
     // Test duplicate hostname creation.
     $test_hostname = 'foo.com';
-    $test_domain = Domain::create([
+    $test_domain = $storage->create([
       'hostname' => $test_hostname,
       'name' => 'Test domain',
       'id' => 'test_domain',
@@ -79,13 +80,12 @@ class DomainValidatorTest extends DomainTestBase {
     foreach ($hostnames as $hostname => $valid) {
       $errors = $validator->validate($hostname);
       if ($valid) {
-        $this->assertTrue(empty($errors), new FormattableMarkup('Validation test for @hostname passed.', array('@hostname' => $hostname)));
+        $this->assertTrue(empty($errors),'Validation test correct with no errors.');
       }
       else {
-        $this->assertTrue(!empty($errors), new FormattableMarkup('Validation test for @hostname failed.', array('@hostname' => $hostname)));
+        $this->assertTrue(!empty($errors), 'Validation test correct with errors.');
       }
     }
-
   }
 
 }

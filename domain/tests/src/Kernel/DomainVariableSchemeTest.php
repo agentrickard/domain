@@ -3,7 +3,7 @@
 namespace Drupal\Tests\domain\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\domain\Functional\DomainTestTrait;
+use Drupal\Tests\domain\Trait\DomainTestTrait;
 
 /**
  * Tests the ability to set a variable scheme on a domain.
