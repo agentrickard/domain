@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain_config\Tests;
+namespace Drupal\Tests\domain_config\Functional;
 
 use Drupal\user\RoleInterface;
 

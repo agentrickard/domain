@@ -12,6 +12,10 @@ use Drupal\Tests\domain\Traits\DomainTestTrait;
 
 /**
  * Base class with helper methods and setup for domain tests.
+ *
+ * @deprecated
+ *  This class will be removed before the 8.1.0 release.
+ *  Use DomainStorage instead, loaded through the EntityTypeManager.
  */
 abstract class DomainTestBase extends WebTestBase {
 
