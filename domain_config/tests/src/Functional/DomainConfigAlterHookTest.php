@@ -10,14 +10,6 @@ namespace Drupal\Tests\domain_config\Functional;
 class DomainConfigAlterHookTest extends DomainConfigTestBase {
 
   /**
-   * Disable config schema checking.
-   *
-   * Domain Config actually duplicates schemas provided by other modules,
-   * so it cannot define its own.
-   */
-  protected $strictConfigSchema = FALSE;
-
-  /**
    * Modules to enable.
    *
    * @var array
