@@ -192,6 +192,8 @@ function domain_source_views_data_alter(array &$data) {
   $table = 'node__' . DOMAIN_SOURCE_FIELD;
   $data[$table][DOMAIN_SOURCE_FIELD]['field']['id'] = 'domain_source';
   $data[$table][DOMAIN_SOURCE_FIELD . '_target_id']['filter']['id'] = 'domain_source';
+  // Since domains are not stored in the database, relationships cannot be used.
+  unset($data[$table][DOMAIN_SOURCE_FIELD]['relationship']);
 }
 
 /**
