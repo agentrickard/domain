@@ -100,7 +100,7 @@ abstract class DomainContentTestBase extends DomainTestBase {
     // Strip all whitespace between tags.
     $content = preg_replace('@>\\s+<@', '><', $content);
     $regex = '/' . preg_quote($text, '/') . '/ui';
-    $message = sprintf('The text "%s" was not found anywhere in the text of the current page.', $text);
+    $message = sprintf('The text "%s" was found in the text of the current page.', $text);
     $this->assert((bool) preg_match($regex, $content), $message);
   }
 

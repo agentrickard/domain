@@ -8,7 +8,7 @@ dependencies:
     - domain_access
     - user
 _core:
-  default_config_hash: Xfk6mJlu1ulvrGc8liItGZNh4BpK_lzdlC_85g3HSgE
+  default_config_hash: MgD8SdR0_ROWt3ExOrWWM7nJBawgEgp3C9Gv5kyXBhg
 id: affiliated_editors
 label: 'Affiliated editors'
 module: user
@@ -25,9 +25,8 @@ display:
     position: 0
     display_options:
       access:
-        type: perm
-        options:
-          perm: 'access domain content editors'
+        type: domain_access_editor
+        options: {  }
       cache:
         type: tag
       query:
@@ -839,7 +838,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: true
           expose:
@@ -887,7 +886,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: false
           expose:
@@ -1014,7 +1013,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user.permissions
+        - user
       max-age: 0
       tags:
         - 'config:field.storage.user.field_domain_access'
@@ -1097,7 +1096,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user.permissions
+        - user
       max-age: 0
       tags:
         - 'config:field.storage.user.field_domain_access'
@@ -1241,7 +1240,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: true
           expose:
@@ -1289,7 +1288,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: false
           expose:
@@ -1451,7 +1450,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user.permissions
+        - user
       tags:
         - 'config:field.storage.user.field_domain_access'
         - 'config:field.storage.user.field_domain_all_affiliates'

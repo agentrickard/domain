@@ -21,6 +21,10 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
     ]);
     $this->drupalLogin($this->admin_user);
 
+    // Create users and content.
+    $this->createDomainContent();
+    $this->createDomainUsers();
+
     // Base Urls for our views.
     $urls = [
       'admin/content/domain-content',
@@ -65,6 +69,7 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
       }
 
       // All affiliates link.
+      // @TODO Fixing this requires a Views Access handler.
       $this->drupalGet($url . '/all_affiliates');
       $this->assertResponse(403);
 
