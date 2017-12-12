@@ -6,7 +6,9 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\Routing\Route;
+use Drupal\domain\DomainInterface;
 use Drupal\domain_access\DomainAccessManagerInterface;
+
 
 class DomainAccessViewsAccess implements AccessCheckInterface {
 
@@ -16,16 +18,6 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
    * @var string
    */
   protected $requirementsKey = '_domain_access_views';
-
-  /**
-   * Sets the permission to use when checking access.
-   */
-  protected $permission = 'publish to any assigned domain';
-
-  /**
-   * Sets the permission to use when checking all access.
-   */
-  protected $allPermission = 'publish to any domain';
 
   /**
    * The entity type manager.
@@ -73,20 +65,23 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
   /**
    * {@inheritdoc}
    */
-  public function access(Route $route, AccountInterface $account) {
+  public function access(Route $route, AccountInterface $account, $arg_0 = 'all_affiliates') {
+    // Permissions are stored on the route defaults.
+    $permission = $route->getDefault('domain_permission');
+    $allPermission = $route->getDefault('domain_all_permission');
+
     // Users with this permission can see any domain content lists, and it is
     // required to view all affiliates.
-    if ($account->hasPermission($this->allPermission)) {
+    if ($account->hasPermission($allPermission)) {
       return AccessResult::allowed();
     }
 
-    // @TODO: This is not pulling the route argument. We need the actual value.
-    $id = $route->getRequirement($this->requirementsKey);
-    $domain = $this->domainStorage->load($id);
+    // Load the domain from the passed argument.
+    $domain = $this->domainStorage->load($arg_0);
 
     // Domain found, check user permissions.
     if (!empty($domain)) {
-      if ($this->allowAccess($account, $domain, $this->permission)) {
+      if ($this->allowAccess($account, $domain, $permission)) {
         return AccessResult::allowed();
       }
     }

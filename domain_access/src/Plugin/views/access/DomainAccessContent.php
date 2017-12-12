@@ -140,6 +140,8 @@ class DomainAccessContent extends AccessPluginBase implements CacheableDependenc
     }
     $list[] = 'all_affiliates';
     $route->setRequirement('_domain_access_views', (string) implode('+', $list));
+    $route->setDefault('domain_permission', $this->permission);
+    $route->setDefault('domain_all_permission', $this->allPermission);
   }
 
   /**
