@@ -146,8 +146,13 @@ function theme_domain_theme_form($variables) {
     if ($form['theme'][$key]['#value'] == $key) {
       $default = t('(default theme)');
     }
+    $screenshot = $themes[$key]->info['screenshot'];
+    // With sub-theming, screenshot may be inherited from base theme
+    if (!is_file($screenshot) && !empty($themes[$key]->info['base theme']) && isset($themes[$themes[$key]->info['base theme']])) {
+      $screenshot = $themes[$themes[$key]->info['base theme']]->info['screenshot'];
+    }
     $row = array(
-      theme('image', array('path' => $themes[$key]->info['screenshot'])),
+      theme('image', array('path' => $screenshot)),
       '<h3>' . $themes[$key]->info['name'] . ' ' . (isset($themes[$key]->info['version']) ? $themes[$key]->info['version'] : '') . ' ' . $default . '</h3>' . t($themes[$key]->info['description']),
       drupal_render($form['theme'][$key]),
       l(t('configure'), 'admin/structure/domain/view/' . $form['domain_id']['#value'] . '/theme/' . $key . '/theme-settings')
