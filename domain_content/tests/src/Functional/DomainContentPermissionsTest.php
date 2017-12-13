@@ -56,12 +56,13 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
       'access administration pages',
       'access domain content',
       'access domain content editors',
+      'publish to any assigned domain',
+      'assign domain editors',
       ]);
-    foreach ($this->domains as $id => $domain) {
-      $this->addDomainsToEntity('user', $this->limited_user->id(), $id, DOMAIN_ACCESS_FIELD);
-    }
-    $allowed = \Drupal::service('domain_access.manager')->getAccessValues($this->limited_user);
-    $this->assertTrue(count($allowed) == 5, count($allowed));
+    $this->addDomainsToEntity('user', $this->limited_user->id(), array_keys($this->domains), DOMAIN_ACCESS_FIELD);
+    $user = \Drupal::service('entity_type.manager')->getStorage('user')->load($this->limited_user->id());
+    $allowed = \Drupal::service('domain_access.manager')->getAccessValues($user);
+    $this->assert(count($allowed) == 5, count($allowed));
     $this->drupalLogin($this->limited_user);
     // Test the overview and domain-specific pages.
     foreach ($urls as $url) {

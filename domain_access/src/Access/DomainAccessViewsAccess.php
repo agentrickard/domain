@@ -65,7 +65,7 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
   /**
    * {@inheritdoc}
    */
-  public function access(Route $route, AccountInterface $account, $arg_0 = 'all_affiliates') {
+  public function access(Route $route, AccountInterface $account, $arg_0 = NULL) {
     // Permissions are stored on the route defaults.
     $permission = $route->getDefault('domain_permission');
     $allPermission = $route->getDefault('domain_all_permission');
@@ -76,8 +76,11 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
       return AccessResult::allowed();
     }
 
-    // Load the domain from the passed argument.
-    $domain = $this->domainStorage->load($arg_0);
+    // Load the domain from the passed argument. In testing, this passed NULL
+    // in some instances.
+    if (!is_null($arg_0)) {
+      $domain = $this->domainStorage->load($arg_0);
+    }
 
     // Domain found, check user permissions.
     if (!empty($domain)) {

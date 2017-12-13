@@ -9,6 +9,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
+use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainStorageInterface;
 use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\user\UserStorageInterface;
