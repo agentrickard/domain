@@ -6,6 +6,7 @@ dependencies:
     - field.storage.node.field_domain_all_affiliates
   module:
     - domain_access
+    - domain_content
     - node
     - user
 _core:
@@ -22,7 +23,7 @@ display:
   default:
     display_options:
       access:
-        type: domain_access_editor
+        type: domain_content_editor
         options: {  }
       cache:
         type: tag

@@ -6,6 +6,7 @@ dependencies:
     - field.storage.user.field_domain_all_affiliates
   module:
     - domain_access
+    - domain_content
     - user
 _core:
   default_config_hash: MgD8SdR0_ROWt3ExOrWWM7nJBawgEgp3C9Gv5kyXBhg
@@ -25,7 +26,7 @@ display:
     position: 0
     display_options:
       access:
-        type: domain_access_editor
+        type: domain_content_admin
         options: {  }
       cache:
         type: tag
