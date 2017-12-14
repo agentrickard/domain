@@ -9,8 +9,6 @@ dependencies:
     - domain_content
     - node
     - user
-_core:
-  default_config_hash: uM_OYnKbDVgGHIxp3YHmCkR2MKnyeCTY_2Xlysl5y6E
 id: affiliated_content
 label: 'Affiliated content'
 module: node
