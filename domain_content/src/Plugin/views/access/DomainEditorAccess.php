@@ -24,7 +24,7 @@ class DomainEditorAccess extends DomainAccessEditor {
    */
   public function alterRouteDefinition(Route $route) {
     parent::alterRouteDefinition($route);
-    $route->setRequirement('_permission', 'access domain content');
+    $route->setRequirement('_permission', 'access domain content editors');
   }
 
 }
