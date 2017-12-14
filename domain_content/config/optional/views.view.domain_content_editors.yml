@@ -6,7 +6,6 @@ dependencies:
     - field.storage.user.field_domain_all_affiliates
   module:
     - domain_access
-    - domain_content
     - user
 id: affiliated_editors
 label: 'Affiliated editors'

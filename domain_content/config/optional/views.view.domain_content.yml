@@ -6,7 +6,6 @@ dependencies:
     - field.storage.node.field_domain_all_affiliates
   module:
     - domain_access
-    - domain_content
     - node
     - user
 id: affiliated_content
