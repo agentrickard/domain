@@ -14,19 +14,26 @@ use Drupal\Core\Url;
 class DomainContentController extends ControllerBase {
 
   /**
-   * Generates a list of content by domain.
+   * Builds the lost of domains and relevant entities.
+   *
+   * @param array $options
+   *   A list of variables required to build editor or content pages.
+   *
+   * @see contentlist() for the values.
+   *
+   * @return $build
+   *   A Drupal page build array.
    */
-  public function contentList() {
+  public function buildList(array $options) {
     $account = $this->getUser();
-    $permission = 'publish to any assigned domain';
     $build = [
       '#theme' => 'table',
-      '#header' => [$this->t('Domain'), $this->t('Content count')],
+      '#header' => [$this->t('Domain'), $options['column_header']],
     ];
-    if ($account->hasPermission('publish to any domain')) {
+    if ($account->hasPermission($options['all_permission'])) {
       $build['#rows'][] = [
-        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-content/all_affiliates')),
-        $this->getCount('node'),
+        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/' . $options['path'] . '/' . '/all_affiliates')),
+        $this->getCount($options['type']),
       ];
     }
     // Loop through domains.
@@ -34,9 +41,9 @@ class DomainContentController extends ControllerBase {
     $manager = \Drupal::service('domain_access.manager');
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
-      if ($account->hasPermission('publish to any domain') || $manager->hasDomainPermissions($account, $domain, [$permission])) {
+      if ($account->hasPermission($options['all_permission']) || $manager->hasDomainPermissions($account, $domain, [$options['permission']])) {
         $row = [
-          Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-content/' . $domain->id())),
+          Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/' . $options['path'] . '/' . $domain->id())),
           $this->getCount('node', $domain),
         ];
         $build['#rows'][] = $row;
@@ -46,35 +53,33 @@ class DomainContentController extends ControllerBase {
   }
 
   /**
+   * Generates a list of content by domain.
+   */
+  public function contentList() {
+    $options = [
+      'type' => 'node',
+      'column_header' => $this->t('Content count'),
+      'permission' => 'publish to any assigned domain',
+      'all_permission' => 'publish to any domain',
+      'path' => 'domain-content',
+    ];
+
+    return $this->buildList($options);
+  }
+
+  /**
    * Generates a list of editors by domain.
    */
   public function editorsList() {
-    $account = $this->getUser();
-    $permission = 'assign domain editors';
-    $build = [
-      '#theme' => 'table',
-      '#header' => [$this->t('Domain'), $this->t('Editor count')],
+    $options = [
+      'type' => 'user',
+      'column_header' => $this->t('Editor count'),
+      'permission' => 'assign domain editors',
+      'all_permission' => 'assign editors to any domain',
+      'path' => 'domain-editors',
     ];
-    if ($account->hasPermission('assign editors to any domain')) {
-      $build['#rows'][] = [
-        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/domain-editors/all_affiliates')),
-        $this->getCount('user'),
-      ];
-    }
-    // Loop through domains.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
-    $manager = \Drupal::service('domain_access.manager');
-    /** @var \Drupal\domain\DomainInterface $domain */
-    foreach ($domains as $domain) {
-      if ($account->hasPermission('assign editors to any domain') || $manager->hasDomainPermissions($account, $domain, [$permission])) {
-        $row = [
-          Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-editors/' . $domain->id())),
-          $this->getCount('user', $domain),
-        ];
-        $build['#rows'][] = $row;
-      }
-    }
-    return $build;
+
+    return $this->buildList($options);
   }
 
   /**
