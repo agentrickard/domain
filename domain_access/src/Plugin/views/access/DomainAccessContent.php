@@ -116,7 +116,6 @@ class DomainAccessContent extends AccessPluginBase implements CacheableDependenc
       return TRUE;
     }
 
-    // @TODO: perhaps we need to set a default argument.
     // The routine below determines what domain (if any) was passed to the View.
     if (isset($this->view->element['#arguments'])) {
       foreach ($this->view->element['#arguments'] as $value) {
@@ -125,9 +124,10 @@ class DomainAccessContent extends AccessPluginBase implements CacheableDependenc
         }
       }
     }
+
     // Domain found, check user permissions.
     if (!empty($domain)) {
-      return $this->allowAccess($account, $domain, $this->permission);
+      return $this->manager->hasDomainPermissions($account, $domain, [$this->permission]);
     }
     return FALSE;
   }
@@ -164,28 +164,6 @@ class DomainAccessContent extends AccessPluginBase implements CacheableDependenc
    */
   public function getCacheTags() {
     return [];
-  }
-
-  /**
-   * Checks that a user can access the internal page for a domain list.
-   *
-   * @param AccountInterface $account
-   *   The user account.
-   * @param DomainInterface $domain
-   *   The domain being checked.
-   * @param string $permission
-   *   The relevant permission to check.
-   *
-   * @return bool
-   *   Returns TRUE if the user can access the domain list page.
-   */
-  protected function allowAccess(AccountInterface $account, DomainInterface $domain, $permission) {
-    $user = $this->userStorage->load($account->id());
-    $allowed = $this->manager->getAccessValues($user);
-    if ($account->hasPermission($permission) && isset($allowed[$domain->id()])) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
 }

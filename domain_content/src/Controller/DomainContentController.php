@@ -31,9 +31,10 @@ class DomainContentController extends ControllerBase {
     }
     // Loop through domains.
     $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
+    $manager = \Drupal::service('domain_access.manager');
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
-      if ($account->hasPermission('publish to any domain') || $this->allowAccess($account, $domain, $permission)) {
+      if ($account->hasPermission('publish to any domain') || $manager->hasDomainPermissions($account, $domain, [$permission])) {
         $row = [
           Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-content/' . $domain->id())),
           $this->getCount('node', $domain),
@@ -62,9 +63,10 @@ class DomainContentController extends ControllerBase {
     }
     // Loop through domains.
     $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
+    $manager = \Drupal::service('domain_access.manager');
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
-      if ($account->hasPermission('assign editors to any domain') || $this->allowAccess($account, $domain, $permission)) {
+      if ($account->hasPermission('assign editors to any domain') || $manager->hasDomainPermissions($account, $domain, [$permission])) {
         $row = [
           Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/domain-editors/' . $domain->id())),
           $this->getCount('user', $domain),
@@ -112,27 +114,6 @@ class DomainContentController extends ControllerBase {
     $account = $this->currentUser();
     // Advanced grants for edit/delete require permissions.
     return \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
-  }
-
-  /**
-   * Checks that a user can access the internal page for a domain list.
-   *
-   * @param AccountInterface $account
-   *   The fully loaded user account.
-   * @param DomainInterface $domain
-   *   The domain being checked.
-   * @param string $permission
-   *   The relevant permission to check.
-   *
-   * @return bool
-   *   Returns TRUE if the user can access the domain list page.
-   */
-  protected function allowAccess(AccountInterface $account, DomainInterface $domain, $permission) {
-    $allowed = \Drupal::service('domain_access.manager')->getAccessValues($account);
-    if ($account->hasPermission($permission) && isset($allowed[$domain->id()])) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
 }

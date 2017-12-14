@@ -84,7 +84,7 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
 
     // Domain found, check user permissions.
     if (!empty($domain)) {
-      if ($this->allowAccess($account, $domain, $permission)) {
+      if ($this->manager->hasDomainPermissions($account, $domain, [$permission])) {
         return AccessResult::allowed();
       }
     }
@@ -96,28 +96,6 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
    */
   public function applies(Route $route) {
     return $route->hasRequirement($this->requirementsKey);
-  }
-
-  /**
-   * Checks that a user can access the internal page for a domain list.
-   *
-   * @param AccountInterface $account
-   *   The user account.
-   * @param DomainInterface $domain
-   *   The domain being checked.
-   * @param string $permission
-   *   The relevant permission to check.
-   *
-   * @return bool
-   *   Returns TRUE if the user can access the domain list page.
-   */
-  protected function allowAccess(AccountInterface $account, DomainInterface $domain, $permission) {
-    $user = $this->userStorage->load($account->id());
-    $allowed = $this->manager->getAccessValues($user);
-    if ($account->hasPermission($permission) && isset($allowed[$domain->id()])) {
-      return TRUE;
-    }
-    return FALSE;
   }
 
 }
