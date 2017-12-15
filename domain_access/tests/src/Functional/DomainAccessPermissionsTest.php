@@ -63,6 +63,11 @@ class DomainAccessPermissionsTest extends DomainTestBase {
         'name' => 'Basic page',
         'display_submitted' => FALSE,
       ));
+      $this->drupalCreateContentType(array(
+        'type' => 'article',
+        'name' => 'Article',
+        'display_submitted' => FALSE,
+      ));
     }
     $this->accessHandler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
     $this->manager = \Drupal::service('domain_access.manager');
@@ -219,7 +224,17 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       else {
         $this->assertResponse(403);
       }
+      // The user should be allowed to create articles.
+      $url = $domain->getPath() . 'node/add/article';
+      $this->drupalGet($url);
+      if ($domain->id() == $two) {
+        $this->assertResponse(200);
+      }
+      else {
+        $this->assertResponse(403);
+      }
     }
+
   }
 
   public function testDomainAccessLimitedCreatePermissions() {
@@ -250,6 +265,10 @@ class DomainAccessPermissionsTest extends DomainTestBase {
       else {
         $this->assertResponse(403);
       }
+      // The user should not be allowed to create articles.
+      $url = $domain->getPath() . 'node/add/article';
+      $this->drupalGet($url);
+      $this->assertResponse(403);
     }
   }
 
