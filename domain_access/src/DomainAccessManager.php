@@ -103,12 +103,11 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * @inheritdoc
    */
   public function hasDomainPermissions(AccountInterface $account, DomainInterface $domain, array $permissions, $conjunction = 'AND') {
+    // Assume no access.
     $access = FALSE;
-    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
-    $allowed = $this->getAccessValues($user);
-    if (isset($allowed[$domain->id()]) || !empty($this->getAllValue($user))) {
-      $access = TRUE;
-    }
+
+    // In the case of multiple AND permissions, assume access and then deny if
+    // any check fails.
     if ($conjunction == 'AND' && !empty($permissions)) {
       $access = TRUE;
       foreach ($permissions as $permission) {
@@ -118,6 +117,8 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         }
       }
     }
+    // In the case of multiple OR permissions, assume deny and then allow if any
+    // check passes.
     else {
       foreach ($permissions as $permission) {
         if ($permission_access = $account->hasPermission($permission)) {
@@ -126,6 +127,13 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         }
       }
     }
+    // Validate that the user is assigned to the domain. If not, deny.
+    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
+    $allowed = $this->getAccessValues($user);
+    if (!isset($allowed[$domain->id()]) && empty($this->getAllValue($user))) {
+      $access = FALSE;
+    }
+
     return $access;
   }
 

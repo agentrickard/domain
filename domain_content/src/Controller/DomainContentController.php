@@ -44,7 +44,7 @@ class DomainContentController extends ControllerBase {
       if ($account->hasPermission($options['all_permission']) || $manager->hasDomainPermissions($account, $domain, [$options['permission']])) {
         $row = [
           Link::fromTextAndUrl($domain->label(), Url::fromUri('internal:/admin/content/' . $options['path'] . '/' . $domain->id())),
-          $this->getCount('node', $domain),
+          $this->getCount($options['type'], $domain),
         ];
         $build['#rows'][] = $row;
       }
