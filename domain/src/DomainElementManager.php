@@ -140,7 +140,9 @@ class DomainElementManager implements DomainElementManagerInterface {
   public function fieldList($field_name) {
     static $fields = [];
     $fields[] = $field_name;
-    return $fields;
+    // Return only unique field names. AJAX requests can result in duplicates.
+    // See https://www.drupal.org/project/domain/issues/2930934.
+    return array_unique($fields);
   }
 
   /**
