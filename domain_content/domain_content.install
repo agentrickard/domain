@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ */
+function domain_content_uninstall() {
+  $storage = \Drupal::service('entity_type.manager')->getStorage('view');
+  $entities = [];
+  foreach (['affiliated_content', 'affiliated_editors'] as $id) {
+    if ($view = $storage->load($id)) {
+      $entities[$id] = $view;
+    }
+  }
+  if (!empty($entities)) {
+    $storage->delete($entities);
+  }
+}

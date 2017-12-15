@@ -2,3 +2,8 @@ services:
   domain_access.manager:
     class: Drupal\domain_access\DomainAccessManager
     arguments: ['@domain.negotiator']
+  access_check.domain_access_views:
+    class: Drupal\domain_access\Access\DomainAccessViewsAccess
+    arguments: ['@entity_type.manager', '@domain_access.manager']
+    tags:
+     - { name: access_check, applies_to: _domain_access_views }

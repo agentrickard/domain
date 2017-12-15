@@ -63,6 +63,19 @@ abstract class DomainTestBase extends BrowserTestBase {
   }
 
   /**
+   * Confirms absence of link with specified locator.
+   *
+   * @param string $locator
+   *   Link id, title, text or image alt.
+   *
+   * @return \Behat\Mink\Element\NodeElement|null
+   *   The link node element.
+   */
+  public function findNoLink($locator) {
+    return empty($this->getSession()->getPage()->hasLink($locator));
+  }
+
+  /**
    * Finds field (input, textarea, select) with specified locator.
    *
    * @param string $locator

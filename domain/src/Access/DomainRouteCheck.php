@@ -22,6 +22,14 @@ use Drupal\domain\DomainNegotiatorInterface;
 class DomainRouteCheck implements AccessInterface {
 
   /**
+   * The key used by the routing requirement.
+   *
+   * @var string
+   */
+  protected $requirementsKey = '_domain';
+
+
+  /**
    * The Domain negotiator.
    *
    * @var \Drupal\domain\DomainNegotiatorInterface
@@ -39,6 +47,13 @@ class DomainRouteCheck implements AccessInterface {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function applies(Route $route) {
+    return $route->hasRequirement($this->requirementsKey);
+  }
+
+  /**
    * Checks access to a route with a _domain requirement.
    *
    * @param \Symfony\Component\Routing\Route $route
@@ -53,7 +68,7 @@ class DomainRouteCheck implements AccessInterface {
    */
   public function access(Route $route, AccountInterface $account) {
     // Requirements just allow strings, so this might be a comma separated list.
-    $string = $route->getRequirement('_domain');
+    $string = $route->getRequirement($this->requirementsKey);
     $domain = $this->domainNegotiator->getActiveDomain();
     // Since only one domain can be active per request, we only suport OR logic.
     $allowed = array_filter(array_map('trim', explode('+', $string)));

@@ -128,6 +128,15 @@ function domain_domain_references_alter($query, $account, $context) {
 }
 
 /**
+ * Implements hook_views_data_alter.
+ */
+function domain_views_data_alter(array &$data) {
+  $table = 'user__' . DOMAIN_ADMIN_FIELD;
+  // Since domains are not stored in the database, relationships cannot be used.
+  unset($data[$table][DOMAIN_ADMIN_FIELD]['relationship']);
+}
+
+/**
  * Implements hook_theme().
  */
 function domain_theme() {

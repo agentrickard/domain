@@ -2,12 +2,13 @@
 
 namespace Drupal\domain_access;
 
-use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Checks the access status of entities based on domain settings.
@@ -16,11 +17,6 @@ use Drupal\Core\Session\AccountInterface;
  * DomainElementManager, however, the use-case is separate as far as I can tell.
  */
 class DomainAccessManager implements DomainAccessManagerInterface {
-
-  /**
-   * @var \Drupal\domain\DomainStorageInterface
-   */
-  protected $domainStorage;
 
   /**
    * @var \Drupal\domain\DomainNegotiatorInterface
@@ -65,7 +61,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * @inheritdoc
    */
-  public function getAllValue(EntityInterface $entity) {
+  public static function getAllValue(EntityInterface $entity) {
     return $entity->hasField(DOMAIN_ACCESS_ALL_FIELD) ? $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
   }
 
@@ -101,6 +97,44 @@ class DomainAccessManager implements DomainAccessManagerInterface {
       }
     }
     return $item;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function hasDomainPermissions(AccountInterface $account, DomainInterface $domain, array $permissions, $conjunction = 'AND') {
+    // Assume no access.
+    $access = FALSE;
+
+    // In the case of multiple AND permissions, assume access and then deny if
+    // any check fails.
+    if ($conjunction == 'AND' && !empty($permissions)) {
+      $access = TRUE;
+      foreach ($permissions as $permission) {
+        if (!($permission_access = $account->hasPermission($permission))) {
+          $access = FALSE;
+          break;
+        }
+      }
+    }
+    // In the case of multiple OR permissions, assume deny and then allow if any
+    // check passes.
+    else {
+      foreach ($permissions as $permission) {
+        if ($permission_access = $account->hasPermission($permission)) {
+          $access = TRUE;
+          break;
+        }
+      }
+    }
+    // Validate that the user is assigned to the domain. If not, deny.
+    $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
+    $allowed = $this->getAccessValues($user);
+    if (!isset($allowed[$domain->id()]) && empty($this->getAllValue($user))) {
+      $access = FALSE;
+    }
+
+    return $access;
   }
 
 }

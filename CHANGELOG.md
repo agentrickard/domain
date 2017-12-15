@@ -68,7 +68,7 @@ marked with [x] are considered complete.
 - [x] Drush support for domain operations
 - [x] Replace / inject the storage manager in DomainAliasLoader.
 - [x] Replace / inject the storage manager in domainStorage.
-- [ ] Write tests for Domain Content.
+- [x] Write tests for Domain Content.
 - [x] Views access handler for domain content.
 - [x] Restrict Domain Source options using JS
 - [o] Recreate the Domain Theme module -- see https://www.drupal.org/project/domain_theme_switch

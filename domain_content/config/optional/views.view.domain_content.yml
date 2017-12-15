@@ -8,8 +8,6 @@ dependencies:
     - domain_access
     - node
     - user
-_core:
-  default_config_hash: 80am62bndx8zJNcM94qCHJcsfULTTuUIZHd13f6UNyQ
 id: affiliated_content
 label: 'Affiliated content'
 module: node
@@ -22,9 +20,8 @@ display:
   default:
     display_options:
       access:
-        type: perm
-        options:
-          perm: 'access domain content'
+        type: domain_content_editor
+        options: {  }
       cache:
         type: tag
       query:
@@ -528,7 +525,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: true
           expose:
@@ -805,8 +802,8 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - 'user.node_grants:view'
-        - user.permissions
       max-age: 0
       tags:
         - 'config:field.storage.node.field_domain_access'
@@ -840,7 +837,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: true
           expose:
@@ -1019,8 +1016,8 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - 'user.node_grants:view'
-        - user.permissions
       max-age: 0
       tags:
         - 'config:field.storage.node.field_domain_access'
@@ -1048,7 +1045,7 @@ display:
           group_type: group
           admin_label: ''
           operator: '='
-          value: true
+          value: '1'
           group: 1
           exposed: true
           expose:
@@ -1297,8 +1294,8 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - 'user.node_grants:view'
-        - user.permissions
       tags:
         - 'config:field.storage.node.field_domain_access'
         - 'config:field.storage.node.field_domain_all_affiliates'

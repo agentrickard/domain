@@ -7,6 +7,7 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\DomainInterface;
 
 /**
  * Checks the access status of entities based on domain settings.
@@ -35,7 +36,7 @@ interface DomainAccessManagerInterface {
    * @return bool
    *   Returns TRUE if the entity is sent to all affiliates.
    */
-  public function getAllValue(EntityInterface $entity);
+  public static function getAllValue(EntityInterface $entity);
 
   /**
    * Compare the entity values against a user's account assignments.
@@ -62,5 +63,23 @@ interface DomainAccessManagerInterface {
    *   The default field value(s).
    */
   public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
+
+  /**
+   * Checks that a user belongs to the domain and has a set of permissions.
+   *
+   * @param AccountInterface $account
+   *   The user account.
+   * @param DomainInterface $domain
+   *   The domain being checked.
+   * @param array $permissions
+   *   The relevant permissions to check.
+   * @param string $conjunction
+   *.  The conunction AND|OR to use when checking permssions.
+   *
+   * @return bool
+   *   Returns TRUE if the user is assigned to the domain and has the necessary
+   *   permissions.
+   */
+  public function hasDomainPermissions(AccountInterface $account, DomainInterface $domain, array $permissions, $conjunction = 'AND');
 
 }
