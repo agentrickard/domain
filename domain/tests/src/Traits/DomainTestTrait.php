@@ -149,6 +149,7 @@ trait DomainTestTrait {
     foreach ($required as $key) {
       $edit[$key] = $domain->get($key);
     }
+    $edit['validate_url'] = 1;
     $edit['id'] = \Drupal::service('entity_type.manager')->getStorage('domain')->createMachineName($edit['hostname']);
     return $edit;
   }

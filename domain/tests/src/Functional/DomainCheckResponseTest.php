@@ -32,7 +32,7 @@ class DomainCheckResponseTest extends DomainTestBase {
     // Make an invalid POST request on admin/config/domain/add.
     $edit = $this->domainPostValues();
     // Set a hostname that does not exist on the server.
-    $edit['hostname'] = 'abcd.example.org';
+    $edit['hostname'] = 'foo.bar';
     $edit['id'] = $storage->createMachineName($edit['hostname']);
     $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
 
