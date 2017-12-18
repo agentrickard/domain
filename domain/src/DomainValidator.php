@@ -140,6 +140,8 @@ class DomainValidator implements DomainValidatorInterface {
     }
     // Expected result (i.e. no exception thrown.)
     $domain->setResponse($request->getStatusCode());
+
+    return $domain->getResponse();
   }
 
   /**
