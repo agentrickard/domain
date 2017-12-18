@@ -57,6 +57,8 @@ abstract class DomainContentTestBase extends DomainTestBase {
         ]);
       }
     }
+    // Rebuild node access rules.
+    node_access_rebuild();
   }
 
   /**

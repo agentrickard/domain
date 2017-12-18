@@ -104,7 +104,8 @@ class DomainContentController extends ControllerBase {
     }
     // Note that we ignore node access so these queries work on any domain.
     $query = \Drupal::entityQuery($entity_type)
-      ->condition($field, $value);
+      ->condition($field, $value)
+      ->accessCheck(FALSE);
 
     return count($query->execute());
   }
