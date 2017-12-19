@@ -34,6 +34,7 @@ class DomainCheckResponseTest extends DomainTestBase {
     // Set a hostname that does not exist on the server.
     $edit['hostname'] = 'foo.bar';
     $edit['id'] = $storage->createMachineName($edit['hostname']);
+    $edit['validate_url'] = 1;
     $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
 
     // The domain should not save.
