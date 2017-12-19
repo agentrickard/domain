@@ -35,8 +35,12 @@ class DomainCheckResponseTest extends DomainTestBase {
     $edit['hostname'] = 'foo.bar';
     $edit['id'] = $storage->createMachineName($edit['hostname']);
     $edit['validate_url'] = 1;
-    $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
-
+    try {
+      $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
+    }
+    catch (Exception $e) {
+      // Ensure no test errors.
+    }
     // The domain should not save.
     $this->assertRaw('The server request to');
     $domains = $storage->loadMultiple();
