@@ -146,6 +146,12 @@ class DomainForm extends EntityForm {
       '#default_value' => $domain->isDefault(),
       '#description' => $this->t('If a URL request fails to match a domain record, the settings for this domain will be used. Only one domain can be default.'),
     );
+    $form['validate_url'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Test server response'),
+      '#default_value' => TRUE,
+      '#description' => $this->t('Validate that  url of the host is accessible to Drupal before saving.'),
+    );
     $required = $this->validator->getRequiredFields();
     foreach ($form as $key => $element) {
       if (in_array($key, $required)) {
@@ -180,6 +186,18 @@ class DomainForm extends EntityForm {
     // We cannot check id() here, as the machine name is editable.
     if ($existing && $existing->getDomainId() != $entity->getDomainId()) {
       $form_state->setErrorByName('hostname', $this->t('The hostname is already registered.'));
+    }
+
+    // Check the domain response. First, clear the path value.
+    $entity->setPath();
+    // Check the response.
+    $response = $this->validator->checkResponse($entity);
+    // If validate_url is set, then we must receive a 200 response.
+    if ($entity->validate_url && $response != 200) {
+      if (empty($response)) {
+        $response = 500;
+      }
+      $form_state->setErrorByName('hostname', $this->t('The server request to @url returned a @response response. To proceed, disable the <em>Test server response</em> in the form.', ['@url' => $entity->getPath(), '@response' => $response]));
     }
   }
 

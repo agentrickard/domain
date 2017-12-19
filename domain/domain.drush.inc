@@ -7,6 +7,7 @@
 
 use Drupal\Component\Utility\Html;
 use Drupal\domain\DomainInterface;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * Implements hook_drush_command().
@@ -28,6 +29,7 @@ function domain_drush_command() {
       'drush domain-add example.com \'My Test Site\'',
       'drush domain-add example.com \'My Test Site\' --inactive=1 --https==1',
       'drush domain-add example.com \'My Test Site\' --weight=10',
+      'drush domain-add example.com \'My Test Site\' --validate=1',
     ),
     'arguments' => array(
       'hostname' => 'The domain hostname to register (e.g. example.com).',
@@ -37,7 +39,8 @@ function domain_drush_command() {
       'inactive' => 'Set the domain to inactive status if set.',
       'https' => 'Use https protocol for this domain if set.',
       'weight' => 'Set the order (weight) of the domain.',
-      'is_default' => 'Set this domain as the default domain.'
+      'is_default' => 'Set this domain as the default domain.',
+      'validate' => 'Force a check of the URL response before allowing registration.',
     ),
   );
   $items['domain-delete'] = array(
@@ -69,13 +72,13 @@ function domain_drush_command() {
     'examples' => array(
       'drush domain-default example.com',
       'drush domain-default 1',
-      'drush domain-default 1 --skip_check=1',
+      'drush domain-default 1 --validate=1',
     ),
     'arguments' => array(
       'domain_id' => 'The numeric id or hostname of the domain to make default.',
     ),
     'options' => array(
-      'skip_check' => 'Bypass the domain response test.'
+      'validate' => 'Force a check of the URL response before allowing registration.',
     ),
   );
   $items['domain-disable'] = array(
@@ -330,14 +333,9 @@ function drush_domain_add($hostname, $name) {
     'weight' => ($weight = drush_get_option('weight')) ? $weight : $start_weight + 1,
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
     'id' => $domain_storage->createMachineName($hostname),
+    'validate_url' => (drush_get_option('validate')) ? 1 : 0,
   );
   $domain = $domain_storage->create($values);
-  /* TODO: Fix this check.
-  if (!empty($domain->is_default)) {
-    $domain->checkResponse();
-    drush_print($domain->response);
-  }
-  */
   domain_drush_create($domain);
 }
 
@@ -370,12 +368,49 @@ function drush_domain_add_validate($hostname, $name) {
  *   A domain entity.
  */
 function domain_drush_create(DomainInterface $domain) {
-  $domain->save();
-  if ($domain->getDomainId()) {
-    drush_print(dt('Created @name at @domain.', array('@name' => $domain->label(), '@domain' => $domain->getHostname())));
+  if ($error = domain_drush_check_response($domain)) {
+    drush_set_error('hostname', $error);
   }
   else {
-    drush_print(dt('The request could not be completed.'));
+    $domain->save();
+    if ($domain->getDomainId()) {
+      drush_print(dt('Created @name at @domain.', array('@name' => $domain->label(), '@domain' => $domain->getHostname())));
+    }
+    else {
+      drush_print(dt('The request could not be completed.'));
+    }
+  }
+}
+
+/**
+ * Runs a check to ensure that the domain is responsive.
+ *
+ * @param Drupal\domain\DomainInterface $domain
+ *   A domain entity.
+ *
+ * @return string
+ *   An error message if the domain url does not validate. Else empty.
+ */
+function domain_drush_check_response(DomainInterface $domain) {
+  // Check the domain response. First, clear the path value.
+  if ($domain->validate_url) {
+    $domain->setPath();
+    try {
+      $response = $domain->getResponse();
+    }
+    // We cannot know which Guzzle Exception class will be returned; be generic.
+    catch (RequestException $e) {
+      watchdog_exception('domain', $e);
+      // File a general server failure.
+      $domain->setResponse(500);
+    }
+    // If validate_url is set, then we must receive a 200 response.
+    if ($domain->getResponse() != 200) {
+      if (empty($response)) {
+        $response = 500;
+      }
+      return dt('The server request to @url returned a @response response. To proceed, disable the test of the server response by leaving off the --validate flag.', ['@url' => $domain->getPath(), '@response' => $response]);
+    }
   }
 }
 
@@ -496,19 +531,15 @@ function drush_domain_test($argument = NULL) {
 function drush_domain_default($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    // TODO: Check for domain response.
-    /*
-    $check = drush_get_option('skip_check');
-    if (empty($check)) {
-      $error = domain_check_response($domain, TRUE);
-      if ($error) {
-        drush_set_error($error);
-        drush_print(dt('You may disable this error by passing --skip_check=1.'));
-        return;
-      }
-    }*/
-    $domain->saveDefault();
-    drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->getHostname())));
+    $validate = (drush_get_option('validate')) ? 1 : 0;
+    $domain->addProperty('validate_url', $validate);
+    if ($error = domain_drush_check_response($domain)) {
+      drush_set_error('domain', $error);
+    }
+    else {
+      $domain->saveDefault();
+      drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->getHostname())));
+    }
   }
 }
 

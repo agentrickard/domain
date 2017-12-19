@@ -54,6 +54,7 @@ class DomainFormsTest extends DomainTestBase {
     // Update the record.
     $edit = [];
     $edit['name'] = 'Foo';
+    $edit['validate_url'] = 0;
     $this->drupalPostForm($editUrl, $edit, 'Save');
 
     // Check that the update succeeded.
