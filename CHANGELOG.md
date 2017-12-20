@@ -109,7 +109,7 @@ marked with [x] are considered complete.
 - [x] Check id logic in Domain Alias list controller
 - [x] Check domain responses on configuration forms
 - [x] Remove deprecated `entity_get_form_display`
-- [ ] Implement theme functions or twig templates where proper
+- [x] Implement theme functions or twig templates where proper
 - [ ] Advanced drush integration / complete labelled tasks
 - [ ] Test cron handling
 - [ ] Caching strategies in DomainNegotiator
