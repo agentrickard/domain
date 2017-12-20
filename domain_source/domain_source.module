@@ -54,14 +54,12 @@ function domain_source_confirm_fields($entity_type, $bundle) {
   }
 
   // Tell the form system how to behave. Default to radio buttons.
-  // @TODO: This function is deprecated, but using the OO syntax is causing
-  // test fails.
-  entity_get_form_display($entity_type, $bundle, 'default')
-    ->setComponent(DOMAIN_SOURCE_FIELD, array(
+  if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load($entity_type . '.' .  $bundle . '.default')) {
+    $display->setComponent(DOMAIN_SOURCE_FIELD, [
       'type' => 'options_select',
       'weight' => 42,
-    ))
-    ->save();
+    ])->save();
+  }
 }
 
 /**

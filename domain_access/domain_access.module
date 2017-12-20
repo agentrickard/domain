@@ -560,19 +560,16 @@ function domain_access_confirm_fields($entity_type, $bundle, $text = array()) {
       $field_config->save();
     }
     // Tell the form system how to behave. Default to radio buttons.
-    // @TODO: This function is deprecated, but using the OO syntax is causing
-    // test fails.
-    entity_get_form_display($entity_type, $bundle, 'default')
-      ->setComponent(DOMAIN_ACCESS_FIELD, array(
+    if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load($entity_type . '.' .  $bundle . '.default')) {
+      $display->setComponent(DOMAIN_ACCESS_FIELD, [
         'type' => 'options_buttons',
         'weight' => 40,
-      ))
-      ->setComponent(DOMAIN_ACCESS_ALL_FIELD, array(
+      ])->setComponent(DOMAIN_ACCESS_ALL_FIELD, [
         'type' => 'boolean_checkbox',
-        'settings' => array('display_label' => 1),
+        'settings' => ['display_label' => 1],
         'weight' => 41,
-      ))
-      ->save();
+      ])->save();
+    }
   }
   catch (Exception $e) {
     \Drupal::logger('domain_access')->notice('Field installation failed.');

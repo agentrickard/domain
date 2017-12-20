@@ -28,10 +28,10 @@ function domain_update_8001() {
  */
 function _domain_configure_field() {
   if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load('user.user.default')) {
-    $display->setComponent(DOMAIN_ADMIN_FIELD, array(
+    $display->setComponent(DOMAIN_ADMIN_FIELD, [
       'type' => 'options_buttons',
       'weight' => 50,
-    ))
+    ])
     ->save();
   }
 }
