@@ -27,12 +27,11 @@ function domain_update_8001() {
  * Configures user form display to checkboxes widget for domain admin field.
  */
 function _domain_configure_field() {
-  // @TODO: This function is deprecated, but using the OO syntax is causing
-  // test fails.
-  entity_get_form_display('user', 'user', 'default')
-    ->setComponent(DOMAIN_ADMIN_FIELD, array(
+  if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load('user.user.default')) {
+    $display->setComponent(DOMAIN_ADMIN_FIELD, array(
       'type' => 'options_buttons',
       'weight' => 50,
     ))
     ->save();
+  }
 }

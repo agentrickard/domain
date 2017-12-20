@@ -150,11 +150,9 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $field_config->save();
 
     // Tell the form system how to behave.
-    entity_get_form_display('node', 'article', 'default')
-      ->setComponent($name, array(
-        'type' => 'options_buttons',
-      ))
-      ->save();
+   if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load('node.article.default')) {
+      $display->setComponent($name, ['type' => 'options_buttons'])->save();
+    }
   }
 
 }
