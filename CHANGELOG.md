@@ -108,7 +108,7 @@ marked with [x] are considered complete.
 - [x] Check loader logic in Domain Access `node_access`
 - [x] Check id logic in Domain Alias list controller
 - [x] Check domain responses on configuration forms
-- [ ] Remove deprecated `entity_get_form_display`
+- [x] Remove deprecated `entity_get_form_display`
 - [ ] Implement theme functions or twig templates where proper
 - [ ] Advanced drush integration / complete labelled tasks
 - [ ] Test cron handling
