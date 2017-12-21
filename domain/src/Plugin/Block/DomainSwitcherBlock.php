@@ -25,8 +25,6 @@ class DomainSwitcherBlock extends DomainBlockBase {
 
   /**
    * Build the output.
-   *
-   * @TODO: abstract or theme this function?
    */
   public function build() {
     /** @var \Drupal\domain\DomainInterface $active_domain */

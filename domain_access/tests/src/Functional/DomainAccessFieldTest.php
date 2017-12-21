@@ -151,9 +151,11 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Create a new content type and test that the fields are created.
     // Create a content type programmatically.
     $type = $this->drupalCreateContentType();
-
     $type_exists = (bool) NodeType::load($type->id());
     $this->assertTrue($type_exists, 'The new content type has been created in the database.');
+
+    // The test is not passing to domain_access_node_type_insert() properly.
+    domain_access_confirm_fields('node', $type->id());
 
     // Visit the article creation page.
     $this->drupalGet('node/add/' . $type->id());

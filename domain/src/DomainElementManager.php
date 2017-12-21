@@ -188,7 +188,6 @@ class DomainElementManager implements DomainElementManagerInterface {
    */
   public function listDisallowed(array $disallowed) {
     $domains = $this->domainStorage->loadMultiple($disallowed);
-    // @TODO: Proper theme function here.
     $string = $this->t('The following domains are currently assigned and cannot be changed:');
     foreach ($domains as $domain) {
       $items[] = $domain->label();
