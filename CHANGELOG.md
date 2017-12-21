@@ -111,6 +111,7 @@ marked with [x] are considered complete.
 - [x] Remove deprecated `entity_get_form_display`
 - [x] Implement theme functions or twig templates where proper
 - [ ] Advanced drush integration / complete labelled tasks
+- [ ] Add filter options to domain_access and domain_source views
 - [ ] Test cron handling
 - [ ] Caching strategies in DomainNegotiator
 - [ ] Caching strategies in DomainConfigOverrides
