@@ -6,6 +6,9 @@ views.access.domain_access_admin:
 views.access.domain_access_editor:
   type: mapping
   label: 'Domain Access: Edit domain content'
+views.argument.domain_access_argument:
+  type: views_argument
+  label: 'Domain Access'
 views.field.domain_access_field:
   type: views_field
   label: 'Domain Access'

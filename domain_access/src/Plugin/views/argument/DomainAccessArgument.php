@@ -5,7 +5,7 @@ namespace Drupal\domain_access\Plugin\views\argument;
 use Drupal\views\Plugin\views\argument\StringArgument;
 
 /**
- * Field handler to present the link an entity on a domain.
+ * Argument handler to find nodes by domain assignment.
  *
  * @ViewsArgument("domain_access_argument")
  */
