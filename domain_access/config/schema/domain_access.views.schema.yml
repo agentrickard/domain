@@ -58,6 +58,6 @@ views.field.domain_access_field:
 views.filter.domain_access_current_all_filter:
   type: views_filter
   label: 'Current Domain or All Domains'
-view.filter.domain_access_filter:
+views.filter.domain_access_filter:
   type: views_filter
   label: 'Domain Access'

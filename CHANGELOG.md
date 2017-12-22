@@ -128,3 +128,4 @@ marked with [x] are considered complete.
 - [x] Remove calls to deprecated methods / classes
 - [ ] Remove unnecessary use statements
 - [ ] Support Tour module
+- [ ] Views schema fails -- see https://www.drupal.org/project/drupal/issues/2834801
