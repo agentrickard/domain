@@ -402,17 +402,17 @@ display:
           click_sort_column: target_id
           type: entity_reference_label
           settings:
-            link: 0
+            link: false
           group_column: target_id
           group_columns: {  }
-          group_rows: 1
-          delta_limit: '0'
-          delta_offset: '0'
-          delta_reversed: 0
-          delta_first_last: 0
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
           multi_type: separator
           separator: ', '
-          field_api_classes: 0
+          field_api_classes: false
           plugin_id: domain_access_field
         field_domain_all_affiliates:
           id: field_domain_all_affiliates
@@ -1080,7 +1080,7 @@ display:
             operation: view
             multiple: 0
             access: false
-            bundles: null
+            bundles: {  }
           glossary: false
           limit: 0
           case: none
@@ -1381,7 +1381,7 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
-            reduce: 0
+            reduce: false
           is_grouped: false
           group_info:
             label: ''
