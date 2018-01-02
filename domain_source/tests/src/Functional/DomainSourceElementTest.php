@@ -105,5 +105,22 @@ class DomainSourceElementTest extends DomainTestBase {
     // Check the URL.
     $url = $this->geturl();
     $this->assert(strpos($url, 'node/1/edit') === FALSE, 'Form submitted.');
+
+    // Save with no source.
+
+    // Edit the node.
+    $this->drupalGet('node/1/edit');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Set the domain source field to an unselected domain.
+    $this->selectFieldOption($locator, '_none');
+
+    // Save the form.
+    $this->pressButton('edit-submit');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Check the URL.
+    $url = $this->geturl();
+    $this->assert(strpos($url, 'node/1/edit') === FALSE, 'Form submitted.');
   }
 }
