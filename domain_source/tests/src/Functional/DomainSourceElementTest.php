@@ -76,6 +76,10 @@ class DomainSourceElementTest extends DomainTestBase {
     $this->pressButton('edit-submit');
     $this->assertSession()->statusCodeEquals(200);
 
+    // Check the URL.
+    $url = $this->geturl();
+    $this->assert(strpos($url, 'node/1/edit') === FALSE, 'Form submitted.');
+
     // Edit the node.
     $this->drupalGet('node/1/edit');
     $this->assertSession()->statusCodeEquals(200);
@@ -90,5 +94,16 @@ class DomainSourceElementTest extends DomainTestBase {
     // Check the URL.
     $url = $this->geturl();
     $this->assert(strpos($url, 'node/1/edit') > 0, 'Form not submitted.');
+
+    // Set the field properly and save again.
+    $this->selectFieldOption($locator, 'one_example_com');
+
+    // Save the form.
+    $this->pressButton('edit-submit');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Check the URL.
+    $url = $this->geturl();
+    $this->assert(strpos($url, 'node/1/edit') === FALSE, 'Form submitted.');
   }
 }
