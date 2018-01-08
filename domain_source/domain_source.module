@@ -128,9 +128,12 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
 function domain_source_form_validate($element, \Drupal\Core\Form\FormStateInterface $form_state) {
   $values = $form_state->getValues();
   // This is only run if Domain Access is present.
-  $access_values = $values[DOMAIN_ACCESS_FIELD];
-  $source_value = current($values[DOMAIN_SOURCE_FIELD]);
+  if (isset($values[DOMAIN_SOURCE_FIELD]) && is_array($values[DOMAIN_SOURCE_FIELD]) && isset($values[DOMAIN_ACCESS_FIELD])) {
+    $access_values = $values[DOMAIN_ACCESS_FIELD];
+    $source_value = current($values[DOMAIN_SOURCE_FIELD]);
+  }
   // If no value is selected, that's acceptable. Else run through a check.
+  // Note that the _none selection returns as [FALSE].
   $source_set = empty($source_value);
   foreach ($access_values as $value) {
     if ($value == $source_value) {
