@@ -120,6 +120,7 @@ class DomainAliasForm extends EntityForm {
     );
     $form['redirect'] = array(
       '#type' => 'select',
+      '#title' => $this->t('Redirect options'),
       '#options' => $this->redirectOptions(),
       '#default_value' => $alias->getRedirect(),
       '#description' => $this->t('Set an optional redirect directive when this alias is invoked.'),
@@ -127,9 +128,10 @@ class DomainAliasForm extends EntityForm {
     $environments = $this->environmentOptions();
     $form['environment'] = array(
       '#type' => 'select',
+      '#title' => $this->t('Environment'),
       '#options' => $environments,
       '#default_value' => $alias->getEnvironment(),
-      '#description' => $this->t('Map the alias to a development environment.'),
+      '#description' => $this->t('Map the alias to a development environment. When an alias is active for an environment, matching aliases (if available) will be used for all domains. Leave as \'default\' if unsure.'),
     );
     $form['environment_help'] = [
       '#type' => 'details',
