@@ -343,7 +343,7 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   }
   // Check to see that we have a valid active domain.
   // Without one, we cannot assert an opinion about access.
-  if (empty($active_domain->getDomainId())) {
+  if (!$active_domain || empty($active_domain->getDomainId())) {
     return AccessResult::neutral();
   }
 
