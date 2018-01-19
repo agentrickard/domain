@@ -45,10 +45,14 @@ class DomainServerBlock extends DomainBlockBase {
     $domain->getResponse();
     $check = \Drupal::service('entity_type.manager')->getStorage('domain')->loadByHostname($_SERVER['HTTP_HOST']);
     $match = $this->t('Exact match');
+    // This value is not translatable.
+    $environment = 'default';
     if (!$check) {
       // Specific check for Domain Alias.
       if (isset($domain->alias)) {
         $match = $this->t('ALIAS: Using alias %id', array('%id' => $domain->alias->getPattern()));
+        // Get the environment.
+        $environment = $domain->alias->getEnvironment();
       }
       else {
         $match = $this->t('FALSE: Using default domain.');
@@ -58,6 +62,23 @@ class DomainServerBlock extends DomainBlockBase {
       $this->t('Domain match'),
       $match,
     );
+    $rows[] = [
+      $this->t('Environment'),
+      $environment,
+    ];
+    $rows[] = [
+      $this->t('Canonical hostname'),
+      $domain->getCanonical(),
+    ];
+    $rows[] = [
+      $this->t('Base path'),
+      $domain->getPath(),
+    ];
+    $rows[] = [
+      $this->t('Current URL'),
+      $domain->getUrl(),
+    ];
+
     $www = \Drupal::config('domain.settings')->get('www_prefix');
     $rows[] = array(
       $this->t('Strip www prefix'),
