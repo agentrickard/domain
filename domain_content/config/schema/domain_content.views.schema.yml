@@ -1,0 +1,8 @@
+# Schema for the domain content plugins.
+
+views.access.domain_content_admin:
+  type: mapping
+  label: 'Domain Content: View domain-specific editors'
+views.access.domain_content_editor:
+  type: mapping
+  label: 'Domain Content: View domain-specific content'

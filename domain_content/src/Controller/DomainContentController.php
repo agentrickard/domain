@@ -32,7 +32,7 @@ class DomainContentController extends ControllerBase {
     ];
     if ($account->hasPermission($options['all_permission'])) {
       $build['#rows'][] = [
-        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/' . $options['path'] . '/' . '/all_affiliates')),
+        Link::fromTextAndUrl($this->t('All affiliates'), Url::fromUri('internal:/admin/content/' . $options['path'] . '/all_affiliates')),
         $this->getCount($options['type']),
       ];
     }
