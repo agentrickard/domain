@@ -47,7 +47,7 @@ class DomainTokenBlock extends DomainBlockBase {
   /**
    * Generates available tokens for printing.
    *
-   * @param Drupal\domain\DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   The active domain request.
    * @return array
    *   An array keyed by token name, with value of replacement value.
