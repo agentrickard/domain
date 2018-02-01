@@ -562,4 +562,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $this->canonical;
   }
 
+  /**
+   * This is a temporary fix for a core bug.
+   *
+   * See https://www.drupal.org/project/drupal/issues/2941457
+   */
+  public function getIterator() {
+    return new \ArrayIterator([]);
+  }
+
 }

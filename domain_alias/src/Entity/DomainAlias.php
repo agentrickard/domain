@@ -135,4 +135,13 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
     \Drupal::service('cache_tags.invalidator')->invalidateTags(['rendered', 'url.site']);
   }
 
+  /**
+   * This is a temporary fix for a core bug.
+   *
+   * See https://www.drupal.org/project/drupal/issues/2941457
+   */
+  public function getIterator() {
+    return new \ArrayIterator([]);
+  }
+
 }
