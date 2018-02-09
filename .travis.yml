@@ -13,8 +13,6 @@ matrix:
     - env: DRUPAL=8.4.x
       php: 5.5
     - env: DRUPAL=8.5.x
-      php: 7.2
-    - env: DRUPAL=8.5.x
       php: 7.1
     - env: DRUPAL=8.5.x
       php: 7.0
