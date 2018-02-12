@@ -204,7 +204,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       return TRUE;
     }
     // Check for registered alias matches.
-    $values = array('hostname' => $httpHost);
+    $values = array('hostname' => $hostname);
     /** @var \Drupal\domain\Entity\DomainInterface $domain */
     $domain = $this->domainStorage->create($values);
     $domain->setMatchType(self::DOMAIN_MATCH_NONE);
