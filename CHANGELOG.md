@@ -13,6 +13,7 @@ Changelog
 23-APR-2017 8.x-1.0-alpha9
 01-DEC-2017 8.x-1.0-alpha10
 19-DEC-2017 8.x-1.0-alpha11
+12-FEB-2018 8.x-1.0-alpha12
 
 Status
 ====
