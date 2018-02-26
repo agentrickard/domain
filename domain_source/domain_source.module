@@ -136,7 +136,12 @@ function domain_source_form_validate($element, \Drupal\Core\Form\FormStateInterf
   // Note that the _none selection returns as [FALSE].
   $source_set = empty($source_value);
   foreach ($access_values as $value) {
-    if ($value == $source_value) {
+    // Core is inconsistent depending on the field order.
+    // See https://www.drupal.org/project/domain/issues/2945771#comment-12493199
+    if (is_array($value) && $value == $source_value) {
+      $source_set = TRUE;
+    }
+    elseif (is_string($value) && !empty($source_value['target_id']) && $value == $source_value['target_id']) {
       $source_set = TRUE;
     }
   }
