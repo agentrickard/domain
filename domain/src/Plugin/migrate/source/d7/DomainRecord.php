@@ -8,7 +8,8 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * Drupal 7 Domain source from database.
  *
  * @MigrateSource(
- *   id = "d7_domain"
+ *   id = "d7_domain",
+ *   source_module = "domain"
  * )
  */
 class DomainRecord extends DrupalSqlBase {

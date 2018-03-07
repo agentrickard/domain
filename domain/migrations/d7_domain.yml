@@ -15,3 +15,4 @@ process:
   status: valid
 destination:
   plugin: entity:domain
+  destination_module: domain
