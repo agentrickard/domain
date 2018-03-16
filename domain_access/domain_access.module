@@ -481,6 +481,19 @@ function domain_access_node_type_insert(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_insert().
+ *
+ * In some cases, form display modes are not set when the node type is created.
+ * be sure to update our field definitions on creation of form_display for
+ * node types.
+ */
+function domain_access_entity_form_display_insert(EntityInterface $entity) {
+  if (!$entity->isSyncing() && $entity->getTargetEntityTypeId() == 'node' && $bundle = $entity->getTargetBundle()) {
+    domain_access_confirm_fields('node', $bundle);
+  }
+}
+
+/**
  * Creates our fields for an entity bundle.
  *
  * @param string $entity_type
