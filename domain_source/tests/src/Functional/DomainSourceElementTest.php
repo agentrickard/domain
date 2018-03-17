@@ -29,9 +29,18 @@ class DomainSourceElementTest extends DomainTestBase {
   }
 
   /**
-   * Basic test setup.
+   * Test runner.
    */
   public function testDomainSourceElement() {
+    $this->runInstalledTest('article');
+    $node_type = $this->createContentType(['type' => 'test']);
+    $this->runInstalledTest('test');
+  }
+
+  /**
+   * Basic test setup.
+   */
+  public function runInstalledTest($node_type) {
     $admin = $this->drupalCreateUser(array(
       'bypass node access',
       'administer content types',
@@ -44,6 +53,8 @@ class DomainSourceElementTest extends DomainTestBase {
 
     $this->drupalGet('node/add/article');
     $this->assertSession()->statusCodeEquals(200);
+
+    $nid = $node_type == 'article' ? 1 : 2;
 
     // Set the title, so the node can be saved.
     $this->fillField('title[0][value]', 'Test node');
@@ -78,10 +89,10 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/1/edit') === FALSE, 'Form submitted.');
+    $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
 
     // Edit the node.
-    $this->drupalGet('node/1/edit');
+    $this->drupalGet('node/' . $nid . '/edit');
     $this->assertSession()->statusCodeEquals(200);
 
     // Set the domain source field to an unselected domain.
@@ -93,7 +104,7 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/1/edit') > 0, 'Form not submitted.');
+    $this->assert(strpos($url, 'node/' . $nid . '/edit') > 0, 'Form not submitted.');
 
     // Set the field properly and save again.
     $this->selectFieldOption($locator, 'one_example_com');
@@ -104,7 +115,7 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/1/edit') === FALSE, 'Form submitted.');
+    $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
 
     // Save with no source.
 
@@ -121,6 +132,6 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/1/edit') === FALSE, 'Form submitted.');
+    $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
   }
 }
