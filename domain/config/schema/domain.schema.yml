@@ -83,3 +83,13 @@ condition.plugin.domain:
       sequence:
         type: string
 
+views.access.domain:
+  type: mapping
+  label: 'Domains'
+  mapping:
+    domain:
+      type: sequence
+      label: 'List of domains'
+      sequence:
+        type: string
+        label: 'Domain'
