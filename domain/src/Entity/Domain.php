@@ -100,7 +100,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    *
    * @var bool
    */
-  protected $is_default;
+  protected $is_default = FALSE;
 
   /**
    * The domain record protocol (e.g. http://).
@@ -211,12 +211,12 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       // Swap the current default.
       /** @var self $default */
       if ($default = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain()) {
-        $default->is_default = 0;
+        $default->is_default = FALSE;
         $default->setHostname($default->getCanonical());
         $default->save();
       }
       // Save the new default.
-      $this->is_default = 1;
+      $this->is_default = TRUE;
       $this->setHostname($this->getCanonical());
       $this->save();
     }
@@ -332,11 +332,11 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     /** @var self $default */
     $default = $storage->loadDefaultDomain();
     if (!$default) {
-      $this->is_default = 1;
+      $this->is_default = TRUE;
     }
     elseif ($this->is_default && $default->getDomainId() != $this->getDomainId()) {
       // Swap the current default.
-      $default->is_default = 0;
+      $default->is_default = FALSE;
       $default->save();
     }
     // Ensures we have a proper domain_id.
