@@ -5,6 +5,9 @@ domain_access.settings:
     node_advanced_tab:
       type: boolean
       label: 'Move domain access field to a tab in the advanced settings on nodes.'
+    node_advanced_tab_open:
+      type: boolean
+      label: 'Open the Domain Access details by default.'
 action.configuration.domain_access_all_action:
   type: action_configuration_default
   label: 'Assign content to all affiliates'

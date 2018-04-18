@@ -251,6 +251,7 @@ function domain_access_form_node_form_alter(&$form, FormState $form_state, $form
     $form[DOMAIN_ACCESS_ALL_FIELD]['#group'] = 'domain';
     $form['domain'] = [
       '#type' => 'details',
+      '#open' => (bool) \Drupal::config('domain_access.settings')->get('node_advanced_tab_open'),
       '#title' => t('Domain settings'),
       '#group' => 'advanced',
       '#attributes' => [
