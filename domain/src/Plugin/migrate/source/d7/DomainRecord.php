@@ -51,7 +51,7 @@ class DomainRecord extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function getIds() {
-    return ['domain_id' => ['type' => 'int']];
+    return ['domain_id' => ['type' => 'integer']];
   }
 
 }
