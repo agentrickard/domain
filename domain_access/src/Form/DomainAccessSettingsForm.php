@@ -37,8 +37,8 @@ class DomainAccessSettingsForm extends ConfigFormBase {
     );
     $form['node_advanced_tab_open'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Open the Domain Access details by default.'),
-      '#description' => $this->t('Force the details tab to be opened.'),
+      '#title' => $this->t('Open the Domain Access details.'),
+      '#description' => $this->t('Set the details tab to be open by default.'),
       '#default_value' => $config->get('node_advanced_tab_open'),
       '#states' => [
         'visible' => [
