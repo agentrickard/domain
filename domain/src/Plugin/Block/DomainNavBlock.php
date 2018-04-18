@@ -157,7 +157,7 @@ class DomainNavBlock extends DomainBlockBase {
     switch ($this->getSetting('link_theme')) {
       case 'select':
         $build['#theme'] = 'domain_nav_block';
-        $build['items'] = $items;
+        $build['#items'] = $items;
         break;
       case 'menus':
         // Map the $items params to what menu.html.twig expects.
