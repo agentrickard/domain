@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_config\Routing;
 
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\RouteProvider;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,8 +23,12 @@ class DomainRouteProvider extends RouteProvider {
    */
   public function getRouteCollectionForRequest(Request $request) {
     // Cache both the system path as well as route parameters and matching
-    // routes. Here we add in the domain as well.
-    $cid = 'route:' . $request->getHost() . ':' . $request->getPathInfo() . ':' . $request->getQueryString();
+    // routes. Here we add in the domain as well. We cannot just modify the
+    // cache id, because it would break Drupal 8.4. In the future, we can
+    // override getRouteCollectionCacheId() instead.
+    $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
+    $cid = 'route:' . $request->getHost() . ':' . $langcode . ':' . $request->getPathInfo() . ':' . $request->getQueryString();
+
     if ($cached = $this->cache->get($cid)) {
       $this->currentPath->setPath($cached->data['path'], $request);
       $request->query->replace($cached->data['query']);
