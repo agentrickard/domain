@@ -57,9 +57,6 @@ before_install:
   # Install Drush.
   - composer global require --no-interaction drush/drush:8.*
 
-  # Check PHP Unit version.
-  - composer run-script drupal-phpunit-upgrade
-
 install:
   # Optimize MySQL timeout and max packet size.
   - echo "mysql.connect_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -86,6 +83,9 @@ before_script:
   - /usr/bin/env PHP_OPTIONS="-d sendmail_path=$(which true)" drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
   - drush --yes en simpletest domain domain_access domain_alias domain_config domain_source
   - drush cr
+
+  # Check PHP Unit version.
+  - composer run-script drupal-phpunit-upgrade
 
   # Start a web server on port 8080 in the background.
   - nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
