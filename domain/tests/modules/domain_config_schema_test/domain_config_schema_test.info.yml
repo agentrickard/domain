@@ -1,0 +1,10 @@
+name: "Domain module config schema tests"
+description: "Support module for domain config schema testing."
+type: module
+package: Testing
+version: VERSION
+core: 8.x
+hidden: TRUE
+
+dependencies:
+  - domain
