@@ -4,21 +4,21 @@ sudo: false
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL=8.4.x
+    - env: DRUPAL=8.5.x
       php: 7.1
-    - env: DRUPAL=8.4.x
+    - env: DRUPAL=8.5.x
       php: 7.0
-    - env: DRUPAL=8.4.x
+    - env: DRUPAL=8.5.x
       php: 5.6
-    - env: DRUPAL=8.4.x
+    - env: DRUPAL=8.5.x
       php: 5.5
-    - env: DRUPAL=8.5.x
+    - env: DRUPAL=8.6.x
       php: 7.1
-    - env: DRUPAL=8.5.x
+    - env: DRUPAL=8.6.x
       php: 7.0
-    - env: DRUPAL=8.5.x
+    - env: DRUPAL=8.6.x
       php: 5.6
-    - env: DRUPAL=8.5.x
+    - env: DRUPAL=8.6.x
       php: 5.5
 
 addons:
@@ -56,6 +56,9 @@ before_install:
 
   # Install Drush.
   - composer global require --no-interaction drush/drush:8.*
+
+  # Check PHP Unit version.
+  - composer run-script drupal-phpunit-upgrade
 
 install:
   # Optimize MySQL timeout and max packet size.
