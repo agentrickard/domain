@@ -31,7 +31,11 @@ class DomainConfigLibraryDiscoveryCollector extends LibraryDiscoveryCollector {
    */
   protected function getCid() {
     if (!isset($this->cid)) {
-      $this->cid = 'library_info:' . $this->domain->id() . ':' . $this->themeManager->getActiveTheme()->getName();
+      $domain_id = 'null';
+      if (!empty($this->domain)) {
+        $domain_id = $this->domain->id();
+      }
+      $this->cid = 'library_info:' . $domain_id . ':' . $this->themeManager->getActiveTheme()->getName();
     }
 
     return $this->cid;
