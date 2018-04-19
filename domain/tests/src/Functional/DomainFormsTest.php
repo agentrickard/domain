@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\domain\Functional;
 
+use Drupal;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
@@ -26,8 +27,15 @@ class DomainFormsTest extends DomainTestBase {
     // Visit the main domain administration page.
     $this->drupalGet('admin/config/domain');
 
-    // Check for the add message.
-    $this->assertText('There is no Domain record yet.', 'Text for no domains found.');
+    // Check for the add message, which changed in Drupal 8.6.
+    $version = (float) Drupal::VERSION;
+    if ($version < 8.6) {
+      $this->assertText('There is no Domain record yet.', 'Text for no domains found.');
+    }
+    else {
+      $this->assertText('There are no domain record entities yet.', 'Text for no domains found.');
+    }
+
     // Visit the add domain administration page.
     $this->drupalGet('admin/config/domain/add');
 
