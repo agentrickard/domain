@@ -25,7 +25,11 @@ class DomainRouteProvider extends RouteProvider {
     // Cache both the system path as well as route parameters and matching
     // routes. Here we add in the domain as well. We cannot just modify the
     // cache id, because it would break Drupal 8.4. In the future, we can
-    // override getRouteCollectionCacheId() instead.
+    // override getRouteCollectionCacheId() instead. In Drupal 8.4 and lower,
+    // the Language Manager is not present.
+    if (!isset($this->languageManager)) {
+      $this->languageManager = \Drupal::languageManager();
+    }
     $langcode = $this->languageManager->getCurrentLanguage(LanguageInterface::TYPE_URL)->getId();
     $cid = 'route:' . $request->getHost() . ':' . $langcode . ':' . $request->getPathInfo() . ':' . $request->getQueryString();
 
