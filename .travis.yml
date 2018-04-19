@@ -4,22 +4,14 @@ sudo: false
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL=8.4.x
-      php: 7.1
-    - env: DRUPAL=8.4.x
-      php: 7.0
-    - env: DRUPAL=8.4.x
-      php: 5.6
-    - env: DRUPAL=8.4.x
-      php: 5.5
     - env: DRUPAL=8.5.x
       php: 7.1
     - env: DRUPAL=8.5.x
-      php: 7.0
-    - env: DRUPAL=8.5.x
       php: 5.6
-    - env: DRUPAL=8.5.x
-      php: 5.5
+    - env: DRUPAL=8.6.x
+      php: 7.1
+    - env: DRUPAL=8.6.x
+      php: 5.6
 
 addons:
   hosts:
@@ -83,6 +75,9 @@ before_script:
   - /usr/bin/env PHP_OPTIONS="-d sendmail_path=$(which true)" drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
   - drush --yes en simpletest domain domain_access domain_alias domain_config domain_source
   - drush cr
+
+  # Check PHP Unit version.
+  - composer run-script drupal-phpunit-upgrade
 
   # Start a web server on port 8080 in the background.
   - nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
