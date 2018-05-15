@@ -38,7 +38,7 @@ function domain_access_install() {
 /**
  * Add the setting to open the domain access fieldset.
  */
-function domain_access_update_8000() {
+function domain_access_update_8001() {
   $config_factory = \Drupal::configFactory();
   $config = $config_factory->getEditable('domain_access.settings');
   $config->set('node_advanced_tab_open', 0);
