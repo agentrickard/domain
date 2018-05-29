@@ -53,9 +53,6 @@ before_install:
   # Install Drush.
   - composer global require --no-interaction drush/drush:8.*
 
-  # Update PHPUnit.
-  - composer run-script drupal-phpunit-upgrade
-
 install:
   # Optimize MySQL timeout and max packet size.
   - echo "mysql.connect_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -74,6 +71,9 @@ before_script:
   # Download Drupal 8 core.
   - travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
   - cd drupal
+
+  # Update PHPUnit.
+  - composer run-script drupal-phpunit-upgrade
 
   # Make the module appear in the correct place
   - ln -s $TESTDIR modules/domain
