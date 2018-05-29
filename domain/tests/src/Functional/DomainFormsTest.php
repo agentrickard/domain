@@ -27,7 +27,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet('admin/config/domain');
 
     // Check for the add message.
-    if (substr_count(Drupal::VERSION, '8.5') > 0) {
+    if (substr_count(\Drupal::VERSION, '8.5') > 0) {
       $this->assertText('There is no Domain record yet.', 'Text for no domains found.');
     }
     else {
