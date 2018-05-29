@@ -156,7 +156,7 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
     }
 
     // Trim and remove port number from host. Host is lowercase as per RFC 952/2181
-    $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
+    $host = mb_strtolower(preg_replace('/:\d+$/', '', trim($host)));
 
     // In the original Symfony code, hostname validation runs here. We have removed that
     // portion because Domains are already validated on creation.
