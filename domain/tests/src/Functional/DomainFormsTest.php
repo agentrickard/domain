@@ -27,7 +27,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet('admin/config/domain');
 
     // Check for the add message.
-    $this->assertText('There is no Domain record yet.', 'Text for no domains found.');
+    $this->assertText('There are no domain record entities yet.', 'Text for no domains found.');
     // Visit the add domain administration page.
     $this->drupalGet('admin/config/domain/add');
 
