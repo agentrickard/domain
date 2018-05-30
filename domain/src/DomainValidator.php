@@ -105,7 +105,7 @@ class DomainValidator implements DomainValidatorInterface {
       }
     }
     // Check for lower case.
-    if ($hostname != Unicode::strtolower($hostname)) {
+    if ($hostname != mb_strtolower($hostname)) {
       $error_list[] = $this->t('Only lower-case characters are allowed.');
     }
     // Check for 'www' prefix if redirection / handling is

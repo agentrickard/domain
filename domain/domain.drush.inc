@@ -273,7 +273,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
 
   // Create the domains.
   foreach ($prepared as $key => $item) {
-    $hostname = strtolower($item);
+    $hostname = mb_strtolower($item);
     $values = array(
       'name' => ($item != $primary) ? ucwords(str_replace(".$primary", '', $item)) : \Drupal::config('system.site')->get('name'),
       'hostname' => $hostname,
@@ -322,7 +322,7 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
 function drush_domain_add($hostname, $name) {
   $records_count = \Drupal::entityTypeManager()->getStorage('domain')->getQuery()->count()->execute();
   $start_weight = $records_count + 1;
-  $hostname = strtolower($hostname);
+  $hostname = mb_strtolower($hostname);
   /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
   $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
   $values = array(

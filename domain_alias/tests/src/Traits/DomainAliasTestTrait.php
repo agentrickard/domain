@@ -23,7 +23,7 @@ trait DomainAliasTestTrait {
   public function createDomainAlias($values, $save = TRUE) {
     // Replicate the logic for creating machine_name patterns.
     // @see ConfigBase::validate()
-    $machine_name = strtolower(preg_replace('/[^a-z0-9_]/', '_', $values['pattern']));
+    $machine_name = mb_strtolower(preg_replace('/[^a-z0-9_]/', '_', $values['pattern']));
     $values['id'] = str_replace(array('*', '.', ':'), '_', $machine_name);
     $alias = \Drupal::entityTypeManager()->getStorage('domain_alias')->create($values);
     if ($save) {

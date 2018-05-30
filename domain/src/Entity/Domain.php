@@ -221,7 +221,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->save();
     }
     else {
-      drupal_set_message($this->t('The selected domain is already the default.'), 'warning');
+      \Drupal::messenger()->addMessage($this->t('The selected domain is already the default.'), 'warning');
     }
   }
 
@@ -244,7 +244,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->save();
     }
     else {
-      drupal_set_message($this->t('The default domain cannot be disabled.'), 'warning');
+      \Drupal::messenger()->addMessage($this->t('The default domain cannot be disabled.'), 'warning');
     }
   }
 
@@ -256,14 +256,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->{$name} = $value;
       $this->setHostname($this->getCanonical());
       $this->save();
-      drupal_set_message($this->t('The @key attribute was set to @value for domain @hostname.', array(
+      \Drupal::messenger()->addMessage($this->t('The @key attribute was set to @value for domain @hostname.', array(
         '@key' => $name,
         '@value' => $value,
         '@hostname' => $this->hostname,
       )));
     }
     else {
-      drupal_set_message($this->t('The @key attribute does not exist.', array('@key' => $name)));
+      \Drupal::messenger()->addMessage($this->t('The @key attribute does not exist.', array('@key' => $name)));
     }
   }
 
