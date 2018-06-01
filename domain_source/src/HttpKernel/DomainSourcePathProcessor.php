@@ -167,7 +167,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     // One for other, because the latter is resource-intensive.
     else {
-      $source = $active_domain;
       $this->moduleHandler->alter('domain_source_path', $source, $path, $options);
     }
     // If a source domain is specified, rewrite the link.
