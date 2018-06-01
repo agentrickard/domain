@@ -123,6 +123,16 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     if (!empty($options['language'])) {
       $langcode = $options['language']->getId();
     }
+
+    // The _format query parameter causes issues when building the URL from
+    // user input, so just return the path before doing other processing.
+    if (is_object($request) && !is_null($request->query)) {
+      $query_params = $request->query->all();
+      if (!empty($query_params) && isset($query_params['_format'])) {
+        return $path;
+      }
+    }
+
     // Get the URL object for this request.
     $alias = $this->aliasManager->getPathByAlias($path, $langcode);
     $url = Url::fromUserInput($alias, $options);
