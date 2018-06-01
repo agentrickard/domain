@@ -118,7 +118,6 @@ marked with [x] are considered complete.
 - [ ] Caching strategies in DomainNegotiator
 - [ ] Caching strategies in DomainConfigOverrides
 - [ ] Cache in the DomainAccessManager
-- [ ] Add filter options to domain_access and domain_source views
 - [ ] Proper handling of default node values
 - [ ] Do not allow actions to be edited?
 - [o] Recreate the Domain Theme module -- see https://www.drupal.org/project/domain_theme_switch
