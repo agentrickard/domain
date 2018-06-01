@@ -30,7 +30,7 @@ class DomainSource extends InOperator {
    * {@inheritdoc}
    */
   public function query() {
-    $active_index = array_search('_active', (array)$this->value);
+    $active_index = array_search('_active', (array) $this->value);
     if ($active_index !== FALSE) {
       $active_id = \Drupal::service('domain.negotiator')->getActiveId();
       $this->value[$active_index] = $active_id;
@@ -38,4 +38,5 @@ class DomainSource extends InOperator {
 
     parent::query();
   }
+
 }

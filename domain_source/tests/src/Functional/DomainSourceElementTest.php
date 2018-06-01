@@ -16,7 +16,14 @@ class DomainSourceElementTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'domain_source', 'field', 'field_ui', 'user');
+  public static $modules = [
+    'domain',
+    'domain_access',
+    'domain_source',
+    'field',
+    'field_ui',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -41,14 +48,14 @@ class DomainSourceElementTest extends DomainTestBase {
    * Basic test setup.
    */
   public function runInstalledTest($node_type) {
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
       'publish to any domain',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
     $this->drupalGet('node/add/article');
@@ -118,7 +125,6 @@ class DomainSourceElementTest extends DomainTestBase {
     $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
 
     // Save with no source.
-
     // Edit the node.
     $this->drupalGet('node/1/edit');
     $this->assertSession()->statusCodeEquals(200);
@@ -134,4 +140,5 @@ class DomainSourceElementTest extends DomainTestBase {
     $url = $this->geturl();
     $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
   }
+
 }

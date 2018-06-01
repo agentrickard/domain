@@ -18,7 +18,7 @@ function domain_source_install() {
     return;
   }
   // Assign domain source to bundles.
-  $list = array();
+  $list = [];
   $node_types = \Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple();
   foreach ($node_types as $type => $info) {
     $list[$type] = 'node';
