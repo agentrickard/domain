@@ -141,10 +141,11 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
         }
       }
     }
+
     // One hook for entities.
     if (!empty($entity)) {
       // Enmsure we send the right translation.
-      if (!empty($langcode) && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
+      if (!empty($langcode) && method_exists($entity, 'hasTranslation') && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
         $entity = $translation;
       }
       if ($target_id = domain_source_get($entity)) {
@@ -156,6 +157,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     // One for other, because the latter is resource-intensive.
     else {
+      $source = $active_domain;
       $this->moduleHandler->alter('domain_source_path', $source, $path, $options);
     }
     // If a source domain is specified, rewrite the link.
