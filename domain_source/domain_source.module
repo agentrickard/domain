@@ -23,6 +23,9 @@ const DOMAIN_SOURCE_FIELD = 'field_domain_source';
  * @param string $bundle
  *   The bundle being created.
  *
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ *
  * @see domain_source_node_type_insert()
  * @see domain_source_install()
  */
@@ -54,7 +57,11 @@ function domain_source_confirm_fields($entity_type, $bundle) {
   }
 
   // Tell the form system how to behave. Default to radio buttons.
-  if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load($entity_type . '.' .  $bundle . '.default')) {
+  /** @var $display \Drupal\Core\Entity\Display\EntityDisplayInterface */
+  $display = \Drupal::entityTypeManager()
+                    ->getStorage('entity_form_display')
+                    ->load($entity_type . '.' . $bundle . '.default');
+  if ($display) {
     $display->setComponent(DOMAIN_SOURCE_FIELD, [
       'type' => 'options_select',
       'weight' => 42,
