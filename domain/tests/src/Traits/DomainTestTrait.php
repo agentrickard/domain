@@ -118,7 +118,7 @@ trait DomainTestTrait {
    *   A regex-safe hostname, without delimiters.
    */
   public function prepareTrustedHostname($hostname) {
-    $hostname = strtolower(preg_replace('/:\d+$/', '', trim($hostname)));
+    $hostname = mb_strtolower(preg_replace('/:\d+$/', '', trim($hostname)));
     return preg_quote($hostname);
   }
 

@@ -4,22 +4,22 @@ sudo: false
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL=8.4.x
-      php: 7.1
-    - env: DRUPAL=8.4.x
-      php: 7.0
-    - env: DRUPAL=8.4.x
-      php: 5.6
-    - env: DRUPAL=8.4.x
+    - env: DRUPAL=8.5.x
       php: 5.5
-    - env: DRUPAL=8.5.x
-      php: 7.1
-    - env: DRUPAL=8.5.x
-      php: 7.0
     - env: DRUPAL=8.5.x
       php: 5.6
     - env: DRUPAL=8.5.x
+      php: 7.1
+    - env: DRUPAL=8.5.x
+      php: 7.2
+    - env: DRUPAL=8.6.x
       php: 5.5
+    - env: DRUPAL=8.6.x
+      php: 5.6
+    - env: DRUPAL=8.6.x
+      php: 7.1
+    - env: DRUPAL=8.6.x
+      php: 7.2
 
 addons:
   hosts:
@@ -76,6 +76,9 @@ before_script:
   - travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
   - cd drupal
 
+  # Update PHPUnit.
+  - composer run-script drupal-phpunit-upgrade
+
   # Make the module appear in the correct place
   - ln -s $TESTDIR modules/domain
 
@@ -91,11 +94,11 @@ before_script:
   - until curl -s example.com:8080; do true; done > /dev/null
 
 script:
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_access
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_content
-  - php core/scripts/run-tests.sh --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_access
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_alias
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain_alias
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_content
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source

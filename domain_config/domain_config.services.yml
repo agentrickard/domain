@@ -5,3 +5,11 @@ services:
       - { name: config.factory.override, priority: -150}
     arguments: ['@config.storage']
 
+  domain_config.library.discovery.collector:
+    decorates: library.discovery.collector
+    class: \Drupal\domain_config\DomainConfigLibraryDiscoveryCollector
+    arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
+    tags:
+      - { name: needs_destruction }
+    calls:
+      - [setDomainNegotiator, ['@domain.negotiator']]

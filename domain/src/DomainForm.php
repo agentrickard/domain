@@ -207,10 +207,10 @@ class DomainForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     $status = parent::save($form, $form_state);
     if ($status == SAVED_NEW) {
-      drupal_set_message($this->t('Domain record created.'));
+      \Drupal::messenger()->addMessage($this->t('Domain record created.'));
     }
     else {
-      drupal_set_message($this->t('Domain record updated.'));
+      \Drupal::messenger()->addMessage($this->t('Domain record updated.'));
     }
     $form_state->setRedirect('domain.admin');
   }
