@@ -5,7 +5,13 @@ namespace Drupal\domain_source\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Class DomainSourceSettingsForm.
+ *
+ * @package Drupal\domain_source\Form
+ */
 class DomainSourceSettingsForm extends ConfigFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -27,6 +33,7 @@ class DomainSourceSettingsForm extends ConfigFormBase {
     $manager = \Drupal::entityTypeManager();
     $routes = $manager->getDefinition('node')->getLinkTemplates();
 
+    $options = [];
     foreach ($routes as $route => $path) {
       // Some parts of the system prepend drupal:, which the routing
       // system doesn't use. The routing system also uses underscores instead
@@ -35,13 +42,13 @@ class DomainSourceSettingsForm extends ConfigFormBase {
       $options[$route] = $route;
     }
     $config = $this->config('domain_source.settings');
-    $form['exclude_routes'] = array(
+    $form['exclude_routes'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Disable link rewrites for the selected routes.'),
       '#default_value' => $config->get('exclude_routes', []),
       '#options' => $options,
       '#description' => $this->t('Check the routes to disable. Any entity URL with a Domain Source field will be rewritten unless its corresponding route is disabled.'),
-    );
+    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -55,6 +62,5 @@ class DomainSourceSettingsForm extends ConfigFormBase {
 
     parent::submitForm($form, $form_state);
   }
-
 
 }

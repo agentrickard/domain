@@ -31,14 +31,14 @@ function domain_source_confirm_fields($entity_type, $bundle) {
   $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
 
   if (!$field = $field_config_storage->load($id)) {
-    $field = array(
+    $field = [
       'field_name' => DOMAIN_SOURCE_FIELD,
       'entity_type' => $entity_type,
       'label' => 'Domain Source',
       'bundle' => $bundle,
       'required' => FALSE,
       'description' => 'Select the canonical domain for this content.',
-      'settings' => array(
+      'settings' => [
         'handler' => 'default:domain',
         // Handler_settings are deprecated but seem to be necessary here.
         'handler_settings' => [
@@ -47,14 +47,17 @@ function domain_source_confirm_fields($entity_type, $bundle) {
         ],
         'target_bundles' => NULL,
         'sort' => ['field' => 'weight', 'direction' => 'ASC'],
-      ),
-    );
+      ],
+    ];
     $field_config = $field_config_storage->create($field);
     $field_config->save();
   }
 
   // Tell the form system how to behave. Default to radio buttons.
-  if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load($entity_type . '.' .  $bundle . '.default')) {
+  $display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load($entity_type . '.' . $bundle . '.default');
+  if ($display) {
     $display->setComponent(DOMAIN_SOURCE_FIELD, [
       'type' => 'options_select',
       'weight' => 42,
@@ -96,7 +99,7 @@ function domain_source_entity_form_display_insert(EntityInterface $entity) {
  * @param Drupal\Core\Entity\EntityInterface $entity
  *   The entity to check.
  *
- * @return string|NULL
+ * @return string|null
  *   The value assigned to the entity, either a domain id string or NULL.
  */
 function domain_source_get(EntityInterface $entity) {
@@ -138,7 +141,7 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
 /**
  * Validate form submissions.
  */
-function domain_source_form_validate($element, \Drupal\Core\Form\FormStateInterface $form_state) {
+function domain_source_form_validate($element, FormStateInterface $form_state) {
   $values = $form_state->getValues();
   // This is only run if Domain Access is present.
   if (isset($values[DOMAIN_SOURCE_FIELD]) && is_array($values[DOMAIN_SOURCE_FIELD]) && isset($values[DOMAIN_ACCESS_FIELD])) {
@@ -166,7 +169,7 @@ function domain_source_form_validate($element, \Drupal\Core\Form\FormStateInterf
 /**
  * Redirect form submissions to other domains.
  */
-function domain_source_form_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function domain_source_form_submit(&$form, FormStateInterface $form_state) {
   // Ensure that we have saved an entity.
   if ($object = $form_state->getFormObject()) {
     $url = $object->getEntity()->url();
@@ -196,7 +199,7 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
   $form = $manager->setFormOptions($form, $form_state, DOMAIN_SOURCE_FIELD, $hide);
   // Add validation if Domain Access is installed.
   if (defined('DOMAIN_ACCESS_FIELD') && isset($form[DOMAIN_ACCESS_FIELD])) {
-    $form[DOMAIN_SOURCE_FIELD]['#element_validate'] = array('domain_source_form_validate');
+    $form[DOMAIN_SOURCE_FIELD]['#element_validate'] = ['domain_source_form_validate'];
     // If using a select field, load the JS to show/hide options.
     if ($form[DOMAIN_SOURCE_FIELD]['widget']['#type'] == 'select') {
       $form['#attached']['library'][] = 'domain_source/drupal.domain_source';
@@ -205,7 +208,7 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
 }
 
 /**
- * Implements hook_views_data_alter.
+ * Implements hook_views_data_alter().
  */
 function domain_source_views_data_alter(array &$data) {
   $table = 'node__' . DOMAIN_SOURCE_FIELD;
@@ -224,7 +227,7 @@ function domain_source_form_devel_generate_form_content_alter(&$form, &$form_sta
   // Add our element to the Devel generate form.
   $list = ['_derive' => t('Derive from domain selection')];
   $list += \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList();
-  $form['domain_source'] = array(
+  $form['domain_source'] = [
     '#title' => t('Domain source'),
     '#type' => 'checkboxes',
     '#options' => $list,
@@ -233,7 +236,7 @@ function domain_source_form_devel_generate_form_content_alter(&$form, &$form_sta
     '#size' => count($list) > 5 ? 5 : count($list),
     '#default_value' => ['_derive'],
     '#description' => t('Sets the source domain for created nodes.'),
-  );
+  ];
 }
 
 /**

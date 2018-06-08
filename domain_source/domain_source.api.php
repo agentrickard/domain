@@ -19,7 +19,7 @@
  * If the entity's path is a translation, the requested translation of the
  * entity will be passed as the $entity value.
  *
- * @param \Drupal\domain\Entity\Domain|NULL &$source
+ * @param \Drupal\domain\Entity\Domain|null &$source
  *   A domain object or NULL if not set.
  * @param string $path
  *   The outbound path request.
@@ -27,7 +27,7 @@
  *   The options for the url, as defined by
  *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface.
  */
-function hook_domain_source_alter(&$source, $path, $options) {
+function hook_domain_source_alter(array &$source, $path, array $options) {
   // Always link to the default domain.
   $source = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain();
 }
@@ -39,7 +39,8 @@ function hook_domain_source_alter(&$source, $path, $options) {
  * are handled by hook_domain_source_alter(). This hook is split
  * from hook_domain_source_alter() for better performance.
  *
- * Note that hook_domain_source_alter() only paths that are not content entities.
+ * Note that hook_domain_source_alter() only paths that are not content
+ * entities.
  *
  * Currently, no modules in the package implement this hook.
  *
@@ -55,7 +56,7 @@ function hook_domain_source_alter(&$source, $path, $options) {
  *   The options for the url, as defined by
  *   \Drupal\Core\PathProcessor\OutboundPathProcessorInterface.
  */
-function hook_domain_source_path_alter(&$source, $path, $options) {
+function hook_domain_source_path_alter(array &$source, $path, array $options) {
   // Always make admin links go to the primary domain.
   $parts = explode('/', $path);
   if (isset($parts[0]) && $parts[0] == 'admin') {
