@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
- * Tests behavior for the rewriting links using core URL methods.
+ * Tests behavior for excluding some links from rewriting.
  *
  * @group domain_source
  */

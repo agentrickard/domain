@@ -123,6 +123,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     if (!empty($options['language'])) {
       $langcode = $options['language']->getId();
     }
+
     // Get the URL object for this request.
     $alias = $this->aliasManager->getPathByAlias($path, $langcode);
     $url = Url::fromUserInput($alias, $options);
@@ -141,10 +142,11 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
         }
       }
     }
+
     // One hook for entities.
     if (!empty($entity)) {
       // Enmsure we send the right translation.
-      if (!empty($langcode) && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
+      if (!empty($langcode) && method_exists($entity, 'hasTranslation') && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
         $entity = $translation;
       }
       if ($target_id = domain_source_get($entity)) {
