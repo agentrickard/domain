@@ -1,0 +1,8 @@
+name: Domain Configuration UI
+description: 'Allows saving of domain specific configuration through the UI.'
+type: module
+package: Domain
+version: VERSION
+core: 8.x
+dependencies:
+  - domain_config
