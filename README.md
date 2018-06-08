@@ -8,7 +8,9 @@ Current Status
 
 Domain module for Drupal port to Drupal 8, under active development.
 
-Active branch is 8-x.1-x. Begin any forks from there.
+Domain required Drupal 8.5 or higher.
+
+Active branch is the 8-x.1-x branch in GitHub. Begin any forks from there.
 
 The underlying API is stable, and it's currently usable for access control.
 The configuration supports manual editing. Themes should work. Views and Bulk
