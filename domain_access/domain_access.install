@@ -29,7 +29,7 @@ function domain_access_install() {
     domain_access_confirm_fields($entity_type, $bundle);
   }
   // Install our actions.
-  $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+  $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
   foreach ($domains as $domain) {
     domain_access_domain_insert($domain);
   }

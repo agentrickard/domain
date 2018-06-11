@@ -44,7 +44,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertResponse(200, 'Article creation found.');
 
     // Check for the form options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertText($domain->label(), 'Domain form item found.');
     }
@@ -162,7 +162,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertResponse(200, $type->id() . ' creation found.');
 
     // Check for the form options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertText($domain->label(), 'Domain form item found.');
     }
@@ -175,7 +175,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $user_edit_page = 'user/' . $user8->id() . '/edit';
     $this->drupalGet($user_edit_page);
     // Check for the form options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertNoText($domain->label(), 'Domain form item not found.');
     }

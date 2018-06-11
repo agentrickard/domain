@@ -72,7 +72,7 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
     $this->assertText($label, 'Found the domain field instance.');
 
     // We expect to find 5 domain options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
       $this->assertRaw($string, 'Found the domain option.');

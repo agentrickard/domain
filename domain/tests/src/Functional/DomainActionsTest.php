@@ -28,7 +28,7 @@ class DomainActionsTest extends DomainTestBase {
     $this->assertResponse(200);
 
     // Test the domains.
-    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
     $domains = $storage->loadMultiple();
     $this->assertTrue(count($domains) == 4, 'Four domain records found.');
 

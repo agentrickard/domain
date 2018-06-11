@@ -37,7 +37,7 @@ class DomainContentController extends ControllerBase {
       ];
     }
     // Loop through domains.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultipleSorted();
     $manager = \Drupal::service('domain_access.manager');
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {

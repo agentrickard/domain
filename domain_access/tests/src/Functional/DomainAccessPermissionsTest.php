@@ -74,7 +74,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $this->userStorage = \Drupal::entityTypeManager()->getStorage('user');
     // Create 5 domains.
     $this->domainCreateTestDomains(5);
-    $this->domains = $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $this->domains = $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
   }
 
   /**

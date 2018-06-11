@@ -45,7 +45,7 @@ class DomainSourceExcludeTest extends DomainTestBase {
 
     // Variables for our tests.
     $path = 'node/1';
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     $source = $domains[$id];
     $expected = $source->getPath() . $path;
     $route_name = 'entity.node.canonical';

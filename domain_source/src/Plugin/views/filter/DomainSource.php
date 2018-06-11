@@ -21,7 +21,7 @@ class DomainSource extends InOperator {
       $this->valueTitle = $this->t('Domains');
       $this->valueOptions = [
         '_active' => $this->t('Active domain'),
-      ] + \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList();
+      ] + \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
     }
     return $this->valueOptions;
   }

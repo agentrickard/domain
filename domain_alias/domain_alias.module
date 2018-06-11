@@ -34,8 +34,8 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   }
   // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
-  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
-  $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+  $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
+  $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
   /** @var \Drupal\domain_alias\Entity\DomainAlias $alias */
   if ($alias = $alias_storage->loadByHostname($hostname)) {
     /** @var \Drupal\domain\Entity\Domain $domain */
@@ -102,7 +102,7 @@ function domain_alias_domain_load($entities) {
   }
 
   // Load and rewrite environement-specific aliases.
-  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+  $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
   if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
     foreach ($entities as $id => $domain) {
       if ($environment_aliases = $alias_storage->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
@@ -160,7 +160,7 @@ function domain_alias_domain_load($entities) {
  * Implements hook_ENTITY_TYPE_delete().
  */
 function domain_alias_domain_delete(EntityInterface $entity) {
-  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+  $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
   $properties = ['domain_id' => $entity->id()];
   foreach ($alias_storage->loadByProperties($properties) as $alias) {
     $alias->delete();
