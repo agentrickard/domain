@@ -24,7 +24,7 @@ class DomainGetResponseTest extends DomainTestBase {
     // Check the created domain based on it's known id value.
     $key = 'example_com';
     /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($key);
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->load($key);
 
     // Our testing server should be able to access the test PNG file.
     $this->assertTrue($domain->getResponse() == 200, 'Server returned a 200 response.');
@@ -35,7 +35,7 @@ class DomainGetResponseTest extends DomainTestBase {
       'id' => 'foo_bar',
       'name' => 'Foo',
     );
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->create($values);
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
 
     $domain->save();
     $this->assertTrue($domain->getResponse() == 500, 'Server test returned a 500 response.');

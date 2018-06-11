@@ -112,7 +112,7 @@ function domain_source_get(EntityInterface $entity) {
   $value = $entity->get(DOMAIN_SOURCE_FIELD)->offsetGet(0);
   if (!empty($value)) {
     $target_id = $value->target_id;
-    if ($domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($target_id)) {
+    if ($domain = \Drupal::entityTypeManager()->getStorage('domain')->load($target_id)) {
       $source = $domain->id();
     }
   }
@@ -227,7 +227,7 @@ function domain_source_views_data_alter(array &$data) {
 function domain_source_form_devel_generate_form_content_alter(&$form, &$form_state, $form_id) {
   // Add our element to the Devel generate form.
   $list = ['_derive' => t('Derive from domain selection')];
-  $list += \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList();
+  $list += \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
   $form['domain_source'] = [
     '#title' => t('Domain source'),
     '#type' => 'checkboxes',
@@ -263,7 +263,7 @@ function domain_source_presave_generate(EntityInterface $entity) {
     if (isset($entity->devel_generate['domain_access'])) {
       $selection = array_filter($entity->devel_generate['domain_access']);
       if (isset($selection['random-selection'])) {
-        $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+        $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
         $selections = array_rand($domains, ceil(rand(1, count($domains))));
       }
       else {

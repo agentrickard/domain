@@ -19,7 +19,7 @@ class DomainValidatorTest extends DomainTestBase {
     // No domains should exist.
     $this->domainTableIsEmpty();
     $validator = \Drupal::service('domain.validator');
-    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
 
     // Create a domain.
     $this->domainCreateTestDomains(1, 'foo.com');
