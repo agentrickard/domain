@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "domain",
  *   label = @Translation("Domain"),
  *   context = {
- *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = FALSE)
+ *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = TRUE)
  *   }
  * )
  */
