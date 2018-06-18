@@ -52,18 +52,12 @@ class DomainSettingsForm extends ConfigFormBase {
       '#default_value' => $config->get('css_classes'),
       '#description' => $this->t('Enter any CSS classes that should be added to the &lt;body&gt; tag. Available replacement patterns are: ' . implode(', ', $patterns)),
     );
-    // Set login paths to be human-editable.
-    $login_paths = $config->get('login_paths');
-    // Replace newline directoves with actual newlines.
-    $find = '\r\n';
-    $replace = "\r\n";
-    $login_paths = str_replace($find, $replace, $login_paths);
     $form['login_paths'] = array(
       '#type' => 'textarea',
       '#rows' => 5,
       '#columns' => 40,
       '#title' => $this->t('Paths that should be accessible for inactive domains'),
-      '#default_value' => $login_paths,
+      '#default_value' => $login_paths = $config->get('login_paths'),
       '#description' => $this->t('Inactive domains are only accessible to users with permission.
         Enter any paths that should be accessible, one per line. Normally, only the
         login path will be allowed.'),
