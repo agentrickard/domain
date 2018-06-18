@@ -61,12 +61,6 @@ class DomainConditionTest extends DomainTestBase {
       ->setContextValue('entity:domain', $this->not_domain);
     $this->assertFalse($condition->execute(), 'Domain request condition fails on wrong domain.');
 
-    // Grab the domain condition and configure it to check against a null set.
-    $condition = $this->manager->createInstance('domain')
-      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
-      ->setContextValue('entity:domain', NULL);
-    $this->assertFalse($condition->execute(), 'Domain request condition fails when no context present.');
-
     // Grab the domain condition and configure it to check against itself.
     $condition = $this->manager->createInstance('domain')
       ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
