@@ -11,6 +11,7 @@ use Drupal\domain\DomainInterface;
 use Drupal\Component\Serialization\Yaml;
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
@@ -217,17 +218,15 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Reassign entities of the supplied type to the $policy domain.
+   * Enumerate entities of the supplied type and domain to the $policy domain.
    *
    * @return string[]
-   *   List of entities supporting domain access.
+   *   List of entity IDs for the selected domain.
    */
-  protected function enumerateDomainEntities($entity_type) {
+  protected function enumerateDomainEntities($entity_type, $domain) {
     $efq = \Drupal::entityQuery($entity_type);
-//    $eq->exists(DOMAIN_ACCESS_FIELD);
+    $efq->condition(DOMAIN_ACCESS_FIELD, $domain, '=');
     $result = $efq->execute();
-//    var_dump($efq);
-//    var_dump($result);
     $entities = [];
     foreach($result as $item) {
       $entities = $item;
@@ -237,44 +236,83 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Reassign entities of the supplied type to the $policy domain.
+   * Reassign old_domain entities, of the supplied type, to the new_domain.
    *
-   * @return string[]
-   *   List of entities supporting domain access.
+   * @param string $entity_type
+   * @param DomainInterface $old_domain
+   * @param DomainInterface $new_domain
+   *
+   * @return
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function reassignEntities($entity_type, $new_domain) {
-    $entities = [];
-    $entity_manager = \Drupal::entityManager();
-    $field_map = $entity_manager->getFieldMap();
-    foreach($field_map as $type => $fields) {
-      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
-        $entities[] = $type;
+  protected function reassignEntities($entity_type, DomainInterface $old_domain, DomainInterface $new_domain) {
+    $entity_storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+
+    $ids = $this->enumerateDomainEntities($entity_type, $old_domain);
+
+    // @TODO is there a problem loading many, possibly big, entities in one go?
+    $entities = $entity_storage->loadMultiple($ids);
+    $count = 0;
+
+    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    foreach($entities as $entity) {
+      $changed = FALSE;
+      $value = $entity->get(DOMAIN_ACCESS_FIELD)->value();
+      if (is_array($value)) {
+        /** @var DomainInterface $item */
+        foreach($value as $k => &$item) {
+          if ($item->getDomainId() == $old_domain->getDomainId()) {
+            $changed = TRUE;
+            $item = $new_domain;
+            break;
+          }
+        }
+      }
+      else {
+        /** @var DomainInterface $value */
+        if ($value->getDomainId() == $old_domain->getDomainId()) {
+          $changed = TRUE;
+          $value = $new_domain;
+        }
+      }
+      $count++;
+      if ($changed) {
+        $entity->set(DOMAIN_ACCESS_FIELD, $value);
+        $entity->save();
       }
     }
-    return $entities;
+    return $count;
   }
 
   /**
    * Reassign entities of the supplied type to the $policy domain.
    *
    *
-   * @param $entity_type
-   *   The name of an entity type, e.g. 'node'.
+   *  $options = [
+   *    'entity_filter' => 'node',
+   *    'policy' => 'prompt' | 'default' | 'ignore'
+   *    'multidomain' => FALSE,
+   *  ];
+   *
    * @param DomainInterface[] $domains
    *   List of the domains to reassign content away from.
-   * @param $policy
-   *   One of the domain policy values (ignore, default) or the machine name of
-   *   the domain to assign to.
-   * @param $multidomain
-   *   When an entity is part of multiple domains, should it be treated the same
-   *   as single-domain content (FALSE), or just removec (TRUE).
    */
-  protected function reassignLinkedEntities($entity_type, $domains, array $options = []) {
-    $entity_manager = \Drupal::entityManager();
-    $field_map = $entity_manager->getFieldMap();
-    foreach($field_map as $type => $fields) {
-      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
-        // found an entity type that supports domain access.
+  protected function reassignLinkedEntities($domains, array $options = []) {
+    $entity_typenames = $this->findDomainEnabledEntities();
+    $new_domain = NULL;
+    if ($options['policy']) {
+
+    }
+    foreach($entity_typenames as $name) {
+      if (empty($options['entity_filter']) || $options['entity_filter'] === $name) {
+        foreach($domains as $domain) {
+          $ids = $this->enumerateDomainEntities($name, $domain);
+          if (!empty($ids)) {
+            $this->reassignEntities($name, $domain, $new_domain);
+          }
+        }
       }
     }
   }
@@ -457,8 +495,6 @@ class DomainCommands extends DrushCommands {
     $rows['domain_access_entities'] = implode(', ', $domain_entities);
     $rows['all_affiliate_support'] = implode(', ', $domain_affiliate_entities);
 
-    $e = $this->enumerateDomainEntities('node');
-    
     return new PropertyList($rows);
   }
 
@@ -539,9 +575,9 @@ class DomainCommands extends DrushCommands {
    *   Delete the domain example.com, leaving its content untouched but
    *   assigning its users to the default domain.
    *
-   * @usage drush domain:delete --content-as=example_net --users-as=example_net example.com
-   *   Delete the domain example.com, assigning its content and users to the
-   *   example.net domain.
+   * @usage drush domain:delete --content-as=example_net --users-as=example_net
+   *   example.com Delete the domain example.com, assigning its content and
+   *   users to the example.net domain.
    *
    * @usage drush domain:delete --dryrun 19476
    *   Show the effects of delete the domain example.com and assigning its
@@ -971,7 +1007,8 @@ class DomainCommands extends DrushCommands {
    *   The primary domain to use. This will be created and used for
    *   *.example.com hostnames.
    * @param array $options
-   *   An associative array of options whose values come from cli, aliases, config, etc.
+   *   An associative array of options whose values come from cli, aliases,
+   *   config, etc.
    * @option count
    *   The count of extra domains to generate. Default is 15.
    * @option empty
