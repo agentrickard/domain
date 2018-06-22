@@ -3,10 +3,12 @@
 namespace Drupal\domain\Commands;
 
 use Consolidation\OutputFormatters\StructuredData\PropertyList;
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Config\StorageException;
 use Drush\Commands\DrushCommands;
 use Drupal\Component\Utility\Html;
 use Drupal\domain\DomainInterface;
+use Drupal\Component\Serialization\Yaml;
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 
 use Drupal\Core\Entity\EntityStorageException;
@@ -199,6 +201,62 @@ class DomainCommands extends DrushCommands {
   /**
    * Reassign entities of the supplied type to the $policy domain.
    *
+   * @return string[]
+   *   List of entities supporting domain access.
+   */
+  protected function findDomainEnabledEntities() {
+    $entities = [];
+    $entity_manager = \Drupal::entityManager();
+    $field_map = $entity_manager->getFieldMap();
+    foreach($field_map as $type => $fields) {
+      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
+        $entities[] = $type;
+      }
+    }
+    return $entities;
+  }
+
+  /**
+   * Reassign entities of the supplied type to the $policy domain.
+   *
+   * @return string[]
+   *   List of entities supporting domain access.
+   */
+  protected function enumerateDomainEntities($entity_type) {
+    $efq = \Drupal::entityQuery($entity_type);
+//    $eq->exists(DOMAIN_ACCESS_FIELD);
+    $result = $efq->execute();
+//    var_dump($efq);
+//    var_dump($result);
+    $entities = [];
+    foreach($result as $item) {
+      $entities = $item;
+    }
+    var_dump($entities);
+    return $entities;
+  }
+
+  /**
+   * Reassign entities of the supplied type to the $policy domain.
+   *
+   * @return string[]
+   *   List of entities supporting domain access.
+   */
+  protected function reassignEntities($entity_type, $new_domain) {
+    $entities = [];
+    $entity_manager = \Drupal::entityManager();
+    $field_map = $entity_manager->getFieldMap();
+    foreach($field_map as $type => $fields) {
+      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
+        $entities[] = $type;
+      }
+    }
+    return $entities;
+  }
+
+  /**
+   * Reassign entities of the supplied type to the $policy domain.
+   *
    *
    * @param $entity_type
    *   The name of an entity type, e.g. 'node'.
@@ -212,17 +270,12 @@ class DomainCommands extends DrushCommands {
    *   as single-domain content (FALSE), or just removec (TRUE).
    */
   protected function reassignLinkedEntities($entity_type, $domains, array $options = []) {
-    $entity_manager = \Drupal::entityTypeManager();
-    $entity_definition = $entity_manager->getDefinition($entity_type, FALSE);
-
-    // Domain Access can only use entities that have bundles.
-    if ($entity_definition->getBundleEntityType()) {
-      $list_builder = $entity_manager->getListBuilder($entity_type);
-      $query        = $list_builder->getStorage()->getQuery();
-      $query->exists(DOMAIN_ACCESS_FIELD);
-      $query->sort($this->entityType->getKey('id'));
-
-      $entity_manager;
+    $entity_manager = \Drupal::entityManager();
+    $field_map = $entity_manager->getFieldMap();
+    foreach($field_map as $type => $fields) {
+      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
+        // found an entity type that supports domain access.
+      }
     }
   }
 
@@ -317,8 +370,10 @@ class DomainCommands extends DrushCommands {
    * count: All Domains
    * count_active: Active Domains
    * default_id: Default Domain ID
-   * default_host: Default Domain Hostname
-   * scheme: Domain entity fields
+   * default_host: Default Domain hostname
+   * scheme: Fields in Domain entity
+   * domain_access_entities: Domain access entities
+   * all_affiliate_support: All-affiliate support
    * @list-orientation true
    * @format table
    * @throws \Drupal\domain\Commands\DomainCommandException
@@ -365,6 +420,45 @@ class DomainCommands extends DrushCommands {
 
       $rows[$key] = $v;
     }
+
+    // Display which entities are enabled for domain access by checking for the fields.
+    $entity_manager = \Drupal::entityManager();
+    $field_map = $entity_manager->getFieldMap();
+    $domain_entities = [];
+    $domain_affiliate_entities = [];
+    foreach($field_map as $type => $fields) {
+      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
+        $domain_entities[] = '+'.$type;
+      }
+      else {
+        try {
+          $def = $entity_manager->getDefinition($type, FALSE);
+        } catch (PluginException $ex) {
+          $domain_entities[] = '{notfound:' . $type . '}';
+          continue;
+        }
+        if ($def->entityClassImplements('Drupal\Core\Entity\FieldableEntityInterface')) {
+          // Entity is fieldable, so could have domain fields.
+          $domain_entities[] = '-' . $type;
+        }
+        elseif ($def->entityClassImplements('Drupal\Core\Entity\ConfigEntityInterface')) {
+          // Entity is configuration entity, which is not fieldable.
+          $domain_entities[] = '!' . $type;
+        }
+        elseif ($def->entityClassImplements('Drupal\Core\Entity\EntityInterface')) {
+          // Entity does not support fields.
+          $domain_entities[] = '/' . $type;
+        }
+      }
+      if (array_key_exists(DOMAIN_ACCESS_ALL_FIELD, $fields)) {
+        $domain_affiliate_entities[] = $type;
+      }
+    }
+    $rows['domain_access_entities'] = implode(', ', $domain_entities);
+    $rows['all_affiliate_support'] = implode(', ', $domain_affiliate_entities);
+
+    $e = $this->enumerateDomainEntities('node');
+    
     return new PropertyList($rows);
   }
 
