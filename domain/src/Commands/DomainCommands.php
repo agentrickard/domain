@@ -44,7 +44,7 @@ class DomainCommands extends DrushCommands {
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   protected function getStorage() {
-    if ($this->domain_storage) {
+    if (!is_null($this->domain_storage)) {
       return $this->domain_storage;
     }
 
@@ -62,10 +62,10 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Lookup a string representing a domain config into that config, or throw.
+   * Lookup a string identifying a domain and return the object, or throw error.
    * 
    * @param string $argument
-   *   A domain-id representing domain, or the domain hostname.
+   *   The machine name, or the hostname, of an existing domain.
    *
    * @return \Drupal\domain\DomainInterface
    *
@@ -73,37 +73,46 @@ class DomainCommands extends DrushCommands {
    */
   protected function getDomainFromArgument($argument) {
     $domain_storage = $this->getStorage();
+
+    // Try loading domain assuming arg is a machine name.
     $domain = $domain_storage->load($argument);
     if (!$domain) {
+      // Try loading assuming it is a host name.
       $domain = $domain_storage->loadByHostname($argument);
     }
+
+    // domain_id (an INT) is only used internally because the Node Access
+    // system demands the use of numeric keys. It should never be used to load
+    // or identify domain records. Use the machine_name or hostname instead.
     if (!$domain) {
       throw new DomainCommandException(
         dt('Domain record could not be found from "!a".', ['!a' => $argument])
       );
     }
+
     return $domain;
   }
 
   /**
-   * Filter a list of domains by excluding
+   * Filter a list of domains by excluding domains appearing in a specific list.
    *
    * @param DomainInterface[] $domains
    *   List of domains.
    * @param int[] $exclude
-   *   List of domain ID numbers to exclude from the list.
+   *   List of domain names to exclude from the list.
+   * @param DomainInterface[] $initial
+   *   Initial value of list that will be returned.
    *
    * @return array
    */
   protected function filterDomains($domains, $exclude, $initial = []) {
-    $list = $initial;
     foreach ($domains as $one) {
-      // Not the domain we're deleting, and not the default.
+      // Exclude unwanted domains.
       if (!in_array($one->id(), $exclude)) {
-        $list[$one->getDomainId()] = $one;
+        $initial[$one->id()] = $one;
       }
     }
-    return $list;
+    return $initial;
   }
 
   /**
@@ -191,8 +200,8 @@ class DomainCommands extends DrushCommands {
         $domain->delete();
       }
       catch (EntityStorageException $e) {
-        throw new DomainCommandException(dt('Unable to delete domain: @dom',
-          ['@dom' => $hostname]), $e);
+        throw new DomainCommandException(dt('Unable to delete domain: @domain',
+          ['@domain' => $hostname]), $e);
       }
       $this->logger()->info(dt('Domain record @domain deleted.',
         ['@domain' => $hostname]));
@@ -218,20 +227,28 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Enumerate entities of the supplied type and domain to the $policy domain.
+   * Enumerate entities of the supplied type and domain.
+   *
+   * @param string $entity_type
+   *   The entity type name, e.g. 'node'
+   * @param string $field
+   *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
+   *   @todo: should this really be a string[] of fields?
+   * @param string $domain
+   *   The machine name of the domain to enumerate.
    *
    * @return string[]
    *   List of entity IDs for the selected domain.
    */
-  protected function enumerateDomainEntities($entity_type, $domain) {
+  protected function enumerateDomainEntities($entity_type, $field, $domain) {
     $efq = \Drupal::entityQuery($entity_type);
-    $efq->condition(DOMAIN_ACCESS_FIELD, $domain, '=');
+    $efq->condition($field, $domain, '=');
     $result = $efq->execute();
     $entities = [];
     foreach($result as $item) {
       $entities = $item;
     }
-    var_dump($entities);
+    //var_dump($entities);
     return $entities;
   }
 
@@ -239,18 +256,22 @@ class DomainCommands extends DrushCommands {
    * Reassign old_domain entities, of the supplied type, to the new_domain.
    *
    * @param string $entity_type
+   *   The entity type name, e.g. 'node'
+   * @param string $field
+   *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
+   *   @todo: should this really be a string[] of fields?
    * @param DomainInterface $old_domain
+   *   The domain the entities currently belong to.
    * @param DomainInterface $new_domain
+   *   The domain the entities should now belong to.
    *
    * @return
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function reassignEntities($entity_type, DomainInterface $old_domain, DomainInterface $new_domain) {
+  protected function reassignEntities($entity_type, $field, DomainInterface $old_domain, DomainInterface $new_domain, $ids) {
     $entity_storage = \Drupal::entityTypeManager()->getStorage($entity_type);
-
-    $ids = $this->enumerateDomainEntities($entity_type, $old_domain);
 
     // @TODO is there a problem loading many, possibly big, entities in one go?
     $entities = $entity_storage->loadMultiple($ids);
@@ -259,13 +280,13 @@ class DomainCommands extends DrushCommands {
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     foreach($entities as $entity) {
       $changed = FALSE;
-      $value = $entity->get(DOMAIN_ACCESS_FIELD)->value();
+      $value = $entity->get($field)->value();
       if (is_array($value)) {
         /** @var DomainInterface $item */
         foreach($value as $k => &$item) {
           if ($item->getDomainId() == $old_domain->getDomainId()) {
             $changed = TRUE;
-            $item = $new_domain;
+            $item = $new_domain->getDomainId();
             break;
           }
         }
@@ -274,12 +295,12 @@ class DomainCommands extends DrushCommands {
         /** @var DomainInterface $value */
         if ($value->getDomainId() == $old_domain->getDomainId()) {
           $changed = TRUE;
-          $value = $new_domain;
+          $value = $new_domain->getDomainId();
         }
       }
       $count++;
       if ($changed) {
-        $entity->set(DOMAIN_ACCESS_FIELD, $value);
+        $entity->set($field, $value);
         $entity->save();
       }
     }
@@ -310,7 +331,7 @@ class DomainCommands extends DrushCommands {
         foreach($domains as $domain) {
           $ids = $this->enumerateDomainEntities($name, $domain);
           if (!empty($ids)) {
-            $this->reassignEntities($name, $domain, $new_domain);
+            $this->reassignEntities($name, $domain, $new_domain, $ids);
           }
         }
       }
@@ -381,10 +402,10 @@ class DomainCommands extends DrushCommands {
             if (($options['inactive'] && $v) || ($options['active'] && !$v)) {
               continue 3; // switch, for, for
             }
-            $v = ($v) ? dt('Active') : dt('Inactive');
+            $v = !empty($v) ? dt('Active') : dt('Inactive');
             break;
           case 'is_default':
-            $v = ($v) ? dt('Default') : '';
+            $v = !empty($v) ? dt('Default') : '';
             break;
         }
 
@@ -624,7 +645,7 @@ class DomainCommands extends DrushCommands {
     if (empty($all_domains)) {
       throw new DomainCommandException('There are no configured domains.');
     }
-    if (is_null($domain_id)) {
+    if (empty($domain_id)) {
       throw new DomainCommandException('You must specify a domain to delete.');
     }
     //endregion
@@ -653,7 +674,7 @@ class DomainCommands extends DrushCommands {
       return;
     }
     // Create list of domain (entity) ids to delete.
-    $delete_domain_ids = array_map(function($v){return $v->id;}, $domains);
+    $delete_domain_ids = array_map(function($v){return $v->id();}, $domains);
     //endregion
 
     //region Get content disposition from configuration and validate.
@@ -678,17 +699,17 @@ class DomainCommands extends DrushCommands {
     //region Perform the 'prompt' for a destination domain.
     if ($policy_content === 'prompt' || $policy_users === 'prompt') {
       // Make a list of the eligible destination domains in form id -> name.
-      $noassign_domain_ids = $delete_domain_ids + [$default_domain->id()];
-      $reassign_list = [
-        '0' => dt('Do not reassign'),
-        '1' => dt('Default domain'),
-      ];
+      $noassign_domain = $domains + [$default_domain];
+      $reassign_list = $this->filterDomains($all_domains, $noassign_domain);
       $reassign_list = array_map(
         function ($v) {
           return $v->getHostname();
         },
-        $this->filterDomains($all_domains, $noassign_domain_ids, $reassign_list)
-      );
+        $reassign_list
+      ) + [
+          '0' => dt('Do not reassign'),
+          '1' => dt('Default domain'),
+        ];
 
       if ($policy_content === 'prompt') {
         $reassign_content = $this->io()
@@ -708,10 +729,10 @@ class DomainCommands extends DrushCommands {
       }
     }
     if ($policy_content === 'default') {
-      $policy_content = $default_domain->getDomainId();
+      $policy_content = $default_domain->id();
     }
     if ($policy_users === 'default') {
-      $policy_users = $default_domain->getDomainId();
+      $policy_users = $default_domain->id();
     }
     //endregion
 
