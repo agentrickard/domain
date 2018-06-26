@@ -8,10 +8,8 @@ use Drupal\Core\Config\StorageException;
 use Drush\Commands\DrushCommands;
 use Drupal\Component\Utility\Html;
 use Drupal\domain\DomainInterface;
-use Drupal\Component\Serialization\Yaml;
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
@@ -329,9 +327,15 @@ class DomainCommands extends DrushCommands {
     foreach($entity_typenames as $name) {
       if (empty($options['entity_filter']) || $options['entity_filter'] === $name) {
         foreach($domains as $domain) {
-          $ids = $this->enumerateDomainEntities($name, $domain);
+          $ids = $this->enumerateDomainEntities($name, DOMAIN_ACCESS_FIELD, $domain);
           if (!empty($ids)) {
-            $this->reassignEntities($name, $domain, $new_domain, $ids);
+            try {
+              $this->reassignEntities($name, DOMAIN_ACCESS_FIELD, $domain, $new_domain, $ids);
+            } catch (PluginException $e) {
+              throw;
+            } catch (EntityStorageException $e) {
+              throw;
+            }
           }
         }
       }
@@ -673,8 +677,6 @@ class DomainCommands extends DrushCommands {
       $this->logger()->info(dt('Nothing to do?'));
       return;
     }
-    // Create list of domain (entity) ids to delete.
-    $delete_domain_ids = array_map(function($v){return $v->id();}, $domains);
     //endregion
 
     //region Get content disposition from configuration and validate.
@@ -698,18 +700,24 @@ class DomainCommands extends DrushCommands {
 
     //region Perform the 'prompt' for a destination domain.
     if ($policy_content === 'prompt' || $policy_users === 'prompt') {
+
       // Make a list of the eligible destination domains in form id -> name.
-      $noassign_domain = $domains + [$default_domain];
+      $noassign_domain = $domains;
+      $noassign_domain[$default_domain->id()] = $default_domain;
+
       $reassign_list = $this->filterDomains($all_domains, $noassign_domain);
+      $reassign_base = [
+        'ignore' => dt('Do not reassign'),
+        'default' => dt('Default domain'),
+      ];
       $reassign_list = array_map(
-        function ($v) {
-          return $v->getHostname();
+        function (DomainInterface $d) {
+          return $d->getHostname();
         },
         $reassign_list
-      ) + [
-          '0' => dt('Do not reassign'),
-          '1' => dt('Default domain'),
-        ];
+      );
+      $reassign_list = array_merge($reassign_base, $reassign_list);
+      asort($reassign_list);
 
       if ($policy_content === 'prompt') {
         $reassign_content = $this->io()
@@ -717,7 +725,7 @@ class DomainCommands extends DrushCommands {
         if (empty($reassign_content)) {
           throw new DomainCommandException('Cancelled.');
         }
-        $policy_content = ($reassign_content == 0) ? 'ignore' : $reassign_content;
+        $policy_content = ($reassign_content === 'ignore') ? 'ignore' : $reassign_content;
       }
       if ($policy_users === 'prompt') {
         $reassign_users = $this->io()
@@ -725,7 +733,7 @@ class DomainCommands extends DrushCommands {
         if (empty($reassign_users)) {
           throw new DomainCommandException('Cancelled.');
         }
-        $policy_users = ($reassign_users == 0) ? 'ignore' : $reassign_users;
+        $policy_users = ($reassign_users === 'ignore') ? 'ignore' : $reassign_users;
       }
     }
     if ($policy_content === 'default') {
