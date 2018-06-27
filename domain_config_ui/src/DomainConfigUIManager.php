@@ -59,8 +59,8 @@ class DomainConfigUIManager {
    * Get the selected language ID.
    */
   public function getSelectedLanguageId() {
-    if ($domain = $this->request->get('domain_config_ui_language')) {
-      return $domain;
+    if ($language = $this->request->get('domain_config_ui_language')) {
+      return $language;
     }
     if (isset($_SESSION['domain_config_ui_language'])) {
       return $_SESSION['domain_config_ui_language'];

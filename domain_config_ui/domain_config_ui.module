@@ -21,40 +21,43 @@ function domain_config_ui_preprocess_page(&$variables) {
   $form = \Drupal::formBuilder()
     ->getForm('Drupal\domain_config_ui\Form\SwitchForm');
   $content = ['domain_config_ui_switch' => $form];
-
-  $variables['page']['content'] = array_merge($content, $variables['page']['content']);
-
   // Add a message below the form showing the current domain.
   if ($warning_message = domain_config_ui_save_warning_message()) {
-    $variables['page']['content']['domain_config_ui_switch_warning'] = $warning_message;
+    $content['domain_config_ui_switch_warning'] = $warning_message;
   }
+
+  $variables['page']['content'] = array_merge($content, $variables['page']['content']);
 }
 
 /**
  * Helper to generate the markup for the domain save warning message.
  */
 function domain_config_ui_save_warning_message() {
-  $selected_domain_id = \Drupal::service('domain_config_ui.manager')
-    ->getSelectedDomainId();
-  $selected_domain = \Drupal::service('entity_type.manager')
-    ->getStorage('domain')
-    ->load($selected_domain_id);
-  if ($selected_domain) {
-    $selected_language_id = \Drupal::service('domain_config_ui.manager')
-      ->getSelectedLanguageId();
+  $manager = \Drupal::service('domain_config_ui.manager');
+  if ($selected_domain_id = $manager->getSelectedDomainId()) {
+    $selected_domain = \Drupal::service('entity_type.manager')
+      ->getStorage('domain')
+      ->load($selected_domain_id);
+  }
+  if ($selected_language_id = $manager->getSelectedLanguageId()) {
     $selected_language = \Drupal::service('language_manager')
       ->getLanguage($selected_language_id);
-    $message = new TranslatableMarkup('Configuration will be saved for @domain @language', [
-      '@domain' => $selected_domain->label(),
-      '@language' => $selected_language ? '(' . $selected_language->getName() . ')' : '',
-    ]);
-    return [
-      '#markup' => new FormattableMarkup('<div class="messages messages--warning">@message</div>', [
-        '@message' => $message,
-      ]),
-      '#weight' => 1000,
-    ];
   }
+  $domain_label = !empty($selected_domain) ?
+    new TranslatableMarkup('the @label domain',['@label' => $selected_domain->label()]) :
+    new TranslatableMarkup('all domains');
+  $language_label = !empty($selected_language) ? $selected_language->getName() : new TranslatableMarkup('all languages');
+  $message = new TranslatableMarkup('This configuration will be saved for @domain when displayed in @language', [
+    '@domain' => $domain_label,
+    '@language' => $language_label,
+  ]);
+
+  return [
+    '#markup' => new FormattableMarkup('<div class="messages messages--warning">@message</div>', [
+      '@message' => $message,
+    ]),
+    '#weight' => -1000,
+  ];
 }
 
 /**

@@ -82,13 +82,14 @@ class SwitchForm extends FormBase {
     ];
 
     // Add domain switch select field.
-    $selected_domain_id = $this->domainConfigUiManager->getSelectedDomainId();
-    $selected_domain = $this->domainStorage->load($selected_domain_id);
+    if ($selected_domain_id = $this->domainConfigUiManager->getSelectedDomainId()) {
+      $selected_domain = $this->domainStorage->load($selected_domain_id);
+    }
     $form['domain_config_ui']['domain'] = [
       '#type' => 'select',
       '#title' => 'Domain',
       '#options' => array_merge(['' => 'All Domains'], $this->domainStorage->loadOptionsList()),
-      '#default_value' => $selected_domain ? $selected_domain->id() : '',
+      '#default_value' => !empty($selected_domain) ? $selected_domain->id() : '',
       '#ajax' => [
         'callback' => '::switchCallback',
       ],
