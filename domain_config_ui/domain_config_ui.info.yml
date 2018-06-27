@@ -1,5 +1,5 @@
 name: Domain Configuration UI
-description: 'Allows saving of domain specific configuration through the UI.'
+description: 'Allows saving of domain specific configuration through the administrative interface.'
 type: module
 package: Domain
 core: 8.x
