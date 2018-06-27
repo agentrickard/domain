@@ -1,0 +1,16 @@
+services:
+  domain_config_ui.manager:
+    class: Drupal\domain_config_ui\DomainConfigUIManager
+    arguments: ['@config.storage', '@domain.loader', '@language_manager']
+
+  domain_config_ui.factory:
+    class: Drupal\domain_config_ui\Config\ConfigFactory
+    tags:
+      - { name: event_subscriber }
+      - { name: service_collector, tag: 'config.factory.override', call: addOverride }
+    arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
+    calls:
+      - [setDomainConfigUIManager, ['@domain_config_ui.manager']]
+
+  config.factory:
+    alias: domain_config_ui.factory
