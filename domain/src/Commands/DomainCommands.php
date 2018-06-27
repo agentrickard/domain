@@ -238,15 +238,16 @@ class DomainCommands extends DrushCommands {
    * @return string[]
    *   List of entity IDs for the selected domain.
    */
-  protected function enumerateDomainEntities($entity_type, $field, $domain) {
+  protected function enumerateDomainEntities(string $entity_type, string $field, string $domain) {
     $efq = \Drupal::entityQuery($entity_type);
+    // Dont access check or we wont get all of the possible entities moved.
+    $efq->accessCheck(FALSE);
     $efq->condition($field, $domain, '=');
     $result = $efq->execute();
     $entities = [];
     foreach($result as $item) {
-      $entities = $item;
+      $entities[] = $item;
     }
-    //var_dump($entities);
     return $entities;
   }
 
@@ -268,7 +269,7 @@ class DomainCommands extends DrushCommands {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function reassignEntities($entity_type, $field, DomainInterface $old_domain, DomainInterface $new_domain, $ids) {
+  protected function reassignEntities(string $entity_type, string $field, DomainInterface $old_domain, DomainInterface $new_domain, $ids) {
     $entity_storage = \Drupal::entityTypeManager()->getStorage($entity_type);
 
     // @TODO is there a problem loading many, possibly big, entities in one go?
@@ -278,27 +279,18 @@ class DomainCommands extends DrushCommands {
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     foreach($entities as $entity) {
       $changed = FALSE;
-      $value = $entity->get($field)->value();
-      if (is_array($value)) {
-        /** @var DomainInterface $item */
-        foreach($value as $k => &$item) {
-          if ($item->getDomainId() == $old_domain->getDomainId()) {
-            $changed = TRUE;
-            $item = $new_domain->getDomainId();
-            break;
-          }
-        }
-      }
-      else {
-        /** @var DomainInterface $value */
-        if ($value->getDomainId() == $old_domain->getDomainId()) {
+      $domain_membership = $entity->{$field};
+      foreach ($domain_membership as $k => &$item) {
+        $props = $item->getValue();
+        if ($props['target_id'] === $old_domain->id()) {
           $changed = TRUE;
-          $value = $new_domain->getDomainId();
+          $item->setValue(['target_id' => $new_domain->id()]);
+          break;
         }
       }
       $count++;
       if ($changed) {
-        $entity->set($field, $value);
+        $entity->{$field}->setValue($domain_membership);
         $entity->save();
       }
     }
@@ -317,28 +309,69 @@ class DomainCommands extends DrushCommands {
    *
    * @param DomainInterface[] $domains
    *   List of the domains to reassign content away from.
+   *
+   * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function reassignLinkedEntities($domains, array $options = []) {
+  protected function reassignLinkedEntities($domains, array $options = ['chatty' => null, 'policy' => null]) {
+    $domain_storage = $this->getStorage();
     $entity_typenames = $this->findDomainEnabledEntities();
-    $new_domain = NULL;
-    if ($options['policy']) {
+    $field_names = [DOMAIN_ACCESS_FIELD, DOMAIN_ADMIN_FIELD, DOMAIN_SOURCE_FIELD];
 
+    $new_domain = $options['policy'];
+    switch($new_domain) {
+      case 'default':
+        $new_domain = $domain_storage->loadDefaultDomain();
+        break;
+      case 'ignore':
+        throw new DomainCommandException('invalid destination domain');
+        break;
+      default:
+        $new_domain = $domain_storage->load($new_domain);
+        break;
     }
-    foreach($entity_typenames as $name) {
+
+    // For each entity type...
+    $exceptions = FALSE;
+    foreach ($entity_typenames as $name) {
       if (empty($options['entity_filter']) || $options['entity_filter'] === $name) {
-        foreach($domains as $domain) {
-          $ids = $this->enumerateDomainEntities($name, DOMAIN_ACCESS_FIELD, $domain);
-          if (!empty($ids)) {
-            try {
-              $this->reassignEntities($name, DOMAIN_ACCESS_FIELD, $domain, $new_domain, $ids);
-            } catch (PluginException $e) {
-              throw;
-            } catch (EntityStorageException $e) {
-              throw;
+
+        // For each domain being reassigned from...
+        foreach ($domains as $domain) {
+
+          // For each domain field ...
+          foreach ($field_names as $field) {
+            $ids = $this->enumerateDomainEntities($name, $field, $domain->id());
+            if (!empty($ids)) {
+
+              try {
+                if ($options['chatty']) {
+                  $this->logger()->info("Reassigning @count @entity_name entities to @domain",
+                    ['@entity_name'=>'',
+                     '@count' => count($ids),
+                     '@domain' => $new_domain->id()]);
+                }
+
+                $this->reassignEntities($name, $field, $domain, $new_domain, $ids);
+              }
+              catch (PluginException $e) {
+                $exceptions = TRUE;
+                $this->logger()->error("Unable to reassign content to @new_domain: plugin exception: @ex",
+                  ['@ex' => $e->getMessage(),
+                   '@new_domain' => $new_domain->id()]);
+              }
+              catch (EntityStorageException $e) {
+                $exceptions = TRUE;
+                $this->logger()->error("Unable to reassign content to @new_domain: storage exception: @ex",
+                  ['@ex' => $e->getMessage(),
+                   '@new_domain' => $new_domain->id()]);
+              }
             }
           }
         }
       }
+    }
+    if ($exceptions) {
+      throw new DomainCommandException('Errors encountered during reassign.');
     }
   }
 
@@ -717,23 +750,15 @@ class DomainCommands extends DrushCommands {
         $reassign_list
       );
       $reassign_list = array_merge($reassign_base, $reassign_list);
-      asort($reassign_list);
+      // asort($reassign_list);
 
       if ($policy_content === 'prompt') {
-        $reassign_content = $this->io()
+        $policy_content = $this->io()
                                  ->choice(dt('Reassign content to:'), $reassign_list);
-        if (empty($reassign_content)) {
-          throw new DomainCommandException('Cancelled.');
-        }
-        $policy_content = ($reassign_content === 'ignore') ? 'ignore' : $reassign_content;
       }
       if ($policy_users === 'prompt') {
-        $reassign_users = $this->io()
+        $policy_users = $this->io()
                               ->choice(dt('Reassign users to:'), $reassign_list);
-        if (empty($reassign_users)) {
-          throw new DomainCommandException('Cancelled.');
-        }
-        $policy_users = ($reassign_users === 'ignore') ? 'ignore' : $reassign_users;
       }
     }
     if ($policy_content === 'default') {
