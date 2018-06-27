@@ -32,7 +32,7 @@ class SettingsForm extends ConfigFormBase {
     $form['remember_domain'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Remember Domain'),
-      '#default_value' => $config->get('remember_domain', FALSE),
+      '#default_value' => $config->get('remember_domain'),
       '#description' => $this->t("Keeps last selected Domain for next configuration pages."),
     ];
     $form['path_pages'] = [
@@ -40,7 +40,7 @@ class SettingsForm extends ConfigFormBase {
       '#rows' => 5,
       '#columns' => 40,
       '#title' => $this->t('Pages'),
-      '#default_value' => $config->get('path_pages', "/admin/appearance\r\n/admin/config/system/site-information"),
+      '#default_value' => $config->get('path_pages'),
       '#description' => $this->t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard."),
     ];
     $form['path_negate'] = [
@@ -49,7 +49,7 @@ class SettingsForm extends ConfigFormBase {
         $this->t('Show for the listed pages'),
         $this->t('Hide for the listed pages'),
       ],
-      '#default_value' => $config->get('path_negate', 0),
+      '#default_value' => $config->get('path_negate'),
     ];
     return parent::buildForm($form, $form_state);
   }
