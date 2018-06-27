@@ -1,0 +1,6 @@
+domain_config_ui.settings:
+  title: Domain Config UI
+  route_name: domain_config_ui.settings
+  parent: domain.admin
+  description: 'Domain Config UI settings'
+  weight: 0
