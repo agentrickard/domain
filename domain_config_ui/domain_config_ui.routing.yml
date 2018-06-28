@@ -4,4 +4,4 @@ domain_config_ui.settings:
     _title: 'Domain config forms'
     _form: '\Drupal\domain_config_ui\Form\SettingsForm'
   requirements:
-    _permission: 'administer domains'
+    _permission: 'administer domain config ui'

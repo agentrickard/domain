@@ -1,0 +1,8 @@
+administer domain config ui:
+  title: 'Administer Domain Config UI settings'
+  description: 'Allows administrators to determine what forms are available for domain-specific configuration.'
+  restrict access: true
+use domain config ui:
+  title: 'Manage domain-specific configurations'
+  description: 'Allows domain administrators to use configuration forms specific to their managed domains.'
+  restrict access: true
