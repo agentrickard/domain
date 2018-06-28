@@ -10,6 +10,7 @@ use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\domain\DomainElementManagerInterface;
 use Drupal\domain_config_ui\DomainConfigUIManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,14 +28,15 @@ class SwitchForm extends FormBase {
    *   The language manager.
    * @param \Drupal\domain_config_ui\DomainConfigUIManager $domain_config_ui_manager
    *   The domain config UI manager.
+   * @param \Drupal\domain\DomainElementManagerInterface $domain_element_manager
+   *   The domain field element manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager,
-    LanguageManagerInterface $language_manager,
-    DomainConfigUIManager $domain_config_ui_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, DomainConfigUIManager $domain_config_ui_manager, DomainElementManagerInterface $domain_element_manager) {
     $this->domainConfigUiManager = $domain_config_ui_manager;
     $this->languageManager = $language_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->domainStorage = $this->entityTypeManager->getStorage('domain');
+    $this->domainElementManager = $domain_element_manager;
   }
 
   /**
@@ -44,7 +46,8 @@ class SwitchForm extends FormBase {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('language_manager'),
-      $container->get('domain_config_ui.manager')
+      $container->get('domain_config_ui.manager'),
+      $container->get('domain.element_manager')
     );
   }
 
@@ -60,9 +63,22 @@ class SwitchForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     // Only allow access to domain administrators.
-    $form['#access'] = $this->currentUser()->hasPermission('administer domains');
+    $form['#access'] = $this->canUseDomainConfig();
     $form = $this->addSwitchFields($form, $form_state);
     return $form;
+  }
+
+  /**
+   * Determines is a user may access the domain-sensitive form.
+   */
+  public function canUseDomainConfig() {
+    if ($this->currentUser()->hasPermission('administer domains')) {
+      return TRUE;
+    }
+    $account = $this->currentUser();
+    $user = $this->entityTypeManager->getStorage('user')->load($account->id());
+    $user_domains = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    return (!empty($user_domains) && $this->currentUser()->hasPermission('use domain config ui'));
   }
 
   /**
