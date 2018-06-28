@@ -73,11 +73,13 @@ class SwitchForm extends FormBase {
    */
   public function canUseDomainConfig() {
     if ($this->currentUser()->hasPermission('administer domains')) {
-      return TRUE;
+      $user_domains = 'all';
     }
-    $account = $this->currentUser();
-    $user = $this->entityTypeManager->getStorage('user')->load($account->id());
-    $user_domains = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    else {
+      $account = $this->currentUser();
+      $user = $this->entityTypeManager->getStorage('user')->load($account->id());
+      $user_domains = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    }
     return (!empty($user_domains) && $this->currentUser()->hasPermission('use domain config ui'));
   }
 
