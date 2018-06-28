@@ -258,13 +258,15 @@ class DomainCommands extends DrushCommands {
    *   The entity type name, e.g. 'node'
    * @param string $field
    *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
-   *   @todo: should this really be a string[] of fields?
-   * @param DomainInterface $old_domain
+   *
+   * @todo: should this really be a string[] of fields?
+   *
+   * @param \Drupal\domain\DomainInterface $old_domain
    *   The domain the entities currently belong to.
-   * @param DomainInterface $new_domain
+   * @param \Drupal\domain\DomainInterface $new_domain
    *   The domain the entities should now belong to.
    *
-   * @return
+   * @return int
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Core\Entity\EntityStorageException
@@ -274,32 +276,53 @@ class DomainCommands extends DrushCommands {
 
     // @TODO is there a problem loading many, possibly big, entities in one go?
     $entities = $entity_storage->loadMultiple($ids);
-    $count = 0;
 
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    /** @var \Drupal\domain\DomainInterface $entity */
     foreach($entities as $entity) {
       $changed = FALSE;
-      $domain_membership = $entity->{$field};
-      foreach ($domain_membership as $k => &$item) {
-        $props = $item->getValue();
-        if ($props['target_id'] === $old_domain->id()) {
+      foreach ($entity->get($field) as $k => $item) {
+        $target_id = $item->target_id;
+        if ($target_id === $old_domain->id()) {
           $changed = TRUE;
-          $item->setValue(['target_id' => $new_domain->id()]);
-          break;
+          $item->target_id = $new_domain->id();
         }
       }
-      $count++;
       if ($changed) {
-        $entity->{$field}->setValue($domain_membership);
         $entity->save();
       }
     }
-    return $count;
+    return count($entities);
+  }
+
+  /**
+   * Return the Domain object corresponding to a policy string.
+   *
+   * @param string $policy
+   *   In general, one of 'prompt' | 'default' | 'ignore' or a domain entity
+   *   machine name, but this function does not process 'prompt'.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|\Drupal\domain\DomainInterface|null
+   * @throws \Drupal\domain\Commands\DomainCommandException
+   */
+  protected function getDomainInstanceFromPolicy(string $policy) {
+    $domain_storage = $this->getStorage();
+    switch($policy) {
+      case 'default':
+        $new_domain = $domain_storage->loadDefaultDomain();
+        break;
+
+      case 'ignore':
+        return NULL;
+
+      default:
+        $new_domain = $domain_storage->load($policy);
+        break;
+    }
+    return $new_domain;
   }
 
   /**
    * Reassign entities of the supplied type to the $policy domain.
-   *
    *
    *  $options = [
    *    'entity_filter' => 'node',
@@ -313,21 +336,12 @@ class DomainCommands extends DrushCommands {
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   protected function reassignLinkedEntities($domains, array $options = ['chatty' => null, 'policy' => null]) {
-    $domain_storage = $this->getStorage();
     $entity_typenames = $this->findDomainEnabledEntities();
     $field_names = [DOMAIN_ACCESS_FIELD, DOMAIN_ADMIN_FIELD, DOMAIN_SOURCE_FIELD];
 
-    $new_domain = $options['policy'];
-    switch($new_domain) {
-      case 'default':
-        $new_domain = $domain_storage->loadDefaultDomain();
-        break;
-      case 'ignore':
-        throw new DomainCommandException('invalid destination domain');
-        break;
-      default:
-        $new_domain = $domain_storage->load($new_domain);
-        break;
+    $new_domain = $this->getDomainInstanceFromPolicy($options['policy']);
+    if (empty($new_domain)) {
+      throw new DomainCommandException('invalid destination domain');
     }
 
     // For each entity type...
@@ -338,7 +352,7 @@ class DomainCommands extends DrushCommands {
         // For each domain being reassigned from...
         foreach ($domains as $domain) {
 
-          // For each domain field ...
+          // And, For each domain field ...
           foreach ($field_names as $field) {
             $ids = $this->enumerateDomainEntities($name, $field, $domain->id());
             if (!empty($ids)) {
