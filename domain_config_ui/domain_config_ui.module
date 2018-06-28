@@ -22,7 +22,7 @@ function domain_config_ui_preprocess_page(&$variables) {
     ->getForm('Drupal\domain_config_ui\Form\SwitchForm');
   $content = ['domain_config_ui_switch' => $form];
   // Add a message below the form showing the current domain.
-  if ($warning_message = domain_config_ui_save_warning_message()) {
+  if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message()) {
     $content['domain_config_ui_switch_warning'] = $warning_message;
   }
 
