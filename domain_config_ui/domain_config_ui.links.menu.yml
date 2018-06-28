@@ -1,5 +1,5 @@
 domain_config_ui.settings:
-  title: Domain Config UI
+  title: Domain config forms
   route_name: domain_config_ui.settings
   parent: domain.admin
   description: 'Domain Config UI settings'

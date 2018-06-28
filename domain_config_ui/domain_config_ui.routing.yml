@@ -1,7 +1,7 @@
 domain_config_ui.settings:
   path: '/admin/config/domain/config-ui'
   defaults:
-    _title: 'Domain Config UI'
+    _title: 'Domain config forms'
     _form: '\Drupal\domain_config_ui\Form\SettingsForm'
   requirements:
     _permission: 'administer domains'

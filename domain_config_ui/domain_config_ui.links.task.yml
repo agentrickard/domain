@@ -1,4 +1,4 @@
 domain_config_ui.settings:
-  title: Domain Config UI
+  title: Domain config forms
   route_name: domain_config_ui.settings
   base_route: domain.admin
