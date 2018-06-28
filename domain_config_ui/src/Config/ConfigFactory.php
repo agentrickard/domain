@@ -12,8 +12,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * Extends core ConfigFactory class to save domain specific configuration.
  */
 class ConfigFactory extends CoreConfigFactory {
+
   /**
    * List of config that should always be saved globally. Use * for wildcards.
+   *
+   * @TODO: Document the logic of this list.
    *
    * @var array
    */
@@ -23,7 +26,7 @@ class ConfigFactory extends CoreConfigFactory {
     '*.theme.*',
     '*.settings',
     'node.settings',
-    'swiftmailer.*',
+    'swiftmailer.*', // @TODO: Non-core items to be removed.
   ];
 
   /**
@@ -105,6 +108,7 @@ class ConfigFactory extends CoreConfigFactory {
     $list = parent::doLoadMultiple($names, $immutable);
 
     // Do not override if configuring 'all' domains or config is immutable.
+    // @TODO: This will need to change if we allow saving for 'all allowed domains'
     if (empty($this->domainConfigUIManager)
       || !$this->domainConfigUIManager->getSelectedDomainId()
       || !$this->isAllowedDomainConfig(current($names))) {

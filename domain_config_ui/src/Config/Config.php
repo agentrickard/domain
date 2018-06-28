@@ -9,6 +9,7 @@ use Drupal\domain_config_ui\DomainConfigUIManager;
  * Extend core Config class to save domain specific configuration.
  */
 class Config extends CoreConfig {
+
   /**
    * The Domain config UI manager.
    *

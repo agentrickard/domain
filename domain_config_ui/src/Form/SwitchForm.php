@@ -103,6 +103,10 @@ class SwitchForm extends FormBase {
     if ($selected_domain_id = $this->domainConfigUiManager->getSelectedDomainId()) {
       $selected_domain = $this->domainStorage->load($selected_domain_id);
     }
+    // @TODO: Restrict the domain list to specific domains.
+    // @TODO: Decide who can set values for 'all domains'.
+    // @TODO: Save for all but overridden but hidden?
+    // @TODO: Should 'all domains' be 'all assigned domains'?
     $form['domain_config_ui']['domain'] = [
       '#type' => 'select',
       '#title' => $this->t('Domain'),
@@ -120,7 +124,6 @@ class SwitchForm extends FormBase {
       foreach ($languages as $id => $language) {
         $language_options[$id] = $language->getName();
       }
-
       $form['domain_config_ui']['language'] = [
         '#type' => 'select',
         '#title' => $this->t('Language'),

@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Domain Config UI manager.
+ *
+ * @TODO: Write an interface.
  */
 class DomainConfigUIManager {
 
