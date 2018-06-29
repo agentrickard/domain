@@ -31,6 +31,8 @@ class DomainCommands extends DrushCommands {
   /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
   protected $domain_storage = NULL;
 
+  protected $entity_field_map = NULL;
+
   /** @var string[] Array of special-case policies for reassigning content. */
   protected $reassignment_policies = ['prompt', 'default', 'ignore']; // + machine name;
 
@@ -207,17 +209,16 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Reassign entities of the supplied type to the $policy domain.
+   * Determine a list of the entities that are domain enabled.
    *
    * @return string[]
    *   List of entities supporting domain access.
    */
-  protected function findDomainEnabledEntities() {
+  protected function findDomainEnabledEntities(string $using_field = DOMAIN_ACCESS_FIELD) {
+    $this->ensureEntityFieldMap();
     $entities = [];
-    $entity_manager = \Drupal::entityManager();
-    $field_map = $entity_manager->getFieldMap();
-    foreach($field_map as $type => $fields) {
-      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
+    foreach($this->entity_field_map as $type => $fields) {
+      if (array_key_exists($using_field, $fields)) {
         $entities[] = $type;
       }
     }
@@ -225,30 +226,61 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
+   * Determine whether or not a given entity is domain-enabled.
+   *
+   * @return string[]
+   *   List of entities supporting domain access.
+   */
+  protected function entityHasDomainField(string $entity_type, string $field = DOMAIN_ACCESS_FIELD) {
+    // Try to avoid repeated calls to getFieldMap() assuming it's expensive.
+    $this->ensureEntityFieldMap();
+    return array_key_exists($field, $this->entity_field_map[$entity_type]);
+  }
+
+  /**
+   * Ensure the local entity field map has been defined.
+   *
+   * @return string[]
+   *   List of entities supporting domain access.
+   */
+  protected function ensureEntityFieldMap() {
+    // Try to avoid repeated calls to getFieldMap() assuming it's expensive.
+    if (empty($this->entity_field_map)) {
+      $entity_manager         = \Drupal::entityManager();
+      $this->entity_field_map = $entity_manager->getFieldMap();
+    }
+  }
+
+  /**
    * Enumerate entities of the supplied type and domain.
    *
    * @param string $entity_type
    *   The entity type name, e.g. 'node'
-   * @param string $field
-   *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
-   *   @todo: should this really be a string[] of fields?
    * @param string $domain
    *   The machine name of the domain to enumerate.
+   * @param string $field
+   *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
    *
-   * @return string[]
+   * @return int|string[]
    *   List of entity IDs for the selected domain.
+   * @todo: should this really be a string[] of fields?
    */
-  protected function enumerateDomainEntities(string $entity_type, string $field, string $domain) {
+  protected function enumerateDomainEntities(string $entity_type, string $domain, string $field, $just_count = FALSE) {
+    if (!$this->entityHasDomainField($entity_type, $field)) {
+      $this->logger()->info("Entity type @entity_type does not have field @field, so none found.",
+        ['@entity_type'=> $entity_type,
+         '@field' => $field]);
+      return [];
+    }
+
     $efq = \Drupal::entityQuery($entity_type);
     // Dont access check or we wont get all of the possible entities moved.
     $efq->accessCheck(FALSE);
     $efq->condition($field, $domain, '=');
-    $result = $efq->execute();
-    $entities = [];
-    foreach($result as $item) {
-      $entities[] = $item;
+    if ($just_count) {
+      $efq->count();
     }
-    return $entities;
+    return $efq->execute();
   }
 
   /**
@@ -258,13 +290,16 @@ class DomainCommands extends DrushCommands {
    *   The entity type name, e.g. 'node'
    * @param string $field
    *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
-   *
-   * @todo: should this really be a string[] of fields?
-   *
+   *   @todo: should this really be a string[] of fields?
    * @param \Drupal\domain\DomainInterface $old_domain
-   *   The domain the entities currently belong to.
+   *   The domain the entities currently belong to. It is not an error for
+   *   entity ids to be passed in that are not in this domain, though of course
+   *   not very useful.
    * @param \Drupal\domain\DomainInterface $new_domain
-   *   The domain the entities should now belong to.
+   *   The domain the entities should now belong to: When an entity belongs to
+   *   the old_domain, this domain replaces it.
+   * @param array $ids
+   *   List of entity IDs for the selected domain and all of type $entity_type.
    *
    * @return int
    *
@@ -277,12 +312,14 @@ class DomainCommands extends DrushCommands {
     // @TODO is there a problem loading many, possibly big, entities in one go?
     $entities = $entity_storage->loadMultiple($ids);
 
+    // @TODO do we need to protect against $entity not having the field $field?
     /** @var \Drupal\domain\DomainInterface $entity */
     foreach($entities as $entity) {
       $changed = FALSE;
       foreach ($entity->get($field) as $k => $item) {
         $target_id = $item->target_id;
-        if ($target_id === $old_domain->id()) {
+        // NB: NOT strict ==
+        if ($target_id == $old_domain->id()) {
           $changed = TRUE;
           $item->target_id = $new_domain->id();
         }
@@ -298,7 +335,7 @@ class DomainCommands extends DrushCommands {
    * Return the Domain object corresponding to a policy string.
    *
    * @param string $policy
-   *   In general, one of 'prompt' | 'default' | 'ignore' or a domain entity
+   *   In general one of 'prompt' | 'default' | 'ignore' or a domain entity
    *   machine name, but this function does not process 'prompt'.
    *
    * @return \Drupal\Core\Entity\EntityInterface|\Drupal\domain\DomainInterface|null
@@ -311,6 +348,7 @@ class DomainCommands extends DrushCommands {
         $new_domain = $domain_storage->loadDefaultDomain();
         break;
 
+      case 'prompt':
       case 'ignore':
         return NULL;
 
@@ -337,7 +375,8 @@ class DomainCommands extends DrushCommands {
    */
   protected function reassignLinkedEntities($domains, array $options = ['chatty' => null, 'policy' => null]) {
     $entity_typenames = $this->findDomainEnabledEntities();
-    $field_names = [DOMAIN_ACCESS_FIELD, DOMAIN_ADMIN_FIELD, DOMAIN_SOURCE_FIELD];
+    // DOMAIN_ADMIN_FIELD too??
+    $field_names = [DOMAIN_ACCESS_FIELD, DOMAIN_SOURCE_FIELD];
 
     $new_domain = $this->getDomainInstanceFromPolicy($options['policy']);
     if (empty($new_domain)) {
@@ -354,7 +393,7 @@ class DomainCommands extends DrushCommands {
 
           // And, For each domain field ...
           foreach ($field_names as $field) {
-            $ids = $this->enumerateDomainEntities($name, $field, $domain->id());
+            $ids = $this->enumerateDomainEntities($name, $domain->id(), $field);
             if (!empty($ids)) {
 
               try {
