@@ -446,6 +446,7 @@ class DomainCommands extends DrushCommands {
    * @aliases domains,domain-list
    *
    * @field-labels
+   *   membership: Membership
    *   weight: Weight
    *   name: Name
    *   hostname: Hostname
@@ -454,7 +455,7 @@ class DomainCommands extends DrushCommands {
    *   is_default: Default
    *   domain_id: Domain Id
    *   id: Machine name
-   * @default-fields domain_id,id,name,hostname,status,is_default
+   * @default-fields domain_id,id,name,hostname,status,membership,is_default
    *
    * @return \Consolidation\OutputFormatters\StructuredData\RowsOfFields
    *
@@ -469,6 +470,17 @@ class DomainCommands extends DrushCommands {
     if (empty($domains)) {
       $this->logger()->warning(dt('No domains have been created. Use "drush domain:add" to create one.'));
       return new RowsOfFields([]);
+    }
+
+    $entity_typenames = $this->findDomainEnabledEntities();
+    $stats = [];
+    $totals = [];
+    foreach ($domains as $domain) {
+      $stats[$domain->id()] = [];
+      foreach ($entity_typenames as $name) {
+        $stats[$domain->id()][$name] = $this->enumerateDomainEntities($name, $domain->id(), DOMAIN_ACCESS_FIELD, TRUE);
+      }
+      $totals[$domain->id()] = array_reduce($stats[$domain->id()], function ($sum, $v){ return $sum + $v; }, 0);
     }
 
     $keys = [
@@ -501,6 +513,7 @@ class DomainCommands extends DrushCommands {
 
         $row[$key] = Html::escape($v);
       }
+      $row['membership'] = $totals[$domain->id()];
       $rows[] = $row;
     }
     return new RowsOfFields($rows);
