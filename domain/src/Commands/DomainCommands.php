@@ -856,8 +856,8 @@ class DomainCommands extends DrushCommands {
     $this->reassignLinkedEntities($domains, $options);
     //endregion
     
-    //$this->deleteDomain($domains);
-    //$this->logger()->info(dt('Domain record deleted.'));
+    $this->deleteDomain($domains, $options);
+    $this->logger()->info(dt('Domain record deleted.'));
   }
 
   /**
