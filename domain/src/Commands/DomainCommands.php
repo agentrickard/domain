@@ -122,7 +122,7 @@ class DomainCommands extends DrushCommands {
    *
    * @return string
    */
-  protected function checkHTTPResponse(DomainInterface $domain, $validate_url) {
+  protected function checkHTTPResponse(DomainInterface $domain, $validate_url = FALSE) {
     // Ensure the url is rebuilt.
     if ($validate_url) {
       $this->validateDomain($domain->getHostname());
@@ -649,6 +649,9 @@ class DomainCommands extends DrushCommands {
    * @command domain:add
    * @aliases domain-add
    *
+   * @return string
+   *   The entity id of the created domain.
+   *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   public function add($hostname, $name, array $options = ['inactive' => null, 'https' => null, 'weight' => null, 'is_default' => null, 'validate' => null]) {
@@ -666,8 +669,11 @@ class DomainCommands extends DrushCommands {
       'id' => $domain_storage->createMachineName($hostname),
       'validate_url' => ($options['validate']) ? 1 : 0,
     );
+    /** @var DomainInterface $domain */
     $domain = $domain_storage->create($values);
     $this->checkCreatedDomain($domain, $values);
+
+    return $values['id'];
   }
 
   /**
@@ -916,22 +922,22 @@ class DomainCommands extends DrushCommands {
    *    config, etc.
    * @option validate
    *   Force a check of the URL response before allowing registration.
-   * @usage drush domain-default example.com
-   * @usage drush domain-default 1
-   * @usage drush domain-default 1 --validate=1
+   * @usage drush domain-default www.example.com
+   * @usage drush domain-default example_org
+   * @usage drush domain-default www.example.org --validate=1
    *
    * @command domain:default
    * @aliases domain-default
+   *
+   * @return string
+   *   Ihe machine name of the default domain.
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   public function defaultDomain($domain_id, array $options = ['validate' => null]) {
     $domain_storage = $this->getStorage();
     // Resolve the domain.
-    if (empty($domain_id)) {
-      $domain = $domain_storage->loadDefaultDomain();
-    }
-    elseif ($domain = $this->getDomainFromArgument($domain_id)) {
+    if (!empty($domain_id) && $domain = $this->getDomainFromArgument($domain_id)) {
       $validate = ($options['validate']) ? 1 : 0;
       $domain->addProperty('validate_url', $validate);
       if ($error = $this->checkHTTPResponse($domain)) {
@@ -942,8 +948,18 @@ class DomainCommands extends DrushCommands {
         $domain->saveDefault();
       }
     }
-    $this->logger()->info(dt('!domain set to primary domain.',
-      ['!domain' => $domain->getHostname()]));
+
+    // Now, ask for the current default, so we know if it worked.
+    $domain = $domain_storage->loadDefaultDomain();
+    if ($domain->status()) {
+      $this->logger()->info(dt('!domain set to primary domain.',
+        ['!domain' => $domain->getHostname()]));
+    }
+    else {
+      $this->logger()->warning(dt('!domain set to primary domain, but is also inactive.',
+        ['!domain' => $domain->getHostname()]));
+    }
+    return $domain->id();
   }
 
   /**
@@ -956,6 +972,9 @@ class DomainCommands extends DrushCommands {
    *
    * @command domain:disable
    * @aliases domain-disable
+   *
+   * @return string
+   *   'disabled' if the domain is now disabled.
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
@@ -971,7 +990,14 @@ class DomainCommands extends DrushCommands {
         $this->logger()->info(dt('!domain is already disabled.',
           ['!domain' => $domain->getHostname()]));
       }
+      if ($domain->status()) {
+        return 'enabled';
+      }
+      else {
+        return 'disabled';
+      }
     }
+    return 'unknown domain';
   }
 
   /**
@@ -984,6 +1010,9 @@ class DomainCommands extends DrushCommands {
    *
    * @command domain:enable
    * @aliases domain-enable
+   *
+   * @return string
+   *   'enabled' if the domain is now enabled.
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
@@ -999,7 +1028,14 @@ class DomainCommands extends DrushCommands {
         $this->logger()->info(dt('!domain is already enabled.',
           ['!domain' => $domain->getHostname()]));
       }
+      if ($domain->status()) {
+        return 'enabled';
+      }
+      else {
+        return 'disabled';
+      }
     }
+    return 'unknown domain';
   }
 
   /**
@@ -1021,11 +1057,16 @@ class DomainCommands extends DrushCommands {
     // Resolve the domain.
     if ($domain = $this->getDomainFromArgument($domain_id)) {
       $domain->saveProperty('name', $name);
+      return $domain->name();
     }
+    return 'unknown domain';
   }
 
   /**
-   * Changes a domain name.
+   * Changes a domain name machine ID.
+   *
+   * This is disabled because we need to modify all content in a 'reassign
+   * domains' type way.
    *
    * @param $domain_id
    *   The numeric id or hostname of the domain to rename.
@@ -1039,22 +1080,22 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function machineName($domain_id, $machine_name) {
-    $domain_storage = $this->getStorage();
-    $machine_name = $domain_storage->createMachineName($machine_name);
-    // Resolve the domain.
-    if ($domain = $this->getDomainFromArgument($domain_id)) {
-      $results = $domain_storage->loadByProperties(['machine_name' => $machine_name]);
-      foreach ($results as $result) {
-        if ($result->id() == $machine_name) {
-          $this->logger()->warning(dt('The machine_name !machine_name is being used by domain !hostname.',
-            ['!machine_name' => $machine_name, '!hostname' => $result->getHostname()]));
-          return;
-        }
-      }
-      $domain->saveProperty('id', $machine_name);
-    }
-  }
+//  public function machineName($domain_id, $machine_name) {
+//    $domain_storage = $this->getStorage();
+//    $machine_name = $domain_storage->createMachineName($machine_name);
+//    // Resolve the domain.
+//    if ($domain = $this->getDomainFromArgument($domain_id)) {
+//      $results = $domain_storage->loadByProperties(['machine_name' => $machine_name]);
+//      foreach ($results as $result) {
+//        if ($result->id() == $machine_name) {
+//          $this->logger()->warning(dt('The machine_name !machine_name is being used by domain !hostname.',
+//            ['!machine_name' => $machine_name, '!hostname' => $result->getHostname()]));
+//          return;
+//        }
+//      }
+//      $domain->saveProperty('id', $machine_name);
+//    }
+//  }
 
   /**
    * Changes a domain scheme.
@@ -1118,6 +1159,7 @@ class DomainCommands extends DrushCommands {
 
       $domain->saveProperty('scheme', $scheme);
     }
+    return $scheme;
   }
 
   /**
@@ -1140,8 +1182,8 @@ class DomainCommands extends DrushCommands {
    * @usage drush gend --count=25
    * @usage drush gend --count=25 --empty=1
    *
-   * @command domains:generate
-   * @aliases gend,domgen,domains-generate
+   * @command domain:generate
+   * @aliases gend,domgen,domain-generate
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
@@ -1192,6 +1234,7 @@ class DomainCommands extends DrushCommands {
         $prepared[] = $value;
       }
     }
+
     // Add any test domains that have numeric prefixes. We don't expect these URLs to work,
     // and mainly use these for testing the user interface.
     $needed = $count - count($prepared);
