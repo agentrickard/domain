@@ -33,6 +33,8 @@ class DomainCommands extends DrushCommands {
 
   protected $entity_field_map = NULL;
 
+  protected $is_dry_run = FALSE;
+
   /** @var string[] Array of special-case policies for reassigning content. */
   protected $reassignment_policies = ['prompt', 'default', 'ignore']; // + machine name;
 
@@ -183,19 +185,23 @@ class DomainCommands extends DrushCommands {
    *
    * @param DomainInterface[] $domains
    *   The domain_id to delete. Pass 'all' to delete all records.
-   * @param string[] $delete_options
-   *   Array containing who to reassign content and users to.
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    * @throws \UnexpectedValueException
    */
-  protected function deleteDomain($domains, $delete_options = []) {
+  protected function deleteDomain($domains) {
     foreach ($domains as $domain) {
       if (!$domain instanceof DomainInterface) {
         throw new StorageException('deleting domains: value is not a domain');
       }
-
       $hostname = $domain->getHostname();
+
+      if ($this->is_dry_run) {
+        $this->logger()->info(dt('DRYRUN: Domain record @domain deleted.',
+          ['@domain' => $hostname]));
+        continue;
+      }
+
       try {
         $domain->delete();
       }
@@ -316,10 +322,19 @@ class DomainCommands extends DrushCommands {
     /** @var \Drupal\domain\DomainInterface $entity */
     foreach($entities as $entity) {
       $changed = FALSE;
+      // Multivalue fields are used, so check each one.
       foreach ($entity->get($field) as $k => $item) {
-        $target_id = $item->target_id;
         // NB: NOT strict ==
-        if ($target_id == $old_domain->id()) {
+        if ($item->target_id == $old_domain->id()) {
+
+          if ($this->is_dry_run) {
+            $this->logger()->info(dt('DRYRUN: Update domain membership for entity @id to @new.',
+              [ '@id' => $entity->id(), '@new' => $new_domain->id() ]));
+
+            // Don't set changed, so don't save either.
+            continue;
+          }
+
           $changed = TRUE;
           $item->target_id = $new_domain->id();
         }
@@ -745,6 +760,8 @@ class DomainCommands extends DrushCommands {
   public function delete($domain_id, $options = ['content-as' => null, 'users-as' => null, 'dryrun' => null, 'chatty' => null ]) {
     $policy_content = 'prompt';
     $policy_users = 'prompt';
+
+    $this->is_dry_run = (bool)$options['dryrun'];
 
     //region Get current domain list and perform sanity checks.
     $domain_storage = $this->getStorage();
