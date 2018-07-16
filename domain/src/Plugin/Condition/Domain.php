@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "domain",
  *   label = @Translation("Domain"),
  *   context = {
- *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = FALSE)
+ *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = TRUE)
  *   }
  * )
  */
@@ -65,7 +65,7 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
       '#type' => 'checkboxes',
       '#title' => $this->t('When the following domains are active'),
       '#default_value' => $this->configuration['domains'],
-      '#options' => array_map('\Drupal\Component\Utility\Html::escape', \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList()),
+      '#options' => array_map('\Drupal\Component\Utility\Html::escape', \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList()),
       '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
       '#attached' => array(
         'library' => array(
@@ -98,7 +98,7 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
    */
   public function summary() {
     // Use the domain labels. They will be sanitized below.
-    $domains = array_intersect_key(\Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList(), $this->configuration['domains']);
+    $domains = array_intersect_key(\Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList(), $this->configuration['domains']);
     if (count($domains) > 1) {
       $domains = implode(', ', $domains);
     }

@@ -41,7 +41,7 @@ abstract class DomainContentTestBase extends DomainTestBase {
     // Create five test domains.
     $this->domainCreateTestDomains(5);
 
-    $this->domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $this->domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
   }
 
   /**

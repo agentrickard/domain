@@ -25,7 +25,7 @@ class DomainNavBlockTest extends DomainTestBase {
   public function testDomainNav() {
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(4);
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
 
     // Place the nav block.
     $block = $this->drupalPlaceBlock('domain_nav_block');

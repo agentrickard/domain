@@ -24,7 +24,7 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
     // Check the created domain based on it's known id value.
     $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->loadByHostname($key);
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->loadByHostname($key);
     $this->assertTrue(!empty($domain), 'Test domain created.');
 
     // Valid patterns to test. Valid is the boolean value.

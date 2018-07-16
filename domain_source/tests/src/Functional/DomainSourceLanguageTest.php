@@ -4,7 +4,6 @@ namespace Drupal\Tests\domain_source\Functional;
 
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
@@ -19,7 +18,15 @@ class DomainSourceLanguageTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('language', 'content_translation', 'domain', 'domain_source', 'field', 'node', 'user');
+  public static $modules = [
+    'language',
+    'content_translation',
+    'domain',
+    'domain_source',
+    'field',
+    'node',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -39,6 +46,9 @@ class DomainSourceLanguageTest extends DomainTestBase {
 
   }
 
+  /**
+   * Tests domain source language.
+   */
   public function testDomainSourceLanguage() {
     // Create a node, assigned to a source domain.
     $id = 'one_example_com';
@@ -63,7 +73,7 @@ class DomainSourceLanguageTest extends DomainTestBase {
 
     // Variables for our tests.
     $path = 'node/1';
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     $source = $domains[$id];
     $expected = $source->getPath() . $path;
     $route_name = 'entity.node.canonical';
