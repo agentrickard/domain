@@ -1,6 +1,47 @@
 <?php
 
 /**
+ * @file
+ * Install, update and uninstall hooks for this module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function domain_content_requirements($phase) {
+  $requirements = [];
+  $allow = TRUE;
+  if ($phase == 'install') {
+    $list['user'] = 'user';
+    $node_types = \Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple();
+    foreach ($node_types as $type => $info) {
+      $list[$type] = 'node';
+    }
+    // Check for required fields.
+    foreach ($list as $bundle => $entity_type) {
+      $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
+      if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
+        $allow = FALSE;
+        break;
+      }
+      $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
+      if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
+        $allow = FALSE;
+        break;
+      }
+    }
+  }
+  if (!$allow) {
+    $requirements['domain_content'] = [
+      'title' => t('Domain content'),
+      'description' => t('Domain content cannot be enabled until Domain access has installed its required fields.'),
+      'severity' => REQUIREMENT_ERROR,
+    ];
+  }
+  return $requirements;
+}
+
+/**
  * Implements hook_uninstall().
  */
 function domain_content_uninstall() {
