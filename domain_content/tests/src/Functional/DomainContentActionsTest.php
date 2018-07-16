@@ -21,7 +21,7 @@ class DomainContentActionsTest extends DomainContentTestBase {
       'access domain content editors',
       'publish to any domain',
       'assign editors to any domain',
-    // Edit access is required. This is fastest.
+      // Edit access is required. This is fastest.
       'bypass node access',
     ]);
     $this->drupalLogin($this->admin_user);
