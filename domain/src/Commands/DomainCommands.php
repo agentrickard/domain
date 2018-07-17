@@ -31,11 +31,26 @@ class DomainCommands extends DrushCommands {
   /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
   protected $domain_storage = NULL;
 
+    /**
+     * Local cache of entity field map, kept for performance.
+     *
+     * @var array
+     */
   protected $entity_field_map = NULL;
 
+    /**
+     * Flag set by the --dryrun cli option. If set prevents changes from
+     * being made by code in this class.
+     *
+     * @var bool
+     */
   protected $is_dry_run = FALSE;
 
-  /** @var string[] Array of special-case policies for reassigning content. */
+  /**
+   * Static array of special-case policies for reassigning content.
+   *
+   * @var string[]
+   * */
   protected $reassignment_policies = ['prompt', 'default', 'ignore']; // + machine name;
 
   /**
@@ -73,7 +88,7 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function getDomainFromArgument($argument) {
+  protected function getDomainFromArgument(string $argument) {
     $domain_storage = $this->getStorage();
 
     // Try loading domain assuming arg is a machine name.
@@ -107,11 +122,11 @@ class DomainCommands extends DrushCommands {
    *
    * @return array
    */
-  protected function filterDomains($domains, $exclude, $initial = []) {
-    foreach ($domains as $one) {
+  protected function filterDomains(array $domains, array $exclude, array $initial = []) {
+    foreach ($domains as $domain) {
       // Exclude unwanted domains.
-      if (!in_array($one->id(), $exclude)) {
-        $initial[$one->id()] = $one;
+      if (!in_array($domain->id(), $exclude)) {
+        $initial[$domain->id()] = $domain;
       }
     }
     return $initial;
@@ -127,8 +142,12 @@ class DomainCommands extends DrushCommands {
   protected function checkHTTPResponse(DomainInterface $domain, $validate_url = FALSE) {
     // Ensure the url is rebuilt.
     if ($validate_url) {
-      $this->validateDomain($domain->getHostname());
+      $code = $this->validateDomain($domain->getHostname());
+      // Some sort of success:
+      return  $code >= 200 && $code <= 299;
     }
+    // Not validating, so all is well!
+    return TRUE;
   }
 
   /**
@@ -138,12 +157,14 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function checkCreatedDomain(DomainInterface $domain, array $values) {
+  protected function checkCreatedDomain(DomainInterface $domain, array $values)
+  {
     if ($error = $this->checkHTTPResponse($domain, $values['validate_url'])) {
-      throw new DomainCommandException(dt('Nobody\'s listening on domain !d: (!e)', [
-        '!d' => $domain->getDomainId(),
-        '!e' => $error,
-      ]));
+      throw new DomainCommandException(
+        dt('Nobody\'s listening on domain !d: (!e)', [
+          '!d' => $domain->getDomainId(),
+          '!e' => $error,
+        ]));
     }
     else {
       try {
@@ -164,20 +185,20 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Validates a domain.
+   * Validates a domain exists by trying to do an http request to it.
    *
    * @param $hostname
    *   The domain name to validate for syntax and uniqueness.
    *
-   * @return array
-   *   An array of errors encountered.
+   * @return int
+   *   The server response code for the request.
    *
    * @see domain_validate()
    */
   protected function validateDomain($hostname) {
     /** @var \Drupal\domain\DomainValidatorInterface $validator */
     $validator = \Drupal::service('domain.validator');
-    return $validator->validate($hostname);
+    return $validator->checkResponse($hostname);
   }
 
   /**
@@ -648,8 +669,11 @@ class DomainCommands extends DrushCommands {
    *   from cli, aliases, config, etc.
    * @option inactive
    *   Set the domain to inactive status if set.
-   * @option https
-   *   Use https protocol for this domain if set.
+   * @option scheme
+   *   Use indicated protocol for this domain, defaults to 'https'. Options:
+   *    - http: normal http (no SSL).
+   *    - https: secure https (with SSL).
+   *    - variable: match the scheme used by the request.
    * @option weight
    *   Set the order (weight) of the domain.
    * @option is_default
@@ -657,7 +681,7 @@ class DomainCommands extends DrushCommands {
    * @option validate
    *   Force a check of the URL response before allowing registration.
    * @usage drush domain-add example.com 'My Test Site'
-   * @usage drush domain-add example.com 'My Test Site' --inactive=1 --https==1
+   * @usage drush domain-add example.com 'My Test Site' --inactive=1 --scheme=https
    * @usage drush domain-add example.com 'My Test Site' --weight=10
    * @usage drush domain-add example.com 'My Test Site' --validate=1
    *
@@ -669,8 +693,27 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function add($hostname, $name, array $options = ['inactive' => null, 'https' => null, 'weight' => null, 'is_default' => null, 'validate' => null]) {
+  public function add($hostname, $name, array $options = ['inactive' => null, 'scheme' => null, 'weight' => null, 'is_default' => null, 'validate' => null]) {
     $domain_storage = $this->getStorage();
+
+    // Validate the weight arg.
+    if (empty($options['weight']) || !is_numeric($options['weight'])) {
+      throw new DomainCommandException(
+        dt('Domain weight "!weight" must be a number',
+          ['!weight' => !empty($options['weight']) ? $options['weight'] : ''])
+      );
+    }
+
+    // Validate the scheme arg.
+    if (empty($options['scheme']) ||
+      ($options['scheme'] !== 'http' && $options['scheme'] !== 'https' && $options['scheme'] !== 'variable')
+    ) {
+      throw new DomainCommandException(
+        dt('Scheme name "!scheme" not known',
+          ['!scheme' => !empty($options['scheme']) ? $options['scheme'] : ''])
+      );
+    }
+
     $records_count = $domain_storage->getQuery()->count()->execute();
     $start_weight = $records_count + 1;
     $hostname = mb_strtolower($hostname);
@@ -678,7 +721,7 @@ class DomainCommands extends DrushCommands {
       'hostname' => $hostname,
       'name' => $name,
       'status' => (!$options['invalid']) ? 1 : 0,
-      'scheme' => (!$options['https']) ? 'http' : 'https',
+      'scheme' => ($options['scheme']) ? $options['scheme'] : 'https',
       'weight' => ($weight = $options['weight']) ? $weight : $start_weight + 1,
       'is_default' => ($is_default = $options['is_default']) ? $is_default : 0,
       'id' => $domain_storage->createMachineName($hostname),
@@ -892,7 +935,6 @@ class DomainCommands extends DrushCommands {
    *   server root.
    * @usage drush domain-test
    * @usage drush domain-test example.com
-   * @usage drush domain-test 1
    *
    * @command domain:test
    * @aliases domain-test
@@ -903,6 +945,7 @@ class DomainCommands extends DrushCommands {
     $domain_storage = $this->getStorage();
 
     // TODO: This won't work in a subdirectory without a parameter.
+    // RIC: What is the intended benaviour here?
     if ($base_path = $options['base_path']) {
       $GLOBALS['base_path'] = '/' . $base_path . '/';
     }
@@ -958,8 +1001,8 @@ class DomainCommands extends DrushCommands {
       $validate = ($options['validate']) ? 1 : 0;
       $domain->addProperty('validate_url', $validate);
       if ($error = $this->checkHTTPResponse($domain)) {
-        throw new DomainCommandException(dt('Unable to verify domain !dom: !error',
-          ['!dom' => $domain->getHostname(), '!error' => $error]));
+        throw new DomainCommandException(dt('Unable to verify domain !domain: !error',
+          ['!domain' => $domain->getHostname(), '!error' => $error]));
       }
       else {
         $domain->saveDefault();
@@ -1080,47 +1123,10 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Changes a domain name machine ID.
-   *
-   * This is disabled because we need to modify all content in a 'reassign
-   * domains' type way.
-   *
-   * @param $domain_id
-   *   The numeric id or hostname of the domain to rename.
-   * @param $machine_name
-   *   The machine-readable name to use for the domain.
-   * @usage drush domain-machine-name example.com foo
-   * @usage drush domain-machine-name 1 foo
-   *
-   * @command domain:machine-name
-   * @aliases domain-machine-name
-   *
-   * @throws \Drupal\domain\Commands\DomainCommandException
-   */
-//  public function machineName($domain_id, $machine_name) {
-//    $domain_storage = $this->getStorage();
-//    $machine_name = $domain_storage->createMachineName($machine_name);
-//    // Resolve the domain.
-//    if ($domain = $this->getDomainFromArgument($domain_id)) {
-//      $results = $domain_storage->loadByProperties(['machine_name' => $machine_name]);
-//      foreach ($results as $result) {
-//        if ($result->id() == $machine_name) {
-//          $this->logger()->warning(dt('The machine_name !machine_name is being used by domain !hostname.',
-//            ['!machine_name' => $machine_name, '!hostname' => $result->getHostname()]));
-//          return;
-//        }
-//      }
-//      $domain->saveProperty('id', $machine_name);
-//    }
-//  }
-
-  /**
    * Changes a domain scheme.
    *
    * @param $domain_id
    *   The numeric id or hostname of the domain to change.
-   * @param $scheme (deprecated)
-   *   The URL schema (http or https) to use for the domain.
    * @param array $options
    *    An associative array of options whose values come from cli, aliases,
    *    config, etc.
@@ -1128,55 +1134,69 @@ class DomainCommands extends DrushCommands {
    * @usage drush domain-scheme example.com --https
    * @usage drush domain-scheme 681 https
    *
-   * @option http
-   *   Set the domain access scheme to http (no SSL).
-   * @option https
-   *   Set the domain access scheme to https (with SSL).
+   * @option set
+   *   Set the canonical domain scheme:
+   *    - http: to http (no SSL).
+   *    - https: to https (with SSL).
+   *    - variable: match the scheme used by the request.
    *
    * @command domain:scheme
    * @aliases domain-scheme
    *
+   * @return string
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function scheme($domain_id, $scheme, $options = ['http' => null, 'https' => null ]) {
+  public function scheme($domain_id, $options = ['set' => null ]) {
+    $new_scheme = NULL;
+
     // Resolve the domain.
     if ($domain = $this->getDomainFromArgument($domain_id)) {
-      if (empty($scheme)) {
-        if ($options['http'] || $options['http']) {
-          if ($options['https']) {
-            $scheme = 'https';
-          }
-          else {
-            $scheme = 'http';
-          }
-        }
-        else {
-          $scheme = $this->io()->choice(dt('Select the default http scheme:'),
-            [
-              1 => dt('http'),
-              2 => dt('https'),
-            ]);
-        }
+      if (!empty($options['set'])) {
+        $new_scheme = $options['set'];
+      }
+      elseif (array_key_exists('set', $options)) {
+        $new_scheme = $this->io()->choice(dt('Select the default http scheme:'),
+          [
+            '1' => dt('http'),
+            '2' => dt('https'),
+            '3' => dt('variable'),
+          ]);
       }
 
-      switch($scheme) {
-        case 'http':
-        case 1:
-          $scheme = 'http';
-          break;
+      // If we were asked to change scheme, validate the value and do so.
+      if (!empty($new_scheme)) {
+        switch ($new_scheme) {
+          case 'http':
+          case '1':
+            $new_scheme = 'http';
+            break;
 
-        case 'https':
-        case 2:
-          $scheme = 'https';
-          break;
+          case 'https':
+          case '2':
+            $new_scheme = 'https';
+            break;
 
-        default:
-          return;
+          case 'variable':
+          case '3':
+            $new_scheme = 'variable';
+            break;
+
+          default:
+            throw new DomainCommandException(
+              dt('Scheme name "!scheme" not known', ['!scheme' => $new_scheme])
+            );
+        }
+        $domain->saveProperty('scheme', $new_scheme);
       }
 
-      $domain->saveProperty('scheme', $scheme);
+      // Either way, return the (new | current) scheme for this domain.
+      return $domain->get('scheme');
     }
-    return $scheme;
+
+    // We couldn't find the domain - so fail.
+    throw new DomainCommandException(
+      dt('Domain name "!domain" not known', ['!domain' => $domain_id])
+    );
   }
 
   /**
