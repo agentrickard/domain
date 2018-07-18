@@ -1151,17 +1151,22 @@ class DomainCommands extends DrushCommands {
 
     // Resolve the domain.
     if ($domain = $this->getDomainFromArgument($domain_id)) {
-      if (!empty($options['set'])) {
-        $new_scheme = $options['set'];
-      }
-      elseif (array_key_exists('set', $options)) {
+      if (isset($options['set']) && $options['set'] === TRUE) {
+        // --set with no value
         $new_scheme = $this->io()->choice(dt('Select the default http scheme:'),
           [
             '1' => dt('http'),
             '2' => dt('https'),
             '3' => dt('variable'),
           ]);
+        // TODO: Something weird is going on here.
+        echo 'selected: "' . var_export($new_scheme, TRUE) . '"' . PHP_EOL;
       }
+      elseif (isset($options['set']) && strlen($options['set']) > 0) {
+        // --set with a value
+        $new_scheme = $options['set'];
+      }
+      // otherwise, --set is not present
 
       // If we were asked to change scheme, validate the value and do so.
       if (!empty($new_scheme)) {
