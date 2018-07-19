@@ -9,6 +9,9 @@ namespace Drupal\Tests\domain_content\Functional;
  */
 class DomainContentActionsTest extends DomainContentTestBase {
 
+  /**
+   * Tests domain contact actions.
+   */
   public function testDomainContentActions() {
     // This user should be able to see everything.
     $this->admin_user = $this->drupalCreateUser([
@@ -18,7 +21,8 @@ class DomainContentActionsTest extends DomainContentTestBase {
       'access domain content editors',
       'publish to any domain',
       'assign editors to any domain',
-      'bypass node access' // Edit access is required. This is fastest.
+      // Edit access is required. This is fastest.
+      'bypass node access',
     ]);
     $this->drupalLogin($this->admin_user);
 
