@@ -10,7 +10,7 @@ namespace Drupal\Tests\domain_content\Functional;
 class DomainContentActionsTest extends DomainContentTestBase {
 
   /**
-   * Tests domain contact actions.
+   * Tests domain content actions.
    */
   public function testDomainContentActions() {
     // This user should be able to see everything.
