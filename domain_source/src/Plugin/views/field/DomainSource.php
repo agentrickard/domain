@@ -28,7 +28,7 @@ class DomainSource extends EntityField {
         $item['rendered']['#type'] = 'markup';
         $item['rendered']['#markup'] = '<a href="' . $domain->buildUrl($url) . '">' . $domain->label() . '</a>';
       }
-      uasort($items, array($this, 'sort'));
+      uasort($items, [$this, 'sort']);
     }
 
     return $items;

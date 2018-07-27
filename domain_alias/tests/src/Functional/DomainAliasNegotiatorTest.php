@@ -37,8 +37,8 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
 
     // Set the storage handles.
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
-    $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
+    $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
 
     // Set known prefixes that work with our tests. This will give us domains
     // 'example.com' and 'one.example.com' aliased to 'two.example.com' and

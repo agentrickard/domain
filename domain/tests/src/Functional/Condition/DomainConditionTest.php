@@ -46,7 +46,7 @@ class DomainConditionTest extends DomainTestBase {
     $this->domainCreateTestDomains(5);
 
     // Get two sample domains.
-    $this->domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $this->domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     $this->test_domain = array_shift($this->domains);
     $this->not_domain = array_shift($this->domains);
   }
@@ -60,12 +60,6 @@ class DomainConditionTest extends DomainTestBase {
       ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
       ->setContextValue('entity:domain', $this->not_domain);
     $this->assertFalse($condition->execute(), 'Domain request condition fails on wrong domain.');
-
-    // Grab the domain condition and configure it to check against a null set.
-    $condition = $this->manager->createInstance('domain')
-      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
-      ->setContextValue('entity:domain', NULL);
-    $this->assertFalse($condition->execute(), 'Domain request condition fails when no context present.');
 
     // Grab the domain condition and configure it to check against itself.
     $condition = $this->manager->createInstance('domain')

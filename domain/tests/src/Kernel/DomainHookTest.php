@@ -59,7 +59,7 @@ class DomainHookTest extends KernelTestBase {
     $this->domainCreateTestDomains();
 
     // Get the services.
-    $this->domainStorage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $this->domainStorage = \Drupal::entityTypeManager()->getStorage('domain');
     $this->currentUser = \Drupal::service('current_user');
     $this->moduleHandler = \Drupal::service('module_handler');
   }
