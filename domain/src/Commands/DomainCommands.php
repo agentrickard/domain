@@ -142,7 +142,8 @@ class DomainCommands extends DrushCommands {
   protected function checkHTTPResponse(DomainInterface $domain, $validate_url = FALSE) {
     // Ensure the url is rebuilt.
     if ($validate_url) {
-      $code = $this->validateDomain($domain->getHostname());
+      $code = $this->checkDomain($domain);
+      echo "check: $code\n";
       // Some sort of success:
       return  $code >= 200 && $code <= 299;
     }
@@ -159,12 +160,11 @@ class DomainCommands extends DrushCommands {
    */
   protected function checkCreatedDomain(DomainInterface $domain, array $values)
   {
-    if ($error = $this->checkHTTPResponse($domain, $values['validate_url'])) {
+    $valid = $this->checkHTTPResponse($domain, $values['validate_url']);
+    if (!$valid) {
       throw new DomainCommandException(
-        dt('Nobody\'s listening on domain !d: (!e)', [
-          '!d' => $domain->getDomainId(),
-          '!e' => $error,
-        ]));
+        dt('Nobody listening on domain !d.', ['!d' => $domain->getHostname()])
+      );
     }
     else {
       try {
@@ -185,20 +185,37 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Validates a domain exists by trying to do an http request to it.
+   * Checks a domain exists by trying to do an http request to it.
    *
-   * @param $hostname
-   *   The domain name to validate for syntax and uniqueness.
+   * @param $domain
+   *   The domain to validate for syntax and uniqueness.
    *
    * @return int
    *   The server response code for the request.
    *
    * @see domain_validate()
    */
-  protected function validateDomain($hostname) {
+  protected function checkDomain($domain) {
     /** @var \Drupal\domain\DomainValidatorInterface $validator */
     $validator = \Drupal::service('domain.validator');
-    return $validator->checkResponse($hostname);
+    return $validator->checkResponse($domain);
+  }
+
+  /**
+   * Validates a domain exists by trying to do an http request to it.
+   *
+   * @param $domain
+   *   The domain to validate for syntax and uniqueness.
+   *
+   * @return string[]
+   *   Array of strings indicating issues found.
+   *
+   * @see domain_validate()
+   */
+  protected function validateDomain($domain) {
+    /** @var \Drupal\domain\DomainValidatorInterface $validator */
+    $validator = \Drupal::service('domain.validator');
+    return $validator->validate($domain);
   }
 
   /**
@@ -486,12 +503,13 @@ class DomainCommands extends DrushCommands {
    *   weight: Weight
    *   name: Name
    *   hostname: Hostname
+   *   valid: HTTP Response
    *   scheme: Scheme
    *   status: Status
    *   is_default: Default
    *   domain_id: Domain Id
    *   id: Machine name
-   * @default-fields domain_id,id,name,hostname,status,membership,is_default
+   * @default-fields id,name,hostname,valid,status,membership,is_default
    *
    * @return \Consolidation\OutputFormatters\StructuredData\RowsOfFields
    *
@@ -523,6 +541,7 @@ class DomainCommands extends DrushCommands {
       'weight',
       'name',
       'hostname',
+      'valid',
       'scheme',
       'status',
       'is_default',
@@ -534,16 +553,31 @@ class DomainCommands extends DrushCommands {
     foreach ($domains as $domain) {
       $row = [];
       foreach ($keys as $key) {
-        $v = $domain->get($key);
         switch($key) {
+          case 'valid':
+            try {
+              $v = $this->checkDomain($domain);
+            }
+            catch(\GuzzleHttp\Exception\TransferException $ex) {
+              $v = -2;
+            }
+            catch(\Exception $ex) {
+              $v = -1;
+            }
+            break;
           case 'status':
+            $v = $domain->get($key);
             if (($options['inactive'] && $v) || ($options['active'] && !$v)) {
               continue 3; // switch, for, for
             }
             $v = !empty($v) ? dt('Active') : dt('Inactive');
-            break;
+          break;
           case 'is_default':
+            $v = $domain->get($key);
             $v = !empty($v) ? dt('Default') : '';
+            break;
+          default:
+            $v = $domain->get($key);
             break;
         }
 
@@ -578,6 +612,7 @@ class DomainCommands extends DrushCommands {
    */
   public function infoDomains() {
     $domain_storage = $this->getStorage();
+    $default_domain = $domain_storage->loadDefaultDomain();
 
     // Load all domains:
     $all_domains = $domain_storage->loadMultiple(NULL);
@@ -606,10 +641,16 @@ class DomainCommands extends DrushCommands {
           $v = count($active_domains);
           break;
         case 'default_id':
-          $v = $domain_storage->loadDefaultDomain()->getDomainId();
+          $v = '-unset-';
+          if ($default_domain) {
+            $v = $default_domain->getDomainId();
+          }
           break;
         case 'default_host':
-          $v = $domain_storage->loadDefaultDomain()->getHostname();
+          $v = '-unset-';
+          if ($default_domain) {
+            $v = $default_domain->getHostname();
+          }
           break;
         case 'scheme':
           $v = implode(', ', array_keys($domain_storage->loadSchema()));
@@ -697,7 +738,7 @@ class DomainCommands extends DrushCommands {
     $domain_storage = $this->getStorage();
 
     // Validate the weight arg.
-    if (empty($options['weight']) || !is_numeric($options['weight'])) {
+    if (!empty($options['weight']) && !is_numeric($options['weight'])) {
       throw new DomainCommandException(
         dt('Domain weight "!weight" must be a number',
           ['!weight' => !empty($options['weight']) ? $options['weight'] : ''])
@@ -705,7 +746,7 @@ class DomainCommands extends DrushCommands {
     }
 
     // Validate the scheme arg.
-    if (empty($options['scheme']) ||
+    if (!empty($options['scheme']) &&
       ($options['scheme'] !== 'http' && $options['scheme'] !== 'https' && $options['scheme'] !== 'variable')
     ) {
       throw new DomainCommandException(
