@@ -133,7 +133,7 @@ class DomainValidator implements DomainValidatorInterface {
     }
     // We cannot know which Guzzle Exception class will be returned; be generic.
     catch (RequestException $e) {
-      watchdog_exception('domain', $e);
+      //watchdog_exception('domain', $e);
       // File a general server failure.
       $domain->setResponse(500);
       return;
