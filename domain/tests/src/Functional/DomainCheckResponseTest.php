@@ -18,7 +18,7 @@ class DomainCheckResponseTest extends DomainTestBase {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
     $this->drupalLogin($this->admin_user);
 
-    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
 
     // Make a POST request on admin/config/domain/add.
     $edit = $this->domainPostValues();

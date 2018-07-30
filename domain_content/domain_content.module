@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Hook implementations for this module.
+ */
+
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Session\AccountInterface;
@@ -8,64 +13,28 @@ use Drupal\Core\Session\AccountInterface;
  * Implements hook_domain_operations().
  */
 function domain_content_domain_operations(DomainInterface $domain, AccountInterface $account) {
-  $operations = array();
+  $operations = [];
 
   // Advanced grants for edit/delete require permissions.
   $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
   $allowed = \Drupal::service('domain_access.manager')->getAccessValues($user);
   $id = $domain->id();
   if ($account->hasPermission('publish to any domain') || ($account->hasPermission('publish to any assigned domain') && isset($allowed[$domain->id()]))) {
-    $operations['domain_content'] = array(
+    $operations['domain_content'] = [
       'title' => t('Content'),
       'url' => Url::fromUri("internal:/admin/content/domain-content/$id"),
       // Core operations start at 0 and increment by 10.
       'weight' => 120,
-    );
+    ];
   }
   if ($account->hasPermission('assign editors to any domain') || ($account->hasPermission('assign domain editors') && isset($allowed[$domain->id()]))) {
-    $operations['domain_users'] = array(
+    $operations['domain_users'] = [
       'title' => t('Editors'),
       'url' => Url::fromUri("internal:/admin/content/domain-editors/$id"),
       // Core operations start at 0 and increment by 10.
       'weight' => 120,
-    );
+    ];
   }
 
   return $operations;
-}
-
-/**
- * Implements hook_requirements.
- */
-function domain_content_requirements($phase) {
-  $requirements = [];
-  $allow = TRUE;
-  if ($phase == 'install') {
-    $list['user'] = 'user';
-    $node_types = \Drupal::entityTypeManager()->getStorage('node_type')->loadMultiple();
-    foreach ($node_types as $type => $info) {
-      $list[$type] = 'node';
-    }
-    // Check for required fields.
-    foreach ($list as $bundle => $entity_type) {
-      $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_FIELD;
-      if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
-        $allow = FALSE;
-        break;
-      }
-      $id = $entity_type . '.' . $bundle . '.' . DOMAIN_ACCESS_ALL_FIELD;
-      if (!$field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
-        $allow = FALSE;
-        break;
-      }
-    }
-  }
-  if (!$allow) {
-    $requirements['domain_content'] = [
-      'title' => t('Domain content'),
-      'description' => t('Domain content cannot be enabled until Domain access has installed its required fields.'),
-      'severity' => REQUIREMENT_ERROR,
-    ];
-  }
-  return $requirements;
 }

@@ -33,8 +33,8 @@ class DomainAliasWildcardTest extends DomainAliasTestBase {
    * Test for environment matching.
    */
   public function testDomainAliasWildcards() {
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
-    $alias_loader = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
+    $alias_loader = \Drupal::entityTypeManager()->getStorage('domain_alias');
     $domains = $domain_storage->loadMultipleSorted(NULL, TRUE);
     // Our patterns should map to example.com, one.example.com, two.example.com.
     $patterns = ['example.*', 'four.example.*', 'five.example.*'];

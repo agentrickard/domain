@@ -57,7 +57,7 @@ class DomainSettingsForm extends ConfigFormBase {
       '#rows' => 5,
       '#columns' => 40,
       '#title' => $this->t('Paths that should be accessible for inactive domains'),
-      '#default_value' => $config->get('login_paths', "/user/login\r\n/user/password"),
+      '#default_value' => $config->get('login_paths'),
       '#description' => $this->t('Inactive domains are only accessible to users with permission.
         Enter any paths that should be accessible, one per line. Normally, only the
         login path will be allowed.'),

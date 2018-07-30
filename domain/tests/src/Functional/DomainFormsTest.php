@@ -18,7 +18,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
     $this->drupalLogin($this->admin_user);
 
-    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
 
     // No domains should exist.
     $this->domainTableIsEmpty();

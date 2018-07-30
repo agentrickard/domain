@@ -26,8 +26,8 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
     // Create test domains.
     $this->domainCreateTestDomains(3);
 
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
-    $alias_loader = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
+    $alias_loader = \Drupal::entityTypeManager()->getStorage('domain_alias');
     $domains = $domain_storage->loadMultiple();
 
     // Save these for later testing.

@@ -5,7 +5,6 @@ namespace Drupal\domain_content\Controller;
 use Drupal\Core\Link;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 
 /**
@@ -19,9 +18,9 @@ class DomainContentController extends ControllerBase {
    * @param array $options
    *   A list of variables required to build editor or content pages.
    *
-   * @see contentlist() for the values.
+   * @see contentlist()
    *
-   * @return $build
+   * @return array
    *   A Drupal page build array.
    */
   public function buildList(array $options) {
@@ -37,7 +36,7 @@ class DomainContentController extends ControllerBase {
       ];
     }
     // Loop through domains.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultipleSorted();
     $manager = \Drupal::service('domain_access.manager');
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach ($domains as $domain) {
@@ -87,7 +86,7 @@ class DomainContentController extends ControllerBase {
    *
    * @param string $entity_type
    *   The entity type.
-   * @param DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   The domain to query. If passed NULL, checks status for all affiliates.
    *
    * @return int
@@ -113,7 +112,7 @@ class DomainContentController extends ControllerBase {
   /**
    * Returns a fully loaded user object for the current request.
    *
-   * @return AccountInterface
+   * @return \Drupal\Core\Session\AccountInterface
    *   The current user object.
    */
   protected function getUser() {

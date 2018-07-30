@@ -6,7 +6,7 @@ use Drupal\Core\Url;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
- * Tests behavior for the rewriting links using core URL methods.
+ * Tests behavior for excluding some links from rewriting.
  *
  * @group domain_source
  */
@@ -17,7 +17,7 @@ class DomainSourceExcludeTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_source', 'field', 'node', 'user');
+  public static $modules = ['domain', 'domain_source', 'field', 'node', 'user'];
 
   /**
    * {@inheritdoc}
@@ -29,15 +29,23 @@ class DomainSourceExcludeTest extends DomainTestBase {
     DomainTestBase::domainCreateTestDomains(2);
   }
 
+  /**
+   * Tests domain source excludes.
+   */
   public function testDomainSourceExclude() {
     // Create a node, assigned to a source domain.
     $id = 'one_example_com';
 
-    $node = $this->createNode(['type' => 'page', 'title' => 'foo', DOMAIN_SOURCE_FIELD => $id]);
+    $node_values = [
+      'type' => 'page',
+      'title' => 'foo',
+      DOMAIN_SOURCE_FIELD => $id,
+    ];
+    $node = $this->createNode($node_values);
 
     // Variables for our tests.
     $path = 'node/1';
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     $source = $domains[$id];
     $expected = $source->getPath() . $path;
     $route_name = 'entity.node.canonical';

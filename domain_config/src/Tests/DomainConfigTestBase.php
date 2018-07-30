@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_config\Tests;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\domain\Tests\DomainTestBase;
 
 /**
@@ -19,6 +18,8 @@ abstract class DomainConfigTestBase extends DomainTestBase {
    *
    * Domain Config actually duplicates schemas provided by other modules,
    * so it cannot define its own.
+   *
+   * @var bool
    */
   protected $strictConfigSchema = FALSE;
 
@@ -29,14 +30,19 @@ abstract class DomainConfigTestBase extends DomainTestBase {
    *
    * @var array
    */
-  protected $langcodes = array('es' => 'Spanish');
+  protected $langcodes = ['es' => 'Spanish'];
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = array('domain', 'language', 'domain_config_test', 'domain_config');
+  public static $modules = [
+    'domain',
+    'language',
+    'domain_config_test',
+    'domain_config',
+  ];
 
   /**
    * {@inheritdoc}
@@ -45,17 +51,17 @@ abstract class DomainConfigTestBase extends DomainTestBase {
     parent::setUp();
 
     // Create and login user.
-    $admin_user = $this->drupalCreateUser(array('administer languages', 'access administration pages'));
+    $admin_user = $this->drupalCreateUser(['administer languages', 'access administration pages']);
     $this->drupalLogin($admin_user);
 
     // Add language.
-    $edit = array(
+    $edit = [
       'predefined_langcode' => 'es',
-    );
+    ];
     $this->drupalPostForm('admin/config/regional/language/add', $edit, t('Add language'));
 
     // Enable URL language detection and selection.
-    $edit = array('language_interface[enabled][language-url]' => '1');
+    $edit = ['language_interface[enabled][language-url]' => '1'];
     $this->drupalPostForm('admin/config/regional/language/detection', $edit, t('Save settings'));
 
     $this->drupalLogout();

@@ -14,20 +14,31 @@ class DomainConfigAlterHookTest extends DomainConfigTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_config', 'domain_config_test', 'domain_config_middleware_test');
+  public static $modules = [
+    'domain',
+    'domain_config',
+    'domain_config_test',
+    'domain_config_middleware_test',
+  ];
 
   /**
    * Domain id key.
+   *
+   * @var string
    */
   public $key = 'example_com';
 
   /**
    * The domain negotiator service.
+   *
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
   public $negotiator;
 
   /**
-   * The mondule handler service.
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   public $moduleHandler;
 

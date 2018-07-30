@@ -3,7 +3,6 @@
 namespace Drupal\domain_config;
 
 use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
@@ -33,14 +32,14 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * The domain context of the request.
    *
-   * @var \Drupal\domain\DomainInterface $domain
+   * @var \Drupal\domain\DomainInterface
    */
   protected $domain;
 
   /**
    * The language context of the request.
    *
-   * @var \Drupal\Core\Language\LanguageInterface $language
+   * @var \Drupal\Core\Language\LanguageInterface
    */
   protected $language;
 
@@ -56,7 +55,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
   /**
    * Indicates that the request context is set.
    *
-   * @var boolean
+   * @var bool
    */
   protected $contextSet;
 
@@ -74,7 +73,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    $overrides = array();
+    $overrides = [];
     // loadOverrides() runs on config entities, which means that if we try
     // to run this routine on our own data, then we end up in an infinite loop.
     // So ensure that we are _not_ looking up a domain.record.*.
@@ -183,7 +182,8 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $this->domainNegotiator = \Drupal::service('domain.negotiator');
     // Get the domain context.
     $this->domain = $this->domainNegotiator->getActiveDomain();
-    // If we have fired too early in the bootstrap, we must force the routine to run.
+    // If we have fired too early in the bootstrap, we must force the routine to
+    // run.
     if (empty($this->domain)) {
       $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
     }

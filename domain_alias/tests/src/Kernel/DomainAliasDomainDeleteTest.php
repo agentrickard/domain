@@ -45,8 +45,8 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
     $this->domainCreateTestDomains(2);
 
     // Get the services.
-    $this->domainStorage = \Drupal::service('entity_type.manager')->getStorage('domain');
-    $this->aliasStorage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $this->domainStorage = \Drupal::entityTypeManager()->getStorage('domain');
+    $this->aliasStorage = \Drupal::entityTypeManager()->getStorage('domain_alias');
   }
 
   /**
