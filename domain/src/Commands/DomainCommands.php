@@ -13,7 +13,7 @@ use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
-
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * A Drush commandfile.
@@ -966,14 +966,16 @@ class DomainCommands extends DrushCommands {
    *
    * If run from a subfolder, you must specify the --uri.
    *
-   * @param $domain_id
-   *   The numeric id or hostname of the domain to test. If no value is passed,
-   *   all domains are tested.
-    * @param array $options An associative array of options whose values come
-    *   from cli, aliases, config, etc.
+   * @option $domain
+   *   The hostname or domain machine name of the domain to test. If no value
+   *   is passed then all domains are tested.
+   * @param array $options An associative array of options whose values come
+   *   from cli, aliases, config, etc.
    * @option base_path
    *   The subdirectory name if Drupal is installed in a folder other than
    *   server root.
+   * @option chatty
+   *   Be more verbose about what is happening.
    * @usage drush domain-test
    * @usage drush domain-test example.com
    *
@@ -982,25 +984,29 @@ class DomainCommands extends DrushCommands {
    * 
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function test($domain_id, array $options = ['base_path' => null]) {
+  public function test(array $options = ['domain' => null, 'base_path' => InputOption::VALUE_REQUIRED, 'chatty' => null]) {
     $domain_storage = $this->getStorage();
 
     // TODO: This won't work in a subdirectory without a parameter.
     // RIC: What is the intended benaviour here?
+    $domain = $options['domain'];
+    $chatty = $options['chatty'];
     if ($base_path = $options['base_path']) {
       $GLOBALS['base_path'] = '/' . $base_path . '/';
     }
-    if (is_null($domain_id)) {
+    if (is_null($domain)) {
       $domains =$domain_storage->loadMultiple(NULL);
     }
     else {
-      if ($domain = $this->getDomainFromArgument($domain_id)) {
+      if ($domain = $this->getDomainFromArgument($domain)) {
         $domains = [$domain];
       }
       else {
-        return;
+        throw new DomainCommandException(dt('Domain @domain not found.',
+          ['@domain' => $options['domain']]));
       }
     }
+
     foreach ($domains as $domain) {
       if ($domain->getResponse() != 200) {
         $this->logger()->error(dt('Fail: !error. Please pass a --uri parameter or a --base_path to retest.' ,
