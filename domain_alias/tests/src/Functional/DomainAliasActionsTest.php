@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
-
 /**
  * Tests the domain record actions on environments.
  *
@@ -16,20 +14,13 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_alias', 'user');
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
+  public static $modules = ['domain', 'domain_alias', 'user'];
 
   /**
    * Tests bulk actions through the domain overview page.
    */
   public function testDomainActions() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));
+    $this->admin_user = $this->drupalCreateUser(['administer domains', 'access administration pages']);
     $this->drupalLogin($this->admin_user);
 
     // Create test domains.
@@ -42,8 +33,8 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
     // Save these for later testing.
     $original_domains = $domains;
 
-    $base = $this->base_hostname;
-    $hostnames = [$base, 'one.' . $base, 'two.'. $base];
+    $base = $this->baseHostname;
+    $hostnames = [$base, 'one.' . $base, 'two.' . $base];
 
     // Our patterns should map to example.com, one.example.com, two.example.com.
     $patterns = ['*.' . $base, 'four.' . $base, 'five.' . $base];
@@ -82,7 +73,7 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
       $this->assertText($name, 'Name found properly.');
     }
     // Test the list of actions.
-    $actions = array('delete', 'disable', 'default');
+    $actions = ['delete', 'disable', 'default'];
     foreach ($actions as $action) {
       $this->assertRaw("/domain/{$action}/", 'Actions found properly.');
     }
@@ -107,7 +98,7 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
     }
 
     // Test the list of actions.
-    $actions = array('enable', 'delete', 'disable', 'default');
+    $actions = ['enable', 'delete', 'disable', 'default'];
     foreach ($actions as $action) {
       $this->assertRaw("/domain/{$action}/", 'Actions found properly.');
     }
@@ -144,4 +135,3 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
   }
 
 }
-

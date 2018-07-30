@@ -21,10 +21,11 @@ class DomainAliasAccessControlHandler extends DomainAccessControlHandler {
     if ($account->hasPermission('administer domain aliases')) {
       return AccessResult::allowed();
     }
-    // For other actions we allow admin if they can administer the parent domains.
+    // For other actions we allow admin if they can administer the parent
+    // domains.
     $domain = $entity->getDomain();
-    // If this account can administer the domain, allow access to actions based on
-    // permission.
+    // If this account can administer the domain, allow access to actions based
+    // on permission.
     if ($is_admin = $this->isDomainAdmin($domain, $account)) {
       if ($operation == 'view' && $account->hasPermission('view domain aliases')) {
         return AccessResult::allowed();

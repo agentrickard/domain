@@ -78,7 +78,7 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
   /**
    * The domain alias record redirect value.
    *
-   * @var integer
+   * @var int
    */
   protected $redirect;
 

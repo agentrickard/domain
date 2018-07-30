@@ -3,7 +3,6 @@
 namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests domain alias request negotiation.
@@ -17,7 +16,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_alias', 'user', 'block');
+  public static $modules = ['domain', 'domain_alias', 'user', 'block'];
 
   /**
    * Tests the handling of aliased requests.
@@ -34,7 +33,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $this->drupalPlaceBlock('domain_server_block');
 
     // To get around block access, let the anon user view the block.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['administer domains']);
 
     // Set the storage handles.
     $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
@@ -57,7 +56,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     foreach ($alias_domains as $index => $alias_domain) {
       $prefix = $prefixes[$index];
       // Set a known pattern.
-      $pattern = $prefix . '.' . $this->base_hostname;
+      $pattern = $prefix . '.' . $this->baseHostname;
       $this->domainAliasCreateTestAlias($alias_domain, $pattern);
       $alias = $alias_storage->loadByPattern($pattern);
       // Set the URL for the request. Note that this is not saved, it is just
@@ -82,12 +81,12 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     // Test a wildcard alias.
     // @TODO: Refactor this test to merge with the above.
     $alias_domain = $domain_storage->loadDefaultDomain();
-    $pattern = '*.' . $this->base_hostname;
+    $pattern = '*.' . $this->baseHostname;
     $this->domainAliasCreateTestAlias($alias_domain, $pattern);
     $alias = $alias_storage->loadByPattern($pattern);
     // Set the URL for the request. Note that this is not saved, it is just
     // URL generation.
-    $alias_domain->set('hostname', 'four.' . $this->base_hostname);
+    $alias_domain->set('hostname', 'four.' . $this->baseHostname);
     $alias_domain->setPath();
     $url = $alias_domain->getPath();
     $this->drupalGet($url);
@@ -105,7 +104,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $this->drupalGet($url);
 
     // Revoke the permission change.
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
+    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['administer domains']);
   }
 
 }
