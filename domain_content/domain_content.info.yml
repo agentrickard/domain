@@ -5,8 +5,8 @@ package: Domain
 version: VERSION
 core: 8.x
 dependencies:
-  - domain
-  - domain_access
-  - node
-  - user
-  - views
+  - drupal:node
+  - drupal:user
+  - drupal:views
+  - domain:domain
+  - domain:domain_access
