@@ -1889,6 +1889,56 @@ function domain_get_node_match($nid) {
 }
 
 /**
+ * Get all possible published URLs pointing to a node.
+ *
+ * @param $node
+ *   A node object.
+ *
+ * @return array
+ *   An array of absolute URLs keyed by domain_id, with the canonical id
+ *   as the first element of the array.
+ */
+function domain_get_content_urls($node) {
+  $urls = array();
+  // If not set, return normal absolute url.
+  if (empty($node->domains)) {
+    $options['absolute'] = TRUE;
+    $urls[] = url('node/' . $node->id, $options);
+  }
+  $weight = -100;
+  foreach ($node->domains as $domain_id) {
+    $domain = domain_load($domain_id);
+    if (!$domain['valid']) {
+      continue;
+    }
+    // Calculate the proper path to the node.
+    $path = drupal_get_path_alias('node/' . $node->nid, $node->language);
+    $options['language'] = $node->language;
+    domain_path($domain_id, $path, $options, $path);
+
+    $url = $domain['path'] . $path;
+    // Order domains by weight.
+    if ($domain['weight'] > $weight) {
+      $new[$domain_id] = $url;
+      $urls = $new + $urls;
+    }
+    else {
+      $urls[$domain_id] = $url;
+    }
+    $weight = $domain['weight'];
+  }
+  // Determine the canonical URL and make it the first item.
+  // This only comes into play if domain source is used.
+  // Else we assume the first item in the array is canonical.
+  if (isset($node->domain_source) && isset($urls[$node->domain_source])) {
+    $canonical[$node->domain_source] = $urls[$node->domain_source];
+    unset($urls[$node->domain_source]);
+    $urls = $canonical + $urls;
+  }
+  return $urls;
+}
+
+/**
  * Allow the lookup of path rewrites.
  *
  * Note that unlike domain_get_node_match(), this function assumes
