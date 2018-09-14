@@ -107,8 +107,13 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
-    // Load the active domain.
-    $active_domain = $this->getActiveDomain();
+    // Load the active domain if not set.
+    if (empty($options['active_domain'])) {
+      $active_domain = $this->getActiveDomain();
+    }
+    else {
+      $active_domain = $options['active_domain'];
+    }
 
     // Only act on valid internal paths and when a domain loads.
     if (empty($active_domain) || empty($path) || !empty($options['external'])) {
@@ -267,4 +272,39 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     return $this->activeDomain;
   }
 
+  /**
+   * Get all possible URLs pointing to a node.
+   *
+   * @param $entity
+   *   An entity object.
+   *
+   * @return array
+   *   An array of absolute URLs keyed by domain_id, with an known canonical id
+   *   as the first element of the array.
+   */
+  public function getContentUrls($entity) {
+    // @TODO: inject this service.
+    $manager = \Drupal::service('domain_access.manager');
+    $domains = $manager->getAccessValues($entity);
+    $source = domain_source_get($entity);
+    if (isset($domains[$source])) {
+      unset($domains['source']);
+    }
+    $list = [];
+    if (!empty($source)) {
+      $list[] = $source;
+    }
+    $list = array_merge($list, array_keys($domains));
+    // @TODO: inject.
+    $storage = \Drupal::\Drupal::entityTypeManager()->getStorage('domain');
+    $domains = $storage->loadMultiple($list);
+    $urls = [];
+    foreach ($domains as $domain) {
+      $options['active_domain'] = $domain->getPath();
+      $url = $entity->toUrl('canonical', $options);
+      $urls[$domain->id()] = $url;
+    }
+
+    return $urls;
+  }
 }
