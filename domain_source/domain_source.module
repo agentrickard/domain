@@ -286,12 +286,3 @@ function domain_source_presave_generate(EntityInterface $entity) {
     }
   }
 }
-
-function domain_source_entity_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
-  if (isset($build['#node'])) {
-    $paths = \Drupal::service('domain_source.path_processor');
-    kint($entity);
-    $urls = $paths->getContentUrls($entity);
-    kint($urls);
-  }
-}
