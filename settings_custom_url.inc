@@ -118,7 +118,7 @@ function domain_url_outbound_alter(&$path, &$options, $original_path) {
       if (!isset($path_lookup[$name])) {
         $path_lookup[$name] = domain_get_path_match($path);
       }
-      if ($path_lookup[$name] != $_domain) {
+      if ($path_lookup[$name]['domain_id'] != $_domain['domain_id']) {
         $options['absolute'] = TRUE;
         // In this case, the $base_url cannot have a trailing slash
         $options['base_url'] = rtrim($path_lookup[$name]['path'], '/');
