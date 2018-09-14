@@ -111,9 +111,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     if (empty($options['active_domain'])) {
       $active_domain = $this->getActiveDomain();
     }
-    else {
-      $active_domain = $options['active_domain'];
-    }
 
     // Only act on valid internal paths and when a domain loads.
     if (empty($active_domain) || empty($path) || !empty($options['external'])) {
@@ -155,7 +152,13 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       if (!empty($langcode) && method_exists($entity, 'hasTranslation') && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
         $entity = $translation;
       }
-      if ($target_id = domain_source_get($entity)) {
+      if (isset($options['domain_target_id'])) {
+        $target_id = $options['domain_target_id'];
+      }
+      else {
+        $target_id = domain_source_get($entity);
+      }
+      if (!empty($target_id)) {
         $source = $this->domainStorage->load($target_id);
       }
       $options['entity'] = $entity;
@@ -164,6 +167,10 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     // One for other, because the latter is resource-intensive.
     else {
+      if (isset($options['domain_target_id'])) {
+        $target_id = $options['domain_target_id'];
+        $source = $this->domainStorage->load($target_id);
+      }
       $this->moduleHandler->alter('domain_source_path', $source, $path, $options);
     }
     // If a source domain is specified, rewrite the link.
@@ -296,13 +303,13 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     $list = array_merge($list, array_keys($domains));
     // @TODO: inject.
-    $storage = \Drupal::\Drupal::entityTypeManager()->getStorage('domain');
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
     $domains = $storage->loadMultiple($list);
     $urls = [];
     foreach ($domains as $domain) {
-      $options['active_domain'] = $domain->getPath();
+      $options['domain_target_id'] = $domain->id();
       $url = $entity->toUrl('canonical', $options);
-      $urls[$domain->id()] = $url;
+      $urls[$domain->id()] = $url->toString();
     }
 
     return $urls;
