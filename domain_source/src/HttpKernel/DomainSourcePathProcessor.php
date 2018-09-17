@@ -3,7 +3,6 @@
 namespace Drupal\domain_source\HttpKernel;
 
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Path\AliasManagerInterface;
@@ -24,13 +23,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $negotiator;
-
-  /**
-   * The Domain Access field manager.
-   *
-   * @var \Drupal\domain_access\DomainAccessManagerInterface
-   */
-  protected $domainAccessManager;
 
   /**
    * The module handler.
@@ -93,8 +85,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
-   * @param \Drupal\domain_access\DomainAccessManagerInterface
-   *   The domain access field manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -104,14 +94,13 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator, DomainAccessManagerInterface $domain_access_manager, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
+  public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager, AliasManagerInterface $alias_manager, ConfigFactoryInterface $config_factory) {
     $this->negotiator = $negotiator;
     $this->moduleHandler = $module_handler;
     $this->entityTypeManager = $entity_type_manager;
     $this->aliasManager = $alias_manager;
     $this->configFactory = $config_factory;
     $this->domainStorage = $entity_type_manager->getStorage('domain');
-    $this->domainAccessManager = $domain_access_manager;
   }
 
   /**
@@ -290,35 +279,4 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     return $this->activeDomain;
   }
 
-  /**
-   * Get all possible URLs pointing to a node.
-   *
-   * @param $entity
-   *   An entity object.
-   *
-   * @return array
-   *   An array of absolute URLs keyed by domain_id, with an known canonical id
-   *   as the first element of the array.
-   */
-  public function getContentUrls($entity) {
-    $domains = $this->domainAccessManager->getAccessValues($entity);
-    $source = domain_source_get($entity);
-    if (isset($domains[$source])) {
-      unset($domains['source']);
-    }
-    $list = [];
-    if (!empty($source)) {
-      $list[] = $source;
-    }
-    $list = array_merge($list, array_keys($domains));
-    $domains = $this->domainStorage->loadMultiple($list);
-    $urls = [];
-    foreach ($domains as $domain) {
-      $options['domain_target_id'] = $domain->id();
-      $url = $entity->toUrl('canonical', $options);
-      $urls[$domain->id()] = $url->toString();
-    }
-
-    return $urls;
-  }
 }

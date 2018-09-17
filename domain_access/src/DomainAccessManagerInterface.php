@@ -82,4 +82,16 @@ interface DomainAccessManagerInterface {
    */
   public function hasDomainPermissions(AccountInterface $account, DomainInterface $domain, array $permissions, $conjunction = 'AND');
 
+  /**
+   * Get all possible URLs pointing to a node.
+   *
+   * @param $entity
+   *   An entity object.
+   *
+   * @return array
+   *   An array of absolute URLs keyed by domain_id, with an known canonical id
+   *   as the first element of the array.
+   */
+  public function getContentUrls($entity);
+
 }

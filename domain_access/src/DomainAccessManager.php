@@ -3,7 +3,9 @@
 namespace Drupal\domain_access;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -24,13 +26,39 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   protected $negotiator;
 
   /**
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The domain storage.
+   *
+   * @var \Drupal\domain\DomainStorageInterface
+   */
+  protected $domainStorage;
+
+  /**
    * Constructs a DomainAccessManager object.
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The Drupal module handler.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(DomainNegotiatorInterface $negotiator) {
+  public function __construct(DomainNegotiatorInterface $negotiator, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager) {
     $this->negotiator = $negotiator;
+    $this->moduleHandler = $module_handler;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
   }
 
   /**
@@ -135,6 +163,39 @@ class DomainAccessManager implements DomainAccessManagerInterface {
     }
 
     return $access;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getContentUrls($entity) {
+    $list = [];
+    $processed = FALSE;
+    $domains = $this->getAccessValues($entity);
+    if ($this->moduleHandler->moduleExists('domain_source')) {
+      $source = domain_source_get($entity);
+      if (isset($domains[$source])) {
+        unset($domains['source']);
+      }
+      if (!empty($source)) {
+        $list[] = $source;
+      }
+      $processed = TRUE;
+    }
+    $list = array_merge($list, array_keys($domains));
+    $domains = $this->domainStorage->loadMultiple($list);
+    $urls = [];
+    foreach ($domains as $domain) {
+      $options['domain_target_id'] = $domain->id();
+      $url = $entity->toUrl('canonical', $options);
+      if ($processed) {
+        $urls[$domain->id()] = $url->toString();
+      }
+      else {
+        $urls[$domain->id()] = trim($domain->getPath(), '/') . $url->toString();
+      }
+    }
+    return $urls;
   }
 
 }

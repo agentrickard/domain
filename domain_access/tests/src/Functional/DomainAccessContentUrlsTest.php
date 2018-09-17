@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\domain_source\Functional;
+namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\domain\Functional\DomainTestBase;
@@ -8,16 +8,16 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
 /**
  * Tests behavior for getting all URLs for an entity.
  *
- * @group domain_source
+ * @group domain_access
  */
-class DomainSourceContentUrlsTest extends DomainTestBase {
+class DomainAccessContentUrlsTest extends DomainTestBase {
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'domain_source', 'field', 'node', 'user'];
+  public static $modules = ['domain', 'domain_access', 'field', 'node', 'user'];
 
   /**
    * {@inheritdoc}
@@ -32,7 +32,7 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
   /**
    * Tests domain source URLs.
    */
-  public function testDomainSourceUrls() {
+  public function testDomainContentUrls() {
     // Create a node, assigned to a source domain.
     $id = 'one_example_com';
 
@@ -40,20 +40,18 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
       'type' => 'page',
       'title' => 'foo',
       DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com', 'two_example_com'],
-      DOMAIN_ACCESS_ALL_FIELD => 0,
-      DOMAIN_SOURCE_FIELD => $id,
+      DOMAIN_ACCESS_ALL_FIELD => 0
     ];
     $node = $this->createNode($nodes_values);
 
     // Variables for our tests.
     $path = 'node/1';
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
-    $source = $domains[$id];
-    $expected = $source->getPath() . $path;
     $route_name = 'entity.node.canonical';
     $route_parameters = ['node' => 1];
     $uri = 'entity:' . $path;
     $uri_path = '/' . $path;
+    $expected = $uri_path;
     $options = [];
 
     // Get the link using Url::fromRoute().
@@ -72,11 +70,10 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
     $paths = \Drupal::service('domain_access.manager');
     $urls = $paths->getContentUrls($node);
     $expected = [
-      $id => $domains[$id]->getPath() . 'node/1',
       'example_com' => $domains['example_com']->getPath() . 'node/1',
+      $id => $domains[$id]->getPath() . 'node/1',
       'two_example_com' => $domains['two_example_com']->getPath() . 'node/1',
     ];
-
     $this->assertTrue($expected == $urls);
   }
 
