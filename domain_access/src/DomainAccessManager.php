@@ -168,7 +168,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * @inheritdoc
    */
-  public function getContentUrls($entity) {
+  public function getContentUrls(EntityInterface $entity) {
     $list = [];
     $processed = FALSE;
     $domains = $this->getAccessValues($entity);
