@@ -92,6 +92,6 @@ interface DomainAccessManagerInterface {
    *   An array of absolute URLs keyed by domain_id, with an known canonical id
    *   as the first element of the array.
    */
-  public function getContentUrls($entity);
+  public function getContentUrls(EntityInterface $entity);
 
 }
