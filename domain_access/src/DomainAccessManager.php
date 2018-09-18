@@ -64,7 +64,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * @inheritdoc
    */
-  public static function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
+  public static function getAccessValues(FieldableEntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
     // @TODO: static cache.
     $list = [];
     // @TODO In tests, $entity is returning NULL.
@@ -89,14 +89,14 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * @inheritdoc
    */
-  public static function getAllValue(EntityInterface $entity) {
+  public static function getAllValue(FieldableEntityInterface $entity) {
     return $entity->hasField(DOMAIN_ACCESS_ALL_FIELD) ? $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
   }
 
   /**
    * @inheritdoc
    */
-  public function checkEntityAccess(EntityInterface $entity, AccountInterface $account) {
+  public function checkEntityAccess(FieldableEntityInterface $entity, AccountInterface $account) {
     $entity_domains = $this->getAccessValues($entity);
     $user = \Drupal::entityTypeManager()->getStorage('user')->load($account->id());
     if (!empty($this->getAllValue($user)) && !empty($entity_domains)) {
@@ -168,7 +168,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * @inheritdoc
    */
-  public function getContentUrls(EntityInterface $entity) {
+  public function getContentUrls(FieldableEntityInterface $entity) {
     $list = [];
     $processed = FALSE;
     $domains = $this->getAccessValues($entity);
