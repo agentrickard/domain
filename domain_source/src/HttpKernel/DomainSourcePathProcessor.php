@@ -107,8 +107,10 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
-    // Load the active domain.
-    $active_domain = $this->getActiveDomain();
+    // Load the active domain if not set.
+    if (empty($options['active_domain'])) {
+      $active_domain = $this->getActiveDomain();
+    }
 
     // Only act on valid internal paths and when a domain loads.
     if (empty($active_domain) || empty($path) || !empty($options['external'])) {
@@ -150,7 +152,13 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       if (!empty($langcode) && method_exists($entity, 'hasTranslation') && $entity->hasTranslation($langcode) && $translation = $entity->getTranslation($langcode)) {
         $entity = $translation;
       }
-      if ($target_id = domain_source_get($entity)) {
+      if (isset($options['domain_target_id'])) {
+        $target_id = $options['domain_target_id'];
+      }
+      else {
+        $target_id = domain_source_get($entity);
+      }
+      if (!empty($target_id)) {
         $source = $this->domainStorage->load($target_id);
       }
       $options['entity'] = $entity;
@@ -159,6 +167,10 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     }
     // One for other, because the latter is resource-intensive.
     else {
+      if (isset($options['domain_target_id'])) {
+        $target_id = $options['domain_target_id'];
+        $source = $this->domainStorage->load($target_id);
+      }
       $this->moduleHandler->alter('domain_source_path', $source, $path, $options);
     }
     // If a source domain is specified, rewrite the link.
