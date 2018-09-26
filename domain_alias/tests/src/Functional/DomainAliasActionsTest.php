@@ -33,7 +33,7 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
     // Save these for later testing.
     $original_domains = $domains;
 
-    $base = $this->baseHostname;
+    $base = $this->base_hostname;
     $hostnames = [$base, 'one.' . $base, 'two.' . $base];
 
     // Our patterns should map to example.com, one.example.com, two.example.com.
