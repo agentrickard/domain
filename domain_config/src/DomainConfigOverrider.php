@@ -73,6 +73,15 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
+    // Try to prevent repeating lookups.
+    static $lookups;
+    // Key should be a known length, so hash.
+    $key = md5(implode(':', $names));
+
+    if (isset($lookups[$key])) {
+      return $lookups[$key];
+    }
+
     $overrides = [];
     // loadOverrides() runs on config entities, which means that if we try
     // to run this routine on our own data, then we end up in an infinite loop.
@@ -80,6 +89,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     $check = current($names);
     $list = explode('.', $check);
     if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
+      $lookups[$key] = $overrides;
       return $overrides;
     }
     if (empty($this->contextSet)) {
@@ -107,6 +117,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
         }
       }
     }
+    $lookups[$key] = $overrides;
     return $overrides;
   }
 
