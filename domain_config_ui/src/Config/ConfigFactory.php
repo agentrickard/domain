@@ -62,7 +62,7 @@ class ConfigFactory extends CoreConfigFactory {
    * @param string $name
    *   The configuration name.
    */
-  protected function isAllowedDomainConfig(string $name) {
+  protected function isAllowedDomainConfig($name) {
     // Return original name if reserved not allowed.
     $is_allowed = FALSE;
     foreach ($this->allowedDomainConfig as $config_name) {
