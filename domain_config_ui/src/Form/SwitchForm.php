@@ -116,11 +116,10 @@ class SwitchForm extends FormBase {
         'callback' => '::switchCallback',
       ],
     ];
-
     // Add language select field.
-    $language_options = ['' => $this->t('Default')];
     $languages = $this->languageManager->getLanguages();
     if (count($languages) > 1) {
+      $language_options = ['' => $this->t('Default')];
       foreach ($languages as $id => $language) {
         $language_options[$id] = $language->getName();
       }
@@ -133,7 +132,16 @@ class SwitchForm extends FormBase {
           'callback' => '::switchCallback',
         ],
       ];
+      $form['domain_config_ui']['help'] = [
+        '#markup' => $this->t('Changing the domain or language will load its active configuration.'),
+      ];
     }
+    else {
+      $form['domain_config_ui']['help'] = [
+        '#markup' => $this->t('Changing the domain will load its active configuration.'),
+      ];
+    }
+
     return $form;
   }
 

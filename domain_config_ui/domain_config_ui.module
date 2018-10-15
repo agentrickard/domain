@@ -47,7 +47,7 @@ function domain_config_ui_save_warning_message() {
     new TranslatableMarkup('the @label domain',['@label' => $selected_domain->label()]) :
     new TranslatableMarkup('all domains');
   $language_label = !empty($selected_language) ? $selected_language->getName() : new TranslatableMarkup('all languages');
-  $message = new TranslatableMarkup('This configuration will be saved for @domain when displayed in @language', [
+  $message = new TranslatableMarkup('This configuration will be saved for @domain when displayed in @language.', [
     '@domain' => $domain_label,
     '@language' => $language_label,
   ]);
