@@ -17,13 +17,6 @@ abstract class DomainAliasTestBase extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_alias');
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
+  public static $modules = ['domain', 'domain_alias'];
 
 }

@@ -13,7 +13,7 @@ interface DomainAliasValidatorInterface {
    * @param \Drupal\domain_alias\DomainAliasInterface $alias
    *   The domain alias to validate.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup | NULL
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|null
    *   The validation error message, if any.
    */
   public function validate(DomainAliasInterface $alias);

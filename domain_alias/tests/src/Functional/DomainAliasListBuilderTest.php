@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
-
 /**
  * Tests behavior for the domain list builder.
  *
@@ -16,7 +14,7 @@ class DomainAliasListBuilderTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_alias', 'user');
+  public static $modules = ['domain', 'domain_alias', 'user'];
 
   /**
    * {@inheritdoc}
@@ -32,7 +30,7 @@ class DomainAliasListBuilderTest extends DomainAliasTestBase {
    * Basic test setup.
    */
   public function testDomainListBuilder() {
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
@@ -40,7 +38,7 @@ class DomainAliasListBuilderTest extends DomainAliasTestBase {
       'administer domains',
       'administer domain aliases',
       'view domain aliases',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
     $this->drupalGet('admin/config/domain');
@@ -53,14 +51,14 @@ class DomainAliasListBuilderTest extends DomainAliasTestBase {
     }
 
     // Now login as a user with limited rights.
-    $account = $this->drupalCreateUser(array(
+    $account = $this->drupalCreateUser([
       'create article content',
       'edit any article content',
       'edit assigned domains',
       'view domain list',
       'view domain aliases',
       'edit domain aliases',
-    ));
+    ]);
     $ids = ['example_com', 'one_example_com'];
     $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ADMIN_FIELD);
     $user_storage = \Drupal::entityTypeManager()->getStorage('user');
