@@ -142,6 +142,7 @@ class SwitchForm extends FormBase {
       ];
     }
 
+    // @TODO: Add cache contexts to form?
     return $form;
   }
 
