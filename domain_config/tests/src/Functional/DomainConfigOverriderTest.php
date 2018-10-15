@@ -73,12 +73,13 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     $this->drupalGet($domain_four->getPath() . 'user/login');
     $this->assertRaw('<title>Log in | Four overridden in settings</title>', 'Found overridden slogan for four.example.com.');
   }
+
   /**
    * Returns the expected site name value from our test configuration.
    *
-   * @param DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   The Domain object.
-   * @param $langcode
+   * @param string $langcode
    *   A two-digit language code.
    *
    * @return string

@@ -2,9 +2,7 @@
 
 namespace Drupal\domain_config\Routing;
 
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Routing\RouteProvider;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,12 +17,12 @@ class DomainRouteProvider extends RouteProvider {
   /**
    * Returns the cache ID for the route collection cache.
    *
-   * We are overridding the cache id by inserting the host to the cid.
-   *
-   * @see Drupal\Core\Routing\RouteProvider::getRouteCollectionCacheId()
+   * We are overriding the cache id by inserting the host to the cid.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
+   *
+   * @see \Drupal\Core\Routing\RouteProvider::getRouteCollectionCacheId()
    *
    * @return string
    *   The cache ID.

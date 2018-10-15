@@ -59,7 +59,8 @@ class CurrentDomainContext implements ContextProviderInterface {
    * {@inheritdoc}
    */
   public function getAvailableContexts() {
-    return $this->getRuntimeContexts([]);
+    $context = new Context(new ContextDefinition('entity:domain', $this->t('Active domain')));
+    return ['entity:domain' => $context];
   }
 
 }

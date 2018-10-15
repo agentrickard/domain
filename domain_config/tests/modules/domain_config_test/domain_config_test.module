@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Hook implementations for this module.
+ */
+
 use Drupal\domain\DomainInterface;
 
 /**
@@ -19,7 +24,7 @@ function domain_config_test_page_attachments_alter(array &$attachments) {
   if (!empty($domain) && $domain->get('config_test') == 'aye') {
     $attachments['#attached']['http_header'][] = [
       'X-Domain-Config-Test-page-attachments-hook',
-      'invoked'
+      'invoked',
     ];
   }
 }

@@ -1,7 +1,7 @@
 services:
   domain_access.manager:
     class: Drupal\domain_access\DomainAccessManager
-    arguments: ['@domain.negotiator']
+    arguments: ['@domain.negotiator', '@module_handler', '@entity_type.manager']
   access_check.domain_access_views:
     class: Drupal\domain_access\Access\DomainAccessViewsAccess
     arguments: ['@entity_type.manager', '@domain_access.manager']

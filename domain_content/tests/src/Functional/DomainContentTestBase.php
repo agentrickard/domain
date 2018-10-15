@@ -13,6 +13,8 @@ abstract class DomainContentTestBase extends DomainTestBase {
    * Disabled config schema checking.
    *
    * Domain Content is having issues with schema definition.
+   *
+   * @var bool
    */
   protected $strictConfigSchema = FALSE;
 
@@ -21,7 +23,7 @@ abstract class DomainContentTestBase extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_content');
+  public static $modules = ['domain', 'domain_content'];
 
   /**
    * An array of domains.
@@ -91,9 +93,9 @@ abstract class DomainContentTestBase extends DomainTestBase {
    * takes some concepts from Mink and rearranges them to work for our tests.
    * Notably, we don't pull page content from the session request.
    *
-   * @param $content
+   * @param string $content
    *   The generated HTML, such as from drupalGet().
-   * @param $text
+   * @param string $text
    *   The text string to search for.
    */
   public function checkContent($content, $text) {

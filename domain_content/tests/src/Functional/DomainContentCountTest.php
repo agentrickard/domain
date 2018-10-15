@@ -3,12 +3,15 @@
 namespace Drupal\Tests\domain_content\Functional;
 
 /**
- * Creates editors and users and count them on the overview page
+ * Creates editors and users and count them on the overview page.
  *
  * @group domain_content
  */
 class DomainContentCountTest extends DomainContentTestBase {
 
+  /**
+   * Tests domain content count.
+   */
   public function testDomainContentCount() {
     // This user should be able to see everything.
     $this->admin_user = $this->drupalCreateUser([
@@ -18,7 +21,7 @@ class DomainContentCountTest extends DomainContentTestBase {
       'access domain content editors',
       'publish to any domain',
       'assign editors to any domain',
-      ]);
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Create users and content.
