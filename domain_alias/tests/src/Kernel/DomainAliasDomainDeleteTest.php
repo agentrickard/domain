@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\domain_alias\Kernel;
 
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 use Drupal\Tests\domain_alias\Traits\DomainAliasTestTrait;
 
@@ -20,15 +19,19 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_alias');
+  public static $modules = ['domain', 'domain_alias'];
 
   /**
    * The Domain storage handler service.
+   *
+   * @var \Drupal\domain\DomainStorageInterface
    */
   public $domainStorage;
 
   /**
    * The Domain alias storage handler service.
+   *
+   * @var \Drupal\domain_alias\DomainAliasStorageInterface
    */
   public $aliasStorage;
 
@@ -53,7 +56,7 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
     $domains = $this->domainStorage->loadMultiple();
     $patterns = [
       'example_com' => '*.example.com',
-      'one_example_com' => 'foo.example.com'
+      'one_example_com' => 'foo.example.com',
     ];
 
     // Create an alias.

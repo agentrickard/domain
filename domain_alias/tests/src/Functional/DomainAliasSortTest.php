@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
-
 /**
  * Tests domain alias request sorting.
  *
@@ -22,14 +20,13 @@ class DomainAliasSortTest extends DomainAliasTestBase {
       $patterns = $storage->getPatterns($key);
       $this->assertTrue(empty(array_diff($values, $patterns)), 'Pattern matched as expected for ' . $key);
     }
-
   }
 
   /**
    * An array of expected matches to specific domains.
    */
   private function sortList() {
-    return array(
+    return [
       'example.com' => [
         'example.com',
         'example.*',
@@ -79,8 +76,7 @@ class DomainAliasSortTest extends DomainAliasTestBase {
         '*.com:8080',
         '*.com:*',
       ],
-    );
+    ];
   }
 
 }
-
