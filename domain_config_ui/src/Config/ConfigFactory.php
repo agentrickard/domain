@@ -185,9 +185,19 @@ class ConfigFactory extends CoreConfigFactory {
   protected function loadDomainOverrides(array $names) {
     $overrides = [];
     foreach ($names as $name) {
+      // Try to load the language-specific domain override.
       $config_name = $this->domainConfigUIManager->getSelectedConfigName($name);
       if ($override = $this->storage->read($config_name)) {
         $overrides[$name] = $override;
+      }
+      // If we tried to load a language-sensitive file and failed, load the
+      // domain-specific override.
+      elseif ($this->domainConfigUIManager->getSelectedLanguageId())  {
+        $omit_language = TRUE;
+        $config_name = $this->domainConfigUIManager->getSelectedConfigName($name, $omit_language);
+        if ($override = $this->storage->read($config_name)) {
+          $overrides[$name] = $override;
+        }
       }
     }
     return $overrides;

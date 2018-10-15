@@ -33,11 +33,13 @@ class DomainConfigUIManager {
    *
    * @param string $name
    *   The config name.
+   * @param boolean $omit_language
+   *   A flag to indicate if the language-sensitive config should be loaded.
    */
-  public function getSelectedConfigName($name) {
+  public function getSelectedConfigName($name, $omit_language = FALSE) {
     if ($domain_id = $this->getSelectedDomainId()) {
       $prefix = "domain.config.{$domain_id}.";
-      if ($langcode = $this->getSelectedLanguageId()) {
+      if (!$omit_language && $langcode = $this->getSelectedLanguageId()) {
         $prefix .= "{$langcode}.";
       }
       return $prefix . $name;
