@@ -16,7 +16,13 @@ function domain_config_ui_preprocess_page(&$variables) {
     || !domain_config_ui_route_is_allowed()) {
     return;
   }
-kint($variables);
+  $route = \Drupal::routeMatch()->getRouteObject();
+  if ($route->hasDefault('_form')) {
+    $form_name = $route->getDefault('_form');
+    if (method_exists($form_name, 'getEditableConfigNames')) {
+      // @TODO - we know this is a config form. But for which config object?
+    }
+  }
   // Add domain switch form that will reload the page to top of content region.
   $form = \Drupal::formBuilder()
     ->getForm('Drupal\domain_config_ui\Form\SwitchForm');
@@ -45,24 +51,21 @@ function domain_config_ui_save_warning_message() {
   }
   $domain_label = !empty($selected_domain) ?
     new TranslatableMarkup('the @label domain',['@label' => $selected_domain->label()]) :
-    new TranslatableMarkup('all domains');
+    new TranslatableMarkup('all domains without custom settings');
 
   // @TODO: Check for overrides.
   $config_factory = \Drupal::service('domain_config_ui.factory');
 
   $languages = \Drupal::service('language_manager')->getLanguages();
-  if (count($languages > 1)) {
+  if (count($languages) > 1) {
     $language_label = !empty($selected_language) ? $selected_language->getName() : new TranslatableMarkup('all languages without custom settings.');
-    $config_status = 'false';
   }
   else {
     $language_label = !empty($selected_language) ? $selected_language->getName() : new TranslatableMarkup('all languages.');
-    $config_status = 'true';
   }
-  $message = new TranslatableMarkup('This configuration will be saved for @domain when displayed in @language<br/> @config_status', [
+  $message = new TranslatableMarkup('This configuration will be saved for @domain when displayed in @language', [
     '@domain' => $domain_label,
     '@language' => $language_label,
-    '@config_status' => $config_status,
   ]);
 
   return [
