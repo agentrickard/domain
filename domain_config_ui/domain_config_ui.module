@@ -6,33 +6,51 @@
  */
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
  * Implements hook_preprocess_page().
  */
 function domain_config_ui_preprocess_page(&$variables) {
-  if (!domain_config_ui_route_is_admin()
-    || !domain_config_ui_route_is_allowed()) {
+  $content = [];
+  if (!domain_config_ui_route_is_admin()) {
     return;
   }
-  $route = \Drupal::routeMatch()->getRouteObject();
-  if ($route->hasDefault('_form')) {
-    $form_name = $route->getDefault('_form');
-    if (method_exists($form_name, 'getEditableConfigNames')) {
-      // @TODO - we know this is a config form. But for which config object?
+  if (!domain_config_ui_route_is_allowed()) {
+    if (\Drupal::currentUser()->hasPermission('administer domain config ui')) {
+      $route = \Drupal::routeMatch()->getRouteObject();
+      // @TODO: add a disable operation too.
+      if ($route->hasDefault('_form')) {
+        $form_name = $route->getDefault('_form');
+        if (method_exists($form_name, 'getEditableConfigNames')) {
+          $params = [
+            'op' => 'enable',
+            'route_name' => \Drupal::routeMatch()->getRouteName(),
+          ];
+          $content['domain_config_ui_add'] = [
+            '#type' => 'link',
+            '#url' => Url::fromRoute('domain_config_ui.inline_action', $params),
+            '#title' => 'Test',
+            '#prefix' => '<div class="messages messages--warning">',
+            '#suffix' => '</div>',
+          ];
+        }
+      }
     }
   }
-  // Add domain switch form that will reload the page to top of content region.
-  $form = \Drupal::formBuilder()
-    ->getForm('Drupal\domain_config_ui\Form\SwitchForm');
-  $content = ['domain_config_ui_switch' => $form];
-  // Add a message below the form showing the current domain.
-  if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message()) {
-    $content['domain_config_ui_switch_warning'] = $warning_message;
+  else {
+    // Add domain switch form that will reload the page to top of content region.
+    $form = \Drupal::formBuilder()->getForm('Drupal\domain_config_ui\Form\SwitchForm');
+    $content = ['domain_config_ui_switch' => $form];
+    // Add a message below the form showing the current domain.
+    if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message()) {
+      $content['domain_config_ui_switch_warning'] = $warning_message;
+    }
   }
-
-  $variables['page']['content'] = array_merge($content, $variables['page']['content']);
+  if ($content) {
+    $variables['page']['content'] = array_merge($content, $variables['page']['content']);
+  }
 }
 
 /**

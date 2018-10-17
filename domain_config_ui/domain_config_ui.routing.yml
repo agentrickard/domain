@@ -5,3 +5,11 @@ domain_config_ui.settings:
     _form: '\Drupal\domain_config_ui\Form\SettingsForm'
   requirements:
     _permission: 'administer domain config ui'
+domain_config_ui.inline_action:
+  path: '/admin/config/domain/config_ui/{op}'
+  defaults:
+    _controller: 'Drupal\domain_config_ui\Controller\DomainConfigUIController::ajaxOperation'
+  requirements:
+    _permission: 'administer domain config ui'
+    _csrf_token: 'TRUE'
+    op: 'enable|disable'
