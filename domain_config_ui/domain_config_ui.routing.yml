@@ -6,7 +6,7 @@ domain_config_ui.settings:
   requirements:
     _permission: 'administer domain config ui'
 domain_config_ui.inline_action:
-  path: '/admin/config/domain/config_ui/{op}'
+  path: '/admin/config/domain/config_ui/{route_name}/{op}'
   defaults:
     _controller: 'Drupal\domain_config_ui\Controller\DomainConfigUIController::ajaxOperation'
   requirements:

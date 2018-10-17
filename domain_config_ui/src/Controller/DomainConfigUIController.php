@@ -32,34 +32,29 @@ class DomainConfigUIController {
    *
    * @see \Drupal\domain\DomainListBuilder
    */
-  public function ajaxOperation($op) {
+  public function ajaxOperation($route_name, $op) {
     $success = FALSE;
-    switch ($op) {
-      case 'default':
-        $domain->saveDefault();
-        $message = $this->t('Domain record set as default');
-        if ($domain->isDefault()) {
-          $success = TRUE;
-        }
-        break;
+    $url = Url::fromRoute($route_name);
+    // Get current module settings.
+    $config = \Drupal::configFactory()->getEditable('domain_config_ui.settings');
+    $path_pages = $config->get('path_pages');
 
-      case 'enable':
-        $domain->enable();
-        $message = $this->t('Domain record has been enabled.');
-        if ($domain->status()) {
+    // Check to see if we already registered this form.
+    $exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages);
+    if (!$exists && !$url->isExternal() && $url->access()) {
+      switch ($op) {
+        case 'enable':
+          // TODO: reverse logic if negate is turned on.
+          $config->set('path_pages', $path_pages . "\r\n" . $url->toString())
+            ->save();
+          $message = $this->t('Form added to domain configuration interface.');
           $success = TRUE;
-        }
-        break;
+          break;
+        case 'disable':
+          break;
+      }
 
-      case 'disable':
-        $domain->disable();
-        $message = $this->t('Domain record has been disabled.');
-        if (!$domain->status()) {
-          $success = TRUE;
-        }
-        break;
     }
-
     // Set a message.
     if ($success) {
       \Drupal::messenger()->addMessage($message);
@@ -69,7 +64,6 @@ class DomainConfigUIController {
     }
 
     // Return to the invoking page.
-    $url = Url::fromRoute('domain.admin', array(), array('absolute' => TRUE));
     return new RedirectResponse($url->toString(), 302);
   }
 
