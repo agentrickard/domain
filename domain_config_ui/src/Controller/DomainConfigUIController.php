@@ -15,22 +15,17 @@ class DomainConfigUIController {
   use StringTranslationTrait;
 
   /**
-   * Handles AJAX operations from the overview form.
+   * Handles AJAX operations to add/remove configuration forms.
    *
-   * @param \Drupal\domain\DomainInterface $domain
+   * @param $route_name
    *   A domain record object.
    * @param string $op
-   *   The operation being performed, either 'default' to make the domain record
-   *   the default, 'enable' to enable the domain record, or 'disable' to
-   *   disable the domain record.
-   *
-   *   Note: The delete action is handled by the entity form system.
+   *   The operation being performed, either 'enable' to enable the form, or
+   *   'disable' to disable the domain form.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
-   *   A redirect response to redirect back to the domain record list.
+   *   A redirect response to redirect back to the calling form.
    *   Supported by the UrlGeneratorTrait.
-   *
-   * @see \Drupal\domain\DomainListBuilder
    */
   public function ajaxOperation($route_name, $op) {
     $success = FALSE;
