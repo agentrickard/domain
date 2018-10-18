@@ -86,21 +86,19 @@ class DomainConfigUIController {
     );
     // @TODO: inject services.
     $storage = \Drupal::service('config.storage');
-    foreach ($storage->listAll() as $name) {
-      $elements = $this->deriveElements($name);
-      if ($elements['prefix'] == 'domain' && $elements['config'] == 'config') {
-        $items[] = $elements;
-      }
+    foreach ($storage->listAll('domain.config') as $name) {
+      $elements[] = $this->deriveElements($name);
     }
     // Sort the items.
-    uasort($items, [$this, 'sortItems']);
+    uasort($elements, [$this, 'sortItems']);
 
-    foreach ($items as $element) {
+    foreach ($elements as $element) {
       $page['table'][] = [
         'name' => ['#markup' => $element['name']],
         'item' => ['#markup' => $element['item']],
         'domain' => ['#markup' => $element['domain']],
         'language' => ['#markup' => $element['language']],
+
       ];
     }
     return $page;
