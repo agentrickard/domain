@@ -75,9 +75,79 @@ class DomainConfigUIController {
    * Lists all stored configuration.
    */
   public function overview() {
-    return [
-      '#markup' => 'test',
+    $page['table'] = array(
+      '#type' => 'table',
+      '#header' => [
+        'name' => t('Configuration key'),
+        'item' => t('Item'),
+        'domain' => t('Domain'),
+        'language' => t('Language')
+      ],
+    );
+    // @TODO: inject services.
+    $storage = \Drupal::service('config.storage');
+    foreach ($storage->listAll() as $name) {
+      $elements = $this->deriveElements($name);
+      if ($elements['prefix'] == 'domain' && $elements['config'] == 'config') {
+        $items[] = $elements;
+      }
+    }
+    // Sort the items.
+    uasort($items, [$this, 'sortItems']);
+
+    foreach ($items as $element) {
+      $page['table'][] = [
+        'name' => ['#markup' => $element['name']],
+        'item' => ['#markup' => $element['item']],
+        'domain' => ['#markup' => $element['domain']],
+        'language' => ['#markup' => $element['language']],
+      ];
+    }
+    return $page;
+  }
+
+  /**
+   * Derives the parts of a config object for presentation.
+   *
+   * @param $name
+   *   A configuration object name.
+   *
+   * @return array
+   */
+  public function deriveElements($name) {
+    // @TODO: inject services.
+    $entity_manager = \Drupal::entityTypeManager();
+    $items = explode('.', $name);
+    $elements = [
+      'prefix' => $items[0],
+      'config' => isset($items[1]) && isset($items[2]) ? $items[1] : '',
+      'domain' => isset($items[2]) && isset($items[3]) ? $items[2] : '',
+      'language' => isset($items[3]) && isset($items[4]) && strlen($items[3]) == 2 ? $items[3] : '',
     ];
+
+    $elements['item'] = trim(str_replace($elements, '', $name), '.');
+
+    if (!empty($elements['domain']) && $domain = $entity_manager->getStorage('domain')->load($elements['domain'])) {
+      $elements['domain'] = $domain->label();
+    }
+
+    if (!$elements['language']) {
+      $elements['language'] = $this->t('all');
+    }
+    elseif ($language = \Drupal::languageManager()->getLanguage($elements['language'])) {
+      $elements['language'] = $language->getName();
+    }
+
+    $elements['name'] = $name;
+
+    return $elements;
+  }
+
+  /**
+   * Sorts items by parent config.
+   */
+  public function sortItems($a, $b) {
+    return $a['item'] > $b['item'];
   }
 
 }
