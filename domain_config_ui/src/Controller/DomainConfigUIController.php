@@ -20,8 +20,9 @@ class DomainConfigUIController {
    * @param $route_name
    *   A domain record object.
    * @param string $op
-   *   The operation being performed, either 'enable' to enable the form, or
-   *   'disable' to disable the domain form.
+   *   The operation being performed, either 'enable' to enable the form,
+   *   'disable' to disable the domain form, or 'remove' to disable the form
+   *   and remove its stored configurations.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response to redirect back to the calling form.
