@@ -70,4 +70,13 @@ class DomainConfigUIController {
     return new RedirectResponse($url->toString(), 302);
   }
 
+  /**
+   * Lists all stored configuration.
+   */
+  public function overview() {
+    return [
+      '#markup' => 'test',
+    ];
+  }
+
 }
