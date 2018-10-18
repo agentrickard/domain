@@ -39,18 +39,27 @@ class DomainConfigUIController {
     $config = \Drupal::configFactory()->getEditable('domain_config_ui.settings');
     $path_pages = $config->get('path_pages');
 
-    // Check to see if we already registered this form.
-    $exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages);
-    if (!$exists && !$url->isExternal() && $url->access()) {
+    if (!$url->isExternal() && $url->access()) {
       switch ($op) {
         case 'enable':
-          // TODO: reverse logic if negate is turned on.
-          $config->set('path_pages', $path_pages . "\r\n" . $url->toString())
-            ->save();
-          $message = $this->t('Form added to domain configuration interface.');
-          $success = TRUE;
+          // Check to see if we already registered this form.
+          if (!$exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
+            // TODO: reverse logic if negate is turned on.
+            $config->set('path_pages', $path_pages . $url->toString() . "\r\n")
+              ->save();
+            $message = $this->t('Form added to domain configuration interface.');
+            $success = TRUE;
+          }
           break;
         case 'disable':
+          if ($exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
+            $new_pages = str_replace($url->toString(), '', $path_pages);
+            $config->set('path_pages', $new_pages)
+              ->save();
+            $message = $this->t('Form removed domain configuration interface.');
+            $success = TRUE;
+            // @TODO: Remove existing cofiguration as a separate action.
+          }
           break;
       }
 
@@ -62,7 +71,6 @@ class DomainConfigUIController {
     else {
       \Drupal::messenger()->addMessage($this->t('The operation failed.'));
     }
-
     // Return to the invoking page.
     return new RedirectResponse($url->toString(), 302);
   }
