@@ -18,30 +18,8 @@ function domain_config_ui_preprocess_page(&$variables) {
     return;
   }
   if (!domain_config_ui_route_is_allowed()) {
-    if (\Drupal::currentUser()->hasPermission('administer domain config ui')) {
-      $route = \Drupal::routeMatch()->getRouteObject();
-      // Never allow this module's settings page.
-      if ($route->getPath() == '/admin/config/domain/config-ui') {
-        return;
-      }
-      // @TODO: add a disable operation too.
-      if ($route->hasDefault('_form')) {
-        $form_name = $route->getDefault('_form');
-        if (method_exists($form_name, 'getEditableConfigNames')) {
-          $params = [
-            'op' => 'enable',
-            'route_name' => \Drupal::routeMatch()->getRouteName(),
-          ];
-          $content['domain_config_ui_add'] = [
-            '#type' => 'link',
-            '#url' => Url::fromRoute('domain_config_ui.inline_action', $params),
-            '#title' => new TranslatableMarkup('Make this form configurable for each domain'),
-            '#prefix' => '<div class="messages messages--warning">',
-            '#suffix' => '</div>',
-          ];
-        }
-      }
-    }
+    $admin_form = domain_config_ui_admin_form('enable');
+    $content = ['domain_config_ui_admin' => $admin_form];
   }
   else {
     // Add domain switch form that will reload the page to top of content region.
@@ -50,6 +28,8 @@ function domain_config_ui_preprocess_page(&$variables) {
     // Add a message below the form showing the current domain.
     if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message()) {
       $content['domain_config_ui_switch_warning'] = $warning_message;
+      $admin_form = domain_config_ui_admin_form('disable');
+      $content['domain_config_ui_admin'] = $admin_form;
     }
   }
   if ($content) {
@@ -58,7 +38,47 @@ function domain_config_ui_preprocess_page(&$variables) {
 }
 
 /**
- * Helper to generate the markup for the domain save warning message.
+ * Generates the markup for the AJAX admin action.
+ *
+ * @param $op
+ *   An operation: either 'enable' or 'disable' are allowed.
+ */
+function domain_config_ui_admin_form($op) {
+  $admin_form = [];
+  if (\Drupal::currentUser()->hasPermission('administer domain config ui')) {
+    $route = \Drupal::routeMatch()->getRouteObject();
+    // Never allow this module's settings page.
+    if ($route->getPath() == '/admin/config/domain/config-ui') {
+      return $admin_form;
+    }
+    // @TODO: add a disable operation too.
+    if ($route->hasDefault('_form')) {
+      $form_name = $route->getDefault('_form');
+      if (method_exists($form_name, 'getEditableConfigNames')) {
+        $params = [
+          'op' => $op,
+          'route_name' => \Drupal::routeMatch()->getRouteName(),
+        ];
+        $title = new TranslatableMarkup('Make this form configurable for each domain');
+        if ($op == 'disable') {
+          $title = new TranslatableMarkup('Disable domain-based configurable for this form');
+        }
+        // @TODO: Make this look like a local task?
+        $admin_form = [
+          '#type' => 'link',
+          '#url' => Url::fromRoute('domain_config_ui.inline_action', $params),
+          '#title' => $title,
+          '#prefix' => '<div class="messages messages--warning">',
+          '#suffix' => '</div>',
+        ];
+      }
+    }
+  }
+  return $admin_form;
+}
+
+/**
+ * Generates the markup for the domain save warning message.
  */
 function domain_config_ui_save_warning_message() {
   $manager = \Drupal::service('domain_config_ui.manager');
