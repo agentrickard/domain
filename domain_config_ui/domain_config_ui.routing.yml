@@ -19,4 +19,12 @@ domain_config_ui.inline_action:
   requirements:
     _permission: 'administer domain config ui'
     _csrf_token: 'TRUE'
-    op: 'enable|disable|remove'
+    op: 'enable|disable'
+domain_config_ui.delete:
+  path: '/admin/config/domain/config_ui/delete/{config_name}'
+  defaults:
+    _title: 'Delete domain configuration'
+    _form: '\Drupal\domain_config_ui\Form\DeleteForm'
+    config_name: NULL
+  requirements:
+    _permission: 'administer domain config ui'

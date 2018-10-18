@@ -98,7 +98,10 @@ class DomainConfigUIController {
         'item' => ['#markup' => $element['item']],
         'domain' => ['#markup' => $element['domain']],
         'language' => ['#markup' => $element['language']],
-
+        'delete' => ['#type' => 'link',
+          '#url' => Url::fromRoute('domain_config_ui.delete', ['config_name' => $element['name']]),
+          '#title' => $this->t('Delete'),
+        ],
       ];
     }
     return $page;
