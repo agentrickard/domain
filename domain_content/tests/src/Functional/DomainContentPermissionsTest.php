@@ -9,6 +9,9 @@ namespace Drupal\Tests\domain_content\Functional;
  */
 class DomainContentPermissionsTest extends DomainContentTestBase {
 
+  /**
+   * Tests domain content permissions.
+   */
   public function testDomainContentPermissions() {
     // This user should be able to see everything.
     $this->admin_user = $this->drupalCreateUser([
@@ -50,7 +53,7 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
         $this->assertResponse(200);
       }
     }
-    // This user should be able to see everything but all affiliates
+    // This user should be able to see everything but all affiliates.
     $this->limited_user = $this->drupalCreateUser([
       'administer domains',
       'access administration pages',

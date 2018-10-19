@@ -16,7 +16,7 @@ interface DomainAccessManagerInterface {
   /**
    * Get the domain access field values from an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The entity to retrieve field data from.
    * @param string $field_name
    *   The name of the field that holds our data.
@@ -24,23 +24,23 @@ interface DomainAccessManagerInterface {
    * @return array
    *   The domain access field values.
    */
-  public static function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD);
+  public static function getAccessValues(FieldableEntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD);
 
   /**
    * Get the all affiliates field values from an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The entity to retrieve field data from.
    *
    * @return bool
    *   Returns TRUE if the entity is sent to all affiliates.
    */
-  public static function getAllValue(EntityInterface $entity);
+  public static function getAllValue(FieldableEntityInterface $entity);
 
   /**
    * Compare the entity values against a user's account assignments.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The entity being checked for access.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The account of the user performing the action.
@@ -48,7 +48,7 @@ interface DomainAccessManagerInterface {
    * @return bool
    *   Returns TRUE if the user has access to the domain.
    */
-  public function checkEntityAccess(EntityInterface $entity, AccountInterface $account);
+  public function checkEntityAccess(FieldableEntityInterface $entity, AccountInterface $account);
 
   /**
    * Get the default field value for an entity.
@@ -80,5 +80,17 @@ interface DomainAccessManagerInterface {
    *   permissions.
    */
   public function hasDomainPermissions(AccountInterface $account, DomainInterface $domain, array $permissions, $conjunction = 'AND');
+
+  /**
+   * Get all possible URLs pointing to an entity.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity to retrieve field data from.
+   *
+   * @return array
+   *   An array of absolute URLs keyed by domain_id, with an known canonical id
+   *   as the first element of the array.
+   */
+  public function getContentUrls(FieldableEntityInterface $entity);
 
 }

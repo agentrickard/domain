@@ -21,13 +21,13 @@ class DomainGetResponseTest extends DomainTestBase {
     // Create a new domain programmatically.
     $this->domainCreateTestDomains();
 
-    // Check the created domain based on it's known id value.
+    // Check the created domain based on its known id value.
     $key = 'example_com';
     /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($key);
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->load($key);
 
     // Our testing server should be able to access the test PNG file.
-    $this->assertTrue($domain->getResponse() == 200, 'Server returned a 200 response.');
+    $this->assert($domain->getResponse() == 200, 'Server returned a 200 response.');
 
     // Now create a bad domain.
     $values = array(
@@ -35,10 +35,10 @@ class DomainGetResponseTest extends DomainTestBase {
       'id' => 'foo_bar',
       'name' => 'Foo',
     );
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->create($values);
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
 
     $domain->save();
-    $this->assertTrue($domain->getResponse() == 500, 'Server test returned a 500 response.');
+    $this->assert($domain->getResponse() == 500, 'Server test returned a 500 response.');
   }
 
 }

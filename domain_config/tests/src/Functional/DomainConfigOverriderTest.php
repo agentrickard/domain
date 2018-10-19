@@ -20,7 +20,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     // Create five new domains programmatically.
     $this->domainCreateTestDomains(5);
     // Get the domain list.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     // Except for the default domain, the page title element should match what
     // is in the override files.
     // With a language context, based on how we have our files setup, we
@@ -63,7 +63,7 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
 
     // Create five new domains programmatically.
     $this->domainCreateTestDomains(5);
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple(['one_example_com', 'four_example_com']);
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple(['one_example_com', 'four_example_com']);
 
     $domain_one = $domains['one_example_com'];
     $this->drupalGet($domain_one->getPath() . 'user/login');
@@ -73,12 +73,13 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
     $this->drupalGet($domain_four->getPath() . 'user/login');
     $this->assertRaw('<title>Log in | Four overridden in settings</title>', 'Found overridden slogan for four.example.com.');
   }
+
   /**
    * Returns the expected site name value from our test configuration.
    *
-   * @param DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   The Domain object.
-   * @param $langcode
+   * @param string $langcode
    *   A two-digit language code.
    *
    * @return string

@@ -6,11 +6,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\domain\DomainAccessControlHandler;
 use Drupal\domain\DomainStorageInterface;
-use Drupal\domain_alias\DomainAliasStorageInterface;
-use Drupal\domain_alias\DomainAliasValidatorInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base form controller for domain alias edit forms.
@@ -18,11 +15,15 @@ use Drupal\domain_alias\DomainAliasValidatorInterface;
 class DomainAliasForm extends EntityForm {
 
   /**
-   * @var \Drupal\domain\DomainAliasValidatorInterface
+   * The domain alias validator.
+   *
+   * @var \Drupal\domain_alias\DomainAliasValidatorInterface
    */
   protected $validator;
 
   /**
+   * The configuration factory service.
+   *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $config;
@@ -42,28 +43,30 @@ class DomainAliasForm extends EntityForm {
   protected $entityTypeManager;
 
   /**
-   * @var \Drupal\domain\DomainStorageInterface $domain_storage
+   * The domain storage manager.
+   *
+   * @var \Drupal\domain\DomainStorageInterface
    */
   protected $domainStorage;
 
   /**
-   * @var \Drupal\domain_alias\DomainAliasStorageInterface $alias_loader
+   * The domain alias storage manager.
+   *
+   * @var \Drupal\domain_alias\DomainAliasStorageInterface
    */
   protected $aliasStorage;
 
   /**
    * Constructs a DomainAliasForm object.
    *
-   * @param \Drupal\domain\DomainAliasValidatorInterface $validator
+   * @param \Drupal\domain_alias\DomainAliasValidatorInterface $validator
    *   The domain alias validator.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   The configuration factory service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\domain_alias\DomainAliasStorageInterface $alias_storage
    *   The alias storage.
-   * @param \Drupal\domain\DomainAccessControlHandler
-   *   The domain access control handler.
    * @param \Drupal\domain\DomainStorageInterface $domain_storage
    *   The domain storage manager.
    */
@@ -97,11 +100,11 @@ class DomainAliasForm extends EntityForm {
     /** @var \Drupal\domain_alias\DomainAliasInterface $alias */
     $alias = $this->entity;
 
-    $form['domain_id'] = array(
+    $form['domain_id'] = [
       '#type' => 'value',
       '#value' => $alias->getDomainId(),
-    );
-    $form['pattern'] = array(
+    ];
+    $form['pattern'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Pattern'),
       '#size' => 40,
@@ -109,28 +112,28 @@ class DomainAliasForm extends EntityForm {
       '#default_value' => $alias->getPattern(),
       '#description' => $this->t('The matching pattern for this alias.'),
       '#required' => TRUE,
-    );
-    $form['id'] = array(
+    ];
+    $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $alias->id(),
-      '#machine_name' => array(
-        'source' => array('pattern'),
+      '#machine_name' => [
+        'source' => ['pattern'],
         'exists' => '\Drupal\domain_alias\Entity\DomainAlias::load',
-      ),
-    );
-    $form['redirect'] = array(
+      ],
+    ];
+    $form['redirect'] = [
       '#type' => 'select',
       '#options' => $this->redirectOptions(),
       '#default_value' => $alias->getRedirect(),
       '#description' => $this->t('Set an optional redirect directive when this alias is invoked.'),
-    );
+    ];
     $environments = $this->environmentOptions();
-    $form['environment'] = array(
+    $form['environment'] = [
       '#type' => 'select',
       '#options' => $environments,
       '#default_value' => $alias->getEnvironment(),
       '#description' => $this->t('Map the alias to a development environment.'),
-    );
+    ];
     $form['environment_help'] = [
       '#type' => 'details',
       '#open' => FALSE,
@@ -183,11 +186,11 @@ class DomainAliasForm extends EntityForm {
    *   A list of valid redirect options.
    */
   public function redirectOptions() {
-    return array(
+    return [
       0 => $this->t('Do not redirect'),
       301 => $this->t('301 redirect: Moved Permanently'),
       302 => $this->t('302 redirect: Found'),
-    );
+    ];
   }
 
   /**
@@ -198,6 +201,7 @@ class DomainAliasForm extends EntityForm {
    */
   public function environmentOptions() {
     $list = $this->config->get('domain_alias.settings')->get('environments');
+    $environments = [];
     foreach ($list as $item) {
       $environments[$item] = $item;
     }
@@ -223,13 +227,13 @@ class DomainAliasForm extends EntityForm {
     $edit_link = $alias->toLink($this->t('Edit'), 'edit-form')->toString();
     if ($alias->save() == SAVED_NEW) {
       \Drupal::messenger()->addMessage($this->t('Created new domain alias.'));
-      $this->logger('domain_alias')->notice('Created new domain alias %name.', array('%name' => $alias->label(), 'link' => $edit_link));
+      $this->logger('domain_alias')->notice('Created new domain alias %name.', ['%name' => $alias->label(), 'link' => $edit_link]);
     }
     else {
       \Drupal::messenger()->addMessage($this->t('Updated domain alias.'));
-      $this->logger('domain_alias')->notice('Updated domain alias %name.', array('%name' => $alias->label(), 'link' => $edit_link));
+      $this->logger('domain_alias')->notice('Updated domain alias %name.', ['%name' => $alias->label(), 'link' => $edit_link]);
     }
-    $form_state->setRedirect('domain_alias.admin', array('domain' => $alias->getDomainId()));
+    $form_state->setRedirect('domain_alias.admin', ['domain' => $alias->getDomainId()]);
   }
 
 }

@@ -2,9 +2,6 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\user\RoleInterface;
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
-
 /**
  * Tests behavior for environment loading on the overview page.
  *
@@ -18,7 +15,8 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Create 3 domains. These will be example.com, one.example.com, two.example.com.
+    // Create 3 domains. These will be example.com, one.example.com,
+    // two.example.com.
     $this->domainCreateTestDomains(3);
   }
 
@@ -26,12 +24,12 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
    * Test for environment matching.
    */
   public function testDomainAliasEnvironments() {
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
-    $alias_loader = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
+    $alias_loader = \Drupal::entityTypeManager()->getStorage('domain_alias');
     $domains = $domain_storage->loadMultiple();
 
     $base = $this->base_hostname;
-    $hostnames = [$base, 'one.' . $base, 'two.'. $base];
+    $hostnames = [$base, 'one.' . $base, 'two.' . $base];
 
     // Our patterns should map to example.com, one.example.com, two.example.com.
     $patterns = ['*.' . $base, 'four.' . $base, 'five.' . $base];
@@ -51,19 +49,19 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
     // Test the environment loader.
     $local = $alias_loader->loadByEnvironment('local');
     $this->assert(count($local) == 3, 'Three aliases set to local');
-    // Test the environment matcher. $domain here is two.example.com
+    // Test the environment matcher. $domain here is two.example.com.
     $match = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($match) == 1, 'One environment match loaded');
     $alias = current($match);
     $this->assert($alias->getPattern() == 'five.' . $base, 'Proper pattern match loaded.');
 
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
     // Load an aliased domain.

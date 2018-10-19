@@ -3,7 +3,6 @@
 namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests domain alias request negotiation.
@@ -17,7 +16,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_alias', 'user', 'block');
+  public static $modules = ['domain', 'domain_alias', 'user', 'block'];
 
   /**
    * Tests the handling of aliased requests.
@@ -34,11 +33,11 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $this->drupalPlaceBlock('domain_server_block');
 
     // To get around block access, let the anon user view the block.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['administer domains']);
 
     // Set the storage handles.
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
-    $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
+    $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
 
     // Set known prefixes that work with our tests. This will give us domains
     // 'example.com' and 'one.example.com' aliased to 'two.example.com' and
@@ -105,7 +104,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $this->drupalGet($url);
 
     // Revoke the permission change.
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
+    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['administer domains']);
   }
 
 }

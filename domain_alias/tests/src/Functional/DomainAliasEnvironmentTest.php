@@ -3,7 +3,6 @@
 namespace Drupal\Tests\domain_alias\Functional;
 
 use Drupal\user\RoleInterface;
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
 
 /**
  * Tests behavior for the domain alias environment handler.
@@ -17,7 +16,7 @@ class DomainAliasEnvironmentTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_alias', 'user');
+  public static $modules = ['domain', 'domain_alias', 'user'];
 
   /**
    * {@inheritdoc}
@@ -25,7 +24,8 @@ class DomainAliasEnvironmentTest extends DomainAliasTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Create 3 domains. These will be example.com, one.example.com, two.example.com.
+    // Create 3 domains. These will be example.com, one.example.com,
+    // two.example.com.
     $this->domainCreateTestDomains(3);
   }
 
@@ -33,8 +33,8 @@ class DomainAliasEnvironmentTest extends DomainAliasTestBase {
    * Test for environment matching.
    */
   public function testDomainAliasEnvironments() {
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
-    $alias_loader = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+    $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
+    $alias_loader = \Drupal::entityTypeManager()->getStorage('domain_alias');
     $domains = $domain_storage->loadMultipleSorted(NULL, TRUE);
     // Our patterns should map to example.com, one.example.com, two.example.com.
     $patterns = ['*.example.com', 'four.example.com', 'five.example.com'];
@@ -50,21 +50,21 @@ class DomainAliasEnvironmentTest extends DomainAliasTestBase {
     // Test the environment loader.
     $local = $alias_loader->loadByEnvironment('local');
     $this->assert(count($local) == 3, 'Three aliases set to local');
-    // Test the environment matcher. $domain here is two.example.com
+    // Test the environment matcher. $domain here is two.example.com.
     $match = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($match) == 1, 'One environment match loaded');
     $alias = current($match);
     $this->assert($alias->getPattern() == 'five.example.com', 'Proper pattern match loaded.');
 
-    // Set one alias to a different environment
+    // Set one alias to a different environment.
     $alias->set('environment', 'testing')->save();
     $local = $alias_loader->loadByEnvironment('local');
     $this->assert(count($local) == 2, 'Two aliases set to local');
-    // Test the environment matcher. $domain here is two.example.com
+    // Test the environment matcher. $domain here is two.example.com.
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($matches) == 0, 'No environment matches loaded');
 
-    // Test the environment matcher. $domain here is one.example.com
+    // Test the environment matcher. $domain here is one.example.com.
     $domain = $domain_storage->load('one_example_com');
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($matches) == 1, 'One environment match loaded');
@@ -77,7 +77,7 @@ class DomainAliasEnvironmentTest extends DomainAliasTestBase {
     $this->drupalPlaceBlock('domain_switcher_block');
 
     // To get around block access, let the anon user view the block.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('administer domains'));
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['administer domains']);
     // For a non-aliased request, the url list should be normal.
     $this->drupalGet($domain->getPath());
     foreach ($domains as $domain) {

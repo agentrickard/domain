@@ -15,7 +15,7 @@ class DomainAccessArgument extends StringArgument {
    * {@inheritdoc}
    */
   public function title() {
-    if ($domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($this->argument)) {
+    if ($domain = \Drupal::entityTypeManager()->getStorage('domain')->load($this->argument)) {
       return $domain->label();
     }
     return parent::title();

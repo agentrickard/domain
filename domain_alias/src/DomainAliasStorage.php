@@ -4,7 +4,6 @@ namespace Drupal\domain_alias;
 
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -64,7 +63,7 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
    */
   public function loadSchema() {
     $fields = $this->typedConfig->getDefinition('domain_alias.alias.*');
-    return isset($fields['mapping']) ? $fields['mapping'] : array();
+    return isset($fields['mapping']) ? $fields['mapping'] : [];
   }
 
   /**
@@ -132,6 +131,7 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
    *   A hostname string, in the format example.com.
    *
    * @return array
+   *   An array of eligible matching patterns.
    */
   public function getPatterns($hostname) {
     $parts = explode('.', $hostname);
@@ -146,7 +146,7 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
     $patterns = $this->buildPatterns($parts);
     // Pattern lists are sorted based on the fewest wildcards. That gives us
     // more precise matches first.
-    uasort($patterns, array($this, 'sort'));
+    uasort($patterns, [$this, 'sort']);
     array_unshift($patterns, $hostname);
 
     // Account for ports.
@@ -164,7 +164,7 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
    * @param array $parts
    *   The hostname of the request, as an array split by dots.
    *
-   * @return array $patterns
+   * @return array
    *   An array of eligible matching patterns.
    */
   private function buildPatterns(array $parts) {
@@ -175,12 +175,12 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
       $temp[$i] = '*';
       $patterns[] = implode('.', $temp);
       // Advanced multi-value wildcards.
-      // Pattern *.*
+      // Pattern *.*.
       if (count($temp) > 2 && $i < ($count - 1)) {
         $temp[$i + 1] = '*';
         $patterns[] = implode('.', $temp);
       }
-      // Pattern foo.bar.*
+      // Pattern foo.bar.*.
       if ($count > 3 && $i < ($count - 2)) {
         $temp[$i + 2] = '*';
         $patterns[] = implode('.', $temp);
@@ -192,7 +192,7 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
         $temp[$i + 2] = '*';
         $patterns[] = implode('.', $temp);
       }
-      // Pattern *.foo.*.*
+      // Pattern *.foo.*.*.
       if ($count > 2) {
         $temp = array_fill(0, $count, '*');
         $temp[$i] = $parts[$i];
@@ -210,7 +210,7 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return array $patterns
+   * @return array
    *   An array of eligible matching patterns, modified by port.
    */
   private function buildPortPatterns(array $patterns, $hostname) {

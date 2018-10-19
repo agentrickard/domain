@@ -32,7 +32,7 @@ function domain_access_node_grants(AccountInterface $account, $op) {
   $active = \Drupal::service('domain.negotiator')->getActiveDomain();
 
   if (empty($active)) {
-    $active = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain();
+    $active = \Drupal::entityTypeManager()->getStorage('domain')->loadDefaultDomain();
   }
 
   // No domains means no permissions.
@@ -88,7 +88,7 @@ function domain_access_node_access_records(NodeInterface $node) {
     }
     foreach ($domains as $id => $domainId) {
       /** @var \Drupal\domain\DomainInterface $domain */
-      if ($domain = \Drupal::service('entity_type.manager')->getStorage('domain')->load($id)) {
+      if ($domain = \Drupal::entityTypeManager()->getStorage('domain')->load($id)) {
         $grants[] = [
           'realm' => ($translation->isPublished()) ? 'domain_id' : 'domain_unpublished',
           'gid' => $domain->getDomainId(),
@@ -166,7 +166,7 @@ function domain_access_presave_generate(EntityInterface $entity) {
     if (isset($entity->devel_generate['domain_access'])) {
       $selection = array_filter($entity->devel_generate['domain_access']);
       if (isset($selection['random-selection'])) {
-        $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+        $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
         $values[DOMAIN_ACCESS_FIELD] = array_rand($domains, ceil(rand(1, count($domains))));
       }
       else {
@@ -198,7 +198,7 @@ function domain_access_form_devel_generate_form_content_alter(&$form, &$form_sta
   // Add our element to the Devel generate form.
   $form['submit']['#weight'] = 10;
   $list = ['random-selection' => t('Random selection')];
-  $list += \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList();
+  $list += \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
   $form['domain_access'] = [
     '#title' => t('Domains'),
     '#type' => 'checkboxes',

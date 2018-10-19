@@ -12,19 +12,19 @@ trait DomainAliasTestTrait {
   /**
    * Creates an alias.
    *
-   * @param $values array
+   * @param array $values
    *   An array of values to assign to the alias.
-   * @param boolean $save
+   * @param bool $save
    *   Whether to save the alias or return for validation.
    *
    * @return \Drupal\domain_alias\Entity\DomainAlias
    *   A domain alias entity.
    */
-  public function createDomainAlias($values, $save = TRUE) {
+  public function createDomainAlias(array $values, $save = TRUE) {
     // Replicate the logic for creating machine_name patterns.
     // @see ConfigBase::validate()
     $machine_name = mb_strtolower(preg_replace('/[^a-z0-9_]/', '_', $values['pattern']));
-    $values['id'] = str_replace(array('*', '.', ':'), '_', $machine_name);
+    $values['id'] = str_replace(['*', '.', ':'], '_', $machine_name);
     $alias = \Drupal::entityTypeManager()->getStorage('domain_alias')->create($values);
     if ($save) {
       $alias->save();
@@ -44,7 +44,7 @@ trait DomainAliasTestTrait {
    *   An optional redirect (301 or 302).
    * @param int $environment
    *   An optional environment string.
-   * @param boolean $save
+   * @param bool $save
    *   Whether to save the alias or return for validation.
    *
    * @return \Drupal\domain_alias\Entity\DomainAlias
@@ -54,12 +54,12 @@ trait DomainAliasTestTrait {
     if (empty($pattern)) {
       $pattern = '*.' . $domain->getHostname();
     }
-    $values = array(
+    $values = [
       'domain_id' => $domain->id(),
       'pattern' => $pattern,
       'redirect' => $redirect,
       'environment' => $environment,
-    );
+    ];
 
     return $this->createDomainAlias($values, $save);
   }
