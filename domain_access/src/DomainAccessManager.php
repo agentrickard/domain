@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_access;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -27,6 +26,8 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   protected $negotiator;
 
   /**
+   * The Drupal module handler.
+   *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
@@ -167,7 +168,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getContentUrls(FieldableEntityInterface $entity) {
     $list = [];

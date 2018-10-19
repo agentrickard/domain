@@ -2,7 +2,6 @@
 
 namespace Drupal\domain_access;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Session\AccountInterface;
