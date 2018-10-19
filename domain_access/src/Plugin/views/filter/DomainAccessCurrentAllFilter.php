@@ -27,14 +27,14 @@ class DomainAccessCurrentAllFilter extends BooleanOperator {
    * {@inheritdoc}
    */
   public function getValueOptions() {
-    $this->valueOptions = array(1 => $this->t('Yes'), 0 => $this->t('No'));
+    $this->valueOptions = [1 => $this->t('Yes'), 0 => $this->t('No')];
   }
 
   /**
    * {@inheritdoc}
    */
   protected function operators() {
-    return array();
+    return [];
   }
 
   /**

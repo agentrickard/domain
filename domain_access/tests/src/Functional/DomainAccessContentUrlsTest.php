@@ -39,8 +39,12 @@ class DomainAccessContentUrlsTest extends DomainTestBase {
     $nodes_values = [
       'type' => 'page',
       'title' => 'foo',
-      DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com', 'two_example_com'],
-      DOMAIN_ACCESS_ALL_FIELD => 0
+      DOMAIN_ACCESS_FIELD => [
+        'example_com',
+        'one_example_com',
+        'two_example_com',
+      ],
+      DOMAIN_ACCESS_ALL_FIELD => 0,
     ];
     $node = $this->createNode($nodes_values);
 

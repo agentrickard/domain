@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\domain_access\Functional;
 
-use Drupal\node\Entity\NodeType;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
@@ -17,7 +16,13 @@ class DomainAccessElementTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'field_ui', 'user');
+  public static $modules = [
+    'domain',
+    'domain_access',
+    'field',
+    'field_ui',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -42,14 +47,14 @@ class DomainAccessElementTest extends DomainTestBase {
    * Basic test setup.
    */
   public function runInstalledTest($node_type) {
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
       'publish to any domain',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
     $this->drupalGet('node/add/' . $node_type);
@@ -95,7 +100,7 @@ class DomainAccessElementTest extends DomainTestBase {
     $account = $this->drupalCreateUser([
       'create ' . $node_type . ' content',
       'edit any ' . $node_type . ' content',
-      'publish to any assigned domain'
+      'publish to any assigned domain',
     ]);
     $ids = ['example_com', 'one_example_com'];
     $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ACCESS_FIELD);
@@ -134,7 +139,7 @@ class DomainAccessElementTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Now, check the node.
-    $storage->resetCache(array($node->id()));
+    $storage->resetCache([$node->id()]);
     $node = $storage->load($node->id());
     // Check that two values are set.
     $values = $manager->getAccessValues($node);
