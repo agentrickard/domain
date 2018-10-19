@@ -116,8 +116,9 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
           $overrides[$name] = $GLOBALS['config'][$config_name['domain']];
         }
       }
+      $lookups[$key] = $overrides;
     }
-    $lookups[$key] = $overrides;
+
     return $overrides;
   }
 
