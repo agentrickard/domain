@@ -17,7 +17,15 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'domain_access_test', 'field', 'field_ui', 'user', 'taxonomy');
+  public static $modules = [
+    'domain',
+    'domain_access',
+    'domain_access_test',
+    'field',
+    'field_ui',
+    'user',
+    'taxonomy',
+  ];
 
   /**
    * {@inheritdoc}
@@ -35,13 +43,13 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
   public function testDomainAccessEntityFields() {
     $label = 'Send to all affiliates';
     // Create a vocabulary.
-    $vocabulary = entity_create('taxonomy_vocabulary', array(
+    $vocabulary = entity_create('taxonomy_vocabulary', [
       'name' => 'Domain vocabulary',
       'description' => 'Test taxonomy for Domain Access',
       'vid' => 'domain_access',
       'langcode' => LanguageInterface::LANGCODE_NOT_SPECIFIED,
       'weight' => 100,
-    ));
+    ]);
     $vocabulary->save();
     $text['taxonomy_term'] = [
       'name' => 'term',
@@ -49,7 +57,7 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
       'description' => 'Make this term available on all domains.',
     ];
     domain_access_confirm_fields('taxonomy_term', 'domain_access', $text);
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
@@ -59,7 +67,7 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
       'administer taxonomy',
       'administer taxonomy_term fields',
       'administer taxonomy_term form display',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
     $this->drupalGet('admin/structure/taxonomy/manage/domain_access/overview/fields');
     $this->assertResponse(200, 'Manage fields page accessed.');

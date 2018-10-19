@@ -19,7 +19,7 @@ class DomainAccessRemove extends DomainAccessActionBase {
   public function execute($entity = NULL) {
     $id = $this->configuration['domain_id'];
     $node_domains = \Drupal::service('domain_access.manager')->getAccessValues($entity);
-    
+
     // Remove domain assignment if present.
     if ($entity !== FALSE && isset($node_domains[$id])) {
       unset($node_domains[$id]);

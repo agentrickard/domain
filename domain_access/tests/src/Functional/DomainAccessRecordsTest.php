@@ -17,7 +17,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
+  public static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
 
   /**
    * Creates a node and tests the creation of node access rules.
@@ -32,17 +32,17 @@ class DomainAccessRecordsTest extends DomainTestBase {
     $node_storage = \Drupal::entityTypeManager()->getStorage('node');
 
     // Create an article node.
-    $node1 = $this->drupalCreateNode(array(
+    $node1 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => array($domain->id()),
+      DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 0,
-    ));
+    ]);
     $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
 
     // Check to see if grants added by domain_node_access_records made it in.
     $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid';
     $records = Database::getConnection()
-      ->query($query, array(':nid' => $node1->id()))
+      ->query($query, [':nid' => $node1->id()])
       ->fetchAll();
 
     $this->assertEqual(count($records), 1, 'Returned the correct number of rows.');
@@ -53,16 +53,16 @@ class DomainAccessRecordsTest extends DomainTestBase {
     $this->assertEqual($records[0]->grant_delete, 1, 'Grant delete stored.');
 
     // Create another article node.
-    $node2 = $this->drupalCreateNode(array(
+    $node2 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => array($domain->id()),
+      DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 1,
-    ));
+    ]);
     $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
     // Check to see if grants added by domain_node_access_records made it in.
     $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid ORDER BY realm';
     $records = Database::getConnection()
-      ->query($query, array(':nid' => $node2->id()))
+      ->query($query, [':nid' => $node2->id()])
       ->fetchAll();
     $this->assertEqual(count($records), 2, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');

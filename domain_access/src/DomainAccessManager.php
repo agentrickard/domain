@@ -5,7 +5,6 @@ namespace Drupal\domain_access;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiatorInterface;
@@ -19,6 +18,8 @@ use Drupal\domain\DomainNegotiatorInterface;
 class DomainAccessManager implements DomainAccessManagerInterface {
 
   /**
+   * The domain negotiator.
+   *
    * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $negotiator;
@@ -34,7 +35,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public static function getAccessValues(EntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
     // @TODO: static cache.
@@ -59,14 +60,14 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public static function getAllValue(EntityInterface $entity) {
     return $entity->hasField(DOMAIN_ACCESS_ALL_FIELD) ? $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function checkEntityAccess(EntityInterface $entity, AccountInterface $account) {
     $entity_domains = $this->getAccessValues($entity);
@@ -79,7 +80,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition) {
     $item = [];
@@ -100,7 +101,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function hasDomainPermissions(AccountInterface $account, DomainInterface $domain, array $permissions, $conjunction = 'AND') {
     // Assume no access.

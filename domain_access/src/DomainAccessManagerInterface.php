@@ -5,7 +5,6 @@ namespace Drupal\domain_access;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\DomainInterface;
 
@@ -67,14 +66,14 @@ interface DomainAccessManagerInterface {
   /**
    * Checks that a user belongs to the domain and has a set of permissions.
    *
-   * @param AccountInterface $account
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account.
-   * @param DomainInterface $domain
+   * @param \Drupal\domain\DomainInterface $domain
    *   The domain being checked.
    * @param array $permissions
    *   The relevant permissions to check.
    * @param string $conjunction
-   *.  The conunction AND|OR to use when checking permssions.
+   *   The conjunction AND|OR to use when checking permissions.
    *
    * @return bool
    *   Returns TRUE if the user is assigned to the domain and has the necessary

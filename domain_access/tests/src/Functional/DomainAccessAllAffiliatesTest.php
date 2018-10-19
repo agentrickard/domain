@@ -16,19 +16,19 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
+  public static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
 
   /**
    * Tests that the module installed its field correctly.
    */
   public function testDomainAccessAllField() {
     $label = 'Send to all affiliates';
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -51,14 +51,14 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
    */
   public function testDomainAccessAllFieldStorage() {
     $label = 'Send to all affiliates';
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
       'publish to any domain',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.

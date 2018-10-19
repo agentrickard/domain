@@ -1,15 +1,17 @@
 <?php
-/**
- * @file
- * Settings form for Domain Access.
- */
 
 namespace Drupal\domain_access\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Class DomainAccessSettingsForm.
+ *
+ * @package Drupal\domain_access\Form
+ */
 class DomainAccessSettingsForm extends ConfigFormBase {
+
   /**
    * {@inheritdoc}
    */
@@ -29,12 +31,12 @@ class DomainAccessSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('domain_access.settings');
-    $form['node_advanced_tab'] = array(
+    $form['node_advanced_tab'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Move Domain Access fields to advanced node settings.'),
       '#default_value' => $config->get('node_advanced_tab'),
       '#description' => $this->t('When checked the Domain Access fields will be shown as a tab in the advanced settings on node edit form. However, if you have placed the fields in a field group already, they will not be moved.'),
-    );
+    ];
     $form['node_advanced_tab_open'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Open the Domain Access details.'),
@@ -43,8 +45,8 @@ class DomainAccessSettingsForm extends ConfigFormBase {
       '#states' => [
         'visible' => [
           ':input[name="node_advanced_tab"]' => ['checked' => TRUE],
-        ]
-      ]
+        ],
+      ],
     ];
     return parent::buildForm($form, $form_state);
   }
@@ -60,6 +62,5 @@ class DomainAccessSettingsForm extends ConfigFormBase {
 
     parent::submitForm($form, $form_state);
   }
-
 
 }
