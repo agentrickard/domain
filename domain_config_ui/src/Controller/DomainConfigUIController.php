@@ -81,7 +81,8 @@ class DomainConfigUIController {
         'name' => t('Configuration key'),
         'item' => t('Item'),
         'domain' => t('Domain'),
-        'language' => t('Language')
+        'language' => t('Language'),
+        'actions' => t('Actions'),
       ],
     );
     // @TODO: inject services.
@@ -98,7 +99,7 @@ class DomainConfigUIController {
         'item' => ['#markup' => $element['item']],
         'domain' => ['#markup' => $element['domain']],
         'language' => ['#markup' => $element['language']],
-        'delete' => ['#type' => 'link',
+        'actions' => ['#type' => 'link',
           '#url' => Url::fromRoute('domain_config_ui.delete', ['config_name' => $element['name']]),
           '#title' => $this->t('Delete'),
         ],
@@ -115,8 +116,7 @@ class DomainConfigUIController {
    *
    * @return array
    */
-  public function deriveElements($name) {
-    // @TODO: inject services.
+  public static function deriveElements($name) {
     $entity_manager = \Drupal::entityTypeManager();
     $items = explode('.', $name);
     $elements = [

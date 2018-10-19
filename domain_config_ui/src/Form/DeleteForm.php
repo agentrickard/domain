@@ -5,6 +5,7 @@ namespace Drupal\domain_config_ui\Form;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\domain_config_ui\Controller\DomainConfigUIController;
 
 /**
  * Class DeleteForm.
@@ -43,8 +44,17 @@ class DeleteForm extends FormBase {
    * Build configuration form with metadata and values.
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_name = NULL) {
-    $form = [
-      '#markup' => $config_name,
+    $elements = DomainConfigUIController::deriveElements($config_name);
+    $form['help'] = [
+      '#markup' => $this->t('Are you sure you want to delete the configuration override: %config_name?', ['%config_name' => $config_name]),
+    ];
+    $form['review'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Review settings'),
+      '#open' => FALSE,
+    ];
+    $form['review']['text'] = [
+      '#markup' => 'test',
     ];
     return $form;
   }
