@@ -15,7 +15,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
   /**
    * The Entity access handler.
    *
-   * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface $accessHandler
+   * @var \Drupal\Core\Entity\EntityAccessControlHandlerInterface
    */
   protected $accessHandler;
 
@@ -24,7 +24,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'node');
+  public static $modules = ['domain', 'domain_access', 'field', 'node'];
 
   /**
    * {@inheritdoc}
@@ -49,10 +49,10 @@ class DomainAccessGrantsTest extends DomainTestBase {
     $active_domain = array_rand($domains, 1);
     $domain = $domains[$active_domain];
     // Create an article node.
-    $node1 = $this->drupalCreateNode(array(
+    $node1 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => array($domain->id()),
-    ));
+      DOMAIN_ACCESS_FIELD => [$domain->id()],
+    ]);
     $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
 
     // Test the response of the node on each site. Should allow access only to
@@ -70,11 +70,11 @@ class DomainAccessGrantsTest extends DomainTestBase {
     }
 
     // Create an article node.
-    $node2 = $this->drupalCreateNode(array(
+    $node2 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => array($domain->id()),
+      DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 1,
-    ));
+    ]);
     $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
     // Test the response of the node on each site. Should allow access on all.
     foreach ($domains as $domain) {
