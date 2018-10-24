@@ -18,7 +18,7 @@ interface DomainCreatorInterface {
    *   Required values are: hostname, name.
    *   Passing an empty array will create a domain from the current request.
    *
-   * @return DomainInterface
+   * @return \Drupal\domain\DomainInterface
    *   A domain record object.
    */
   public function createDomain(array $values = []);

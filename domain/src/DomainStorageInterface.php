@@ -116,7 +116,7 @@ interface DomainStorageInterface extends ConfigEntityStorageInterface {
    *
    * This function helps us account for variable schemes across environments.
    *
-   * @return scheme
+   * @return string
    *   A string representation of s scheme (http|https).
    */
   public function getDefaultScheme();
