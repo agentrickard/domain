@@ -48,7 +48,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->fillField('pass[pass2]', 'test');
 
     // We expect to find 5 domain options. We set two as selected.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     $count = 0;
     $ids = ['example_com', 'one_example_com', 'two_example_com'];
     foreach ($domains as $domain) {

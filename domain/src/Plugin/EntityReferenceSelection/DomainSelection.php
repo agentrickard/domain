@@ -24,7 +24,7 @@ class DomainSelection extends DefaultSelection {
    *
    * @var string
    */
-  protected $field_type = 'editor';
+  protected $fieldType = 'editor';
 
   /**
    * {@inheritdoc}
@@ -47,7 +47,7 @@ class DomainSelection extends DefaultSelection {
     if (!empty($info->configuration['entity'])) {
       $context['entity_type'] = $info->configuration['entity']->getEntityTypeId();
       $context['bundle'] = $info->configuration['entity']->bundle();
-      $context['field_type'] = $this->field_type;
+      $context['field_type'] = $this->fieldType;
 
       // Load the current user.
       $account = User::load($this->currentUser->id());

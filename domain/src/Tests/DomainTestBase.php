@@ -63,7 +63,7 @@ abstract class DomainTestBase extends WebTestBase {
    * @return bool
    *   TRUE if a given user account is logged in, or FALSE.
    */
-  protected function drupalUserIsLoggedIn($account) {
+  protected function drupalUserIsLoggedIn(UserInterface $account) {
     // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
     if (!isset($account->session_id)) {
       return (bool) $account->id();

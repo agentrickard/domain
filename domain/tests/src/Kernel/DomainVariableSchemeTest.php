@@ -45,7 +45,7 @@ class DomainVariableSchemeTest extends KernelTestBase {
     $this->domainCreateTestDomains();
 
     // Get the services.
-    $this->domainStorage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $this->domainStorage = \Drupal::entityTypeManager()->getStorage('domain');
   }
 
   /**

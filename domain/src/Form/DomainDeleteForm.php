@@ -37,8 +37,8 @@ class DomainDeleteForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
-    \Drupal::messenger()->addMessage($this->t('Domain %label has been deleted.', array('%label' => $this->entity->label())));
-    \Drupal::logger('domain')->notice('Domain %label has been deleted.', array('%label' => $this->entity->label()));
+    \Drupal::messenger()->addMessage($this->t('Domain %label has been deleted.', ['%label' => $this->entity->label()]));
+    \Drupal::logger('domain')->notice('Domain %label has been deleted.', ['%label' => $this->entity->label()]);
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 

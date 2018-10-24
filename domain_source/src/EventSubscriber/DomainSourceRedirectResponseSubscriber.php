@@ -7,7 +7,6 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\EventSubscriber\RedirectResponseSubscriber;
-use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\domain\DomainRedirectResponse;
 
 /**
@@ -55,8 +54,8 @@ class DomainSourceRedirectResponseSubscriber extends RedirectResponseSubscriber 
           // local. Do not follow that redirect. Display an error message
           // instead. We're already catching one exception, so trigger_error()
           // rather than throw another one.
-          // We don't throw an exception, because this is a client error rather than a
-          // server error.
+          // We don't throw an exception, because this is a client error rather
+          // than a server error.
           $message = 'Redirects to external URLs are not allowed by default, use \Drupal\Core\Routing\TrustedRedirectResponse for it.';
           trigger_error($message, E_USER_ERROR);
           $safe_response = new Response($message, 400);

@@ -8,7 +8,6 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainNegotiator;
-use Drupal\domain\DomainAccessControlHandler;
 use Drupal\Core\Url;
 use Drupal\Core\Session\AccountInterface;
 
@@ -34,8 +33,8 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   }
   // If no exact match, then run the alias load routine.
   $hostname = $domain->getHostname();
-  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
-  $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+  $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
+  $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
   /** @var \Drupal\domain_alias\Entity\DomainAlias $alias */
   if ($alias = $alias_storage->loadByHostname($hostname)) {
     /** @var \Drupal\domain\Entity\Domain $domain */
@@ -49,11 +48,11 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
     }
     else {
       // If the domain did not load, report an error.
-      \Drupal::logger('domain_alias')->error('Found matching alias %alias for host request %hostname, but failed to load matching domain with id %id.',
-       ['%alias' => $alias->getPattern(),
+      \Drupal::logger('domain_alias')->error('Found matching alias %alias for host request %hostname, but failed to load matching domain with id %id.', [
+        '%alias' => $alias->getPattern(),
         '%hostname' => $hostname,
         '%id' => $alias->getDomainId(),
-       ]);
+      ]);
     }
   }
 }
@@ -63,15 +62,16 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
  */
 function domain_alias_domain_operations(DomainInterface $domain, AccountInterface $account) {
   $operations = [];
-  // Check permissions. The user must be a super-admin or assigned to the domain.
+  // Check permissions. The user must be a super-admin or assigned to the
+  // domain.
   $is_domain_admin = $domain->access('update', $account);
   if ($account->hasPermission('administer domain aliases') || ($is_domain_admin && $account->hasPermission('view domain aliases'))) {
     // Add aliases to the list of operations.
-    $operations['domain_alias'] = array(
+    $operations['domain_alias'] = [
       'title' => t('Aliases'),
-      'url' => Url::fromRoute('domain_alias.admin', array('domain' => $domain->id())),
+      'url' => Url::fromRoute('domain_alias.admin', ['domain' => $domain->id()]),
       'weight' => 60,
-    );
+    ];
   }
   return $operations;
 }
@@ -81,8 +81,8 @@ function domain_alias_domain_operations(DomainInterface $domain, AccountInterfac
  */
 function domain_alias_domain_load($entities) {
   static $enabled;
-  // We can only perform meaningful actions if url.site is a cache context. Otherwise,
-  // the render process ignores our changes.
+  // We can only perform meaningful actions if url.site is a cache context.
+  // Otherwise, the render process ignores our changes.
   if (!isset($enabled)) {
     $required_cache_contexts = \Drupal::getContainer()->getParameter('renderer.config')['required_cache_contexts'];
     if (!in_array('url.site', $required_cache_contexts) && !in_array('url', $required_cache_contexts)) {
@@ -101,16 +101,17 @@ function domain_alias_domain_load($entities) {
     return;
   }
 
-  // Load and rewrite environement-specific aliases.
-  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+  // Load and rewrite environment-specific aliases.
+  $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
   if (isset($active->alias) && $active->alias->getEnvironment() != 'default') {
     foreach ($entities as $id => $domain) {
       if ($environment_aliases = $alias_storage->loadByEnvironmentMatch($domain, $active->alias->getEnvironment())) {
-        foreach($environment_aliases as $environment_alias) {
+        foreach ($environment_aliases as $environment_alias) {
           $pattern = $environment_alias->getPattern();
           // Add a canonical property.
           $domain->setCanonical();
-          // Override the domain hostname and path. We always prefer a string match.
+          // Override the domain hostname and path. We always prefer a string
+          // match.
           if (substr_count($pattern, '*') < 1) {
             $domain->setHostname($pattern);
             $domain->setPath();
@@ -160,7 +161,7 @@ function domain_alias_domain_load($entities) {
  * Implements hook_ENTITY_TYPE_delete().
  */
 function domain_alias_domain_delete(EntityInterface $entity) {
-  $alias_storage = \Drupal::service('entity_type.manager')->getStorage('domain_alias');
+  $alias_storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
   $properties = ['domain_id' => $entity->id()];
   foreach ($alias_storage->loadByProperties($properties) as $alias) {
     $alias->delete();

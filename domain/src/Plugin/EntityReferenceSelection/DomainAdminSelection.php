@@ -29,6 +29,6 @@ class DomainAdminSelection extends DomainSelection {
    *
    * @var string
    */
-  protected $field_type = 'admin';
+  protected $fieldType = 'admin';
 
 }

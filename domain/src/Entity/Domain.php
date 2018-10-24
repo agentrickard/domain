@@ -156,7 +156,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    */
   public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
     parent::preCreate($storage_controller, $values);
-    $domain_storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
     $default = $domain_storage->loadDefaultId();
     $count = $storage_controller->getQuery()->count()->execute();
     $values += [
@@ -212,7 +212,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     if (!$this->isDefault()) {
       // Swap the current default.
       /** @var self $default */
-      if ($default = \Drupal::service('entity_type.manager')->getStorage('domain')->loadDefaultDomain()) {
+      if ($default = \Drupal::entityTypeManager()->getStorage('domain')->loadDefaultDomain()) {
         $default->is_default = FALSE;
         $default->setHostname($default->getCanonical());
         $default->save();
@@ -258,14 +258,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->{$name} = $value;
       $this->setHostname($this->getCanonical());
       $this->save();
-      \Drupal::messenger()->addMessage($this->t('The @key attribute was set to @value for domain @hostname.', array(
+      \Drupal::messenger()->addMessage($this->t('The @key attribute was set to @value for domain @hostname.', [
         '@key' => $name,
         '@value' => $value,
         '@hostname' => $this->hostname,
-      )));
+      ]));
     }
     else {
-      \Drupal::messenger()->addMessage($this->t('The @key attribute does not exist.', array('@key' => $name)));
+      \Drupal::messenger()->addMessage($this->t('The @key attribute does not exist.', ['@key' => $name]));
     }
   }
 
@@ -428,7 +428,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   public function getScheme($add_suffix = TRUE) {
     $scheme = $this->scheme;
     if ($scheme == 'variable') {
-      $scheme = \Drupal::service('entity_type.manager')->getStorage('domain')->getDefaultScheme();
+      $scheme = \Drupal::entityTypeManager()->getStorage('domain')->getDefaultScheme();
     }
     elseif ($scheme != 'https') {
       $scheme = 'http';

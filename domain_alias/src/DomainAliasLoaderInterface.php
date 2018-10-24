@@ -6,6 +6,7 @@ use Drupal\domain\DomainInterface;
 
 /**
  * Supplies loader methods for common domain_alias requests.
+ *
  * @deprecated
  *  This interface will be removed before the 8.1.0 release.
  */
@@ -35,7 +36,7 @@ interface DomainAliasLoaderInterface {
    * @return array
    *   An array of Drupal\domain_alias\DomainAliasInterface objects.
    */
-  public function loadMultiple($ids = NULL, $reset = FALSE);
+  public function loadMultiple(array $ids = NULL, $reset = FALSE);
 
   /**
    * Loads a domain alias record by hostname lookup.
@@ -45,7 +46,7 @@ interface DomainAliasLoaderInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface|null
    *   The best match alias record for the provided hostname.
    */
   public function loadByHostname($hostname);
@@ -56,11 +57,10 @@ interface DomainAliasLoaderInterface {
    * @param string $pattern
    *   A pattern string, in the format *.example.com.
    *
-   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface|null
    *   The domain alias record given a pattern string.
    */
   public function loadByPattern($pattern);
-
 
   /**
    * Loads an array of domain alias record by environment lookup.

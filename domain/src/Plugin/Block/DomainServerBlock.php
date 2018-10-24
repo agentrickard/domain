@@ -42,7 +42,7 @@ class DomainServerBlock extends DomainBlockBase {
     ];
     // Check the response test.
     $domain->getResponse();
-    $check = \Drupal::service('entity_type.manager')->getStorage('domain')->loadByHostname($_SERVER['HTTP_HOST']);
+    $check = \Drupal::entityTypeManager()->getStorage('domain')->loadByHostname($_SERVER['HTTP_HOST']);
     $match = $this->t('Exact match');
     // This value is not translatable.
     $environment = 'default';

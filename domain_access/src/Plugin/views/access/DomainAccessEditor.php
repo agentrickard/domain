@@ -15,11 +15,15 @@ class DomainAccessEditor extends DomainAccessContent {
 
   /**
    * Sets the permission to use when checking access.
+   *
+   * @var string
    */
   protected $permission = 'assign domain editors';
 
   /**
    * Sets the permission to use when checking all access.
+   *
+   * @var string
    */
   protected $allPermission = 'assign editors to any domain';
 

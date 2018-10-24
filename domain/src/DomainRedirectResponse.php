@@ -151,13 +151,15 @@ class DomainRedirectResponse extends CacheableSecuredRedirectResponse {
       self::$trustedHosts = [];
     }
 
-    // Trim and remove port number from host. Host is lowercase as per RFC 952/2181
+    // Trim and remove port number from host. Host is lowercase as per RFC
+    // 952/2181.
     $host = mb_strtolower(preg_replace('/:\d+$/', '', trim($host)));
 
-    // In the original Symfony code, hostname validation runs here. We have removed that
-    // portion because Domains are already validated on creation.
+    // In the original Symfony code, hostname validation runs here. We have
+    // removed that portion because Domains are already validated on creation.
     if (count(self::$trustedHostPatterns) > 0) {
-      // To avoid host header injection attacks, you should provide a list of trusted host patterns
+      // To avoid host header injection attacks, you should provide a list of
+      // trusted host patterns.
       if (in_array($host, self::$trustedHosts)) {
         return TRUE;
       }

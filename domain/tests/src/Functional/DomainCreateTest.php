@@ -17,7 +17,7 @@ class DomainCreateTest extends DomainTestBase {
     $this->domainTableIsEmpty();
 
     // Create a new domain programmatically.
-    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
     $domain = $storage->create();
     $domain->set('id', $storage->createMachineName($domain->getHostname()));
     $keys = [

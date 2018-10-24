@@ -6,13 +6,15 @@ use Drupal\Core\Asset\LibraryDiscoveryCollector;
 use Drupal\domain\DomainNegotiatorInterface;
 
 /**
- * Class DomainConfigLibraryDiscoveryCollector
+ * Class DomainConfigLibraryDiscoveryCollector.
  *
  * @package Drupal\domain_config
  */
 class DomainConfigLibraryDiscoveryCollector extends LibraryDiscoveryCollector {
 
   /**
+   * The active domain.
+   *
    * @var \Drupal\domain\DomainInterface
    */
   protected $domain;
@@ -21,6 +23,7 @@ class DomainConfigLibraryDiscoveryCollector extends LibraryDiscoveryCollector {
    * Set a domain.
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $domainNegotiator
+   *   The domain negotiator.
    */
   public function setDomainNegotiator(DomainNegotiatorInterface $domainNegotiator) {
     $this->domain = $domainNegotiator->getActiveDomain();

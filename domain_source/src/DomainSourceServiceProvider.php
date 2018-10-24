@@ -17,4 +17,5 @@ class DomainSourceServiceProvider extends ServiceProviderBase {
     $definition = $container->getDefinition('redirect_response_subscriber');
     $definition->setClass('Drupal\domain_source\EventSubscriber\DomainSourceRedirectResponseSubscriber');
   }
+
 }

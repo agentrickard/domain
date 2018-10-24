@@ -17,7 +17,13 @@ class DomainAccessFieldTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'field_ui', 'user');
+  public static $modules = [
+    'domain',
+    'domain_access',
+    'field',
+    'field_ui',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -44,7 +50,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertResponse(200, 'Article creation found.');
 
     // Check for the form options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertText($domain->label(), 'Domain form item found.');
     }
@@ -72,7 +78,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertNoText($label, 'All affiliates field not found.');
 
     // Test a user who can access no domain settings.
-    $user3 = $this->drupalCreateUser(array('create article content'));
+    $user3 = $this->drupalCreateUser(['create article content']);
     $this->drupalLogin($user3);
 
     // Visit the article creation page.
@@ -89,7 +95,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     // The domain/domain affiliates fields are not accessible to this user.
     // The save will fail with an EntityStorageException until
     // https://www.drupal.org/node/2609252 is fixed.
-    $edit = array();
+    $edit = [];
     $edit['title[0][value]'] = $this->randomMachineName(8);
     $edit['body[0][value]'] = $this->randomMachineName(16);
     $this->drupalPostForm('node/add/article', $edit, t('Save'));
@@ -99,7 +105,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertTrue($node, 'Node found in database.');
 
     // Test a user who can assign users to domains.
-    $user4 = $this->drupalCreateUser(array('administer users', 'assign editors to any domain'));
+    $user4 = $this->drupalCreateUser(['administer users', 'assign editors to any domain']);
     $this->drupalLogin($user4);
 
     // Visit the account creation page.
@@ -112,7 +118,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     }
 
     // Test a user who can assign users to some domains.
-    $user5 = $this->drupalCreateUser(array('administer users', 'assign domain editors'));
+    $user5 = $this->drupalCreateUser(['administer users', 'assign domain editors']);
     $active_domain = array_rand($domains, 1);
     $this->addDomainsToEntity('user', $user5->id(), $active_domain, DOMAIN_ACCESS_FIELD);
     $this->drupalLogin($user5);
@@ -132,7 +138,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     }
 
     // Test a user who can access no domain settings.
-    $user6 = $this->drupalCreateUser(array('administer users'));
+    $user6 = $this->drupalCreateUser(['administer users']);
     $this->drupalLogin($user6);
 
     // Visit the account creation page.
@@ -145,7 +151,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     }
 
     // Test a user who can access all domain settings.
-    $user7 = $this->drupalCreateUser(array('bypass node access', 'publish to any domain'));
+    $user7 = $this->drupalCreateUser(['bypass node access', 'publish to any domain']);
     $this->drupalLogin($user7);
 
     // Create a new content type and test that the fields are created.
@@ -162,20 +168,20 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertResponse(200, $type->id() . ' creation found.');
 
     // Check for the form options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertText($domain->label(), 'Domain form item found.');
     }
     $this->assertText($label, 'All affiliates field found.');
 
     // Test user without access to affiliates field editing their user page.
-    $user8 = $this->drupalCreateUser(array('change own username'));
+    $user8 = $this->drupalCreateUser(['change own username']);
     $this->drupalLogin($user8);
 
     $user_edit_page = 'user/' . $user8->id() . '/edit';
     $this->drupalGet($user_edit_page);
     // Check for the form options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $this->assertNoText($domain->label(), 'Domain form item not found.');
     }
@@ -183,7 +189,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $this->assertNoText($label, 'All affiliates field not found.');
 
     // Change own username.
-    $edit = array();
+    $edit = [];
     $edit['name'] = $this->randomMachineName();
 
     $this->drupalPostForm($user_edit_page, $edit, t('Save'));

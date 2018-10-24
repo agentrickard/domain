@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\domain_access\Access;
 
 use Drupal\Core\Access\AccessCheckInterface;
@@ -6,10 +7,13 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\Routing\Route;
-use Drupal\domain\DomainInterface;
 use Drupal\domain_access\DomainAccessManagerInterface;
 
-
+/**
+ * Class DomainAccessViewsAccess.
+ *
+ * @package Drupal\domain_access\Access
+ */
 class DomainAccessViewsAccess implements AccessCheckInterface {
 
   /**
@@ -29,7 +33,7 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
   /**
    * The Domain storage handler.
    *
-   * @var \Drupal\domain\DomainStorageInterface $domainStorage
+   * @var \Drupal\domain\DomainStorageInterface
    */
   protected $domainStorage;
 
@@ -43,7 +47,7 @@ class DomainAccessViewsAccess implements AccessCheckInterface {
   /**
    * The Domain access manager.
    *
-   * @var \Drupal\domain_access\DomainAccessManagerInterface $manager
+   * @var \Drupal\domain_access\DomainAccessManagerInterface
    */
   protected $manager;
 

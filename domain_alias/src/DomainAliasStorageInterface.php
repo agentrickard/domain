@@ -18,7 +18,7 @@ interface DomainAliasStorageInterface extends ConfigEntityStorageInterface {
    * @param string $hostname
    *   A hostname string, in the format example.com.
    *
-   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface|null
    *   The best match alias record for the provided hostname.
    */
   public function loadByHostname($hostname);
@@ -29,7 +29,7 @@ interface DomainAliasStorageInterface extends ConfigEntityStorageInterface {
    * @param string $pattern
    *   A pattern string, in the format *.example.com.
    *
-   * @return \Drupal\domain_alias\DomainAliasInterface | NULL
+   * @return \Drupal\domain_alias\DomainAliasInterface|null
    *   The domain alias record given a pattern string.
    */
   public function loadByPattern($pattern);

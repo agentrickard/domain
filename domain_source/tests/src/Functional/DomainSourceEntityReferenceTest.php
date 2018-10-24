@@ -16,18 +16,25 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_source', 'field', 'field_ui', 'menu_ui', 'block');
+  public static $modules = [
+    'domain',
+    'domain_source',
+    'field',
+    'field_ui',
+    'menu_ui',
+    'block',
+  ];
 
   /**
    * Tests that the module installed its field correctly.
    */
   public function testDomainSourceNodeField() {
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -49,13 +56,13 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
    * Tests the storage of the domain source field.
    */
   public function testDomainSourceFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
       'administer menu',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.
@@ -69,7 +76,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $this->assertText('Domain Source', 'Found the domain field instance.');
 
     // We expect to find 5 domain options + none.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
       $this->assertRaw($string, 'Found the domain option.');
@@ -120,19 +127,19 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $this->drupalPlaceBlock('system_menu_block:main');
 
     // Enable main menu as available menu.
-    $edit = array(
+    $edit = [
       'menu_options[main]' => 1,
       'menu_parent' => 'main:',
-    );
+    ];
     $this->drupalPostForm('admin/structure/types/manage/article', $edit, t('Save content type'));
 
     // Create a third node that is assigned to a menu.
-    $edit = array(
+    $edit = [
       'title[0][value]' => 'Node 3',
       'menu[enabled]' => 1,
       'menu[title]' => 'Test preview',
       'field_domain_source' => $two,
-    );
+    ];
     $this->drupalPostForm('node/add/article', $edit, 'Save');
     // Test the URL against expectations, and the rendered menu link.
     $node = $node_storage->load(3);

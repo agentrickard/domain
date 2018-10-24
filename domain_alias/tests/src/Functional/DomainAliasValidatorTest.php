@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
-use Drupal\Tests\domain_alias\Functional\DomainAliasTestBase;
-
 /**
  * Tests domain alias record validation.
  *
@@ -24,26 +22,36 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
     // Check the created domain based on it's known id value.
     $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
-    $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->loadByHostname($key);
+    $domain = \Drupal::entityTypeManager()->getStorage('domain')->loadByHostname($key);
     $this->assertTrue(!empty($domain), 'Test domain created.');
 
     // Valid patterns to test. Valid is the boolean value.
     $patterns = [
       'localhost' => 1,
       'example.com' => 1,
-      'www.example.com' => 1, // see www-prefix test, below.
+       // See www-prefix test, below.
+      'www.example.com' => 1,
       '*.example.com' => 1,
       'one.example.com' => 1,
       'example.com:8080' => 1,
-      'foobar' => 0, // must have a dot or be localhost
-      '*.*.example.com' => 0, // only one wildcard.
-      'example.com::8080' => 0, // only one colon.
-      'example.com:abc' => 0, // no letters after a colon.
-      '.example.com' => 0, // cannot begin with a dot.
-      'example.com.' => 0, // cannot end with a dot.
-      'EXAMPLE.com' => 0, // lowercase only.
-      'éxample.com' => 0, // ascii-only.
-      'foo.com' => 0, // duplicate.
+       // Must have a dot or be localhost.
+      'foobar' => 0,
+       // Only one wildcard.
+      '*.*.example.com' => 0,
+       // Only one colon.
+      'example.com::8080' => 0,
+       // No letters after a colon.
+      'example.com:abc' => 0,
+       // Cannot begin with a dot.
+      '.example.com' => 0,
+       // Cannot end with a dot.
+      'example.com.' => 0,
+       // Lowercase only.
+      'EXAMPLE.com' => 0,
+       // ascii-only.
+      'éxample.com' => 0,
+       // duplicate.
+      'foo.com' => 0,
     ];
     foreach ($patterns as $pattern => $valid) {
       $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);
@@ -57,10 +65,11 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
     }
     // Test the configurable option.
     $config = $this->config('domain.settings');
-    $config->set('allow_non_ascii', true)->save();
+    $config->set('allow_non_ascii', TRUE)->save();
     // Valid hostnames to test. Valid is the boolean value.
     $patterns = [
-      'éxample.com' => 1, // ascii-only allowed.
+      // ascii-only allowed.
+      'éxample.com' => 1,
     ];
     foreach ($patterns as $pattern => $valid) {
       $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);

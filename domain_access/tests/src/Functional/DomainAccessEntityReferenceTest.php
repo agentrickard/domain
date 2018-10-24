@@ -16,18 +16,18 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
+  public static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
 
   /**
    * Tests that the module installed its field correctly.
    */
   public function testDomainAccessNodeField() {
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -49,14 +49,14 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
    * Tests the storage of the domain access field.
    */
   public function testDomainAccessFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
       'publish to any domain',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.
@@ -70,7 +70,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $this->assertText('Domain Access', 'Found the domain field instance.');
 
     // We expect to find 5 domain options.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
       $this->assertRaw($string, 'Found the domain option.');

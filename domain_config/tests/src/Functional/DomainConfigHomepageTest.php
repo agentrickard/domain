@@ -11,7 +11,7 @@ use Drupal\user\RoleInterface;
  */
 class DomainConfigHomepageTest extends DomainConfigTestBase {
 
-  public static $modules = array('node', 'views');
+  public static $modules = ['node', 'views'];
 
   /**
    * Tests that domain-specific homepage loading works.
@@ -20,7 +20,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
    */
   public function testDomainConfigHomepage() {
     // Let anon users see content.
-    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, array('access content'));
+    user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, ['access content']);
 
     // Configure 'node' as front page.
     $site_config = $this->config('system.site');
@@ -31,17 +31,17 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     // Create four new domains programmatically.
     $this->domainCreateTestDomains(5);
     // Get the domain list.
-    $domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple();
-    $this->drupalCreateNode(array(
+    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
+    $this->drupalCreateNode([
       'type' => 'article',
       'title' => 'Node 1',
       'promoted' => TRUE,
-    ));
-    $this->drupalCreateNode(array(
+    ]);
+    $this->drupalCreateNode([
       'type' => 'article',
       'title' => 'Node 2',
       'promoted' => TRUE,
-    ));
+    ]);
     $homepages = $this->getHomepages();
     foreach ($domains as $domain) {
       $home = $this->drupalGet($domain->getPath());
@@ -58,13 +58,13 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
    * Returns the expected homepage paths for each domain.
    */
   private function getHomepages() {
-    $homepages = array(
+    $homepages = [
       'example_com' => 'node',
       'one_example_com' => 'node/1',
       'two_example_com' => 'node',
       'three_example_com' => 'node',
       'four_example_com' => 'node/2',
-    );
+    ];
     return $homepages;
   }
 

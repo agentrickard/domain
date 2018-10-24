@@ -28,11 +28,15 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
   protected $entityTypeManager;
 
   /**
+   * The domain alias storage.
+   *
    * @var \Drupal\domain_alias\DomainAliasStorageInterface
    */
   protected $aliasStorage;
 
   /**
+   * The domain storage.
+   *
    * @var \Drupal\domain\DomainStorageInterface
    */
   protected $domainStorage;
@@ -58,7 +62,7 @@ class DomainAliasValidator implements DomainAliasValidatorInterface {
    * @param \Drupal\domain_alias\DomainAliasInterface $alias
    *   The Domain Alias to validate.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup | NULL
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   A validation error message, if any.
    */
   public function validate(DomainAliasInterface $alias) {

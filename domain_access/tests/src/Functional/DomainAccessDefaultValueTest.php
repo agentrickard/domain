@@ -18,20 +18,20 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_access', 'field', 'field_ui');
+  public static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
 
   /**
    * Test the usage of DomainAccessManager::getDefaultValue().
    */
   public function testDomainAccessDefaultValue() {
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
       'publish to any domain',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Create 5 domains.
@@ -68,10 +68,10 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
     $this->drupalLogout();
 
     // Create a limited value user.
-    $this->test_user = $this->drupalCreateUser(array(
+    $this->test_user = $this->drupalCreateUser([
       'create article content',
       'edit any article content',
-    ));
+    ]);
 
     // Login and try to edit the created node.
     $this->drupalLogin($this->test_user);

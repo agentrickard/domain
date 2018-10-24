@@ -48,12 +48,13 @@ abstract class DomainTestBase extends BrowserTestBase {
     parent::setUp();
 
     // Set the base hostname for domains.
-    $this->baseHostname = \Drupal::service('entity_type.manager')->getStorage('domain')->createHostname();
+    $this->baseHostname = \Drupal::entityTypeManager()->getStorage('domain')->createHostname();
   }
 
   /**
-   * The methods below are brazenly copied from Rules module. They are all
-   * helper methods that make writing tests a bit easier.
+   * The methods below are brazenly copied from Rules module.
+   *
+   * They are all helper methods that make writing tests a bit easier.
    */
 
   /**

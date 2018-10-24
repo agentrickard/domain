@@ -11,7 +11,8 @@
 function domain_alias_set_environments() {
   $config = \Drupal::service('config.factory')->getEditable('domain_alias.settings');
   // Set and save new message value.
-  $config->set('environments', ['default', 'local', 'development', 'staging', 'testing'])->save();
+  $environments = ['default', 'local', 'development', 'staging', 'testing'];
+  $config->set('environments', $environments)->save();
 }
 
 /**

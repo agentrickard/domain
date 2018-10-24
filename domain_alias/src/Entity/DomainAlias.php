@@ -78,7 +78,7 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
   /**
    * The domain alias record redirect value.
    *
-   * @var integer
+   * @var int
    */
   protected $redirect;
 
@@ -114,7 +114,7 @@ class DomainAlias extends ConfigEntityBase implements DomainAliasInterface {
    * {@inheritdoc}
    */
   public function getDomain() {
-    $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
+    $storage = \Drupal::entityTypeManager()->getStorage('domain');
     $domains = $storage->loadByProperties(['domain_id' => $this->domain_id]);
     return $domains ? current($domains) : NULL;
   }

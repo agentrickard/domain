@@ -103,14 +103,14 @@ class DomainNavBlock extends DomainBlockBase {
   public function build() {
     /** @var \Drupal\domain\DomainInterface $active_domain */
     $active_domain = \Drupal::service('domain.negotiator')->getActiveDomain();
-    $access_handler = \Drupal::service('entity_type.manager')->getAccessControlHandler('domain');
+    $access_handler = \Drupal::entityTypeManager()->getAccessControlHandler('domain');
     $account = \Drupal::currentUser();
 
     // Determine the visible domain list.
     $items = [];
     $add_path = ($this->getSetting('link_options') == 'active');
     /** @var \Drupal\domain\DomainInterface $domain */
-    foreach (\Drupal::service('entity_type.manager')->getStorage('domain')->loadMultipleSorted() as $domain) {
+    foreach (\Drupal::entityTypeManager()->getStorage('domain')->loadMultipleSorted() as $domain) {
       // Set the URL.
       $options = ['absolute' => TRUE, 'https' => ($domain->getScheme() == 'https')];
       if ($add_path) {
