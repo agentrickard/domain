@@ -20,7 +20,7 @@ interface DomainStorageInterface extends ConfigEntityStorageInterface {
   /**
    * Returns the id of the default domain.
    *
-   * @return int
+   * @return int|bool
    *   The id of the default domain or FALSE if none is set.
    */
   public function loadDefaultId();
@@ -116,7 +116,7 @@ interface DomainStorageInterface extends ConfigEntityStorageInterface {
    *
    * This function helps us account for variable schemes across environments.
    *
-   * @return $scheme
+   * @return scheme
    *   A string representation of s scheme (http|https).
    */
   public function getDefaultScheme();

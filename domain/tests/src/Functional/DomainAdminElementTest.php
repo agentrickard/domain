@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests behavior for the domain admin field element.
  *
@@ -16,7 +14,7 @@ class DomainAdminElementTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'field', 'field_ui', 'user');
+  public static $modules = ['domain', 'field', 'field_ui', 'user'];
 
   /**
    * {@inheritdoc}
@@ -32,12 +30,12 @@ class DomainAdminElementTest extends DomainTestBase {
    * Basic test setup.
    */
   public function testDomainAccessElement() {
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer users',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
     $this->drupalGet('admin/people/create');
@@ -73,16 +71,16 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->assert(count($values) == 3, 'User saved with three domain records.');
 
     // Now login as a user with limited rights.
-    $account = $this->drupalCreateUser(array(
+    $account = $this->drupalCreateUser([
       'administer users',
       'assign domain administrators',
-    ));
+    ]);
     $ids = ['example_com', 'one_example_com'];
     $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ADMIN_FIELD);
     $tester = $storage->load($account->id());
     $values = $manager->getFieldValues($tester, DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 2, 'User saved with two domain records.');
-    $storage->resetCache(array($account->id()));
+    $storage->resetCache([$account->id()]);
     $this->drupalLogin($account);
 
     $this->drupalGet('user/' . $user->id() . '/edit');
@@ -107,7 +105,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Now, check the user.
-    $storage->resetCache(array($user->id()));
+    $storage->resetCache([$user->id()]);
     $user = $storage->load($user->id());
     // Check that two values are set.
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);

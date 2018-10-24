@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests the domain record actions.
  *
@@ -15,7 +13,7 @@ class DomainActionsTest extends DomainTestBase {
    * Tests bulk actions through the domain overview page.
    */
   public function testDomainActions() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'access administration pages'));
+    $this->admin_user = $this->drupalCreateUser(['administer domains', 'access administration pages']);
     $this->drupalLogin($this->admin_user);
 
     $path = 'admin/config/domain';
@@ -43,7 +41,7 @@ class DomainActionsTest extends DomainTestBase {
       $this->assertText($name, 'Name found properly.');
     }
     // Test the list of actions.
-    $actions = array('delete', 'disable', 'default');
+    $actions = ['delete', 'disable', 'default'];
     foreach ($actions as $action) {
       $this->assertRaw("/domain/{$action}/", 'Actions found properly.');
     }
@@ -68,7 +66,7 @@ class DomainActionsTest extends DomainTestBase {
     }
 
     // Test the list of actions.
-    $actions = array('enable', 'delete', 'disable', 'default');
+    $actions = ['enable', 'delete', 'disable', 'default'];
     foreach ($actions as $action) {
       $this->assertRaw("/domain/{$action}/", 'Actions found properly.');
     }
@@ -100,4 +98,3 @@ class DomainActionsTest extends DomainTestBase {
   }
 
 }
-

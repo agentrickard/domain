@@ -7,6 +7,7 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 
 /**
  * Loads Domain records.
+ *
  * @deprecated
  *  This class will be removed before the 8.1.0 release.
  *  Use DomainStorage instead, loaded through the EntityTypeManager.
@@ -49,7 +50,7 @@ class DomainLoader implements DomainLoaderInterface {
    */
   public function loadSchema() {
     $fields = $this->typedConfig->getDefinition('domain.record.*');
-    return isset($fields['mapping']) ? $fields['mapping'] : array();
+    return isset($fields['mapping']) ? $fields['mapping'] : [];
   }
 
   /**
@@ -58,7 +59,7 @@ class DomainLoader implements DomainLoaderInterface {
   public function load($id, $reset = FALSE) {
     $controller = $this->getStorage();
     if ($reset) {
-      $controller->resetCache(array($id));
+      $controller->resetCache([$id]);
     }
     return $controller->load($id);
   }
@@ -78,7 +79,7 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadDefaultDomain() {
-    $result = $this->getStorage()->loadByProperties(array('is_default' => TRUE));
+    $result = $this->getStorage()->loadByProperties(['is_default' => TRUE]);
     if (!empty($result)) {
       return current($result);
     }
@@ -101,7 +102,7 @@ class DomainLoader implements DomainLoaderInterface {
    */
   public function loadMultipleSorted(array $ids = NULL) {
     $domains = $this->loadMultiple($ids);
-    uasort($domains, array($this, 'sort'));
+    uasort($domains, [$this, 'sort']);
     return $domains;
   }
 
@@ -110,7 +111,7 @@ class DomainLoader implements DomainLoaderInterface {
    */
   public function loadByHostname($hostname) {
     $hostname = $this->prepareHostname($hostname);
-    $result = $this->getStorage()->loadByProperties(array('hostname' => $hostname));
+    $result = $this->getStorage()->loadByProperties(['hostname' => $hostname]);
     if (empty($result)) {
       return NULL;
     }
@@ -121,7 +122,7 @@ class DomainLoader implements DomainLoaderInterface {
    * {@inheritdoc}
    */
   public function loadOptionsList() {
-    $list = array();
+    $list = [];
     foreach ($this->loadMultipleSorted() as $id => $domain) {
       $list[$id] = $domain->label();
     }

@@ -3,7 +3,6 @@
 namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain navigation block.
@@ -17,7 +16,7 @@ class DomainNavBlockTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'node', 'block');
+  public static $modules = ['domain', 'node', 'block'];
 
   /**
    * Test domain navigation block.
@@ -31,7 +30,7 @@ class DomainNavBlockTest extends DomainTestBase {
     $block = $this->drupalPlaceBlock('domain_nav_block');
 
     // Let the anon user view the block.
-    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('use domain nav block'));
+    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['use domain nav block']);
 
     // Load the homepage. All links should appear.
     $this->drupalGet('<front>');
@@ -56,7 +55,7 @@ class DomainNavBlockTest extends DomainTestBase {
       }
     }
     // Let the anon user view diabled domains. All links should appear.
-    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));
+    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access inactive domains']);
 
     // Load the homepage.
     $this->drupalGet('<front>');
@@ -94,4 +93,5 @@ class DomainNavBlockTest extends DomainTestBase {
       $this->assertRaw($domain->getPath());
     }
   }
+
 }

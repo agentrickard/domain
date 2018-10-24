@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Traits;
 
-use Drupal\domain\DomainInterface;
-
 /**
  * Contains helper classes for tests to set up various configuration.
  */
@@ -22,45 +20,57 @@ trait DomainTestTrait {
    *
    * @param int $count
    *   The number of domains to create.
-   * @param string|NULL $base_hostname
+   * @param string|null $baseHostname
    *   The root domain to use for domain creation (e.g. example.com).
    * @param array $list
    *   An optional list of subdomains to apply instead of the default set.
    */
-  public function domainCreateTestDomains($count = 1, $base_hostname = NULL, $list = array()) {
+  public function domainCreateTestDomains($count = 1, $baseHostname = NULL, array $list = []) {
     $original_domains = \Drupal::service('entity_type.manager')->getStorage('domain')->loadMultiple(NULL, TRUE);
-    if (empty($base_hostname)) {
-      $base_hostname = $this->base_hostname;
+    if (empty($baseHostname)) {
+      $baseHostname = $this->baseHostname;
     }
     // Note: these domains are rigged to work on my test server.
     // For proper testing, yours should be set up similarly, but you can pass a
     // $list array to change the default.
     if (empty($list)) {
-      $list = array('', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten');
+      $list = [
+        '',
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+        'eight',
+        'nine',
+        'ten',
+      ];
     }
     for ($i = 0; $i < $count; $i++) {
       if ($i === 0) {
-        $hostname = $base_hostname;
+        $hostname = $baseHostname;
         $machine_name = 'example.com';
         $name = 'Example';
       }
       elseif (!empty($list[$i])) {
-        $hostname = $list[$i] . '.' . $base_hostname;
+        $hostname = $list[$i] . '.' . $baseHostname;
         $machine_name = $list[$i] . '.example.com';
         $name = 'Test ' . ucfirst($list[$i]);
       }
       // These domains are not setup and are just for UX testing.
       else {
-        $hostname = 'test' . $i . '.' . $base_hostname;
+        $hostname = 'test' . $i . '.' . $baseHostname;
         $machine_name = 'test' . $i . '.example.com';
         $name = 'Test ' . $i;
       }
       // Create a new domain programmatically.
-      $values = array(
+      $values = [
         'hostname' => $hostname,
         'name' => $name,
         'id' => \Drupal::service('entity_type.manager')->getStorage('domain')->createMachineName($machine_name),
-      );
+      ];
       $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
       $domain->save();
     }
@@ -79,7 +89,7 @@ trait DomainTestTrait {
    * @param string $field
    *   The name of the domain field used to attach to the entity.
    */
-  public function addDomainsToEntity($entity_type, $entity_id, $ids, $field) {
+  public function addDomainsToEntity($entity_type, $entity_id, array $ids, $field) {
     if ($entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
       $entity->set($field, $ids);
       $entity->save();
@@ -111,10 +121,10 @@ trait DomainTestTrait {
   /**
    * Converts a domain hostname to a trusted host pattern.
    *
-   * @param $hostname
+   * @param string $hostname
    *   A hostname string.
    *
-   * @return
+   * @return string
    *   A regex-safe hostname, without delimiters.
    */
   public function prepareTrustedHostname($hostname) {
@@ -126,7 +136,7 @@ trait DomainTestTrait {
    * Set the base hostname for this test.
    */
   public function setBaseHostname() {
-    $this->base_hostname = \Drupal::service('entity_type.manager')->getStorage('domain')->createHostname();
+    $this->baseHostname = \Drupal::service('entity_type.manager')->getStorage('domain')->createHostname();
   }
 
   /**
@@ -143,7 +153,7 @@ trait DomainTestTrait {
    * Creates domain record for use with POST request tests.
    */
   public function domainPostValues() {
-    $edit = array();
+    $edit = [];
     $domain = \Drupal::service('entity_type.manager')->getStorage('domain')->create();
     $required = \Drupal::service('domain.validator')->getRequiredFields();
     foreach ($required as $key) {

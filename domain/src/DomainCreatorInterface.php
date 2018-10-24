@@ -4,6 +4,7 @@ namespace Drupal\domain;
 
 /**
  * Handles the creation of new domain records.
+ *
  * @deprecated
  *  This interface will be removed before the 8.1.0 release.
  */
@@ -17,10 +18,10 @@ interface DomainCreatorInterface {
    *   Required values are: hostname, name.
    *   Passing an empty array will create a domain from the current request.
    *
-   * @return DomainInterface $domain
+   * @return DomainInterface
    *   A domain record object.
    */
-  public function createDomain(array $values = array());
+  public function createDomain(array $values = []);
 
   /**
    * Gets the hostname of the active request.

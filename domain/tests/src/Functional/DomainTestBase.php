@@ -8,6 +8,11 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\domain\DomainInterface;
 use Drupal\Tests\domain\Traits\DomainTestTrait;
 
+/**
+ * Class DomainTestBase.
+ *
+ * @package Drupal\Tests\domain\Functional
+ */
 abstract class DomainTestBase extends BrowserTestBase {
 
   use DomainTestTrait;
@@ -15,17 +20,19 @@ abstract class DomainTestBase extends BrowserTestBase {
   /**
    * Sets a base hostname for running tests.
    *
-   * When creating test domains, try to use $this->base_hostname or the
+   * When creating test domains, try to use $this->baseHostname or the
    * domainCreateTestDomains() method.
+   *
+   * @var string
    */
-  public $base_hostname;
+  public $baseHostname;
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = array('domain', 'node');
+  public static $modules = ['domain', 'node'];
 
   /**
    * We use the standard profile for testing.
@@ -41,7 +48,7 @@ abstract class DomainTestBase extends BrowserTestBase {
     parent::setUp();
 
     // Set the base hostname for domains.
-    $this->base_hostname = \Drupal::service('entity_type.manager')->getStorage('domain')->createHostname();
+    $this->baseHostname = \Drupal::service('entity_type.manager')->getStorage('domain')->createHostname();
   }
 
   /**
@@ -68,8 +75,8 @@ abstract class DomainTestBase extends BrowserTestBase {
    * @param string $locator
    *   Link id, title, text or image alt.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
-   *   The link node element.
+   * @return bool
+   *   TRUE if link is absent, or FALSE.
    */
   public function findNoLink($locator) {
     return empty($this->getSession()->getPage()->hasLink($locator));
@@ -132,9 +139,10 @@ abstract class DomainTestBase extends BrowserTestBase {
   /**
    * Checks checkbox with specified locator.
    *
-   * @param string $locator input id, name or label
+   * @param string $locator
+   *   An input id, name or label.
    *
-   * @throws ElementNotFoundException
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function checkField($locator) {
     $this->getSession()->getPage()->checkField($locator);
@@ -143,9 +151,10 @@ abstract class DomainTestBase extends BrowserTestBase {
   /**
    * Unchecks checkbox with specified locator.
    *
-   * @param string $locator input id, name or label
+   * @param string $locator
+   *   An input id, name or label.
    *
-   * @throws ElementNotFoundException
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function uncheckField($locator) {
     $this->getSession()->getPage()->uncheckField($locator);
@@ -154,15 +163,18 @@ abstract class DomainTestBase extends BrowserTestBase {
   /**
    * Selects option from select field with specified locator.
    *
-   * @param string  $locator  input id, name or label
-   * @param string  $value    option value
-   * @param Boolean $multiple select multiple options
+   * @param string $locator
+   *   An input id, name or label.
+   * @param string $value
+   *   The option value.
+   * @param bool $multiple
+   *   Whether to select multiple options.
    *
-   * @throws ElementNotFoundException
+   * @throws \Behat\Mink\Exception\ElementNotFoundException
    *
    * @see NodeElement::selectOption
    */
-  public function selectFieldOption($locator, $value, $multiple = false) {
+  public function selectFieldOption($locator, $value, $multiple = FALSE) {
     $this->getSession()->getPage()->selectFieldOption($locator, $value, $multiple);
   }
 
@@ -173,6 +185,7 @@ abstract class DomainTestBase extends BrowserTestBase {
    *   The user account object to check.
    *
    * @return bool
+   *   TRUE if a given user account is logged in, or FALSE.
    */
   protected function drupalUserIsLoggedIn(AccountInterface $account) {
     // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
@@ -181,7 +194,7 @@ abstract class DomainTestBase extends BrowserTestBase {
     }
     // The session ID is hashed before being stored in the database.
     // @see \Drupal\Core\Session\SessionHandler::read()
-    return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
+    return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", [':sid' => Crypt::hashBase64($account->session_id)])->fetchField();
   }
 
   /**

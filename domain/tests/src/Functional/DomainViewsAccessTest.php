@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests the domain access plugin for Views.
  *
@@ -16,10 +14,12 @@ class DomainViewsAccessTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'node', 'views', 'block');
+  public static $modules = ['domain', 'node', 'views', 'block'];
 
   /**
    * Disabled config schema checking.
+   *
+   * @var bool
    *
    * @TODO: https://github.com/agentrickard/domain/issues/200
    */
@@ -37,7 +37,7 @@ class DomainViewsAccessTest extends DomainTestBase {
     // Create a user. To test the area output was more difficult, so we just
     // configured two views. The page shows the first, admin, user, and the
     // block will show this new user name.
-    $this->user = $this->drupalCreateUser(array('administer domains', 'create domains'));
+    $this->user = $this->drupalCreateUser(['administer domains', 'create domains']);
     // Place the view block.
     $this->drupalPlaceBlock('views_block:domain_views_access-block_1');
 
@@ -75,7 +75,7 @@ class DomainViewsAccessTest extends DomainTestBase {
    * using it, it cannot be enabled normally.
    */
   protected function enableViewsTestModule() {
-    \Drupal::service('module_installer')->install(array('domain_test'));
+    \Drupal::service('module_installer')->install(['domain_test']);
     $this->resetAll();
     $this->rebuildContainer();
     $this->container->get('module_handler')->reload();

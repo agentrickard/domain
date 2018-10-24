@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests the domain record form interface.
  *
@@ -15,7 +13,7 @@ class DomainFormsTest extends DomainTestBase {
    * Create, edit and delete a domain via the user interface.
    */
   public function testDomainInterface() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
+    $this->admin_user = $this->drupalCreateUser(['administer domains', 'create domains']);
     $this->drupalLogin($this->admin_user);
 
     $storage = \Drupal::service('entity_type.manager')->getStorage('domain');
@@ -72,7 +70,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet($deleteUrl);
 
     // Delete the record.
-    $this->drupalPostForm($deleteUrl, array(), 'Delete');
+    $this->drupalPostForm($deleteUrl, [], 'Delete');
     $storage->resetCache([$default_id]);
     $domain = $storage->load($default_id);
     $this->assertTrue(empty($domain), 'Domain record deleted.');

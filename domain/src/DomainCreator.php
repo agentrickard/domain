@@ -16,14 +16,14 @@ class DomainCreator implements DomainCreatorInterface {
   /**
    * The Domain loader.
    *
-   * @var \Drupal\domain\DomainLoaderInterface $loader
+   * @var \Drupal\domain\DomainLoaderInterface
    */
   protected $loader;
 
   /**
    * The Domain negotiator.
    *
-   * @var \Drupal\domain\DomainNegotiatorInterface $negotiator
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $negotiator;
 
@@ -43,19 +43,19 @@ class DomainCreator implements DomainCreatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function createDomain(array $values = array()) {
+  public function createDomain(array $values = []) {
     $default = $this->loader->loadDefaultId();
     $domains = $this->loader->loadMultiple();
     if (empty($values)) {
       $values['hostname'] = $this->createHostname();
       $values['name'] = \Drupal::config('system.site')->get('name');
     }
-    $values += array(
+    $values += [
       'scheme' => \Drupal::service('entity_type.manager')->getStorage('domain')->getDefaultScheme(),
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
-    );
+    ];
     $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
 
     return $domain;

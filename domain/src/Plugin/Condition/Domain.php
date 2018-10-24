@@ -61,18 +61,18 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $form['domains'] = array(
+    $form['domains'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('When the following domains are active'),
       '#default_value' => $this->configuration['domains'],
       '#options' => array_map('\Drupal\Component\Utility\Html::escape', \Drupal::service('entity_type.manager')->getStorage('domain')->loadOptionsList()),
       '#description' => $this->t('If you select no domains, the condition will evaluate to TRUE for all requests.'),
-      '#attached' => array(
-        'library' => array(
+      '#attached' => [
+        'library' => [
           'domain/drupal.domain',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
     return parent::buildConfigurationForm($form, $form_state);
   }
 
@@ -80,9 +80,9 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
-      'domains' => array(),
-    ) + parent::defaultConfiguration();
+    return [
+      'domains' => [],
+    ] + parent::defaultConfiguration();
   }
 
   /**
@@ -106,10 +106,10 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
       $domains = reset($domains);
     }
     if ($this->isNegated()) {
-      return $this->t('Active domain is not @domains', array('@domains' => $domains));
+      return $this->t('Active domain is not @domains', ['@domains' => $domains]);
     }
     else {
-      return $this->t('Active domain is @domains', array('@domains' => $domains));
+      return $this->t('Active domain is @domains', ['@domains' => $domains]);
     }
   }
 

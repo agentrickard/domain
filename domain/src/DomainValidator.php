@@ -68,7 +68,7 @@ class DomainValidator implements DomainValidatorInterface {
    * {@inheritdoc}
    */
   public function validate($hostname) {
-    $error_list = array();
+    $error_list = [];
     // Check for at least one dot or the use of 'localhost'.
     // Note that localhost can specify a port.
     $localhost_check = explode(':', $hostname);
@@ -148,7 +148,7 @@ class DomainValidator implements DomainValidatorInterface {
    * {@inheritdoc}
    */
   public function getRequiredFields() {
-    return array('hostname', 'name', 'scheme', 'status', 'weight');
+    return ['hostname', 'name', 'scheme', 'status', 'weight'];
   }
 
 }

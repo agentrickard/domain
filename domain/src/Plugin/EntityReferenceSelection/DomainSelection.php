@@ -65,48 +65,48 @@ class DomainSelection extends DefaultSelection {
     $selection_handler_settings = $this->configuration['handler_settings'];
 
     // Merge-in default values.
-    $selection_handler_settings += array(
+    $selection_handler_settings += [
       // For the 'target_bundles' setting, a NULL value is equivalent to "allow
       // entities from any bundle to be referenced" and an empty array value is
       // equivalent to "no entities from any bundle can be referenced".
       'target_bundles' => NULL,
-      'sort' => array(
+      'sort' => [
         'field' => 'weight',
         'direction' => 'ASC',
-      ),
+      ],
       'auto_create' => FALSE,
       'default_selection' => 'current',
-    );
+    ];
 
-    $form['target_bundles'] = array(
+    $form['target_bundles'] = [
       '#type' => 'value',
       '#value' => NULL,
-    );
+    ];
 
-    $fields = array(
+    $fields = [
       'weight' => $this->t('Weight'),
       'label' => $this->t('Name'),
       'hostname' => $this->t('Hostname'),
-    );
+    ];
 
-    $form['sort']['field'] = array(
+    $form['sort']['field'] = [
       '#type' => 'select',
       '#title' => $this->t('Sort by'),
       '#options' => $fields,
       '#ajax' => FALSE,
       '#default_value' => $selection_handler_settings['sort']['field'],
-    );
+    ];
 
-    $form['sort']['direction'] = array(
+    $form['sort']['direction'] = [
       '#type' => 'select',
       '#title' => $this->t('Sort direction'),
       '#required' => TRUE,
-      '#options' => array(
+      '#options' => [
         'ASC' => $this->t('Ascending'),
         'DESC' => $this->t('Descending'),
-      ),
+      ],
       '#default_value' => $selection_handler_settings['sort']['direction'],
-    );
+    ];
 
     return $form;
   }

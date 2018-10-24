@@ -2,8 +2,6 @@
 
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
-use Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection;
-
 /**
  * Provides entity reference selections for the domain entity type.
  *

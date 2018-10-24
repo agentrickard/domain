@@ -23,6 +23,8 @@ class DomainNegotiator implements DomainNegotiatorInterface {
 
   /**
    * The HTTP_HOST value of the request.
+   *
+   * @var string
    */
   protected $httpHost;
 
@@ -76,7 +78,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    *   The request stack object.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
@@ -103,8 +105,8 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
     else {
-      $values = array('hostname' => $httpHost);
-      /** @var \Drupal\domain\Entity\DomainInterface $domain */
+      $values = ['hostname' => $httpHost];
+      /** @var \Drupal\domain\DomainInterface $domain */
       $domain = $this->domainStorage->create($values);
       $domain->setMatchType(self::DOMAIN_MATCH_NONE);
     }
@@ -204,8 +206,8 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       return TRUE;
     }
     // Check for registered alias matches.
-    $values = array('hostname' => $hostname);
-    /** @var \Drupal\domain\Entity\DomainInterface $domain */
+    $values = ['hostname' => $hostname];
+    /** @var \Drupal\domain\DomainInterface $domain */
     $domain = $this->domainStorage->create($values);
     $domain->setMatchType(self::DOMAIN_MATCH_NONE);
 
