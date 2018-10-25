@@ -19,7 +19,7 @@ function domain_assets_library_info_build() {
   /** @var \Drupal\domain\DomainInterface $domain */
   foreach (Domain::loadMultiple() as $domain) {
     $id = $domain->id();
-    $libraries["domain.dummy-$id"] = [];
+    $libraries["domain/dummy.$id"] = [];
   }
   return $libraries;
 }
@@ -45,5 +45,5 @@ function domain_assets_page_attachments(array &$attachments) {
   $negotiator = \Drupal::service('domain.negotiator');
   $domain = $negotiator->getActiveDomain();
   $id = $domain->id();
-  $attachments['#attached']['library'][] = "domain.dummy-$id";
+  $attachments['#attached']['library'][] = "domain/dummy.$id";
 }
