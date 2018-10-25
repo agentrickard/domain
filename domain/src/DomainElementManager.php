@@ -2,6 +2,7 @@
 
 namespace Drupal\domain;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -126,7 +127,7 @@ class DomainElementManager implements DomainElementManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function disallowedOptions(FormStateInterface $form_state, $field) {
+  public function disallowedOptions(FormStateInterface $form_state, array $field) {
     $options = [];
     $info = $form_state->getBuildInfo();
     $entity = $form_state->getFormObject()->getEntity();
@@ -151,7 +152,7 @@ class DomainElementManager implements DomainElementManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFieldValues($entity, $field_name) {
+  public function getFieldValues(EntityInterface $entity, $field_name) {
     // @TODO: static cache.
     $list = [];
     // @TODO In tests, $entity is returning NULL.

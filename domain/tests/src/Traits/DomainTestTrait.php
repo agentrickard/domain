@@ -84,12 +84,12 @@ trait DomainTestTrait {
    *   The entity type being acted upon.
    * @param int $entity_id
    *   The entity id.
-   * @param array $ids
-   *   An array of ids to add.
+   * @param array|string $ids
+   *   An id or array of ids to add.
    * @param string $field
    *   The name of the domain field used to attach to the entity.
    */
-  public function addDomainsToEntity($entity_type, $entity_id, array $ids, $field) {
+  public function addDomainsToEntity($entity_type, $entity_id, $ids, $field) {
     if ($entity = \Drupal::entityTypeManager()->getStorage($entity_type)->load($entity_id)) {
       $entity->set($field, $ids);
       $entity->save();
