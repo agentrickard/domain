@@ -36,7 +36,7 @@ interface DomainAliasLoaderInterface {
    * @return array
    *   An array of Drupal\domain_alias\DomainAliasInterface objects.
    */
-  public function loadMultiple($ids = NULL, $reset = FALSE);
+  public function loadMultiple(array $ids = NULL, $reset = FALSE);
 
   /**
    * Loads a domain alias record by hostname lookup.
