@@ -1,0 +1,8 @@
+name: Domain Assets
+description: 'Allows domain specific assets, e.g. for color.module.'
+type: module
+package: Domain
+version: VERSION
+core: 8.x
+dependencies:
+  - domain:domain

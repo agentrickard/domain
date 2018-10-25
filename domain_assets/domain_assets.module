@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Allows domain specific assets.
+ */
+
+use Drupal\domain\Entity\Domain;
+
+/**
+ * Implements hook_library_info_build().
+ *
+ * Adds empty dummy libraries, one per domain.
+ *
+ * @aee domain_config_page_attachments().
+ */
+function domain_assets_library_info_build() {
+  $libraries = [];
+  /** @var \Drupal\domain\DomainInterface $domain */
+  foreach (Domain::loadMultiple() as $domain) {
+    $id = $domain->id();
+    $libraries["domain.dummy-$id"] = [];
+  }
+  return $libraries;
+}
+
+/**
+ * Implements hook_page_attachments().
+ *
+ * Adds our domain specific dummy library to every page, as a hack to have
+ * AssetResolver cache asset info per domain. As AssetResolver caches asset
+ * info per hash-of-all-library-keys, with our dummy library we ensure that
+ * that cache key varies per domain. So if then e.g. color.module alters the
+ * theme css library info dependent on a domain dependent config, with our hack
+ * we avoid cache clashes.
+ * In an ideal world, the color module would propagete the cache context from
+ * config to library asset info to said cache key, but as there are currently
+ * no APIs for that, we simply do this and cache per domain.
+ *
+ * @see \Drupal\Core\Asset\AssetResolver::getCssAssets
+ * @see \Drupal\Core\Asset\AssetResolver::getJsAssets
+ */
+function domain_assets_page_attachments(array &$attachments) {
+  /** @var \Drupal\domain\DomainNegotiatorInterface $negotiator */
+  $negotiator = \Drupal::service('domain.negotiator');
+  $domain = $negotiator->getActiveDomain();
+  $id = $domain->id();
+  $attachments['#attached']['library'][] = "domain.dummy-$id";
+}
