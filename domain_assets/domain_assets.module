@@ -8,20 +8,17 @@
 use Drupal\domain\Entity\Domain;
 
 /**
- * Implements hook_library_info_build().
- *
- * Adds empty dummy libraries, one per domain.
- *
- * @aee domain_config_page_attachments().
+ * Implements hook_library_info_alter().
  */
-function domain_assets_library_info_build() {
-  $libraries = [];
+function domain_assets_library_info_alter(&$libraries, $extension) {
+  if ($extension !== 'domain_assets') {
+    return;
+  }
   /** @var \Drupal\domain\DomainInterface $domain */
   foreach (Domain::loadMultiple() as $domain) {
     $id = $domain->id();
-    $libraries["domain/dummy.$id"] = [];
+    $libraries["dummy.$id"] = ['css' => []];
   }
-  return $libraries;
 }
 
 /**
