@@ -19,6 +19,7 @@ function domain_assets_library_info_alter(&$libraries, $extension) {
     $id = $domain->id();
     $libraries["dummy.$id"] = ['css' => []];
   }
+  $libraries["dummy._none"] = ['css' => []];
 }
 
 /**
@@ -41,6 +42,6 @@ function domain_assets_page_attachments(array &$attachments) {
   /** @var \Drupal\domain\DomainNegotiatorInterface $negotiator */
   $negotiator = \Drupal::service('domain.negotiator');
   $domain = $negotiator->getActiveDomain();
-  $id = $domain->id();
+  $id = $domain ? $domain->id() : '_none';
   $attachments['#attached']['library'][] = "domain/dummy.$id";
 }
