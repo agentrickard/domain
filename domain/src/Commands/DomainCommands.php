@@ -373,7 +373,10 @@ class DomainCommands extends DrushCommands {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function reassignEntities(string $entity_type, string $field, DomainInterface $old_domain, DomainInterface $new_domain, $ids):int {
+  protected function reassignEntities(string $entity_type, string $field,
+                                      DomainInterface $old_domain, DomainInterface $new_domain,
+                                      array $ids):int {
+
     $entity_storage = \Drupal::entityTypeManager()->getStorage($entity_type);
 
     // @TODO is there a problem loading many, possibly big, entities in one go?
@@ -420,14 +423,17 @@ class DomainCommands extends DrushCommands {
   protected function getDomainInstanceFromPolicy(string $policy) {
     $domain_storage = $this->getStorage();
     switch($policy) {
+      /* Use the Default Domain machine name */
       case 'default':
         $new_domain = $domain_storage->loadDefaultDomain();
         break;
 
+      /* Ask interactively for a Domain machine name */
       case 'prompt':
       case 'ignore':
         return NULL;
 
+      /* Use this (specified) Domain machine name */
       default:
         $new_domain = $domain_storage->load($policy);
         break;
@@ -692,7 +698,7 @@ class DomainCommands extends DrushCommands {
     $domain_affiliate_entities = [];
     foreach($field_map as $type => $fields) {
       if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
-        $domain_entities[] = '+'.$type;
+        $domain_entities[] = '+' . $type;
       }
       else {
         try {
@@ -780,9 +786,15 @@ class DomainCommands extends DrushCommands {
       );
     }
 
+    if (empty($hostname) || $hostname !== mb_strtolower($hostname)) {
+      throw new DomainCommandException(
+        dt('The hostname "!hostname" must not contain upper case characters',
+          ['!hostname' => $hostname])
+      );
+    }
+
     $records_count = $domain_storage->getQuery()->count()->execute();
     $start_weight = $records_count + 1;
-    $hostname = mb_strtolower($hostname);
     $values = array(
       'hostname' => $hostname,
       'name' => $name,
