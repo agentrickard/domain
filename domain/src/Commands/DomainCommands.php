@@ -864,13 +864,14 @@ class DomainCommands extends DrushCommands {
    * @option content-as
    *   Values "prompt", "ignore", "default", <name>, Reassign content
    *   associated with the the domain being deleted to the default domain, to
-   *   a specified domain, or leave the content alone (&hence inaccessible in
-   *   the normal way). The default value is 'prompt': ask which domain to use.
+   *   a specified domain, or leave the content alone (and so inaccessible
+   *   in the normal way). The default value is 'prompt': ask which domain to
+   *   use.
    * @option users-as
    *   Values "prompt", "ignore", "default", <name>, Reassign user accounts
    *   associated with the the domain being deleted to the default domain,
    *   to the domain whose machine name is <name>, or leave the user accounts
-   *   alone (&hence inaccessible in the normal way). The default value is
+   *   alone (and so inaccessible in the normal way). The default value is
    *   'prompt': ask which domain to use.
    *
    * @command domain:delete
@@ -882,9 +883,9 @@ class DomainCommands extends DrushCommands {
     $policy_content = 'prompt';
     $policy_users = 'prompt';
 
-    $this->is_dry_run = (bool)$options['dryrun'];
+    $this->is_dry_run = (bool) $options['dryrun'];
 
-    //region Get current domain list and perform sanity checks.
+    // Get current domain list and perform validation checks.
     $domain_storage = $this->getStorage();
     $default_domain = $domain_storage->loadDefaultDomain();
     $all_domains = $domain_storage->loadMultipleSorted(NULL);
@@ -895,9 +896,8 @@ class DomainCommands extends DrushCommands {
     if (empty($domain_id)) {
       throw new DomainCommandException('You must specify a domain to delete.');
     }
-    //endregion
 
-    //region Determine which domains to be deleted.
+    // Determine which domains to be deleted.
     if ($domain_id === 'all') {
       $domains = $all_domains;
       if (empty($domains)) {
@@ -920,9 +920,8 @@ class DomainCommands extends DrushCommands {
       $this->logger()->info(dt('Nothing to do?'));
       return;
     }
-    //endregion
 
-    //region Get content disposition from configuration and validate.
+    // Get content disposition from configuration and validate.
     if ($options['content-as']) {
       if (\in_array($options['content-as'], $this->reassignment_policies, True)) {
         $policy_content = $options['content-as'];
@@ -939,9 +938,8 @@ class DomainCommands extends DrushCommands {
         $policy_users = $options['users-as'];
       }
     }
-    //endregion
 
-    //region Perform the 'prompt' for a destination domain.
+    // Perform the 'prompt' for a destination domain.
     if ($policy_content === 'prompt' || $policy_users === 'prompt') {
 
       // Make a list of the eligible destination domains in form id -> name.
@@ -977,9 +975,8 @@ class DomainCommands extends DrushCommands {
     if ($policy_users === 'default') {
       $policy_users = $default_domain->id();
     }
-    //endregion
 
-    //region Reassign content as required.
+    // Reassign content as required.
     $options = [
       'entity_filter' => 'node',
       'policy' => $policy_content,
@@ -992,8 +989,7 @@ class DomainCommands extends DrushCommands {
       'multidomain' => FALSE,
     ];
     $this->reassignLinkedEntities($domains, $options);
-    //endregion
-    
+
     $this->deleteDomain($domains, $options);
     $this->logger()->info(dt('Domain record deleted.'));
   }
