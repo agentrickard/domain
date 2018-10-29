@@ -37,11 +37,15 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t("Keeps last selected Domain for next configuration pages."),
     ];
     // @TODO: Determine what core paths are safe defaults.
-    $form['path_pages'] = [
+    $form['pages'] = [
+      '#title' => $this->t('Pages'),
+      '#type' => 'details',
+      '#open' => FALSE,
+    ];
+    $form['pages']['path_pages'] = [
       '#type' => 'textarea',
       '#rows' => 5,
       '#columns' => 40,
-      '#title' => $this->t('Pages'),
       '#default_value' => $config->get('path_pages'),
       '#description' => $this->t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard."),
     ];
@@ -54,6 +58,7 @@ class SettingsForm extends ConfigFormBase {
       ],
       '#default_value' => $config->get('path_negate'),
     ];
+
     return parent::buildForm($form, $form_state);
   }
 

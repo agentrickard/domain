@@ -42,7 +42,7 @@ class DomainConfigUIController {
           // Check to see if we already registered this form.
           if (!$exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
             // TODO: reverse logic if negate is turned on.
-            $config->set('path_pages', $path_pages . $url->toString() . "\r\n")
+            $config->set('path_pages', $path_pages . "\r\n" . $url->toString())
               ->save();
             $message = $this->t('Form added to domain configuration interface.');
             $success = TRUE;
@@ -51,6 +51,7 @@ class DomainConfigUIController {
         case 'disable':
           if ($exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
             $new_pages = str_replace($url->toString(), '', $path_pages);
+            $new_pages = trim($new_pages);
             $config->set('path_pages', $new_pages)
               ->save();
             $message = $this->t('Form removed domain configuration interface.');
