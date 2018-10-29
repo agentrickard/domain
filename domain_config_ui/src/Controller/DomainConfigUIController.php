@@ -75,6 +75,7 @@ class DomainConfigUIController {
    * Lists all stored configuration.
    */
   public function overview() {
+    $elements = [];
     $page['table'] = array(
       '#type' => 'table',
       '#header' => [
@@ -91,18 +92,25 @@ class DomainConfigUIController {
       $elements[] = $this->deriveElements($name);
     }
     // Sort the items.
-    uasort($elements, [$this, 'sortItems']);
+    if (!empty($elements)) {
+      uasort($elements, [$this, 'sortItems']);
 
-    foreach ($elements as $element) {
-      $page['table'][] = [
-        'name' => ['#markup' => $element['name']],
-        'item' => ['#markup' => $element['item']],
-        'domain' => ['#markup' => $element['domain']],
-        'language' => ['#markup' => $element['language']],
-        'actions' => ['#type' => 'link',
-          '#url' => Url::fromRoute('domain_config_ui.delete', ['config_name' => $element['name']]),
-          '#title' => $this->t('Delete'),
-        ],
+      foreach ($elements as $element) {
+        $page['table'][] = [
+          'name' => ['#markup' => $element['name']],
+          'item' => ['#markup' => $element['item']],
+          'domain' => ['#markup' => $element['domain']],
+          'language' => ['#markup' => $element['language']],
+          'actions' => ['#type' => 'link',
+            '#url' => Url::fromRoute('domain_config_ui.delete', ['config_name' => $element['name']]),
+            '#title' => $this->t('Delete'),
+          ],
+        ];
+      }
+    }
+    else {
+      $page = [
+        '#markup' => $this->t('No domain-specific configurations have been found.'),
       ];
     }
     return $page;
@@ -133,7 +141,8 @@ class DomainConfigUIController {
     }
 
     if (!$elements['language']) {
-      $elements['language'] = $this->t('all');
+      // Static context requires use of t() here.
+      $elements['language'] = t('all');
     }
     elseif ($language = \Drupal::languageManager()->getLanguage($elements['language'])) {
       $elements['language'] = $language->getName();

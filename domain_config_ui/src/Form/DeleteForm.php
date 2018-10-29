@@ -15,27 +15,6 @@ class DeleteForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getQuestion() {
-    return $this->t('Are you sure you want to delete this item?');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCancelUrl() {
-    return new Url('domain_config_ui.list');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getConfirmText() {
-    return $this->t('Delete');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getFormId() {
     return 'domain_config_ui_delete';
   }
@@ -55,6 +34,22 @@ class DeleteForm extends FormBase {
     ];
     $form['review']['text'] = [
       '#markup' => 'test',
+    ];
+    $form['actions']['#type'] = 'actions';
+    $form['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Delete configuration'),
+      '#button_type' => 'primary',
+    ];
+    $form['actions']['cancel'] = [
+      '#type' => 'link',
+      '#title' => $this->t('Cancel'),
+      '#url' => new Url('domain_config_ui.list'),
+      '#attributes' => [
+        'class' => [
+          'button',
+        ],
+      ],
     ];
     return $form;
   }
