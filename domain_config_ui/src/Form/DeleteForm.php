@@ -2,7 +2,7 @@
 
 namespace Drupal\domain_config_ui\Form;
 
-use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -96,23 +96,23 @@ class DeleteForm extends FormBase {
     $items = [];
     foreach ($array as $key => $val) {
       if (!is_array($val)) {
-        $value = Html::escape($val);
+        $value = $this->formatValue($val);
         $item = [
           '#theme' => 'item_list',
           '#items' => [$value],
-          '#title' => Html::escape($key),
+          '#title' => $this->formatValue($key),
         ];
         $items[] = render($item);
       }
       else {
         $list = [];
         foreach ($val as $k => $v) {
-          $list[] = $this->t('<strong>@key</strong> : @value', ['@key' => $k, '@value' => $v]);
+          $list[] = $this->t('<strong>@key</strong> : @value', ['@key' => $k, '@value' => $this->formatValue($v)]);
         }
         $variables = array(
           '#theme' => 'item_list',
           '#items' => $list,
-          '#title' => Html::escape($key),
+          '#title' => $this->formatValue($key),
         );
         $items[] = render($variables);
       }
@@ -122,6 +122,30 @@ class DeleteForm extends FormBase {
       '#items' => $items,
     );
     return render($rendered);
+  }
+
+  /**
+   * Formats a value as a string, for readable output.
+   *
+   * Taken from config_inspector module.
+   *
+   * @param $value
+   *   The value element.
+   *
+   * @return string
+   *   The value in string form.
+   */
+  protected function formatValue($value) {
+    if (is_bool($value)) {
+      return $value ? 'true' : 'false';
+    }
+    if (is_scalar($value)) {
+      return SafeMarkup::checkPlain($value);
+    }
+    if (empty($value)) {
+      return '<' . $this->t('empty') . '>';
+    }
+    return '<' . gettype($value) . '>';
   }
 
 }
