@@ -260,7 +260,7 @@ class DomainConfigUIController {
       return SafeMarkup::checkPlain($value);
     }
     if (empty($value)) {
-      return '<' . $this->t('empty') . '>';
+      return '<' . t('empty') . '>';
     }
     return '<' . gettype($value) . '>';
   }
