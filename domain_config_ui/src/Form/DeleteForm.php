@@ -7,6 +7,7 @@ use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\domain_config_ui\Controller\DomainConfigUIController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Class DeleteForm.
@@ -24,10 +25,17 @@ class DeleteForm extends FormBase {
    * Build configuration form with metadata and values.
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_name = NULL) {
+    if (empty($config_name)) {
+      $url = Url::fromRoute('domain_config_ui.list');
+      return new RedirectResponse($url->toString());
+    }
+
     $elements = DomainConfigUIController::deriveElements($config_name);
     $config = \Drupal::configFactory()->get($config_name)->getRawData();
 
     $form['help'] = [
+      '#type' => 'item',
+      '#title' => SafeMarkup::checkPlain($config_name),
       '#markup' => $this->t('Are you sure you want to delete the configuration
         override: %config_name?', ['%config_name' => $config_name]),
       '#prefix' => '<p>',
@@ -53,8 +61,9 @@ class DeleteForm extends FormBase {
       '#open' => FALSE,
     ];
     $form['review']['text'] = [
-      '#markup' => $this->printArray($config),
+      '#markup' => DomainConfigUIController::printArray($config),
     ];
+    $form['config_name'] = ['#type' => 'value', '#value' => $config_name];
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
       '#type' => 'submit',
@@ -78,74 +87,12 @@ class DeleteForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    \Drupal::messenger()->addMessage($this->t('Domain %label has been deleted.', array('%label' => $this->entity->label())));
-    \Drupal::logger('domain')->notice('Domain %label has been deleted.', array('%label' => $this->entity->label()));
-    $form_state->setRedirectUrl($this->getCancelUrl());
-  }
-
-  /**
-   * Prints array data for the form.
-   *
-   * @param array $array
-   *   An array of data. Note that we support two levels of nesting.
-   *
-   * @return string
-   *   A suitable output string.
-   */
-  public function printArray(array $array) {
-    $items = [];
-    foreach ($array as $key => $val) {
-      if (!is_array($val)) {
-        $value = $this->formatValue($val);
-        $item = [
-          '#theme' => 'item_list',
-          '#items' => [$value],
-          '#title' => $this->formatValue($key),
-        ];
-        $items[] = render($item);
-      }
-      else {
-        $list = [];
-        foreach ($val as $k => $v) {
-          $list[] = $this->t('<strong>@key</strong> : @value', ['@key' => $k, '@value' => $this->formatValue($v)]);
-        }
-        $variables = array(
-          '#theme' => 'item_list',
-          '#items' => $list,
-          '#title' => $this->formatValue($key),
-        );
-        $items[] = render($variables);
-      }
-    }
-    $rendered = array(
-      '#theme' => 'item_list',
-      '#items' => $items,
-    );
-    return render($rendered);
-  }
-
-  /**
-   * Formats a value as a string, for readable output.
-   *
-   * Taken from config_inspector module.
-   *
-   * @param $value
-   *   The value element.
-   *
-   * @return string
-   *   The value in string form.
-   */
-  protected function formatValue($value) {
-    if (is_bool($value)) {
-      return $value ? 'true' : 'false';
-    }
-    if (is_scalar($value)) {
-      return SafeMarkup::checkPlain($value);
-    }
-    if (empty($value)) {
-      return '<' . $this->t('empty') . '>';
-    }
-    return '<' . gettype($value) . '>';
+    $name = $form_state->getValue('config_name');
+    $message = $this->t('Domain configuration %label has been deleted.', ['%label' => $name]);
+    \Drupal::messenger()->addMessage($message);
+    \Drupal::logger('domain_config')->notice($message);
+    \Drupal::configFactory()->getEditable($name)->delete();
+    $form_state->setRedirectUrl(new Url('domain_config_ui.list'));
   }
 
 }
