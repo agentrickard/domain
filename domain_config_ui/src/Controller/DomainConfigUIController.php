@@ -142,7 +142,7 @@ class DomainConfigUIController {
 
     if (!$elements['language']) {
       // Static context requires use of t() here.
-      $elements['language'] = t('all');
+      $elements['language'] = t('all')->render();
     }
     elseif ($language = \Drupal::languageManager()->getLanguage($elements['language'])) {
       $elements['language'] = $language->getName();
