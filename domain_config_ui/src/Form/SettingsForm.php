@@ -4,6 +4,7 @@ namespace Drupal\domain_config_ui\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Class SettingsForm.
@@ -49,6 +50,23 @@ class SettingsForm extends ConfigFormBase {
     ];
 
     return parent::buildForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $path_pages = $form_state->getValue('path_pages');
+    $path_pages = str_replace(["\r\n", "\n", "\r"], '|', $path_pages);
+    $pages = explode("|", $path_pages);
+    $exists = [];
+    foreach ($pages as $page) {
+      if (in_array($page, $exists)) {
+        $form_state->setError($form['pages']['path_pages'], $this->t('Duplicate paths cannot be added'));
+      }
+      $exists[] = $page;
+    }
+
   }
 
   /**
