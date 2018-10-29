@@ -48,9 +48,9 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    * {@inheritdoc}
    */
   public function defaultConfiguration() {
-    return array(
+    return [
       'domain_id' => '',
-    );
+    ];
   }
 
   /**
@@ -58,13 +58,13 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
-    $form['domain_id'] = array(
+    $form['domain_id'] = [
       '#type' => 'checkboxes',
       '#title' => t('Domain'),
       '#options' => $domains,
       '#default_value' => $this->configuration['id'],
       '#required' => TRUE,
-    );
+    ];
     return $form;
   }
 

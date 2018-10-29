@@ -4,16 +4,13 @@ namespace Drupal\domain_access\Plugin\views\access;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
-use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainStorageInterface;
 use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\user\UserStorageInterface;
-
 
 /**
  * Access plugin that provides domain-editing access control.
@@ -33,11 +30,15 @@ class DomainAccessContent extends AccessPluginBase implements CacheableDependenc
 
   /**
    * Sets the permission to use when checking access.
+   *
+   * @var string
    */
   protected $permission = 'publish to any assigned domain';
 
   /**
    * Sets the permission to use when checking all access.
+   *
+   * @var string
    */
   protected $allPermission = 'publish to any domain';
 
@@ -71,11 +72,11 @@ class DomainAccessContent extends AccessPluginBase implements CacheableDependenc
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param DomainStorageInterface $domain_storage
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
    *   The domain storage service.
-   * @param UserStorageInterface $user_storage
+   * @param \Drupal\user\UserStorageInterface $user_storage
    *   The user storage service.
-   * @param DomainAccessManagerInterface $manager
+   * @param \Drupal\domain_access\DomainAccessManagerInterface $manager
    *   The domain access manager service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainStorageInterface $domain_storage, UserStorageInterface $user_storage, DomainAccessManagerInterface $manager) {

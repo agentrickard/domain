@@ -56,7 +56,7 @@ class DomainAliasLoader implements DomainAliasLoaderInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadMultiple($ids = NULL, $reset = FALSE) {
+  public function loadMultiple(array $ids = NULL, $reset = FALSE) {
     $controller = $this->getStorage();
     if ($reset) {
       $controller->resetCache($ids);

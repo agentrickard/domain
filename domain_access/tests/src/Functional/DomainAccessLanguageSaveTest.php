@@ -6,7 +6,7 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
- * Tests behavior for saving the domain access field elements in multiple languages.
+ * Tests saving the domain access field elements in multiple languages.
  *
  * @group domain_access
  */
@@ -17,7 +17,14 @@ class DomainAccessLanguageSaveTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'field', 'user', 'language', 'content_translation',];
+  public static $modules = [
+    'domain',
+    'domain_access',
+    'field',
+    'user',
+    'language',
+    'content_translation',
+  ];
 
   /**
    * {@inheritdoc}
@@ -41,7 +48,7 @@ class DomainAccessLanguageSaveTest extends DomainTestBase {
    */
   public function testDomainAccessSave() {
     $storage = \Drupal::entityTypeManager()->getStorage('node');
-    // Save a node programatically.
+    // Save a node programmatically.
     $node = $storage->create([
       'type' => 'article',
       'title' => 'Test node',
