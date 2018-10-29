@@ -135,13 +135,12 @@ function domain_config_ui_save_warning_message() {
  */
 function domain_config_ui_route_is_allowed() {
   $path_pages = \Drupal::config('domain_config_ui.settings')->get('path_pages');
-  $path_negate = \Drupal::config('domain_config_ui.settings')->get('path_negate');
   $route = \Drupal::routeMatch()->getRouteObject();
   // Never allow this module's form to be added.
   if ($route->getPath() == '/admin/config/domain/config-ui') {
     return FALSE;
   }
-  return !$path_negate === \Drupal::service('path.matcher')->matchPath($route->getPath(), $path_pages);
+  return \Drupal::service('path.matcher')->matchPath($route->getPath(), $path_pages);
 }
 
 /**
