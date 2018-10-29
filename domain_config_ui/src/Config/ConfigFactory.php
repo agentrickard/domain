@@ -63,6 +63,7 @@ class ConfigFactory extends CoreConfigFactory {
    *   The configuration name.
    */
   protected function isAllowedDomainConfig($name) {
+    // @TODO: REMOVE
     // IGNORE FOR TESTING.
     return TRUE;
     // Return original name if reserved not allowed.

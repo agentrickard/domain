@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_config_ui\Form;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -24,6 +25,8 @@ class DeleteForm extends FormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state, $config_name = NULL) {
     $elements = DomainConfigUIController::deriveElements($config_name);
+    $config = \Drupal::configFactory()->get($config_name)->getRawData();
+
     $form['help'] = [
       '#markup' => $this->t('Are you sure you want to delete the configuration
         override: %config_name?', ['%config_name' => $config_name]),
@@ -50,7 +53,7 @@ class DeleteForm extends FormBase {
       '#open' => FALSE,
     ];
     $form['review']['text'] = [
-      '#markup' => 'test',
+      '#markup' => $this->printArray($config),
     ];
     $form['actions']['#type'] = 'actions';
     $form['actions']['submit'] = [
@@ -71,7 +74,6 @@ class DeleteForm extends FormBase {
     return $form;
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -80,4 +82,47 @@ class DeleteForm extends FormBase {
     \Drupal::logger('domain')->notice('Domain %label has been deleted.', array('%label' => $this->entity->label()));
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
+
+  /**
+   * Prints array data for the form.
+   *
+   * @param array $array
+   *   An array of data. Note that we support two levels of nesting.
+   *
+   * @return string
+   *   A suitable output string.
+   */
+  public function printArray(array $array) {
+    $items = [];
+    foreach ($array as $key => $val) {
+      if (!is_array($val)) {
+        $value = Html::escape($val);
+        $item = [
+          '#theme' => 'item_list',
+          '#items' => [$value],
+          '#title' => Html::escape($key),
+        ];
+        $items[] = render($item);
+      }
+      else {
+        $list = [];
+        foreach ($val as $k => $v) {
+          $list[] = $this->t('<strong>@key</strong> : @value', ['@key' => $k, '@value' => $v]);
+        }
+        $variables = array(
+          '#theme' => 'item_list',
+          '#items' => $list,
+          '#title' => Html::escape($key),
+        );
+        $items[] = render($variables);
+      }
+    }
+    $rendered = array(
+      '#theme' => 'item_list',
+      '#items' => $items,
+    );
+    return render($rendered);
+  }
+
 }
+
