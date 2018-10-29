@@ -9,6 +9,3 @@ domain_config_ui.settings:
     path_pages:
       type: text
       label: 'Paths for supported configuration forms'
-    path_negate:
-      type: integer
-      label: 'Reverse the path matching logic'
