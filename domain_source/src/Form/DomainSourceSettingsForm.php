@@ -45,7 +45,7 @@ class DomainSourceSettingsForm extends ConfigFormBase {
     $form['exclude_routes'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Disable link rewrites for the selected routes.'),
-      '#default_value' => $config->get('exclude_routes', []),
+      '#default_value' => $config->get('exclude_routes') ?: [],
       '#options' => $options,
       '#description' => $this->t('Check the routes to disable. Any entity URL with a Domain Source field will be rewritten unless its corresponding route is disabled.'),
     ];
