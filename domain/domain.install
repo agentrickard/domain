@@ -31,7 +31,6 @@ function _domain_configure_field() {
     $display->setComponent(DOMAIN_ADMIN_FIELD, [
       'type' => 'options_buttons',
       'weight' => 50,
-    ])
-    ->save();
+    ])->save();
   }
 }

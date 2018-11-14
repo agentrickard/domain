@@ -12,7 +12,7 @@
  *
  * use Drupal\domain\DomainInterface;
  *
- * @param array $domains
+ * @param \Drupal\domain\DomainInterface[] $domains
  *   An array of $domain record objects.
  */
 function hook_domain_load(array $domains) {
@@ -70,11 +70,11 @@ function hook_domain_operations(\Drupal\domain\DomainInterface $domain, \Drupal\
   if ($account->hasPermission('view domain aliases') || $account->hasPermission('administer domain aliases')) {
     // Add aliases to the list.
     $id = $domain->id();
-    $operations['domain_alias'] = array(
+    $operations['domain_alias'] = [
       'title' => t('Aliases'),
-      'url' => Url::fromRoute('domain_alias.admin', array('domain' => $id)),
+      'url' => \Drupal\Core\Url::fromRoute('domain_alias.admin', ['domain' => $id]),
       'weight' => 60,
-    );
+    ];
   }
   return $operations;
 }
@@ -88,6 +88,9 @@ function hook_domain_operations(\Drupal\domain\DomainInterface $domain, \Drupal\
  *
  * NOTE: This does not apply to Domain Alias records.
  *
+ * No return value. Modify $error_list by reference. Return an empty array
+ * or NULL to validate this domain.
+ *
  * @param array &$error_list
  *   The list of current validation errors. Modify this value by reference.
  *   If you return an empty array or NULL, the domain is considered valid.
@@ -96,12 +99,9 @@ function hook_domain_operations(\Drupal\domain\DomainInterface $domain, \Drupal\
  *   Note that this is checked for uniqueness separately. This value is not
  *   modifiable.
  *
- * No return value. Modify $error_list by reference. Return an empty array
- * or NULL to validate this domain.
- *
  * @see domain_valid_domain()
  */
-function hook_domain_validate_alter(&$error_list, $hostname) {
+function hook_domain_validate_alter(array &$error_list, $hostname) {
   // Only allow TLDs to be .org for our site.
   if (substr($hostname, -4) != '.org') {
     $error_list[] = t('Only .org domains may be registered.');
@@ -113,6 +113,8 @@ function hook_domain_validate_alter(&$error_list, $hostname) {
  *
  * Note that this hook does not fire for users with the 'administer domains'
  * permission.
+ *
+ * No return value. Modify the $query object via methods.
  *
  * @param \Drupal\Core\Entity\Query\QueryInterface $query
  *   An entity query prepared by DomainSelection::buildEntityQuery().
@@ -126,10 +128,8 @@ function hook_domain_validate_alter(&$error_list, $hostname) {
  *      'editor' for assigning editorial permissions (as in Domain Access)
  *      'admin' for assigning administrative permissions for a specific domain.
  *      Most contributed modules will use 'editor'.
- *
- * No return value. Modify the $query object via methods.
  */
-function hook_domain_references_alter($query, $account, $context) {
+function hook_domain_references_alter(\Drupal\Core\Entity\Query\QueryInterface $query, \Drupal\Core\Session\AccountInterface $account, array $context) {
   // Remove the default domain from non-admins when editing nodes.
   if ($context['entity_type'] == 'node' && $context['field_type'] == 'editor' && !$account->hasPermission('edit assigned domains')) {
     $default = \Drupal::entityTypeManager()->getStorage('domain')->loadDefaultId();

@@ -7,14 +7,10 @@ use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
- * Handles requests for token creation.
+ * Token handler for Domain.
  *
  * TokenAPI still uses procedural code, but we have moved it to a class for
  * easier refactoring.
- */
-
-/**
- * Token handler for Domain.
  */
 class DomainToken {
 
@@ -30,21 +26,21 @@ class DomainToken {
   /**
    * The Domain storage handler.
    *
-   * @var \Drupal\domain\DomainStorageInterface $domainStorage
+   * @var \Drupal\domain\DomainStorageInterface
    */
   protected $domainStorage;
 
   /**
    * The Domain negotiator.
    *
-   * @var \Drupal\domain\DomainNegotiatorInterface $negotiator
+   * @var \Drupal\domain\DomainNegotiatorInterface
    */
   protected $negotiator;
 
   /**
    * Constructs a DomainToken object.
    *
-   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator.
@@ -60,64 +56,64 @@ class DomainToken {
    */
   public function getTokenInfo() {
     // Domain token types.
-    $info['types']['domain'] = array(
+    $info['types']['domain'] = [
       'name' => $this->t('Domains'),
       'description' => $this->t('Tokens related to domains.'),
       'needs-data' => 'domain',
-    );
+    ];
     // These two types require the Token contrib module.
-    $info['types']['current-domain'] = array(
+    $info['types']['current-domain'] = [
       'name' => $this->t('Current domain'),
       'description' => $this->t('Tokens related to the current domain.'),
       'type' => 'domain',
-    );
-    $info['types']['default-domain'] = array(
+    ];
+    $info['types']['default-domain'] = [
       'name' => $this->t('Default domain'),
       'description' => $this->t('Tokens related to the default domain.'),
       'type' => 'domain',
-    );
+    ];
 
     // Domain tokens.
-    $info['tokens']['domain']['id'] = array(
+    $info['tokens']['domain']['id'] = [
       'name' => $this->t('Domain id'),
-      'description' => $this->t('The domain\'s numeric ID.'),
-    );
-    $info['tokens']['domain']['machine-name'] = array(
+      'description' => $this->t("The domain's numeric ID."),
+    ];
+    $info['tokens']['domain']['machine-name'] = [
       'name' => $this->t('Domain machine name'),
       'description' => $this->t('The domain machine identifier.'),
-    );
-    $info['tokens']['domain']['path'] = array(
+    ];
+    $info['tokens']['domain']['path'] = [
       'name' => $this->t('Domain path'),
       'description' => $this->t('The base URL for the domain.'),
-    );
-    $info['tokens']['domain']['name'] = array(
+    ];
+    $info['tokens']['domain']['name'] = [
       'name' => $this->t('Domain name'),
       'description' => $this->t('The domain name.'),
-    );
-    $info['tokens']['domain']['url'] = array(
+    ];
+    $info['tokens']['domain']['url'] = [
       'name' => $this->t('Domain URL'),
-      'description' => $this->t('The domain\'s URL for the current page request.'),
-    );
-    $info['tokens']['domain']['hostname'] = array(
+      'description' => $this->t("The domain's URL for the current page request."),
+    ];
+    $info['tokens']['domain']['hostname'] = [
       'name' => $this->t('Domain hostname'),
       'description' => $this->t('The domain hostname.'),
-    );
-    $info['tokens']['domain']['scheme'] = array(
+    ];
+    $info['tokens']['domain']['scheme'] = [
       'name' => $this->t('Domain scheme'),
       'description' => $this->t('The domain scheme.'),
-    );
-    $info['tokens']['domain']['status'] = array(
+    ];
+    $info['tokens']['domain']['status'] = [
       'name' => $this->t('Domain status'),
       'description' => $this->t('The domain status.'),
-    );
-    $info['tokens']['domain']['weight'] = array(
+    ];
+    $info['tokens']['domain']['weight'] = [
       'name' => $this->t('Domain weight'),
       'description' => $this->t('The domain weight.'),
-    );
-    $info['tokens']['domain']['is_default'] = array(
+    ];
+    $info['tokens']['domain']['is_default'] = [
       'name' => $this->t('Domain default'),
       'description' => $this->t('The domain is the default domain.'),
-    );
+    ];
 
     return $info;
   }
@@ -126,7 +122,7 @@ class DomainToken {
    * Implements hook_tokens().
    */
   public function getTokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
-    $replacements = array();
+    $replacements = [];
 
     $domain = NULL;
 
@@ -140,9 +136,11 @@ class DomainToken {
           $domain = $this->negotiator->getActiveDomain();
         }
         break;
+
       case 'current-domain':
         $domain = $this->negotiator->getActiveDomain();
         break;
+
       case 'default-domain':
         $domain = $this->domainStorage->loadDefaultDomain();
         break;
@@ -168,6 +166,7 @@ class DomainToken {
    * We assume that the token will call an instance of DomainInterface.
    *
    * @return array
+   *   An array of callbacks keyed by the token string.
    */
   public function getCallbacks() {
     return [

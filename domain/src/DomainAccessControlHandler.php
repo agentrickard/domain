@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain\DomainElementManagerInterface;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -20,11 +19,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class DomainAccessControlHandler extends EntityAccessControlHandler implements EntityHandlerInterface {
 
- /**
-  * The entity type manager
-  *
-  * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-  */
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
   protected $entityTypeManager;
 
   /**
@@ -105,10 +104,11 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity to retrieve field data from.
-   * @param \Drupal\Core\Session\AccountInterface
+   * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account.
    *
-   * @return boolean
+   * @return bool
+   *   TRUE if a user can administer a specific domain, or FALSE.
    */
   public function isDomainAdmin(EntityInterface $entity, AccountInterface $account) {
     $user = $this->userStorage->load($account->id());

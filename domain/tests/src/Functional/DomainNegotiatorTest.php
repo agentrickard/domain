@@ -3,7 +3,6 @@
 namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain negotiation manager.
@@ -17,7 +16,7 @@ class DomainNegotiatorTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_test', 'block');
+  public static $modules = ['domain', 'domain_test', 'block'];
 
   /**
    * Tests the handling of an inbound request.
@@ -34,7 +33,7 @@ class DomainNegotiatorTest extends DomainTestBase {
     $this->drupalPlaceBlock('domain_server_block');
 
     // To get around block access, let the anon user view the block.
-    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('view domain information'));
+    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['view domain information']);
 
     // Test the response of the default home page.
     foreach (\Drupal::entityTypeManager()->getStorage('domain')->loadMultiple() as $domain) {
