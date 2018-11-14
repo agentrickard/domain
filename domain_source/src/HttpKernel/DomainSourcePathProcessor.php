@@ -76,7 +76,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
   /**
    * The domain storage.
    *
-   * @var \Drupal\domain\DomainStorageInterface
+   * @var \Drupal\domain\DomainStorageInterface|null
    */
   protected $domainStorage;
 
@@ -100,7 +100,6 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     $this->entityTypeManager = $entity_type_manager;
     $this->aliasManager = $alias_manager;
     $this->configFactory = $config_factory;
-    $this->domainStorage = $entity_type_manager->getStorage('domain');
   }
 
   /**
@@ -159,7 +158,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
         $target_id = domain_source_get($entity);
       }
       if (!empty($target_id)) {
-        $source = $this->domainStorage->load($target_id);
+        $source = $this->domainStorage()->load($target_id);
       }
       $options['entity'] = $entity;
       $options['entity_type'] = $entity->getEntityTypeId();
@@ -169,7 +168,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     else {
       if (isset($options['domain_target_id'])) {
         $target_id = $options['domain_target_id'];
-        $source = $this->domainStorage->load($target_id);
+        $source = $this->domainStorage()->load($target_id);
       }
       $this->moduleHandler->alter('domain_source_path', $source, $path, $options);
     }
@@ -277,6 +276,19 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       $this->activeDomain = $active;
     }
     return $this->activeDomain;
+  }
+
+  /**
+   * Retrieves the domain storage handler.
+   *
+   * @return \Drupal\domain\DomainStorageInterface
+   *   The domain storage handler.
+   */
+  protected function domainStorage() {
+    if (!$this->domainStorage) {
+      $this->domainStorage = $this->entityTypeManager->getStorage('domain');
+    }
+    return $this->domainStorage;
   }
 
 }
