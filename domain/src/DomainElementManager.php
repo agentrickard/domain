@@ -56,15 +56,24 @@ class DomainElementManager implements DomainElementManagerInterface {
       return $form;
     }
     $fields = $this->fieldList($field_name);
+    $empty = FALSE;
     $disallowed = $this->disallowedOptions($form_state, $form[$field_name]);
-    $empty = empty($form[$field_name]['widget']['#options']);
-
+    if (empty($form[$field_name]['widget']['#options']) ||
+         (count($form[$field_name]['widget']['#options']) == 1 &&
+          isset($form[$field_name]['widget']['#options']['_none'])
+         )
+       ) {
+      $empty = TRUE;
+    }
     // If the domain form element is set as a group, and the field is not assigned to
     // another group, then move it. See domain_access_form_node_form_alter().
     if (isset($form['domain']) && !isset($form[$field_name]['#group'])) {
       $form[$field_name]['#group'] = 'domain';
     }
-
+    // If no values and we should hide the element, do so.
+    if ($hide_on_disallow && $empty) {
+      $form[$field_name]['#access'] = FALSE;
+    }
     // Check for domains the user cannot access or the absence of any options.
     if (!empty($disallowed) || $empty) {
       // @TODO: Potentially show this information to users with permission.
@@ -76,10 +85,7 @@ class DomainElementManager implements DomainElementManagerInterface {
         '#type' => 'value',
         '#value' => $fields,
       );
-      if ($hide_on_disallow || $empty) {
-        $form[$field_name]['#access'] = FALSE;
-      }
-      elseif (!empty($disallowed)) {
+      if (!empty($disallowed)) {
         $form[$field_name]['widget']['#description'] .= $this->listDisallowed($disallowed);
       }
       // Call our submit function to merge in values.
