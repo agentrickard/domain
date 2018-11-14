@@ -19,15 +19,19 @@ class DomainVariableSchemeTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain');
+  public static $modules = ['domain'];
 
   /**
    * Domain id key.
+   *
+   * @var string
    */
   public $key = 'example_com';
 
   /**
    * The Domain storage handler service.
+   *
+   * @var \Drupal\domain\DomainStorageInterface
    */
   public $domainStorage;
 

@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests the domain record creation API.
  *
@@ -22,7 +20,16 @@ class DomainCreateTest extends DomainTestBase {
     $storage = \Drupal::entityTypeManager()->getStorage('domain');
     $domain = $storage->create();
     $domain->set('id', $storage->createMachineName($domain->getHostname()));
-    foreach (array('id', 'name', 'hostname', 'scheme', 'status', 'weight' , 'is_default') as $key) {
+    $keys = [
+      'id',
+      'name',
+      'hostname',
+      'scheme',
+      'status',
+      'weight',
+      'is_default',
+    ];
+    foreach ($keys as $key) {
       $property = $domain->get($key);
       $this->assertTrue(isset($property), 'Property loaded');
     }

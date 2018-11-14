@@ -2,6 +2,7 @@
 
 namespace Drupal\domain;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -22,16 +23,16 @@ interface DomainElementManagerInterface {
    *
    * @param array $form
    *   The form array.
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state object.
-   * @param $field_name
+   * @param string $field_name
    *   The name of the field to check.
-   * @param boolean $hide_on_disallow
+   * @param bool $hide_on_disallow
    *   If the field is set to a value that cannot be altered by the user who
    *   is not assigned to that domain, pass TRUE to remove the form element
    *   entirely. See DomainSourceElementManager for the use-case.
    *
-   * @return array $form
+   * @return array
    *   Return the modified form array.
    */
   public function setFormOptions(array $form, FormStateInterface $form_state, $field_name, $hide_on_disallow = FALSE);
@@ -42,30 +43,29 @@ interface DomainElementManagerInterface {
    * On form submit, loop through the hidden form values and add those to the
    * entity being saved.
    *
-   * @param $form
-   *   The form array.
-   * @param Drupal\Core\Form\FormStateInterface $form_state
-   *   The form state object.
+   * No return value. Hidden values are added to the field values directly.
    *
-   * @return
-   *   No return value. Hidden values are added to the field values directly.
+   * @param array $form
+   *   The form array.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state object.
    */
   public static function submitEntityForm(array &$form, FormStateInterface $form_state);
 
   /**
    * Finds options not accessible to the current user.
    *
-   * @param Drupal\Core\Form\FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state object.
    * @param array $field
    *   The field element being processed.
    */
-  public function disallowedOptions(FormStateInterface $form_state, $field);
+  public function disallowedOptions(FormStateInterface $form_state, array $field);
 
   /**
    * Stores a static list of fields that have been disallowed.
    *
-   * @param $field_name
+   * @param string $field_name
    *   The name of the field being processed. Inherited from setFormOptions.
    *
    * @return array
@@ -85,7 +85,7 @@ interface DomainElementManagerInterface {
    *   The domain access field values, keyed by id (machine_name) with value of
    *   the numeric domain_id used by node access.
    */
-  public function getFieldValues($entity, $field_name);
+  public function getFieldValues(EntityInterface $entity, $field_name);
 
   /**
    * Returns the default submit handler to be used for a field element.
@@ -97,8 +97,8 @@ interface DomainElementManagerInterface {
    *   The method must be public and static, since it will be called from the
    *   form submit handler without knowledge of the parent class.
    *
-   * The base implementat is submitEntityForm, and can be overridden by
-   * specific subclasses.
+   *   The base implementation is submitEntityForm, and can be overridden by
+   *   specific subclasses.
    */
   public function getSubmitHandler();
 

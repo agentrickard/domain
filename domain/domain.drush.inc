@@ -13,146 +13,146 @@ use GuzzleHttp\Exception\RequestException;
  * Implements hook_drush_command().
  */
 function domain_drush_command() {
-  $items = array();
+  $items = [];
 
-  $items['domain-list'] = array(
+  $items['domain-list'] = [
     'description' => 'List active domains for the site.',
-    'examples' => array(
+    'examples' => [
       'drush domain-list',
       'drush domains',
-    ),
-    'aliases' => array('domains'),
-  );
-  $items['domain-add'] = array(
+    ],
+    'aliases' => ['domains'],
+  ];
+  $items['domain-add'] = [
     'description' => 'Add a new domain to the site.',
-    'examples' => array(
+    'examples' => [
       'drush domain-add example.com \'My Test Site\'',
       'drush domain-add example.com \'My Test Site\' --inactive=1 --https==1',
       'drush domain-add example.com \'My Test Site\' --weight=10',
       'drush domain-add example.com \'My Test Site\' --validate=1',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'hostname' => 'The domain hostname to register (e.g. example.com).',
       'name' => 'The name of the site (e.g. Domain Two).',
-    ),
-    'options' => array(
+    ],
+    'options' => [
       'inactive' => 'Set the domain to inactive status if set.',
       'https' => 'Use https protocol for this domain if set.',
       'weight' => 'Set the order (weight) of the domain.',
       'is_default' => 'Set this domain as the default domain.',
       'validate' => 'Force a check of the URL response before allowing registration.',
-    ),
-  );
-  $items['domain-delete'] = array(
+    ],
+  ];
+  $items['domain-delete'] = [
     'description' => 'Delete a domain from the site.',
-    'examples' => array(
+    'examples' => [
       'drush domain-delete example.com',
       'drush domain-delete 1',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain' => 'The numeric id or hostname of the domain to delete.',
-    ),
-  );
-  $items['domain-test'] = array(
+    ],
+  ];
+  $items['domain-test'] = [
     'description' => 'Tests domains for proper response. If run from a subfolder, you must specify the --uri.',
-    'examples' => array(
+    'examples' => [
       'drush domain-test',
       'drush domain-test example.com',
       'drush domain-test 1',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain_id' => 'The numeric id or hostname of the domain to test. If no value is passed, all domains are tested.',
-    ),
-    'options' => array(
+    ],
+    'options' => [
       'base_path' => 'The subdirectory name if Drupal is installed in a folder other than server root.',
-    ),
-  );
-  $items['domain-default'] = array(
+    ],
+  ];
+  $items['domain-default'] = [
     'description' => 'Sets the default domain. If run from a subfolder, you must specify the --uri.',
-    'examples' => array(
+    'examples' => [
       'drush domain-default example.com',
       'drush domain-default 1',
       'drush domain-default 1 --validate=1',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain_id' => 'The numeric id or hostname of the domain to make default.',
-    ),
-    'options' => array(
+    ],
+    'options' => [
       'validate' => 'Force a check of the URL response before allowing registration.',
-    ),
-  );
-  $items['domain-disable'] = array(
+    ],
+  ];
+  $items['domain-disable'] = [
     'description' => 'Sets a domain status to off.',
-    'examples' => array(
+    'examples' => [
       'drush domain-disable example.com',
       'drush domain-disable 1',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain_id' => 'The numeric id or hostname of the domain to disable.',
-    ),
-  );
-  $items['domain-enable'] = array(
+    ],
+  ];
+  $items['domain-enable'] = [
     'description' => 'Sets a domain status to on.',
-    'examples' => array(
+    'examples' => [
       'drush domain-disable example.com',
       'drush domain-disable 1',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain_id' => 'The numeric id or hostname of the domain to enable.',
-    ),
-  );
-  $items['domain-name'] = array(
+    ],
+  ];
+  $items['domain-name'] = [
     'description' => 'Changes a domain label.',
-    'examples' => array(
+    'examples' => [
       'drush domain-name example.com Foo',
       'drush domain-name 1 Foo',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain_id' => 'The numeric id or hostname of the domain to relabel.',
       'name' => 'The name to use for the domain.',
-    ),
-  );
-  $items['domain-machine-name'] = array(
+    ],
+  ];
+  $items['domain-machine-name'] = [
     'description' => 'Changes a domain name.',
-    'examples' => array(
+    'examples' => [
       'drush domain-machine-name example.com foo',
       'drush domain-machine-name 1 foo',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain_id' => 'The numeric id or hostname of the domain to rename.',
       'name' => 'The machine-readable name to use for the domain.',
-    ),
-  );
-  $items['domain-scheme'] = array(
+    ],
+  ];
+  $items['domain-scheme'] = [
     'description' => 'Changes a domain scheme.',
-    'examples' => array(
+    'examples' => [
       'drush domain-scheme example.com https',
       'drush domain-scheme 1 https',
-    ),
-    'arguments' => array(
+    ],
+    'arguments' => [
       'domain_id' => 'The numeric id or hostname of the domain to change.',
       'scheme' => 'The URL schema (http or https) to use for the domain.',
-    ),
-  );
-  $items['generate-domains'] = array(
+    ],
+  ];
+  $items['generate-domains'] = [
     'description' => 'Generate domains for testing.',
-    'arguments' => array(
+    'arguments' => [
       'primary' => 'The primary domain to use. This will be created and used for *.example.com hostnames.',
-    ),
-    'options' => array(
+    ],
+    'options' => [
       'count' => 'The count of extra domains to generate. Default is 15.',
-      'empty' => 'Pass empty=1 to truncate the {domain} table before creating records.'
-    ),
-    'examples' => array(
+      'empty' => 'Pass empty=1 to truncate the {domain} table before creating records.',
+    ],
+    'examples' => [
       'drush domain-generate example.com',
       'drush domain-generate example.com --count=25',
       'drush domain-generate example.com --count=25 --empty=1',
       'drush gend',
       'drush gend --count=25',
       'drush gend --count=25 --empty=1',
-    ),
-    'aliases' => array('gend'),
-  );
+    ],
+    'aliases' => ['gend'],
+  ];
   return $items;
 }
 
@@ -178,7 +178,7 @@ function drush_domain_list() {
     return;
   }
 
-  $header = array(
+  $header = [
     'weight' => dt('Weight'),
     'name' => dt('Name'),
     'hostname' => dt('Hostname'),
@@ -187,10 +187,10 @@ function drush_domain_list() {
     'is_default' => dt('Default'),
     'domain_id' => dt('Domain Id'),
     'id' => dt('Machine name'),
-  );
-  $rows = array(array_values($header));
+  ];
+  $rows = [array_values($header)];
   foreach ($domains as $domain) {
-    $row = array();
+    $row = [];
     foreach ($header as $key => $name) {
       $row[] = Html::escape($domain->get($key));
     }
@@ -210,11 +210,8 @@ function drush_domain_list() {
  * The script may also add test1, test2, test3 up to any number to test a
  * large number of domains. This test is mostly for UI testing.
  *
- * @param $primary
+ * @param string $primary
  *   The root domain to use for domain creation.
- *
- * @return
- *   A list of the domains created.
  */
 function drush_domain_generate_domains($primary = 'example.com') {
   // Check the number of domains to create.
@@ -224,14 +221,14 @@ function drush_domain_generate_domains($primary = 'example.com') {
     $count = 15;
   }
   // Ensure we don't duplicate any domains.
-  $existing = array();
+  $existing = [];
   if (!empty($domains)) {
     foreach ($domains as $domain) {
       $existing[] = $domain->getHostname();
     }
   }
   // Set up one.* and so on.
-  $names = array(
+  $names = [
     'one',
     'two',
     'three',
@@ -245,23 +242,23 @@ function drush_domain_generate_domains($primary = 'example.com') {
     'foo',
     'bar',
     'baz',
-  );
+  ];
   // Set the creation array.
-  $new = array($primary);
+  $new = [$primary];
   foreach ($names as $name) {
     $new[] = $name . '.' . $primary;
   }
   // Include a non hostname.
   $new[] = 'my' . $primary;
   // Filter against existing so we can count correctly.
-  $prepared = array();
+  $prepared = [];
   foreach ($new as $key => $value) {
     if (!in_array($value, $existing)) {
       $prepared[] = $value;
     }
   }
-  // Add any test domains that have numeric prefixes. We don't expect these URLs to work,
-  // and mainly use these for testing the user interface.
+  // Add any test domains that have numeric prefixes. We don't expect these URLs
+  // to work, and mainly use these for testing the user interface.
   $needed = $count - count($prepared);
   for ($i = 1; $i <= $needed; $i++) {
     $prepared[] = 'test' . $i . '.' . $primary;
@@ -274,7 +271,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
   // Create the domains.
   foreach ($prepared as $key => $item) {
     $hostname = mb_strtolower($item);
-    $values = array(
+    $values = [
       'name' => ($item != $primary) ? ucwords(str_replace(".$primary", '', $item)) : \Drupal::config('system.site')->get('name'),
       'hostname' => $hostname,
       'scheme' => 'http',
@@ -282,7 +279,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
       'weight' => ($item != $primary) ? $key + $start_weight + 1 : -1,
       'is_default' => 0,
       'id' => \Drupal::entityTypeManager()->getStorage('domain')->createMachineName($hostname),
-    );
+    ];
     $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
     domain_drush_create($domain);
   }
@@ -296,7 +293,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
 /**
  * Validates the domain generation script.
  *
- * @param $primary
+ * @param string $primary
  *   The root domain to use for domain creation.
  */
 function drush_domain_generate_domains_validate($primary = 'example.com') {
@@ -304,11 +301,7 @@ function drush_domain_generate_domains_validate($primary = 'example.com') {
     db_query("TRUNCATE TABLE {domain}");
   }
   return;
-  // TODO: Update this validation.
-  $error = domain_valid_domain($primary);
-  if (!empty($error)) {
-    return drush_set_error('domain', $error);
-  }
+  // TODO: Add validation.
 }
 
 /**
@@ -325,7 +318,7 @@ function drush_domain_add($hostname, $name) {
   $hostname = mb_strtolower($hostname);
   /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
   $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
-  $values = array(
+  $values = [
     'hostname' => $hostname,
     'name' => $name,
     'status' => (!drush_get_option('invalid')) ? 1 : 0,
@@ -334,7 +327,7 @@ function drush_domain_add($hostname, $name) {
     'is_default' => ($is_default = drush_get_option('is_default')) ? $is_default : 0,
     'id' => $domain_storage->createMachineName($hostname),
     'validate_url' => (drush_get_option('validate')) ? 1 : 0,
-  );
+  ];
   $domain = $domain_storage->create($values);
   domain_drush_create($domain);
 }
@@ -374,7 +367,7 @@ function domain_drush_create(DomainInterface $domain) {
   else {
     $domain->save();
     if ($domain->getDomainId()) {
-      drush_print(dt('Created @name at @domain.', array('@name' => $domain->label(), '@domain' => $domain->getHostname())));
+      drush_print(dt('Created @name at @domain.', ['@name' => $domain->label(), '@domain' => $domain->getHostname()]));
     }
     else {
       drush_print(dt('The request could not be completed.'));
@@ -417,7 +410,7 @@ function domain_drush_check_response(DomainInterface $domain) {
 /**
  * Validates a domain.
  *
- * @param $hostname
+ * @param string $hostname
  *   The domain name to validate for syntax and uniqueness.
  *
  * @return array
@@ -434,7 +427,7 @@ function domain_drush_validate_domain($hostname) {
 /**
  * Deletes a domain record.
  *
- * @param $argument
+ * @param string $argument
  *   The domain_id to delete. Pass 'all' to delete all records.
  */
 function drush_domain_delete($argument = NULL) {
@@ -447,7 +440,7 @@ function drush_domain_delete($argument = NULL) {
       drush_print(dt('There are no domains to delete.'));
       return;
     }
-    $content = drush_choice(array(1 => dt('Delete all domains')), dt('This action may not be undone. Continue?'), '!value');
+    $content = drush_choice([1 => dt('Delete all domains')], dt('This action may not be undone. Continue?'), '!value');
     if (empty($content)) {
       return;
     }
@@ -464,14 +457,14 @@ function drush_domain_delete($argument = NULL) {
   }
   foreach ($domains as $domain) {
     $domain->delete();
-    drush_print(dt('Domain record @domain deleted.', array('@domain' => $domain->getHostname())));
+    drush_print(dt('Domain record @domain deleted.', ['@domain' => $domain->getHostname()]));
   }
 
   return;
 
   // TODO: Set options for re-assigning content.
   $list = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple(NULL, TRUE);
-  $options = array('0' => dt('Do not reassign'));
+  $options = ['0' => dt('Do not reassign')];
   foreach ($list as $data) {
     if ($data->id() != $domain->id()) {
       $options[$data->getDomainId()] = $data->getHostname();
@@ -496,7 +489,7 @@ function drush_domain_delete($argument = NULL) {
 /**
  * Tests a domain record for the proper HTTP response.
  *
- * @param $argument
+ * @param string $argument
  *   The domain_id to test. Passing no value tests all records.
  */
 function drush_domain_test($argument = NULL) {
@@ -509,7 +502,7 @@ function drush_domain_test($argument = NULL) {
   }
   else {
     if ($domain = drush_domain_get_from_argument($argument)) {
-      $domains = array($domain);
+      $domains = [$domain];
     }
     else {
       return;
@@ -517,10 +510,10 @@ function drush_domain_test($argument = NULL) {
   }
   foreach ($domains as $domain) {
     if ($domain->getResponse() != 200) {
-      drush_print(dt('Fail: !error. Please pass a --uri parameter or a --base_path to retest.' , array('!error' => $domain->getResponse())));
+      drush_print(dt('Fail: !error. Please pass a --uri parameter or a --base_path to retest.', ['!error' => $domain->getResponse()]));
     }
     else {
-      drush_print(dt('Success: !url tested successfully.', array('!url' => $domain->getPath())));
+      drush_print(dt('Success: !url tested successfully.', ['!url' => $domain->getPath()]));
     }
   }
 }
@@ -538,7 +531,7 @@ function drush_domain_default($argument) {
     }
     else {
       $domain->saveDefault();
-      drush_print(dt('!domain set to primary domain.', array('!domain' => $domain->getHostname())));
+      drush_print(dt('!domain set to primary domain.', ['!domain' => $domain->getHostname()]));
     }
   }
 }
@@ -551,10 +544,10 @@ function drush_domain_disable($argument) {
   if ($domain = drush_domain_get_from_argument($argument)) {
     if ($domain->status()) {
       $domain->disable();
-      drush_print(dt('!domain has been disabled.', array('!domain' => $domain->getHostname())));
+      drush_print(dt('!domain has been disabled.', ['!domain' => $domain->getHostname()]));
     }
     else {
-      drush_print(dt('!domain is already disabled.', array('!domain' => $domain->getHostname())));
+      drush_print(dt('!domain is already disabled.', ['!domain' => $domain->getHostname()]));
     }
   }
 }
@@ -567,10 +560,10 @@ function drush_domain_enable($argument) {
   if ($domain = drush_domain_get_from_argument($argument)) {
     if (!$domain->status()) {
       $domain->enable();
-      drush_print(dt('!domain has been enabled.', array('!domain' => $domain->getHostname())));
+      drush_print(dt('!domain has been enabled.', ['!domain' => $domain->getHostname()]));
     }
     else {
-      drush_print(dt('!domain is already enabled.', array('!domain' => $domain->getHostname())));
+      drush_print(dt('!domain is already enabled.', ['!domain' => $domain->getHostname()]));
     }
   }
 }
@@ -594,10 +587,10 @@ function drush_domain_machine_name($argument, $machine_name) {
   if ($domain = drush_domain_get_from_argument($argument)) {
     $results = \Drupal::entityTypeManager()
       ->getStorage('domain')
-      ->loadByProperties(array('machine_name' => $machine_name));
+      ->loadByProperties(['machine_name' => $machine_name]);
     foreach ($results as $result) {
       if ($result->id() == $machine_name) {
-        drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', array('@machine_name' => $machine_name, '@hostname' => $result->getHostname())));
+        drush_print(dt('The machine_name @machine_name is being used by domain @hostname.', ['@machine_name' => $machine_name, '@hostname' => $result->getHostname()]));
         return;
       }
     }
@@ -611,7 +604,7 @@ function drush_domain_machine_name($argument, $machine_name) {
 function drush_domain_scheme($argument) {
   // Resolve the domain.
   if ($domain = drush_domain_get_from_argument($argument)) {
-    $content = drush_choice(array(1 => dt('http'), 2 => dt('https')), dt('Select the default http scheme:'), '!value');
+    $content = drush_choice([1 => dt('http'), 2 => dt('https')], dt('Select the default http scheme:'), '!value');
     if (empty($content)) {
       return;
     }

@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests domain record HTTP response.
  *
@@ -30,11 +28,11 @@ class DomainGetResponseTest extends DomainTestBase {
     $this->assert($domain->getResponse() == 200, 'Server returned a 200 response.');
 
     // Now create a bad domain.
-    $values = array(
+    $values = [
       'hostname' => 'foo.bar',
       'id' => 'foo_bar',
       'name' => 'Foo',
-    );
+    ];
     $domain = \Drupal::entityTypeManager()->getStorage('domain')->create($values);
 
     $domain->save();

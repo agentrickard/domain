@@ -2,8 +2,6 @@
 
 namespace Drupal\domain\Plugin\EntityReferenceSelection;
 
-use Drupal\domain\Plugin\EntityReferenceSelection\DomainSelection;
-
 /**
  * Provides entity reference selections for the domain entity type.
  *
@@ -31,6 +29,6 @@ class DomainAdminSelection extends DomainSelection {
    *
    * @var string
    */
-  protected $field_type = 'admin';
+  protected $fieldType = 'admin';
 
 }

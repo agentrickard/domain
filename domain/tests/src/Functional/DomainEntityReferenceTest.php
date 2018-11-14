@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests the domain record entity reference field type.
  *
@@ -16,18 +14,18 @@ class DomainEntityReferenceTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'field', 'field_ui');
+  public static $modules = ['domain', 'field', 'field_ui'];
 
   /**
    * Create, edit and delete a domain field via the user interface.
    */
   public function testDomainField() {
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Visit the article field administration page.
@@ -64,13 +62,13 @@ class DomainEntityReferenceTest extends DomainTestBase {
    * Create content for a domain field.
    */
   public function testDomainFieldStorage() {
-    $this->admin_user = $this->drupalCreateUser(array(
+    $this->admin_user = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($this->admin_user);
 
     // Create test domain field.
@@ -123,34 +121,34 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $label = 'domain';
     $name = 'field_' . $label;
 
-    $storage = array(
+    $storage = [
       'field_name' => $name,
       'entity_type' => 'node',
       'type' => 'entity_reference',
       'cardinality' => -1,
-      'settings' => array(
+      'settings' => [
         'target_type' => 'domain',
-      ),
-    );
+      ],
+    ];
     $field_storage_config = \Drupal::entityTypeManager()->getStorage('field_storage_config')->create($storage);
     $field_storage_config->save();
 
-    $field = array(
+    $field = [
       'field_name' => $name,
       'entity_type' => 'node',
       'label' => 'Domain test field',
       'bundle' => 'article',
-      'settings' => array(
-        'handler_settings' => array(
-          'sort' => array('field' => 'weight', 'direction' => 'ASC'),
-        ),
-      ),
-    );
+      'settings' => [
+        'handler_settings' => [
+          'sort' => ['field' => 'weight', 'direction' => 'ASC'],
+        ],
+      ],
+    ];
     $field_config = \Drupal::entityTypeManager()->getStorage('field_config')->create($field);
     $field_config->save();
 
     // Tell the form system how to behave.
-   if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load('node.article.default')) {
+    if ($display = \Drupal::entityTypeManager()->getStorage('entity_form_display')->load('node.article.default')) {
       $display->setComponent($name, ['type' => 'options_buttons'])->save();
     }
   }

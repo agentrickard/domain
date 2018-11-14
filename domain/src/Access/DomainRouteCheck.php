@@ -12,8 +12,8 @@ use Drupal\domain\DomainNegotiatorInterface;
  * Determines access to routes based on domains.
  *
  * You can specify the '_domain' key on route requirements. If you specify a
- * single domain, users with that domain with have access. If you specify multiple
- * ones you can join them by using "+".
+ * single domain, users with that domain with have access. If you specify
+ * multiple ones you can join them by using "+".
  *
  * This access checker is separate from the global check used by inactive
  * domains. It is expressly for use with Views and other systems that need
@@ -28,7 +28,6 @@ class DomainRouteCheck implements AccessInterface {
    */
   protected $requirementsKey = '_domain';
 
-
   /**
    * The Domain negotiator.
    *
@@ -39,7 +38,7 @@ class DomainRouteCheck implements AccessInterface {
   /**
    * Constructs the object.
    *
-   * @param DomainNegotiatorInterface $negotiator
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiation service.
    */
   public function __construct(DomainNegotiatorInterface $negotiator) {

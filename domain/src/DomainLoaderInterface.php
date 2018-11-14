@@ -4,6 +4,7 @@ namespace Drupal\domain;
 
 /**
  * Supplies loader methods for common domain requests.
+ *
  * @deprecated
  *  This interface will be removed before the 8.1.0 release.
  */

@@ -56,7 +56,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     foreach ($alias_domains as $index => $alias_domain) {
       $prefix = $prefixes[$index];
       // Set a known pattern.
-      $pattern = $prefix . '.' . $this->base_hostname;
+      $pattern = $prefix . '.' . $this->baseHostname;
       $this->domainAliasCreateTestAlias($alias_domain, $pattern);
       $alias = $alias_storage->loadByPattern($pattern);
       // Set the URL for the request. Note that this is not saved, it is just
@@ -81,12 +81,12 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     // Test a wildcard alias.
     // @TODO: Refactor this test to merge with the above.
     $alias_domain = $domain_storage->loadDefaultDomain();
-    $pattern = '*.' . $this->base_hostname;
+    $pattern = '*.' . $this->baseHostname;
     $this->domainAliasCreateTestAlias($alias_domain, $pattern);
     $alias = $alias_storage->loadByPattern($pattern);
     // Set the URL for the request. Note that this is not saved, it is just
     // URL generation.
-    $alias_domain->set('hostname', 'four.' . $this->base_hostname);
+    $alias_domain->set('hostname', 'four.' . $this->baseHostname);
     $alias_domain->setPath();
     $url = $alias_domain->getPath();
     $this->drupalGet($url);

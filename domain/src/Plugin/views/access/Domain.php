@@ -6,12 +6,11 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain\DomainNegotiator;
+use Drupal\domain\DomainNegotiatorInterface;
 use Drupal\domain\DomainStorageInterface;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
-
 
 /**
  * Access plugin that provides domain-based access control.
@@ -52,12 +51,12 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param DomainStorageInterface $domain_storage
+   * @param \Drupal\domain\DomainStorageInterface $domain_storage
    *   The domain storage loader.
-   * @param DomainNegotiator $domain_negotiator
+   * @param \Drupal\domain\DomainNegotiatorInterface $domain_negotiator
    *   The domain negotiator.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainStorageInterface $domain_storage, DomainNegotiator $domain_negotiator) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DomainStorageInterface $domain_storage, DomainNegotiatorInterface $domain_negotiator) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->domainStorage = $domain_storage;
     $this->domainNegotiator = $domain_negotiator;
@@ -117,7 +116,7 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
    */
   protected function defineOptions() {
     $options = parent::defineOptions();
-    $options['domain'] = array('default' => array());
+    $options['domain'] = ['default' => []];
 
     return $options;
   }
@@ -127,27 +126,27 @@ class Domain extends AccessPluginBase implements CacheableDependencyInterface {
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
-    $form['domain'] = array(
+    $form['domain'] = [
       '#type' => 'checkboxes',
       '#title' => $this->t('Domain'),
       '#default_value' => $this->options['domain'],
       '#options' => $this->domainStorage->loadOptionsList(),
       '#description' => $this->t('Only the checked domain(s) will be able to access this display.'),
-    );
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
-    $domain = $form_state->getValue(array('access_options', 'domain'));
+    $domain = $form_state->getValue(['access_options', 'domain']);
     $domain = array_filter($domain);
 
     if (!$domain) {
       $form_state->setError($form['domain'], $this->t('You must select at least one domain if type is "by domain"'));
     }
 
-    $form_state->setValue(array('access_options', 'domain'), $domain);
+    $form_state->setValue(['access_options', 'domain'], $domain);
   }
 
   /**
