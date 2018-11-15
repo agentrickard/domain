@@ -146,6 +146,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
 
   /**
    * The canonical hostname for the domain.
+   *
+   * @var string
    */
   protected $canonical;
 
@@ -157,12 +159,12 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     $domain_storage = \Drupal::entityTypeManager()->getStorage('domain');
     $default = $domain_storage->loadDefaultId();
     $count = $storage_controller->getQuery()->count()->execute();
-    $values += array(
+    $values += [
       'scheme' => empty($GLOBALS['is_https']) ? 'http' : 'https',
       'status' => 1,
       'weight' => $count + 1,
       'is_default' => (int) empty($default),
-    );
+    ];
     // Note that we have not created a domain_id, which is only used for
     // node access control and will be added on save.
   }
@@ -256,14 +258,14 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $this->{$name} = $value;
       $this->setHostname($this->getCanonical());
       $this->save();
-      \Drupal::messenger()->addMessage($this->t('The @key attribute was set to @value for domain @hostname.', array(
+      \Drupal::messenger()->addMessage($this->t('The @key attribute was set to @value for domain @hostname.', [
         '@key' => $name,
         '@value' => $value,
         '@hostname' => $this->hostname,
-      )));
+      ]));
     }
     else {
-      \Drupal::messenger()->addMessage($this->t('The @key attribute does not exist.', array('@key' => $name)));
+      \Drupal::messenger()->addMessage($this->t('The @key attribute does not exist.', ['@key' => $name]));
     }
   }
 
@@ -376,7 +378,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
         'domain_disable_action.' . $entity->id(),
         'domain_enable_action.' . $entity->id(),
       ]);
-     foreach ($actions as $action) {
+      foreach ($actions as $action) {
         $action->delete();
       }
     }
@@ -392,8 +394,9 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     // across environments. Instead, we use the crc32 hash function to create a
     // unique numeric id for each domain. In some systems (Windows?) we have
     // reports of crc32 returning a negative number. Issue #2794047.
-    // If we don't use hash(), then crc32() returns different results for 32- and 64-bit
-    // systems. On 32-bit systems, the number returned may also be too large for PHP.
+    // If we don't use hash(), then crc32() returns different results for 32-
+    // and 64-bit systems. On 32-bit systems, the number returned may also be
+    // too large for PHP.
     // See #2908236.
     $id = hash('crc32', $this->id());
     $id = abs(hexdec(substr($id, 0, -2)));
@@ -403,13 +406,13 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * Creates a unique numeric id for use in the {node_access} table.
    *
-   * @param integer $id
-   *   An integer to ue as the numeric id.
+   * @param int $id
+   *   An integer to use as the numeric id.
    */
   public function createNumericId($id) {
     // Ensure that this value is unique.
     $storage = \Drupal::entityTypeManager()->getStorage('domain');
-    $result = $storage->loadByProperties(array('domain_id' => $id));
+    $result = $storage->loadByProperties(['domain_id' => $id]);
     if (empty($result)) {
       $this->domain_id = $id;
     }
@@ -464,7 +467,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
    * {@inheritdoc}
    */
   public function getLink($current_path = TRUE) {
-    $options = array('absolute' => TRUE, 'https' => $this->isHttps());
+    $options = ['absolute' => TRUE, 'https' => $this->isHttps()];
     if ($current_path) {
       $url = Url::fromUri($this->getUrl(), $options);
     }

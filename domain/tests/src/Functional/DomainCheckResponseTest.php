@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests the domain record response check.
  *
@@ -15,7 +13,7 @@ class DomainCheckResponseTest extends DomainTestBase {
    * Tests that a domain responds as expected.
    */
   public function testDomainCheckResponse() {
-    $this->admin_user = $this->drupalCreateUser(array('administer domains', 'create domains'));
+    $this->admin_user = $this->drupalCreateUser(['administer domains', 'create domains']);
     $this->drupalLogin($this->admin_user);
 
     $storage = \Drupal::entityTypeManager()->getStorage('domain');
@@ -38,7 +36,7 @@ class DomainCheckResponseTest extends DomainTestBase {
     try {
       $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       // Ensure no test errors.
     }
     // The domain should not save.

@@ -35,22 +35,22 @@ function domain_test_domain_request_alter(DomainInterface &$domain) {
 }
 
 /**
- * Implements hook_domain_operations
+ * Implements hook_domain_operations().
  */
 function domain_test_domain_operations(DomainInterface $domain) {
   $operations = [];
   // Add aliases to the list.
   $id = $domain->id();
-  $operations['domain_test'] = array(
+  $operations['domain_test'] = [
     'title' => t('Test'),
-    'url' => Url::fromRoute('entity.domain.edit_form', array('domain' => $id)),
+    'url' => Url::fromRoute('entity.domain.edit_form', ['domain' => $id]),
     'weight' => 80,
-  );
+  ];
   return $operations;
 }
 
 /**
- * Implements hook_domain_references_alter
+ * Implements hook_domain_references_alter().
  */
 function domain_test_domain_references_alter($query, $account, $context) {
   if ($context['entity_type'] == 'node') {

@@ -4,7 +4,6 @@ namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\RoleInterface;
-use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the access rules and redirects for inactive domains.
@@ -18,7 +17,7 @@ class DomainInactiveTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'node', 'views');
+  public static $modules = ['domain', 'node', 'views'];
 
   /**
    * Test inactive domain.
@@ -57,7 +56,7 @@ class DomainInactiveTest extends DomainTestBase {
     $this->assertResponse(200, 'Request to reset password on inactive domain allowed.');
 
     // Try to access with the proper permission.
-    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, array('access inactive domains'));
+    user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access inactive domains']);
     // Must flush cache because we did not resave the domain.
     drupal_flush_all_caches();
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
@@ -70,13 +69,14 @@ class DomainInactiveTest extends DomainTestBase {
     // Check against trusted host patterns.
     $settings['settings']['trusted_host_patterns'] = (object) [
       'value' => ['^' . $this->prepareTrustedHostname($domain->getHostname()) . '$',
-                  '^' . $this->prepareTrustedHostname($domain2->getHostname()) . '$'],
+        '^' . $this->prepareTrustedHostname($domain2->getHostname()) . '$',
+      ],
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
 
     // Revoke the permission change.
-    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, array('access inactive domains'));
+    user_role_revoke_permissions(RoleInterface::ANONYMOUS_ID, ['access inactive domains']);
 
     $domain2->saveDefault();
 

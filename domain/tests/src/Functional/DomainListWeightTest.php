@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests behavior for the weight element of the domain list builder.
  *
@@ -16,7 +14,7 @@ class DomainListWeightTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'user');
+  public static $modules = ['domain', 'user'];
 
   /**
    * {@inheritdoc}
@@ -43,13 +41,13 @@ class DomainListWeightTest extends DomainTestBase {
     $this->assert($domain->id() == 'test59_example_com', 'Last domain is test59');
     $domains_old = $domains;
 
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
     $this->drupalGet('admin/config/domain');
@@ -70,7 +68,7 @@ class DomainListWeightTest extends DomainTestBase {
         $this->assert($domain->getWeight() == 61, 'Weight set to 61 ' . $domain->getWeight());
       }
       else {
-        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight(). 'Weights unchanged');
+        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight() . 'Weights unchanged');
       }
       $i++;
     }
@@ -101,10 +99,11 @@ class DomainListWeightTest extends DomainTestBase {
         $this->assert($domain->getWeight() == 2, 'Weight set to 2');
       }
       else {
-        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight(). 'Weights unchanged');
+        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight() . 'Weights unchanged');
       }
     }
     // The last domain should be test59_example_com.
     $this->assert($domain->id() == 'test59_example_com', 'Last domain is test59' . $domain->id());
   }
+
 }

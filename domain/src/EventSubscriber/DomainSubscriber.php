@@ -4,7 +4,6 @@ namespace Drupal\domain\EventSubscriber;
 
 use Drupal\domain\Access\DomainAccessCheck;
 use Drupal\domain\DomainNegotiatorInterface;
-use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\DomainRedirectResponse;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
@@ -59,7 +58,7 @@ class DomainSubscriber implements EventSubscriberInterface {
    *
    * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiator service.
-   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\domain\Access\DomainAccessCheck $access_check
    *   The access check interface.
@@ -120,7 +119,8 @@ class DomainSubscriber implements EventSubscriberInterface {
           $response = new TrustedRedirectResponse($domain_url, $redirect_status);
         }
         else {
-          // If the redirect is not to a registered hostname, reject the request.
+          // If the redirect is not to a registered hostname, reject the
+          // request.
           $response = new Response('The provided host name is not a valid redirect.', 401);
         }
         $event->setResponse($response);
@@ -133,7 +133,7 @@ class DomainSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     // This needs to fire very early in the stack, before accounts are cached.
-    $events[KernelEvents::REQUEST][] = array('onKernelRequestDomain', 50);
+    $events[KernelEvents::REQUEST][] = ['onKernelRequestDomain', 50];
     return $events;
   }
 

@@ -20,6 +20,8 @@ class DomainNavBlock extends DomainBlockBase {
 
   /**
    * An array of settings.
+   *
+   * @var string[]
    */
   public $settings = [];
 
@@ -48,30 +50,30 @@ class DomainNavBlock extends DomainBlockBase {
       '#default_value' => !empty($this->configuration['link_options']) ? $this->configuration['link_options'] : $defaults['link_options'],
       '#description' => $this->t('Determines how links to each domain will be written. Note that some paths may not be accessible on all domains.'),
     ];
-    $options = array(
-      'select' => t('JavaScript select list'),
-      'menus' => t('Menu-style tab links'),
-      'ul' => t('Unordered list of links'),
-    );
-    $elements['link_theme'] = array(
+    $options = [
+      'select' => $this->t('JavaScript select list'),
+      'menus' => $this->t('Menu-style tab links'),
+      'ul' => $this->t('Unordered list of links'),
+    ];
+    $elements['link_theme'] = [
       '#type' => 'radios',
       '#title' => t('Link theme'),
       '#default_value' => !empty($this->configuration['link_theme']) ? $this->configuration['link_theme'] : $defaults['link_theme'],
       '#options' => $options,
       '#description' => $this->t('Select how to display the block output.'),
-    );
-    $options = array(
-      'name' => t('The domain display name'),
-      'hostname' => t('The raw hostname'),
-      'url' => t('The domain base URL'),
-    );
-    $elements['link_label'] = array(
+    ];
+    $options = [
+      'name' => $this->t('The domain display name'),
+      'hostname' => $this->t('The raw hostname'),
+      'url' => $this->t('The domain base URL'),
+    ];
+    $elements['link_label'] = [
       '#type' => 'radios',
-      '#title' => t('Link text'),
+      '#title' => $this->t('Link text'),
       '#default_value' => !empty($this->configuration['link_label']) ? $this->configuration['link_label'] : $defaults['link_label'],
       '#options' => $options,
       '#description' => $this->t('Select the text to display for each link.'),
-    );
+    ];
     return $elements;
   }
 
@@ -91,7 +93,7 @@ class DomainNavBlock extends DomainBlockBase {
    * Overrides \Drupal\block\BlockBase::access().
    */
   public function access(AccountInterface $account, $return_as_object = FALSE) {
-    $access = AccessResult::allowedIfHasPermissions($account, array('administer domains', 'use domain nav block'), 'OR');
+    $access = AccessResult::allowedIfHasPermissions($account, ['administer domains', 'use domain nav block'], 'OR');
     return $return_as_object ? $access : $access->isAllowed();
   }
 
@@ -159,6 +161,7 @@ class DomainNavBlock extends DomainBlockBase {
         $build['#theme'] = 'domain_nav_block';
         $build['#items'] = $items;
         break;
+
       case 'menus':
         // Map the $items params to what menu.html.twig expects.
         $build['#items'] = $items;
@@ -166,6 +169,7 @@ class DomainNavBlock extends DomainBlockBase {
         $build['#sorted'] = TRUE;
         $build['#theme'] = 'menu__' . strtr($build['#menu_name'], '-', '_');
         break;
+
       case 'ul':
       default:
         $build['#theme'] = 'item_list';
@@ -190,11 +194,11 @@ class DomainNavBlock extends DomainBlockBase {
   /**
    * Gets the configuration for the block, loading defaults if not set.
    *
-   * @param $key
-   *   The setting key to retrieve, a string
+   * @param string $key
+   *   The setting key to retrieve, a string.
    *
-   * @return
-   *.  The setting value, a string.
+   * @return string
+   *   The setting value, a string.
    */
   public function getSetting($key) {
     if (isset($this->settings[$key])) {

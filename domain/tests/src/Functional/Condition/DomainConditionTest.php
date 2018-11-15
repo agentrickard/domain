@@ -20,16 +20,22 @@ class DomainConditionTest extends DomainTestBase {
 
   /**
    * A test domain.
+   *
+   * @var \Drupal\domain\DomainInterface
    */
-  protected $test_domain;
+  protected $testDomain;
 
   /**
    * A test domain that never matches $test_domain.
+   *
+   * @var \Drupal\domain\DomainInterface
    */
-  protected $not_domain;
+  protected $notDomain;
 
   /**
    * An array of all testing domains.
+   *
+   * @var \Drupal\domain\DomainInterface[]
    */
   protected $domains;
 
@@ -47,8 +53,8 @@ class DomainConditionTest extends DomainTestBase {
 
     // Get two sample domains.
     $this->domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
-    $this->test_domain = array_shift($this->domains);
-    $this->not_domain = array_shift($this->domains);
+    $this->testDomain = array_shift($this->domains);
+    $this->notDomain = array_shift($this->domains);
   }
 
   /**
@@ -57,23 +63,23 @@ class DomainConditionTest extends DomainTestBase {
   public function testConditions() {
     // Grab the domain condition and configure it to check against one domain.
     $condition = $this->manager->createInstance('domain')
-      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
-      ->setContextValue('entity:domain', $this->not_domain);
+      ->setConfig('domains', [$this->testDomain->id() => $this->testDomain->id()])
+      ->setContextValue('entity:domain', $this->notDomain);
     $this->assertFalse($condition->execute(), 'Domain request condition fails on wrong domain.');
 
     // Grab the domain condition and configure it to check against itself.
     $condition = $this->manager->createInstance('domain')
-      ->setConfig('domains', array($this->test_domain->id() => $this->test_domain->id()))
-      ->setContextValue('entity:domain', $this->test_domain);
+      ->setConfig('domains', [$this->testDomain->id() => $this->testDomain->id()])
+      ->setContextValue('entity:domain', $this->testDomain);
     $this->assertTrue($condition->execute(), 'Domain request condition succeeds on matching domain.');
 
     // Check for the proper summary.
     // Summaries require an extra space due to negate handling in summary().
-    $this->assertEqual($condition->summary(), 'Active domain is ' . $this->test_domain->label());
+    $this->assertEqual($condition->summary(), 'Active domain is ' . $this->testDomain->label());
 
     // Check the negated summary.
     $condition->setConfig('negate', TRUE);
-    $this->assertEqual($condition->summary(), 'Active domain is not ' . $this->test_domain->label());
+    $this->assertEqual($condition->summary(), 'Active domain is not ' . $this->testDomain->label());
 
     // Check the negated condition.
     $this->assertFalse($condition->execute(), 'Domain request condition fails when condition negated.');

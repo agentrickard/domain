@@ -39,12 +39,12 @@ class DomainAccessCheck implements AccessCheckInterface {
   /**
    * Constructs the object.
    *
-   * @param DomainNegotiatorInterface $negotiator
+   * @param \Drupal\domain\DomainNegotiatorInterface $negotiator
    *   The domain negotiation service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
-   *   The path matcher service
+   *   The path matcher service.
    */
   public function __construct(DomainNegotiatorInterface $negotiator, ConfigFactoryInterface $config_factory, PathMatcherInterface $path_matcher) {
     $this->domainNegotiator = $negotiator;
@@ -71,7 +71,6 @@ class DomainAccessCheck implements AccessCheckInterface {
    * {@inheritdoc}
    */
   public function access(AccountInterface $account) {
-    /** @var \Drupal\domain\DomainInterface $domain */
     $domain = $this->domainNegotiator->getActiveDomain();
     // Is the domain allowed?
     // No domain, let it pass.
@@ -84,7 +83,7 @@ class DomainAccessCheck implements AccessCheckInterface {
     }
     // Inactive domain, require permissions.
     else {
-      $permissions = array('administer domains', 'access inactive domains');
+      $permissions = ['administer domains', 'access inactive domains'];
       $operator = 'OR';
       return AccessResult::allowedIfHasPermissions($account, $permissions, $operator)->setCacheMaxAge(0);
     }

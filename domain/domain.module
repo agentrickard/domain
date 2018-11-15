@@ -5,11 +5,11 @@
  * Defines a Domain concept for use with Drupal.
  */
 
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
 use Drupal\domain\DomainInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Component\Utility\Html;
-use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * The name of the node access control field.
@@ -71,10 +71,9 @@ function domain_token_info() {
 /**
  * Implements hook_tokens().
  */
-function domain_tokens($type, $tokens, array $data, array $options, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata) {
+function domain_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
   return \Drupal::service('domain.token')->getTokens($type, $tokens, $data, $options, $bubbleable_metadata);
 }
-
 
 /**
  * Implements hook_preprocess_HOOK() for html.html.twig.
@@ -128,7 +127,7 @@ function domain_domain_references_alter($query, $account, $context) {
 }
 
 /**
- * Implements hook_views_data_alter.
+ * Implements hook_views_data_alter().
  */
 function domain_views_data_alter(array &$data) {
   $table = 'user__' . DOMAIN_ADMIN_FIELD;
@@ -155,8 +154,8 @@ function domain_theme() {
  * @param array $variables
  *   An associative array containing:
  *   - items: An array of labels and urls for use in the list.
- *     Properties used: 'label', 'url', 'active'
+ *     Properties used: 'label', 'url', 'active'.
  */
-function template_preprocess_domain_nav_block(&$variables) {
+function template_preprocess_domain_nav_block(array &$variables) {
   $variables['items'] = $variables['items']['#items'];
 }

@@ -25,17 +25,19 @@ abstract class DomainTestBase extends WebTestBase {
   /**
    * Sets a base hostname for running tests.
    *
-   * When creating test domains, try to use $this->base_hostname or the
+   * When creating test domains, try to use $this->baseHostname or the
    * domainCreateTestDomains() method.
+   *
+   * @var string
    */
-  public $base_hostname;
+  public $baseHostname;
 
   /**
    * Modules to enable.
    *
    * @var array
    */
-  public static $modules = array('domain', 'node');
+  public static $modules = ['domain', 'node'];
 
   /**
    * {@inheritdoc}
@@ -45,7 +47,7 @@ abstract class DomainTestBase extends WebTestBase {
 
     // Create Basic page and Article node types.
     if ($this->profile != 'standard') {
-      $this->drupalCreateContentType(array('type' => 'article', 'name' => 'Article'));
+      $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     }
 
     // Set the base hostname for domains.
@@ -59,15 +61,16 @@ abstract class DomainTestBase extends WebTestBase {
    *   The user account object to check.
    *
    * @return bool
+   *   TRUE if a given user account is logged in, or FALSE.
    */
-  protected function drupalUserIsLoggedIn($account) {
+  protected function drupalUserIsLoggedIn(UserInterface $account) {
     // @TODO: This is a temporary hack for the test login fails when setting $cookie_domain.
     if (!isset($account->session_id)) {
       return (bool) $account->id();
     }
     // The session ID is hashed before being stored in the database.
     // @see \Drupal\Core\Session\SessionHandler::read()
-    return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", array(':sid' => Crypt::hashBase64($account->session_id)))->fetchField();
+    return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", [':sid' => Crypt::hashBase64($account->session_id)])->fetchField();
   }
 
   /**
@@ -92,7 +95,7 @@ abstract class DomainTestBase extends WebTestBase {
     if (isset($this->sessionId)) {
       $account->session_id = $this->sessionId;
     }
-    $pass = $this->assert($this->drupalUserIsLoggedIn($account), new FormattableMarkup('User %name successfully logged in.', array('%name' => $account->getUsername())), 'User login');
+    $pass = $this->assert($this->drupalUserIsLoggedIn($account), new FormattableMarkup('User %name successfully logged in.', ['%name' => $account->getUsername()]), 'User login');
     if ($pass) {
       $this->loggedInUser = $account;
       $this->container->get('current_user')->setAccount($account);

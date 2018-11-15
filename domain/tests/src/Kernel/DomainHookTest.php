@@ -9,8 +9,8 @@ use Drupal\Tests\domain\Traits\DomainTestTrait;
 /**
  * Tests domain hooks documented in domain.api.php.
  *
- * Note that the other hooks are covered by functional tests, since they involve UI
- * elements.
+ * Note that the other hooks are covered by functional tests, since they involve
+ * UI elements.
  *
  * @see DomainReferencesTest
  * @see DomainListBuilderTes
@@ -27,25 +27,33 @@ class DomainHookTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'domain_test', 'user', 'node');
+  public static $modules = ['domain', 'domain_test', 'user', 'node'];
 
   /**
    * Domain id key.
+   *
+   * @var string
    */
   public $key = 'example_com';
 
   /**
    * The Domain storage handler service.
+   *
+   * @var \Drupal\domain\DomainStorageInterface
    */
   public $domainStorage;
 
   /**
    * The current user service.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
    */
   public $currentUser;
 
   /**
-   * The mondule handler service.
+   * The module handler service.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   public $moduleHandler;
 
@@ -74,8 +82,8 @@ class DomainHookTest extends KernelTestBase {
     // Internal hooks.
     $path = $domain->getPath();
     $url = $domain->getUrl();
-    $this->assertTrue(isset($path), new FormattableMarkup('The path property was set to %path by hook_entity_load.', array('%path' => $path)));
-    $this->assertTrue(isset($url), new FormattableMarkup('The url property was set to %url by hook_entity_load.', array('%url' => $url)));
+    $this->assertTrue(isset($path), new FormattableMarkup('The path property was set to %path by hook_entity_load.', ['%path' => $path]));
+    $this->assertTrue(isset($url), new FormattableMarkup('The url property was set to %url by hook_entity_load.', ['%url' => $url]));
 
     // External hooks.
     $this->assertTrue($domain->foo == 'bar', 'The foo property was set to <em>bar</em> by hook_domain_load.');
@@ -102,7 +110,7 @@ class DomainHookTest extends KernelTestBase {
   public function testHookDomainRequestAlter() {
     // Set the request.
     $negotiator = \Drupal::service('domain.negotiator');
-    $negotiator->setRequestDomain($this->base_hostname);
+    $negotiator->setRequestDomain($this->baseHostname);
 
     // Check that the property was added by our hook.
     $domain = $negotiator->getActiveDomain();
@@ -116,7 +124,7 @@ class DomainHookTest extends KernelTestBase {
     $domain = $this->domainStorage->load($this->key);
 
     // Set the request.
-    $operations = $this->moduleHandler->invokeAll('domain_operations', array($domain, $this->currentUser));
+    $operations = $this->moduleHandler->invokeAll('domain_operations', [$domain, $this->currentUser]);
 
     // Test that our operations were added by the hook.
     $this->assertTrue(isset($operations['domain_test']), 'Domain test operation loaded.');
