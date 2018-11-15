@@ -1,25 +1,22 @@
 language: php
 sudo: false
 
+php:
+- 5.6
+- 7.0
+- 7.1
+- 7.2
+
 matrix:
   fast_finish: true
-  include:
-    - env: DRUPAL=8.5.x
-      php: 5.5
-    - env: DRUPAL=8.5.x
-      php: 5.6
-    - env: DRUPAL=8.5.x
-      php: 7.1
-    - env: DRUPAL=8.5.x
-      php: 7.2
-    - env: DRUPAL=8.6.x
-      php: 5.5
-    - env: DRUPAL=8.6.x
-      php: 5.6
-    - env: DRUPAL=8.6.x
-      php: 7.1
-    - env: DRUPAL=8.6.x
-      php: 7.2
+  # Run the coding standards check only once.
+  exclude:
+    - php: 5.6
+      env: TEST_SUITE=PHP_CodeSniffer
+    - php: 7.0
+      env: TEST_SUITE=PHP_CodeSniffer
+    - php: 7.1
+      env: TEST_SUITE=PHP_CodeSniffer
 
 addons:
   hosts:
@@ -39,6 +36,10 @@ env:
     # add composer's global bin directory to the path
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
+  matrix:
+  - TEST_SUITE=8.5.x
+  - TEST_SUITE=8.6.x
+  - TEST_SUITE=PHP_CodeSniffer
 
 mysql:
   database: domain
@@ -69,36 +70,30 @@ before_script:
 
   # Remember the current rules test directory for later use in the Drupal installation.
   - TESTDIR=$(pwd)
+  # Remember the Drupal installation path.
+  - DRUPAL_DIR=$(pwd)/drupal
   # Navigate out of module directory to prevent blown stack by recursive module lookup.
   - cd ..
 
   # Download Drupal 8 core.
-  - travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
-  - cd drupal
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || cd drupal
 
   # Update PHPUnit.
-  - composer run-script drupal-phpunit-upgrade
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || composer run-script drupal-phpunit-upgrade
 
   # Make the module appear in the correct place
-  - ln -s $TESTDIR modules/domain
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || ln -s $TESTDIR modules/domain
 
   # Install drupal default profile
-  - /usr/bin/env PHP_OPTIONS="-d sendmail_path=$(which true)" drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
-  - drush --yes en simpletest domain domain_access domain_alias domain_config domain_source
-  - drush cr
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || /usr/bin/env PHP_OPTIONS="-d sendmail_path=$(which true)" drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || drush --yes en simpletest domain domain_access domain_alias domain_config domain_source
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || drush cr
 
   # Start a web server on port 8080 in the background.
-  - nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
 
   # Wait until the web server is responding.
-  - until curl -s example.com:8080; do true; done > /dev/null
+  - test ${TEST_SUITE} == "PHP_CodeSniffer" || until curl -s example.com:8080; do true; done > /dev/null
 
-script:
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_access
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_content
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
+script: DRUPAL_DIR=$DRUPAL_DIR TESTDIR=$TESTDIR $TESTDIR/scripts/travis-ci/run-test.sh $TEST_SUITE
