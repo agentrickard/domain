@@ -1240,7 +1240,7 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          plugin_id: numeric
+          plugin_id: boolean
         field_domain_access_target_id:
           id: field_domain_access_target_id
           table: node__field_domain_access
