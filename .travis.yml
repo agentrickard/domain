@@ -94,11 +94,11 @@ before_script:
   - until curl -s example.com:8080; do true; done > /dev/null
 
 script:
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_access
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_content
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 4 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_access
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_alias
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain_alias
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_content
+  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 10 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
