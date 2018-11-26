@@ -75,17 +75,17 @@ class DomainAccessCheck implements AccessCheckInterface {
     // Is the domain allowed?
     // No domain, let it pass.
     if (empty($domain)) {
-      return AccessResult::allowed()->setCacheMaxAge(0);
+      return AccessResult::allowed()->addCacheTags(['url.site']);
     }
     // Active domain, let it pass.
     if ($domain->status()) {
-      return AccessResult::allowed()->setCacheMaxAge(0);
+      return AccessResult::allowed()->addCacheTags(['url.site']);
     }
     // Inactive domain, require permissions.
     else {
       $permissions = ['administer domains', 'access inactive domains'];
       $operator = 'OR';
-      return AccessResult::allowedIfHasPermissions($account, $permissions, $operator)->setCacheMaxAge(0);
+      return AccessResult::allowedIfHasPermissions($account, $permissions, $operator)->addCacheTags(['url.site']);
     }
   }
 
