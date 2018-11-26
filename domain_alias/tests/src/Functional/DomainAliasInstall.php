@@ -16,7 +16,7 @@ class DomainAliasInstall extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'node'];
+  public static $modules = ['domain'];
 
   /**
    * {@inheritdoc}
@@ -30,7 +30,8 @@ class DomainAliasInstall extends BrowserTestBase {
   }
 
   public function testInstallationContentFail() {
-    $this->createNode(['type' => 'article', 'title' => 'Foo']);
+    $this->createContentType();
+    $this->createNode();
     \Drupal::service('module_installer')->install(['domain_alias']);
   }
 
