@@ -3,7 +3,6 @@
 namespace Drupal\domain\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\domain\DomainStorageInterface;

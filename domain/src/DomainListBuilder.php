@@ -6,16 +6,12 @@ use Drupal\Core\Config\Entity\DraggableListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\domain\DomainAccessControlHandler;
-use Drupal\domain\DomainStorageInterface;
-use Drupal\domain\DomainElementManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -71,10 +67,24 @@ class DomainListBuilder extends DraggableListBuilder {
   protected $domainStorage;
 
   /**
+   * The domain field element manager.
+   *
+   * @var \Drupal\domain\DomainElementManagerInterface
+   */
+  protected $domainElementManager;
+
+  /**
+   * The User storage handler.
+   *
+   * @var \Drupal\user\UserStorageInterface
+   */
+  protected $userStorage;
+
+  /**
    * The number of entities to list per page.
    *
-   * DraggableListBuilder sets this to FALSE, which cancels any pagination. Restore the
-   * default value from EntityListBuilder.
+   * DraggableListBuilder sets this to FALSE, which cancels any pagination.
+   * Restore the default value from EntityListBuilder.
    *
    * @var int|false
    */
@@ -96,7 +106,7 @@ class DomainListBuilder extends DraggableListBuilder {
   }
 
   /**
-   * Constructs a new EntityListBuilder object.
+   * Constructs a new DomainListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
@@ -104,16 +114,16 @@ class DomainListBuilder extends DraggableListBuilder {
    *   The domain storage class.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The active user account.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $destination
+   * @param \Drupal\Core\Routing\RedirectDestinationInterface $destination_handler
    *   The redirect destination helper.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\domain\DomainElementManager $domain_element_manager
+   * @param \Drupal\domain\DomainElementManagerInterface $domain_element_manager
    *   The domain field element manager.
    */
-  public function __construct(EntityTypeInterface $entity_type, DomainStorageInterface $domain_storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainElementManager $domain_element_manager) {
+  public function __construct(EntityTypeInterface $entity_type, DomainStorageInterface $domain_storage, AccountInterface $account, RedirectDestinationInterface $destination_handler, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, DomainElementManagerInterface $domain_element_manager) {
     parent::__construct($entity_type, $domain_storage);
     $this->entityTypeId = $entity_type->id();
     $this->domainStorage = $domain_storage;
@@ -152,35 +162,35 @@ class DomainListBuilder extends DraggableListBuilder {
     $super_admin = $this->currentUser->hasPermission('administer domains');
     if ($super_admin || $this->currentUser->hasPermission('access inactive domains')) {
       if ($entity->status() && !$default) {
-        $operations['disable'] = array(
+        $operations['disable'] = [
           'title' => $this->t('Disable'),
-          'url' => Url::fromRoute('domain.inline_action', array('op' => 'disable', 'domain' => $id)),
+          'url' => Url::fromRoute('domain.inline_action', ['op' => 'disable', 'domain' => $id]),
           'weight' => 50,
-        );
+        ];
       }
       elseif (!$default) {
-        $operations['enable'] = array(
+        $operations['enable'] = [
           'title' => $this->t('Enable'),
-          'url' => Url::fromRoute('domain.inline_action', array('op' => 'enable', 'domain' => $id)),
+          'url' => Url::fromRoute('domain.inline_action', ['op' => 'enable', 'domain' => $id]),
           'weight' => 40,
-        );
+        ];
       }
     }
     if (!$default && $super_admin) {
-      $operations['default'] = array(
+      $operations['default'] = [
         'title' => $this->t('Make default'),
-        'url' => Url::fromRoute('domain.inline_action', array('op' => 'default', 'domain' => $id)),
+        'url' => Url::fromRoute('domain.inline_action', ['op' => 'default', 'domain' => $id]),
         'weight' => 30,
-      );
+      ];
     }
     if (!$default && $this->accessHandler->checkAccess($entity, 'delete')->isAllowed()) {
-      $operations['delete'] = array(
+      $operations['delete'] = [
         'title' => $this->t('Delete'),
-        'url' => Url::fromRoute('entity.domain.delete_form', array('domain' => $id)),
+        'url' => Url::fromRoute('entity.domain.delete_form', ['domain' => $id]),
         'weight' => 20,
-      );
+      ];
     }
-    $operations += $this->moduleHandler->invokeAll('domain_operations', array($entity, $this->currentUser));
+    $operations += $this->moduleHandler->invokeAll('domain_operations', [$entity, $this->currentUser]);
     foreach ($operations as $key => $value) {
       if (isset($value['query']['token'])) {
         $operations[$key]['query'] += $destination;
@@ -222,13 +232,13 @@ class DomainListBuilder extends DraggableListBuilder {
     }
 
     $row['label'] = $this->getLabel($entity);
-    $row['hostname'] = array('#markup' => $entity->getLink());
+    $row['hostname'] = ['#markup' => $entity->getLink()];
     if ($entity->isActive()) {
       $row['hostname']['#prefix'] = '<strong>';
       $row['hostname']['#suffix'] = '</strong>';
     }
-    $row['status'] = array('#markup' => $entity->status() ? $this->t('Active') : $this->t('Inactive'));
-    $row['is_default'] = array('#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No')));
+    $row['status'] = ['#markup' => $entity->status() ? $this->t('Active') : $this->t('Inactive')];
+    $row['is_default'] = ['#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No'))];
     $row += parent::buildRow($entity);
 
     if (!$this->currentUser->hasPermission('administer domains')) {
@@ -280,7 +290,6 @@ class DomainListBuilder extends DraggableListBuilder {
     }
   }
 
-
   /**
    * Internal sort method for form weights.
    */
@@ -294,8 +303,8 @@ class DomainListBuilder extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    *
-   * Builds the entity listing as a form with pagination. This method overrides both
-   * Drupal\Core\Config\Entity\DraggableListBuilder::render() and
+   * Builds the entity listing as a form with pagination. This method overrides
+   * both Drupal\Core\Config\Entity\DraggableListBuilder::render() and
    * Drupal\Core\Entity\EntityListBuilder::render().
    */
   public function render() {
@@ -304,9 +313,9 @@ class DomainListBuilder extends DraggableListBuilder {
 
     // Only add the pager if a limit is specified.
     if ($this->limit) {
-      $form['pager'] = array(
+      $form['pager'] = [
         '#type' => 'pager',
-      );
+      ];
     }
     return $form;
   }
@@ -314,8 +323,8 @@ class DomainListBuilder extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    *
-   * Loads entity IDs using a pager sorted by the entity weight. The default behavior when
-   * using a limit is to sort by id.
+   * Loads entity IDs using a pager sorted by the entity weight. The default
+   * behavior when using a limit is to sort by id.
    *
    * We also have to limit by assigned domains of the active user.
    *
@@ -328,10 +337,10 @@ class DomainListBuilder extends DraggableListBuilder {
     $query = $this->getStorage()->getQuery()
       ->sort($this->entityType->getKey('weight'));
 
-    // If the user cannot administer domains, we must filter the query further by
-    // assigned IDs. We don't have to check permissions here, because that is handled by
-    // the route system and buildRow(). There are two permissions that allow users to view
-    // the entire list.
+    // If the user cannot administer domains, we must filter the query further
+    // by assigned IDs. We don't have to check permissions here, because that is
+    // handled by the route system and buildRow(). There are two permissions
+    // that allow users to view the entire list.
     if (!$this->currentUser->hasPermission('administer domains') && !$this->currentUser->hasPermission('view domain list')) {
       $user = $this->userStorage->load($this->currentUser->id());
       $allowed = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
@@ -344,4 +353,5 @@ class DomainListBuilder extends DraggableListBuilder {
     }
     return $query->execute();
   }
+
 }

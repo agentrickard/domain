@@ -3,7 +3,6 @@
 namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests the domain CSS configuration.
@@ -17,11 +16,14 @@ class DomainCSSTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain');
+  public static $modules = ['domain'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
-    \Drupal::service('theme_handler')->install(array('bartik'));
+    \Drupal::service('theme_handler')->install(['bartik']);
   }
 
   /**

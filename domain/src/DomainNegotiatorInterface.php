@@ -84,7 +84,9 @@ interface DomainNegotiatorInterface {
    * @param string $hostname
    *   A string representing the hostname of the request (e.g. example.com).
    *
-   * @return boolean
+   * @return bool
+   *   TRUE if a URL's hostname is registered as a valid domain or alias, or
+   *   FALSE.
    */
   public function isRegisteredDomain($hostname);
 

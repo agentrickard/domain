@@ -23,6 +23,8 @@ class DomainNegotiator implements DomainNegotiatorInterface {
 
   /**
    * The HTTP_HOST value of the request.
+   *
+   * @var string
    */
   protected $httpHost;
 
@@ -36,7 +38,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   /**
    * The domain storage class.
    *
-   * @var \Drupal\domain\DomainStorageInterface
+   * @var \Drupal\domain\DomainStorageInterface|null
    */
   protected $domainStorage;
 
@@ -76,7 +78,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    *   The request stack object.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
@@ -85,7 +87,6 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $this->requestStack = $requestStack;
     $this->moduleHandler = $module_handler;
     $this->entityTypeManager = $entity_type_manager;
-    $this->domainStorage = $this->entityTypeManager->getStorage('domain');
     $this->configFactory = $config_factory;
   }
 
@@ -96,16 +97,16 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // @TODO: Investigate caching methods.
     $this->setHttpHost($httpHost);
     // Try to load a direct match.
-    if ($domain = $this->domainStorage->loadByHostname($httpHost)) {
+    if ($domain = $this->domainStorage()->loadByHostname($httpHost)) {
       // If the load worked, set an exact match flag for the hook.
       $domain->setMatchType(self::DOMAIN_MATCH_EXACT);
     }
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
     else {
-      $values = array('hostname' => $httpHost);
-      /** @var \Drupal\domain\Entity\DomainInterface $domain */
-      $domain = $this->domainStorage->create($values);
+      $values = ['hostname' => $httpHost];
+      /** @var \Drupal\domain\DomainInterface $domain */
+      $domain = $this->domainStorage()->create($values);
       $domain->setMatchType(self::DOMAIN_MATCH_NONE);
     }
 
@@ -124,7 +125,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $this->setActiveDomain($domain);
     }
     // Fallback to default domain if no match.
-    elseif ($domain = $this->domainStorage->loadDefaultDomain()) {
+    elseif ($domain = $this->domainStorage()->loadDefaultDomain()) {
       $this->moduleHandler->alter('domain_request', $domain);
       $domain->setMatchType(self::DOMAIN_MATCH_NONE);
       if (!empty($domain->id())) {
@@ -178,7 +179,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $httpHost = $_SERVER['HTTP_HOST'];
     }
     $hostname = !empty($httpHost) ? $httpHost : 'localhost';
-    return $this->domainStorage->prepareHostname($hostname);
+    return $this->domainStorage()->prepareHostname($hostname);
   }
 
   /**
@@ -200,13 +201,13 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    */
   public function isRegisteredDomain($hostname) {
     // Direct hostname match always passes.
-    if ($domain = $this->domainStorage->loadByHostname($hostname)) {
+    if ($domain = $this->domainStorage()->loadByHostname($hostname)) {
       return TRUE;
     }
     // Check for registered alias matches.
-    $values = array('hostname' => $hostname);
-    /** @var \Drupal\domain\Entity\DomainInterface $domain */
-    $domain = $this->domainStorage->create($values);
+    $values = ['hostname' => $hostname];
+    /** @var \Drupal\domain\DomainInterface $domain */
+    $domain = $this->domainStorage()->create($values);
     $domain->setMatchType(self::DOMAIN_MATCH_NONE);
 
     // Now check with modules (like Domain Alias) that register alternate
@@ -218,6 +219,19 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Retrieves the domain storage handler.
+   *
+   * @return \Drupal\domain\DomainStorageInterface
+   *   The domain storage handler.
+   */
+  protected function domainStorage() {
+    if (!$this->domainStorage) {
+      $this->domainStorage = $this->entityTypeManager->getStorage('domain');
+    }
+    return $this->domainStorage;
   }
 
 }

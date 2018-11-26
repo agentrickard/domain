@@ -2,8 +2,6 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use Drupal\Tests\domain\Functional\DomainTestBase;
-
 /**
  * Tests behavior for the domain list builder.
  *
@@ -16,7 +14,7 @@ class DomainListBuilderTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = array('domain', 'user');
+  public static $modules = ['domain', 'user'];
 
   /**
    * {@inheritdoc}
@@ -32,13 +30,13 @@ class DomainListBuilderTest extends DomainTestBase {
    * Basic test setup.
    */
   public function testDomainListBuilder() {
-    $admin = $this->drupalCreateUser(array(
+    $admin = $this->drupalCreateUser([
       'bypass node access',
       'administer content types',
       'administer node fields',
       'administer node display',
       'administer domains',
-    ));
+    ]);
     $this->drupalLogin($admin);
 
     $this->drupalGet('admin/config/domain');
@@ -64,12 +62,12 @@ class DomainListBuilderTest extends DomainTestBase {
     }
 
     // Now login as a user with limited rights.
-    $account = $this->drupalCreateUser(array(
+    $account = $this->drupalCreateUser([
       'create article content',
       'edit any article content',
       'edit assigned domains',
       'view domain list',
-    ));
+    ]);
     $ids = ['example_com', 'one_example_com'];
     $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ADMIN_FIELD);
     $user_storage = \Drupal::entityTypeManager()->getStorage('user');
@@ -130,12 +128,12 @@ class DomainListBuilderTest extends DomainTestBase {
     }
 
     // Now login as a user with more limited rights.
-    $account2 = $this->drupalCreateUser(array(
+    $account2 = $this->drupalCreateUser([
       'create article content',
       'edit any article content',
       'edit assigned domains',
       'view assigned domains',
-    ));
+    ]);
     $ids = ['example_com', 'one_example_com'];
     $this->addDomainsToEntity('user', $account2->id(), $ids, DOMAIN_ADMIN_FIELD);
     $user_storage = \Drupal::entityTypeManager()->getStorage('user');

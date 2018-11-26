@@ -3,7 +3,6 @@
 namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Config\ConfigValueException;
-use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
  * Tests domain record validation.
@@ -33,15 +32,22 @@ class DomainValidatorTest extends DomainTestBase {
     $hostnames = [
       'localhost' => 1,
       'example.com' => 1,
-      'www.example.com' => 1, // see www-prefix test, below.
+       // See www-prefix test, below.
+      'www.example.com' => 1,
       'one.example.com' => 1,
       'example.com:8080' => 1,
-      'example.com::8080' => 0, // only one colon.
-      'example.com:abc' => 0, // no letters after a colon.
-      '.example.com' => 0, // cannot begin with a dot.
-      'example.com.' => 0, // cannot end with a dot.
-      'EXAMPLE.com' => 0, // lowercase only.
-      'éxample.com' => 0, // ascii-only.
+       // Only one colon.
+      'example.com::8080' => 0,
+       // No letters after a colon.
+      'example.com:abc' => 0,
+       // Cannot begin with a dot.
+      '.example.com' => 0,
+       // Cannot end with a dot.
+      'example.com.' => 0,
+       // Lowercase only.
+      'EXAMPLE.com' => 0,
+       // ascii-only.
+      'éxample.com' => 0,
     ];
     foreach ($hostnames as $hostname => $valid) {
       $errors = $validator->validate($hostname);
@@ -69,18 +75,20 @@ class DomainValidatorTest extends DomainTestBase {
     }
     // Test the two configurable options.
     $config = $this->config('domain.settings');
-    $config->set('www_prefix', true);
-    $config->set('allow_non_ascii', true);
+    $config->set('www_prefix', TRUE);
+    $config->set('allow_non_ascii', TRUE);
     $config->save();
     // Valid hostnames to test. Valid is the boolean value.
     $hostnames = [
-      'www.example.com' => 0, // no www-prefix allowed
-      'éxample.com' => 1, // ascii-only allowed.
+       // No www-prefix allowed.
+      'www.example.com' => 0,
+       // ascii-only allowed.
+      'éxample.com' => 1,
     ];
     foreach ($hostnames as $hostname => $valid) {
       $errors = $validator->validate($hostname);
       if ($valid) {
-        $this->assertTrue(empty($errors),'Validation test correct with no errors.');
+        $this->assertTrue(empty($errors), 'Validation test correct with no errors.');
       }
       else {
         $this->assertTrue(!empty($errors), 'Validation test correct with errors.');

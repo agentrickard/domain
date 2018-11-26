@@ -28,7 +28,7 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
     $alias_loader = \Drupal::entityTypeManager()->getStorage('domain_alias');
     $domains = $domain_storage->loadMultiple();
 
-    $base = $this->base_hostname;
+    $base = $this->baseHostname;
     $hostnames = [$base, 'one.' . $base, 'two.' . $base];
 
     // Our patterns should map to example.com, one.example.com, two.example.com.

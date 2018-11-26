@@ -4,13 +4,11 @@ namespace Drupal\domain;
 
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\domain\DomainStorageInterface;
 
 /**
  * Loads Domain records.
@@ -66,7 +64,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    */
   public function loadSchema() {
     $fields = $this->typedConfig->getDefinition('domain.record.*');
-    return isset($fields['mapping']) ? $fields['mapping'] : array();
+    return isset($fields['mapping']) ? $fields['mapping'] : [];
   }
 
   /**
@@ -84,20 +82,19 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    * {@inheritdoc}
    */
   public function loadDefaultDomain() {
-    $result = $this->loadByProperties(array('is_default' => TRUE));
+    $result = $this->loadByProperties(['is_default' => TRUE]);
     if (!empty($result)) {
       return current($result);
     }
     return NULL;
   }
 
-
   /**
    * {@inheritdoc}
    */
   public function loadMultipleSorted(array $ids = NULL) {
     $domains = $this->loadMultiple($ids);
-    uasort($domains, array($this, 'sort'));
+    uasort($domains, [$this, 'sort']);
     return $domains;
   }
 
@@ -106,7 +103,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    */
   public function loadByHostname($hostname) {
     $hostname = $this->prepareHostname($hostname);
-    $result = $this->loadByProperties(array('hostname' => $hostname));
+    $result = $this->loadByProperties(['hostname' => $hostname]);
     if (empty($result)) {
       return NULL;
     }
@@ -117,7 +114,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    * {@inheritdoc}
    */
   public function loadOptionsList() {
-    $list = array();
+    $list = [];
     foreach ($this->loadMultipleSorted() as $id => $domain) {
       $list[$id] = $domain->label();
     }
@@ -153,12 +150,12 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
       $values['hostname'] = $this->createHostname();
       $values['name'] = \Drupal::config('system.site')->get('name');
     }
-    $values += array(
+    $values += [
       'scheme' => $this->getDefaultScheme(),
       'status' => 1,
       'weight' => count($domains) + 1,
       'is_default' => (int) empty($default),
-    );
+    ];
     $domain = parent::create($values);
 
     return $domain;
@@ -168,7 +165,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    * {@inheritdoc}
    */
   public function createHostname() {
-    // We cannot inject  the negotiator due to dependencies.
+    // We cannot inject the negotiator due to dependencies.
     return \Drupal::service('domain.negotiator')->negotiateActiveHostname();
   }
 
@@ -186,7 +183,7 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    * {@inheritdoc}
    */
   public function getDefaultScheme() {
-    // Use the foundation request if possible/
+    // Use the foundation request if possible.
     $request = \Drupal::request();
     if (!empty($request)) {
       $scheme = $request->getScheme();
