@@ -1,0 +1,24 @@
+{
+    "name": "drupal/domain",
+    "description": "Creates domain records within a Drupal installation.",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "Ken Rickard",
+            "email": "agentrickard@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "http://drupal.org/project/issues/domain",
+        "irc": "http://irc.freenode.org/drupal-contribute",
+        "source": "http://cgit.drupalcode.org/domain"
+    },
+    "extra": {
+        "drush": {
+            "services": {
+                "drush.services.yml": "^9"
+            }
+        }
+    }
+}
