@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- PHP_CodeSniffer standard for Drupal modules. -->
+<!-- See http://pear.php.net/manual/en/package.php.php-codesniffer.annotated-ruleset.php -->
+<ruleset name="Drupal Module">
+  <description>Drupal coding standard for contributed modules</description>
+
+  <rule ref="./vendor/drupal/coder/coder_sniffer/Drupal">
+    <!-- Disabled rules -->
+    <exclude name="Drupal.InfoFiles.AutoAddedKeys"/>
+    <exclude name="Drupal.Files.TxtFileLineLength"/>
+  </rule>
+  <exclude-pattern>./vendor</exclude-pattern>
+</ruleset>

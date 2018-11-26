@@ -1,7 +1,12 @@
 <?php
 
 /**
- * Implements hook_domain_source_path_alter()
+ * @file
+ * Hook implementations for this module.
+ */
+
+/**
+ * Implements hook_domain_source_path_alter().
  */
 function domain_source_test_domain_source_alter(&$source, $path, $options) {
   // Always make our test REST links go to the primary domain.

@@ -17,7 +17,14 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'domain_source', 'field', 'node', 'user'];
+  public static $modules = [
+    'domain',
+    'domain_access',
+    'domain_source',
+    'field',
+    'node',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
@@ -39,7 +46,11 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
     $nodes_values = [
       'type' => 'page',
       'title' => 'foo',
-      DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com', 'two_example_com'],
+      DOMAIN_ACCESS_FIELD => [
+        'example_com',
+        'one_example_com',
+        'two_example_com',
+      ],
       DOMAIN_ACCESS_ALL_FIELD => 0,
       DOMAIN_SOURCE_FIELD => $id,
     ];
