@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "domain",
  *   label = @Translation("Domain"),
  *   context = {
- *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = TRUE)
+ *     "entity:domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = FALSE)
  *   }
  * )
  */
@@ -73,7 +73,12 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
         ],
       ],
     ];
-    return parent::buildConfigurationForm($form, $form_state);
+    $form = parent::buildConfigurationForm($form, $form_state);
+    if (isset($form['context_mapping']['entity:domain']['#title'])) {
+      $form['context_mapping']['entity:domain']['#title'] = $this->t('Select the Domain condition');
+      $form['context_mapping']['entity:domain']['#description'] = $this->t('This value must be set to "Active domain" for the context to work.');
+    }
+    return $form;
   }
 
   /**
