@@ -141,4 +141,44 @@ class DomainSourceElementTest extends DomainTestBase {
     $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
   }
 
+  /**
+   * Test for https://www.drupal.org/project/domain/issues/3010256.
+   */
+  public function testAnonForm() {
+    // Editor with no domain permissions should not see the element.
+    $editor = $this->drupalCreateUser([
+      'create article content',
+    ]);
+    $this->drupalLogin($editor);
+
+    $this->drupalGet('node/add/article');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $locator = DOMAIN_SOURCE_FIELD;
+    $this->assertSession()->fieldNotExists($locator);
+
+    // Editor with domain permissions should see the element once they
+    // are assigned to domains.
+    $editor2 = $this->drupalCreateUser([
+      'create article content',
+      'publish to any assigned domain',
+    ]);
+    $this->drupalLogin($editor2);
+
+    $this->drupalGet('node/add/article');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $locator = DOMAIN_SOURCE_FIELD;
+    $this->assertSession()->fieldNotExists($locator);
+
+    // Domain assignment.
+    $ids = ['example_com', 'one_example_com'];
+    $this->addDomainsToEntity('user', $editor2->id(), $ids, DOMAIN_ACCESS_FIELD);
+
+    $this->drupalGet('node/add/article');
+    $this->assertSession()->statusCodeEquals(200);
+
+    $this->assertSession()->fieldExists($locator);
+  }
+
 }
