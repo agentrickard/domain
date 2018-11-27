@@ -170,15 +170,23 @@ class DomainCommands extends DrushCommands {
    * @param array $values
    *   Array of additional information:
    *   - 'validate_url' : True to perform a URL lookup, False otherwise.
+   * @param bool $check_response
+   *   Indicates that registration should not be allowed unless the server
+   *   returns a 200 response.
+   *
+   * @return bool
+   *    TODO: stndardize this return soe we can issue good messages.
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function checkCreatedDomain(DomainInterface $domain, array $values) {
-    $valid = $this->checkHTTPResponse($domain, $values['validate_url']);
-    if (!$valid) {
-      throw new DomainCommandException(
-        dt('Nobody listening on domain !d.', ['!d' => $domain->getHostname()])
-      );
+  protected function checkCreatedDomain(DomainInterface $domain, array $values, $check_response) {
+    if ($check_response) {
+      $valid = $this->checkHTTPResponse($domain, $values['validate_url']);
+      if (!$valid) {
+        throw new DomainCommandException(
+          dt('The server did not return a 200 response for !d. Domain creation failed. Use the --validate=false flag to overriude.', ['!d' => $domain->getHostname()])
+        );
+      }
     }
     else {
       try {
@@ -191,6 +199,7 @@ class DomainCommands extends DrushCommands {
       if ($domain->getDomainId()) {
         $this->logger()->info(dt('Created @name at @domain.',
           ['@name' => $domain->label(), '@domain' => $domain->getHostname()]));
+        return TRUE;
       }
       else {
         $this->logger()->error(dt('The request could not be completed.'));
@@ -510,8 +519,6 @@ class DomainCommands extends DrushCommands {
     }
   }
 
-  // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
   /**
    * List active domains for the site.
    *
@@ -528,19 +535,19 @@ class DomainCommands extends DrushCommands {
    * @aliases domains,domain-list
    *
    * @field-labels
-   *   membership: Membership
    *   weight: Weight
    *   name: Name
    *   hostname: Hostname
-   *   valid: HTTP Response
+   *   response: HTTP Response
    *   scheme: Scheme
    *   status: Status
    *   is_default: Default
    *   domain_id: Domain Id
    *   id: Machine name
-   * @default-fields id,name,hostname,valid,status,membership,is_default
+   * @default-fields id,name,hostname,scheme,status,is_default,response
    *
    * @param array $options
+   *
    * @return \Consolidation\OutputFormatters\StructuredData\RowsOfFields
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
@@ -556,22 +563,11 @@ class DomainCommands extends DrushCommands {
       return new RowsOfFields([]);
     }
 
-    $entity_typenames = $this->findDomainEnabledEntities();
-    $stats = [];
-    $totals = [];
-    foreach ($domains as $domain) {
-      $stats[$domain->id()] = [];
-      foreach ($entity_typenames as $name) {
-        $stats[$domain->id()][$name] = $this->enumerateDomainEntities($name, $domain->id(), DOMAIN_ACCESS_FIELD, TRUE);
-      }
-      $totals[$domain->id()] = array_reduce($stats[$domain->id()], function ($sum, $v){ return $sum + $v; }, 0);
-    }
-
     $keys = [
       'weight',
       'name',
       'hostname',
-      'valid',
+      'response',
       'scheme',
       'status',
       'is_default',
@@ -584,7 +580,7 @@ class DomainCommands extends DrushCommands {
       $row = [];
       foreach ($keys as $key) {
         switch($key) {
-          case 'valid':
+          case 'response':
             try {
               $v = $this->checkDomain($domain);
             }
@@ -601,7 +597,7 @@ class DomainCommands extends DrushCommands {
               continue 3; // switch, for, for
             }
             $v = !empty($v) ? dt('Active') : dt('Inactive');
-          break;
+            break;
           case 'is_default':
             $v = $domain->get($key);
             $v = !empty($v) ? dt('Default') : '';
@@ -613,7 +609,6 @@ class DomainCommands extends DrushCommands {
 
         $row[$key] = Html::escape($v);
       }
-      $row['membership'] = $totals[$domain->id()];
       $rows[] = $row;
     }
     return new RowsOfFields($rows);
@@ -665,10 +660,10 @@ class DomainCommands extends DrushCommands {
       $v = '';
       switch($key) {
         case 'count':
-          $v = \count($all_domains);
+          $v = count($all_domains);
           break;
         case 'count_active':
-          $v = \count($active_domains);
+          $v = count($active_domains);
           break;
         case 'default_id':
           $v = '-unset-';
@@ -806,9 +801,14 @@ class DomainCommands extends DrushCommands {
     );
     /** @var DomainInterface $domain */
     $domain = $domain_storage->create($values);
-    $this->checkCreatedDomain($domain, $values);
 
-    return $values['id'];
+    $validate = !empty($options['validate']);
+    if ($this->checkCreatedDomain($domain, $values, $validate)) {
+      return dt('Created the !hostname with machine id !id.', ['!hostname' => $values['hostname'], '!id' => $values['id']]);
+    }
+    else {
+      return dt('No domain created.');
+    }
   }
 
   /**
@@ -878,7 +878,7 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function delete($domain_id, $options = ['content-as' => null, 'users-as' => null, 'dryrun' => null, 'chatty' => null ]) {
+  public function delete($domain_id, $options = ['content-as' => null, 'users-as' => null, 'dryrun' => null, 'chatty' => null]) {
     $policy_content = 'prompt';
     $policy_users = 'prompt';
 
