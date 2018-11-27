@@ -29,22 +29,26 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class DomainCommands extends DrushCommands {
 
-  /** @var \Drupal\domain\DomainStorageInterface $domain_storage */
+  /**
+   * The domain entity storage service.
+   *
+   * @var \Drupal\domain\DomainStorageInterface $domain_storage
+   */
   protected $domain_storage = NULL;
 
-    /**
-     * Local cache of entity field map, kept for performance.
-     *
-     * @var array
-     */
+  /**
+   * Local cache of entity field map, kept for performance.
+   *
+   * @var array
+   */
   protected $entity_field_map = NULL;
 
-    /**
-     * Flag set by the --dryrun cli option. If set prevents changes from
-     * being made by code in this class.
-     *
-     * @var bool
-     */
+  /**
+   * Flag set by the --dryrun cli option. If set prevents changes from
+   * being made by code in this class.
+   *
+   * @var bool
+   */
   protected $is_dry_run = FALSE;
 
   /**
@@ -52,16 +56,16 @@ class DomainCommands extends DrushCommands {
    *
    * @var string[]
    * */
-  protected $reassignment_policies = ['prompt', 'default', 'ignore']; // + machine name;
+  protected $reassignment_policies = ['prompt', 'default', 'ignore'];
 
   /**
-   * Get a domain storage object or throw an exception.
+   * Gets a domain storage object or throw an exception.
    *
    * @return DomainStorageInterface
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function getStorage():DomainStorageInterface {
+  protected function getStorage() {
     if (!is_null($this->domain_storage)) {
       return $this->domain_storage;
     }
@@ -80,16 +84,16 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Lookup a string identifying a domain and return the object, or throw error.
-   * 
+   * Loads a domain based on a string identifier.
+   *
    * @param string $argument
-   *   The machine name, or the hostname, of an existing domain.
+   *   The machine name or the hostname of an existing domain.
    *
    * @return \Drupal\domain\DomainInterface
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function getDomainFromArgument(string $argument):DomainInterface {
+  protected function getDomainFromArgument($argument) {
     $domain_storage = $this->getStorage();
 
     // Try loading domain assuming arg is a machine name.
@@ -112,7 +116,7 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Filter a list of domains by excluding domains appearing in a specific list.
+   * Filters a list of domains by excluding domains appearing in a specific list.
    *
    * @param DomainInterface[] $domains
    *   List of domains.
@@ -123,7 +127,7 @@ class DomainCommands extends DrushCommands {
    *
    * @return array
    */
-  protected function filterDomains(array $domains, array $exclude, array $initial = []):array {
+  protected function filterDomains(array $domains, array $exclude, array $initial = []) {
     foreach ($domains as $domain) {
       // Exclude unwanted domains.
       if (! \in_array($domain->id(), $exclude, False)) {
@@ -134,7 +138,7 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Check the domain response.
+   * Checks the domain response.
    *
    * @param \Drupal\domain\DomainInterface $domain
    *   The domain to check.
@@ -146,7 +150,7 @@ class DomainCommands extends DrushCommands {
    *   True if the domain resolves properly, or we are not checking,
    *   False otherwise.
    */
-  protected function checkHTTPResponse(DomainInterface $domain, $validate_url = FALSE):bool {
+  protected function checkHTTPResponse(DomainInterface $domain, $validate_url = FALSE) {
     // Ensure the url is rebuilt.
     if ($validate_url) {
       $code = $this->checkDomain($domain);
@@ -155,7 +159,7 @@ class DomainCommands extends DrushCommands {
       return  $code >= 200 && $code <= 299;
     }
     // Not validating, so all is well!
-    return TRUE;
+    return FALSE;
   }
 
   /**
@@ -169,8 +173,7 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function checkCreatedDomain(DomainInterface $domain, array $values)
-  {
+  protected function checkCreatedDomain(DomainInterface $domain, array $values) {
     $valid = $this->checkHTTPResponse($domain, $values['validate_url']);
     if (!$valid) {
       throw new DomainCommandException(
@@ -213,11 +216,10 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Validates a domain exists by trying to do an http request to it.
+   * Validates a domain meets the standards for a hostname.
    *
    * @param DomainInterface $domain
    *   The domain to validate for syntax and uniqueness.
-   *
    * @return string[]
    *   Array of strings indicating issues found.
    *
@@ -264,7 +266,7 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Return a list of the entity types that are domain enabled.
+   * Returns a list of the entity types that are domain enabled.
    *
    * A domain-enabled entity is defined here as an entity type that includes
    * the domain access field(s).
@@ -275,7 +277,7 @@ class DomainCommands extends DrushCommands {
    * @return string[]
    *   List of entity machine names that support domain access.
    */
-  protected function findDomainEnabledEntities(string $using_field = DOMAIN_ACCESS_FIELD):array {
+  protected function findDomainEnabledEntities($using_field = DOMAIN_ACCESS_FIELD) {
     $this->ensureEntityFieldMap();
     $entities = [];
     foreach($this->entity_field_map as $type => $fields) {
@@ -287,18 +289,17 @@ class DomainCommands extends DrushCommands {
   }
 
   /**
-   * Determine whether or not a given entity is domain-enabled.
+   * Determines whether or not a given entity is domain-enabled.
    *
    * @param string $entity_type
    *   The machine name of the entity.
-   *
    * @param string $field
    *   The name of the field to check for existence.
    *
    * @return bool
    *   True if this type of entity has a domain field.
    */
-  protected function entityHasDomainField(string $entity_type, string $field = DOMAIN_ACCESS_FIELD):bool {
+  protected function entityHasDomainField($entity_type, $field = DOMAIN_ACCESS_FIELD) {
     // Try to avoid repeated calls to getFieldMap(), assuming it's expensive.
     $this->ensureEntityFieldMap();
     return array_key_exists($field, $this->entity_field_map[$entity_type]);
@@ -332,7 +333,7 @@ class DomainCommands extends DrushCommands {
    *   List of entity IDs for the selected domain.
    * @todo: should this really be a string[] of fields?
    */
-  protected function enumerateDomainEntities(string $entity_type, string $domain_id, string $field, $just_count = FALSE) {
+  protected function enumerateDomainEntities($entity_type, $domain_id, $field, $just_count = FALSE) {
     if (!$this->entityHasDomainField($entity_type, $field)) {
       $this->logger()->info('Entity type @entity_type does not have field @field, so none found.',
         ['@entity_type'=> $entity_type,
@@ -373,9 +374,7 @@ class DomainCommands extends DrushCommands {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
-  protected function reassignEntities(string $entity_type, string $field,
-                                      DomainInterface $old_domain, DomainInterface $new_domain,
-                                      array $ids):int {
+  protected function reassignEntities($entity_type, $field, DomainInterface $old_domain, DomainInterface $new_domain, array $ids) {
 
     $entity_storage = \Drupal::entityTypeManager()->getStorage($entity_type);
 
@@ -420,7 +419,7 @@ class DomainCommands extends DrushCommands {
    * @return \Drupal\Core\Entity\EntityInterface|\Drupal\domain\DomainInterface|null
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function getDomainInstanceFromPolicy(string $policy) {
+  protected function getDomainInstanceFromPolicy($policy) {
     $domain_storage = $this->getStorage();
     switch($policy) {
       /* Use the Default Domain machine name */
@@ -546,7 +545,7 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function listDomains(array $options = ['inactive' => null, 'active' => null]):RowsOfFields {
+  public function listDomains(array $options = ['inactive' => null, 'active' => null]) {
     $domain_storage = $this->getStorage();
 
     // Load all domains:
@@ -641,7 +640,7 @@ class DomainCommands extends DrushCommands {
    * @format table
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function infoDomains():PropertyList {
+  public function infoDomains() {
     $domain_storage = $this->getStorage();
     $default_domain = $domain_storage->loadDefaultDomain();
 
@@ -876,7 +875,7 @@ class DomainCommands extends DrushCommands {
    *
    * @command domain:delete
    * @aliases domain-delete
-   * 
+   *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   public function delete($domain_id, $options = ['content-as' => null, 'users-as' => null, 'dryrun' => null, 'chatty' => null ]) {
@@ -1013,7 +1012,7 @@ class DomainCommands extends DrushCommands {
    *
    * @command domain:test
    * @aliases domain-test
-   * 
+   *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   public function test(array $options = ['domain' => null, 'base_path' => InputOption::VALUE_REQUIRED, 'chatty' => null]) {
@@ -1192,7 +1191,7 @@ class DomainCommands extends DrushCommands {
    * @return string
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function renameDomain($domain_id, $name):string {
+  public function renameDomain($domain_id, $name) {
     // Resolve the domain.
     if ($domain = $this->getDomainFromArgument($domain_id)) {
       $domain->saveProperty('name', $name);
@@ -1225,7 +1224,7 @@ class DomainCommands extends DrushCommands {
    * @return string
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function scheme($domain_id, $options = ['set' => null ]):string {
+  public function scheme($domain_id, $options = ['set' => null ]) {
     $new_scheme = NULL;
 
     // Resolve the domain.
