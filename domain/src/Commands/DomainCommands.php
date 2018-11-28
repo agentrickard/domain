@@ -113,10 +113,16 @@ class DomainCommands extends DrushCommands {
               $v = $this->checkDomain($domain);
             }
             catch(\GuzzleHttp\Exception\TransferException $ex) {
-              $v = -2;
+              $v = dt('500 - Failed');
             }
             catch(\Exception $ex) {
-              $v = -1;
+              $v = dt('500 - Exception');
+            }
+            if ($v >= 200 && $v <= 299) {
+              $v = dt('200 - OK');
+            }
+            elseif ($v == 500) {
+              $v = dt('500 - No server');
             }
             break;
           case 'status':
@@ -271,12 +277,12 @@ class DomainCommands extends DrushCommands {
    *   Set the order (weight) of the domain.
    * @option is_default
    *   Set this domain as the default domain.
-   * @option validate_response
+   * @option validate
    *   Force a check of the URL response before allowing registration.
    * @usage drush domain-add example.com 'My Test Site'
-   * @usage drush domain-add example.com 'My Test Site' --inactive=1 --scheme=https
-   * @usage drush domain-add example.com 'My Test Site' --weight=10
-   * @usage drush domain-add example.com 'My Test Site' --validate=1
+   * @usage drush domain-add example.com 'My Test Site' scheme=https --inactive
+   * @usage drush domain-add example.com 'My Test Site' weight=10
+   * @usage drush domain-add example.com 'My Test Site' --validate
    *
    * @command domain:add
    * @aliases domain-add
@@ -287,9 +293,6 @@ class DomainCommands extends DrushCommands {
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   public function add($hostname, $name, array $options) {
-    if (!isset($options['validate_response'])) {
-      $options['validate_response'] = 1;
-    }
     // Validate the weight arg.
     if (!empty($options['weight']) && !is_numeric($options['weight'])) {
       throw new DomainCommandException(
@@ -346,7 +349,7 @@ class DomainCommands extends DrushCommands {
       }
     }
 
-    $validate_response = empty($options['validate_response']);
+    $validate_response = (bool) $options['validate'];
     if ($this->createDomain($domain, $validate_response)) {
       return dt('Created the !hostname with machine id !id.', ['!hostname' => $values['hostname'], '!id' => $values['id']]);
     }
@@ -1053,7 +1056,7 @@ class DomainCommands extends DrushCommands {
       $valid = $this->checkHTTPResponse($domain, TRUE);
       if (!$valid) {
         throw new DomainCommandException(
-          dt('The server did not return a 200 response for !d. Domain creation failed. Use the --validate_response=false flag to overriude.', ['!d' => $domain->getHostname()])
+          dt('The server did not return a 200 response for !d. Domain creation failed. Remove the --validate flag to save this domain.', ['!d' => $domain->getHostname()])
         );
       }
     }
