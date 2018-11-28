@@ -264,8 +264,8 @@ class DomainCommands extends DrushCommands {
    *   The domain hostname to register (e.g. example.com).
    * @param $name
    *   The name of the site (e.g. Domain Two).
-   * @param array $options An associative array of options whose values come
-   *   from cli, aliases, config, etc.
+   * @param array $options An associative array of optional values.
+   *
    * @option inactive
    *   Set the domain to inactive status if set.
    * @option scheme
@@ -279,9 +279,10 @@ class DomainCommands extends DrushCommands {
    *   Set this domain as the default domain.
    * @option validate
    *   Force a check of the URL response before allowing registration.
+   *
    * @usage drush domain-add example.com 'My Test Site'
-   * @usage drush domain-add example.com 'My Test Site' scheme=https --inactive
-   * @usage drush domain-add example.com 'My Test Site' weight=10
+   * @usage drush domain-add example.com 'My Test Site' --scheme=https --inactive
+   * @usage drush domain-add example.com 'My Test Site' --weight=10
    * @usage drush domain-add example.com 'My Test Site' --validate
    *
    * @command domain:add
@@ -292,7 +293,7 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function add($hostname, $name, array $options) {
+  public function add($hostname, $name, array $options = ['weight' => null, 'scheme' => null]) {
     // Validate the weight arg.
     if (!empty($options['weight']) && !is_numeric($options['weight'])) {
       throw new DomainCommandException(
