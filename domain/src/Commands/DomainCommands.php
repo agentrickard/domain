@@ -454,11 +454,12 @@ class DomainCommands extends DrushCommands {
       if (empty($really)) {
         return;
       }
+      // @TODO: delete all.
     }
     elseif ($domain = $this->getDomainFromArgument($domain_id)) {
       if ($domain->isDefault()) {
-        throw new DomainCommandException('The primary domain may not be deleted. '
-                                         .'Use drush domain:default to set a new default domain.');
+        throw new DomainCommandException('The primary domain may not be deleted.
+          Use drush domain:default to set a new default domain.');
       }
       $domains = [$domain];
     }
@@ -489,13 +490,12 @@ class DomainCommands extends DrushCommands {
     if ($policy_content === 'prompt' || $policy_users === 'prompt') {
 
       // Make a list of the eligible destination domains in form id -> name.
-      $noassign_domain = $domains;
-      $noassign_domain[$default_domain->id()] = $default_domain;
+      $noassign_domain = [$domain->id()];
 
       $reassign_list = $this->filterDomains($all_domains, $noassign_domain);
       $reassign_base = [
         'ignore' => dt('Do not reassign'),
-        'default' => dt('Default domain'),
+        'default' => dt('Reassign to default domain'),
       ];
       $reassign_list = array_map(
         function (DomainInterface $d) {
@@ -504,7 +504,6 @@ class DomainCommands extends DrushCommands {
         $reassign_list
       );
       $reassign_list = array_merge($reassign_base, $reassign_list);
-      // asort($reassign_list);
 
       if ($policy_content === 'prompt') {
         $policy_content = $this->io()
@@ -523,21 +522,25 @@ class DomainCommands extends DrushCommands {
     }
 
     // Reassign content as required.
-    $options = [
-      'entity_filter' => 'node',
-      'policy' => $policy_content,
-      'multidomain' => FALSE,
-    ];
-    $this->reassignLinkedEntities($domains, $options);
-    $options = [
-      'entity_filter' => 'user',
-      'policy' => $policy_users,
-      'multidomain' => FALSE,
-    ];
-    $this->reassignLinkedEntities($domains, $options);
-
+    if ($policy_content !== 'ignore') {
+      $options = [
+        'entity_filter' => 'node',
+        'policy' => $policy_content,
+        'multidomain' => FALSE,
+      ];
+      $this->reassignLinkedEntities($domains, $options);
+    }
+    if ($policy_users !== 'ignore') {
+      $options = [
+        'entity_filter' => 'user',
+        'policy' => $policy_users,
+        'multidomain' => FALSE,
+      ];
+      $this->reassignLinkedEntities($domains, $options);
+    }
     $this->deleteDomain($domains, $options);
     $this->logger()->info(dt('Domain record deleted.'));
+    return dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
   }
 
   /**
@@ -996,8 +999,8 @@ class DomainCommands extends DrushCommands {
    *
    * @param DomainInterface[] $domains
    *   List of domains.
-   * @param int[] $exclude
-   *   List of domain names to exclude from the list.
+   * @param string[] $exclude
+   *   List of domain id to exclude from the list.
    * @param DomainInterface[] $initial
    *   Initial value of list that will be returned.
    *
@@ -1006,7 +1009,7 @@ class DomainCommands extends DrushCommands {
   protected function filterDomains(array $domains, array $exclude, array $initial = []) {
     foreach ($domains as $domain) {
       // Exclude unwanted domains.
-      if (! \in_array($domain->id(), $exclude, False)) {
+      if (! \in_array($domain->id(), $exclude, FALSE)) {
         $initial[$domain->id()] = $domain;
       }
     }
