@@ -82,9 +82,9 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function listDomains(array $options = ['inactive' => null, 'active' => null]) {
+  public function listDomains(array $options) {
     // Load all domains:
-    $domains = $this->domainStorage()->loadMultipleSorted(NULL);
+    $domains = $this->domainStorage()->loadMultipleSorted();
 
     if (empty($domains)) {
       $this->logger()->warning(dt('No domains have been created. Use "drush domain:add" to create one.'));
@@ -271,7 +271,7 @@ class DomainCommands extends DrushCommands {
    *   Set the order (weight) of the domain.
    * @option is_default
    *   Set this domain as the default domain.
-   * @option validate
+   * @option validate_response
    *   Force a check of the URL response before allowing registration.
    * @usage drush domain-add example.com 'My Test Site'
    * @usage drush domain-add example.com 'My Test Site' --inactive=1 --scheme=https
@@ -286,8 +286,10 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function add($hostname, $name, array $options = ['inactive' => null, 'scheme' => null, 'weight' => null, 'is_default' => null, 'validate' => null]) {
-
+  public function add($hostname, $name, array $options) {
+    if (!isset($options['validate_response'])) {
+      $options['validate_response'] = 1;
+    }
     // Validate the weight arg.
     if (!empty($options['weight']) && !is_numeric($options['weight'])) {
       throw new DomainCommandException(
@@ -306,30 +308,46 @@ class DomainCommands extends DrushCommands {
       );
     }
 
-    if (empty($hostname) || $hostname !== mb_strtolower($hostname)) {
-      throw new DomainCommandException(
-        dt('The hostname "!hostname" must not contain upper case characters',
-          ['!hostname' => $hostname])
-      );
-    }
-
-    $records_count = $this->domainStorage()->getQuery()->count()->execute();
-    $start_weight = $records_count + 1;
+    $domains = $this->domainStorage()->loadMultipleSorted();
+    $start_weight = count($domains) + 1;
     $values = array(
       'hostname' => $hostname,
       'name' => $name,
-      'status' => (!$options['invalid']) ? 1 : 0,
-      'scheme' => $options['scheme'] ?: 'https',
-      'weight' => ($weight = $options['weight']) ? $weight : $start_weight + 1,
-      'is_default' => ($is_default = $options['is_default']) ? $is_default : 0,
+      'status' => empty($options['inactive']),
+      'scheme' => empty($options['scheme']) ? 'http' : $options['scheme'],
+      'weight' => empty($options['weight']) ? $start_weight : $options['weight'],
+      'is_default' => !empty($options['is_default']),
       'id' => $this->domainStorage()->createMachineName($hostname),
-      'validate_url' => ($options['validate']) ? 1 : 0,
     );
     /** @var DomainInterface $domain */
     $domain = $this->domainStorage()->create($values);
 
-    $validate = !empty($options['validate']);
-    if ($this->checkCreatedDomain($domain, $values, $validate)) {
+    // Check for hostname validity. This is required.
+    $valid = $this->validateDomain($domain);
+    if (!empty($valid)) {
+      throw new DomainCommandException(
+        dt('Hostname is not valid. !errors',
+          ['!errors' => implode(" ", $valid)])
+      );
+    }
+    // Check for hostname and id uniqueness.
+    foreach ($domains as $existing) {
+      if ($hostname == $existing->getHostname()) {
+        throw new DomainCommandException(
+          dt('No domain created. Hostname is a duplicate of !hostname.',
+           ['!hostname' => $hostname])
+        );
+      }
+      if ($values['id'] == $existing->id()) {
+        throw new DomainCommandException(
+          dt('No domain created. Id is a duplicate of !id.',
+           ['!id' => $existing->id()])
+        );
+      }
+    }
+
+    $validate_response = empty($options['validate_response']);
+    if ($this->createDomain($domain, $validate_response)) {
       return dt('Created the !hostname with machine id !id.', ['!hostname' => $values['hostname'], '!id' => $values['id']]);
     }
     else {
@@ -1021,24 +1039,21 @@ class DomainCommands extends DrushCommands {
    *
    * @param DomainInterface $domain
    *   The (as yet unsaved) domain to create.
-   * @param array $values
-   *   Array of additional information:
-   *   - 'validate_url' : True to perform a URL lookup, False otherwise.
    * @param bool $check_response
    *   Indicates that registration should not be allowed unless the server
    *   returns a 200 response.
    *
    * @return bool
-   *    TODO: stndardize this return soe we can issue good messages.
+   *    TODO: stndardize this return so we can issue good messages.
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function checkCreatedDomain(DomainInterface $domain, array $values, $check_response) {
+  protected function createDomain(DomainInterface $domain, $check_response = FALSE) {
     if ($check_response) {
-      $valid = $this->checkHTTPResponse($domain, $values['validate_url']);
+      $valid = $this->checkHTTPResponse($domain, TRUE);
       if (!$valid) {
         throw new DomainCommandException(
-          dt('The server did not return a 200 response for !d. Domain creation failed. Use the --validate=false flag to overriude.', ['!d' => $domain->getHostname()])
+          dt('The server did not return a 200 response for !d. Domain creation failed. Use the --validate_response=false flag to overriude.', ['!d' => $domain->getHostname()])
         );
       }
     }
@@ -1059,6 +1074,7 @@ class DomainCommands extends DrushCommands {
         $this->logger()->error(dt('The request could not be completed.'));
       }
     }
+    return FALSE;
   }
 
   /**
@@ -1091,7 +1107,7 @@ class DomainCommands extends DrushCommands {
   protected function validateDomain(DomainInterface $domain) {
     /** @var \Drupal\domain\DomainValidatorInterface $validator */
     $validator = \Drupal::service('domain.validator');
-    return $validator->validate($domain);
+    return $validator->validate($domain->getHostname());
   }
 
   /**
