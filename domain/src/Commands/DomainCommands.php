@@ -384,11 +384,11 @@ class DomainCommands extends DrushCommands {
    *   Delete the domain example.com, assigning its content and users to
    *   the default domain, example.org.
    *
-   * @usage drush domain:delete --content-as=ignore example.com
+   * @usage drush domain:delete --content-assign=ignore example.com
    *   Delete the domain example.com, leaving its content untouched but
    *   assigning its users to the default domain.
    *
-   * @usage drush domain:delete --content-as=example_net --users-as=example_net
+   * @usage drush domain:delete --content-assign=example_net --users-assign=example_net
    *   example.com Delete the domain example.com, assigning its content and
    *   users to the example.net domain.
    *
@@ -408,13 +408,13 @@ class DomainCommands extends DrushCommands {
    *   Document each step as it is performed.
    * @option dryrun
    *   Do not do anything, but explain what would be done. Implies --chatty.
-   * @option content-as
+   * @option content-assign
    *   Values "prompt", "ignore", "default", <name>, Reassign content
    *   associated with the the domain being deleted to the default domain, to
    *   a specified domain, or leave the content alone (and so inaccessible
    *   in the normal way). The default value is 'prompt': ask which domain to
    *   use.
-   * @option users-as
+   * @option users-assign
    *   Values "prompt", "ignore", "default", <name>, Reassign user accounts
    *   associated with the the domain being deleted to the default domain,
    *   to the domain whose machine name is <name>, or leave the user accounts
@@ -426,7 +426,7 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function delete($domain_id, $options = ['content-as' => null, 'users-as' => null, 'dryrun' => null, 'chatty' => null]) {
+  public function delete($domain_id, $options = ['content-assign' => null, 'users-assign' => null, 'dryrun' => null, 'chatty' => null]) {
     $policy_content = 'prompt';
     $policy_users = 'prompt';
 
@@ -469,22 +469,24 @@ class DomainCommands extends DrushCommands {
     }
 
     // Get content disposition from configuration and validate.
-    if ($options['content-as']) {
-      if (\in_array($options['content-as'], $this->reassignment_policies, True)) {
-        $policy_content = $options['content-as'];
+    if ($options['content-assign']) {
+      if (\in_array($options['content-assign'], $this->reassignment_policies, TRUE)) {
+        $policy_content = $options['content-assign'];
       }
       elseif ($this->getDomainFromArgument($domain_id)) {
-        $policy_content = $options['content-as'];
+        $policy_content = $options['content-assign'];
       }
     }
-    if ($options['users-as']) {
-      if (\in_array($options['users-as'], $this->reassignment_policies, True)) {
-        $policy_users = $options['users-as'];
+    if ($options['users-assign']) {
+      if (\in_array($options['users-assign'], $this->reassignment_policies, TRUE)) {
+        $policy_users = $options['users-assign'];
       }
       elseif ($this->getDomainFromArgument($domain_id)) {
-        $policy_users = $options['users-as'];
+        $policy_users = $options['users-assign'];
       }
     }
+
+    $assign_content = \Drupal::moduleHandler()->moduleExists('domain_access');
 
     // Perform the 'prompt' for a destination domain.
     if ($policy_content === 'prompt' || $policy_users === 'prompt') {
@@ -505,13 +507,11 @@ class DomainCommands extends DrushCommands {
       );
       $reassign_list = array_merge($reassign_base, $reassign_list);
 
-      if ($policy_content === 'prompt') {
-        $policy_content = $this->io()
-                                 ->choice(dt('Reassign content to:'), $reassign_list);
+      if ($assign_content && $policy_content === 'prompt') {
+        $policy_content = $this->io()->choice(dt('Reassign content to:'), $reassign_list);
       }
       if ($policy_users === 'prompt') {
-        $policy_users = $this->io()
-                              ->choice(dt('Reassign users to:'), $reassign_list);
+        $policy_users = $this->io()->choice(dt('Reassign users to:'), $reassign_list);
       }
     }
     if ($policy_content === 'default') {
@@ -522,7 +522,7 @@ class DomainCommands extends DrushCommands {
     }
 
     // Reassign content as required.
-    if ($policy_content !== 'ignore') {
+    if ($assign_content && $policy_content !== 'ignore') {
       $options = [
         'entity_filter' => 'node',
         'policy' => $policy_content,
@@ -538,9 +538,13 @@ class DomainCommands extends DrushCommands {
       ];
       $this->reassignLinkedEntities($domains, $options);
     }
+
     $this->deleteDomain($domains, $options);
-    $this->logger()->info(dt('Domain record deleted.'));
-    return dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
+
+    $message = dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
+    $this->logger()->info($message));
+
+    return $message;
   }
 
   /**
