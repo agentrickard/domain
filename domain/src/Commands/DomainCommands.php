@@ -542,7 +542,7 @@ class DomainCommands extends DrushCommands {
     $this->deleteDomain($domains, $options);
 
     $message = dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
-    $this->logger()->info($message));
+    $this->logger()->info($message);
 
     return $message;
   }

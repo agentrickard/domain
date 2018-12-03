@@ -14,4 +14,11 @@
     "irc": "http://irc.freenode.org/drupal-contribute",
     "source": "http://cgit.drupalcode.org/domain"
   }
+  "extra": {
+    "drush": {
+      "services": {
+        "domain/drush.services.yml": "^9"
+      }
+    }
+  }
 }
