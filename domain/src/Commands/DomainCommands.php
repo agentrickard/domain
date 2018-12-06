@@ -163,8 +163,7 @@ class DomainCommands extends DrushCommands {
    * default_id: Default Domain ID
    * default_host: Default Domain hostname
    * scheme: Fields in Domain entity
-   * domain_access_entities: Domain access entities
-   * all_affiliate_support: All-affiliate support
+   * domain_admin_entities: Domain admin entities
    * @list-orientation true
    * @format table
    * @throws \Drupal\domain\Commands\DomainCommandException
@@ -201,7 +200,7 @@ class DomainCommands extends DrushCommands {
         case 'default_id':
           $v = '-unset-';
           if ($default_domain) {
-            $v = $default_domain->getDomainId();
+            $v = $default_domain->id();
           }
           break;
         case 'default_host':
@@ -224,35 +223,12 @@ class DomainCommands extends DrushCommands {
     $domain_entities = [];
     $domain_affiliate_entities = [];
     foreach($field_map as $type => $fields) {
-      if (array_key_exists(DOMAIN_ACCESS_FIELD, $fields)) {
-        $domain_entities[] = '+' . $type;
+      if (array_key_exists(DOMAIN_ADMIN_FIELD, $fields)) {
+        $domain_entities[] = $type;
       }
-      else {
-        try {
-          $def = $entity_manager->getDefinition($type, FALSE);
-        } catch (PluginException $ex) {
-          $domain_entities[] = '{notfound:' . $type . '}';
-          continue;
-        }
-        if ($def->entityClassImplements('Drupal\Core\Entity\FieldableEntityInterface')) {
-          // Entity is fieldable, so could have domain fields.
-          $domain_entities[] = '-' . $type;
-        }
-        elseif ($def->entityClassImplements('Drupal\Core\Entity\ConfigEntityInterface')) {
-          // Entity is configuration entity, which is not fieldable.
-          $domain_entities[] = '!' . $type;
-        }
-        elseif ($def->entityClassImplements('Drupal\Core\Entity\EntityInterface')) {
-          // Entity does not support fields.
-          $domain_entities[] = '/' . $type;
-        }
-      }
-      if (array_key_exists(DOMAIN_ACCESS_ALL_FIELD, $fields)) {
-        $domain_affiliate_entities[] = $type;
-      }
+      // @TODO add a hook to poll other modules.
     }
-    $rows['domain_access_entities'] = implode(', ', $domain_entities);
-    $rows['all_affiliate_support'] = implode(', ', $domain_affiliate_entities);
+    $rows['domain_admin_entities'] = implode(', ', $domain_entities);
 
     return new PropertyList($rows);
   }
