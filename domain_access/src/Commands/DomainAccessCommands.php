@@ -32,9 +32,7 @@ class DomainAccessCommands extends DrushCommands {
    */
   public function initDomainInfo(InputInterface $input, AnnotationData $annotationData) {
     // To add a field label, append to the 'field-labels' item.
-    // Note that \ArrayObject::offsetGet()/Set() are used here.
-    $data = $annotationData->offsetGet('field-labels');
-    $annotationData->offsetSet('field-labels', $data . "\n" . 'domain_access: Domain Access');
+    $annotationData['field-labels'] .= "\n" . 'domain_access: Domain Access';
   }
 
   /**
