@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain_access\Commands;
+namespace Drupal\domain_source\Commands;
 
 use Consolidation\AnnotatedCommand\AnnotationData;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,12 +20,12 @@ use Drush\Commands\DrushCommands;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Drush commands for the domain access module.
+ * Drush commands for the domain source module.
  *
  * These commands mainly extend base Domain commands. See the documentation at
  * https://github.com/consolidation/annotated-command for details.
  */
-class DomainAccessCommands extends DomainCommands {
+class DomainSourceCommands extends DomainCommands {
 
   /**
    * Registers additional information to domain:info.
@@ -35,7 +35,7 @@ class DomainAccessCommands extends DomainCommands {
   public function initDomainInfo(InputInterface $input, AnnotationData $annotationData) {
     // To add a field label, append to the 'field-labels' item.
     // @TODO: watch https://github.com/consolidation/annotated-command/pull/174
-    $annotationData['field-labels'] .= "\n" . 'domain_access_entities: Domain access entities';
+    $annotationData['field-labels'] .= "\n" . 'domain_source_entities: Domain source entities';
   }
 
   /**
@@ -45,7 +45,7 @@ class DomainAccessCommands extends DomainCommands {
    */
   public function alterDomainInfo($result, CommandData $commandData) {
     // Display which entities are enabled for domain by checking for the fields.
-    $result['domain_access_entities'] = $this->getFieldEntities(DOMAIN_ACCESS_FIELD);
+    $result['domain_source_entities'] = $this->getFieldEntities(DOMAIN_SOURCE_FIELD);
 
     return $result;
   }
