@@ -15,6 +15,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Html;
 use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainStorageInterface;
+use Drupal\domain\Commands\DomainCommands;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -23,7 +24,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  * These commands mainly extend base Domain commands.
  */
-class DomainAccessCommands extends DrushCommands {
+class DomainAccessCommands extends DomainCommands {
 
   /**
    * Registers additional information to domain:info.
@@ -32,21 +33,19 @@ class DomainAccessCommands extends DrushCommands {
    */
   public function initDomainInfo(InputInterface $input, AnnotationData $annotationData) {
     // To add a field label, append to the 'field-labels' item.
-    $annotationData['field-labels'] .= "\n" . 'domain_access: Domain Access';
+    // @TODO: watch https://github.com/consolidation/annotated-command/pull/174
+    $annotationData['field-labels'] .= "\n" . 'domain_access_entities: Domain access entities';
   }
 
   /**
    * Provides additional information to domain:info.
    *
    * @hook alter domain:info
-   * @option $alteration Alter the result of the command in some way.
-   * @default $alteration TRUE
-   * @usage domain:info --alteration
    */
   public function alterDomainInfo($result, CommandData $commandData) {
-    if ($commandData->input()->getOption('alteration')) {
-      $result['domain_access'] = 'hey';
-    }
+    // Display which entities are enabled for domain by checking for the fields.
+    $result['domain_access_entities'] = $this->getFieldEntities(DOMAIN_ACCESS_FIELD);
+
     return $result;
   }
 

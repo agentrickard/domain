@@ -217,20 +217,29 @@ class DomainCommands extends DrushCommands {
       $rows[$key] = $v;
     }
 
-    // Display which entities are enabled for domain access by checking for the fields.
+
+    // Display which entities are enabled for domain by checking for the fields.
+    $rows['domain_admin_entities'] = $this->getFieldEntities(DOMAIN_ADMIN_FIELD);
+
+    return new PropertyList($rows);
+  }
+
+  /**
+   * Finds entities that reference a specific field.
+   *
+   * @param $field_name
+   *   The field name to lookup.
+   */
+  public function getFieldEntities($field_name) {
     $entity_manager = \Drupal::entityManager();
     $field_map = $entity_manager->getFieldMap();
     $domain_entities = [];
-    $domain_affiliate_entities = [];
     foreach($field_map as $type => $fields) {
-      if (array_key_exists(DOMAIN_ADMIN_FIELD, $fields)) {
+      if (array_key_exists($field_name, $fields)) {
         $domain_entities[] = $type;
       }
-      // @TODO add a hook to poll other modules.
     }
-    $rows['domain_admin_entities'] = implode(', ', $domain_entities);
-
-    return new PropertyList($rows);
+    return implode(', ', $domain_entities);
   }
 
   /**
