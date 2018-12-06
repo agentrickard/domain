@@ -401,6 +401,8 @@ class DomainCommands extends DrushCommands {
    * @aliases domain-delete
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
+   *
+   * @see https://github.com/consolidation/annotated-command#option-event-hook
    */
   public function delete($domain_id, $options = ['content-assign' => null, 'users-assign' => null, 'dryrun' => null, 'chatty' => null]) {
     $policy_content = 'prompt';

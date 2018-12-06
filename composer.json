@@ -18,6 +18,7 @@
     "drush": {
       "services": {
         "domain/drush.services.yml": "^9"
+        "domain_access/drush.services.yml": "^9"
       }
     }
   }
