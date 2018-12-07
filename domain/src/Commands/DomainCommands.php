@@ -539,14 +539,8 @@ class DomainCommands extends DrushCommands {
    *
    * If run from a subfolder, you must specify the --uri.
    *
-   * @option $domain
-   *   The hostname or domain machine name of the domain to test. If no value
-   *   is passed then all domains are tested.
-   * @param array $options An associative array of options whose values come
-   *   from cli, aliases, config, etc.
-   * @option base_path
-   *   The subdirectory name if Drupal is installed in a folder other than
-   *   server root.
+   * @param $domain_id
+   *   The machine name or hostname of the domain to make default.
    *
    * @usage drush domain-test
    * @usage drush domain-test example.com
@@ -554,18 +548,19 @@ class DomainCommands extends DrushCommands {
    * @command domain:test
    * @aliases domain-test
    *
+   * @field-labels
+   *   id: Machine name
+   *   url: URL
+   *   response: HTTP Response
+   * @default-fields id,url,response
+   *
+   * @return \Consolidation\OutputFormatters\StructuredData\RowsOfFields
+   *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function test(array $options = ['domain' => null, 'base_path' => InputOption::VALUE_REQUIRED, 'chatty' => null]) {
-
-    // TODO: This won't work in a subdirectory without a parameter.
-    // RIC: What is the intended benaviour here?
-    $domain_id = $options['domain'];
-    if ($base_path = $options['base_path']) {
-      $GLOBALS['base_path'] = '/' . $base_path . '/';
-    }
-    if (\is_null($domain_id)) {
-      $domains =$this->domainStorage()->loadMultiple(NULL);
+  public function test($domain_id = null) {
+    if (is_null($domain_id)) {
+      $domains = $this->domainStorage()->loadMultipleSorted();
     }
     else {
       if ($domain = $this->getDomainFromArgument($domain_id)) {
@@ -576,24 +571,23 @@ class DomainCommands extends DrushCommands {
           ['@domain' => $options['domain']]));
       }
     }
-
+    $keys = ['url', 'response'];
+    $rows = [];
     foreach ($domains as $domain) {
-      if ($domain->getResponse() != 200) {
-        $this->logger()->error(dt('Fail: !error. Please pass a --uri parameter or a --base_path to retest.' ,
-          ['!error' => $domain->getResponse()]));
-      }
-      else {
-        $this->logger()->info(dt('Success: !url tested successfully.',
-          ['!url' => $domain->getPath()]));
-      }
+      $rows[] = [
+        'id' => $domain->id(),
+        'url' => $domain->getPath(),
+        'response' => $domain->getResponse(),
+      ];
     }
+    return new RowsOfFields($rows);
   }
 
   /**
-   * Sets the default domain. If run from a subfolder, specify the --uri.
+   * Sets the default domain.
    *
    * @param $domain_id
-   *   The numeric id or hostname of the domain to make default.
+   *   The machine name or hostname of the domain to make default.
     * @param array $options
    *    An associative array of options whose values come from cli, aliases,
    *    config, etc.
