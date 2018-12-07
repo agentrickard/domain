@@ -710,7 +710,7 @@ class DomainCommands extends DrushCommands {
    * Changes a domain label.
    *
    * @param $domain_id
-   *   The numeric id or hostname of the domain to relabel.
+   *   The machine name or hostname of the domain to relabel.
    * @param $name
    *   The name to use for the domain.
    * @usage drush domain-name example.com Foo
@@ -726,9 +726,9 @@ class DomainCommands extends DrushCommands {
     // Resolve the domain.
     if ($domain = $this->getDomainFromArgument($domain_id)) {
       $domain->saveProperty('name', $name);
-      return $domain->name();
+      return dt('Renamed !domain to !name.', ['!domain' => $domain->getHostname(), '!name' => $domain->label()]);
     }
-    return 'unknown domain';
+    return dt('No matching domain record found.');
   }
 
   /**
