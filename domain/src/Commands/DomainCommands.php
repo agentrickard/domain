@@ -393,12 +393,6 @@ class DomainCommands extends DrushCommands {
    *   Document each step as it is performed.
    * @option dryrun
    *   Do not do anything, but explain what would be done. Implies --chatty.
-   * @option content-assign
-   *   Values "prompt", "ignore", "default", <name>, Reassign content
-   *   associated with the the domain being deleted to the default domain, to
-   *   a specified domain, or leave the content alone (and so inaccessible
-   *   in the normal way). The default value is 'prompt': ask which domain to
-   *   use.
    * @option users-assign
    *   Values "prompt", "ignore", "default", <name>, Reassign user accounts
    *   associated with the the domain being deleted to the default domain,
@@ -413,7 +407,7 @@ class DomainCommands extends DrushCommands {
    *
    * @see https://github.com/consolidation/annotated-command#option-event-hook
    */
-  public function delete($domain_id, $options = ['content-assign' => null, 'users-assign' => null, 'dryrun' => null, 'chatty' => null]) {
+  public function delete($domain_id, $options = ['users-assign' => null, 'dryrun' => null, 'chatty' => null]) {
     $policy_content = 'prompt';
     $policy_users = 'prompt';
 

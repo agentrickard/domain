@@ -3,20 +3,10 @@
 namespace Drupal\domain_source\Commands;
 
 use Consolidation\AnnotatedCommand\AnnotationData;
-use Symfony\Component\Console\Input\InputInterface;
 use Consolidation\AnnotatedCommand\CommandData;
-use Consolidation\OutputFormatters\StructuredData\PropertyList;
-use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
-use Drupal\Core\Config\StorageException;
-use Drupal\Core\Entity\EntityStorageException;
-use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
-use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
-use Drupal\Component\Utility\Html;
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainStorageInterface;
 use Drupal\domain\Commands\DomainCommands;
-use Drush\Commands\DrushCommands;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -48,6 +38,19 @@ class DomainSourceCommands extends DomainCommands {
     $result['domain_source_entities'] = $this->getFieldEntities(DOMAIN_SOURCE_FIELD);
 
     return $result;
+  }
+
+/**
+ * @hook option domain:delete
+ */
+  public function deleteOptions(Command $command, AnnotationData $annotationData) {
+    $command->addOption(
+        'source-assign',
+        '',
+        InputOption::VALUE_OPTIONAL,
+        'Reassign content for Domain Source',
+        null
+    );
   }
 
 }
