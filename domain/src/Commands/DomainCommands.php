@@ -661,19 +661,15 @@ class DomainCommands extends DrushCommands {
         $domain->disable();
         $this->logger()->info(dt('!domain has been disabled.',
           ['!domain' => $domain->getHostname()]));
+        return dt('Disabled !domain.', ['!domain' => $domain->getHostname()]);
       }
       else {
         $this->logger()->info(dt('!domain is already disabled.',
           ['!domain' => $domain->getHostname()]));
-      }
-      if ($domain->status()) {
-        return 'enabled';
-      }
-      else {
-        return 'disabled';
+        return dt('!domain is already disabled.', ['!domain' => $domain->getHostname()]);
       }
     }
-    return 'unknown domain';
+    return dt('No matching domain record found.');
   }
 
   /**
@@ -699,19 +695,15 @@ class DomainCommands extends DrushCommands {
         $domain->enable();
         $this->logger()->info(dt('!domain has been enabled.',
           ['!domain' => $domain->getHostname()]));
+        return dt('Enabled !domain.', ['!domain' => $domain->getHostname()]);
       }
       else {
         $this->logger()->info(dt('!domain is already enabled.',
           ['!domain' => $domain->getHostname()]));
-      }
-      if ($domain->status()) {
-        return 'enabled';
-      }
-      else {
-        return 'disabled';
+        return dt('!domain is already enabled.', ['!domain' => $domain->getHostname()]);
       }
     }
-    return 'unknown domain';
+    return dt('No matching domain record found.');
   }
 
   /**
