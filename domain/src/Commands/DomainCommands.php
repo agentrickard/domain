@@ -735,19 +735,12 @@ class DomainCommands extends DrushCommands {
    * Changes a domain scheme.
    *
    * @param $domain_id
-   *   The numeric id or hostname of the domain to change.
-   * @param array $options
-   *    An associative array of options whose values come from cli, aliases,
-   *    config, etc.
+   *   The machine name or hostname of the domain to change.
+   * @param $scheme
+   *   The scheme to use for the domain: http, https, or variable.
    *
-   * @usage drush domain-scheme example.com --https
-   * @usage drush domain-scheme 681 https
-   *
-   * @option set
-   *   Set the canonical domain scheme:
-   *    - http: to http (no SSL).
-   *    - https: to https (with SSL).
-   *    - variable: match the scheme used by the request.
+   * @usage drush domain-scheme example.com http
+   * @usage drush domain-scheme example_com https
    *
    * @command domain:scheme
    * @aliases domain-scheme
@@ -755,43 +748,37 @@ class DomainCommands extends DrushCommands {
    * @return string
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function scheme($domain_id, $options = ['set' => null ]) {
-    $new_scheme = NULL;
+  public function scheme($domain_id, $scheme = null) {
+    $new_scheme = null;
 
     // Resolve the domain.
     if ($domain = $this->getDomainFromArgument($domain_id)) {
-      if (isset($options['set']) && $options['set'] === TRUE) {
-        // --set with no value
+      if (!empty($scheme)) {
+        // --set with a value
+        $new_scheme = $scheme;
+      }
+      else {
+        // Prompt for selection.
         $new_scheme = $this->io()->choice(dt('Select the default http scheme:'),
           [
-            '1' => dt('http'),
-            '2' => dt('https'),
-            '3' => dt('variable'),
+            'http' => 'http',
+            'https' => 'https',
+            'variable' => 'variable',
           ]);
-        // TODO: Something weird is going on here.
-        echo 'selected: "' . var_export($new_scheme, TRUE) . '"' . PHP_EOL;
       }
-      elseif (isset($options['set']) && strlen($options['set']) > 0) {
-        // --set with a value
-        $new_scheme = $options['set'];
-      }
-      // otherwise, --set is not present
 
       // If we were asked to change scheme, validate the value and do so.
       if (!empty($new_scheme)) {
         switch ($new_scheme) {
           case 'http':
-          case '1':
             $new_scheme = 'http';
             break;
 
           case 'https':
-          case '2':
             $new_scheme = 'https';
             break;
 
           case 'variable':
-          case '3':
             $new_scheme = 'variable';
             break;
 
@@ -804,7 +791,7 @@ class DomainCommands extends DrushCommands {
       }
 
       // Either way, return the (new | current) scheme for this domain.
-      return $domain->get('scheme');
+      return dt('Scheme is now to "!scheme" for !domain', ['!scheme' => $domain->get('scheme'),'!domain' => $domain->id()]);
     }
 
     // We couldn't find the domain - so fail.
