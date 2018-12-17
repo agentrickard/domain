@@ -237,11 +237,37 @@ function domain_conf_api($all = FALSE, $settings = array()) {
         // Discard the #domain_setting flag; it is not needed.
         unset($value['#domain_setting']);
         // Set the $options array.
-        $options[$key] = $value;
+        $options[$key] = domain_conf_settings_load($value, $settings);
       }
     }
   }
   return $options;
+}
+
+ /**
+ * Recursively set default values of form fields based on settings for the domain being configured.
+ *
+ * @param $elements
+ *   Array of form elements.
+ * @param $settings
+ *   Array of settings for the domain being configured.
+ *
+ * @return
+ *   Array of form elements with default values set.
+ */
+function domain_conf_settings_load($elements, $settings) {
+  if (!is_array($elements)) {
+    return $elements;
+  }
+  foreach (element_children($elements) as $key) {
+    if (isset($elements[$key]) && $elements[$key]) {
+      $elements[$key] = domain_conf_settings_load($elements[$key], $settings);
+    }
+    if (is_array($elements[$key]) && array_key_exists('#default_value', $elements[$key]) && isset($settings[$key])) {
+      $elements[$key]['#default_value'] = $settings[$key];
+    }
+  }
+  return $elements;
 }
 
 /**
