@@ -144,12 +144,10 @@ function domain_overview_form_submit($form, &$form_state) {
     $valid = $value['valid'];
     // Process the default domain.
     if ($form_state['values']['default_domain'] == $domain_id) {
+      $default = 1;
+      $valid = 1;
+      // Indicate a message if the value changed.
       if ($domain_id != $form_state['complete form']['default_domain']['#default_value']) {
-        db_update('domain')
-          ->fields(array('is_default' => 0))
-          ->execute();
-        $default = 1;
-        $valid = 1;
         drupal_set_message(t('The primary domain has been set to %domain.', array('%domain' => domain_get_path($value['values']))));
       }
     }
