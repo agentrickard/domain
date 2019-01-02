@@ -813,13 +813,15 @@ class DomainCommands extends DrushCommands {
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function generate($primary, array $options = ['count' => null, 'empty' => null]) {
+  public function generate($primary = 'example.com', array $options = ['count' => null, 'empty' => null]) {
     // Check the number of domains to create.
 
     $count = $options['count'];
+
     $domains = $this->domainStorage()->loadMultiple(NULL);
-    if (empty($count)) {
-      $count = 15;
+    if (!empty($options['empty'])) {
+      $this->domainStorage()->delete($domains);
+      $domains = $this->domainStorage()->loadMultiple(NULL);
     }
     // Ensure we don't duplicate any domains.
     $existing = array();
@@ -855,14 +857,14 @@ class DomainCommands extends DrushCommands {
     // Filter against existing so we can count correctly.
     $prepared = array();
     foreach ($new as $key => $value) {
-      if (! \in_array($value, $existing, true)) {
+      if (!in_array($value, $existing, true)) {
         $prepared[] = $value;
       }
     }
 
     // Add any test domains that have numeric prefixes. We don't expect these URLs to work,
     // and mainly use these for testing the user interface.
-    $needed = $count - \count($prepared);
+    $needed = $count - count($prepared);
     for ($i = 1; $i <= $needed; $i++) {
       $prepared[] = 'test' . $i . '.' . $primary;
     }
@@ -884,12 +886,16 @@ class DomainCommands extends DrushCommands {
         'id' => $this->domainStorage()->createMachineName($hostname),
       );
       $domain = $this->domainStorage()->create($values);
-      $this->checkCreatedDomain($domain, $values);
+      $domain->save();
+      $this->logger()->info(dt('Created the @domain.', ['@domain' => $domain->getHostname()]));
     }
 
     // If nothing created, say so.
-    if (empty($new)) {
+    if (empty($prepared)) {
       $this->logger()->info(dt('No new domains were created.'));
+    }
+    else {
+      return dt('Created @count new domains.', ['@count' => count($prepared)]);
     }
   }
 
