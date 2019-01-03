@@ -299,7 +299,7 @@ class DomainCommands extends DrushCommands {
 
     $domains = $this->domainStorage()->loadMultipleSorted();
     $start_weight = count($domains) + 1;
-    $values = array(
+    $values = [
       'hostname' => $hostname,
       'name' => $name,
       'status' => empty($options['inactive']),
@@ -307,7 +307,7 @@ class DomainCommands extends DrushCommands {
       'weight' => empty($options['weight']) ? $start_weight : $options['weight'],
       'is_default' => !empty($options['is_default']),
       'id' => $this->domainStorage()->createMachineName($hostname),
-    );
+    ];
     /** @var DomainInterface $domain */
     $domain = $this->domainStorage()->create($values);
 
@@ -835,7 +835,7 @@ class DomainCommands extends DrushCommands {
       }
     }
     // Set up one.* and so on.
-    $names = array(
+    $names = [
       'one',
       'two',
       'three',
@@ -849,16 +849,16 @@ class DomainCommands extends DrushCommands {
       'foo',
       'bar',
       'baz',
-    );
+    ];
     // Set the creation array.
-    $new = array($primary);
+    $new = [$primary];
     foreach ($names as $name) {
       $new[] = $name . '.' . $primary;
     }
     // Include a non hostname.
     $new[] = 'my' . $primary;
     // Filter against existing so we can count correctly.
-    $prepared = array();
+    $prepared = [];
     foreach ($new as $key => $value) {
       if (!in_array($value, $existing, true)) {
         $prepared[] = $value;
@@ -890,7 +890,7 @@ class DomainCommands extends DrushCommands {
     // Create the domains.
     foreach ($prepared as $key => $item) {
       $hostname = mb_strtolower($item);
-      $values = array(
+      $values = [
         'name' => ($item != $primary) ? ucwords(str_replace(".$primary", '', $item)) : \Drupal::config('system.site')->get('name'),
         'hostname' => $hostname,
         'scheme' => 'http',
@@ -898,7 +898,7 @@ class DomainCommands extends DrushCommands {
         'weight' => ($item != $primary) ? $key + $start_weight + 1 : -1,
         'is_default' => 0,
         'id' => $this->domainStorage()->createMachineName($hostname),
-      );
+      ];
       $domain = $this->domainStorage()->create($values);
       $domain->save();
       $list[] = dt('Created @domain.', ['@domain' => $domain->getHostname()]);
