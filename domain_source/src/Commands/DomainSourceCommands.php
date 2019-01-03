@@ -40,9 +40,9 @@ class DomainSourceCommands extends DomainCommands {
     return $result;
   }
 
-/**
- * @hook option domain:delete
- */
+  /**
+   * @hook option domain:delete
+   */
   public function deleteOptions(Command $command, AnnotationData $annotationData) {
     $command->addOption(
         'source-assign',
@@ -51,6 +51,29 @@ class DomainSourceCommands extends DomainCommands {
         'Reassign content for Domain Source',
         null
     );
+  }
+
+  /**
+   * @hook on-event domain-delete
+   */
+  public function domainSourceDomainDelete($target_domain, $options) {
+    // Run our own deletion routine here.
+    if (is_null($options['content-assign'])) {
+      $policy_content = 'prompt';
+    }
+    if (!empty($options['content-assign'])) {
+      if (in_array($options['content-assign'], $this->reassignment_policies, TRUE)) {
+        $policy_content = $options['content-assign'];
+      }
+    }
+
+    $delete_options = [
+      'entity_filter' => 'node',
+      'policy' => $policy_content,
+      'field' => DOMAIN_SOURCE_FIELD,
+    ];
+
+    return $this->doReassign($target_domain, $delete_options);
   }
 
 }

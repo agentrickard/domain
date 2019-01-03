@@ -56,7 +56,7 @@ class DomainAccessCommands extends DomainCommands {
 /**
  * @hook on-event domain-delete
  */
-  public function hookDomainDelete($target_domain, $options) {
+  public function domainAccessDomainDelete($target_domain, $options) {
     // Run our own deletion routine here.
     if (is_null($options['content-assign'])) {
       $policy_content = 'prompt';

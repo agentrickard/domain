@@ -516,7 +516,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
         $reassign_list
       );
       $reassign_list = array_merge($reassign_base, $reassign_list);
-      $policy = $this->io()->choice(dt('Reassign @type data to:', ['@type' => $delete_options['entity_filter']]), $reassign_list);
+      $policy = $this->io()->choice(dt('Reassign @type field @field data to:', ['@type' => $delete_options['entity_filter'], '@field' => $delete_options['field']]), $reassign_list);
     }
     elseif ($policy === 'default') {
       $policy = $default_domain->id();
@@ -525,7 +525,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
       $delete_options['policy'] = $policy;
       $target = [$target_domain];
       $count = $this->reassignLinkedEntities($target, $delete_options);
-      return dt('@count @type entities updated.', ['@count' => $count, '@type' => $delete_options['entity_filter']]);
+      return dt('@count @type entities updated field @field.', ['@count' => $count, '@type' => $delete_options['entity_filter'], '@field' => $delete_options['field']]);
     }
   }
 
