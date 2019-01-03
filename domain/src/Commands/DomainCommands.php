@@ -115,7 +115,7 @@ class DomainCommands extends DrushCommands {
             catch(\GuzzleHttp\Exception\TransferException $ex) {
               $v = dt('500 - Failed');
             }
-            catch(\Exception $ex) {
+            catch(Exception $ex) {
               $v = dt('500 - Exception');
             }
             if ($v >= 200 && $v <= 299) {
@@ -435,7 +435,8 @@ class DomainCommands extends DrushCommands {
       if (empty($really)) {
         return;
       }
-      // @TODO: delete all.
+      $this->domainStorage()->delete($domains);
+      return dt('All domains deleted');
     }
     elseif ($domain = $this->getDomainFromArgument($domain_id)) {
       if ($domain->isDefault()) {
@@ -451,7 +452,7 @@ class DomainCommands extends DrushCommands {
 
     // Get content disposition from configuration and validate.
     if ($options['content-assign']) {
-      if (\in_array($options['content-assign'], $this->reassignment_policies, TRUE)) {
+      if (in_array($options['content-assign'], $this->reassignment_policies, TRUE)) {
         $policy_content = $options['content-assign'];
       }
       elseif ($this->getDomainFromArgument($domain_id)) {
@@ -459,7 +460,7 @@ class DomainCommands extends DrushCommands {
       }
     }
     if ($options['users-assign']) {
-      if (\in_array($options['users-assign'], $this->reassignment_policies, TRUE)) {
+      if (in_array($options['users-assign'], $this->reassignment_policies, TRUE)) {
         $policy_users = $options['users-assign'];
       }
       elseif ($this->getDomainFromArgument($domain_id)) {
@@ -986,7 +987,7 @@ class DomainCommands extends DrushCommands {
   protected function filterDomains(array $domains, array $exclude, array $initial = []) {
     foreach ($domains as $domain) {
       // Exclude unwanted domains.
-      if (! \in_array($domain->id(), $exclude, FALSE)) {
+      if (!in_array($domain->id(), $exclude, FALSE)) {
         $initial[$domain->id()] = $domain;
       }
     }
@@ -1177,7 +1178,7 @@ class DomainCommands extends DrushCommands {
   protected function ensureEntityFieldMap() {
     // Try to avoid repeated calls to getFieldMap() assuming it's expensive.
     if (empty($this->entity_field_map)) {
-      $entity_manager         = \Drupal::entityManager();
+      $entity_manager = \Drupal::entityManager();
       $this->entity_field_map = $entity_manager->getFieldMap();
     }
   }
@@ -1269,7 +1270,7 @@ class DomainCommands extends DrushCommands {
         $entity->save();
       }
     }
-    return \count($entities);
+    return count($entities);
   }
 
   /**
