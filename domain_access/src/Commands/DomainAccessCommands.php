@@ -53,4 +53,11 @@ class DomainAccessCommands extends DomainCommands {
     );
   }
 
+/**
+ * @hook on-event domain-delete
+ */
+  public function hookDomainDelete($domains, $options, $reassign_list, $policy_users) {
+    // Run our own deletion routine here.
+  }
+
 }

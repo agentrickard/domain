@@ -2,6 +2,8 @@
 
 namespace Drupal\domain\Commands;
 
+use Consolidation\AnnotatedCommand\Events\CustomEventAwareInterface;
+use Consolidation\AnnotatedCommand\Events\CustomEventAwareTrait;
 use Consolidation\OutputFormatters\StructuredData\PropertyList;
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 use Drupal\Core\Config\StorageException;
@@ -18,7 +20,9 @@ use Symfony\Component\Console\Input\InputOption;
 /**
  * Drush commands for the domain module.
  */
-class DomainCommands extends DrushCommands {
+class DomainCommands extends DrushCommands implements CustomEventAwareInterface {
+
+  use CustomEventAwareTrait;
 
   /**
    * The domain entity storage service.
@@ -43,7 +47,7 @@ class DomainCommands extends DrushCommands {
   protected $is_dry_run = FALSE;
 
   /**
-   * Static array of special-case policies for reassigning content.
+   * Static array of special-case policies for reassigning field data.
    *
    * @var string[]
    * */
@@ -408,8 +412,9 @@ class DomainCommands extends DrushCommands {
    * @see https://github.com/consolidation/annotated-command#option-event-hook
    */
   public function delete($domain_id, $options = ['users-assign' => null, 'dryrun' => null, 'chatty' => null]) {
-    $policy_content = 'prompt';
-    $policy_users = 'prompt';
+    if (is_null($options['users-assign'])) {
+      $policy_users = 'prompt';
+    }
 
     $this->is_dry_run = (bool) $options['dryrun'];
 
@@ -435,8 +440,7 @@ class DomainCommands extends DrushCommands {
       if (empty($really)) {
         return;
       }
-      $this->domainStorage()->delete($domains);
-      return dt('All domains deleted');
+      // TODO: handle deletion of all domains.
     }
     elseif ($domain = $this->getDomainFromArgument($domain_id)) {
       if ($domain->isDefault()) {
@@ -445,12 +449,8 @@ class DomainCommands extends DrushCommands {
       }
       $domains = [$domain];
     }
-    else {
-      $this->logger()->info(dt('Nothing to do?'));
-      return;
-    }
 
-    // Get content disposition from configuration and validate.
+    /* Get content disposition from configuration and validate.
     if ($options['content-assign']) {
       if (in_array($options['content-assign'], $this->reassignment_policies, TRUE)) {
         $policy_content = $options['content-assign'];
@@ -458,21 +458,16 @@ class DomainCommands extends DrushCommands {
       elseif ($this->getDomainFromArgument($domain_id)) {
         $policy_content = $options['content-assign'];
       }
-    }
-    if ($options['users-assign']) {
+    }*/
+    if (!empty($options['users-assign'])) {
       if (in_array($options['users-assign'], $this->reassignment_policies, TRUE)) {
         $policy_users = $options['users-assign'];
       }
-      elseif ($this->getDomainFromArgument($domain_id)) {
-        $policy_users = $options['users-assign'];
-      }
     }
 
-    $assign_content = \Drupal::moduleHandler()->moduleExists('domain_access');
-
+    // TODO: Abstract this more.
     // Perform the 'prompt' for a destination domain.
-    if ($policy_content === 'prompt' || $policy_users === 'prompt') {
-
+    if ($policy_users === 'prompt') {
       // Make a list of the eligible destination domains in form id -> name.
       $noassign_domain = [$domain->id()];
 
@@ -488,22 +483,15 @@ class DomainCommands extends DrushCommands {
         $reassign_list
       );
       $reassign_list = array_merge($reassign_base, $reassign_list);
-
-      if ($assign_content && $policy_content === 'prompt') {
-        $policy_content = $this->io()->choice(dt('Reassign content to:'), $reassign_list);
-      }
       if ($policy_users === 'prompt') {
         $policy_users = $this->io()->choice(dt('Reassign users to:'), $reassign_list);
       }
-    }
-    if ($policy_content === 'default') {
-      $policy_content = $default_domain->id();
     }
     if ($policy_users === 'default') {
       $policy_users = $default_domain->id();
     }
 
-    // Reassign content as required.
+    /* Reassign content as required.
     if ($assign_content && $policy_content !== 'ignore') {
       $options = [
         'entity_filter' => 'node',
@@ -511,14 +499,20 @@ class DomainCommands extends DrushCommands {
         'multidomain' => FALSE,
       ];
       $this->reassignLinkedEntities($domains, $options);
-    }
+    }*/
     if ($policy_users !== 'ignore') {
-      $options = [
+      $delete_options = [
         'entity_filter' => 'user',
         'policy' => $policy_users,
         'multidomain' => FALSE,
       ];
-      $this->reassignLinkedEntities($domains, $options);
+      $this->reassignLinkedEntities($domains, $delete_options);
+    }
+
+    // Fire any registered hooks for deletion, passing them current imput.
+    $handlers = $this->getCustomEventHandlers('domain-delete');
+    foreach ($handlers as $handler) {
+      $handler($domains, $options, $reassign_list, $policy_users);
     }
 
     $this->deleteDomain($domains, $options);
