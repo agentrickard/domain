@@ -815,8 +815,10 @@ class DomainCommands extends DrushCommands {
    */
   public function generate($primary = 'example.com', array $options = ['count' => null, 'empty' => null]) {
     // Check the number of domains to create.
-
     $count = $options['count'];
+    if (is_null($count)) {
+      $count = 15;
+    }
 
     $domains = $this->domainStorage()->loadMultiple(NULL);
     if (!empty($options['empty'])) {
@@ -824,7 +826,7 @@ class DomainCommands extends DrushCommands {
       $domains = $this->domainStorage()->loadMultiple(NULL);
     }
     // Ensure we don't duplicate any domains.
-    $existing = array();
+    $existing = [];
     if (!empty($domains)) {
       /** @var DomainInterface $domain */
       foreach ($domains as $domain) {
@@ -864,14 +866,25 @@ class DomainCommands extends DrushCommands {
 
     // Add any test domains that have numeric prefixes. We don't expect these URLs to work,
     // and mainly use these for testing the user interface.
-    $needed = $count - count($prepared);
-    for ($i = 1; $i <= $needed; $i++) {
+    // Test that we already have test domains.
+    $start = 1;
+    foreach ($existing as $exists) {
+      $name = explode('.', $exists);
+      if (substr_count($name[0], 'test') > 0) {
+        $num = (int) str_replace('test', '', $name[0]) + 1;
+        if ($num > $start) {
+          $start = $num;
+        }
+      }
+    }
+    $needed = $count - count($prepared) + $start;
+    for ($i = $start; $i <= $needed; $i++) {
       $prepared[] = 'test' . $i . '.' . $primary;
     }
-
     // Get the initial item weight for sorting.
-    $start_weight = \count($domains);
-    $prepared = \array_slice($prepared, 0, $count);
+    $start_weight = count($domains);
+    $prepared = array_slice($prepared, 0, $count);
+    $list = [];
 
     // Create the domains.
     foreach ($prepared as $key => $item) {
@@ -887,15 +900,15 @@ class DomainCommands extends DrushCommands {
       );
       $domain = $this->domainStorage()->create($values);
       $domain->save();
-      $this->logger()->info(dt('Created the @domain.', ['@domain' => $domain->getHostname()]));
+      $list[] = dt('Created @domain.', ['@domain' => $domain->getHostname()]);
     }
 
     // If nothing created, say so.
     if (empty($prepared)) {
-      $this->logger()->info(dt('No new domains were created.'));
+      return dt('No new domains were created.');
     }
     else {
-      return dt('Created @count new domains.', ['@count' => count($prepared)]);
+      return dt("Created @count new domains:\n@list", ['@count' => count($prepared), '@list' => implode("\n", $list)]);
     }
   }
 
