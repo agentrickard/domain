@@ -56,8 +56,24 @@ class DomainAccessCommands extends DomainCommands {
 /**
  * @hook on-event domain-delete
  */
-  public function hookDomainDelete($domains, $options, $reassign_list, $policy_users) {
+  public function hookDomainDelete($target_domain, $options) {
     // Run our own deletion routine here.
+    if (is_null($options['content-assign'])) {
+      $policy_content = 'prompt';
+    }
+    if (!empty($options['content-assign'])) {
+      if (in_array($options['content-assign'], $this->reassignment_policies, TRUE)) {
+        $policy_content = $options['content-assign'];
+      }
+    }
+
+    $delete_options = [
+      'entity_filter' => 'node',
+      'policy' => $policy_content,
+      'field' => DOMAIN_ACCESS_FIELD,
+    ];
+
+    return $this->doReassign($target_domain, $delete_options);
   }
 
 }

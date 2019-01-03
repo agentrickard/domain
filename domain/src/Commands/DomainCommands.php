@@ -450,26 +450,59 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
       $domains = [$domain];
     }
 
-    /* Get content disposition from configuration and validate.
-    if ($options['content-assign']) {
-      if (in_array($options['content-assign'], $this->reassignment_policies, TRUE)) {
-        $policy_content = $options['content-assign'];
-      }
-      elseif ($this->getDomainFromArgument($domain_id)) {
-        $policy_content = $options['content-assign'];
-      }
-    }*/
     if (!empty($options['users-assign'])) {
       if (in_array($options['users-assign'], $this->reassignment_policies, TRUE)) {
         $policy_users = $options['users-assign'];
       }
     }
 
-    // TODO: Abstract this more.
+    $delete_options = [
+      'entity_filter' => 'user',
+      'policy' => $policy_users,
+      'field' => DOMAIN_ADMIN_FIELD,
+    ];
+
+    if ($policy_users !== 'ignore') {
+      $messages[] = $this->doReassign($domain, $delete_options);
+    }
+
+    // Fire any registered hooks for deletion, passing them current imput.
+    $handlers = $this->getCustomEventHandlers('domain-delete');
+    $messages = [];
+    foreach ($handlers as $handler) {
+      $messages[] = $handler($domain, $options);
+    }
+
+    $this->deleteDomain($domains, $options);
+
+    $message = dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
+    if ($messages) {
+      $message .= "\n" . implode("\n", $messages);
+    }
+    $this->logger()->info($message);
+    return $message;
+  }
+
+  /**
+   * Handles reassignment of entities to another domain.
+   *
+   * This method includes necessary UI elements if the user is prompted to
+   * choose a new domain.
+   *
+   * @param Drupal\domain\DomainInterface $target_domain
+   *   The domain selected for deletion.
+   * @param array $delete_options
+   *   A selection of options for deletion, defined in reassignLinkedEntities().
+   */
+  public function doReassign(DomainInterface $target_domain, array $delete_options) {
+    $policy = $delete_options['policy'];
+    $default_domain = $this->domainStorage()->loadDefaultDomain();
+    $all_domains = $this->domainStorage()->loadMultipleSorted(NULL);
+
     // Perform the 'prompt' for a destination domain.
-    if ($policy_users === 'prompt') {
+    if ($policy === 'prompt') {
       // Make a list of the eligible destination domains in form id -> name.
-      $noassign_domain = [$domain->id()];
+      $noassign_domain = [$target_domain->id()];
 
       $reassign_list = $this->filterDomains($all_domains, $noassign_domain);
       $reassign_base = [
@@ -483,44 +516,17 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
         $reassign_list
       );
       $reassign_list = array_merge($reassign_base, $reassign_list);
-      if ($policy_users === 'prompt') {
-        $policy_users = $this->io()->choice(dt('Reassign users to:'), $reassign_list);
-      }
+      $policy = $this->io()->choice(dt('Reassign @type data to:', ['@type' => $delete_options['entity_filter']]), $reassign_list);
     }
-    if ($policy_users === 'default') {
-      $policy_users = $default_domain->id();
+    elseif ($policy === 'default') {
+      $policy = $default_domain->id();
     }
-
-    /* Reassign content as required.
-    if ($assign_content && $policy_content !== 'ignore') {
-      $options = [
-        'entity_filter' => 'node',
-        'policy' => $policy_content,
-        'multidomain' => FALSE,
-      ];
-      $this->reassignLinkedEntities($domains, $options);
-    }*/
-    if ($policy_users !== 'ignore') {
-      $delete_options = [
-        'entity_filter' => 'user',
-        'policy' => $policy_users,
-        'multidomain' => FALSE,
-      ];
-      $this->reassignLinkedEntities($domains, $delete_options);
+    if ($policy !== 'ignore') {
+      $delete_options['policy'] = $policy;
+      $target = [$target_domain];
+      $count = $this->reassignLinkedEntities($target, $delete_options);
+      return dt('@count @type entities updated.', ['@count' => $count, '@type' => $delete_options['entity_filter']]);
     }
-
-    // Fire any registered hooks for deletion, passing them current imput.
-    $handlers = $this->getCustomEventHandlers('domain-delete');
-    foreach ($handlers as $handler) {
-      $handler($domains, $options, $reassign_list, $policy_users);
-    }
-
-    $this->deleteDomain($domains, $options);
-
-    $message = dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
-    $this->logger()->info($message);
-
-    return $message;
   }
 
   /**
@@ -1133,9 +1139,9 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *   The specific field name to look for.
    *
    * @return string[]
-   *   List of entity machine names that support domain access.
+   *   List of entity machine names that support domain references.
    */
-  protected function findDomainEnabledEntities($using_field = DOMAIN_ACCESS_FIELD) {
+  protected function findDomainEnabledEntities($using_field = DOMAIN_ADMIN_FIELD) {
     $this->ensureEntityFieldMap();
     $entities = [];
     foreach($this->entity_field_map as $type => $fields) {
@@ -1157,7 +1163,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @return bool
    *   True if this type of entity has a domain field.
    */
-  protected function entityHasDomainField($entity_type, $field = DOMAIN_ACCESS_FIELD) {
+  protected function entityHasDomainField($entity_type, $field = DOMAIN_ADMIN_FIELD) {
     // Try to avoid repeated calls to getFieldMap(), assuming it's expensive.
     $this->ensureEntityFieldMap();
     return array_key_exists($field, $this->entity_field_map[$entity_type]);
@@ -1215,8 +1221,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @param string $entity_type
    *   The entity type name, e.g. 'node'
    * @param string $field
-   *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
-   *   @todo: should this really be a string[] of fields?
+   *   The field to manipulate in the entity, e.g. DOMAIN_ADMIN_FIELD.
    * @param \Drupal\domain\DomainInterface $old_domain
    *   The domain the entities currently belong to. It is not an error for
    *   entity ids to be passed in that are not in this domain, though of course
@@ -1233,19 +1238,16 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @throws \Drupal\Core\Entity\EntityStorageException
    */
   protected function reassignEntities($entity_type, $field, DomainInterface $old_domain, DomainInterface $new_domain, array $ids) {
-
     $entity_storage = \Drupal::entityTypeManager()->getStorage($entity_type);
-
-    // @TODO is there a problem loading many, possibly big, entities in one go?
     $entities = $entity_storage->loadMultiple($ids);
 
-    // @TODO do we need to protect against $entity not having the field $field?
-    /** @var \Drupal\domain\DomainInterface $entity */
     foreach($entities as $entity) {
       $changed = FALSE;
+      if (!$entity->hasField($field)) {
+        continue;
+      }
       // Multivalue fields are used, so check each one.
       foreach ($entity->get($field) as $k => $item) {
-        // NB: NOT strict ==
         if ($item->target_id == $old_domain->id()) {
 
           if ($this->is_dry_run) {
@@ -1303,8 +1305,8 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @param array $options
    *  [
    *    'entity_filter' => 'node',
-   *    'policy' => 'prompt' | 'default' | 'ignore'
-   *    'multidomain' => FALSE,
+   *    'policy' => 'prompt' | 'default' | 'ignore' | {domain_id}
+   *    'field' => DOMAIN_ACCESS_FIELD,
    *  ];
    *
    * @param DomainInterface[] $domains
@@ -1312,10 +1314,10 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  protected function reassignLinkedEntities($domains, array $options = ['chatty' => null, 'policy' => null]) {
-    $entity_typenames = $this->findDomainEnabledEntities();
-    // DOMAIN_ADMIN_FIELD too??
-    $field_names = [DOMAIN_ACCESS_FIELD, DOMAIN_SOURCE_FIELD];
+  protected function reassignLinkedEntities($domains, array $options) {
+    $count = 0;
+    $field = $options['field'];
+    $entity_typenames = $this->findDomainEnabledEntities($field);
 
     $new_domain = $this->getDomainInstanceFromPolicy($options['policy']);
     if (empty($new_domain)) {
@@ -1329,34 +1331,28 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
 
         // For each domain being reassigned from...
         foreach ($domains as $domain) {
-
-          // And, For each domain field ...
-          foreach ($field_names as $field) {
-            $ids = $this->enumerateDomainEntities($name, $domain->id(), $field);
-            if (!empty($ids)) {
-
-              try {
-                if ($options['chatty']) {
-                  $this->logger()->info('Reassigning @count @entity_name entities to @domain',
-                    ['@entity_name'=>'',
-                     '@count' => \count($ids),
-                     '@domain' => $new_domain->id()]);
-                }
-
-                $this->reassignEntities($name, $field, $domain, $new_domain, $ids);
+          $ids = $this->enumerateDomainEntities($name, $domain->id(), $field);
+          if (!empty($ids)) {
+            try {
+              if ($options['chatty']) {
+                $this->logger()->info('Reassigning @count @entity_name entities to @domain',
+                  ['@entity_name'=>'',
+                   '@count' => \count($ids),
+                   '@domain' => $new_domain->id()]);
               }
-              catch (PluginException $e) {
-                $exceptions = TRUE;
-                $this->logger()->error('Unable to reassign content to @new_domain: plugin exception: @ex',
-                  ['@ex' => $e->getMessage(),
-                   '@new_domain' => $new_domain->id()]);
-              }
-              catch (EntityStorageException $e) {
-                $exceptions = TRUE;
-                $this->logger()->error('Unable to reassign content to @new_domain: storage exception: @ex',
-                  ['@ex' => $e->getMessage(),
-                   '@new_domain' => $new_domain->id()]);
-              }
+             $count = $this->reassignEntities($name, $field, $domain, $new_domain, $ids);
+            }
+            catch (PluginException $e) {
+              $exceptions = TRUE;
+              $this->logger()->error('Unable to reassign content to @new_domain: plugin exception: @ex',
+                ['@ex' => $e->getMessage(),
+               '@new_domain' => $new_domain->id()]);
+            }
+            catch (EntityStorageException $e) {
+              $exceptions = TRUE;
+              $this->logger()->error('Unable to reassign content to @new_domain: storage exception: @ex',
+                ['@ex' => $e->getMessage(),
+                 '@new_domain' => $new_domain->id()]);
             }
           }
         }
@@ -1365,6 +1361,8 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
     if ($exceptions) {
       throw new DomainCommandException('Errors encountered during reassign.');
     }
+
+    return $count;
   }
 
 }
