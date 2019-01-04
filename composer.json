@@ -13,7 +13,7 @@
     "issues": "http://drupal.org/project/issues/domain",
     "irc": "http://irc.freenode.org/drupal-contribute",
     "source": "http://cgit.drupalcode.org/domain"
-  }
+  },
   "extra": {
     "drush": {
       "services": {
