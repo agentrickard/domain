@@ -13,5 +13,14 @@
     "issues": "http://drupal.org/project/issues/domain",
     "irc": "http://irc.freenode.org/drupal-contribute",
     "source": "http://cgit.drupalcode.org/domain"
+  },
+  "extra": {
+    "drush": {
+      "services": {
+        "domain/drush.services.yml": "^9",
+        "domain_access/drush.services.yml": "^9",
+        "domain_source/drush.services.yml": "^9"
+      }
+    }
   }
 }
