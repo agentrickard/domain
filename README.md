@@ -204,18 +204,11 @@ Testing
 
 @zerolab built a Travis definition file for automated testing! That means all pull requests will automatically run tests!
 
-[![Build Status](https://travis-ci.org/agentrickard/domain.svg?branch=8.x-1.x)](https://travis-ci.org/agentrickard/domain)
-
-The module does have solid test coverage, and complete coverage is required for release.
-Right now, we mostly use SimpleTest, because it is most familiar, and much of our
-testing is about browser and http behavior.
-
 If you file a pull request or patch, please (at a minimum) run the existing tests to check
 for failures. Writing additional tests will greatly speed completion, as I won't commit
 code without test coverage.
 
-New tests should be written as Functional, Kernel, or Unit tests. Conversion patches that
-move Simpletests to Functional tests are welcome.
+New tests should be written in PHPUnit as Functional, Kernel, or Unit tests.
 
 Because Domain requires varying http host requests to test, we can't normally use the Drupal.org
 testing infrastructure. (This may change, but we are not counting on it.)
@@ -227,5 +220,3 @@ point to your drupal instance. I use variants of `example.com` for local tests. 
 in most test cases. See `DomainTestBase::domainCreateTestDomains()` for the logic.
 
 When running tests, you normally need to be on the default domain.
-
-If anyone is capable of building a vagrant box to simplify testing, that would be ideal.
