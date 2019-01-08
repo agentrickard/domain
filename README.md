@@ -199,7 +199,7 @@ a beta release on Drupal.org.
 
 We would like to tackle issues in that order, but feel free to work on what motivates you.
 
-Testing
+Testing [![Build Status](https://travis-ci.com/agentrickard/domain.svg?branch=8.x-1.x)](https://travis-ci.com/agentrickard/domain)
 ====
 
 @zerolab built a Travis definition file for automated testing! That means all pull requests will automatically run tests!
