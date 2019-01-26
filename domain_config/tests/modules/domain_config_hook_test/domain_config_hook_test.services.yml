@@ -1,0 +1,7 @@
+services:
+  domain_config_service.page_cache_request_policy:
+    class: Drupal\domain_config_hook_test\PageCache\RequestPolicy\PageCacheRequestPolicy
+    arguments: ['@config.factory']
+    tags:
+      - { name: page_cache_request_policy }
+
