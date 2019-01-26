@@ -12,7 +12,6 @@ function domain_config_hook_test_user_login($account) {
   \Drupal::state()->set('domain_config_test__user_login', TRUE);
 }
 
-
 /**
  * Implements hook_module_implements_alter().
  */

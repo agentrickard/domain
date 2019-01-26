@@ -3,7 +3,7 @@ services:
     class: Drupal\domain_config\DomainConfigOverrider
     tags:
       - { name: config.factory.override, priority: -150}
-    arguments: ['@config.storage']
+    arguments: ['@config.storage', '@module_handler']
 
   domain_config.library.discovery.collector:
     decorates: library.discovery.collector
