@@ -1,0 +1,18 @@
+name: "Domain config hook test"
+description: "Support module for domain config testing."
+type: module
+package: Testing
+# version: VERSION
+core: 8.x
+hidden: TRUE
+
+dependencies: []
+
+# This module represents several services that could be provided by multiple modules in the Drupal community.
+# The following are not playing nice together:
+#   - A page cache policy service that uses the config factory.
+#   - A module that implements hook_module_implements.
+#   - A random hook that hook_module_implements wishes to control.
+#   - The domain_config module (and domain negotiator service, I believe).
+
+# When this module is functioning correctly, when a user logs in, there will not be a state key set.
