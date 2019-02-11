@@ -20,6 +20,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SwitchForm extends FormBase {
 
   /**
+   * The domain entity access control handler.
+   *
+   * @var \Drupal\domain\DomainAccessControlHandler
+   */
+  protected $accessHandler;
+
+  /**
    * Constructs a new DevelGenerateForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -37,6 +44,8 @@ class SwitchForm extends FormBase {
     $this->entityTypeManager = $entity_type_manager;
     $this->domainStorage = $this->entityTypeManager->getStorage('domain');
     $this->domainElementManager = $domain_element_manager;
+    // Not loaded directly since it is not an interface.
+    $this->accessHandler = $this->entityTypeManager->getAccessControlHandler('domain');
   }
 
   /**
@@ -103,25 +112,25 @@ class SwitchForm extends FormBase {
     if ($selected_domain_id = $this->domainConfigUiManager->getSelectedDomainId()) {
       $selected_domain = $this->domainStorage->load($selected_domain_id);
     }
-    // @TODO: Restrict the domain list to specific domains.
-    // @TODO: Decide who can set values for 'all domains'.
-    // @TODO: Save for all but overridden but hidden?
-    // @TODO: Should 'all domains' be 'all assigned domains'?
+    // Get the form options.
     $form['domain_config_ui']['domain'] = [
       '#type' => 'select',
       '#title' => $this->t('Domain'),
-      '#options' => array_merge(['' => $this->t('All Domains')], $this->domainStorage->loadOptionsList()),
+      '#options' => $this->getDomainOptions(),
       '#default_value' => !empty($selected_domain) ? $selected_domain->id() : '',
       '#ajax' => [
         'callback' => '::switchCallback',
       ],
     ];
-    // Add language select field.
+    // Add language select field. Domain Confgi does not rely on core's Config
+    // Translation module, so we set our own permission.
     $languages = $this->languageManager->getLanguages();
-    if (count($languages) > 1) {
+    if (count($languages) > 1 && \Drupal::currentUser()->hasPermission('translate domain configuration')) {
       $language_options = ['' => $this->t('Default')];
       foreach ($languages as $id => $language) {
-        $language_options[$id] = $language->getName();
+        if (!$language->isLocked()) {
+          $language_options[$id] = $language->getName();
+        }
       }
       $form['domain_config_ui']['language'] = [
         '#type' => 'select',
@@ -193,6 +202,29 @@ class SwitchForm extends FormBase {
     $response = new AjaxResponse();
     $response->addCommand(new RedirectCommand($request_uri));
     return $response;
+  }
+
+  /**
+   * Gets the available domain list for the form user.
+   *
+   * @return array
+   *   An array of select options.
+   */
+  public function getDomainOptions() {
+    $domains = $this->domainStorage->loadMultiple();
+    $options = [];
+    foreach ($domains as $domain) {
+      // If the user cannot view the domain, then don't show in the list.
+      // View here is sufficient, because it means the user is assigned to the
+      // domain. We have already checked for the ability to use this form.
+      $access = $this->accessHandler->checkAccess($domain, 'view');
+      if ($access->isAllowed()) {
+        $options[$domain->id()] = $domain->label();
+      }
+    }
+    // We always use 'all domains' here because it sets the default. Any user
+    // who can access this form can set the default value.
+    return array_merge(['' => $this->t('All Domains')], $options);
   }
 
 }

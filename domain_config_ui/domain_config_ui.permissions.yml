@@ -6,3 +6,7 @@ use domain config ui:
   title: 'Manage domain-specific configurations'
   description: 'Allows domain administrators to use configuration forms specific to their managed domains.'
   restrict access: true
+translate domain configuration:
+  title: 'Translate domain-specific configurations'
+  description: 'Allows domain administrators to use language-specific configuration forms specific to their managed domains.'
+  restrict access: true
