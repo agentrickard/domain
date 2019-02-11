@@ -286,3 +286,17 @@ function domain_source_presave_generate(EntityInterface $entity) {
     }
   }
 }
+
+
+/**
+ * Implements hook_hook_info().
+ */
+function domain_source_hook_info() {
+  $hooks['domain_source_alter'] = [
+    'group' => 'domain_source',
+  ];
+  $hooks['domain_source_path_alter'] = [
+    'group' => 'domain_source',
+  ];
+  return $hooks;
+}

@@ -343,8 +343,8 @@ class Domain extends ConfigEntityBase implements DomainInterface {
       $default->is_default = FALSE;
       $default->save();
     }
-    // Ensures we have a proper domain_id.
-    if ($this->isNew()) {
+    // Ensures we have a proper domain_id but does not erase existing ones.
+    if ($this->isNew() && empty($this->getDomainId())) {
       $this->createDomainId();
     }
     // Prevent duplicate hostname.

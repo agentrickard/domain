@@ -110,12 +110,6 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $domain->setMatchType(self::DOMAIN_MATCH_NONE);
     }
 
-    // Make sure all modules are loaded and can alter the found domains.
-    // See https://www.drupal.org/node/2896434#comment-12267208.
-    $this->moduleHandler->reload();
-    foreach ($this->moduleHandler->getImplementations('domain_request_alter') as $module) {
-      $this->moduleHandler->load($module);
-    }
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
     $this->moduleHandler->alter('domain_request', $domain);

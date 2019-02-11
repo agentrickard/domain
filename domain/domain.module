@@ -159,3 +159,19 @@ function domain_theme() {
 function template_preprocess_domain_nav_block(array &$variables) {
   $variables['items'] = $variables['items']['#items'];
 }
+
+/**
+ * Implements hook_hook_info().
+ */
+function domain_hook_info() {
+  $hooks['domain_request_alter'] = [
+    'group' => 'domain',
+  ];
+  $hooks['domain_validate_alter'] = [
+    'group' => 'domain',
+  ];
+  $hooks['domain_references_alter'] = [
+    'group' => 'domain',
+  ];
+  return $hooks;
+}

@@ -13,7 +13,7 @@ use Drupal\Core\Url;
 class DomainContentController extends ControllerBase {
 
   /**
-   * Builds the lost of domains and relevant entities.
+   * Builds the list of domains and relevant entities.
    *
    * @param array $options
    *   A list of variables required to build editor or content pages.
