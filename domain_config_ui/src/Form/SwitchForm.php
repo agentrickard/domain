@@ -125,7 +125,7 @@ class SwitchForm extends FormBase {
     // Add language select field. Domain Confgi does not rely on core's Config
     // Translation module, so we set our own permission.
     $languages = $this->languageManager->getLanguages();
-    if (count($languages) > 1 && \Drupal::currentUser()->hasPermission('translate domain configuration')) {
+    if (count($languages) > 1 && $this->currentUser()->hasPermission('translate domain configuration')) {
       $language_options = ['' => $this->t('Default')];
       foreach ($languages as $id => $language) {
         if (!$language->isLocked()) {
@@ -211,7 +211,7 @@ class SwitchForm extends FormBase {
    *   An array of select options.
    */
   public function getDomainOptions() {
-    $domains = $this->domainStorage->loadMultiple();
+    $domains = $this->domainStorage->loadMultipleSorted();
     $options = [];
     foreach ($domains as $domain) {
       // If the user cannot view the domain, then don't show in the list.
