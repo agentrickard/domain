@@ -18,15 +18,13 @@ function domain_config_ui_preprocess_page(&$variables) {
     return;
   }
   if (!domain_config_ui_route_is_allowed()) {
-    $admin_form = domain_config_ui_admin_form('enable');
-    $content = ['domain_config_ui_admin' => $admin_form];
+    $content = ['domain_config_ui_admin' => domain_config_ui_admin_form('enable')];
   }
   else {
+    $content = ['domain_config_ui_admin' => domain_config_ui_admin_form('disable')];
     // Add a message below the form showing the current domain.
     $form = \Drupal::formBuilder()->getForm('Drupal\domain_config_ui\Form\SwitchForm');
     if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message()) {
-      $admin_form = domain_config_ui_admin_form('disable');
-      $content['domain_config_ui_admin'] = $admin_form;
       $content['domain_config_ui_switch_warning'] = $warning_message;
     }
     // Add domain switch form that will reload the page to top of content region.
@@ -51,7 +49,6 @@ function domain_config_ui_admin_form($op) {
     if ($route->getPath() == '/admin/config/domain/config-ui') {
       return $admin_form;
     }
-    // @TODO: add a disable operation too.
     if ($route->hasDefault('_form')) {
       $form_name = $route->getDefault('_form');
       if (method_exists($form_name, 'getEditableConfigNames')) {
@@ -63,7 +60,6 @@ function domain_config_ui_admin_form($op) {
         if ($op == 'disable') {
           $title = new TranslatableMarkup('Disable domain configuration');
         }
-        // @TODO: Make this look like a local task?
         $admin_form = [
           '#type' => 'link',
           '#url' => Url::fromRoute('domain_config_ui.inline_action', $params),
@@ -71,7 +67,6 @@ function domain_config_ui_admin_form($op) {
           '#attributes' => [
             'class' => [
               'button',
-
               'button--primary',
               'button--small',
             ],

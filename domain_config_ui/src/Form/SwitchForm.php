@@ -78,7 +78,7 @@ class SwitchForm extends FormBase {
   }
 
   /**
-   * Determines is a user may access the domain-sensitive form.
+   * Determines if a user may access the domain-sensitive form.
    */
   public function canUseDomainConfig() {
     if ($this->currentUser()->hasPermission('administer domains')) {
@@ -89,7 +89,9 @@ class SwitchForm extends FormBase {
       $user = $this->entityTypeManager->getStorage('user')->load($account->id());
       $user_domains = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
     }
-    return (!empty($user_domains) && $this->currentUser()->hasPermission('use domain config ui'));
+    $permission = $this->currentUser()->hasPermission('use domain config ui') ||
+                  $this->currentUser()->hasPermission('administer domain config ui');
+    return (!empty($user_domains) && $permission);
   }
 
   /**
