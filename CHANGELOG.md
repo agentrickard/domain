@@ -16,6 +16,7 @@ Changelog
 12-FEB-2018 8.x-1.0-alpha12
 07-MAR-2018 8.x-1.0-alpha13
 19-OCT-2018 8.x-1.0-alpha14
+21-FEB-2019 8.x-1.0-alpha15
 
 Status
 ====
@@ -113,7 +114,7 @@ marked with [x] are considered complete.
 - [x] Check domain responses on configuration forms
 - [x] Remove deprecated `entity_get_form_display`
 - [x] Implement theme functions or twig templates where proper
-- [ ] Advanced drush integration / complete labelled tasks
+- [x] Advanced drush integration / complete labelled tasks
 - [ ] Add filter options to domain_access and domain_source views
 - [ ] Test cron handling
 - [ ] Caching strategies in DomainNegotiator
