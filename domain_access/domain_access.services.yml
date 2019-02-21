@@ -7,3 +7,6 @@ services:
     arguments: ['@entity_type.manager', '@domain_access.manager']
     tags:
      - { name: access_check, applies_to: _domain_access_views }
+  domain_access.access_method:
+    class: Drupal\domain_access\AccessMethod\NodeAccess
+    arguments: ['@domain_access.manager', '@domain.negotiator', '@entity_type.manager']
