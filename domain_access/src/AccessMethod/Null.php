@@ -3,7 +3,7 @@
 namespace Drupal\domain_access\AccessMethod;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\domain_access\AccessMethodBase;
+use Drupal\domain_access\DomainAccessMethodInterface;
 use Drupal\node\NodeInterface;
 
 /**
@@ -11,7 +11,7 @@ use Drupal\node\NodeInterface;
  *
  * @package Drupal\domain_access
  */
-class Null extends AccessMethodBase {
+class Null implements DomainAccessMethodInterface {
 
   /**
    * {@inheritdoc}

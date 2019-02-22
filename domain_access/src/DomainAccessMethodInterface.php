@@ -10,7 +10,7 @@ use Drupal\node\NodeInterface;
  *
  * @package Drupal\domain_access
  */
-interface AccessMethodInterface {
+interface DomainAccessMethodInterface {
 
   /**
    * Build the grants avaible for passed user.

@@ -3,9 +3,9 @@
 namespace Drupal\domain_access\AccessMethod;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\domain_access\AccessMethodBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\domain_access\DomainAccessMethodInterface;
 use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\node\NodeInterface;
 
@@ -14,7 +14,7 @@ use Drupal\node\NodeInterface;
  *
  * @package Drupal\domain_access
  */
-class NodeAccess extends AccessMethodBase {
+class NodeAccess implements DomainAccessMethodInterface {
 
   /**
    * @var \Drupal\domain_access\DomainAccessManagerInterface
