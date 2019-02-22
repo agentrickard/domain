@@ -2,8 +2,11 @@
 
 namespace Drupal\domain_access\AccessMethod;
 
-use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\domain_access\AccessMethodBase;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\node\NodeInterface;
 
 /**
@@ -12,6 +15,33 @@ use Drupal\node\NodeInterface;
  * @package Drupal\domain_access
  */
 class NodeAccess extends AccessMethodBase {
+
+  /**
+   * @var \Drupal\domain_access\DomainAccessManagerInterface
+   */
+  protected $domainAccessManager;
+
+  /**
+   * @var \Drupal\domain\DomainNegotiatorInterface
+   */
+  protected $domainNegotiator;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * AccessMethodBase constructor.
+   *
+   * @param \Drupal\domain_access\DomainAccessManagerInterface $domainAccessManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   */
+  public function __construct(DomainAccessManagerInterface $domainAccessManager, DomainNegotiatorInterface $domainNegotiator, EntityTypeManagerInterface $entityTypeManager) {
+    $this->domainAccessManager = $domainAccessManager;
+    $this->domainNegotiator = $domainNegotiator;
+    $this->entityTypeManager = $entityTypeManager;
+  }
 
   /**
    * {@inheritdoc}
