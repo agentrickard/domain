@@ -11,7 +11,7 @@ use Drupal\node\NodeInterface;
  *
  * @package Drupal\domain_access
  */
-class Null implements DomainAccessMethodInterface {
+class NoRecords implements DomainAccessMethodInterface {
 
   /**
    * {@inheritdoc}
