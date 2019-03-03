@@ -27,14 +27,14 @@ const DOMAIN_ACCESS_ALL_FIELD = 'field_domain_all_affiliates';
  * Implements hook_node_grants().
  */
 function domain_access_node_grants(AccountInterface $account, $op) {
-  return \Drupal::service('domain_access.access_method')->Grants($account, $op);
+  return \Drupal::service('domain_access.access_method')->nodeAccessGrants($account, $op);
 }
 
 /**
  * Implements hook_node_access_records().
  */
 function domain_access_node_access_records(NodeInterface $node) {
-  return \Drupal::service('domain_access.access_method')->Records($node);
+  return \Drupal::service('domain_access.access_method')->nodeAccessRecords($node);
 }
 
 /**

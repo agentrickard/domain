@@ -16,14 +16,14 @@ class NoRecords implements DomainAccessMethodInterface {
   /**
    * {@inheritdoc}
    */
-  public function Grants(AccountInterface $account, $op) {
+  public function nodeAccessGrants(AccountInterface $account, $op) {
     return [];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function Records(NodeInterface $node) {
+  public function nodeAccessRecords(NodeInterface $node) {
     return [];
   }
 

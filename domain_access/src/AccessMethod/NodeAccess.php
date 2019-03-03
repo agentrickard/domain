@@ -46,7 +46,7 @@ class NodeAccess implements DomainAccessMethodInterface {
   /**
    * {@inheritdoc}
    */
-  public function Grants(AccountInterface $account, $op) {
+  public function nodeAccessGrants(AccountInterface $account, $op) {
     $grants = [];
     /** @var \Drupal\domain\Entity\Domain $active */
     $active = $this->domainNegotiator->getActiveDomain();
@@ -92,7 +92,7 @@ class NodeAccess implements DomainAccessMethodInterface {
   /**
    * {@inheritdoc}
    */
-  public function Records(NodeInterface $node) {
+  public function nodeAccessRecords(NodeInterface $node) {
     $grants = [];
     // Create grants for each translation of the node. See the report at
     // https://www.drupal.org/node/2825419 for the logic here. Note that right

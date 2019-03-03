@@ -22,7 +22,7 @@ interface DomainAccessMethodInterface {
    *
    * @return array
    */
-  public function Grants(AccountInterface $account, $op);
+  public function nodeAccessGrants(AccountInterface $account, $op);
 
   /**
    * Build node access records.
@@ -32,6 +32,6 @@ interface DomainAccessMethodInterface {
    *
    * @return array
    */
-  public function Records(NodeInterface $node);
+  public function nodeAccessRecords(NodeInterface $node);
 
 }
