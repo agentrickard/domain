@@ -100,7 +100,7 @@ function domain_access_node_access_records(NodeInterface $node) {
       }
     }
     // Set the domain_site grant.
-    if (!empty($translation->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $translation->isPublished()) {
+    if ($translation->hasField(DOMAIN_ACCESS_ALL_FIELD) && !empty($translation->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $translation->isPublished()) {
       $grants[] = [
         'realm' => 'domain_site',
         'gid' => 0,
