@@ -123,8 +123,13 @@ class DomainElementManager implements DomainElementManagerInterface {
         $node = $form_state->getFormObject()->getEntity();
         $entity_values = $form_state->getValue($field);
       }
-      foreach ($values as $value) {
-        $entity_values[]['target_id'] = $value;
+      if (is_array($values)) {
+        foreach ($values as $value) {
+          $entity_values[]['target_id'] = $value;
+        }
+      }
+      else {
+        $entity_values[]['target_id'] = $values;
       }
       // Prevent a fatal error caused by passing a NULL value.
       // See https://www.drupal.org/node/2841962.
