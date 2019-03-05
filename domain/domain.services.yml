@@ -39,3 +39,8 @@ services:
   domain.loader:
     class: Drupal\domain\DomainLoader
     arguments: ['@config.typed', '@config.factory']
+  domain.twig_extension:
+    class: Drupal\domain\TwigExtension
+    arguments: ['@domain.negotiator']
+    tags:
+      - {name: twig.extension}
