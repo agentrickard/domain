@@ -28,10 +28,15 @@ class TwigExtension extends \Twig_Extension {
    * {@inheritdoc}
    */
   public function getGlobals() {
-    return [
-      'domain_active' => $this->domainNegotiator->getActiveDomain(),
-      'domain_active_id' => $this->domainNegotiator->getActiveId(),
-    ];
+    if ($domain = $this->domainNegotiator->getActiveDomain()) {
+      return [
+        'domain_active' => $domain,
+        'domain_active_id' => $domain->id(),
+      ];
+    }
+    else {
+      return [];
+    }
   }
 
   /**
