@@ -42,8 +42,7 @@ class DomainAccessCurrentAllFilter extends BooleanOperator {
    */
   public function query() {
     $this->ensureMyTable();
-    // @TODO: Proper abstraction of table and field name.
-    $all_table = $this->query->ensureTable('node__field_domain_all_affiliates');
+    $all_table = $this->query->addTable('node__field_domain_all_affiliates', $this->relationship);
     $current_domain = \Drupal::service('domain.negotiator')->getActiveId();
     if (empty($this->value)) {
       // @TODO proper handling of NULL?
