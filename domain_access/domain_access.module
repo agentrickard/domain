@@ -607,7 +607,7 @@ function domain_access_views_data_alter(array &$data) {
       'field' => DOMAIN_ACCESS_FIELD . '_target_id',
       'id' => 'domain_access_current_all_filter',
       'title' => t('Available on current domain'),
-      'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates).'),
+      'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).'),
     ],
   ];
   // Since domains are not stored in the database, relationships cannot be used.
