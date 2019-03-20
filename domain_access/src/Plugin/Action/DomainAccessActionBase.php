@@ -62,7 +62,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
       '#type' => 'checkboxes',
       '#title' => t('Domain'),
       '#options' => $domains,
-      '#default_value' => $this->configuration['id'],
+      '#default_value' => isset($this->configuration['domain_id']) ? (array) $this->configuration['domain_id'] : [],
       '#required' => TRUE,
     ];
     return $form;
@@ -81,7 +81,14 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
   public function calculateDependencies() {
     if (!empty($this->configuration['domain_id'])) {
       $prefix = $this->entityType->getConfigPrefix() . '.';
-      $this->addDependency('config', $prefix . $this->configuration['domain_id']);
+      if (is_array($this->configuration['domain_id'])) {
+        foreach ($this->configuration['domain_id'] as $domain_id) {
+          $this->addDependency('config', $prefix . $domain_id);
+        }
+      }
+      else {
+        $this->addDependency('config', $prefix . $this->configuration['domain_id']);
+      }
     }
     return $this->dependencies;
   }
