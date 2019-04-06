@@ -43,5 +43,5 @@ function domain_assets_page_attachments(array &$attachments) {
   $negotiator = \Drupal::service('domain.negotiator');
   $domain = $negotiator->getActiveDomain();
   $id = $domain ? $domain->id() : '_none';
-  $attachments['#attached']['library'][] = "domain/dummy.$id";
+  $attachments['#attached']['library'][] = "domain_assets/dummy.$id";
 }
