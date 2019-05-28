@@ -126,7 +126,14 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
    * {@inheritdoc}
    */
   public function sort(DomainInterface $a, DomainInterface $b) {
-    return $a->getWeight() > $b->getWeight();
+    // Prioritize the weights.
+    $weight_difference = $a->getWeight() - $b->getWeight();
+    if ($weight_difference !== 0) {
+      return $weight_difference;
+    }
+
+    // Fallback to the labels if the weights are equal.
+    return strcmp($a->label(), $b->label());
   }
 
   /**
