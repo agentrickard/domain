@@ -17,15 +17,6 @@ class DomainViewsAccessTest extends DomainTestBase {
   public static $modules = ['domain', 'node', 'views', 'block'];
 
   /**
-   * Disabled config schema checking.
-   *
-   * @var bool
-   *
-   * @TODO: https://github.com/agentrickard/domain/issues/200
-   */
-  protected $strictConfigSchema = FALSE;
-
-  /**
    * Test inactive domain.
    */
   public function testInactiveDomain() {
