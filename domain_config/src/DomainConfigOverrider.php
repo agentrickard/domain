@@ -211,9 +211,6 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // run.
     if (empty($this->domain)) {
       $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
-      // Ensure the module hook cache is set properly.
-      // See https://www.drupal.org/project/domain/issues/3025541
-      $this->moduleHandler->resetImplementations();
     }
 
   }

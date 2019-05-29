@@ -110,6 +110,11 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $domain->setMatchType(self::DOMAIN_MATCH_NONE);
     }
 
+    // Ensure the module hook cache is set properly.
+    // See https://www.drupal.org/project/domain/issues/3025541 and
+    // https://www.drupal.org/project/domain/issues/3048554
+    $this->moduleHandler->reload();
+
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
     $this->moduleHandler->alter('domain_request', $domain);
