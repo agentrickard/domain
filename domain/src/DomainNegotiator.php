@@ -93,7 +93,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   /**
    * {@inheritdoc}
    */
-  public function setRequestDomain($httpHost, $reset = FALSE) {
+  public function setRequestDomain($httpHost, $reset = FALSE, $load_modules = TRUE) {
     // @TODO: Investigate caching methods.
     $this->setHttpHost($httpHost);
     // Try to load a direct match.
@@ -111,7 +111,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     }
 
     // Ensure the module hook cache is set properly.
-    $this->loadModules();
+    $this->loadModules($load_modules);
 
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
@@ -142,18 +142,18 @@ class DomainNegotiator implements DomainNegotiatorInterface {
   /**
    * Determine the active domain.
    */
-  protected function negotiateActiveDomain() {
+  protected function negotiateActiveDomain($load_modules = TRUE) {
     $httpHost = $this->negotiateActiveHostname();
-    $this->setRequestDomain($httpHost);
+    $this->setRequestDomain($httpHost, $load_modules);
     return $this->domain;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getActiveDomain($reset = FALSE) {
+  public function getActiveDomain($reset = FALSE, $load_modules = TRUE) {
     if ($reset) {
-      $this->negotiateActiveDomain();
+      $this->negotiateActiveDomain($load_modules);
     }
     return $this->domain;
   }
@@ -243,9 +243,11 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    * @link https://www.drupal.org/project/domain/issues/3025541
    * @link https://www.drupal.org/project/domain/issues/3048554
    */
-  protected function loadModules() {
+  protected function loadModules($load_modules = TRUE) {
     if ($this->moduleHandler->moduleExists('domain_config')) {
-      $this->moduleHandler->reload();
+      if ($load_modules) {
+        $this->moduleHandler->reload();
+      }
       $this->moduleHandler->getHookInfo();
       foreach ($this->moduleHandler->getHookInfo() as $hook => $info) {
         $modules = $this->moduleHandler->getImplementations($hook);

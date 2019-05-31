@@ -210,7 +210,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // If we have fired too early in the bootstrap, we must force the routine to
     // run.
     if (empty($this->domain)) {
-      $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
+      $this->domain = $this->domainNegotiator->getActiveDomain(FALSE, FALSE);
     }
 
   }
