@@ -111,9 +111,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     }
 
     // Ensure the module hook cache is set properly.
-    // See https://www.drupal.org/project/domain/issues/3025541 and
-    // https://www.drupal.org/project/domain/issues/3048554
-    $this->moduleHandler->reload();
+    $this->loadModules();
 
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
@@ -231,6 +229,31 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $this->domainStorage = $this->entityTypeManager->getStorage('domain');
     }
     return $this->domainStorage;
+  }
+
+  /**
+   * Ensures that all modules are loaded properly.
+   *
+   * In early bootstrap phases, we have replicable reports of hooks not being
+   * loaded properly when Domain Config is in play. Testing reveals that the
+   * most efficient way to fix the issue is here, in the dynamic load. This
+   * action should not require resetting core caches, which is a huge hit on
+   * performance.
+   *
+   * @link https://www.drupal.org/project/domain/issues/3025541
+   * @link https://www.drupal.org/project/domain/issues/3048554
+   */
+  protected function loadModules() {
+    if ($this->moduleHandler->moduleExists('domain_config')) {
+      $this->moduleHandler->reload();
+      $this->moduleHandler->getHookInfo();
+      foreach ($this->moduleHandler->getHookInfo() as $hook => $info) {
+        $modules = $this->moduleHandler->getImplementations($hook);
+        foreach ($modules as $module) {
+          $this->moduleHandler->load($module);
+        }
+      }
+    }
   }
 
 }
