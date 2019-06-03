@@ -111,7 +111,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     }
 
     // Ensure the module hook cache is set properly.
-    $this->loadModules($load_modules);
+   # $this->loadModules($load_modules);
 
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.
