@@ -197,6 +197,10 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // is called for each lookup, this is more efficient.
     $this->contextSet = TRUE;
 
+    // We must ensure that modules have loaded, which they may not have.
+    // See https://www.drupal.org/project/domain/issues/3025541.
+    $this->moduleHandler->loadAll();
+
     // Get the language context. Note that injecting the language manager
     // into the service created a circular dependency error, so we load from
     // the core service manager.
@@ -206,16 +210,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // The same issue is true for the domainNegotiator.
     $this->domainNegotiator = \Drupal::service('domain.negotiator');
     // Get the domain context.
-    $this->domain = $this->domainNegotiator->getActiveDomain();
-    // If we have fired too early in the bootstrap, we must force the routine to
-    // run.
-    if (empty($this->domain)) {
-      $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
-      // Ensure the module hook cache is set properly.
-      // See https://www.drupal.org/project/domain/issues/3025541
-      $this->moduleHandler->resetImplementations();
-    }
-
+    $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
   }
 
 }

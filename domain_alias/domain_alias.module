@@ -97,7 +97,7 @@ function domain_alias_domain_load($entities) {
   $active = $negotiator->getActiveDomain();
 
   // Do nothing if no domain is active.
-  if (is_null($active)) {
+  if (empty($active)) {
     return;
   }
 
