@@ -10,7 +10,7 @@ use Drupal\domain\DomainInterface;
 /**
  * Implements hook_domain_request_alter().
  */
-function domain_config_test_domain_request_alter(DomainInterface &$domain) {
+function domain_config_test_domain_request_alter(DomainInterface $domain) {
   $domain->addProperty('config_test', 'aye');
 }
 
