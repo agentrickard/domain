@@ -67,9 +67,6 @@ interface DomainNegotiatorInterface {
   /**
    * Gets the active domain.
    *
-   * If the domain has not been calculated, it will be. You can also force
-   * recalculation by passing $reset = TRUE, but that is discouraged.
-   *
    * This method should be called by external classes using the negotiator
    * service.
    *
