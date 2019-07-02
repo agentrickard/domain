@@ -106,6 +106,8 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processOutbound($path, &$options = [], Request $request = NULL, BubbleableMetadata $bubbleable_metadata = NULL) {
+    $config = $this->configFactory->get('domain_source.settings');
+
     // Load the active domain if not set.
     if (empty($options['active_domain'])) {
       $active_domain = $this->getActiveDomain();
@@ -173,7 +175,7 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
       $this->moduleHandler->alter('domain_source_path', $source, $path, $options);
     }
     // If a source domain is specified, rewrite the link.
-    if (!empty($source)) {
+    if (!empty($source) && (!$config->get('dont_redirect_on_aliases') || ($config->get('dont_redirect_on_aliases') && $source->id() != $options['active_domain']->id()))) {
       // Note that url rewrites add a leading /, which getPath() also adds.
       $options['base_url'] = trim($source->getPath(), '/');
       $options['absolute'] = TRUE;

@@ -8,3 +8,6 @@ domain_source.settings:
       sequence:
         type: string
         label: 'Route'
+    dont_redirect_on_aliases:
+      type: boolean
+      label: 'Stop redirecting on aliases'
