@@ -145,7 +145,7 @@ function domain_requirements($phase) {
 
       // Now report.
       $t = get_t();
-      if (empty($message)) {
+      if (empty($messages)) {
         $severity = REQUIREMENT_OK;
         $messages[] = t('Module installed correctly.');
       }
