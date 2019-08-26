@@ -1,6 +1,9 @@
 language: php
 sudo: false
 
+services:
+  - mysql
+
 matrix:
   fast_finish: true
   include:
@@ -49,7 +52,7 @@ before_install:
   # Install Drush.
   - composer global require --no-interaction drush/drush:8.*
 
-install:
+before_install:
   # Optimize MySQL timeout and max packet size.
   - echo "mysql.connect_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "default_socket_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
