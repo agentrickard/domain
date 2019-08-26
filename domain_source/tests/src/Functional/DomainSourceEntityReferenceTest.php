@@ -153,7 +153,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Remove the field from the node type and make sure nothing breaks.
     // See https://www.drupal.org/node/2892612
     $id = 'node.article.field_domain_source';
-    if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
+    if ($field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
       $field->delete();
       field_purge_batch(10, $field->uuid());
       drupal_flush_all_caches();

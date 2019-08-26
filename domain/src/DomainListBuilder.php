@@ -231,7 +231,7 @@ class DomainListBuilder extends DraggableListBuilder {
       return;
     }
 
-    $row['label'] = $this->getLabel($entity);
+    $row['label'] = $entity->label();
     $row['hostname'] = ['#markup' => $entity->getLink()];
     if ($entity->isActive()) {
       $row['hostname']['#prefix'] = '<strong>';
