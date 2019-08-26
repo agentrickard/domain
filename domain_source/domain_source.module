@@ -202,7 +202,7 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
   if (isset($form[DOMAIN_SOURCE_FIELD]) && defined('DOMAIN_ACCESS_FIELD') && isset($form[DOMAIN_ACCESS_FIELD])) {
     $form[DOMAIN_SOURCE_FIELD]['#element_validate'] = ['domain_source_form_validate'];
     // If using a select field, load the JS to show/hide options.
-    if ($form[DOMAIN_SOURCE_FIELD]['widget']['#type'] == 'select') {
+    if (isset($form[DOMAIN_SOURCE_FIELD]['widget']['#type']) && $form[DOMAIN_SOURCE_FIELD]['widget']['#type'] == 'select') {
       $form['#attached']['library'][] = 'domain_source/drupal.domain_source';
     }
   }
