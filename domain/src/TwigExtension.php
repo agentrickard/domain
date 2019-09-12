@@ -43,7 +43,9 @@ class TwigExtension extends \Twig_Extension {
    * {@inheritdoc}
    */
   public function getFunctions() {
-    new \Twig_SimpleFunction('is_domain', [$this, 'isDomain']);
+    return [
+      new \Twig_SimpleFunction('is_domain', [$this, 'isDomain']),
+    ];
   }
 
   /**
