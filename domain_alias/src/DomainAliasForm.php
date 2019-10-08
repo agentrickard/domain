@@ -65,17 +65,13 @@ class DomainAliasForm extends EntityForm {
    *   The configuration factory service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\domain_alias\DomainAliasStorageInterface $alias_storage
-   *   The alias storage.
-   * @param \Drupal\domain\DomainStorageInterface $domain_storage
-   *   The domain storage manager.
    */
-  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager, DomainAliasStorageInterface $alias_storage, DomainStorageInterface $domain_storage) {
+  public function __construct(DomainAliasValidatorInterface $validator, ConfigFactoryInterface $config, EntityTypeManagerInterface $entity_type_manager) {
     $this->validator = $validator;
     $this->config = $config;
     $this->entityTypeManager = $entity_type_manager;
-    $this->aliasStorage = $alias_storage;
-    $this->domainStorage = $domain_storage;
+    $this->aliasStorage = $entity_type_manager->getStorage('domain_alias');
+    $this->domainStorage = $entity_type_manager->getStorage('domain');
     // Not loaded directly since it is not an interface.
     $this->accessHandler = $this->entityTypeManager->getAccessControlHandler('domain');
   }
@@ -87,9 +83,7 @@ class DomainAliasForm extends EntityForm {
     return new static(
       $container->get('domain_alias.validator'),
       $container->get('config.factory'),
-      $container->get('entity_type.manager'),
-      $container->get('entity_type.manager')->getStorage('domain_alias'),
-      $container->get('entity_type.manager')->getStorage('domain')
+      $container->get('entity_type.manager')
     );
   }
 
