@@ -114,7 +114,14 @@ function _domain_bootstrap($phase) {
       // If the Domain Access module has been disabled, or if we're unable to interact with the database, stop loading.
       if (function_exists('db_query')) {
         $table = domain_get_primary_table('system');
-        $check = (bool) db_query("SELECT status FROM $table WHERE name = 'domain' AND type = 'module'")->fetchField();
+        $query = db_select($table, 'c')
+          ->fields('c', array('status'))
+          ->condition('name', 'domain')
+          ->condition('type', 'module')
+          ->execute()
+          ->fetchAssoc();
+        
+        $check = (bool) $query['status'];
         if (empty($check)) {
           return NULL;
         }
