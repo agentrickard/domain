@@ -985,7 +985,7 @@ function domain_save($values, $form_values = array()) {
   domain_static_reset();
 
   // In all cases, we need to force a menu rebuild, which also clears the cache.
-  menu_rebuild();
+  variable_set('menu_rebuild_needed', TRUE);
 
   return $domain;
 }
@@ -1042,7 +1042,7 @@ function domain_delete($domain, $values = array()) {
     ->execute();
 
   // In all cases, we need to force a menu rebuild, which also clears the cache.
-  menu_rebuild();
+  variable_set('menu_rebuild_needed', TRUE);
 
   // Notify that node access needs to be rebuilt.
   node_access_needs_rebuild(TRUE);
