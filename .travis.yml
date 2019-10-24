@@ -7,13 +7,13 @@ services:
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL=8.6.x
+    - env: DRUPAL=8.7.x
       php: 7.1
-    - env: DRUPAL=8.6.x
+    - env: DRUPAL=8.7.x
       php: 7.2
-    - env: DRUPAL=8.7.x
+    - env: DRUPAL=8.8.x
       php: 7.1
-    - env: DRUPAL=8.7.x
+    - env: DRUPAL=8.8.x
       php: 7.2
 
 addons:
