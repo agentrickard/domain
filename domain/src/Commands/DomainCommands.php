@@ -235,10 +235,9 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *   The field name to lookup.
    */
   public function getFieldEntities($field_name) {
-    $entity_manager = \Drupal::entityManager();
-    $field_map = $entity_manager->getFieldMap();
+    $this->ensureEntityFieldMap();
     $domain_entities = [];
-    foreach($field_map as $type => $fields) {
+    foreach($this->entity_field_map as $type => $fields) {
       if (array_key_exists($field_name, $fields)) {
         $domain_entities[] = $type;
       }
@@ -1178,8 +1177,8 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
   protected function ensureEntityFieldMap() {
     // Try to avoid repeated calls to getFieldMap() assuming it's expensive.
     if (empty($this->entity_field_map)) {
-      $entity_manager = \Drupal::entityManager();
-      $this->entity_field_map = $entity_manager->getFieldMap();
+      $entity_field_manager = \Drupal::service('entity_field.manager');
+      $this->entity_field_map = $entity_field_manager->getFieldMap();
     }
   }
 
