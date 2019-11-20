@@ -2,7 +2,3 @@ services:
   domain_alias.validator:
     class: Drupal\domain_alias\DomainAliasValidator
     arguments: ['@config.factory', '@entity_type.manager']
-  # @deprecated and will be removed for 8.x-1.0 release.
-  domain_alias.loader:
-    class: Drupal\domain_alias\DomainAliasLoader
-    arguments: ['@config.typed']
