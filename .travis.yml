@@ -7,13 +7,13 @@ services:
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL_INSTALL=drush dl drupal-8.7.x --drupal-project-rename=drupal UPDATE_PHPUNIT=composer run-script drupal-phpunit-upgrade
+    - env: DRUPAL_INSTALL="drush dl drupal-8.7.x --drupal-project-rename=drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade"
       php: 7.1
-    - env: DRUPAL_INSTALL=drush dl drupal-8.7.x --drupal-project-rename=drupal UPDATE_PHPUNIT=composer run-script drupal-phpunit-upgrade
+    - env: DRUPAL_INSTALL="drush dl drupal-8.7.x --drupal-project-rename=drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade"
       php: 7.2
-    - env: DRUPAL_INSTALL=composer create-project drupal/legacy-project:8.8.0-beta1 drupal UPDATE_PHPUNIT=""
+    - env: DRUPAL_INSTALL="composer create-project drupal/legacy-project:8.8.0-beta1 drupal" UPDATE_PHPUNIT=""
       php: 7.1
-    - env: DRUPAL_INSTALL=composer create-project drupal/legacy-project:8.8.0-beta1 drupal UPDATE_PHPUNIT=""
+    - env: DRUPAL_INSTALL="composer create-project drupal/legacy-project:8.8.0-beta1 drupal" UPDATE_PHPUNIT=""
       php: 7.2
 
 addons:
