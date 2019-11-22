@@ -7,13 +7,13 @@ services:
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL=8.7.x
+    - env: DRUPAL_INSTALL=drush dl drupal-8.7.x --drupal-project-rename=drupal UPDATE_PHPUNIT=composer run-script drupal-phpunit-upgrade
       php: 7.1
-    - env: DRUPAL=8.7.x
+    - env: DRUPAL_INSTALL=drush dl drupal-8.7.x --drupal-project-rename=drupal UPDATE_PHPUNIT=composer run-script drupal-phpunit-upgrade
       php: 7.2
-    - env: DRUPAL=8.8.x
+    - env: DRUPAL_INSTALL=composer create-project drupal/legacy-project:8.8.0-beta1 drupal UPDATE_PHPUNIT=""
       php: 7.1
-    - env: DRUPAL=8.8.x
+    - env: DRUPAL_INSTALL=composer create-project drupal/legacy-project:8.8.0-beta1 drupal UPDATE_PHPUNIT=""
       php: 7.2
 
 addons:
@@ -67,11 +67,11 @@ before_script:
   - cd ..
 
   # Download Drupal 8 core.
-  - travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
+  - travis_retry $DRUPAL_INSTALL
   - cd drupal
 
-  # Update PHPUnit.
-  - composer run-script drupal-phpunit-upgrade
+  # Update PHPUnit when needed (only 8.7).
+  - $UPDATE_PHPUNIT
 
   # Make the module appear in the correct place
   - ln -s $TESTDIR modules/domain
