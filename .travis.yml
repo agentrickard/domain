@@ -24,6 +24,11 @@ addons:
     - three.example.com
     - four.example.com
     - five.example.com
+    - six.example.com
+    - seven.example.com
+    - eight.example.com
+    - nine.example.com
+    - ten.example.com
 
 cache:
   directories:
