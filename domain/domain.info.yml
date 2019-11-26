@@ -5,6 +5,5 @@ package: Domain
 version: VERSION
 core: 8.x
 dependencies:
-  - drupal:system (>=8.5)
   - drupal:options
 configure: domain.admin
