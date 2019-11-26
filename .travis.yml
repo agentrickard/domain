@@ -8,13 +8,13 @@ matrix:
   fast_finish: true
   include:
     - env: DRUPAL=8.7.x
-      php: 7.1
+      php: 7.2
     - env: DRUPAL=8.7.x
-      php: 7.2
-    - env: DRUPAL=8.8.x
-      php: 7.1
+      php: 7.3
     - env: DRUPAL=8.8.x
       php: 7.2
+    - env: DRUPAL=8.8.x
+      php: 7.3
 
 addons:
   hosts:
@@ -71,7 +71,13 @@ before_script:
   - cd drupal
 
   # Update PHPUnit.
-  - composer run-script drupal-phpunit-upgrade
+  - |
+    if [ $DRUPAL == "8.7.x" ]; then
+      composer run-script drupal-phpunit-upgrade
+    fi
+
+  # Install dependencies.
+  - composer install
 
   # Make the module appear in the correct place
   - ln -s $TESTDIR modules/domain
