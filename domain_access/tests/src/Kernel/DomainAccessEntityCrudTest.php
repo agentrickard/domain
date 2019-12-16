@@ -8,9 +8,11 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 
 /**
+ * Tests creation of nodes and users before and after deleting required fields.
+ *
  * @group domain_access
  */
-class DomainAccessContentEntityCrudWithDeletedFieldsTest extends KernelTestBase {
+class DomainAccessEntityCrudTest extends KernelTestBase {
 
   use UserCreationTrait {
     createUser as drupalCreateUser;
