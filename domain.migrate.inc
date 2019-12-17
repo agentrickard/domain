@@ -103,6 +103,7 @@ class MigrateDestinationDomain extends MigrateDestination {
     // Check to see if this is a new domain.
     $update = FALSE;
     if ($data = domain_machine_name_load($domain['machine_name'])) {
+      $domain['domain_id'] = $data['domain_id'];
       $update = TRUE;
     }
 
