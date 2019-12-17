@@ -7,15 +7,14 @@ services:
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL=8.7.x
+    - env: DRUPAL_INSTALL="drush dl drupal-8.7.x --drupal-project-rename=drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade"
       php: 7.2
-    - env: DRUPAL=8.7.x
+    - env: DRUPAL_INSTALL="drush dl drupal-8.7.x --drupal-project-rename=drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade"
       php: 7.3
-    - env: DRUPAL=8.8.x
+    - env: DRUPAL_INSTALL="composer create-project drupal/legacy-project:8.8.x drupal" UPDATE_PHPUNIT=""
       php: 7.2
-    # PHPUnit update for 7.3 is failing.
-    #- env: DRUPAL=8.8.x
-    #  php: 7.3
+    - env: DRUPAL_INSTALL="composer create-project drupal/legacy-project:8.8.x drupal" UPDATE_PHPUNIT=""
+      php: 7.3
 
 addons:
   hosts:
@@ -25,6 +24,11 @@ addons:
     - three.example.com
     - four.example.com
     - five.example.com
+    - six.example.com
+    - seven.example.com
+    - eight.example.com
+    - nine.example.com
+    - ten.example.com
 
 cache:
   directories:
@@ -68,14 +72,11 @@ before_script:
   - cd ..
 
   # Download Drupal 8 core.
-  - travis_retry drush dl drupal-$DRUPAL --drupal-project-rename=drupal
+  - travis_retry $DRUPAL_INSTALL
   - cd drupal
 
-  # Update PHPUnit.
-  - |
-    if [ $DRUPAL == "8.7.x" ]; then
-      composer run-script drupal-phpunit-upgrade
-    fi
+  # Update PHPUnit when needed (only 8.7).
+  - $UPDATE_PHPUNIT
 
   # Install dependencies.
   - composer install
