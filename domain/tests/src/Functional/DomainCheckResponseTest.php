@@ -20,6 +20,8 @@ class DomainCheckResponseTest extends DomainTestBase {
 
     // Make a POST request on admin/config/domain/add.
     $edit = $this->domainPostValues();
+    // Use hostname with dot (.) to avoid validation error.
+    $edit['hostname'] = 'example.com';
     $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
 
     // Did it save correctly?
