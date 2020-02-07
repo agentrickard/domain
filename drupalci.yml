@@ -14,7 +14,7 @@ build:
         commands:
           - '/bin/bash -c "cd ${SOURCE_DIR}/modules/contrib/domain && chmod +x ./define_subdomains.sh && ./define_subdomains.sh"'
       run_tests.standard:
-        types: 'Simpletest,PHPUnit-Unit,PHPUnit-Build,PHPUnit-Kernel,PHPUnit-Functional'
+        types: 'PHPUnit-Unit,PHPUnit-Build,PHPUnit-Kernel,PHPUnit-Functional'
       run_tests.js:
         concurrency: 1
         types: 'PHPUnit-FunctionalJavascript'
