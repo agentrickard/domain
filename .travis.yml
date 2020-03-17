@@ -13,7 +13,7 @@ matrix:
       php: 7.3
     - env: DRUPAL_INSTALL="composer create-project drupal/legacy-project:8.8.x drupal" UPDATE_PHPUNIT=""
       php: 7.2
-    - env: DRUPAL_INSTALL="composer create-project drupal/legacy-project:8.8.x-dev drupal" UPDATE_PHPUNIT=""
+    - env: DRUPAL_INSTALL="composer create-project drupal/legacy-project:8.8.x drupal" UPDATE_PHPUNIT=""
       php: 7.3
 
 addons:
@@ -86,7 +86,7 @@ before_script:
 
   # Install drupal default profile
   - /usr/bin/env PHP_OPTIONS="-d sendmail_path=$(which true)" drush --yes --verbose site-install minimal --db-url=mysql://root:@127.0.0.1/domain
-  - drush --yes en simpletest domain domain_access domain_alias domain_config domain_source
+  - drush --yes en domain domain_access domain_alias domain_config domain_source
   - drush cr
 
   # Start a web server on port 8080 in the background.
