@@ -7,7 +7,7 @@ services:
 matrix:
   fast_finish: true
   include:
-    - env: DRUPAL_BRANCH="8.8.x" drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade" MODULE_LIST="simpletest domain domain_access domain_alias domain_config domain_source"
+    - env: DRUPAL_BRANCH="8.8.x" drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade" MODULE_LIST="domain domain_access domain_alias domain_config domain_source"
       php: 7.3
 
 addons:
@@ -89,12 +89,9 @@ before_script:
   # Wait until the web server is responding.
   - until curl -s example.com:8080; do true; done > /dev/null
 
+  # Export PHP Unit vars
+  - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
+  - export SIMPLETEST_BASE_URL='http://example.com:8080'
+
 script:
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_access
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Kernel" --php `which php` --url http://example.com:8080 domain_alias
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_config
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_content
-  - php core/scripts/run-tests.sh --suppress-deprecations --verbose --color --concurrency 20 --types "PHPUnit-Functional" --php `which php` --url http://example.com:8080 domain_source
+  - vendor/bin/phpunit -c core --group domain modules/domain
