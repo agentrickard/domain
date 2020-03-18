@@ -10,15 +10,6 @@ use Drupal\Tests\domain\Functional\DomainTestBase;
 abstract class DomainContentTestBase extends DomainTestBase {
 
   /**
-   * Disabled config schema checking.
-   *
-   * Domain Content is having issues with schema definition.
-   *
-   * @var bool
-   */
-  protected $strictConfigSchema = FALSE;
-
-  /**
    * Modules to enable.
    *
    * @var array

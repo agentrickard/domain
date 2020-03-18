@@ -100,7 +100,7 @@ function domain_access_node_access_records(NodeInterface $node) {
       }
     }
     // Set the domain_site grant.
-    if (!empty($translation->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $translation->isPublished()) {
+    if ($translation->hasField(DOMAIN_ACCESS_ALL_FIELD) && !empty($translation->get(DOMAIN_ACCESS_ALL_FIELD)->value) && $translation->isPublished()) {
       $grants[] = [
         'realm' => 'domain_site',
         'gid' => 0,
@@ -150,6 +150,10 @@ function domain_access_user_presave(EntityInterface $account) {
  * Handles presave operations for devel generate.
  */
 function domain_access_presave_generate(EntityInterface $entity) {
+  if (!$entity->hasField(DOMAIN_ACCESS_ALL_FIELD)) {
+    return;
+  }
+
   // There is a core bug https://www.drupal.org/node/2609252 that causes a
   // fatal database errors if the boolean DOMAIN_ACCESS_ALL_FIELD is set when
   // a user cannot access the field. See domain_access_entity_field_access().
@@ -421,11 +425,13 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
 
 /**
  * Implements hook_entity_field_access().
+ *
+ * Hides the domain access fields from the entity add/edit forms
+ * when the user cannot access them.
  */
 function domain_access_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
-  // Hide the domain access fields from the entity add/edit forms
-  // when the user cannot access them.
-  if ($operation != 'edit') {
+  // If not editing an entity, do nothing.
+  if ($operation !== 'edit' || empty($items)) {
     return AccessResult::neutral();
   }
 
@@ -607,7 +613,7 @@ function domain_access_views_data_alter(array &$data) {
       'field' => DOMAIN_ACCESS_FIELD . '_target_id',
       'id' => 'domain_access_current_all_filter',
       'title' => t('Available on current domain'),
-      'help' => t('Filters out nodes not available on current domain (published to current domain or all affiliates).'),
+      'help' => t('Filters out nodes available on current domain (published to current domain or all affiliates).'),
     ],
   ];
   // Since domains are not stored in the database, relationships cannot be used.

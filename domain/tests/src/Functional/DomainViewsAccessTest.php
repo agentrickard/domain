@@ -17,15 +17,6 @@ class DomainViewsAccessTest extends DomainTestBase {
   public static $modules = ['domain', 'node', 'views', 'block'];
 
   /**
-   * Disabled config schema checking.
-   *
-   * @var bool
-   *
-   * @TODO: https://github.com/agentrickard/domain/issues/200
-   */
-  protected $strictConfigSchema = FALSE;
-
-  /**
    * Test inactive domain.
    */
   public function testInactiveDomain() {
@@ -50,20 +41,20 @@ class DomainViewsAccessTest extends DomainTestBase {
       if (in_array($domain->id(), $allowed)) {
         $this->assertResponse('200', 'Access allowed');
         $this->assertRaw('admin');
-        $this->assertRaw($this->user->getUsername());
+        $this->assertRaw($this->user->getAccountName());
       }
       else {
         $this->assertResponse('403', 'Access denied');
         $this->assertNoRaw('admin');
-        $this->assertNoRaw($this->user->getUsername());
+        $this->assertNoRaw($this->user->getAccountName());
       }
       // Test the block on another page.
       $this->drupalGet($domain->getPath());
       if (in_array($domain->id(), $allowed)) {
-        $this->assertRaw($this->user->getUsername());
+        $this->assertRaw($this->user->getAccountName());
       }
       else {
-        $this->assertNoRaw($this->user->getUsername());
+        $this->assertNoRaw($this->user->getAccountName());
       }
     }
   }

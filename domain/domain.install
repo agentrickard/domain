@@ -15,6 +15,20 @@ function domain_install() {
 }
 
 /**
+ * Implements hook_uninstall().
+ *
+ * Core does not properly purge field provided by configuration entities.
+ * There are a few related issues and @todo notices in core to this effect.
+ * Instead, we handle field purges ourselves.
+ */
+function domain_uninstall() {
+  // Do a pass of purging on deleted Field API data, if any exists.
+  $limit = \Drupal::config('field.settings')->get('purge_batch_size');
+  field_purge_batch($limit);
+  \Drupal::entityTypeManager()->clearCachedDefinitions();
+}
+
+/**
  * Implements hook_update_N().
  *
  * Installs the domain admin field on users.

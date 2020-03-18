@@ -3,14 +3,14 @@
 namespace Drupal\domain_access\Plugin\views\field;
 
 use Drupal\views\ResultRow;
-use Drupal\views\Plugin\views\field\Field;
+use Drupal\views\Plugin\views\field\EntityField;
 
 /**
  * Field handler to present the link an entity on a domain.
  *
  * @ViewsField("domain_access_field")
  */
-class DomainAccessField extends Field {
+class DomainAccessField extends EntityField {
 
   /**
    * {@inheritdoc}

@@ -298,7 +298,7 @@ function drush_domain_generate_domains($primary = 'example.com') {
  */
 function drush_domain_generate_domains_validate($primary = 'example.com') {
   if ($empty = drush_get_option('empty')) {
-    db_query("TRUNCATE TABLE {domain}");
+    \Drupal::database()->truncate("domain")->execute();
   }
   return;
   // TODO: Add validation.

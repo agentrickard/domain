@@ -101,12 +101,12 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $node = $node_storage->load(1);
     // Check that the value is set.
     $value = domain_source_get($node);
-    $this->assertTrue($value == $two, 'Node saved with proper source record.');
+    $this->assertEquals($two, $value, 'Node saved with proper source record.');
 
     // Test the URL.
     $url = $node->toUrl()->toString();
     $expected_url = $two_path . 'node/1';
-    $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
+    $this->assertEquals($expected_url, $url, 'URL rewritten correctly.');
 
     // Try to post a node, assigned to no domain.
     $edit['title[0][value]'] = 'Test node';
@@ -121,7 +121,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Test the url.
     $url = $node->toUrl()->toString();
     $expected_url = base_path() . 'node/2';
-    $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
+    $this->assertEquals($expected_url, $url, 'URL rewritten correctly.');
 
     // Place the menu block.
     $this->drupalPlaceBlock('system_menu_block:main');
@@ -145,7 +145,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $node = $node_storage->load(3);
     $url = $node->toUrl()->toString();
     $expected_url = $two_path . 'node/3';
-    $this->assertTrue($expected_url == $url, 'URL rewritten correctly.');
+    $this->assertEquals($expected_url, $url, 'URL rewritten correctly.');
     // Load the page with a menu and check that link.
     $this->drupalGet('node/3');
     $this->assertRaw('href="' . $url, 'Menu link rewritten correctly.');
@@ -153,7 +153,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Remove the field from the node type and make sure nothing breaks.
     // See https://www.drupal.org/node/2892612
     $id = 'node.article.field_domain_source';
-    if ($field = \Drupal::entityManager()->getStorage('field_config')->load($id)) {
+    if ($field = \Drupal::entityTypeManager()->getStorage('field_config')->load($id)) {
       $field->delete();
       field_purge_batch(10, $field->uuid());
       drupal_flush_all_caches();
@@ -167,8 +167,8 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Test the URL against expectations, and the rendered menu link.
     $node = $node_storage->load(4);
     $url = $node->toUrl()->toString();
-    $expected_url = '/node/4';
-    $this->assertTrue($expected_url == $url, 'No URL rewrite performed.');
+    $expected_url = base_path() . 'node/4';
+    $this->assertEquals($expected_url, $url, 'No URL rewrite performed.');
   }
 
 }

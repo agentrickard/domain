@@ -75,7 +75,7 @@ class DomainNavBlockTest extends DomainTestBase {
     // Confirm domain links.
     foreach ($domains as $id => $domain) {
       $this->findLink($domain->getHostname());
-      $this->assertRaw($domain->buildUrl('/user/login'));
+      $this->assertRaw($domain->buildUrl(base_path() . 'user/login'));
     }
 
     // Now update the configuration and test again.

@@ -44,11 +44,11 @@ class DomainSourceParameterTest extends DomainTestBase {
     }
     $source = $domains[$id];
     $uri_path = '/' . $path;
-    $expected = $uri_path . '?_format=json';
+    $expected = base_path() . $path . '?_format=json';
 
     // Get the link using Url::fromUserInput()
     $url = URL::fromUserInput($uri_path, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUserInput: ' . $url . ' expected: ' . $expected);
+    $this->assertEquals($expected, $url, 'fromUserInput');
   }
 
 }

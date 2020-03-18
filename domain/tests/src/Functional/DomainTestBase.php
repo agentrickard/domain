@@ -42,6 +42,13 @@ abstract class DomainTestBase extends BrowserTestBase {
   protected $profile = 'standard';
 
   /**
+   * The database connection.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -49,6 +56,8 @@ abstract class DomainTestBase extends BrowserTestBase {
 
     // Set the base hostname for domains.
     $this->baseHostname = \Drupal::entityTypeManager()->getStorage('domain')->createHostname();
+
+    $this->database = $this->getDatabaseConnection();
   }
 
   /**
@@ -208,7 +217,7 @@ abstract class DomainTestBase extends BrowserTestBase {
     }
     // The session ID is hashed before being stored in the database.
     // @see \Drupal\Core\Session\SessionHandler::read()
-    return (bool) db_query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", [':sid' => Crypt::hashBase64($account->session_id)])->fetchField();
+    return (bool) $this->database->query("SELECT sid FROM {users_field_data} u INNER JOIN {sessions} s ON u.uid = s.uid WHERE s.sid = :sid", [':sid' => Crypt::hashBase64($account->session_id)])->fetchField();
   }
 
   /**
@@ -230,7 +239,7 @@ abstract class DomainTestBase extends BrowserTestBase {
     // Login.
     $url = $domain->getPath() . 'user/login';
     $this->submitForm([
-      'name' => $account->getUsername(),
+      'name' => $account->getAccountName(),
       'pass' => $account->passRaw,
     ], t('Log in'));
 

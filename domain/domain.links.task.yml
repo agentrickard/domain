@@ -6,3 +6,13 @@ domain.settings:
   title: Domain settings
   route_name: domain.settings
   base_route: domain.admin
+entity.domain.edit_form:
+  route_name: entity.domain.edit_form
+  base_route: entity.domain.edit_form
+  title: Edit
+  weight: 10
+entity.domain.delete_form:
+  route_name: entity.domain.delete_form
+  base_route: entity.domain.edit_form
+  title: Delete
+  weight: 20
