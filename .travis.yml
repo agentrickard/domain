@@ -94,6 +94,7 @@ before_script:
   # Export PHP Unit vars
   - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
   - export SIMPLETEST_BASE_URL='http://example.com:8080'
+  - export SYMFONY_DEPRECATIONS_HELPER='disabled'
 
 script:
   - vendor/bin/phpunit -c core --group domain modules/domain -v
