@@ -441,6 +441,8 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
         return;
       }
       // TODO: handle deletion of all domains.
+      $policy_users = "ignore";
+      $message = dt('All domain records have been deleted.');
     }
     elseif ($domain = $this->getDomainFromArgument($domain_id)) {
       if ($domain->isDefault()) {
@@ -448,6 +450,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
           Use drush domain:default to set a new default domain.');
       }
       $domains = [$domain];
+      $message = dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
     }
 
     if (!empty($options['users-assign'])) {
@@ -475,7 +478,6 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
 
     $this->deleteDomain($domains, $options);
 
-    $message = dt('Domain record !domain deleted.', ['!domain' => $domain->id()]);
     if ($messages) {
       $message .= "\n" . implode("\n", $messages);
     }
