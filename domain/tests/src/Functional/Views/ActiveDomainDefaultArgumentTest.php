@@ -3,16 +3,15 @@
 namespace Drupal\Tests\domain\Functional\Views;
 
 use Drupal\Core\Url;
+use Drupal\Tests\domain\Functional\DomainTestBase;
 use Drupal\Tests\domain\Traits\DomainTestTrait;
-use Drupal\Tests\views\Functional\ViewTestBase;
-use Drupal\views\Tests\ViewTestData;
 
 /**
  * Tests the active_domain default argument.
  *
  * @group domain
  */
-class ActiveDomainDefaultArgumentTest extends ViewTestBase {
+class ActiveDomainDefaultArgumentTest extends DomainTestBase {
 
   use DomainTestTrait;
 
@@ -24,14 +23,7 @@ class ActiveDomainDefaultArgumentTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['node', 'domain', 'domain_test_views'];
-
-  /**
-   * Views used by this test.
-   *
-   * @var array
-   */
-  public static $testViews = ['test_active_domain_argument'];
+  public static $modules = ['node', 'domain', 'domain_access', 'domain_test_views'];
 
   /**
    * Data mapping.
@@ -44,16 +36,8 @@ class ActiveDomainDefaultArgumentTest extends ViewTestBase {
    * {@inheritdoc}
    */
   protected function setUp($import_test_views = TRUE) {
-    parent::setUp($import_test_views);
-
-    if ($import_test_views) {
-      ViewTestData::createTestViews(get_class($this), ['domain_test_views']);
-    }
-
-    $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
-    $this->container->get('module_installer')->install(['domain_access']);
-
-    $this->domainCreateTestDomains(3, 'example.com');
+    parent::setUp();
+    $this->domainCreateTestDomains(3);
     $this->createTestData();
   }
 
