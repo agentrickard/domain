@@ -194,7 +194,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
         $urls[$domain->id()] = $url->toString();
       }
       else {
-        $urls[$domain->id()] = trim($domain->getPath(), '/') . $url->toString();
+        $urls[$domain->id()] = $domain->buildUrl($url->toString());
       }
     }
     return $urls;

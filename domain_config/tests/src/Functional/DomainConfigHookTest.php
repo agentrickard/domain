@@ -30,7 +30,7 @@ class DomainConfigHookTest extends BrowserTestBase {
   public function testHookRuns() {
     $this->drupalGet('user/login');
     $user = $this->drupalCreateUser([]);
-    $edit = ['name' => $user->getUserName(), 'pass' => $user->passRaw];
+    $edit = ['name' => $user->getAccountName(), 'pass' => $user->passRaw];
     $this->drupalPostForm(NULL, $edit, t('Log in'));
 
     $test = \Drupal::state()->get('domain_config_test__user_login', NULL);

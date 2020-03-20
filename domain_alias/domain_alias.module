@@ -27,8 +27,12 @@ use Drupal\Core\Session\AccountInterface;
  * These patterns should be sufficient for most conditions.
  */
 function domain_alias_domain_request_alter(DomainInterface &$domain) {
+  // During the installation the entity definition is not yet added when this
+  // hook is invoked, so skip if not present.
+  $has_definition = \Drupal::entityTypeManager()->hasDefinition('domain_alias');
+
   // If an exact match has loaded, do nothing.
-  if ($domain->getMatchType() == DomainNegotiator::DOMAIN_MATCH_EXACT) {
+  if ($domain->getMatchType() === DomainNegotiator::DOMAIN_MATCH_EXACT || !$has_definition) {
     return;
   }
   // If no exact match, then run the alias load routine.
@@ -97,7 +101,7 @@ function domain_alias_domain_load($entities) {
   $active = $negotiator->getActiveDomain();
 
   // Do nothing if no domain is active.
-  if (is_null($active)) {
+  if (empty($active)) {
     return;
   }
 

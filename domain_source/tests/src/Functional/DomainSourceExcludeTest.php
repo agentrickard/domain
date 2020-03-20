@@ -56,15 +56,15 @@ class DomainSourceExcludeTest extends DomainTestBase {
 
     // Get the link using Url::fromRoute().
     $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromRoute');
+    $this->assertEquals($expected, $url, 'fromRoute');
 
     // Get the link using Url::fromUserInput()
     $url = URL::fromUserInput($uri_path, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUserInput');
+    $this->assertEquals($expected, $url, 'fromUserInput');
 
     // Get the link using Url::fromUri()
     $url = URL::fromUri($uri, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUri');
+    $this->assertEquals($expected, $url, 'fromUri');
 
     // Exclude the edit path from rewrites.
     $config = $this->config('domain_source.settings');
@@ -72,7 +72,7 @@ class DomainSourceExcludeTest extends DomainTestBase {
 
     // Variables for our tests.
     $path = 'node/1/edit';
-    $expected = '/' . $path;
+    $expected = base_path() . $path;
     $route_name = 'entity.node.edit_form';
     $route_parameters = ['node' => 1];
     $uri = 'internal:/' . $path;
@@ -84,15 +84,15 @@ class DomainSourceExcludeTest extends DomainTestBase {
 
     // Get the link using Url::fromRoute().
     $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromRoute' . $url);
+    $this->assertEquals($expected, $url, 'fromRoute');
 
     // Get the link using Url::fromUserInput()
     $url = URL::fromUserInput($uri_path, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUserInput');
+    $this->assertEquals($expected, $url, 'fromUserInput');
 
     // Get the link using Url::fromUri()
     $url = URL::fromUri($uri, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUri');
+    $this->assertEquals($expected, $url, 'fromUri');
   }
 
 }

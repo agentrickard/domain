@@ -3,6 +3,7 @@
 namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 
 /**
@@ -43,7 +44,7 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
   public function testDomainAccessEntityFields() {
     $label = 'Send to all affiliates';
     // Create a vocabulary.
-    $vocabulary = entity_create('taxonomy_vocabulary', [
+    $vocabulary = Vocabulary::create([
       'name' => 'Domain vocabulary',
       'description' => 'Test taxonomy for Domain Access',
       'vid' => 'domain_access',

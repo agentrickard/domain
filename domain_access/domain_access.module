@@ -154,6 +154,10 @@ function domain_access_user_presave(EntityInterface $account) {
  * Handles presave operations for devel generate.
  */
 function domain_access_presave_generate(EntityInterface $entity) {
+  if (!$entity->hasField(DOMAIN_ACCESS_ALL_FIELD)) {
+    return;
+  }
+
   // There is a core bug https://www.drupal.org/node/2609252 that causes a
   // fatal database errors if the boolean DOMAIN_ACCESS_ALL_FIELD is set when
   // a user cannot access the field. See domain_access_entity_field_access().
@@ -425,11 +429,13 @@ function domain_access_node_create_access(AccountInterface $account, $context, $
 
 /**
  * Implements hook_entity_field_access().
+ *
+ * Hides the domain access fields from the entity add/edit forms
+ * when the user cannot access them.
  */
 function domain_access_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
-  // Hide the domain access fields from the entity add/edit forms
-  // when the user cannot access them.
-  if ($operation != 'edit') {
+  // If not editing an entity, do nothing.
+  if ($operation !== 'edit' || empty($items)) {
     return AccessResult::neutral();
   }
 

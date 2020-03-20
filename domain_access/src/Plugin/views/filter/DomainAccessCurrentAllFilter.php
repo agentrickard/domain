@@ -43,15 +43,23 @@ class DomainAccessCurrentAllFilter extends BooleanOperator {
   public function query() {
     $this->ensureMyTable();
     $all_table = $this->query->addTable('node__field_domain_all_affiliates', $this->relationship);
-    $current_domain = \Drupal::service('domain.negotiator')->getActiveId();
+    $all_field = $all_table . '.field_domain_all_affiliates_value';
+    $real_field = $this->tableAlias . '.' . $this->realField;
+    /** @var DomainNegotiatorInterface $domain_negotiator */
+    $domain_negotiator = \Drupal::service('domain.negotiator');
+    $current_domain = $domain_negotiator->getActiveDomain();
+    $current_domain_id = $current_domain->id();
     if (empty($this->value)) {
-      // @TODO proper handling of NULL?
-      $where = "$this->tableAlias.$this->realField <> '$current_domain'";
-      $where = '(' . $where . " OR $this->tableAlias.$this->realField IS NULL)";
-      $where = '(' . $where . " AND ($all_table.field_domain_all_affiliates_value = 0 OR $all_table.field_domain_all_affiliates_value IS NULL))";
+      $where = "(($real_field <> '$current_domain_id' OR $real_field IS NULL) AND ($all_field = 0 OR $all_field IS NULL))";
+      if ($current_domain->isDefault()) {
+        $where = "($real_field <> '$current_domain_id' AND ($all_field = 0 OR $all_field IS NULL))";
+      }
     }
     else {
-      $where = "($this->tableAlias.$this->realField = '$current_domain' OR $all_table.field_domain_all_affiliates_value = 1)";
+      $where = "($real_field = '$current_domain_id' OR $all_field = 1)";
+      if ($current_domain->isDefault()) {
+        $where = "(($real_field = '$current_domain_id' OR $real_field IS NULL) OR $all_field = 1)";
+      }
     }
     $this->query->addWhereExpression($this->options['group'], $where);
     // This filter causes duplicates.
