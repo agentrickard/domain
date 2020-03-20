@@ -53,7 +53,7 @@ class ActiveDomainDefaultArgumentTest extends ViewTestBase {
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
     $this->container->get('module_installer')->install(['domain_access']);
 
-    $this->domainCreateTestDomains(3, 'example.com');
+    $this->domainCreateTestDomains(3);
     $this->createTestData();
   }
 

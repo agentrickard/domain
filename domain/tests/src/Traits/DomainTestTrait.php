@@ -21,7 +21,8 @@ trait DomainTestTrait {
    * @param int $count
    *   The number of domains to create.
    * @param string|null $base_hostname
-   *   The root domain to use for domain creation (e.g. example.com).
+   *   The root domain to use for domain creation (e.g. example.com). You should
+   *   normally leave this blank to account for alternate test environments.
    * @param array $list
    *   An optional list of subdomains to apply instead of the default set.
    */
