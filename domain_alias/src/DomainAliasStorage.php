@@ -2,15 +2,12 @@
 
 namespace Drupal\domain_alias;
 
-use Drupal\Component\Uuid\UuidInterface;
-use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\Entity\ConfigEntityStorage;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\domain\DomainInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Alias loader utility class.
@@ -25,38 +22,42 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
   protected $typedConfig;
 
   /**
-   * Constructs a DomainAliasStorage object.
+   * The request stack object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
-   *   The entity type definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
-   *   The UUID service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
-   *   The memory cache.
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+
+  /**
+   * Sets the TypedConfigManager dependency.
+   *
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed config handler.
    */
-  public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, TypedConfigManagerInterface $typed_config) {
-    parent::__construct($entity_type, $config_factory, $uuid_service, $language_manager, $memory_cache);
+  protected function setTypedConfigManager(TypedConfigManagerInterface $typed_config) {
     $this->typedConfig = $typed_config;
+  }
+
+  /**
+   * Sets the request stack object dependency.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack object.
+   */
+  protected function setRequestStack(RequestStack $request_stack) {
+    $this->requestStack = $request_stack;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
-    return new static(
-      $entity_type,
-      $container->get('config.factory'),
-      $container->get('uuid'),
-      $container->get('language_manager'),
-      $container->get('entity.memory_cache'),
-      $container->get('config.typed')
-    );
+    $instance = parent::createInstance($container, $entity_type);
+    $instance->setTypedConfigManager($container->get('config.typed'));
+    $instance->setRequestStack($container->get('request_stack'));
+
+    return $instance;
   }
 
   /**
@@ -138,22 +139,26 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
     $parts = explode('.', $hostname);
     $count = count($parts);
     // Account for ports.
+    $port = null;
     if (substr_count($hostname, ':') > 0) {
+      // extract port
       $ports = explode(':', $parts[$count - 1]);
+      // remove port part
       $parts[$count - 1] = preg_replace('/:(\d+)/', '', $parts[$count - 1]);
-      $parts[] = $ports[1];
+      // save port for later
+      $port = $ports[1];
     }
+
     // Build the list of possible matching patterns.
     $patterns = $this->buildPatterns($parts);
     // Pattern lists are sorted based on the fewest wildcards. That gives us
     // more precise matches first.
     uasort($patterns, [$this, 'sort']);
-    array_unshift($patterns, $hostname);
+    // Re-assemble parts without port
+    array_unshift($patterns, implode('.', $parts));
 
     // Account for ports.
-    if (isset($ports)) {
-      $patterns = $this->buildPortPatterns($patterns, $hostname);
-    }
+    $patterns = $this->buildPortPatterns($patterns, $hostname, $port);
 
     // Return unique patters.
     return array_unique($patterns);
@@ -214,38 +219,24 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
    * @return array
    *   An array of eligible matching patterns, modified by port.
    */
-  private function buildPortPatterns(array $patterns, $hostname) {
+  private function buildPortPatterns(array $patterns, $hostname, $port) {
+    // Fetch the port if empty
+    if (empty($port)) {
+      $port = $this->requestStack->getCurrentRequest()->getPort();
+    }
+
+    $new_patterns = [];
     foreach ($patterns as $index => $pattern) {
-      // Make a pattern for port wildcards.
-      if (substr_count($pattern, ':') < 1) {
-        $new = explode('.', $pattern);
-        $port = (int) array_pop($new);
-        $allow = FALSE;
-        // Do not allow *.* or *:*.
-        foreach ($new as $item) {
-          if ($item != '*') {
-            $allow = TRUE;
-          }
-        }
-        if ($allow) {
-          // For port 80, allow bare hostname matches.
-          if ($port == 80) {
-            // Base hostname with port.
-            $patterns[] = str_replace(':' . $port, '', $hostname);
-            // Base hostname is allowed.
-            $patterns[] = implode('.', $new);
-          }
-          // Base hostname with wildcard port.
-          $patterns[] = str_replace(':' . $port, ':*', $hostname);
-          // Pattern with exact port.
-          $patterns[] = implode('.', $new) . ':' . $port;
-          // Pattern with wildcard port.
-          $patterns[] = implode('.', $new) . ':*';
-        }
-        unset($patterns[$index]);
+      // If default ports, allow exact no-port alias
+      $new_patterns[] = $pattern . ':*';
+      if (empty($port) || $port == 80 || $port == 443) {
+        $new_patterns[] = $pattern;
+      }
+      if ( !empty($port) ) {
+        $new_patterns[] = $pattern . ':' . $port;
       }
     }
-    return $patterns;
+    return $new_patterns;
   }
 
 }
