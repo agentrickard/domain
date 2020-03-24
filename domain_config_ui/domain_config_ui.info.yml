@@ -3,6 +3,7 @@ description: 'Allows saving of domain specific configuration through the adminis
 type: module
 package: Domain
 core: 8.x
+core_version_requirement: ^8 || ^9
 configure: domain_config_ui.settings
 dependencies:
   - domain:domain_config
