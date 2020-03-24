@@ -1,7 +1,8 @@
 <?php
 
-namespace Drupal\Tests\domain_config_ui\Functional;
+namespace Drupal\Tests\domain_config_ui\FunctionalJavaScript;
 
+use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\domain_config\Functional\DomainConfigTestBase;
 use Drupal\Tests\domain_config_ui\Traits\DomainConfigUITestTrait;
 use Drupal\domain\DomainInterface;
@@ -9,9 +10,9 @@ use Drupal\domain\DomainInterface;
 /**
  * Tests the domain config user interface.
  *
- * @group domain_config_ui
+ * @group domain_config_ui-broken
  */
-class DomainConfigUIOverrideTest extends DomainConfigTestBase {
+class DomainConfigUIOverrideTest extends WebDriverTestBase {
 
   use DomainConfigUITestTrait;
 
@@ -26,6 +27,7 @@ class DomainConfigUIOverrideTest extends DomainConfigTestBase {
 
   public function setUp() {
     parent::setUp();
+    DomainConfigTestBase::setUp();
 
     $this->createAdminUser();
     $this->createEditorUser();
