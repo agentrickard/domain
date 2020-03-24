@@ -14,8 +14,16 @@ class DomainConfigUISettingsTest extends DomainConfigTestBase {
 
   use DomainConfigUITestTrait;
 
+  /**
+   *  @var Drupal\Core\Session\AccountInterface
+   *  A user with full permissions to use the module.
+   */
   protected $admin_user;
 
+  /**
+   *  @var Drupal\Core\Session\AccountInterface
+   *  A user with access to site administration but not this module.
+   */
   protected $editor_user;
 
   /**
