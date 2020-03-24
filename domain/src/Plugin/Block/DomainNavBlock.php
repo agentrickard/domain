@@ -112,12 +112,11 @@ class DomainNavBlock extends DomainBlockBase {
     /** @var \Drupal\domain\DomainInterface $domain */
     foreach (\Drupal::entityTypeManager()->getStorage('domain')->loadMultipleSorted() as $domain) {
       // Set the URL.
-      $options = ['absolute' => TRUE, 'https' => ($domain->getScheme() == 'https')];
       if ($add_path) {
-        $url = Url::fromUri($domain->getUrl(), $options);
+        $url = Url::fromUri($domain->getUrl());
       }
       else {
-        $url = Url::fromUri($domain->getPath(), $options);
+        $url = Url::fromUri($domain->getPath());
       }
       // Set the label text.
       $label = $domain->label();
