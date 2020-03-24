@@ -15,18 +15,6 @@ class DomainConfigUISettingsTest extends DomainConfigTestBase {
   use DomainConfigUITestTrait;
 
   /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with full permissions to use the module.
-   */
-  protected $admin_user;
-
-  /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with access to site administration but not this module.
-   */
-  protected $editor_user;
-
-  /**
    * Modules to enable.
    *
    * @var array
@@ -38,29 +26,11 @@ class DomainConfigUISettingsTest extends DomainConfigTestBase {
   public function setUp() {
     parent::setUp();
 
-    // Create users.
-    $this->admin_user = $this->drupalCreateUser([
-      'administer domains',
-      'administer domain config ui',
-      'use domain config ui',
-      'administer languages',
-      'access administration pages',
-      'administer site configuration',
-    ]);
-
-    // Create users.
-    $this->editor_user = $this->drupalCreateUser([
-      'administer languages',
-      'access administration pages',
-      'administer site configuration',
-    ]);
+    $this->createAdminUser();
+    $this->createEditorUser();
 
     $this->domainCreateTestDomains(5);
-    // Assign the admin_user to some domains.
-    // $entity_type, $entity_id, $ids, $field
-    $this->addDomainsToEntity('user', $this->admin_user->id(), ['example_com', 'one_example_com'], DOMAIN_ADMIN_FIELD);
   }
-
 
   /**
    * Tests access the the settings form.

@@ -15,24 +15,6 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
   use DomainConfigUITestTrait;
 
   /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with full permissions to use the module.
-   */
-  protected $admin_user;
-
-  /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with access to domains but not language.
-   */
-  protected $editor_user;
-
-  /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with permission to domains and language.
-   */
-  protected $language_user;
-
-  /**
    * Modules to enable.
    *
    * @var array
@@ -44,36 +26,14 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
   public function setUp() {
     parent::setUp();
 
-    // Create users.
-    $this->admin_user = $this->drupalCreateUser([
-      'administer domains',
-      'administer domain config ui',
-      'use domain config ui',
-      'translate domain configuration',
-      'administer languages',
-      'access administration pages',
-      'administer site configuration',
-    ]);
-
-    // Create users.
-    $this->editor_user = $this->drupalCreateUser([
-      'access administration pages',
-      'use domain config ui',
-      'administer site configuration',
-    ]);
-
-    // Create users.
-    $this->language_user = $this->drupalCreateUser([
-      'access administration pages',
-      'use domain config ui',
-      'translate domain configuration',
-      'administer site configuration',
-    ]);
+    $this->createAdminUser();
+    $this->createLimitedUser();
+    $this->createLanguageUser();
 
     $this->domainCreateTestDomains(5);
     // Assign the admin_user and editor_user to some domains.
     // $entity_type, $entity_id, $ids, $field
-    $this->addDomainsToEntity('user', $this->editor_user->id(), ['example_com', 'one_example_com'], DOMAIN_ADMIN_FIELD);
+    $this->addDomainsToEntity('user', $this->limited_user->id(), ['example_com', 'one_example_com'], DOMAIN_ADMIN_FIELD);
     $this->addDomainsToEntity('user', $this->language_user->id(), ['two_example_com', 'three_example_com'], DOMAIN_ADMIN_FIELD);
   }
 
@@ -81,7 +41,7 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
   /**
    * Tests access the the settings form.
    */
-  public function testDomainConfigUISettingsAccess() {
+  public function testDomainConfigUIOptions() {
     $this->drupalLogin($this->admin_user);
     $path = '/admin/config/domain/config-ui';
     $path2 = '/admin/config/system/site-information';
@@ -110,7 +70,7 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
     }
 
     // Now test the editor_user.
-    $this->drupalLogin($this->editor_user);
+    $this->drupalLogin($this->limited_user);
 
     // Visit the domain config ui administration page.
     $this->drupalGet($path);
