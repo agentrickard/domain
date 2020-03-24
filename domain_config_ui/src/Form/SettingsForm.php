@@ -66,7 +66,6 @@ class SettingsForm extends ConfigFormBase {
       }
       $exists[] = $page;
     }
-
   }
 
   /**
