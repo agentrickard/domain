@@ -32,10 +32,7 @@ class ConfigFactory extends CoreConfigFactory {
    * @param \Drupal\domain_config_ui\DomainConfigUIManager $domain_config_ui_manager
    *   The domain config UI manager.
    */
-  public function __construct(StorageInterface $storage,
-    EventDispatcherInterface $event_dispatcher,
-    TypedConfigManagerInterface $typed_config,
-    DomainConfigUIManager $domain_config_ui_manager) {
+  public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config, DomainConfigUIManager $domain_config_ui_manager) {
     parent::__construct($storage, $event_dispatcher, $typed_config);
     $this->domainConfigUIManager = $domain_config_ui_manager;
   }
