@@ -36,13 +36,15 @@ trait DomainConfigUITestTrait {
    */
   public function createAdminUser() {
     $this->admin_user = $this->drupalCreateUser([
+      'access administration pages',
+      'access content',
       'administer domains',
       'administer domain config ui',
-      'use domain config ui',
+      'administer site configuration',
       'administer languages',
       'translate domain configuration',
-      'access administration pages',
-      'administer site configuration',
+      'use domain config ui',
+      'view domain information',
     ]);
   }
 
@@ -51,9 +53,10 @@ trait DomainConfigUITestTrait {
    */
   public function createEditorUser() {
     $this->editor_user = $this->drupalCreateUser([
-      'administer languages',
       'access administration pages',
+      'access content',
       'administer site configuration',
+      'administer languages',
     ]);
   }
 
@@ -62,13 +65,12 @@ trait DomainConfigUITestTrait {
    */
   public function createLimitedUser() {
     $this->limited_user = $this->drupalCreateUser([
-      'administer languages',
       'access administration pages',
-      'use domain config ui',
+      'administer languages',
       'administer site configuration',
+      'use domain config ui',
     ]);
   }
-
 
   /**
    * Create a language administrator.
