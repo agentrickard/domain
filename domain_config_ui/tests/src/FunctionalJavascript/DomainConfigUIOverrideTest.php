@@ -2,12 +2,11 @@
 
 namespace Drupal\Tests\domain_config_ui\FunctionalJavaScript;
 
-use Drupal\Core\Session\AccountInterface;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\domain_config_ui\Traits\DomainConfigUITestTrait;
 use Drupal\domain\DomainInterface;
 use Drupal\Tests\domain\Traits\DomainTestTrait;
-use Drupal\Tests\block\Traits\BlockCreationTrait;
+
 /**
  * Tests the domain config user interface.
  *
@@ -17,7 +16,6 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
 
   use DomainConfigUITestTrait;
   use DomainTestTrait;
-  use BlockCreationTrait;
 
   /**
    * Disabled config schema checking.
