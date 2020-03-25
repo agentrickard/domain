@@ -1,10 +1,12 @@
 language: php
-sudo: false
+dist: xenial
+os: linux
 
 services:
   - mysql
+  - xvfb
 
-matrix:
+jobs:
   fast_finish: true
   include:
     - env: DRUPAL_BRANCH="8.8.x" drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade" MODULE_LIST="domain domain_access domain_alias domain_config domain_source"
@@ -25,6 +27,7 @@ addons:
     - eight.example.com
     - nine.example.com
     - ten.example.com
+  chrome: stable
 
 cache:
   directories:
@@ -36,15 +39,13 @@ env:
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
 
-mysql:
-  database: domain
-  username: root
-  encoding: utf8
-
 notifications:
   email: false
 
 before_install:
+  # Create database.
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS domain CHARACTER SET utf8 COLLATE utf8_general_ci;'
+
   # Remove Xdebug. Not an issue for PHP 7.
   - phpenv config-rm xdebug.ini || true
 
