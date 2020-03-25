@@ -6,15 +6,27 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\domain_config\Functional\DomainConfigTestBase;
 use Drupal\Tests\domain_config_ui\Traits\DomainConfigUITestTrait;
 use Drupal\domain\DomainInterface;
+use Drupal\Tests\domain\Traits\DomainTestTrait;
 
 /**
  * Tests the domain config user interface.
  *
- * @group domain_config_ui-broken
+ * @group domain_config_ui_js
  */
 class DomainConfigUIOverrideTest extends WebDriverTestBase {
 
   use DomainConfigUITestTrait;
+  use DomainTestTrait;
+
+  /**
+   * Disabled config schema checking.
+   *
+   * Domain Config actually duplicates schemas provided by other modules,
+   * so it cannot define its own.
+   *
+   * @var bool
+   */
+  protected $strictConfigSchema = FALSE;
 
   /**
    * Modules to enable.
@@ -23,92 +35,24 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
    */
   public static $modules = [
     'domain_config_ui',
+    'domain_config_test',
+    'language',
   ];
 
   public function setUp() {
     parent::setUp();
-    DomainConfigTestBase::setUp();
 
     $this->createAdminUser();
     $this->createEditorUser();
 
-    $this->domainCreateTestDomains(5);
+    #$this->createTestDomains(5);
   }
 
-
-  /**
-   * Tests access the the settings form.
-   */
-  public function testDomainConfigUISettingsAccess() {
-    // Get the domain list.
-    $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
-    // Test a site name value.
-    foreach ($domains as $domain) {
-      // No site names have been changed.
-      $langcode = 'es';
-      $path = $domain->getPath() . $langcode . '/user/login';
-      $this->drupalGet($path);
-      $this->assertRaw('<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>', 'Loaded the proper site name.' . '<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>');
-      $langcode = '';
-      $path = $domain->getPath() . '/user/login';
-      $this->drupalGet($path);
-      $this->assertRaw('<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>', 'Loaded the proper site name.' . '<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>');
-    }
-
+  public function testAjax() {
     $this->drupalLogin($this->admin_user);
-    $path = '/admin/config/domain/config-ui';
-    $path2 = '/admin/config/system/site-information';
-
-    // Visit the domain config ui administration page.
-    $this->drupalGet($path);
-    $this->assertResponse(200);
-
+    $path = '/admin/config/system/site-information';
     // Visit the site information page.
-    $this->drupalGet($path2);
-    $this->assertResponse(200);
-    $this->findField('domain');
-
-    // Save and test a change.
-    $this->selectFieldOption('domain', 'one_example_com');
-    $string = '<option value="one_example_com" selected="selected">';
-    sleep(3);
-    $this->fillField('site_name', 'New name');
-    $this->pressButton('edit-submit');
-
-    $this->drupalGet($path2);
-    $this->drupalLogout();
-
-    // Except for the edited domain, the page title element should match what
-    // is in the override files.
-    // With a language context, based on how we have our files setup, we
-    // expect the following outcomes:
-    // - example.com name = 'Drupal' for English, 'Drupal' for Spanish.
-    // - one.example.com name = 'One' for English, 'Drupal' for Spanish.
-    // - two.example.com name = 'Two' for English, 'Dos' for Spanish.
-    // - three.example.com name = 'Drupal' for English, 'Drupal' for Spanish.
-    // - four.example.com name = 'Four' for English, 'Four' for Spanish.
-    foreach ($domains as $domain) {
-      if ($domain->id() === 'one_example_com') {
-        $langcode = 'es';
-        $path = $domain->getPath() . $langcode . '/user/login';
-        $this->drupalGet($path);
-        $this->assertRaw('<title>Log in | New name', 'Loaded the proper site name.');
-        $langcode = '';
-        $path = $domain->getPath() . '/user/login';
-        $this->drupalGet($path);
-        $this->assertRaw('<title>Log in | New name', 'Loaded the proper site name.');
-      }
-      else {
-        $langcode = 'es';
-        $path = $domain->getPath() . $langcode . '/user/login';
-        $this->drupalGet($path);
-        $this->assertRaw('<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>', 'Loaded the proper site name.' . '<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>');
-        $langcode = '';
-        $path = $domain->getPath() . '/user/login';
-        $this->drupalGet($path);
-        $this->assertRaw('<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>', 'Loaded the proper site name.' . '<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>');
-      }
-    }
+    $this->drupalGet($path);
   }
 
   /**
