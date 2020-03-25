@@ -43,9 +43,6 @@ notifications:
   email: false
 
 before_install:
-  # Create database.
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS domain CHARACTER SET utf8 COLLATE utf8_general_ci;'
-
   # Remove Xdebug. Not an issue for PHP 7.
   - phpenv config-rm xdebug.ini || true
 
@@ -57,7 +54,7 @@ before_install:
   # Optimize MySQL timeout and max packet size.
   - echo "mysql.connect_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "default_socket_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - mysql -e 'create database domain;'
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS domain CHARACTER SET utf8 COLLATE utf8_general_ci;'
   - mysql -e "SET GLOBAL wait_timeout = 36000;"
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
 
