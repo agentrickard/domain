@@ -77,11 +77,10 @@ class DomainConfigUISettingsTest extends DomainConfigTestBase {
     $this->findLink('Disable domain configuration');
     $this->clickLink('Disable domain configuration');
 
-    $this->drupalGet($path);
-    $expected = "/admin/appearance";
+    $expected2 = "/admin/appearance";
     $config = $this->config('domain_config_ui.settings');
-    $value = $config->get('path_pages');
-    $this->assertEqual($expected, $value);
+    $value2 = $config->get('path_pages');
+    $this->assertEqual($expected2, $value2);
 
     $this->drupalGet($path);
     $this->assertResponse(200);
