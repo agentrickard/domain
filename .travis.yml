@@ -27,7 +27,6 @@ addons:
     - eight.example.com
     - nine.example.com
     - ten.example.com
-  chrome: stable
 
 cache:
   directories:
@@ -59,7 +58,12 @@ before_install:
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
 
 before_script:
-
+  # Install chromedriver
+  - CHROME_MAIN_VERSION=`google-chrome-stable --version | sed -E 's/(^Google Chrome |\.[0-9]+ )//g'`
+  - CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAIN_VERSION"`
+  - curl "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O
+  - unzip chromedriver_linux64.zip -d ~/bin
+  -
   # Remember the current rules test directory for later use in the Drupal installation.
   - TESTDIR=$(pwd)
   # Navigate out of module directory to prevent blown stack by recursive module lookup.
@@ -99,6 +103,7 @@ script:
   - vendor/bin/phpunit -c core --group domain_access modules/domain -v
   - vendor/bin/phpunit -c core --group domain_alias modules/domain -v
   - vendor/bin/phpunit -c core --group domain_config modules/domain -v
-  - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
   - vendor/bin/phpunit -c core --group domain_content modules/domain -v
   - vendor/bin/phpunit -c core --group domain_source modules/domain -v
+  - chromedriver --port=4444 &
+  - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
