@@ -77,6 +77,9 @@ class DomainConfigUISettingsTest extends DomainConfigTestBase {
     $this->findLink('Disable domain configuration');
     $this->clickLink('Disable domain configuration');
 
+    $this->container
+      ->get('config.factory')->clearStaticCache();
+
     $expected2 = "/admin/appearance";
     $config = $this->config('domain_config_ui.settings');
     $value2 = $config->get('path_pages');
