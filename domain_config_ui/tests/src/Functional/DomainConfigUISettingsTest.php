@@ -68,7 +68,7 @@ class DomainConfigUISettingsTest extends DomainConfigTestBase {
     $config = $this->config('domain_config_ui.settings');
     $expected = "/admin/appearance\r\n/admin/config/system/site-information";
     $value = $config->get('path_pages');
-    $this->assertEqual($expected, $value);
+    $this->assertEquals($expected, $value);
 
     $this->drupalLogin($this->admin_user);
     $path = '/admin/config/system/site-information';
@@ -83,7 +83,7 @@ class DomainConfigUISettingsTest extends DomainConfigTestBase {
     $expected2 = "/admin/appearance";
     $config = $this->config('domain_config_ui.settings');
     $value2 = $config->get('path_pages');
-    $this->assertEqual($expected2, $value2);
+    $this->assertEquals($expected2, $value2);
 
     $this->drupalGet($path);
     $this->assertResponse(200);
