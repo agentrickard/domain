@@ -19,7 +19,7 @@ class DomainConfigUIController {
    * Handles AJAX operations to add/remove configuration forms.
    *
    * @param $route_name
-   *   A domain record object.
+   *   The route from which the AJAX request was triggered.
    * @param string $op
    *   The operation being performed, either 'enable' to enable the form,
    *   'disable' to disable the domain form, or 'remove' to disable the form
@@ -31,7 +31,18 @@ class DomainConfigUIController {
    */
   public function ajaxOperation($route_name, $op) {
     $success = FALSE;
-    $url = Url::fromRoute($route_name);
+    // Get the query string for the return URL.
+    $query = \Drupal::requestStack()->getCurrentRequest()->getQueryString();
+    $params = [];
+    $parts = explode('&', $query);
+    foreach ($parts as $part) {
+      $element = explode('=', $part);
+      if ($element[0] !== 'token') {
+        $params[$element[0]] = $element[1];
+      }
+    }
+    $url = Url::fromRoute($route_name, $params);
+
     // Get current module settings.
     $config = \Drupal::configFactory()->getEditable('domain_config_ui.settings');
     $path_pages = $config->get('path_pages');
@@ -53,7 +64,7 @@ class DomainConfigUIController {
             $new_pages = trim($new_pages);
             $config->set('path_pages', $new_pages)
               ->save();
-            $message = $this->t('Form removed domain configuration interface.');
+            $message = $this->t('Form removed from domain configuration interface.');
             $success = TRUE;
           }
           break;
