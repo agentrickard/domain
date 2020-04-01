@@ -17,7 +17,7 @@ function domain_config_ui_preprocess_page(&$variables) {
   if (!domain_config_ui_route_is_admin()) {
     return;
   }
-  if (!domain_config_ui_route_is_allowed()) {
+  if (!domain_config_ui_path_is_registered()) {
     $content = ['domain_config_ui_admin' => domain_config_ui_admin_form('enable')];
   }
   else {
@@ -101,9 +101,6 @@ function domain_config_ui_save_warning_message() {
     new TranslatableMarkup('the @label domain',['@label' => $selected_domain->label()]) :
     new TranslatableMarkup('all domains without custom configuration');
 
-  // @TODO: Check for overrides.
-  $config_factory = \Drupal::service('domain_config_ui.factory');
-
   $languages = \Drupal::service('language_manager')->getLanguages();
   if (count($languages) > 1) {
     $language_label = !empty($selected_language) ? $selected_language->getName() : new TranslatableMarkup('all languages without custom configuration.');
@@ -130,13 +127,11 @@ function domain_config_ui_save_warning_message() {
  * @return bool
  *   TRUE if domain switch should be added. Otherwise, FALSE.
  */
-function domain_config_ui_route_is_allowed() {
+function domain_config_ui_path_is_registered() {
   $path_pages = \Drupal::config('domain_config_ui.settings')->get('path_pages');
-  $route = \Drupal::routeMatch()->getRouteObject();
   // Some forms pass arguments, such as theme settings, so check both path and route.
   $path = \Drupal::requestStack()->getCurrentRequest()->getPathInfo();
-  return \Drupal::service('path.matcher')->matchPath($route->getPath(), $path_pages) ||
-          \Drupal::service('path.matcher')->matchPath($path, $path_pages);
+  return \Drupal::service('path.matcher')->matchPath($path, $path_pages);
 }
 
 /**
