@@ -7,11 +7,11 @@ use Drupal\Tests\domain_config_ui\Traits\DomainConfigUITestTrait;
 use Drupal\Tests\domain\Traits\DomainTestTrait;
 
 /**
- * Tests the domain config user interface.
+ * Tests the domain config inspector.
  *
  * @group domain_config_ui
  */
-class DomainConfigUIOverrideTest extends WebDriverTestBase {
+class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
 
   use DomainConfigUITestTrait;
   use DomainTestTrait;
@@ -33,7 +33,6 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
    */
   public static $modules = [
     'domain_config_ui',
-    'domain_config_test',
     'language'
   ];
 
@@ -52,21 +51,7 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
   /**
    * Tests that we can save domain and language-specific settings.
    */
-  public function testAjax() {
-    // Test base configuration.
-    $config_name = 'system.site';
-    $config = \Drupal::configFactory()->get($config_name)->getRawData();
-
-    $this->assertEquals($config['name'], 'Drupal');
-    $this->assertEquals($config['page']['front'], '/user/login');
-
-    // Test stored configuration.
-    $config_name = 'domain.config.one_example_com.en.system.site';
-    $config = \Drupal::configFactory()->get($config_name)->getRawData();
-
-    $this->assertEquals($config['name'], 'One');
-    $this->assertEquals($config['page']['front'], '/node/1');
-
+  public function testSavedConfig() {
     $this->drupalLogin($this->admin_user);
     $path = '/admin/config/system/site-information';
 
@@ -87,13 +72,6 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
     $this->htmlOutput($page->getHtml());
     $page->pressButton('Save configuration');
     $this->htmlOutput($page->getHtml());
-
-    // We did not save a language prefix, so none will be present.
-    $config_name = 'domain.config.one_example_com.system.site';
-    $config = \Drupal::configFactory()->get($config_name)->getRawData();
-
-    $this->assertEquals($config['name'], 'New name');
-    $this->assertEquals($config['page']['front'], '/user');
 
     // Now let's save a language.
     // Visit the site information page.
@@ -117,19 +95,48 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
     $page->pressButton('Save configuration');
     $this->htmlOutput($page->getHtml());
 
-    // We did save a language prefix, so one will be present.
-    $config_name = 'domain.config.one_example_com.es.system.site';
-    $config = \Drupal::configFactory()->get($config_name)->getRawData();
+    // Now, head to /admin/config/domain/config-ui/list
+    $path = '/admin/config/domain/config-ui/list';
+    $this->drupalGet($path);
+    $page = $this->getSession()->getPage();
+    $this->htmlOutput($page->getHtml());
+    $this->assertSession()->pageTextContains('Saved configuration');
+    $this->assertSession()->pageTextContains('domain.config.one_example_com.system.site');
+    $this->assertSession()->pageTextContains('domain.config.one_example_com.es.system.site');
+    $this->assertSession()->pageTextNotContains('domain.config.example_com.en.system.site');
 
-    $this->assertEquals($config['name'], 'Neuvo nombre');
-    $this->assertEquals($config['page']['front'], '/user');
+    $page->findLink('Inspect');
+    $page->clickLink('Inspect');
+    $page = $this->getSession()->getPage();
+    $this->htmlOutput($page->getHtml());
+    $this->assertSession()->pageTextContains('domain.config.one_example_com.es.system.site');
+    $this->assertSession()->pageTextContains('Neuvo nombre');
 
-    // Make sure the base is untouched.
-    $config_name = 'system.site';
-    $config = \Drupal::configFactory()->get($config_name)->getRawData();
+    $path = '/admin/config/domain/config_ui/inspect/domain.config.one_example_com.system.site';
+    $this->drupalGet($path);
+    $page = $this->getSession()->getPage();
+    $this->htmlOutput($page->getHtml());
+    $this->assertSession()->pageTextContains('domain.config.one_example_com.system.site');
+    $this->assertSession()->pageTextContains('New name');
 
-    $this->assertEquals($config['name'], 'Drupal');
-    $this->assertEquals($config['page']['front'], '/user/login');
+    $path = '/admin/config/domain/config_ui/delete/domain.config.one_example_com.system.site';
+    $this->drupalGet($path);
+    $page = $this->getSession()->getPage();
+    $this->htmlOutput($page->getHtml());
+    $this->assertSession()->pageTextContains('Are you sure you want to delete the configuration override: domain.config.one_example_com.system.site?');
+    $page->findButton('Delete configuration');
+    $page->pressButton('Delete configuration');
+
+    // Now, head to /admin/config/domain/config-ui/list
+    $path = '/admin/config/domain/config-ui/list';
+    $this->drupalGet($path);
+    $page = $this->getSession()->getPage();
+    $this->htmlOutput($page->getHtml());
+    $this->assertSession()->pageTextContains('Saved configuration');
+    $this->assertSession()->pageTextNotContains('domain.config.one_example_com.system.site');
+    $this->assertSession()->pageTextContains('domain.config.one_example_com.es.system.site');
+    $this->assertSession()->pageTextNotContains('domain.config.example_com.en.system.site');
+
   }
 
   /**
