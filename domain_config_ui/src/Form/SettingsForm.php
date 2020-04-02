@@ -46,7 +46,7 @@ class SettingsForm extends ConfigFormBase {
       '#rows' => 5,
       '#columns' => 40,
       '#default_value' => $config->get('path_pages'),
-      '#description' => $this->t("Specify pages by using their paths. Enter one path per line. The '*' character may be used as a wildcard."),
+      '#description' => $this->t("Specify pages by using their paths. Enter one path per line. Paths must start with /admin. Wildcards (*) are not supported. An example path is /admin/appearance for the Appearance page."),
     ];
 
     return parent::buildForm($form, $form_state);

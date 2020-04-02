@@ -52,7 +52,7 @@ class DomainConfigUIController {
         case 'enable':
           // Check to see if we already registered this form.
           if (!$exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
-            $config->set('path_pages', $path_pages . "\r\n" . $url->toString())
+            $config->set('path_pages', $path_pages . "\r\n" . '/'. $url->getInternalPath())
               ->save();
             $message = $this->t('Form added to domain configuration interface.');
             $success = TRUE;
@@ -60,7 +60,7 @@ class DomainConfigUIController {
           break;
         case 'disable':
           if ($exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
-            $new_pages = str_replace($url->toString(), '', $path_pages);
+            $new_pages = str_replace('/'. $url->getInternalPath(), '', $path_pages);
             $new_pages = trim($new_pages);
             $config->set('path_pages', $new_pages)
               ->save();

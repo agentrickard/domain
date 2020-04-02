@@ -72,9 +72,9 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
 
     $this->assertSession()->assertWaitOnAjaxRequest();
 
-    $config = $this->config('domain_config_ui.settings');
+    $config2 = $this->config('domain_config_ui.settings');
     $expected2 = "/admin/appearance\r\n/admin/config/system/site-information\r\n/admin/appearance/settings/stark";
-    $value2 = $config->get('path_pages');
+    $value2 = $config2->get('path_pages');
     $this->assertEquals($expected2, $value2);
 
     // Test removal of paths.
@@ -94,8 +94,8 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
     $this->assertSession()->assertWaitOnAjaxRequest();
 
     $expected3 = "/admin/appearance";
-    $config = $this->config('domain_config_ui.settings');
-    $value3 = $config->get('path_pages');
+    $config3 = $this->config('domain_config_ui.settings');
+    $value3 = $config3->get('path_pages');
     $this->assertEquals($expected3, $value3);
 
     $this->drupalGet($path);
