@@ -5,6 +5,7 @@ namespace Drupal\Tests\domain_config_ui\FunctionalJavascript;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\domain_config_ui\Traits\DomainConfigUITestTrait;
 use Drupal\Tests\domain\Traits\DomainTestTrait;
+use Drupal\domain_config_ui\DomainConfigUITrait;
 
 /**
  * Tests the domain config settings interface
@@ -13,6 +14,7 @@ use Drupal\Tests\domain\Traits\DomainTestTrait;
  */
 class DomainConfigUISettingsTest extends WebDriverTestBase {
 
+  use DomainConfigUITrait;
   use DomainConfigUITestTrait;
   use DomainTestTrait;
 
@@ -52,8 +54,8 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
    */
   public function testDomainConfigUISettings() {
     $config = $this->config('domain_config_ui.settings');
-    $expected = "/admin/appearance\r\n/admin/config/system/site-information";
-    $value = $config->get('path_pages');
+    $expected = $this->explodePathSettings("/admin/appearance\r\n/admin/config/system/site-information");
+    $value = $this->explodePathSettings($config->get('path_pages'));
     $this->assertEquals($expected, $value);
 
     $this->drupalLogin($this->admin_user);
@@ -72,9 +74,10 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
 
     $this->assertSession()->assertWaitOnAjaxRequest();
 
+    $this->drupalGet($path);
     $config2 = $this->config('domain_config_ui.settings');
-    $expected2 = "/admin/appearance\r\n/admin/config/system/site-information\r\n/admin/appearance/settings/stark";
-    $value2 = $config2->get('path_pages');
+    $expected2 = $this->explodePathSettings("/admin/appearance\r\n/admin/config/system/site-information\r\n/admin/appearance/settings/stark");
+    $value2 = $this->explodePathSettings($config2->get('path_pages'));
     $this->assertEquals($expected2, $value2);
 
     // Test removal of paths.
@@ -93,9 +96,9 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
 
     $this->assertSession()->assertWaitOnAjaxRequest();
 
-    $expected3 = "/admin/appearance";
+    $expected3 = $this->explodePathSettings("/admin/appearance");
     $config3 = $this->config('domain_config_ui.settings');
-    $value3 = $config3->get('path_pages');
+    $value3 = $this->explodePathSettings($config3->get('path_pages'));
     $this->assertEquals($expected3, $value3);
 
     $this->drupalGet($path);
