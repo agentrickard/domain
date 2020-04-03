@@ -62,7 +62,7 @@ trait DomainConfigUITestTrait {
   }
 
   /**
-   *  Create a limited adming user.
+   *  Create a limited admin user.
    */
   public function createLimitedUser() {
     $this->limited_user = $this->drupalCreateUser([
