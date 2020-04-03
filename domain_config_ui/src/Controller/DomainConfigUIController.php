@@ -6,6 +6,7 @@ use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\domain\DomainInterface;
+use Drupal\domain_config_ui\DomainConfigUITrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  */
 class DomainConfigUIController {
 
+  use DomainConfigUITrait;
   use StringTranslationTrait;
 
   /**
@@ -45,25 +47,22 @@ class DomainConfigUIController {
 
     // Get current module settings.
     $config = \Drupal::configFactory()->getEditable('domain_config_ui.settings');
-    $path_pages = $config->get('path_pages');
+    $path_pages = $this->standardizePaths($config->get('path_pages'));
+    $new_path = '/' . $url->getInternalPath();
 
     if (!$url->isExternal() && $url->access()) {
       switch ($op) {
         case 'enable':
           // Check to see if we already registered this form.
-          if (!$exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
-            $config->set('path_pages', $path_pages . "\r\n" . '/'. $url->getInternalPath())
-              ->save();
+          if (!$exists = \Drupal::service('path.matcher')->matchPath($new_path, $path_pages)) {
+            $this->addPath($new_path);
             $message = $this->t('Form added to domain configuration interface.');
             $success = TRUE;
           }
           break;
         case 'disable':
-          if ($exists = \Drupal::service('path.matcher')->matchPath($url->toString(), $path_pages)) {
-            $new_pages = str_replace('/'. $url->getInternalPath(), '', $path_pages);
-            $new_pages = trim($new_pages);
-            $config->set('path_pages', $new_pages)
-              ->save();
+          if ($exists = \Drupal::service('path.matcher')->matchPath($new_path, $path_pages)) {
+            $this->removePath($new_path);
             $message = $this->t('Form removed from domain configuration interface.');
             $success = TRUE;
           }
@@ -275,6 +274,5 @@ class DomainConfigUIController {
     }
     return '<' . gettype($value) . '>';
   }
-
 
 }
