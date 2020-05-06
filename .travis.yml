@@ -100,8 +100,8 @@ before_script:
   - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
   - export SIMPLETEST_BASE_URL='http://example.com:8080'
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
-  - export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com:9515"]'
+  - export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com:9222"]'
 
 script:
-  - chromedriver --port=9515
+  - chromedriver --port=9222
   - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
