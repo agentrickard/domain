@@ -62,9 +62,6 @@ before_install:
   - sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
   - sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=0
 
-  # start your web application and listen on `localhost`
-  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://example.com &
-
 before_script:
   # Install chromedriver
   - CHROME_MAIN_VERSION=`google-chrome-stable --version | sed -E 's/(^Google Chrome |\.[0-9]+ )//g'`
@@ -106,8 +103,11 @@ before_script:
   - export SIMPLETEST_BASE_URL='http://example.com:8080'
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
   #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
+  # start your web application and listen on `localhost`
+  #- google-chrome-stable --headless --disable-gpu --remote-debugging-port=4444 http://example.com &
+
 
 script:
-  - chromedriver --port=4444 --no-sandbox --disable-dev-shm-usage &
+  - chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu &
   - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
   - pkill chromedriver
