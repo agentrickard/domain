@@ -27,6 +27,7 @@ addons:
     - eight.example.com
     - nine.example.com
     - ten.example.com
+  chrome: stable
 
 cache:
   directories:
