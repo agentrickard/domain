@@ -111,6 +111,6 @@ before_script:
   #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
 
 script:
-  - chromedriver --port=444 &
+  - chromedriver --port=4444 &
   - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
   #- pkill chromedriver
