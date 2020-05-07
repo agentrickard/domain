@@ -108,6 +108,5 @@ before_script:
 
 
 script:
-  - chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu &
-  - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
+  - chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu && vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
   - pkill chromedriver
