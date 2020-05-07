@@ -1,10 +1,9 @@
 language: php
-dist: xenial
+dist: trusty
 os: linux
 
 services:
   - mysql
-  - xvfb
 
 jobs:
   fast_finish: true
@@ -27,6 +26,7 @@ addons:
     - eight.example.com
     - nine.example.com
     - ten.example.com
+  chrome: stable
 
 cache:
   directories:
@@ -58,7 +58,7 @@ before_install:
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
 
   - # start your web application and listen on `localhost`
-  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=4444 http://example.com &
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://example.com &
 
 before_script:
   # Install chromedriver
@@ -103,5 +103,4 @@ before_script:
   - export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
 
 script:
-  - chromedriver --port=80
   - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
