@@ -27,7 +27,6 @@ addons:
     - eight.example.com
     - nine.example.com
     - ten.example.com
-  chrome: stable
 
 cache:
   directories:
@@ -58,15 +57,9 @@ before_install:
   - mysql -e "SET GLOBAL wait_timeout = 36000;"
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
 
-  # Try to get ipv6 running.
-  - ip a
+  # Get ipv6 running.
   - sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
-  - ip a
   - sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=0
-  - ip a
-
-  #- # start your web application and listen on `localhost`
-  #- google-chrome-stable --headless --disable-gpu --remote-debugging-port=4444 http://example.com &
 
 before_script:
   # Install chromedriver
@@ -113,4 +106,4 @@ before_script:
 script:
   - chromedriver --port=4444 &
   - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
-  #- pkill chromedriver
+  - pkill chromedriver
