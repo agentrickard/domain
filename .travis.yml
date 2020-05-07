@@ -107,7 +107,7 @@ before_script:
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
   #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
 
-  - chromedriver --port=4444 &
-
 script:
+  - chromedriver --port=4444 --no-sandbox --disable-dev-shm-usage &
   - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
+  - pkill chromedriver
