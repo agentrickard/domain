@@ -1,6 +1,7 @@
 language: php
 dist: xenial
 os: linux
+sudo: required
 
 services:
   - mysql
