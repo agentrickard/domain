@@ -3,7 +3,7 @@ set -x
 
 #echo ${SOURCE_DIR}
 #[[ ${SOURCE_DIR} =~ workspace\/(.*?)\/source ]] && echo "${BASH_REMATCH[1]}"
-echo hostname
+hostname
 CONTAINER_NAME=${hostname}
 CONTAINER_NAME=${CONTAINER_NAME//_/-}
 CONTAINER_NAME='php-apache-'$CONTAINER_NAME
