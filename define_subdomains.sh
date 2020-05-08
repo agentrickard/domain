@@ -1,7 +1,8 @@
 #!/bin/bash
-set -uex
+set -x
 
-[[ ${PROJECT_DIR} =~ workspace\/(.*?)\/source ]] && echo "${BASH_REMATCH[1]}"
+echo ${SOURCE_DIR}
+[[ ${SOURCE_DIR} =~ workspace\/(.*?)\/source ]] && echo "${BASH_REMATCH[1]}"
 CONTAINER_NAME=${BASH_REMATCH[1]}
 CONTAINER_NAME=${CONTAINER_NAME//_/-}
 CONTAINER_NAME='php-apache-'$CONTAINER_NAME
