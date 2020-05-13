@@ -1,11 +1,10 @@
 language: php
-dist: xenial
+dist: trusty
 os: linux
 sudo: required
 
 services:
   - mysql
-  - xvfb
 
 jobs:
   fast_finish: true
@@ -99,21 +98,16 @@ before_script:
   # Wait until the web server is responding.
   - until curl -s example.com:8080; do true; done > /dev/null
 
-  # Enable xvfb
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
-
   # Export PHP Unit vars
   - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
   - export SIMPLETEST_BASE_URL='http://example.com:8080'
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
   #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
   # start your web application and listen on `localhost`
-  - google-chrome-stable --no-sandbox --headless --disable-gpu --disable-dev-shm-usage &
+  - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
   - which chromedriver
   - which google-chrome-stable
-  - chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage --disable-gpu --verbose &
+  #- chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage --disable-gpu --verbose &
 
 script:
   #- chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu &&
