@@ -5,6 +5,7 @@ sudo: required
 
 services:
   - mysql
+  - xvfb
 
 jobs:
   fast_finish: true
@@ -97,6 +98,11 @@ before_script:
 
   # Wait until the web server is responding.
   - until curl -s example.com:8080; do true; done > /dev/null
+
+  # Enable xvfb
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
 
   # Export PHP Unit vars
   - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
