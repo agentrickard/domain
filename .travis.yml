@@ -107,7 +107,7 @@ before_script:
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
   - which chromedriver
   - which google-chrome-stable
-  #- chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage --disable-gpu --verbose &
+  - chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage --disable-gpu --verbose &
 
 script:
   #- chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu &&
