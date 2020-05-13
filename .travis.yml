@@ -102,7 +102,7 @@ before_script:
   - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
   - export SIMPLETEST_BASE_URL='http://example.com:8080'
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
-  - export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://localhost"]'
+  - export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
   # start your web application and listen on `localhost`
   #- google-chrome-stable --headless --disable-gpu --no-sandbox --disable-dev-shm-usage --port=4444 http://localhost &
   - which chromedriver
