@@ -108,7 +108,7 @@ before_script:
   - google-chrome-stable --no-sandbox --headless --disable-gpu --remote-debugging-port=9222 --verbose http://example.local &
   - which chromedriver
   - which google-chrome-stable
-  - chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage --disable-gpu  &
+  - chromedriver --no-sandbox --port=4444 --headless --verbose --disable-dev-shm-usage --disable-gpu  &
   # Wait until the web driver is responding.
   - until curl -s example.local:4444; do true; done > /dev/null
 
