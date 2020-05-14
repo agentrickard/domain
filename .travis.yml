@@ -17,17 +17,17 @@ jobs:
 
 addons:
   hosts:
-    - example.com
-    - one.example.com
-    - two.example.com
-    - three.example.com
-    - four.example.com
-    - five.example.com
-    - six.example.com
-    - seven.example.com
-    - eight.example.com
-    - nine.example.com
-    - ten.example.com
+    - example.local
+    - one.example.local
+    - two.example.local
+    - three.example.local
+    - four.example.local
+    - five.example.local
+    - six.example.local
+    - seven.example.local
+    - eight.example.local
+    - nine.example.local
+    - ten.example.local
   chrome: stable
 
 cache:
@@ -97,15 +97,15 @@ before_script:
   - nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
 
   # Wait until the web server is responding.
-  - until curl -s example.com:8080; do true; done > /dev/null
+  - until curl -s example.local:8080; do true; done > /dev/null
 
   # Export PHP Unit vars
   - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
-  - export SIMPLETEST_BASE_URL='http://example.com:8080'
+  - export SIMPLETEST_BASE_URL='http://example.local:8080'
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
-  #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
+  #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.local"]'
   # start your web application and listen on `localhost`
-  - google-chrome-stable --no-sandbox --headless --disable-gpu --remote-debugging-port=9222 http://example.com &
+  - google-chrome-stable --no-sandbox --headless --disable-gpu --remote-debugging-port=9222 http://example.local &
   - which chromedriver
   - which google-chrome-stable
   - chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage --disable-gpu  &
