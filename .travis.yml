@@ -105,7 +105,7 @@ before_script:
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
   #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.com"]'
   # start your web application and listen on `localhost`
-  - google-chrome-stable --no-sandbox --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+  - google-chrome-stable --no-sandbox --headless --disable-gpu --remote-debugging-port=9222 http://example.com &
   - which chromedriver
   - which google-chrome-stable
   - chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage --disable-gpu  &
