@@ -105,10 +105,10 @@ before_script:
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
   #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.local"]'
   # start your web application and listen on `localhost`
-  - google-chrome-stable --no-sandbox --headless --remote-debugging-port=9222 --verbose http://example.local &
+  - google-chrome-stable --no-sandbox --headless --remote-debugging-port=9222 http://example.local &
   - which chromedriver
   - which google-chrome-stable
-  - chromedriver --no-sandbox --port=4444 --headless --verbose --disable-dev-shm-usage  &
+  - chromedriver --no-sandbox --port=4444 --headless --dump-dom --disable-dev-shm-usage  &
   # Wait until the web driver is responding.
   - until curl -s example.local:4444; do true; done > /dev/null
 
