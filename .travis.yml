@@ -114,5 +114,6 @@ before_script:
 
 script:
   #- chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu &&
-  - vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
+  #- vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
+  - vendor/bin/phpunit -c core /home/travis/build/agentrickard/domain/domain_config_ui/tests/src/FunctionalJavascript/DomainConfigUISettingsTest.php --verbose
   #- pkill chromedriver
