@@ -99,7 +99,7 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    if ($account->hasPermission('create domains')) {
+    if ($account->hasPermission('administer domains') || $account->hasPermission('create domains')) {
       return AccessResult::allowed();
     }
     return AccessResult::neutral();
