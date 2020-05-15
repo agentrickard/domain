@@ -80,10 +80,6 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
     if ($account->hasPermission('administer domains')) {
       return AccessResult::allowed();
     }
-    // @TODO: This may not be relevant.
-    if ($operation == 'create' && $account->hasPermission('create domains')) {
-      return AccessResult::allowed();
-    }
     // For view, we allow admins unless the domain is inactive.
     $is_admin = $this->isDomainAdmin($entity, $account);
     if ($operation == 'view' && ($entity->status() || $account->hasPermission('access inactive domains')) && ($is_admin || $account->hasPermission('view domain list'))) {
@@ -97,6 +93,16 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
       return AccessResult::allowed();
     }
     return AccessResult::forbidden();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+    if ($account->hasPermission('create domains')) {
+      return AccessResult::allowed();
+    }
+    return AccessResult::neutral();
   }
 
   /**
