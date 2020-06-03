@@ -137,7 +137,7 @@ class DomainHookTest extends KernelTestBase {
     $domain = $this->domainStorage->load($this->key);
 
     // Set the request.
-    $manager = \Drupal::service('entity.manager');
+    $manager = \Drupal::service('entity_type.manager');
     $target_type = 'domain';
 
     // Build a node entity selection query.

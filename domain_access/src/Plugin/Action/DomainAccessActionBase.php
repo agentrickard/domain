@@ -40,7 +40,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity.manager')->getDefinition('domain')
+      $container->get('entity_type.manager')->getDefinition('domain')
     );
   }
 
