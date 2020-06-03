@@ -24,7 +24,10 @@ function domain_config_ui_preprocess_page(&$variables) {
     $content = ['domain_config_ui_admin' => domain_config_ui_admin_form('disable')];
     // Add a message below the form showing the current domain.
     $form = \Drupal::formBuilder()->getForm('Drupal\domain_config_ui\Form\SwitchForm');
-    if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message()) {
+    if (isset($form['domain_config_ui']['domain']['#options'])) {
+      $options = $form['domain_config_ui']['domain']['#options'];
+    }
+    if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message($options)) {
       $content['domain_config_ui_switch_warning'] = $warning_message;
     }
     // Add domain switch form that will reload the page to top of content region.
@@ -85,8 +88,11 @@ function domain_config_ui_admin_form($op) {
 
 /**
  * Generates the markup for the domain save warning message.
+ *
+ * @param array $domain_options
+ *   The options for the domain element of the form.
  */
-function domain_config_ui_save_warning_message() {
+function domain_config_ui_save_warning_message(array $domain_options = []) {
   $manager = \Drupal::service('domain_config_ui.manager');
   if ($selected_domain_id = $manager->getSelectedDomainId()) {
     $selected_domain = \Drupal::service('entity_type.manager')
@@ -100,6 +106,13 @@ function domain_config_ui_save_warning_message() {
   $domain_label = !empty($selected_domain) ?
     new TranslatableMarkup('the @label domain',['@label' => $selected_domain->label()]) :
     new TranslatableMarkup('all domains without custom configuration');
+
+  // In some cases, the user cannot use 'all domains.' In that case, we have to
+  // use the default option as a label.
+  if (empty($selected_domain) && \Drupal::currentUser()->hasPermission('set default domain configuration')) {
+    $label = current($domain_options);
+    $domain_label = new TranslatableMarkup('the @label domain',['@label' => $label]);
+  }
 
   $languages = \Drupal::service('language_manager')->getLanguages();
   if (count($languages) > 1) {

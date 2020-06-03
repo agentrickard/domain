@@ -91,9 +91,9 @@ class ConfigFactory extends CoreConfigFactory {
         if (isset($module_overrides[$name])) {
           $this->cache[$cache_key]->setModuleOverride($module_overrides[$name]);
           $list[$name] = $this->cache[$cache_key];
+          $this->propagateConfigOverrideCacheability($cache_key, $name);
         }
 
-        $this->propagateConfigOverrideCacheability($cache_key, $name);
       }
     }
 

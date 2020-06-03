@@ -62,6 +62,9 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
       $string = 'value="' . $domain->id() . '"';
       $this->assertRaw($string, 'Found the domain option.');
     }
+    // We expect to find 'All Domains'.
+    $this->assertRaw('All Domains</option>', 'Found the domain option.');
+
     // We expect to find two language options.
     $languages = ['en', 'es'];
     foreach ($languages as $langcode) {
@@ -93,6 +96,9 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
       }
     }
 
+    // We expect to find 'All Domains'.
+    $this->assertRaw('All Domains</option>', 'Found the domain option.');
+
     // Now test the language_user.
     $this->drupalLogin($this->language_user);
 
@@ -116,6 +122,10 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
         $this->assertNoRaw($string, 'Did not find the domain option.');
       }
     }
+
+    // We do not expect to find 'All Domains'.
+    $this->assertNoRaw('All Domains</option>', 'Found the domain option.');
+
     // We expect to find two language options.
     $languages = ['en', 'es'];
     foreach ($languages as $langcode) {

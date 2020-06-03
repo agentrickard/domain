@@ -43,6 +43,7 @@ trait DomainConfigUITestTrait {
       'administer site configuration',
       'administer languages',
       'administer themes',
+      'set default domain configuration',
       'translate domain configuration',
       'use domain config ui',
       'view domain information',
@@ -70,6 +71,7 @@ trait DomainConfigUITestTrait {
       'administer languages',
       'administer site configuration',
       'use domain config ui',
+      'set default domain configuration',
     ]);
   }
 

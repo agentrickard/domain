@@ -124,7 +124,7 @@ class SwitchForm extends FormBase {
         'callback' => '::switchCallback',
       ],
     ];
-    // Add language select field. Domain Confgi does not rely on core's Config
+    // Add language select field. Domain Config does not rely on core's Config
     // Translation module, so we set our own permission.
     $languages = $this->languageManager->getLanguages();
     if (count($languages) > 1 && $this->currentUser()->hasPermission('translate domain configuration')) {
@@ -224,9 +224,11 @@ class SwitchForm extends FormBase {
         $options[$domain->id()] = $domain->label();
       }
     }
-    // We always use 'all domains' here because it sets the default. Any user
-    // who can access this form can set the default value.
-    return array_merge(['' => $this->t('All Domains')], $options);
+    // The user must have permission to set the default value.
+    if ($this->currentUser()->hasPermission('set default domain configuration')) {
+    #  $options = array_merge(['' => $this->t('All Domains')], $options);
+    }
+    return $options;
   }
 
 }
