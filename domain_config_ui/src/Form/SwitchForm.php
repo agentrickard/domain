@@ -226,7 +226,7 @@ class SwitchForm extends FormBase {
     }
     // The user must have permission to set the default value.
     if ($this->currentUser()->hasPermission('set default domain configuration')) {
-    #  $options = array_merge(['' => $this->t('All Domains')], $options);
+      $options = array_merge(['' => $this->t('All Domains')], $options);
     }
     return $options;
   }

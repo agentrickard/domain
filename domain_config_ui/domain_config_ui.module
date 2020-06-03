@@ -109,7 +109,7 @@ function domain_config_ui_save_warning_message(array $domain_options = []) {
 
   // In some cases, the user cannot use 'all domains.' In that case, we have to
   // use the default option as a label.
-  if (empty($selected_domain) && \Drupal::currentUser()->hasPermission('set default domain configuration')) {
+  if (empty($selected_domain) && !\Drupal::currentUser()->hasPermission('set default domain configuration')) {
     $label = current($domain_options);
     $domain_label = new TranslatableMarkup('the @label domain',['@label' => $label]);
   }
