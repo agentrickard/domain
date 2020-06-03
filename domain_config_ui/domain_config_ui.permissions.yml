@@ -3,7 +3,7 @@ administer domain config ui:
   description: 'Allows administrators to determine what forms are available for domain-specific configuration.'
   restrict access: true
 set default domain configuration:
-  title: 'Set the default configuration for all sites '
+  title: 'Set the default configuration for all sites'
   description: 'Allows domain administrators to set the default value for a configuration. The default value is used for all sites without a domain-specific configuration.'
   restrict access: true
 translate domain configuration:

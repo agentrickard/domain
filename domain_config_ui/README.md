@@ -7,12 +7,14 @@ The module allows select editors to save settings on a per-domain and per-langua
 
 ## Permissions
 
-The module provides three permissions:
+The module provides four permissions:
 
 * 'Administer Domain Config UI settings'
     - Allows administrators to determine what forms are available for domain-specific configuration. Give only to administrators.
 * 'Manage domain-specific configurations'
     - Allows domain administrators to use configuration forms specific to their managed domains.
+* 'Set the default configuration for all sites'
+    - Allows domain administrators to set the default value for configuration. The default value is used for all sites without a domain-specific configuration.
 * 'Translate domain-specific configurations'
     - Allows domain administrators to use language-specific configuration forms specific to their managed domains.
 
