@@ -77,10 +77,10 @@ class DomainAliasWildcardTest extends DomainAliasTestBase {
       $this->assertSession()->linkByHrefExists($domain->getPath(), 0, 'Link found: ' . $domain->getPath());
     }
     // For an aliased request (four.example.com), the list should be aliased.
-    $url = $domain->getScheme() . str_replace('*', 'com', $alias->getPattern()) . $domain->getPort();
+    $url = $domain->getScheme() . str_replace('*', $this->baseTLD, $alias->getPattern()) . $domain->getPort();
     $this->drupalGet($url);
     foreach ($matches as $match) {
-      $this->assertSession()->assertEscaped(str_replace('*', 'com', $match->getPattern()));
+      $this->assertSession()->assertEscaped(str_replace('*', $this->baseTLD, $match->getPattern()));
     }
   }
 
