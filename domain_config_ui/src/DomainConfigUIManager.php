@@ -19,11 +19,20 @@ class DomainConfigUIManager implements DomainConfigUIManagerInterface {
   /**
    * Constructs DomainConfigUIManager object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
+   * Note that we had issues with using Dependency Injection from the service here, so
+   * instead we instantiate the request manually.
+   *
+   * @link https://www.drupal.org/project/domain/issues/3004243#comment-13689184
    */
-  public function __construct(RequestStack $request_stack) {
-    $this->request = $request_stack->getCurrentRequest();
+  public function __construct() {
+    $this->setRequest();
+  }
+
+  /**
+   * Sets the current request.
+   */
+  private function setRequest() {
+    $this->request = \Drupal::request();
   }
 
   /**
