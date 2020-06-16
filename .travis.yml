@@ -106,12 +106,11 @@ before_script:
   - export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.local"]'
   # start your web application and listen on `localhost`
   - google-chrome-stable --no-sandbox --headless --dump-dom http://example.local &
-  #- chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage  &
+  - chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage  &
   # Wait until the web driver is responding.
-  #- until curl -s example.local:4444; do true; done > /dev/null
+  - until curl -s example.local:4444; do true; done > /dev/null
 
 script:
-  - chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu &
   #- vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
   - vendor/bin/phpunit -c core /home/travis/build/agentrickard/domain/domain_config_ui/tests/src/FunctionalJavascript/DomainConfigUISettingsTest.php --verbose
   - pkill chromedriver
