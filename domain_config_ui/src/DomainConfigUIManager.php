@@ -12,9 +12,16 @@ class DomainConfigUIManager implements DomainConfigUIManagerInterface {
   /**
    * A RequestStack instance.
    *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
+   * The current request.
+   *
    * @var \Symfony\Component\HttpFoundation\Request
    */
-  protected $request;
+  protected $currentRequest;
 
   /**
    * Constructs DomainConfigUIManager object.
@@ -23,7 +30,9 @@ class DomainConfigUIManager implements DomainConfigUIManagerInterface {
    *   The request stack.
    */
   public function __construct(RequestStack $request_stack) {
-    $this->request = $request_stack->getCurrentRequest();
+    // We want the currentRequest, but reports suggest it is not yet available in all cases.
+    // https://www.drupal.org/project/domain/issues/3004243#comment-13700917
+    $this->requestStack = $request_stack;
   }
 
   /**
@@ -44,10 +53,10 @@ class DomainConfigUIManager implements DomainConfigUIManagerInterface {
    * {@inheritdoc}
    */
   public function getSelectedDomainId() {
-    if ($domain = $this->request->get('domain_config_ui_domain')) {
+    if (!empty($this->getRequest()) && $domain = $this->currentRequest->get('domain_config_ui_domain')) {
       return $domain;
     }
-    if (isset($_SESSION['domain_config_ui_domain'])) {
+    elseif (isset($_SESSION['domain_config_ui_domain'])) {
       return $_SESSION['domain_config_ui_domain'];
     }
   }
@@ -56,12 +65,24 @@ class DomainConfigUIManager implements DomainConfigUIManagerInterface {
    * {@inheritdoc}
    */
   public function getSelectedLanguageId() {
-    if ($language = $this->request->get('domain_config_ui_language')) {
+    if (!empty($this->getRequest()) && $language = $this->currentRequest->get('domain_config_ui_language')) {
       return $language;
     }
-    if (isset($_SESSION['domain_config_ui_language'])) {
+    elseif (isset($_SESSION['domain_config_ui_language'])) {
       return $_SESSION['domain_config_ui_language'];
     }
+  }
+
+  /**
+   * Ensures that the currentRequest is loaded.
+   *
+   * @return Symfony\Component\HttpFoundation\Request|null
+   */
+  private function getRequest() {
+    if (!isset($this->currentRequest)) {
+      $this->currentRequest = $this->requestStack->getCurrentRequest();
+    }
+    return $this->currentRequest;
   }
 
 }
