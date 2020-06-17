@@ -3,20 +3,21 @@
 namespace Drupal\domain_config_ui;
 
 /**
- * Contains helper classes for the ui.
+ * Contains helper classes for the user interface.
  *
- * Some methods are called from a form and an Ajax callback, so we have
- * those in this trait.
+ * Some methods are called from a form and an Ajax callback, so we have those
+ * shared methods in this trait.
  */
 trait DomainConfigUITrait {
 
   /**
    * Adds a path to the registry.
    *
-   * @param $new_path
+   * @param string $new_path
    *   The path to add.
    *
    * @return string
+   *   The normalized path that was added.
    */
   public function addPath($new_path) {
     $config = \Drupal::configFactory()->getEditable('domain_config_ui.settings');
@@ -34,10 +35,11 @@ trait DomainConfigUITrait {
   /**
    * Removes a path from the registry.
    *
-   * @param $old_path
+   * @param string $old_path
    *   The path to remove.
    *
    * @return string
+   *   The normalized path that was removed.
    */
   public function removePath($old_path) {
     $config = \Drupal::configFactory()->getEditable('domain_config_ui.settings');
@@ -59,10 +61,11 @@ trait DomainConfigUITrait {
   /**
    * Turns an array of paths into a linebreak separated string.
    *
-   * @param $path_array
+   * @param array $path_array
    *   An array of registered paths.
    *
    * @return string
+   *   A normalized string of paths.
    */
   public function implodePathSettings($path_array) {
     return implode("\r\n", $path_array);
@@ -71,10 +74,11 @@ trait DomainConfigUITrait {
   /**
    * Turns the path string into an array.
    *
-   * @param $path_string
+   * @param string $path_string
    *   An string of registered paths.
    *
    * @return array
+   *   A normalized array of paths.
    */
   public function explodePathSettings($path_string) {
     // Replace newlines with a logical 'or'.
@@ -91,6 +95,7 @@ trait DomainConfigUITrait {
    *   The string of paths.
    *
    * @return string
+   *   A normalized path string.
    */
   public function standardizePaths($path_string) {
     return $this->implodePathSettings($this->explodePathSettings($path_string));

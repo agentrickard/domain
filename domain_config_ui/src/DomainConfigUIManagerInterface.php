@@ -12,7 +12,7 @@ interface DomainConfigUIManagerInterface {
    *
    * @param string $name
    *   The config name.
-   * @param boolean $omit_language
+   * @param bool $omit_language
    *   A flag to indicate if the language-sensitive config should be loaded.
    *
    * @return string
