@@ -49,8 +49,10 @@ class DeleteForm extends FormBase {
     }
     $form['more_help'] = [
       '#markup' => $this->t('This configuration is for the %domain domain and
-        applies to %language.', ['%domain' => $elements['domain'],
-        '%language' => $language]
+        applies to %language.', [
+          '%domain' => $elements['domain'],
+          '%language' => $language
+        ]
       ),
       '#prefix' => '<p>',
       '#suffix' => '</p>',
@@ -96,4 +98,3 @@ class DeleteForm extends FormBase {
   }
 
 }
-
