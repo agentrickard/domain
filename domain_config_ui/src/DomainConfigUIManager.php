@@ -30,7 +30,7 @@ class DomainConfigUIManager implements DomainConfigUIManagerInterface {
    *   The request stack.
    */
   public function __construct(RequestStack $request_stack) {
-    // We want the currentRequest, but reports suggest it is not yet available in all cases.
+    // We want the currentRequest, but it is not always available.
     // https://www.drupal.org/project/domain/issues/3004243#comment-13700917
     $this->requestStack = $request_stack;
   }
@@ -77,6 +77,7 @@ class DomainConfigUIManager implements DomainConfigUIManagerInterface {
    * Ensures that the currentRequest is loaded.
    *
    * @return Symfony\Component\HttpFoundation\Request|null
+   *   The current request object.
    */
   private function getRequest() {
     if (!isset($this->currentRequest)) {
