@@ -155,9 +155,9 @@ trait DomainTestTrait {
    */
   public function domainTableIsEmpty() {
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple(NULL, TRUE);
-    $this->assertTrue(empty($domains), 'No domains have been created.');
+    $this->assertEmpty($domains, 'No domains have been created.');
     $default_id = \Drupal::entityTypeManager()->getStorage('domain')->loadDefaultId();
-    $this->assertTrue(empty($default_id), 'No default domain has been set.');
+    $this->assertEmpty($default_id, 'No default domain has been set.');
   }
 
   /**

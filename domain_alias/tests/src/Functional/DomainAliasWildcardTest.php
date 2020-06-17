@@ -57,11 +57,11 @@ class DomainAliasWildcardTest extends DomainAliasTestBase {
     $this->assert($alias->getPattern() == 'five.example.*', 'Proper pattern match loaded.');
 
     // Test the environment matcher. $domain here is one.example.com.
-    $domain = $domain_storage->load('example_com');
+    $domain = $domain_storage->load('one_example_com');
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($matches) == 1, 'One environment match loaded');
     $alias = current($matches);
-    $this->assert($alias->getPattern() == 'example.*', 'Proper pattern match loaded.');
+    $this->assert($alias->getPattern() == 'four.example.*', 'Proper pattern match loaded.');
 
     // Now load a page and check things.
     // Since we cannot read the service request, we place a block

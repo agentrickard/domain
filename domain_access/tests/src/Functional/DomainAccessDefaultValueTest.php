@@ -60,9 +60,9 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
     $this->assertTrue($node, 'Article node created.');
     // Check that the values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
-    $this->assertTrue(count($values) == 1, 'Node saved with one domain record.');
+    $this->assertCount(1, $values, 'Node saved with one domain record.');
     $allValue = \Drupal::service('domain_access.manager')->getAllValue($node);
-    $this->assertTrue(empty($allValue), 'Not sent to all affiliates.');
+    $this->assertEmpty($allValue, 'Not sent to all affiliates.');
 
     // Logout the admin user.
     $this->drupalLogout();
@@ -90,9 +90,9 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
     $this->assertTrue($node, 'Article node created.');
     // Check that the values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
-    $this->assertTrue(count($values) == 1, 'Node saved with one domain record.');
+    $this->assertCount(1, $values, 'Node saved with one domain record.');
     $allValue = \Drupal::service('domain_access.manager')->getAllValue($node);
-    $this->assertTrue(empty($allValue), 'Not sent to all affiliates.');
+    $this->assertEmpty($allValue, 'Not sent to all affiliates.');
 
   }
 

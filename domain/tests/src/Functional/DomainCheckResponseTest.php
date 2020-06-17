@@ -27,7 +27,7 @@ class DomainCheckResponseTest extends DomainTestBase {
     // Did it save correctly?
     $this->assertNoRaw('The server request to');
     $domains = $storage->loadMultiple();
-    $this->assertTrue(count($domains) == 1, 'Domain record saved via form.');
+    $this->assertCount(1, $domains, 'Domain record saved via form.');
 
     // Make an invalid POST request on admin/config/domain/add.
     $edit = $this->domainPostValues();
@@ -44,7 +44,7 @@ class DomainCheckResponseTest extends DomainTestBase {
     // The domain should not save.
     $this->assertRaw('The server request to');
     $domains = $storage->loadMultiple();
-    $this->assertTrue(count($domains) == 1, 'Domain record not saved via form.');
+    $this->assertCount(1, $domains, 'Domain record not saved via form.');
 
     // Bypass the check.
     $edit['validate_url'] = 0;
@@ -53,7 +53,7 @@ class DomainCheckResponseTest extends DomainTestBase {
     // The domain should save.
     $this->assertNoRaw('The server request to');
     $domains = $storage->loadMultiple();
-    $this->assertTrue(count($domains) == 2, 'Domain record saved via form.');
+    $this->assertCount(2, $domains, 'Domain record saved via form.');
   }
 
 }
