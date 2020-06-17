@@ -34,9 +34,12 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
   public static $modules = [
     'domain_config_ui',
     'domain_config_test',
-    'language'
+    'language',
   ];
 
+  /**
+   * {@inheritDoc}
+   */
   public function setUp() {
     parent::setUp();
 

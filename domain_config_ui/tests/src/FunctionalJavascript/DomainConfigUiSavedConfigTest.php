@@ -33,9 +33,12 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
    */
   public static $modules = [
     'domain_config_ui',
-    'language'
+    'language',
   ];
 
+  /**
+   * {@inheritDoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -95,7 +98,7 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
     $page->pressButton('Save configuration');
     $this->htmlOutput($page->getHtml());
 
-    // Now, head to /admin/config/domain/config-ui/list
+    // Now, head to /admin/config/domain/config-ui/list.
     $path = '/admin/config/domain/config-ui/list';
     $this->drupalGet($path);
     $page = $this->getSession()->getPage();
@@ -127,7 +130,7 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
     $page->findButton('Delete configuration');
     $page->pressButton('Delete configuration');
 
-    // Now, head to /admin/config/domain/config-ui/list
+    // Now, head to /admin/config/domain/config-ui/list.
     $path = '/admin/config/domain/config-ui/list';
     $this->drupalGet($path);
     $page = $this->getSession()->getPage();

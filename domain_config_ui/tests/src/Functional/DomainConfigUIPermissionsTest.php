@@ -23,6 +23,9 @@ class DomainConfigUIPermissionsTest extends DomainConfigTestBase {
     'domain_config_ui',
   ];
 
+  /**
+   * {@inheritDoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -35,7 +38,7 @@ class DomainConfigUIPermissionsTest extends DomainConfigTestBase {
   /**
    * Tests access the the settings form.
    */
-  public function testDomainConfigUISettingsAccess() {
+  public function testSettingsAccess() {
     $this->drupalLogin($this->admin_user);
     $path = '/admin/config/domain/config-ui';
     $path2 = '/admin/config/system/site-information';

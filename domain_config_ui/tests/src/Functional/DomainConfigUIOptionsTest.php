@@ -23,6 +23,9 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
     'domain_config_ui',
   ];
 
+  /**
+   * {@inheritDoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -32,16 +35,14 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
 
     $this->domainCreateTestDomains(5);
     // Assign the admin_user and editor_user to some domains.
-    // $entity_type, $entity_id, $ids, $field
     $this->addDomainsToEntity('user', $this->limited_user->id(), ['example_com', 'one_example_com'], DOMAIN_ADMIN_FIELD);
     $this->addDomainsToEntity('user', $this->language_user->id(), ['two_example_com', 'three_example_com'], DOMAIN_ADMIN_FIELD);
   }
 
-
   /**
    * Tests access the the settings form.
    */
-  public function testDomainConfigUIOptions() {
+  public function testFormOptions() {
     $this->drupalLogin($this->admin_user);
     $path = '/admin/config/domain/config-ui';
     $path2 = '/admin/config/system/site-information';

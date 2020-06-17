@@ -8,7 +8,7 @@ use Drupal\Tests\domain\Traits\DomainTestTrait;
 use Drupal\domain_config_ui\DomainConfigUITrait;
 
 /**
- * Tests the domain config settings interface
+ * Tests the domain config settings interface.
  *
  * @group domain_config_ui
  */
@@ -35,9 +35,12 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
    */
   public static $modules = [
     'domain_config_ui',
-    'language'
+    'language',
   ];
 
+  /**
+   * {@inheritDoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -52,7 +55,7 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
   /**
    * Tests ability to add/remove forms.
    */
-  public function testDomainConfigUISettings() {
+  public function testSettings() {
     $config = $this->config('domain_config_ui.settings');
     $expected = $this->explodePathSettings("/admin/appearance\r\n/admin/config/system/site-information");
     $value = $this->explodePathSettings($config->get('path_pages'));
