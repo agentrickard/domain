@@ -114,7 +114,7 @@ class DomainAdminElementTest extends DomainTestBase {
     // Test the case presented in https://www.drupal.org/node/2841962.
     $config = \Drupal::configFactory()->getEditable('user.settings');
     $config->set('verify_mail', 0);
-    $config->set('register', USER_REGISTER_VISITORS);
+    $config->set('register', \Drupal\user\UserInterface::REGISTER_VISITORS);
     $config->save();
     $this->drupalLogout();
     $this->drupalGet('user/register');
