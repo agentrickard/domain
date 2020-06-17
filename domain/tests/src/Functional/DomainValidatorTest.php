@@ -26,7 +26,7 @@ class DomainValidatorTest extends DomainTestBase {
     $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = $storage->loadByHostname($key);
-    $this->assertTrue(!empty($domain), 'Test domain created.');
+    $this->assertNotEmpty($domain, 'Test domain created.');
 
     // Valid hostnames to test. Valid is the boolean value.
     $hostnames = [
@@ -52,10 +52,10 @@ class DomainValidatorTest extends DomainTestBase {
     foreach ($hostnames as $hostname => $valid) {
       $errors = $validator->validate($hostname);
       if ($valid) {
-        $this->assertTrue(empty($errors), 'Validation correct with no errors.');
+        $this->assertEmpty($errors, 'Validation correct with no errors.');
       }
       else {
-        $this->assertTrue(!empty($errors), 'Validation correct with proper errors.');
+        $this->assertNotEmpty($errors, 'Validation correct with proper errors.');
       }
     }
     // Test duplicate hostname creation.
@@ -88,10 +88,10 @@ class DomainValidatorTest extends DomainTestBase {
     foreach ($hostnames as $hostname => $valid) {
       $errors = $validator->validate($hostname);
       if ($valid) {
-        $this->assertTrue(empty($errors), 'Validation test correct with no errors.');
+        $this->assertEmpty($errors, 'Validation test correct with no errors.');
       }
       else {
-        $this->assertTrue(!empty($errors), 'Validation test correct with errors.');
+        $this->assertNotEmpty($errors, 'Validation test correct with errors.');
       }
     }
   }

@@ -23,7 +23,7 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
     $key = 'foo.com';
     /** @var \Drupal\domain\Entity\Domain $domain */
     $domain = \Drupal::entityTypeManager()->getStorage('domain')->loadByHostname($key);
-    $this->assertTrue(!empty($domain), 'Test domain created.');
+    $this->assertNotEmpty($domain, 'Test domain created.');
 
     // Valid patterns to test. Valid is the boolean value.
     $patterns = [
@@ -57,10 +57,10 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
       $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);
       $errors = $validator->validate($alias);
       if ($valid) {
-        $this->assertTrue(empty($errors), 'Validation test success.');
+        $this->assertEmpty($errors, 'Validation test success.');
       }
       else {
-        $this->assertTrue(!empty($errors), 'Validation test success.');
+        $this->assertNotEmpty($errors, 'Validation test success.');
       }
     }
     // Test the configurable option.
@@ -75,10 +75,10 @@ class DomainAliasValidatorTest extends DomainAliasTestBase {
       $alias = $this->domainAliasCreateTestAlias($domain, $pattern, 0, 'default', FALSE);
       $errors = $validator->validate($alias);
       if ($valid) {
-        $this->assertTrue(empty($errors), 'Validation test success.');
+        $this->assertEmpty($errors, 'Validation test success.');
       }
       else {
-        $this->assertTrue(!empty($errors), 'Validation test success.');
+        $this->assertNotEmpty($errors, 'Validation test success.');
       }
     }
   }

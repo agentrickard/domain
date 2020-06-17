@@ -28,7 +28,7 @@ class DomainActionsTest extends DomainTestBase {
     // Test the domains.
     $storage = \Drupal::entityTypeManager()->getStorage('domain');
     $domains = $storage->loadMultiple();
-    $this->assertTrue(count($domains) == 4, 'Four domain records found.');
+    $this->assertCount(4, $domains, 'Four domain records found.');
 
     // Check the default domain.
     $default = $storage->loadDefaultId();

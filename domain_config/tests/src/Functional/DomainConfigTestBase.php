@@ -67,7 +67,7 @@ abstract class DomainConfigTestBase extends DomainTestBase {
     $this->rebuildContainer();
 
     $es = \Drupal::entityTypeManager()->getStorage('configurable_language')->load('es');
-    $this->assertTrue(!empty($es), 'Created test language.');
+    $this->assertNotEmpty($es, 'Created test language.');
   }
 
 }

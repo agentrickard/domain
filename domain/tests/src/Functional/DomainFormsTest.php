@@ -38,7 +38,7 @@ class DomainFormsTest extends DomainTestBase {
 
     // Did it save correctly?
     $default_id = $storage->loadDefaultId();
-    $this->assertTrue(!empty($default_id), 'Domain record saved via form.');
+    $this->assertNotEmpty($default_id, 'Domain record saved via form.');
 
     // Does it load correctly?
     $storage->resetCache([$default_id]);
@@ -46,7 +46,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->assertTrue($new_domain->id() == $default_id, 'Domain loaded properly.');
 
     // Has a UUID been set?
-    $this->assertTrue(!empty($new_domain->uuid()), 'Entity UUID set properly.');
+    $this->assertNotEmpty($new_domain->uuid(), 'Entity UUID set properly.');
 
     // Visit the edit domain administration page.
     $editUrl = 'admin/config/domain/edit/' . $new_domain->id();
@@ -71,7 +71,7 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalPostForm($deleteUrl, [], 'Delete');
     $storage->resetCache([$default_id]);
     $domain = $storage->load($default_id);
-    $this->assertTrue(empty($domain), 'Domain record deleted.');
+    $this->assertEmpty($domain, 'Domain record deleted.');
 
     // No domains should exist.
     $this->domainTableIsEmpty();

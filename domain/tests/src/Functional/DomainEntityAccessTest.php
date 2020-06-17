@@ -42,7 +42,7 @@ class DomainEntityAccessTest extends DomainTestBase {
 
     // Did it save correctly?
     $default_id = $storage->loadDefaultId();
-    $this->assertTrue(!empty($default_id), 'Domain record saved via form.');
+    $this->assertNotEmpty($default_id, 'Domain record saved via form.');
 
     // Does it load correctly?
     $storage->resetCache([$default_id]);
