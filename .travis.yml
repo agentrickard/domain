@@ -1,34 +1,30 @@
 language: php
-dist: xenial
-os: linux
-sudo: required
+sudo: false
 
 services:
   - mysql
-  - xvfb
 
-jobs:
+matrix:
   fast_finish: true
   include:
     - env: DRUPAL_BRANCH="8.8.x" drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade" MODULE_LIST="domain domain_access domain_alias domain_config domain_source"
       php: 7.3
-   # - env: DRUPAL_BRANCH="8.9.x" drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade" MODULE_LIST="domain domain_access domain_alias domain_config domain_source"
-   #   php: 7.3
+    - env: DRUPAL_BRANCH="8.9.x" drupal" UPDATE_PHPUNIT="composer run-script drupal-phpunit-upgrade" MODULE_LIST="domain domain_access domain_alias domain_config domain_source"
+      php: 7.3
 
 addons:
   hosts:
-    - example.local
-    - one.example.local
-    - two.example.local
-    - three.example.local
-    - four.example.local
-    - five.example.local
-    - six.example.local
-    - seven.example.local
-    - eight.example.local
-    - nine.example.local
-    - ten.example.local
-  chrome: stable
+    - example.com
+    - one.example.com
+    - two.example.com
+    - three.example.com
+    - four.example.com
+    - five.example.com
+    - six.example.com
+    - seven.example.com
+    - eight.example.com
+    - nine.example.com
+    - ten.example.com
 
 cache:
   directories:
@@ -39,6 +35,11 @@ env:
     # add composer's global bin directory to the path
     # see: https://github.com/drush-ops/drush#install---composer
     - PATH="$PATH:$HOME/.composer/vendor/bin"
+
+mysql:
+  database: domain
+  username: root
+  encoding: utf8
 
 notifications:
   email: false
@@ -55,21 +56,12 @@ before_install:
   # Optimize MySQL timeout and max packet size.
   - echo "mysql.connect_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - echo "default_socket_timeout=3000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS domain CHARACTER SET utf8 COLLATE utf8_general_ci;'
+  - mysql -e 'create database domain;'
   - mysql -e "SET GLOBAL wait_timeout = 36000;"
   - mysql -e "SET GLOBAL max_allowed_packet = 134209536;"
 
-  # Get ipv6 running.
-  - sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
-  - sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=0
-
 before_script:
-  # Install chromedriver
-  - CHROME_MAIN_VERSION=`google-chrome-stable --version | sed -E 's/(^Google Chrome |\.[0-9]+ )//g'`
-  - CHROMEDRIVER_VERSION=`curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_MAIN_VERSION"`
-  - curl "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" -O
-  - unzip chromedriver_linux64.zip -d ~/bin
-  -
+
   # Remember the current rules test directory for later use in the Drupal installation.
   - TESTDIR=$(pwd)
   # Navigate out of module directory to prevent blown stack by recursive module lookup.
@@ -97,21 +89,17 @@ before_script:
   - nohup php -S 0.0.0.0:8080 > /dev/null 2>&1 &
 
   # Wait until the web server is responding.
-  - until curl -s example.local:8080; do true; done > /dev/null
+  - until curl -s example.com:8080; do true; done > /dev/null
 
   # Export PHP Unit vars
   - export SIMPLETEST_DB='mysql://root:@127.0.0.1/domain'
-  - export SIMPLETEST_BASE_URL='http://example.local:8080'
+  - export SIMPLETEST_BASE_URL='http://example.com:8080'
   - export SYMFONY_DEPRECATIONS_HELPER='disabled'
-  #- export MINK_DRIVER_ARGS_WEBDRIVER='["chrome", {"browserName":"chrome","chromeOptions":{"args":["--disable-gpu","--headless", "--no-sandbox", "--disable-dev-shm-usage"]}}, "http://example.local"]'
-  # start your web application and listen on `localhost`
-  - google-chrome-stable --no-sandbox --headless --dump-dom http://example.local &
-  - chromedriver --no-sandbox --port=4444 --headless --disable-dev-shm-usage  &
-  # Wait until the web driver is responding.
-  - until curl -s example.local:4444; do true; done > /dev/null
 
 script:
-  #- chromedriver --port=4444 --headless --no-sandbox --disable-dev-shm-usage --disable-gpu &&
-  #- vendor/bin/phpunit -c core --group domain_config_ui modules/domain -v
-  - vendor/bin/phpunit -c core /home/travis/build/agentrickard/domain/domain_config_ui/tests/src/FunctionalJavascript/DomainConfigUISettingsTest.php --verbose
-  - pkill chromedriver
+  - vendor/bin/phpunit -c core --group domain modules/domain -v
+  - vendor/bin/phpunit -c core --group domain_access modules/domain -v
+  - vendor/bin/phpunit -c core --group domain_alias modules/domain -v
+  - vendor/bin/phpunit -c core --group domain_config modules/domain -v
+  - vendor/bin/phpunit -c core --group domain_content modules/domain -v
+  - vendor/bin/phpunit -c core --group domain_source modules/domain -v
