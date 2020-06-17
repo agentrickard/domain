@@ -2,10 +2,9 @@
 
 namespace Drupal\domain_config_ui\Controller;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\domain\DomainInterface;
 use Drupal\domain_config_ui\DomainConfigUITrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -152,7 +151,7 @@ class DomainConfigUIController {
     }
     $page['help'] = [
       '#type' => 'item',
-      '#title' => SafeMarkup::checkPlain($config_name),
+      '#title' => Html::escape($config_name),
       '#markup' => $this->t('This configuration is for the %domain domain and
         applies to %language.', ['%domain' => $elements['domain'],
         '%language' => $language]
@@ -267,7 +266,7 @@ class DomainConfigUIController {
       return $value ? 'true' : 'false';
     }
     if (is_scalar($value)) {
-      return SafeMarkup::checkPlain($value);
+      return Html::escape($value);
     }
     if (empty($value)) {
       return '<' . t('empty') . '>';

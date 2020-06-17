@@ -2,7 +2,7 @@
 
 namespace Drupal\domain_config_ui\Form;
 
-use Drupal\Component\Utility\SafeMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -35,7 +35,7 @@ class DeleteForm extends FormBase {
 
     $form['help'] = [
       '#type' => 'item',
-      '#title' => SafeMarkup::checkPlain($config_name),
+      '#title' => Html::escape($config_name),
       '#markup' => $this->t('Are you sure you want to delete the configuration
         override: %config_name?', ['%config_name' => $config_name]),
       '#prefix' => '<p>',
