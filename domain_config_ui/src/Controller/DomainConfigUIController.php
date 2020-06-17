@@ -19,7 +19,7 @@ class DomainConfigUIController {
   /**
    * Handles AJAX operations to add/remove configuration forms.
    *
-   * @param $route_name
+   * @param string $route_name
    *   The route from which the AJAX request was triggered.
    * @param string $op
    *   The operation being performed, either 'enable' to enable the form,
@@ -59,6 +59,7 @@ class DomainConfigUIController {
             $success = TRUE;
           }
           break;
+
         case 'disable':
           if ($exists = \Drupal::service('path.matcher')->matchPath($new_path, $path_pages)) {
             $this->removePath($new_path);
@@ -84,7 +85,7 @@ class DomainConfigUIController {
    */
   public function overview() {
     $elements = [];
-    $page['table'] = array(
+    $page['table'] = [
       '#type' => 'table',
       '#header' => [
         'name' => t('Configuration key'),
@@ -93,7 +94,7 @@ class DomainConfigUIController {
         'language' => t('Language'),
         'actions' => t('Actions'),
       ],
-    );
+    ];
     // @TODO: inject services.
     $storage = \Drupal::service('config.storage');
     foreach ($storage->listAll('domain.config') as $name) {
@@ -133,10 +134,10 @@ class DomainConfigUIController {
   /**
    * Controller for inspecting configuration.
    *
-   * @param $config_name
+   * @param string $config_name
    *   The domain config object being inspected.
    */
-  public function inspectConfig($config_name = null) {
+  public function inspectConfig($config_name = NULL) {
     if (empty($config_name)) {
       $url = Url::fromRoute('domain_config_ui.list');
       return new RedirectResponse($url->toString());
@@ -153,8 +154,10 @@ class DomainConfigUIController {
       '#type' => 'item',
       '#title' => Html::escape($config_name),
       '#markup' => $this->t('This configuration is for the %domain domain and
-        applies to %language.', ['%domain' => $elements['domain'],
-        '%language' => $language]
+        applies to %language.', [
+          '%domain' => $elements['domain'],
+          '%language' => $language
+        ]
       ),
       '#prefix' => '<p>',
       '#suffix' => '</p>',
@@ -168,10 +171,11 @@ class DomainConfigUIController {
   /**
    * Derives the parts of a config object for presentation.
    *
-   * @param $name
+   * @param string $name
    *   A configuration object name.
    *
    * @return array
+   *   An array of config values, keyed by name.
    */
   public static function deriveElements($name) {
     $entity_manager = \Drupal::entityTypeManager();
@@ -235,18 +239,18 @@ class DomainConfigUIController {
         foreach ($val as $k => $v) {
           $list[] = t('<strong>@key</strong> : @value', ['@key' => $k, '@value' => self::formatValue($v)]);
         }
-        $variables = array(
+        $variables = [
           '#theme' => 'item_list',
           '#items' => $list,
           '#title' => self::formatValue($key),
-        );
+        ];
         $items[] = render($variables);
       }
     }
-    $rendered = array(
+    $rendered = [
       '#theme' => 'item_list',
       '#items' => $items,
-    );
+    ];
     return render($rendered);
   }
 
@@ -255,7 +259,7 @@ class DomainConfigUIController {
    *
    * Taken from config_inspector module.
    *
-   * @param $value
+   * @param mixed $value
    *   The value element.
    *
    * @return string

@@ -150,7 +150,7 @@ class ConfigFactory extends CoreConfigFactory {
       }
       // If we tried to load a language-sensitive file and failed, load the
       // domain-specific override.
-      elseif ($this->domainConfigUIManager->getSelectedLanguageId())  {
+      elseif ($this->domainConfigUIManager->getSelectedLanguageId()) {
         $omit_language = TRUE;
         $config_name = $this->domainConfigUIManager->getSelectedConfigName($name, $omit_language);
         if ($override = $this->storage->read($config_name)) {
