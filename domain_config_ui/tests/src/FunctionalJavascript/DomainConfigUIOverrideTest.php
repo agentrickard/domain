@@ -70,7 +70,7 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
     $this->assertEquals($config['name'], 'One');
     $this->assertEquals($config['page']['front'], '/node/1');
 
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
     $path = '/admin/config/system/site-information';
 
     // Visit the site information page.
@@ -140,8 +140,8 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
    */
   private function createLanguage() {
     // Create and login user.
-    $admin_user = $this->drupalCreateUser(['administer languages', 'access administration pages']);
-    $this->drupalLogin($admin_user);
+    $adminUser = $this->drupalCreateUser(['administer languages', 'access administration pages']);
+    $this->drupalLogin($adminUser);
 
     // Add language.
     $edit = [

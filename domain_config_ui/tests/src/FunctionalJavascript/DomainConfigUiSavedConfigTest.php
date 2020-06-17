@@ -55,7 +55,7 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
    * Tests that we can save domain and language-specific settings.
    */
   public function testSavedConfig() {
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
     $path = '/admin/config/system/site-information';
 
     // Visit the site information page.
@@ -147,8 +147,8 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
    */
   private function createLanguage() {
     // Create and login user.
-    $admin_user = $this->drupalCreateUser(['administer languages', 'access administration pages']);
-    $this->drupalLogin($admin_user);
+    $adminUser = $this->drupalCreateUser(['administer languages', 'access administration pages']);
+    $this->drupalLogin($adminUser);
 
     // Add language.
     $edit = [

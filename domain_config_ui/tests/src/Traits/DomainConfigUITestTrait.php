@@ -8,34 +8,38 @@ namespace Drupal\Tests\domain_config_ui\Traits;
 trait DomainConfigUITestTrait {
 
   /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with full permissions to use the module.
+   * A user with full permissions to use the module.
+   *
+   * @var Drupal\Core\Session\AccountInterface
    */
-  protected $admin_user;
+  protected $adminUser;
 
   /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with access administration but not this module.
+   * A user with access administration but not this module.
+   *
+   * @var Drupal\Core\Session\AccountInterface
    */
-  protected $editor_user;
+  protected $editorUser;
 
   /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with access to domains but not language.
+   * A user with access to domains but not language.
+   *
+   * @var Drupal\Core\Session\AccountInterface
    */
-  protected $limited_user;
+  protected $limitedUser;
 
   /**
-   *  @var Drupal\Core\Session\AccountInterface
-   *  A user with permission to domains and language.
+   * A user with permission to domains and language.
+   *
+   * @var Drupal\Core\Session\AccountInterface
    */
-  protected $language_user;
+  protected $languageUser;
 
   /**
-   *  Create an admin user.
+   * Create an admin user.
    */
   public function createAdminUser() {
-    $this->admin_user = $this->drupalCreateUser([
+    $this->adminUser = $this->drupalCreateUser([
       'access administration pages',
       'access content',
       'administer domains',
@@ -51,10 +55,10 @@ trait DomainConfigUITestTrait {
   }
 
   /**
-   *  Create an editor user.
+   * Create an editor user.
    */
   public function createEditorUser() {
-    $this->editor_user = $this->drupalCreateUser([
+    $this->editorUser = $this->drupalCreateUser([
       'access administration pages',
       'access content',
       'administer site configuration',
@@ -63,10 +67,10 @@ trait DomainConfigUITestTrait {
   }
 
   /**
-   *  Create a limited admin user.
+   * Create a limited admin user.
    */
   public function createLimitedUser() {
-    $this->limited_user = $this->drupalCreateUser([
+    $this->limitedUser = $this->drupalCreateUser([
       'access administration pages',
       'administer languages',
       'administer site configuration',
@@ -79,7 +83,7 @@ trait DomainConfigUITestTrait {
    * Create a language administrator.
    */
   public function createLanguageUser() {
-    $this->language_user = $this->drupalCreateUser([
+    $this->languageUser = $this->drupalCreateUser([
       'access administration pages',
       'use domain config ui',
       'translate domain configuration',

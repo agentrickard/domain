@@ -34,16 +34,16 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
     $this->createLanguageUser();
 
     $this->domainCreateTestDomains(5);
-    // Assign the admin_user and editor_user to some domains.
-    $this->addDomainsToEntity('user', $this->limited_user->id(), ['example_com', 'one_example_com'], DOMAIN_ADMIN_FIELD);
-    $this->addDomainsToEntity('user', $this->language_user->id(), ['two_example_com', 'three_example_com'], DOMAIN_ADMIN_FIELD);
+    // Assign the adminUser and editorUser to some domains.
+    $this->addDomainsToEntity('user', $this->limitedUser->id(), ['example_com', 'one_example_com'], DOMAIN_ADMIN_FIELD);
+    $this->addDomainsToEntity('user', $this->languageUser->id(), ['two_example_com', 'three_example_com'], DOMAIN_ADMIN_FIELD);
   }
 
   /**
    * Tests access the the settings form.
    */
   public function testFormOptions() {
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
     $path = '/admin/config/domain/config-ui';
     $path2 = '/admin/config/system/site-information';
 
@@ -73,8 +73,8 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
       $this->assertRaw($string, 'Found the language option.');
     }
 
-    // Now test the editor_user.
-    $this->drupalLogin($this->limited_user);
+    // Now test the editorUser.
+    $this->drupalLogin($this->limitedUser);
 
     // Visit the domain config ui administration page.
     $this->drupalGet($path);
@@ -100,8 +100,8 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
     // We expect to find 'All Domains'.
     $this->assertRaw('All Domains</option>', 'Found the domain option.');
 
-    // Now test the language_user.
-    $this->drupalLogin($this->language_user);
+    // Now test the languageUser.
+    $this->drupalLogin($this->languageUser);
 
     // Visit the domain config ui administration page.
     $this->drupalGet($path);

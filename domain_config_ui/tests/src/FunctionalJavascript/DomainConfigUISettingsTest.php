@@ -61,7 +61,7 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
     $value = $this->explodePathSettings($config->get('path_pages'));
     $this->assertEquals($expected, $value);
 
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
 
     // Test some theme paths.
     $path = '/admin/appearance';
@@ -109,7 +109,7 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
     $page->findLink('Enable domain configuration');
 
     // Ensure the editor cannot access the form.
-    $this->drupalLogin($this->editor_user);
+    $this->drupalLogin($this->editorUser);
     $this->drupalGet($path);
     $this->assertSession()->pageTextNotContains('Enable domain configuration');
   }

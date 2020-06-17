@@ -39,7 +39,7 @@ class DomainConfigUIPermissionsTest extends DomainConfigTestBase {
    * Tests access the the settings form.
    */
   public function testSettingsAccess() {
-    $this->drupalLogin($this->admin_user);
+    $this->drupalLogin($this->adminUser);
     $path = '/admin/config/domain/config-ui';
     $path2 = '/admin/config/system/site-information';
 
@@ -52,7 +52,7 @@ class DomainConfigUIPermissionsTest extends DomainConfigTestBase {
     $this->assertResponse(200);
     $this->findField('domain');
 
-    $this->drupalLogin($this->editor_user);
+    $this->drupalLogin($this->editorUser);
 
     // Visit the domain config ui administration page.
     $this->drupalGet($path);
