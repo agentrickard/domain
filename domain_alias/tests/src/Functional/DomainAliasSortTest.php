@@ -18,7 +18,7 @@ class DomainAliasSortTest extends DomainAliasTestBase {
     $storage = \Drupal::entityTypeManager()->getStorage('domain_alias');
     foreach ($list as $key => $values) {
       $patterns = $storage->getPatterns($key);
-      $this->assertTrue(empty(array_diff($values, $patterns)), 'Pattern matched as expected for ' . $key);
+      $this->assertEmpty(array_diff($values, $patterns), 'Pattern matched as expected for ' . $key);
     }
   }
 

@@ -37,7 +37,7 @@ class DomainCreateTest extends DomainTestBase {
 
     // Did it save correctly?
     $default_id = $storage->loadDefaultId();
-    $this->assertTrue(!empty($default_id), 'Default domain has been set.');
+    $this->assertNotEmpty($default_id, 'Default domain has been set.');
 
     // Does it load correctly?
     $new_domain = $storage->load($default_id);
@@ -52,7 +52,7 @@ class DomainCreateTest extends DomainTestBase {
     // Delete the domain.
     $domain->delete();
     $domain = $storage->load($default_id, TRUE);
-    $this->assertTrue(empty($domain), 'Domain record deleted.');
+    $this->assertEmpty($domain, 'Domain record deleted.');
 
     // No domains should exist.
     $this->domainTableIsEmpty();

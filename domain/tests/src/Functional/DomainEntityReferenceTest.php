@@ -108,7 +108,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $values = $node->get('field_domain');
 
     // Get the expected value count.
-    $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
+    $this->assertCount(2, $values, 'Node saved with two domain records.');
 
   }
 

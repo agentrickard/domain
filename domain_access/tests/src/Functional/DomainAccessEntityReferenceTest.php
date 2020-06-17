@@ -92,7 +92,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
     // Check that two values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
-    $this->assertTrue(count($values) == 2, 'Node saved with two domain records.');
+    $this->assertCount(2, $values, 'Node saved with two domain records.');
   }
 
 }

@@ -45,7 +45,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
       ->query($query, [':nid' => $node1->id()])
       ->fetchAll();
 
-    $this->assertEqual(count($records), 1, 'Returned the correct number of rows.');
+    $this->assertCount(1, $records, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
     $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
     $this->assertEqual($records[0]->grant_view, 1, 'Grant view stored.');
@@ -64,7 +64,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
     $records = Database::getConnection()
       ->query($query, [':nid' => $node2->id()])
       ->fetchAll();
-    $this->assertEqual(count($records), 2, 'Returned the correct number of rows.');
+    $this->assertCount(2, $records, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
     $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
     $this->assertEqual($records[0]->grant_view, 1, 'Grant view stored.');

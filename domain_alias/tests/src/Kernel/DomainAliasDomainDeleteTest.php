@@ -69,18 +69,18 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
       ];
       $this->createDomainAlias($values);
       $alias = $this->aliasStorage->loadByPattern($patterns[$id]);
-      $this->assertTrue(!empty($alias), 'Alias saved properly');
+      $this->assertNotEmpty($alias, 'Alias saved properly');
     }
 
     // Delete one domain.
     $domain->delete();
     $alias = $this->aliasStorage->loadByPattern($patterns[$id]);
-    $this->assertTrue(empty($alias), 'Alias deleted properly');
+    $this->assertEmpty($alias, 'Alias deleted properly');
 
     // Check the remaining domain, which should still have an alias.
     $domain = $this->domainStorage->load('example_com');
     $alias = $this->aliasStorage->loadByPattern($patterns[$domain->id()]);
-    $this->assertTrue(!empty($alias), 'Alias retained properly');
+    $this->assertNotEmpty($alias, 'Alias retained properly');
   }
 
 }
