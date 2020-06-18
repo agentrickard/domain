@@ -101,5 +101,6 @@ script:
   - vendor/bin/phpunit -c core --group domain_access modules/domain -v
   - vendor/bin/phpunit -c core --group domain_alias modules/domain -v
   - vendor/bin/phpunit -c core --group domain_config modules/domain -v
+  - vendor/bin/phpunit -c core --group domain_config_ui modules/domain --testsuite functional -v
   - vendor/bin/phpunit -c core --group domain_content modules/domain -v
   - vendor/bin/phpunit -c core --group domain_source modules/domain -v

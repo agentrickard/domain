@@ -1,0 +1,12 @@
+domain_config_ui.settings:
+  title: Domain config forms
+  route_name: domain_config_ui.settings
+  parent: domain.admin
+  description: 'Domain Config UI settings'
+  weight: 0
+domain_config_ui.list:
+  title: Saved configuration
+  route_name: domain_config_ui.list
+  parent: domain_config_ui.settings
+  description: 'Saved configuration'
+  weight: 0

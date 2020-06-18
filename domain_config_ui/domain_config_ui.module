@@ -1,0 +1,168 @@
+<?php
+
+/**
+ * @file
+ * Allows saving of domain specific configuration through the UI.
+ */
+
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\Component\Render\FormattableMarkup;
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function domain_config_ui_preprocess_page(&$variables) {
+  $content = [];
+  if (!domain_config_ui_route_is_admin()) {
+    return;
+  }
+  if (!domain_config_ui_path_is_registered()) {
+    $content = ['domain_config_ui_admin' => domain_config_ui_admin_form('enable')];
+  }
+  else {
+    $content = ['domain_config_ui_admin' => domain_config_ui_admin_form('disable')];
+    // Add a message below the form showing the current domain.
+    $form = \Drupal::formBuilder()->getForm('Drupal\domain_config_ui\Form\SwitchForm');
+    if (isset($form['domain_config_ui']['domain']['#options'])) {
+      $options = $form['domain_config_ui']['domain']['#options'];
+    }
+    if ($form['#access'] && $warning_message = domain_config_ui_save_warning_message($options)) {
+      $content['domain_config_ui_switch_warning'] = $warning_message;
+    }
+    // Add domain switch form to the top of the content region.
+    $content['domain_config_ui_switch'] = $form;
+  }
+  if ($content) {
+    $variables['page']['content'] = array_merge($content, $variables['page']['content']);
+  }
+}
+
+/**
+ * Generates the markup for the AJAX admin action.
+ *
+ * @param string $op
+ *   An operation: either 'enable' or 'disable' are allowed.
+ */
+function domain_config_ui_admin_form($op) {
+  $admin_form = [];
+  if (\Drupal::currentUser()->hasPermission('administer domain config ui')) {
+    $route = \Drupal::routeMatch()->getRouteObject();
+    // We make a special exception for the themes overview, which is unique.
+    // @TODO: make this list extensible.
+    $special = $route->getPath() === '/admin/appearance';
+    if ($route->hasDefault('_form') || $special) {
+      $form_name = $route->getDefault('_form');
+      if (method_exists($form_name, 'getEditableConfigNames') || $special) {
+        $params = [
+          'op' => $op,
+          'route_name' => \Drupal::routeMatch()->getRouteName(),
+        ];
+        foreach (\Drupal::routeMatch()->getParameters() as $key => $value) {
+          $params[$key] = $value;
+        }
+        $title = new TranslatableMarkup('Enable domain configuration');
+        if ($op == 'disable') {
+          $title = new TranslatableMarkup('Disable domain configuration');
+        }
+        $admin_form = [
+          '#type' => 'link',
+          '#url' => Url::fromRoute('domain_config_ui.inline_action', $params),
+          '#title' => $title,
+          '#attributes' => [
+            'class' => [
+              'button',
+              'button--primary',
+              'button--small',
+            ],
+          ],
+          '#prefix' => '<p>',
+          '#suffix' => '</p>',
+          '#weight' => -10,
+        ];
+      }
+    }
+  }
+  return $admin_form;
+}
+
+/**
+ * Generates the markup for the domain save warning message.
+ *
+ * @param array $domain_options
+ *   The options for the domain element of the form.
+ */
+function domain_config_ui_save_warning_message(array $domain_options = []) {
+  $manager = \Drupal::service('domain_config_ui.manager');
+  if ($selected_domain_id = $manager->getSelectedDomainId()) {
+    $selected_domain = \Drupal::service('entity_type.manager')
+      ->getStorage('domain')
+      ->load($selected_domain_id);
+  }
+  if ($selected_language_id = $manager->getSelectedLanguageId()) {
+    $selected_language = \Drupal::service('language_manager')
+      ->getLanguage($selected_language_id);
+  }
+  $domain_label = !empty($selected_domain) ?
+    new TranslatableMarkup('the @label domain', ['@label' => $selected_domain->label()]) :
+    new TranslatableMarkup('all domains without custom configuration');
+
+  // In some cases, the user cannot use 'all domains.' In that case, we have to
+  // use the default option as a label.
+  if (empty($selected_domain) && !\Drupal::currentUser()->hasPermission('set default domain configuration')) {
+    $label = current($domain_options);
+    $domain_label = new TranslatableMarkup('the @label domain', ['@label' => $label]);
+  }
+
+  $languages = \Drupal::service('language_manager')->getLanguages();
+  if (count($languages) > 1) {
+    $language_label = !empty($selected_language) ? $selected_language->getName() : new TranslatableMarkup('all languages without custom configuration.');
+  }
+  else {
+    $language_label = !empty($selected_language) ? $selected_language->getName() : new TranslatableMarkup('all languages.');
+  }
+  $message = new TranslatableMarkup('This configuration will be saved for @domain and displayed in @language', [
+    '@domain' => $domain_label,
+    '@language' => $language_label,
+  ]);
+
+  return [
+    '#markup' => new FormattableMarkup('<div class="messages messages--warning">@message</div>', [
+      '@message' => $message,
+    ]),
+    '#weight' => -1000,
+  ];
+}
+
+/**
+ * Checks if provided path should have a domain switch form on top of the page.
+ *
+ * @return bool
+ *   TRUE if domain switch should be added. Otherwise, FALSE.
+ */
+function domain_config_ui_path_is_registered() {
+  $path_pages = \Drupal::config('domain_config_ui.settings')->get('path_pages');
+  // Theme settings pass arguments, so check both path and route.
+  $path = \Drupal::requestStack()->getCurrentRequest()->getPathInfo();
+  return \Drupal::service('path.matcher')->matchPath($path, $path_pages);
+}
+
+/**
+ * Checks if route is admin.
+ *
+ * @return bool
+ *   TRUE if route is admin. Otherwise, FALSE.
+ */
+function domain_config_ui_route_is_admin() {
+  $route = \Drupal::routeMatch()->getRouteObject();
+  // Never allow this module's form to be added.
+  // @TODO: Allow modules to extend this list.
+  $disallowed = [
+    '/admin/config/domain/config-ui',
+    '/admin/config/domain/settings',
+  ];
+  if (in_array($route->getPath(), $disallowed, TRUE)) {
+    return FALSE;
+  }
+  return \Drupal::service('router.admin_context')->isAdminRoute($route);
+}

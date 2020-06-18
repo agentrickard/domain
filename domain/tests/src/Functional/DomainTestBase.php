@@ -119,6 +119,19 @@ abstract class DomainTestBase extends BrowserTestBase {
   }
 
   /**
+   * Finds no field exists (input, textarea, select) with specified locator.
+   *
+   * @param string $locator
+   *   Input id, name or label.
+   *
+   * @return \Behat\Mink\Element\NodeElement|null
+   *   The input field element.
+   */
+  public function findNoField($locator) {
+    return $this->assertSession()->fieldNotExists($locator);;
+  }
+
+  /**
    * Finds button with specified locator.
    *
    * @param string $locator
