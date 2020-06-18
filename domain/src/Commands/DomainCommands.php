@@ -771,7 +771,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   public function scheme($domain_id, $scheme = NULL) {
-    $new_scheme = null;
+    $new_scheme = NULL;
 
     // Resolve the domain.
     if ($domain = $this->getDomainFromArgument($domain_id)) {
@@ -898,7 +898,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
     // Filter against existing so we can count correctly.
     $prepared = [];
     foreach ($new as $key => $value) {
-      if (!in_array($value, $existing, true)) {
+      if (!in_array($value, $existing, TRUE)) {
         $prepared[] = $value;
       }
     }
@@ -1356,14 +1356,15 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * Reassign entities of the supplied type to the $policy domain.
    *
    * @param array $options
-   *   Drush options sent to the command.
+   *   Drush options sent to the command. An array such as the following:
    *   [
    *     'entity_filter' => 'node',
    *     'policy' => 'prompt' | 'default' | 'ignore' | {domain_id}
    *     'field' => DOMAIN_ACCESS_FIELD,
    *   ];
-   * @param \Drupal\domain\DomainInterface[] $domains
-   *   List of the domains to reassign content away from.
+   *   The caller is expected to provide this information.
+   * @param array $domains
+   *   Array of domain objects to reassign content away from.
    *
    * @return int
    *   The count of updated entities.
