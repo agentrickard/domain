@@ -67,7 +67,7 @@ trait DomainConfigUITrait {
    * @return string
    *   A normalized string of paths.
    */
-  public function implodePathSettings($path_array) {
+  public function implodePathSettings(array $path_array) {
     return implode("\r\n", $path_array);
   }
 
@@ -91,7 +91,7 @@ trait DomainConfigUITrait {
   /**
    * Normalizes the path string using \r\n for linebreaks.
    *
-   * @param $path_string
+   * @param string $path_string
    *   The string of paths.
    *
    * @return string
