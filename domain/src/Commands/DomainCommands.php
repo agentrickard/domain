@@ -14,6 +14,7 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Html;
 use Drupal\domain\DomainInterface;
 use Drush\Commands\DrushCommands;
+use GuzzleHttp\Exception\TransferException;
 
 /**
  * Drush commands for the domain module.
@@ -55,6 +56,9 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
   /**
    * List active domains for the site.
    *
+   * @param array $options
+   *   The options passed to the command.
+   *
    * @option inactive
    *   Show only the domains that are inactive/disabled.
    * @option active
@@ -78,9 +82,6 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *   domain_id: Domain Id
    *   id: Machine name
    * @default-fields id,name,hostname,scheme,status,is_default,response
-   *
-   * @param array $options
-   *   The options passed to the command.
    *
    * @return \Consolidation\OutputFormatters\StructuredData\RowsOfFields
    *   Table output.
@@ -117,7 +118,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
             try {
               $v = $this->checkDomain($domain);
             }
-            catch (\GuzzleHttp\Exception\TransferException $ex) {
+            catch (TransferException $ex) {
               $v = dt('500 - Failed');
             }
             catch (Exception $ex) {
@@ -541,7 +542,13 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
       $delete_options['policy'] = $policy;
       $target = [$target_domain];
       $count = $this->reassignLinkedEntities($target, $delete_options);
-      return dt('@count @type entities updated field @field.', ['@count' => $count, '@type' => $delete_options['entity_filter'], '@field' => $delete_options['field']]);
+      return dt('@count @type entities updated field @field.',
+        [
+          '@count' => $count,
+          '@type' => $delete_options['entity_filter'],
+          '@field' => $delete_options['field'],
+        ]
+      );
     }
   }
 
@@ -760,6 +767,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *
    * @return string
    *   The message to print.
+   *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
   public function scheme($domain_id, $scheme = NULL) {
@@ -798,21 +806,21 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
 
           default:
             throw new DomainCommandException(
-              dt('Scheme name "!scheme" not known', ['!scheme' => $new_scheme])
+              dt('Scheme name "!scheme" not known.', ['!scheme' => $new_scheme])
             );
         }
         $domain->saveProperty('scheme', $new_scheme);
       }
 
       // Return the (new | current) scheme for this domain.
-      return dt('Scheme is now to "!scheme" for !domain',
-        ['!scheme' => $domain->get('scheme'),'!domain' => $domain->id()]
+      return dt('Scheme is now to "!scheme." for !domain',
+        ['!scheme' => $domain->get('scheme'), '!domain' => $domain->id()]
       );
     }
 
     // We couldn't find the domain, so fail.
     throw new DomainCommandException(
-      dt('Domain name "!domain" not known', ['!domain' => $domain_id])
+      dt('Domain name "!domain" not known.', ['!domain' => $domain_id])
     );
   }
 
@@ -1236,7 +1244,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
       $this->logger()->info('Entity type @entity_type does not have field @field, so none found.',
         [
           '@entity_type' => $entity_type,
-          '@field' => $field
+          '@field' => $field,
         ]
       );
       return [];
@@ -1318,7 +1326,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *   In general one of 'prompt' | 'default' | 'ignore' or a domain entity
    *   machine name, but this function does not process 'prompt'.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|\Drupal\domain\DomainInterface|NULL
+   * @return \Drupal\Core\Entity\EntityInterface|\Drupal\domain\DomainInterface|null
    *   The requested domain or NULL if not found.
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
@@ -1391,7 +1399,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
                   ]
                 );
               }
-             $count = $this->reassignEntities($name, $field, $domain, $new_domain, $ids);
+              $count = $this->reassignEntities($name, $field, $domain, $new_domain, $ids);
             }
             catch (PluginException $e) {
               $exceptions = TRUE;

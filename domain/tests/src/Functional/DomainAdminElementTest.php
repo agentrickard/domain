@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\domain\Functional;
 
-use \Drupal\user\UserInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Tests behavior for the domain admin field element.
@@ -116,7 +116,7 @@ class DomainAdminElementTest extends DomainTestBase {
     // Test the case presented in https://www.drupal.org/node/2841962.
     $config = \Drupal::configFactory()->getEditable('user.settings');
     $config->set('verify_mail', 0);
-    $config->set('register', REGISTER_VISITORS);
+    $config->set('register', UserInterface::REGISTER_VISITORS);
     $config->save();
     $this->drupalLogout();
     $this->drupalGet('user/register');
