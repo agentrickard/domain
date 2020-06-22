@@ -57,15 +57,15 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
     $options = [];
 
     // Get the link using Url::fromRoute().
-    $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
+    $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
     $this->assertTrue($url == $expected, 'fromRoute');
 
     // Get the link using Url::fromUserInput()
-    $url = URL::fromUserInput($uri_path, $options)->toString();
+    $url = Url::fromUserInput($uri_path, $options)->toString();
     $this->assertTrue($url == $expected, 'fromUserInput');
 
     // Get the link using Url::fromUri()
-    $url = URL::fromUri($uri, $options)->toString();
+    $url = Url::fromUri($uri, $options)->toString();
     $this->assertTrue($url == $expected, 'fromUri');
 
     // Get the path processor service.

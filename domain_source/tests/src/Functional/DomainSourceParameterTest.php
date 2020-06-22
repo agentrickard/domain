@@ -47,7 +47,7 @@ class DomainSourceParameterTest extends DomainTestBase {
     $expected = base_path() . $path . '?_format=json';
 
     // Get the link using Url::fromUserInput()
-    $url = URL::fromUserInput($uri_path, $options)->toString();
+    $url = Url::fromUserInput($uri_path, $options)->toString();
     $this->assertEquals($expected, $url, 'fromUserInput');
   }
 
