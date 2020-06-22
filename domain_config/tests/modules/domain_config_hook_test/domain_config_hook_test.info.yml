@@ -2,8 +2,8 @@ name: "Domain config hook test"
 description: "Support module for domain config testing."
 type: module
 package: Testing
-# version: VERSION
-core: 8.x
+version: VERSION
+core_version_requirement: ^8 || ^9
 hidden: TRUE
 
 dependencies: []
