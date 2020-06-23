@@ -27,6 +27,13 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
   protected $strictConfigSchema = FALSE;
 
   /**
+   * The default theme.
+   *
+   * @var string
+   */
+  protected $defaultTheme = 'stable';
+
+  /**
    * Modules to enable.
    *
    * @var array
