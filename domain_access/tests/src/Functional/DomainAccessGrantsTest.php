@@ -53,7 +53,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
       'type' => 'article',
       DOMAIN_ACCESS_FIELD => [$domain->id()],
     ]);
-    $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
+    $this->assertNotNull($node_storage->load($node1->id()), 'Article node created.');
 
     // Test the response of the node on each site. Should allow access only to
     // the selected site.
@@ -75,7 +75,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
       DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 1,
     ]);
-    $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
+    $this->assertNotNull($node_storage->load($node2->id()), 'Article node created.');
     // Test the response of the node on each site. Should allow access on all.
     foreach ($domains as $domain) {
       $path = $domain->getPath() . 'node/' . $node2->id();
