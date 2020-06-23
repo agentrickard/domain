@@ -137,7 +137,7 @@ class DomainHookTest extends KernelTestBase {
     $operations = $this->moduleHandler->invokeAll('domain_operations', [$domain, $this->currentUser]);
 
     // Test that our operations were added by the hook.
-    $this->assertTrue(isset($operations['domain_test']), 'Domain test operation loaded.');
+    $this->assertArrayHasKey('domain_test', $operations, 'Domain test operation loaded.');
   }
 
   /**

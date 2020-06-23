@@ -31,7 +31,7 @@ class DomainCreateTest extends DomainTestBase {
     ];
     foreach ($keys as $key) {
       $property = $domain->get($key);
-      $this->assertTrue(isset($property), 'Property loaded');
+      $this->assertNotNull($property, 'Property loaded');
     }
     $domain->save();
 
@@ -41,13 +41,13 @@ class DomainCreateTest extends DomainTestBase {
 
     // Does it load correctly?
     $new_domain = $storage->load($default_id);
-    $this->assertTrue($new_domain->id() == $domain->id(), 'Domain loaded properly.');
+    $this->assertEquals($new_domain->id(), $domain->id(), 'Domain loaded properly.');
 
     // Has domain id been set?
-    $this->assertTrue($new_domain->getDomainId(), 'Domain id set properly.');
+    $this->assertNotNull($new_domain->getDomainId(), 'Domain id set properly.');
 
     // Has a UUID been set?
-    $this->assertTrue($new_domain->uuid(), 'Entity UUID set properly.');
+    $this->assertNotNull($new_domain->uuid(), 'Entity UUID set properly.');
 
     // Delete the domain.
     $domain->delete();
