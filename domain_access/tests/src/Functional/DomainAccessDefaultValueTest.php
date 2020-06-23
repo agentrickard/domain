@@ -57,7 +57,7 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
 
     // Load the node.
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
-    $this->assertTrue($node, 'Article node created.');
+    $this->assertNotNull($node, 'Article node created.');
     // Check that the values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertCount(1, $values, 'Node saved with one domain record.');
@@ -87,7 +87,7 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
 
     // Load the node.
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
-    $this->assertTrue($node, 'Article node created.');
+    $this->assertNotNull($node, 'Article node created.');
     // Check that the values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertCount(1, $values, 'Node saved with one domain record.');
