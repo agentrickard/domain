@@ -58,6 +58,16 @@ class DomainHookTest extends KernelTestBase {
   public $moduleHandler;
 
   /**
+   * Sets a base hostname for running tests.
+   *
+   * When creating test domains, try to use $this->baseHostname or the
+   * domainCreateTestDomains() method.
+   *
+   * @var string
+   */
+  public $baseHostname;
+
+  /**
    * Test setup.
    */
   protected function setUp() {
