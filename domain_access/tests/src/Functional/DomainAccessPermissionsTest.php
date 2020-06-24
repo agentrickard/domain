@@ -104,14 +104,14 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $domain_user1 = $this->userStorage->load($domain_user1->id());
     $assigned = $this->manager->getAccessValues($domain_user1);
     $this->assertCount(1, $assigned, 'User assigned to one domain.');
-    $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'User assigned to proper test domain.');
     // Assign one node to default domain, and one to our test domain.
     $domain_node1 = $this->drupalCreateNode(['type' => 'page', DOMAIN_ACCESS_FIELD => [$one]]);
     $domain_node2 = $this->drupalCreateNode(['type' => 'page', DOMAIN_ACCESS_FIELD => [$two]]);
     $assigned = $this->manager->getAccessValues($domain_node1);
-    $this->assertTrue(isset($assigned[$one]), 'Node1 assigned to proper test domain.');
+    $this->assertArrayHasKey($one, $assigned, 'Node1 assigned to proper test domain.');
     $assigned = $this->manager->getAccessValues($domain_node2);
-    $this->assertTrue(isset($assigned[$two]), 'Node2 assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'Node2 assigned to proper test domain.');
 
     // Tests 'edit domain content' to edit content assigned to their domains.
     $this->assertNodeAccess([
@@ -136,15 +136,15 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $domain_user3 = $this->userStorage->load($domain_user3->id());
     $assigned = $this->manager->getAccessValues($domain_user3);
     $this->assertCount(1, $assigned, 'User assigned to one domain.');
-    $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'User assigned to proper test domain.');
 
     // Assign two different node types to our test domain.
     $domain_node3 = $this->drupalCreateNode(['type' => 'article', DOMAIN_ACCESS_FIELD => [$two]]);
     $domain_node4 = $this->drupalCreateNode(['type' => 'page', DOMAIN_ACCESS_FIELD => [$two]]);
     $assigned = $this->manager->getAccessValues($domain_node3);
-    $this->assertTrue(isset($assigned[$two]), 'Node3 assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'Node3 assigned to proper test domain.');
     $assigned = $this->manager->getAccessValues($domain_node4);
-    $this->assertTrue(isset($assigned[$two]), 'Node4 assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'Node4 assigned to proper test domain.');
 
     // Tests 'edit TYPE content on assigned domains'.
     $this->assertNodeAccess([
@@ -171,16 +171,16 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $domain_user4 = $this->userStorage->load($domain_user4->id());
     $assigned = $this->manager->getAccessValues($domain_user4);
     $this->assertCount(1, $assigned, 'User assigned to one domain.');
-    $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'User assigned to proper test domain.');
     $this->assertNotEmpty($domain_user4->get(DOMAIN_ACCESS_ALL_FIELD)->value, 'User assign to all affiliates.');
 
     // Assign two different node types to our test domain.
     $domain_node5 = $this->drupalCreateNode(['type' => 'article', DOMAIN_ACCESS_FIELD => [$one]]);
     $domain_node6 = $this->drupalCreateNode(['type' => 'page', DOMAIN_ACCESS_FIELD => [$one]]);
     $assigned = $this->manager->getAccessValues($domain_node5);
-    $this->assertTrue(isset($assigned[$one]), 'Node5 assigned to proper test domain.');
+    $this->assertArrayHasKey($one, $assigned, 'Node5 assigned to proper test domain.');
     $assigned = $this->manager->getAccessValues($domain_node6);
-    $this->assertTrue(isset($assigned[$one]), 'Node6 assigned to proper test domain.');
+    $this->assertArrayHasKey($one, $assigned, 'Node6 assigned to proper test domain.');
 
     // Tests 'edit TYPE content on assigned domains'.
     $this->assertNodeAccess([
@@ -215,7 +215,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $domain_user5 = $this->userStorage->load($domain_account5->id());
     $assigned = $this->manager->getAccessValues($domain_user5);
     $this->assertCount(1, $assigned, 'User assigned to one domain.');
-    $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'User assigned to proper test domain.');
     // This test is domain sensitive.
     foreach ($this->domains as $domain) {
       $this->domainLogin($domain, $domain_account5);
@@ -259,7 +259,7 @@ class DomainAccessPermissionsTest extends DomainTestBase {
     $domain_user6 = $this->userStorage->load($domain_account6->id());
     $assigned = $this->manager->getAccessValues($domain_user6);
     $this->assertCount(1, $assigned, 'User assigned to one domain.');
-    $this->assertTrue(isset($assigned[$two]), 'User assigned to proper test domain.');
+    $this->assertArrayHasKey($two, $assigned, 'User assigned to proper test domain.');
     // This test is domain sensitive.
     foreach ($this->domains as $domain) {
       $this->domainLogin($domain, $domain_account6);

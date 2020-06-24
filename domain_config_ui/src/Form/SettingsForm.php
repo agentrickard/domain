@@ -60,11 +60,12 @@ class SettingsForm extends ConfigFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $path_string = $form_state->getValue('path_pages');
     $path_array = $this->explodePathSettings($path_string);
-
+    $exists = [];
     foreach ($path_array as $path) {
-      if (in_array($path, $exists)) {
+      if (in_array($path, $exists, TRUE)) {
         $form_state->setError($form['pages']['path_pages'], $this->t('Duplicate paths cannot be added'));
       }
+      $exists[] = $path;
     }
   }
 

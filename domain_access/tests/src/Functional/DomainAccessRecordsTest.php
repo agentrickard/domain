@@ -37,7 +37,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
       DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 0,
     ]);
-    $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
+    $this->assertNotNull($node_storage->load($node1->id()), 'Article node created.');
 
     // Check to see if grants added by domain_node_access_records made it in.
     $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid';
@@ -58,7 +58,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
       DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 1,
     ]);
-    $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
+    $this->assertNotNull($node_storage->load($node2->id()), 'Article node created.');
     // Check to see if grants added by domain_node_access_records made it in.
     $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid ORDER BY realm';
     $records = Database::getConnection()

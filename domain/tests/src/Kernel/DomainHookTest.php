@@ -58,6 +58,16 @@ class DomainHookTest extends KernelTestBase {
   public $moduleHandler;
 
   /**
+   * Sets a base hostname for running tests.
+   *
+   * When creating test domains, try to use $this->baseHostname or the
+   * domainCreateTestDomains() method.
+   *
+   * @var string
+   */
+  public $baseHostname;
+
+  /**
    * Test setup.
    */
   protected function setUp() {
@@ -127,7 +137,7 @@ class DomainHookTest extends KernelTestBase {
     $operations = $this->moduleHandler->invokeAll('domain_operations', [$domain, $this->currentUser]);
 
     // Test that our operations were added by the hook.
-    $this->assertTrue(isset($operations['domain_test']), 'Domain test operation loaded.');
+    $this->assertArrayHasKey('domain_test', $operations, 'Domain test operation loaded.');
   }
 
   /**
