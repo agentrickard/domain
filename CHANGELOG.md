@@ -19,6 +19,7 @@ Changelog
 21-FEB-2019 8.x-1.0-alpha15
 21-JUN-2019 8.x-1.0-alpha16
 19-JUN-2020 8.x-1.0-beta1
+24-JUN-2020 8.x-1.0-beta2
 
 Status
 ====
