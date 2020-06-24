@@ -53,7 +53,7 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
     $options = [];
 
     // Get the link using Url::fromRoute().
-    $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
+    $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
     $this->assertTrue($url == $expected, 'fromRoute');
 
     // Set up two additional domains.
@@ -74,7 +74,7 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
     $node->save();
     // Get the link using Url::fromRoute().
     $expected = $domain2->getPath() . $path;
-    $url = URL::fromRoute($route_name, $route_parameters, $options)->toString();
+    $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
     // Assert that the URL is what we expect.
     $this->assertTrue($url == $expected, 'fromRoute');
     $this->drupalGet($url);

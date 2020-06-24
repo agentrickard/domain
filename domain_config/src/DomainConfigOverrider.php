@@ -84,55 +84,67 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    // Try to prevent repeating lookups.
-    static $lookups;
-    // Key should be a known length, so hash.
-    $key = md5(implode(':', $names));
-    if (isset($lookups[$key])) {
-      return $lookups[$key];
-    }
+    // Assume first time loading is NULL.
+    static $load = NULL;
 
-    // Set the context of the override request.
-    if (empty($this->contextSet)) {
-      $this->initiateContext();
+    // Check if any overridden config exists or if we have already
+    // made this check.
+    // See https://www.drupal.org/project/domain/issues/3126532.
+    if ($load === FALSE || !$this->storage->listAll('domain.config.')) {
+      $load = FALSE;
+      return [];
     }
+    else {
+      // Try to prevent repeating lookups.
+      static $lookups;
+      // Key should be a known length, so hash.
+      $key = md5(implode(':', $names));
+      if (isset($lookups[$key])) {
+        return $lookups[$key];
+      }
 
-    // Prepare our overrides.
-    $overrides = [];
-    // loadOverrides() runs on config entities, which means that if we try
-    // to run this routine on our own data, then we end up in an infinite loop.
-    // So ensure that we are _not_ looking up a domain.record.*.
-    $check = current($names);
-    $list = explode('.', $check);
-    if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
-      $lookups[$key] = $overrides;
+      // Set the context of the override request.
+      if (empty($this->contextSet)) {
+        $this->initiateContext();
+      }
+
+      // Prepare our overrides.
+      $overrides = [];
+      // loadOverrides() runs on config entities, which means that if we try
+      // to run this routine on our own data, then we end up in an infinite loop.
+      // So ensure that we are _not_ looking up a domain.record.*.
+      $check = current($names);
+      $list = explode('.', $check);
+      if (isset($list[0]) && isset($list[1]) && $list[0] == 'domain' && $list[1] == 'record') {
+        $lookups[$key] = $overrides;
+        return $overrides;
+      }
+      if (!empty($this->domain)) {
+        foreach ($names as $name) {
+          $config_name = $this->getDomainConfigName($name, $this->domain);
+          // Check to see if the config storage has an appropriately named file
+          // containing override data.
+          if ($override = $this->storage->read($config_name['langcode'])) {
+            $overrides[$name] = $override;
+          }
+          // Check to see if we have a file without a specific language.
+          elseif ($override = $this->storage->read($config_name['domain'])) {
+            $overrides[$name] = $override;
+          }
+
+          // Apply any settings.php overrides.
+          if (isset($GLOBALS['config'][$config_name['langcode']])) {
+            $overrides[$name] = $GLOBALS['config'][$config_name['langcode']];
+          }
+          elseif (isset($GLOBALS['config'][$config_name['domain']])) {
+            $overrides[$name] = $GLOBALS['config'][$config_name['domain']];
+          }
+        }
+        $lookups[$key] = $overrides;
+      }
+
       return $overrides;
     }
-    if (!empty($this->domain)) {
-      foreach ($names as $name) {
-        $config_name = $this->getDomainConfigName($name, $this->domain);
-        // Check to see if the config storage has an appropriately named file
-        // containing override data.
-        if ($override = $this->storage->read($config_name['langcode'])) {
-          $overrides[$name] = $override;
-        }
-        // Check to see if we have a file without a specific language.
-        elseif ($override = $this->storage->read($config_name['domain'])) {
-          $overrides[$name] = $override;
-        }
-
-        // Apply any settings.php overrides.
-        if (isset($GLOBALS['config'][$config_name['langcode']])) {
-          $overrides[$name] = $GLOBALS['config'][$config_name['langcode']];
-        }
-        elseif (isset($GLOBALS['config'][$config_name['domain']])) {
-          $overrides[$name] = $GLOBALS['config'][$config_name['domain']];
-        }
-      }
-      $lookups[$key] = $overrides;
-    }
-
-    return $overrides;
   }
 
   /**

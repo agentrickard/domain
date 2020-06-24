@@ -102,7 +102,7 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Check that the node exists in the database.
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
-    $this->assertTrue($node, 'Node found in database.');
+    $this->assertNotNull($node, 'Node found in database.');
 
     // Test a user who can assign users to domains.
     $user4 = $this->drupalCreateUser(['administer users', 'assign editors to any domain']);

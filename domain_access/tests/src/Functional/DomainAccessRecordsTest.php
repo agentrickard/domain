@@ -37,7 +37,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
       DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 0,
     ]);
-    $this->assertTrue($node_storage->load($node1->id()), 'Article node created.');
+    $this->assertNotNull($node_storage->load($node1->id()), 'Article node created.');
 
     // Check to see if grants added by domain_node_access_records made it in.
     $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid';
@@ -45,7 +45,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
       ->query($query, [':nid' => $node1->id()])
       ->fetchAll();
 
-    $this->assertEqual(count($records), 1, 'Returned the correct number of rows.');
+    $this->assertCount(1, $records, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
     $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
     $this->assertEqual($records[0]->grant_view, 1, 'Grant view stored.');
@@ -58,13 +58,13 @@ class DomainAccessRecordsTest extends DomainTestBase {
       DOMAIN_ACCESS_FIELD => [$domain->id()],
       DOMAIN_ACCESS_ALL_FIELD => 1,
     ]);
-    $this->assertTrue($node_storage->load($node2->id()), 'Article node created.');
+    $this->assertNotNull($node_storage->load($node2->id()), 'Article node created.');
     // Check to see if grants added by domain_node_access_records made it in.
     $query = 'SELECT realm, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE nid = :nid ORDER BY realm';
     $records = Database::getConnection()
       ->query($query, [':nid' => $node2->id()])
       ->fetchAll();
-    $this->assertEqual(count($records), 2, 'Returned the correct number of rows.');
+    $this->assertCount(2, $records, 'Returned the correct number of rows.');
     $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
     $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
     $this->assertEqual($records[0]->grant_view, 1, 'Grant view stored.');

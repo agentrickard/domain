@@ -23,7 +23,7 @@ class DomainCSSTest extends DomainTestBase {
    */
   protected function setUp() {
     parent::setUp();
-    \Drupal::service('theme_handler')->install(['bartik']);
+    \Drupal::service('theme_installer')->install(['bartik']);
   }
 
   /**

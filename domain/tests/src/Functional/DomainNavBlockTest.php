@@ -54,7 +54,7 @@ class DomainNavBlockTest extends DomainTestBase {
         $this->assertNoRaw($domain->label());
       }
     }
-    // Let the anon user view diabled domains. All links should appear.
+    // Let the anon user view disabled domains. All links should appear.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access inactive domains']);
 
     // Load the homepage.

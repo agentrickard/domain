@@ -172,11 +172,12 @@ function domain_source_form_validate($element, FormStateInterface $form_state) {
 function domain_source_form_submit(&$form, FormStateInterface $form_state) {
   // Ensure that we have saved an entity.
   if ($object = $form_state->getFormObject()) {
-    $url = $object->getEntity()->url();
+    $urlObject = $object->getEntity()->toUrl();
   }
   // Validate that the URL will be considered "external" by Drupal, which means
   // that a scheme value will be present.
-  if (!empty($url)) {
+  if (!empty($urlObject)) {
+    $url = $urlObject->toString();
     $uri_parts = parse_url($url);
     // If necessary and secure, issue a TrustedRedirectResponse to the new URL.
     if (!empty($uri_parts['host'])) {

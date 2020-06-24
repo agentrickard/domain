@@ -57,11 +57,11 @@ class DomainAliasWildcardTest extends DomainAliasTestBase {
     $this->assert($alias->getPattern() == 'five.example.*', 'Proper pattern match loaded.');
 
     // Test the environment matcher. $domain here is one.example.com.
-    $domain = $domain_storage->load('example_com');
+    $domain = $domain_storage->load('one_example_com');
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
     $this->assert(count($matches) == 1, 'One environment match loaded');
     $alias = current($matches);
-    $this->assert($alias->getPattern() == 'example.*', 'Proper pattern match loaded.');
+    $this->assert($alias->getPattern() == 'four.example.*', 'Proper pattern match loaded.');
 
     // Now load a page and check things.
     // Since we cannot read the service request, we place a block
@@ -77,10 +77,10 @@ class DomainAliasWildcardTest extends DomainAliasTestBase {
       $this->assertSession()->linkByHrefExists($domain->getPath(), 0, 'Link found: ' . $domain->getPath());
     }
     // For an aliased request (four.example.com), the list should be aliased.
-    $url = $domain->getScheme() . str_replace('*', 'com', $alias->getPattern()) . $domain->getPort();
+    $url = $domain->getScheme() . str_replace('*', $this->baseTLD, $alias->getPattern());
     $this->drupalGet($url);
     foreach ($matches as $match) {
-      $this->assertSession()->assertEscaped(str_replace('*', 'com', $match->getPattern()));
+      $this->assertSession()->assertEscaped(str_replace('*', $this->baseTLD, $match->getPattern()));
     }
   }
 

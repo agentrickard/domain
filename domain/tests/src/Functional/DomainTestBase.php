@@ -28,6 +28,16 @@ abstract class DomainTestBase extends BrowserTestBase {
   public $baseHostname;
 
   /**
+   * Sets a base TLD for running tests.
+   *
+   * When creating test domains, try to use $this->baseTLD or the
+   * domainCreateTestDomains() method.
+   *
+   * @var string
+   */
+  public $baseTLD;
+
+  /**
    * Modules to enable.
    *
    * @var array
@@ -56,6 +66,9 @@ abstract class DomainTestBase extends BrowserTestBase {
 
     // Set the base hostname for domains.
     $this->baseHostname = \Drupal::entityTypeManager()->getStorage('domain')->createHostname();
+
+    // Ensure that $this->baseTLD is set.
+    $this->setBaseTLD();
 
     $this->database = $this->getDatabaseConnection();
   }
@@ -103,6 +116,19 @@ abstract class DomainTestBase extends BrowserTestBase {
    */
   public function findField($locator) {
     return $this->getSession()->getPage()->findField($locator);
+  }
+
+  /**
+   * Finds no field exists (input, textarea, select) with specified locator.
+   *
+   * @param string $locator
+   *   Input id, name or label.
+   *
+   * @return \Behat\Mink\Element\NodeElement|null
+   *   The input field element.
+   */
+  public function findNoField($locator) {
+    return $this->assertSession()->fieldNotExists($locator);;
   }
 
   /**

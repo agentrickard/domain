@@ -15,7 +15,22 @@ class DomainSourceServiceProvider extends ServiceProviderBase {
    */
   public function alter(ContainerBuilder $container) {
     $definition = $container->getDefinition('redirect_response_subscriber');
-    $definition->setClass('Drupal\domain_source\EventSubscriber\DomainSourceRedirectResponseSubscriber');
+    if ($this->getDrupalVersion() > 8) {
+      $definition->setClass('Drupal\domain_source\EventSubscriber\DomainSourceRedirectResponseSubscriber');
+    }
+    else {
+      $definition->setClass('Drupal\domain_source\EventSubscriber\DomainSourceRedirectResponseSubscriberD8');
+    }
+  }
+
+  /**
+   * Determines the Drupal version.
+   *
+   * @return integer
+   *  The core numberic version.
+   */
+  private function getDrupalVersion() {
+    return (int) substr(\Drupal::VERSION, 0, 1);
   }
 
 }

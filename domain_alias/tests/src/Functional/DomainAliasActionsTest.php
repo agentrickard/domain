@@ -60,7 +60,7 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
 
     // Test the domains.
     $domains = $domain_storage->loadMultiple();
-    $this->assertTrue(count($domains) == 3, 'Three domain records found.');
+    $this->assertCount(3, $domains, 'Three domain records found.');
 
     // Check the default domain.
     $default = $domain_storage->loadDefaultId();

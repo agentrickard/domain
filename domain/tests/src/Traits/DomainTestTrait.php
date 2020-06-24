@@ -10,7 +10,7 @@ trait DomainTestTrait {
   /**
    * Generates a list of domains for testing.
    *
-   * In my environment, I use the example.com hostname as a base. Then I name
+   * In my environment, I use the example.local hostname as a base. Then I name
    * hostnames one.* two.* up to ten. Note that we always use *_example_com
    * for the machine_name (entity id) value, though the hostname can vary
    * based on the system. This naming allows us to load test schema files.
@@ -138,6 +138,16 @@ trait DomainTestTrait {
    */
   public function setBaseHostname() {
     $this->baseHostname = \Drupal::entityTypeManager()->getStorage('domain')->createHostname();
+    $this->setBaseTLD();
+  }
+
+  /**
+   * Set the base TLD for this test.
+   */
+  public function setBaseTLD() {
+    $hostname = $this->baseHostname;
+    $parts = explode('.', $hostname);
+    $this->baseTLD = array_pop($parts);
   }
 
   /**
@@ -145,9 +155,9 @@ trait DomainTestTrait {
    */
   public function domainTableIsEmpty() {
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple(NULL, TRUE);
-    $this->assertTrue(empty($domains), 'No domains have been created.');
+    $this->assertEmpty($domains, 'No domains have been created.');
     $default_id = \Drupal::entityTypeManager()->getStorage('domain')->loadDefaultId();
-    $this->assertTrue(empty($default_id), 'No default domain has been set.');
+    $this->assertEmpty($default_id, 'No default domain has been set.');
   }
 
   /**

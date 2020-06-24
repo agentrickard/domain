@@ -1,0 +1,38 @@
+domain_config_ui.settings:
+  path: '/admin/config/domain/config-ui'
+  defaults:
+    _title: 'Domain config forms'
+    _form: '\Drupal\domain_config_ui\Form\SettingsForm'
+  requirements:
+    _permission: 'administer domain config ui'
+domain_config_ui.list:
+  path: '/admin/config/domain/config-ui/list'
+  defaults:
+    _title: 'Saved configuration'
+    _controller: '\Drupal\domain_config_ui\Controller\DomainConfigUIController::overview'
+  requirements:
+    _permission: 'administer domain config ui'
+domain_config_ui.inline_action:
+  path: '/admin/config/domain/config_ui/{route_name}/{op}'
+  defaults:
+    _controller: '\Drupal\domain_config_ui\Controller\DomainConfigUIController::ajaxOperation'
+  requirements:
+    _permission: 'administer domain config ui'
+    _csrf_token: 'TRUE'
+    op: 'enable|disable'
+domain_config_ui.inspect:
+  path: '/admin/config/domain/config_ui/inspect/{config_name}'
+  defaults:
+    _title: 'Inspect domain configuration'
+    _controller: '\Drupal\domain_config_ui\Controller\DomainConfigUIController::inspectConfig'
+    config_name: NULL
+  requirements:
+    _permission: 'administer domain config ui'
+domain_config_ui.delete:
+  path: '/admin/config/domain/config_ui/delete/{config_name}'
+  defaults:
+    _title: 'Delete domain configuration'
+    _form: '\Drupal\domain_config_ui\Form\DeleteForm'
+    config_name: NULL
+  requirements:
+    _permission: 'administer domain config ui'
