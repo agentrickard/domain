@@ -138,14 +138,13 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
   public function getPatterns($hostname) {
     $parts = explode('.', $hostname);
     $count = count($parts);
+
     // Account for ports.
-    $port = null;
+    $port = NULL;
     if (substr_count($hostname, ':') > 0) {
-      // extract port
+      // Extract port and save for later.
       $ports = explode(':', $parts[$count - 1]);
-      // remove port part
       $parts[$count - 1] = preg_replace('/:(\d+)/', '', $parts[$count - 1]);
-      // save port for later
       $port = $ports[1];
     }
 
@@ -215,12 +214,14 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
    *   An array of eligible matching patterns.
    * @param string $hostname
    *   A hostname string, in the format example.com.
+   * @param integer $port
+   *   The port of the request.
    *
    * @return array
    *   An array of eligible matching patterns, modified by port.
    */
-  private function buildPortPatterns(array $patterns, $hostname, $port) {
-    // Fetch the port if empty
+  private function buildPortPatterns(array $patterns, $hostname, $port = NULL) {
+    // Fetch the port if empty.
     if (empty($port)) {
       $port = $this->requestStack->getCurrentRequest()->getPort();
     }
@@ -232,10 +233,11 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
       if (empty($port) || $port == 80 || $port == 443) {
         $new_patterns[] = $pattern;
       }
-      if ( !empty($port) ) {
+      if (!empty($port)) {
         $new_patterns[] = $pattern . ':' . $port;
       }
     }
+
     return $new_patterns;
   }
 
