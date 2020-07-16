@@ -100,7 +100,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
       'one_example_com' => ['en' => 'node/1', 'es' => 'node'],
       'two_example_com' => ['en' => 'node', 'es' => 'node'],
       'three_example_com' => ['en' => 'node', 'es' => 'node'],
-      'four_example_com' => ['en' => 'node/2', 'es' => 'node'],
+      'four_example_com' => ['en' => 'node/2', 'es' => 'node/2'],
     ];
     return $homepages;
   }
