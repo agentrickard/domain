@@ -32,14 +32,19 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     $this->domainCreateTestDomains(5);
     // Get the domain list.
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
-    $this->drupalCreateNode([
+    $node1 = $this->drupalCreateNode([
       'type' => 'article',
       'title' => 'Node 1',
       'promoted' => TRUE,
     ]);
-    $this->drupalCreateNode([
+    $node2 = $this->drupalCreateNode([
       'type' => 'article',
       'title' => 'Node 2',
+      'promoted' => TRUE,
+    ]);
+    $node3 = $this->drupalCreateNode([
+      'type' => 'article',
+      'title' => 'Node 3',
       'promoted' => TRUE,
     ]);
     $homepages = $this->getHomepages();
@@ -51,6 +56,27 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
       $expected_home = $this->drupalGet($expected);
 
       $this->assertTrue($home == $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+    }
+    // Explicit test for https://www.drupal.org/project/domain/issues/3154402
+    // Create and login user.
+    $admin_user = $this->drupalCreateUser(['bypass node access', 'access administration pages']);
+    $this->drupalLogin($admin_user);
+    $this->drupalGet($domain->getPath() . 'node/' . $node3->id() . '/delete');
+    $this->getSession()->getPage()->pressButton('Delete');
+    $this->drupalLogout();
+
+    // Retest the homepages.
+    foreach ($domains as $domain) {
+      // Prime the cache -- else bigpipe is slightly different.
+      $this->drupalGet($domain->getPath());
+      // Get the cached page.
+      $home = $this->drupalGet($domain->getPath());
+
+      // Check if this setting is picked up.
+      $expected = $domain->getPath() . $homepages[$domain->id()];
+      $expected_home = $this->drupalGet($expected);
+
+      $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
     }
   }
 
