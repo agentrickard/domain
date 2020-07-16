@@ -49,13 +49,19 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     ]);
     $homepages = $this->getHomepages();
     foreach ($domains as $domain) {
-      $home = $this->drupalGet($domain->getPath());
+      foreach (['en', 'es'] as $langcode) {
+        $prefix = '';
+        if ($langcode == 'es') {
+          $prefix = 'es/';
+        }
+        $home = $this->drupalGet($domain->getPath() . $prefix);
 
-      // Check if this setting is picked up.
-      $expected = $domain->getPath() . $homepages[$domain->id()];
-      $expected_home = $this->drupalGet($expected);
+        // Check if this setting is picked up.
+        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()];
+        $expected_home = $this->drupalGet($expected);
 
-      $this->assertTrue($home == $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+        $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+      }
     }
     // Explicit test for https://www.drupal.org/project/domain/issues/3154402
     // Create and login user.
@@ -67,16 +73,21 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
 
     // Retest the homepages.
     foreach ($domains as $domain) {
-      // Prime the cache -- else bigpipe is slightly different.
-      $this->drupalGet($domain->getPath());
-      // Get the cached page.
-      $home = $this->drupalGet($domain->getPath());
+      foreach (['en', 'es'] as $langcode) {
+        $prefix = '';
+        if ($langcode == 'es') {
+          $prefix = 'es/';
+        }
+        // Prime the cache to prevent a bigpipe mismatch.
+        $this->drupalGet($domain->getPath() . $prefix);
+        $home = $this->drupalGet($domain->getPath() . $prefix);
 
-      // Check if this setting is picked up.
-      $expected = $domain->getPath() . $homepages[$domain->id()];
-      $expected_home = $this->drupalGet($expected);
+        // Check if this setting is picked up.
+        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()];
+        $expected_home = $this->drupalGet($expected);
 
-      $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+        $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+      }
     }
   }
 
