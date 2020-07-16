@@ -57,7 +57,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
         $home = $this->drupalGet($domain->getPath() . $prefix);
 
         // Check if this setting is picked up.
-        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()];
+        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()][$langcode];
         $expected_home = $this->drupalGet($expected);
 
         $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
@@ -83,7 +83,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
         $home = $this->drupalGet($domain->getPath() . $prefix);
 
         // Check if this setting is picked up.
-        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()];
+        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()][$langcode];
         $expected_home = $this->drupalGet($expected);
 
         $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
@@ -96,11 +96,11 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
    */
   private function getHomepages() {
     $homepages = [
-      'example_com' => 'node',
-      'one_example_com' => 'node/1',
-      'two_example_com' => 'node',
-      'three_example_com' => 'node',
-      'four_example_com' => 'node/2',
+      'example_com' => ['en' => 'node', 'es' => 'node'],
+      'one_example_com' => ['en' => 'node/1', 'es' => 'node'],
+      'two_example_com' => ['en' => 'node', 'es' => 'node'],
+      'three_example_com' => ['en' => 'node', 'es' => 'node'],
+      'four_example_com' => ['en' => 'node/2', 'es' => 'node'],
     ];
     return $homepages;
   }
