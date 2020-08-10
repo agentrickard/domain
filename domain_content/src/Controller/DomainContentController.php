@@ -63,7 +63,14 @@ class DomainContentController extends ControllerBase {
       'path' => 'domain-content',
     ];
 
-    return $this->buildList($options);
+    return [
+      $this->buildList($options),
+      [
+        '#type' => 'view',
+        '#name' => 'affiliated_content',
+        '#display_id' => 'embed_1',
+      ],
+    ];
   }
 
   /**
