@@ -16,7 +16,6 @@ description: 'Find and manage content.'
 tag: domain
 base_table: node_field_data
 base_field: nid
-core: 8.x
 display:
   default:
     display_options:
@@ -1053,6 +1052,46 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           plugin_id: domain_access_filter
+        field_domain_all_affiliates_value:
+          id: field_domain_all_affiliates_value
+          table: node__field_domain_all_affiliates
+          field: field_domain_all_affiliates_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: All
+          group: 1
+          exposed: true
+          expose:
+            operator_id: ''
+            label: 'All affiliates'
+            description: ''
+            use_operator: false
+            operator: field_domain_all_affiliates_value_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_domain_all_affiliates_value
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          plugin_id: boolean
       filter_groups:
         operator: AND
         groups:
