@@ -79,11 +79,11 @@ class DomainConditionTest extends DomainTestBase {
 
     // Check for the proper summary.
     // Summaries require an extra space due to negate handling in summary().
-    $this->assertEqual($condition->summary(), 'Active domain is ' . $this->testDomain->label());
+    $this->assertEquals($condition->summary(), 'Active domain is ' . $this->testDomain->label());
 
     // Check the negated summary.
     $condition->setConfig('negate', TRUE);
-    $this->assertEqual($condition->summary(), 'Active domain is not ' . $this->testDomain->label());
+    $this->assertEquals($condition->summary(), 'Active domain is not ' . $this->testDomain->label());
 
     // Check the negated condition.
     $this->assertFalse($condition->execute(), 'Domain request condition fails when condition negated.');

@@ -71,7 +71,7 @@ class DomainValidatorTest extends DomainTestBase {
     }
     catch (ConfigValueException $e) {
       $expected_message = "The hostname ($test_hostname) is already registered.";
-      $this->assertEqual($expected_message, $e->getMessage());
+      $this->assertEquals($expected_message, $e->getMessage());
     }
     // Test the two configurable options.
     $config = $this->config('domain.settings');

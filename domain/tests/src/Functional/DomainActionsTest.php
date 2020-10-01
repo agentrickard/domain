@@ -23,7 +23,7 @@ class DomainActionsTest extends DomainTestBase {
 
     // Visit the domain overview administration page.
     $this->drupalGet($path);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Test the domains.
     $storage = \Drupal::entityTypeManager()->getStorage('domain');
@@ -33,28 +33,28 @@ class DomainActionsTest extends DomainTestBase {
     // Check the default domain.
     $default = $storage->loadDefaultId();
     $key = 'example_com';
-    $this->assertTrue($default == $key, 'Default domain set correctly.');
+    $this->assertEquals($default, $key, 'Default domain set correctly.');
 
     // Test some text on the page.
     foreach ($domains as $domain) {
       $name = $domain->label();
-      $this->assertText($name, 'Name found properly.');
+      $this->assertSession()->pageTextContains($name);
     }
     // Test the list of actions.
     $actions = ['delete', 'disable', 'default'];
     foreach ($actions as $action) {
-      $this->assertRaw("/domain/{$action}/", 'Actions found properly.');
+      $this->assertSession()->responseContains("/domain/{$action}/");
     }
     // Check that all domains are active.
-    $this->assertNoRaw('Inactive', 'Inactive domain not found.');
+    $this->assertSession()->responseNotContains('Inactive');
 
     // Disable a domain and test the enable link.
     $this->clickLink('Disable', 0);
-    $this->assertRaw('Inactive', 'Inactive domain found.');
+    $this->assertSession()->responseContains('Inactive');
 
     // Visit the domain overview administration page to clear cache.
     $this->drupalGet($path);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     foreach ($storage->loadMultiple() as $domain) {
       if ($domain->id() == 'one_example_com') {
@@ -68,15 +68,15 @@ class DomainActionsTest extends DomainTestBase {
     // Test the list of actions.
     $actions = ['enable', 'delete', 'disable', 'default'];
     foreach ($actions as $action) {
-      $this->assertRaw("/domain/{$action}/", 'Actions found properly.');
+      $this->assertSession()->responseContains("/domain/{$action}/");
     }
     // Re-enable the domain.
     $this->clickLink('Enable', 0);
-    $this->assertNoRaw('Inactive', 'Inactive domain not found.');
+    $this->assertSession()->responseNotContains('Inactive');
 
     // Visit the domain overview administration page to clear cache.
     $this->drupalGet($path);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     foreach ($storage->loadMultiple() as $domain) {
       $this->assertNotEmpty($domain->status(), 'All domains active.');
@@ -87,13 +87,13 @@ class DomainActionsTest extends DomainTestBase {
 
     // Visit the domain overview administration page to clear cache.
     $this->drupalGet($path);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check the default domain.
     $storage->resetCache();
     $default = $storage->loadDefaultId();
     $key = 'one_example_com';
-    $this->assertTrue($default == $key, 'Default domain set correctly.');
+    $this->assertEquals($default, $key, 'Default domain set correctly.');
 
   }
 

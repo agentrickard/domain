@@ -39,22 +39,22 @@ class DomainViewsAccessTest extends DomainTestBase {
       $path = $domain->getPath() . 'domain-views-access';
       $this->DrupalGet($path);
       if (in_array($domain->id(), $allowed)) {
-        $this->assertResponse('200', 'Access allowed');
-        $this->assertRaw('admin');
-        $this->assertRaw($this->user->getAccountName());
+        $this->assertSession()->statusCodeEquals('200');
+        $this->assertSession()->responseContains('admin');
+        $this->assertSession()->responseContains($this->user->getAccountName());
       }
       else {
-        $this->assertResponse('403', 'Access denied');
-        $this->assertNoRaw('admin');
-        $this->assertNoRaw($this->user->getAccountName());
+        $this->assertSession()->statusCodeEquals('403');
+        $this->assertSession()->responseNotContains('admin');
+        $this->assertSession()->responseNotContains($this->user->getAccountName());
       }
       // Test the block on another page.
       $this->drupalGet($domain->getPath());
       if (in_array($domain->id(), $allowed)) {
-        $this->assertRaw($this->user->getAccountName());
+        $this->assertSession()->responseContains($this->user->getAccountName());
       }
       else {
-        $this->assertNoRaw($this->user->getAccountName());
+        $this->assertSession()->responseNotContains($this->user->getAccountName());
       }
     }
   }

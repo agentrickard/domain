@@ -38,7 +38,7 @@ class DomainEntityAccessTest extends DomainTestBase {
     $edit = $this->domainPostValues();
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'example.com';
-    $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
+    $this->submitForm('admin/config/domain/add', $edit, 'Save');
 
     // Did it save correctly?
     $default_id = $storage->loadDefaultId();
@@ -59,13 +59,13 @@ class DomainEntityAccessTest extends DomainTestBase {
 
     // Visit the add domain add page.
     $this->drupalGet('admin/config/domain/add');
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
     // Make a POST request on admin/config/domain/add.
     $edit = $this->domainPostValues();
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'one.example.com';
     $edit['id'] = \Drupal::entityTypeManager()->getStorage('domain')->createMachineName($edit['hostname']);
-    $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
+    $this->submitForm('admin/config/domain/add', $edit, 'Save');
 
     // Does it load correctly?
     $storage->resetCache([$edit['id']]);
@@ -79,7 +79,7 @@ class DomainEntityAccessTest extends DomainTestBase {
     $this->drupalLogin($noneditor);
     // Visit the add domain administration page.
     $this->drupalGet('admin/config/domain/add');
-    $this->assertResponse(403);
+    $this->assertSession()->statusCodeEquals(403);
   }
 
 }

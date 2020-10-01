@@ -49,11 +49,11 @@ class DomainInactiveTest extends DomainTestBase {
     // Check to see if the user can login.
     $url = $domain->getPath() . 'user/login';
     $this->drupalGet($url);
-    $this->assertResponse(200, 'Request to login on inactive domain allowed.');
+    $this->assertSession()->statusCodeEquals(200);
     // Check to see if the user can reset password.
     $url = $domain->getPath() . 'user/password';
     $this->drupalGet($url);
-    $this->assertResponse(200, 'Request to reset password on inactive domain allowed.');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Try to access with the proper permission.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['access inactive domains']);
@@ -83,7 +83,7 @@ class DomainInactiveTest extends DomainTestBase {
     // Test the trusted host, which should redirect to default.
     $this->drupalGet($domain->getPath());
     $this->assertTrue($domain2->getPath() == $this->getUrl(), 'Redirected from the inactive domain.');
-    $this->assertResponse(200, 'Request to trusted host allowed.');
+    $this->assertSession()->statusCodeEquals(200);
 
     // The redirect is cached, so we must flush cache to test again.
     drupal_flush_all_caches();
@@ -92,7 +92,7 @@ class DomainInactiveTest extends DomainTestBase {
     // Disable the domain and test for redirect.
     $domain3->saveDefault();
     $this->drupalGet($domain->getPath());
-    $this->assertRaw('The provided host name is not a valid redirect.');
+    $this->assertSession()->responseContains('The provided host name is not a valid redirect.');
   }
 
 }

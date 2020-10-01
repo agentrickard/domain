@@ -22,10 +22,10 @@ class DomainCheckResponseTest extends DomainTestBase {
     $edit = $this->domainPostValues();
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'example.com';
-    $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
+    $this->submitForm('admin/config/domain/add', $edit, 'Save');
 
     // Did it save correctly?
-    $this->assertNoRaw('The server request to');
+    $this->assertSession()->responseNotContains('The server request to');
     $domains = $storage->loadMultiple();
     $this->assertCount(1, $domains, 'Domain record saved via form.');
 
@@ -36,22 +36,22 @@ class DomainCheckResponseTest extends DomainTestBase {
     $edit['id'] = $storage->createMachineName($edit['hostname']);
     $edit['validate_url'] = 1;
     try {
-      $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
+      $this->submitForm('admin/config/domain/add', $edit, 'Save');
     }
     catch (\Exception $e) {
       // Ensure no test errors.
     }
     // The domain should not save.
-    $this->assertRaw('The server request to');
+    $this->assertSession()->responseContains('The server request to');
     $domains = $storage->loadMultiple();
     $this->assertCount(1, $domains, 'Domain record not saved via form.');
 
     // Bypass the check.
     $edit['validate_url'] = 0;
-    $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
+    $this->submitForm('admin/config/domain/add', $edit, 'Save');
 
     // The domain should save.
-    $this->assertNoRaw('The server request to');
+    $this->assertSession()->responseNotContains('The server request to');
     $domains = $storage->loadMultiple();
     $this->assertCount(2, $domains, 'Domain record saved via form.');
   }

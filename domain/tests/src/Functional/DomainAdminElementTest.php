@@ -70,7 +70,7 @@ class DomainAdminElementTest extends DomainTestBase {
     // Check that two values are set.
     $manager = \Drupal::service('domain.element_manager');
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
-    $this->assert(count($values) == 3, 'User saved with three domain records.');
+    $this->assertCount(3, $values, 'User saved with three domain records.');
 
     // Now login as a user with limited rights.
     $account = $this->drupalCreateUser([
@@ -81,7 +81,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ADMIN_FIELD);
     $tester = $storage->load($account->id());
     $values = $manager->getFieldValues($tester, DOMAIN_ADMIN_FIELD);
-    $this->assert(count($values) == 2, 'User saved with two domain records.');
+    $this->assertCount(2, $values, 'User saved with two domain records.');
     $storage->resetCache([$account->id()]);
     $this->drupalLogin($account);
 
@@ -111,7 +111,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $user = $storage->load($user->id());
     // Check that two values are set.
     $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
-    $this->assert(count($values) == 2, 'User saved with two domain records.');
+    $this->assertCount(2, $values, 'User saved with two domain records.');
 
     // Test the case presented in https://www.drupal.org/node/2841962.
     $config = \Drupal::configFactory()->getEditable('user.settings');

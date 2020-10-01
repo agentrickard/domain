@@ -45,7 +45,7 @@ class DomainCSSTest extends DomainTestBase {
     foreach (\Drupal::entityTypeManager()->getStorage('domain')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
       $text = '<body class="' . Html::getClass($domain->id() . '-class');
-      $this->assertNoRaw($text, 'No custom CSS present.');
+      $this->assertSession()->responseNotContains($text, 'No custom CSS present.');
     }
     // Set the css classes.
     $config = $this->config('domain.settings');
@@ -58,7 +58,7 @@ class DomainCSSTest extends DomainTestBase {
       drupal_flush_all_caches();
       $this->drupalGet($domain->getPath());
       $text = '<body class="' . Html::getClass($domain->id() . '-class');
-      $this->assertRaw($text, 'Custom CSS present.' . $text);
+      $this->assertSession()->responseContains($text);
     }
 
     // Set the css classes.
@@ -71,7 +71,7 @@ class DomainCSSTest extends DomainTestBase {
       drupal_flush_all_caches();
       $this->drupalGet($domain->getPath());
       $text = '<body class="' . Html::getClass($domain->id() . '-class') . ' ' . Html::getClass($domain->label() . '-class');
-      $this->assertRaw($text, 'Custom CSS present.' . $text);
+      $this->assertSession()->responseContains($text);
     }
 
   }

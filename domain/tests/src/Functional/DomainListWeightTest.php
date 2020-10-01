@@ -103,7 +103,7 @@ class DomainListWeightTest extends DomainTestBase {
       }
     }
     // The last domain should be test59_example_com.
-    $this->assert($domain->id() == 'test59_example_com', 'Last domain is test59' . $domain->id());
+    $this->assertEquals('test59_example_com', $domain->id(), 'Last domain is test59' . $domain->id());
   }
 
 }

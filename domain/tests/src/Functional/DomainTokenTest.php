@@ -38,10 +38,10 @@ class DomainTokenTest extends DomainTestBase {
     // Test the response of the default home page.
     foreach (\Drupal::entityTypeManager()->getStorage('domain')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
-      $this->assertRaw($domain->label(), 'Loaded the proper domain.');
-      $this->assertRaw('<th>Token</th>', 'Token values printed.');
+      $this->assertSession()->responseContains($domain->label());
+      $this->assertSession()->responseContains('<th>Token</th>');
       foreach ($this->tokenList() as $token => $callback) {
-        $this->assertRaw("<td>$token</td>", "$token found correctly.");
+        $this->assertSession()->responseContains("<td>$token</td>");
         // The URL token is sensitive to the path, which is /user, but that
         // does not come across when making the callback outside of a request
         // context.
@@ -52,7 +52,7 @@ class DomainTokenTest extends DomainTestBase {
             $value .= '/';
           }
         }
-        $this->assertRaw('<td>' . $value . '</td>', 'Value set correctly to ' . $value);
+        $this->assertSession()->responseContains('<td>' . $value . '</td>');
       }
     }
   }
