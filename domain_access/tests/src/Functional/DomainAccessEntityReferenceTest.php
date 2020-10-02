@@ -87,7 +87,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
     $edit['title[0][value]'] = 'Test node';
     $edit["field_domain_access[{$one}]"] = TRUE;
     $edit["field_domain_access[{$two}]"] = TRUE;
-    $this->submitForm('node/add/article', $edit, 'Save');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
     // Check that two values are set.

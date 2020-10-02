@@ -35,7 +35,7 @@ class DomainInactiveTest extends DomainTestBase {
     $domain = $domains['two_example_com'];
     $this->drupalGet($domain->getPath());
     $this->assertTrue($domain->status(), 'Tested domain is set to active.');
-    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the active domain.');
+    $this->assertEquals($this->getUrl(), $domain->getPath(), 'Loaded the active domain.');
 
     // Disable the domain and test for redirect.
     $domain->disable();
@@ -44,7 +44,7 @@ class DomainInactiveTest extends DomainTestBase {
     $this->drupalGet($domain->getPath());
 
     $this->assertFalse($domain->status(), 'Tested domain is set to inactive.');
-    $this->assertTrue($default->getPath() == $this->getUrl(), 'Redirected an inactive domain to the default domain.');
+    $this->assertEquals($this->getUrl(), $default->getPath(), 'Redirected an inactive domain to the default domain.');
 
     // Check to see if the user can login.
     $url = $domain->getPath() . 'user/login';
@@ -82,7 +82,7 @@ class DomainInactiveTest extends DomainTestBase {
 
     // Test the trusted host, which should redirect to default.
     $this->drupalGet($domain->getPath());
-    $this->assertTrue($domain2->getPath() == $this->getUrl(), 'Redirected from the inactive domain.');
+    $this->assertTrue($this->getUrl(), $domain2->getPath(), 'Redirected from the inactive domain.');
     $this->assertSession()->statusCodeEquals(200);
 
     // The redirect is cached, so we must flush cache to test again.

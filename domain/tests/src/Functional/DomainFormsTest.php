@@ -34,7 +34,7 @@ class DomainFormsTest extends DomainTestBase {
     $edit = $this->domainPostValues();
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'example.com';
-    $this->submitForm('admin/config/domain/add', $edit, 'Save');
+    $this->submitForm($edit, 'Save');
 
     // Did it save correctly?
     $default_id = $storage->loadDefaultId();
@@ -43,7 +43,7 @@ class DomainFormsTest extends DomainTestBase {
     // Does it load correctly?
     $storage->resetCache([$default_id]);
     $new_domain = $storage->load($default_id);
-    $this->assertTrue($new_domain->id() == $default_id, 'Domain loaded properly.');
+    $this->assertEquals($default_id, $new_domain->id(), 'Domain loaded properly.');
 
     // Has a UUID been set?
     $this->assertNotEmpty($new_domain->uuid(), 'Entity UUID set properly.');
@@ -56,19 +56,20 @@ class DomainFormsTest extends DomainTestBase {
     $edit = [];
     $edit['name'] = 'Foo';
     $edit['validate_url'] = 0;
-    $this->submitForm($editUrl, $edit, 'Save');
+    $this->drupalGet($editUrl);
+    $this->submitForm($edit, 'Save');
 
     // Check that the update succeeded.
     $storage->resetCache([$default_id]);
     $domain = $storage->load($default_id);
-    $this->assertTrue($domain->label() == 'Foo', 'Domain record updated via form.');
+    $this->assertEquals('Foo', $domain->label(), 'Domain record updated via form.');
 
     // Visit the delete domain administration page.
     $deleteUrl = 'admin/config/domain/delete/' . $new_domain->id();
     $this->drupalGet($deleteUrl);
 
     // Delete the record.
-    $this->submitForm($deleteUrl, [], 'Delete');
+    $this->submitForm([], 'Save');
     $storage->resetCache([$default_id]);
     $domain = $storage->load($default_id);
     $this->assertEmpty($domain, 'Domain record deleted.');

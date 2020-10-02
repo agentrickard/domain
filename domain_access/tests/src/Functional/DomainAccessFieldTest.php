@@ -98,7 +98,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $edit = [];
     $edit['title[0][value]'] = $this->randomMachineName(8);
     $edit['body[0][value]'] = $this->randomMachineName(16);
-    $this->submitForm('node/add/article', $edit, t('Save'));
+    $this->submitForm($edit, t('Save'));
 
     // Check that the node exists in the database.
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
@@ -192,7 +192,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $edit = [];
     $edit['name'] = $this->randomMachineName();
 
-    $this->submitForm($user_edit_page, $edit, t('Save'));
+    $this->submitForm($edit, t('Save'));
   }
 
 }

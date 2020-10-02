@@ -22,7 +22,8 @@ class DomainCheckResponseTest extends DomainTestBase {
     $edit = $this->domainPostValues();
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'example.com';
-    $this->submitForm('admin/config/domain/add', $edit, 'Save');
+    $this->drupalGet('admin/config/domain/add');
+    $this->submitForm($edit, 'Save');
 
     // Did it save correctly?
     $this->assertSession()->responseNotContains('The server request to');
@@ -36,7 +37,8 @@ class DomainCheckResponseTest extends DomainTestBase {
     $edit['id'] = $storage->createMachineName($edit['hostname']);
     $edit['validate_url'] = 1;
     try {
-      $this->submitForm('admin/config/domain/add', $edit, 'Save');
+      $this->drupalGet('admin/config/domain/add');
+      $this->submitForm($edit, 'Save');
     }
     catch (\Exception $e) {
       // Ensure no test errors.
@@ -48,7 +50,8 @@ class DomainCheckResponseTest extends DomainTestBase {
 
     // Bypass the check.
     $edit['validate_url'] = 0;
-    $this->submitForm('admin/config/domain/add', $edit, 'Save');
+    $this->drupalGet('admin/config/domain/add');
+    $this->submitForm($edit, 'Save');
 
     // The domain should save.
     $this->assertSession()->responseNotContains('The server request to');

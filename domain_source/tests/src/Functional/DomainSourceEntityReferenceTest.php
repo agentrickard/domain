@@ -96,7 +96,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Try to post a node, assigned to the second domain.
     $edit['title[0][value]'] = 'Test node';
     $edit['field_domain_source'] = $two;
-    $this->submitForm('node/add/article', $edit, 'Save');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
     $node = $node_storage->load(1);
     // Check that the value is set.
@@ -111,7 +111,8 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     // Try to post a node, assigned to no domain.
     $edit['title[0][value]'] = 'Test node';
     $edit["field_domain_source"] = '_none';
-    $this->submitForm('node/add/article', $edit, 'Save');
+    $this->drupalGet('node/add/article');
+    $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
     $node = $node_storage->load(2);
     // Check that the value is set.
@@ -131,7 +132,8 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
       'menu_options[main]' => 1,
       'menu_parent' => 'main:',
     ];
-    $this->submitForm('admin/structure/types/manage/article', $edit, t('Save content type'));
+    $this->drupalGet('admin/structure/types/manage/article');
+    $this->submitForm($edit, t('Save content type'));
 
     // Create a third node that is assigned to a menu.
     $edit = [
@@ -140,7 +142,8 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
       'menu[title]' => 'Test preview',
       'field_domain_source' => $two,
     ];
-    $this->submitForm('node/add/article', $edit, 'Save');
+    $this->drupalGet('node/add/article');
+    $this->submitForm($edit, 'Save');
     // Test the URL against expectations, and the rendered menu link.
     $node = $node_storage->load(3);
     $url = $node->toUrl()->toString();
@@ -163,7 +166,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
     // Try to post a node, assigned to no domain.
     $edit2['title[0][value]'] = 'Test node';
-    $this->submitForm('node/add/article', $edit2, 'Save');
+    $this->submitForm($edit2, 'Save');
     // Test the URL against expectations, and the rendered menu link.
     $node = $node_storage->load(4);
     $url = $node->toUrl()->toString();

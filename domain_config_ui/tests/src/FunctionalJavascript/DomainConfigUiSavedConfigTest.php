@@ -162,11 +162,13 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
     $edit = [
       'predefined_langcode' => 'es',
     ];
-    $this->submitForm('admin/config/regional/language/add', $edit, t('Add language'));
+    $this->drupalGet('admin/config/regional/language/add');
+    $this->submitForm($edit, t('Add language'));
 
     // Enable URL language detection and selection.
     $edit = ['language_interface[enabled][language-url]' => '1'];
-    $this->submitForm('admin/config/regional/language/detection', $edit, t('Save settings'));
+    $this->drupalGet('admin/config/regional/language/detection');
+    $this->submitForm($edit, t('Save settings'));
 
     $this->drupalLogout();
 

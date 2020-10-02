@@ -38,7 +38,8 @@ class DomainEntityAccessTest extends DomainTestBase {
     $edit = $this->domainPostValues();
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'example.com';
-    $this->submitForm('admin/config/domain/add', $edit, 'Save');
+    $this->drupalGet('admin/config/domain/add');
+    $this->submitForm($edit, 'Save');
 
     // Did it save correctly?
     $default_id = $storage->loadDefaultId();
@@ -47,7 +48,7 @@ class DomainEntityAccessTest extends DomainTestBase {
     // Does it load correctly?
     $storage->resetCache([$default_id]);
     $new_domain = $storage->load($default_id);
-    $this->assertTrue($new_domain->id() == $default_id, 'Domain loaded properly.');
+    $this->assertEquals($default_id, $new_domain->id(), 'Domain loaded properly.');
 
     $this->drupalLogout();
     $editor = $this->drupalCreateUser([
@@ -65,12 +66,14 @@ class DomainEntityAccessTest extends DomainTestBase {
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'one.example.com';
     $edit['id'] = \Drupal::entityTypeManager()->getStorage('domain')->createMachineName($edit['hostname']);
-    $this->submitForm('admin/config/domain/add', $edit, 'Save');
+    $this->drupalGet('admin/config/domain/add');
+    $this->submitForm($edit, 'Save');
+
 
     // Does it load correctly?
     $storage->resetCache([$edit['id']]);
     $new_domain = $storage->load($edit['id']);
-    $this->assertTrue($new_domain->id() == $edit['id'], 'Domain loaded properly.');
+    $this->assertEquals($edit['id'], $new_domain->id(), 'Domain loaded properly.');
 
     $this->drupalLogout();
     $noneditor = $this->drupalCreateUser([
