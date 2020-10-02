@@ -33,14 +33,14 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Check for a domain field.
-    $this->assertNoText('Domain test field');
+    $this->assertSession()->pageTextNotContains('Domain test field');
 
     // Visit the article field display administration page.
     $this->drupalGet('admin/structure/types/manage/article/display');
     $this->assertSession()->statusCodeEquals(200);
 
     // Check for a domain field.
-    $this->assertNoText('Domain test field');
+    $this->assertSession()->pageTextNotContains('Domain test field');
 
     // Create test domain field.
     $this->domainCreateTestField();
@@ -49,13 +49,13 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $this->drupalGet('admin/structure/types/manage/article/fields');
 
     // Check the new field.
-    $this->assertText('Domain test field');
+    $this->assertSession()->pageTextContains('Domain test field');
 
     // Visit the article field display administration page.
     $this->drupalGet('admin/structure/types/manage/article/display');
 
     // Check the new field.
-    $this->assertText('Domain test field');
+    $this->assertSession()->pageTextContains('Domain test field');
   }
 
   /**
@@ -82,7 +82,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     // Check the new field exists on the page.
-    $this->assertText('Domain test field');
+    $this->assertSession()->pageTextContains('Domain test field');
 
     // We expect to find 5 domain options.
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();

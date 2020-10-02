@@ -29,7 +29,7 @@ class DomainEntityAccessTest extends DomainTestBase {
     $this->drupalGet('admin/config/domain');
 
     // Check for the add message.
-    $this->assertText('There are no domain record entities yet.', 'Text for no domains found.');
+    $this->assertSession()->pageTextContains('There are no domain record entities yet.');
 
     // Visit the add domain administration page.
     $this->drupalGet('admin/config/domain/add');
