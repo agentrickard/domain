@@ -54,11 +54,11 @@ abstract class DomainConfigTestBase extends DomainTestBase {
     $edit = [
       'predefined_langcode' => 'es',
     ];
-    $this->drupalPostForm('admin/config/regional/language/add', $edit, t('Add language'));
+    $this->submitForm('admin/config/regional/language/add', $edit, t('Add language'));
 
     // Enable URL language detection and selection.
     $edit = ['language_interface[enabled][language-url]' => '1'];
-    $this->drupalPostForm('admin/config/regional/language/detection', $edit, t('Save settings'));
+    $this->submitForm('admin/config/regional/language/detection', $edit, t('Save settings'));
 
     $this->drupalLogout();
 

@@ -50,7 +50,7 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
       $expected = $domain->getPath() . $homepages[$domain->id()];
       $expected_home = $this->drupalGet($expected);
 
-      $this->assertTrue($home == $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+      $this->assertEquals($expected_home, $home, 'Proper home page loaded (' . $domain->id() . ').');
     }
   }
 

@@ -36,10 +36,10 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
         $path = $domain->getPath() . $langcode . '/user/login';
         $this->drupalGet($path);
         if ($domain->isDefault()) {
-          $this->assertRaw('<title>Log in | Drupal</title>', 'Loaded the proper site name.');
+          $this->assertSession()->responseContains('<title>Log in | Drupal</title>');
         }
         else {
-          $this->assertRaw('<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>', 'Loaded the proper site name.' . '<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>');
+          $this->assertSession()->responseContains('<title>Log in | ' . $this->expectedName($domain, $langcode) . '</title>');
         }
       }
     }
@@ -67,11 +67,11 @@ class DomainConfigOverriderTest extends DomainConfigTestBase {
 
     $domain_one = $domains['one_example_com'];
     $this->drupalGet($domain_one->getPath() . 'user/login');
-    $this->assertRaw('<title>Log in | First</title>', 'Found overridden slogan for one.example.com.');
+    $this->assertSession()->responseContains('<title>Log in | First</title>');
 
     $domain_four = $domains['four_example_com'];
     $this->drupalGet($domain_four->getPath() . 'user/login');
-    $this->assertRaw('<title>Log in | Four overridden in settings</title>', 'Found overridden slogan for four.example.com.');
+    $this->assertSession()->responseContains('<title>Log in | Four overridden in settings</title>');
   }
 
   /**
