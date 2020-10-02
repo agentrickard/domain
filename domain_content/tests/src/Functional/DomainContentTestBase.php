@@ -96,7 +96,7 @@ abstract class DomainContentTestBase extends DomainTestBase {
     $content = preg_replace('@>\\s+<@', '><', $content);
     $regex = '/' . preg_quote($text, '/') . '/ui';
     $message = sprintf('The text "%s" was found in the text of the current page.', $text);
-    $this->assert((bool) preg_match($regex, $content), $message);
+    $this->assertTrue((bool) preg_match($regex, $content), $message);
   }
 
 }

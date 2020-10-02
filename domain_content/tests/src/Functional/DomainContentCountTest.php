@@ -36,7 +36,7 @@ class DomainContentCountTest extends DomainContentTestBase {
     // Test the overview pages.
     foreach ($urls as $url) {
       $content = $this->drupalGet($url);
-      $this->assertResponse(200);
+      $this->assertSession()->statusCodeEquals(200);
       // Find the links.
       $this->findLink('All affiliates');
       foreach ($this->domains as $id => $domain) {

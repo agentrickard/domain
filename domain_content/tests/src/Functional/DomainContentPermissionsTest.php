@@ -36,7 +36,7 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
     // Test the overview and domain-specific pages.
     foreach ($urls as $url) {
       $this->drupalGet($url);
-      $this->assertResponse(200);
+      $this->assertSession()->statusCodeEquals(200);
       // Find the links.
       $this->findLink('All affiliates');
       foreach ($this->domains as $id => $domain) {
@@ -45,12 +45,12 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
 
       // All affiliates link.
       $this->drupalGet($url . '/all_affiliates');
-      $this->assertResponse(200);
+      $this->assertSession()->statusCodeEquals(200);
 
       // Individual domain pages.
       foreach ($this->domains as $id => $domain) {
         $this->drupalGet($url . '/' . $id);
-        $this->assertResponse(200);
+        $this->assertSession()->statusCodeEquals(200);
       }
     }
     // This user should be able to see everything but all affiliates.
@@ -68,21 +68,21 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
     // Test the overview and domain-specific pages.
     foreach ($urls as $url) {
       $this->drupalGet($url);
-      $this->assertResponse(200);
+      $this->assertSession()->statusCodeEquals(200);
       // Find the links.
-      $this->assertNoRaw('All affiliates');
+      $this->assertSession()->responseNotContains('All affiliates');
       foreach ($this->domains as $id => $domain) {
         $this->findLink($domain->label());
       }
 
       // All affiliates link.
       $this->drupalGet($url . '/all_affiliates');
-      $this->assertResponse(403);
+      $this->assertSession()->statusCodeEquals(403);
 
       // Individual domain pages.
       foreach ($this->domains as $id => $domain) {
         $this->drupalGet($url . '/' . $id);
-        $this->assertResponse(200);
+        $this->assertSession()->statusCodeEquals(200);
       }
     }
 
@@ -103,9 +103,9 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
         $expected = 403;
       }
       $this->drupalGet($url);
-      $this->assertResponse($expected);
+      $this->assertSession()->statusCodeEquals($expected);
       // Find the links.
-      $this->assertNoRaw('All affiliates');
+      $this->assertSession()->responseNotContains('All affiliates');
       foreach ($this->domains as $id => $domain) {
         if ($expected == 200) {
           $this->findLink($domain->label());
@@ -117,12 +117,12 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
 
       // All affiliates link will fail for both paths.
       $this->drupalGet($url . '/all_affiliates');
-      $this->assertResponse(403);
+      $this->assertSession()->statusCodeEquals(403);
 
       // Individual domain pages.
       foreach ($this->domains as $id => $domain) {
         $this->drupalGet($url . '/' . $id);
-        $this->assertResponse($expected);
+        $this->assertSession()->statusCodeEquals($expected);
       }
     }
 
@@ -144,9 +144,9 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
         $expected = 403;
       }
       $this->drupalGet($url);
-      $this->assertResponse($expected);
+      $this->assertSession()->statusCodeEquals($expected);
       // Find the links.
-      $this->assertNoRaw('All affiliates');
+      $this->assertSession()->responseNotContains('All affiliates');
       foreach ($this->domains as $id => $domain) {
         if ($expected == 200 && $id == $assigned_id) {
           $this->findLink($domain->label());
@@ -158,16 +158,16 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
 
       // All affiliates link will fail for both paths.
       $this->drupalGet($url . '/all_affiliates');
-      $this->assertResponse(403);
+      $this->assertSession()->statusCodeEquals(403);
 
       // Individual domain pages.
       foreach ($this->domains as $id => $domain) {
         $this->drupalGet($url . '/' . $id);
         if ($expected == 200 && $id == $assigned_id) {
-          $this->assertResponse(200);
+          $this->assertSession()->statusCodeEquals(200);
         }
         else {
-          $this->assertResponse(403);
+          $this->assertSession()->statusCodeEquals(403);
         }
       }
     }
