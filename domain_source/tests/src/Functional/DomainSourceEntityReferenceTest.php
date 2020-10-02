@@ -16,7 +16,7 @@ class DomainSourceEntityReferenceTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'domain',
     'domain_source',
     'field',

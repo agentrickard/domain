@@ -39,7 +39,7 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'domain_config_ui',
     'domain_config_test',
     'language',
@@ -48,7 +48,7 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
   /**
    * {@inheritDoc}
    */
-  public function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->createAdminUser();

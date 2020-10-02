@@ -14,12 +14,12 @@ class DomainListWeightTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'user'];
+  protected static $modules = ['domain', 'user'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 60 domains. We paginate at 50.

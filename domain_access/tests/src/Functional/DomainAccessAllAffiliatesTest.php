@@ -16,7 +16,7 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
+  protected static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
 
   /**
    * Tests that the module installed its field correctly.
@@ -75,7 +75,7 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertSession()->responseContains($string, 'Found the domain option.');
+      $this->assertSession()->responseContains($string);
       if (!isset($one)) {
         $one = $domain->id();
         continue;

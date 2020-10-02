@@ -16,7 +16,7 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_alias', 'user', 'block'];
+  protected static $modules = ['domain', 'domain_alias', 'user', 'block'];
 
   /**
    * Tests the handling of aliased requests.

@@ -11,7 +11,7 @@ use Drupal\user\RoleInterface;
  */
 class DomainConfigHomepageTest extends DomainConfigTestBase {
 
-  public static $modules = ['node', 'views'];
+  protected static $modules = ['node', 'views'];
 
   /**
    * Tests that domain-specific homepage loading works.

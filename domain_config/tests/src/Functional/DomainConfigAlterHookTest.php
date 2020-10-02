@@ -14,7 +14,7 @@ class DomainConfigAlterHookTest extends DomainConfigTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'domain',
     'domain_config',
     'domain_config_test',
@@ -45,7 +45,7 @@ class DomainConfigAlterHookTest extends DomainConfigTestBase {
   /**
    * Test setup.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a domain.

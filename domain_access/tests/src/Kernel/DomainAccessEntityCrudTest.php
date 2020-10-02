@@ -32,12 +32,12 @@ class DomainAccessEntityCrudTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['system', 'field', 'filter', 'text', 'user', 'node', 'domain', 'domain_access'];
+  protected static $modules = ['system', 'field', 'filter', 'text', 'user', 'node', 'domain', 'domain_access'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setup();
 
     $this->entityTypeManager = $this->container->get('entity_type.manager');

@@ -16,12 +16,12 @@ class DomainAliasWildcardTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_alias', 'user'];
+  protected static $modules = ['domain', 'domain_alias', 'user'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 3 domains. These will be example.com, one.example.com,

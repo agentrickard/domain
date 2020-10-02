@@ -47,12 +47,12 @@ class DomainAccessPermissionsTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'field', 'node'];
+  protected static $modules = ['domain', 'domain_access', 'field', 'node'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     // Clear permissions for authenticated users.
     $this->config('user.role.' . RoleInterface::AUTHENTICATED_ID)->set('permissions', [])->save();

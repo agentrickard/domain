@@ -33,7 +33,7 @@ abstract class DomainConfigTestBase extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'domain',
     'language',
     'domain_config_test',
@@ -43,7 +43,7 @@ abstract class DomainConfigTestBase extends DomainTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create and login user.

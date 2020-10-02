@@ -17,12 +17,12 @@ class DomainSourceUrlTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_source', 'field', 'node', 'user'];
+  protected static $modules = ['domain', 'domain_source', 'field', 'node', 'user'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 2 domains.
@@ -56,15 +56,15 @@ class DomainSourceUrlTest extends DomainTestBase {
 
     // Get the link using Url::fromRoute().
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($expected, $url, 'fromRoute');
+    $this->assertEquals($expected, $url, 'fromRoute');
 
     // Get the link using Url::fromUserInput()
     $url = Url::fromUserInput($uri_path, $options)->toString();
-    $this->assertTrue($expected, $url, 'fromUserInput');
+    $this->assertEquals($expected, $url, 'fromUserInput');
 
     // Get the link using Url::fromUri()
     $url = Url::fromUri($uri, $options)->toString();
-    $this->assertTrue($expected, $url, 'fromUri');
+    $this->assertEquals($expected, $url, 'fromUri');
   }
 
 }

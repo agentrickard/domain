@@ -19,14 +19,14 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'domain_config_ui',
   ];
 
   /**
    * {@inheritDoc}
    */
-  public function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->createAdminUser();

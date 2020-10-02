@@ -27,7 +27,7 @@ class DomainHookTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_test', 'user', 'node'];
+  protected static $modules = ['domain', 'domain_test', 'user', 'node'];
 
   /**
    * Domain id key.
@@ -70,7 +70,7 @@ class DomainHookTest extends KernelTestBase {
   /**
    * Test setup.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a domain.

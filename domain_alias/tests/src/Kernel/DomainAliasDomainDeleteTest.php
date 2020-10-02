@@ -19,7 +19,7 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_alias'];
+  protected static $modules = ['domain', 'domain_alias'];
 
   /**
    * The Domain storage handler service.
@@ -38,7 +38,7 @@ class DomainAliasDomainDeleteTest extends DomainTestBase {
   /**
    * Test setup.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a domain.

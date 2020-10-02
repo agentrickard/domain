@@ -16,7 +16,7 @@ class DomainNegotiatorTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_test', 'block'];
+  protected static $modules = ['domain', 'domain_test', 'block'];
 
   /**
    * Tests the handling of an inbound request.

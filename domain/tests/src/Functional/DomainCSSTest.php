@@ -16,12 +16,12 @@ class DomainCSSTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain'];
+  protected static $modules = ['domain'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     \Drupal::service('theme_installer')->install(['bartik']);
   }
@@ -45,7 +45,7 @@ class DomainCSSTest extends DomainTestBase {
     foreach (\Drupal::entityTypeManager()->getStorage('domain')->loadMultiple() as $domain) {
       $this->drupalGet($domain->getPath());
       $text = '<body class="' . Html::getClass($domain->id() . '-class');
-      $this->assertSession()->responseNotContains($text, 'No custom CSS present.');
+      $this->assertSession()->responseNotContains($text);
     }
     // Set the css classes.
     $config = $this->config('domain.settings');

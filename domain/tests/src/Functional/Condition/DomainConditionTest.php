@@ -42,7 +42,7 @@ class DomainConditionTest extends DomainTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Set the condition manager.

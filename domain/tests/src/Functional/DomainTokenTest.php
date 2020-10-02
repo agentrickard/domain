@@ -16,7 +16,7 @@ class DomainTokenTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'block'];
+  protected static $modules = ['domain', 'block'];
 
   /**
    * Tests the handling of an inbound request.

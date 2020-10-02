@@ -16,12 +16,12 @@ class DomainConfigTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_config_schema_test'];
+  protected static $modules = ['domain', 'domain_config_schema_test'];
 
   /**
    * Test setup.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installEntitySchema('domain');

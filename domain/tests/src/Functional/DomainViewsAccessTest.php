@@ -14,7 +14,7 @@ class DomainViewsAccessTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'node', 'views', 'block'];
+  protected static $modules = ['domain', 'node', 'views', 'block'];
 
   /**
    * Test inactive domain.

@@ -14,7 +14,7 @@ abstract class DomainContentTestBase extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_content'];
+  protected static $modules = ['domain', 'domain_content'];
 
   /**
    * An array of domains.
@@ -26,7 +26,7 @@ abstract class DomainContentTestBase extends DomainTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create five test domains.

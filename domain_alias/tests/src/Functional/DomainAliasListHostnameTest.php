@@ -12,7 +12,7 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 3 domains. These will be example.com, one.example.com,

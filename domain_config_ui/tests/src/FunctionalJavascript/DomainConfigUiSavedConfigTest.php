@@ -39,7 +39,7 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'domain_config_ui',
     'language',
   ];
@@ -47,7 +47,7 @@ class DomainConfigUiSavedConfigTest extends WebDriverTestBase {
   /**
    * {@inheritDoc}
    */
-  public function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->createAdminUser();

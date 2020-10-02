@@ -12,7 +12,7 @@ class DomainConfigHookProblemTest extends DomainConfigHookTest {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     // Adds the domain_config module.
     'domain_config',
   ];

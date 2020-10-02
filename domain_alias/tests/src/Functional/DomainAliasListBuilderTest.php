@@ -14,12 +14,12 @@ class DomainAliasListBuilderTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_alias', 'user'];
+  protected static $modules = ['domain', 'domain_alias', 'user'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 5 domains.

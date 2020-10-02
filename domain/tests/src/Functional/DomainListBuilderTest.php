@@ -14,12 +14,12 @@ class DomainListBuilderTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'user'];
+  protected static $modules = ['domain', 'user'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 150 domains.
@@ -204,7 +204,7 @@ class DomainListBuilderTest extends DomainTestBase {
    */
   private function checkNoPagination() {
     foreach (['?page=0', '?page=1', '?page=2'] as $href) {
-      $this->assertSession()->linkByHrefNotExists($href, 0, 'Link not found');
+      $this->assertSession()->linkByHrefNotExists($href, 'Link not found');
     }
   }
 

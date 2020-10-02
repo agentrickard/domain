@@ -42,7 +42,7 @@ abstract class DomainTestBase extends BrowserTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'node'];
+  protected static $modules = ['domain', 'node'];
 
   /**
    * We use the standard profile for testing.
@@ -61,7 +61,7 @@ abstract class DomainTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Set the base hostname for domains.

@@ -14,7 +14,7 @@ class DomainEntityReferenceTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'field', 'field_ui'];
+  protected static $modules = ['domain', 'field', 'field_ui'];
 
   /**
    * Create, edit and delete a domain field via the user interface.

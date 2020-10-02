@@ -16,12 +16,12 @@ class DomainAdminElementTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'field', 'field_ui', 'user'];
+  protected static $modules = ['domain', 'field', 'field_ui', 'user'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 5 domains.

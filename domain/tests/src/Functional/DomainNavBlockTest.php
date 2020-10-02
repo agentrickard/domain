@@ -16,7 +16,7 @@ class DomainNavBlockTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'node', 'block'];
+  protected static $modules = ['domain', 'node', 'block'];
 
   /**
    * Test domain navigation block.

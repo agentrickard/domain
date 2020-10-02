@@ -53,7 +53,7 @@ trait DomainTestTrait {
       if ($i === 0) {
         $hostname = $base_hostname;
         $machine_name = 'example.com';
-        $name = 'Example';
+        $name = 'Example base domain';
       }
       elseif (!empty($list[$i])) {
         $hostname = $list[$i] . '.' . $base_hostname;

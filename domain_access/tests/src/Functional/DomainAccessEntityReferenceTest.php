@@ -16,7 +16,7 @@ class DomainAccessEntityReferenceTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
+  protected static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
 
   /**
    * Tests that the module installed its field correctly.

@@ -17,7 +17,7 @@ class DomainAccessRecordsTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
+  protected static $modules = ['domain', 'domain_access', 'field', 'field_ui'];
 
   /**
    * Creates a node and tests the creation of node access rules.

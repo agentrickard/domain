@@ -17,12 +17,12 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_source', 'field', 'node', 'user'];
+  protected static $modules = ['domain', 'domain_source', 'field', 'node', 'user'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 3 domains.
@@ -54,7 +54,7 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
 
     // Get the link using Url::fromRoute().
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($expected, $url, 'fromRoute');
+    $this->assertEquals($expected, $url, 'fromRoute');
 
     // Set up two additional domains.
     $domain2 = $domains['two_example_com'];
@@ -76,7 +76,7 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
     $expected = $domain2->getPath() . $path;
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
     // Assert that the URL is what we expect.
-    $this->assertTrue($expected, $url, 'fromRoute');
+    $this->assertEquals($expected, $url, 'fromRoute');
     $this->drupalGet($url);
     $this->assertSession()->statusCodeEquals(200);
   }

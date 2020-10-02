@@ -17,6 +17,6 @@ abstract class DomainAliasTestBase extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_alias'];
+  protected static $modules = ['domain', 'domain_alias'];
 
 }

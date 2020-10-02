@@ -19,7 +19,7 @@ class DomainVariableSchemeTest extends KernelTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain'];
+  protected static $modules = ['domain'];
 
   /**
    * Domain id key.
@@ -48,7 +48,7 @@ class DomainVariableSchemeTest extends KernelTestBase {
   /**
    * Test setup.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a domain.

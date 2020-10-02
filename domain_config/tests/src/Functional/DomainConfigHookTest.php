@@ -14,7 +14,7 @@ class DomainConfigHookTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'domain',
     // See module info file for description of what this module does.
     'domain_config_hook_test',

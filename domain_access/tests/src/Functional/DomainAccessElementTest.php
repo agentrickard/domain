@@ -16,7 +16,7 @@ class DomainAccessElementTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'domain',
     'domain_access',
     'field',
@@ -27,7 +27,7 @@ class DomainAccessElementTest extends DomainTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create 5 domains.
@@ -109,7 +109,7 @@ class DomainAccessElementTest extends DomainTestBase {
     $values = $manager->getAccessValues($user);
     $this->assertCount(2, $values, 'User saved with two domain records.');
     $value = $manager->getAllValue($user);
-    $this->assertCount(0, $value, 'User not saved to all affiliates.');
+    $this->assertFalse($value, 'User not saved to all affiliates.');
 
     $this->drupalLogin($account);
 

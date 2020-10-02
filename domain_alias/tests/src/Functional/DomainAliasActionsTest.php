@@ -14,7 +14,7 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_alias', 'user'];
+  protected static $modules = ['domain', 'domain_alias', 'user'];
 
   /**
    * Tests bulk actions through the domain overview page.
@@ -70,7 +70,7 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
     // Test some text on the page.
     foreach ($domains as $domain) {
       $name = $domain->label();
-      $this->assertSession()->pageTextContains($name, 'Name found properly.');
+      $this->assertSession()->pageTextContains($name);
     }
     // Test the list of actions.
     $actions = ['delete', 'disable', 'default'];
@@ -78,7 +78,7 @@ class DomainAliasActionsTest extends DomainAliasTestBase {
       $this->assertSession()->responseContains("/domain/{$action}/");
     }
     // Check that all domains are active.
-    $this->assertSession()->responseNotContains('Inactive', 'Inactive domain not found.');
+    $this->assertSession()->responseNotContains('Inactive');
 
     // Disable a domain and test the enable link.
     $this->clickLink('Disable', 0);

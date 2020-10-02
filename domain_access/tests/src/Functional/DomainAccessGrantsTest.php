@@ -24,12 +24,12 @@ class DomainAccessGrantsTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'domain_access', 'field', 'node'];
+  protected static $modules = ['domain', 'domain_access', 'field', 'node'];
 
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Ensure node_access table is clear.
@@ -62,7 +62,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
       $this->drupalGet($path);
       if ($domain->id() == $active_domain) {
         $this->assertSession()->statusCodeEquals(200);
-        $this->assertSession()->responseContains($node1->getTitle(), 'Article found on domain.');
+        $this->assertSession()->responseContains($node1->getTitle());
       }
       else {
         $this->assertSession()->statusCodeEquals(403);
@@ -81,7 +81,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
       $path = $domain->getPath() . 'node/' . $node2->id();
       $this->drupalGet($path);
       $this->assertSession()->statusCodeEquals(200);
-      $this->assertSession()->responseContains($node2->getTitle(), 'Article found on domain.');
+      $this->assertSession()->responseContains($node2->getTitle());
     }
   }
 
