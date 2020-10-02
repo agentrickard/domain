@@ -49,11 +49,11 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
 
     // Visit the domain config ui administration page.
     $this->drupalGet($path);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Visit the site information page.
     $this->drupalGet($path2);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
     $this->findField('domain');
     $this->findField('language');
 
@@ -61,16 +61,16 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, 'Found the domain option.');
+      $this->assertSession()->responseContains($string);
     }
     // We expect to find 'All Domains'.
-    $this->assertRaw('All Domains</option>', 'Found the domain option.');
+    $this->assertSession()->responseContains('All Domains</option>');
 
     // We expect to find two language options.
     $languages = ['en', 'es'];
     foreach ($languages as $langcode) {
       $string = 'value="' . $langcode . '"';
-      $this->assertRaw($string, 'Found the language option.');
+      $this->assertSession()->responseContains($string);
     }
 
     // Now test the editorUser.
@@ -78,11 +78,11 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
 
     // Visit the domain config ui administration page.
     $this->drupalGet($path);
-    $this->assertResponse(403);
+    $this->assertSession()->statusCodeEquals(403);
 
     // Visit the site information page.
     $this->drupalGet($path2);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
     $this->findField('domain');
     $this->findNoField('language');
 
@@ -90,26 +90,26 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
       if (in_array($domain->id(), ['example_com', 'one_example_com'], TRUE)) {
-        $this->assertRaw($string, 'Found the domain option.');
+        $this->assertSession()->responseContains($string);
       }
       else {
-        $this->assertNoRaw($string, 'Did not find the domain option.');
+        $this->assertSession()->responseNotContains($string);
       }
     }
 
     // We expect to find 'All Domains'.
-    $this->assertRaw('All Domains</option>', 'Found the domain option.');
+    $this->assertSession()->responseContains('All Domains</option>');
 
     // Now test the languageUser.
     $this->drupalLogin($this->languageUser);
 
     // Visit the domain config ui administration page.
     $this->drupalGet($path);
-    $this->assertResponse(403);
+    $this->assertSession()->statusCodeEquals(403);
 
     // Visit the site information page.
     $this->drupalGet($path2);
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
     $this->findField('domain');
     $this->findField('language');
 
@@ -117,21 +117,21 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
       if (in_array($domain->id(), ['two_example_com', 'three_example_com'], TRUE)) {
-        $this->assertRaw($string, 'Found the domain option.');
+        $this->assertSession()->responseContains($string);
       }
       else {
-        $this->assertNoRaw($string, 'Did not find the domain option.');
+        $this->assertSession()->responseNotContains($string);
       }
     }
 
     // We do not expect to find 'All Domains'.
-    $this->assertNoRaw('All Domains</option>', 'Found the domain option.');
+    $this->assertSession()->responseNotContains('All Domains</option>');
 
     // We expect to find two language options.
     $languages = ['en', 'es'];
     foreach ($languages as $langcode) {
       $string = 'value="' . $langcode . '"';
-      $this->assertRaw($string, 'Found the language option.');
+      $this->assertSession()->responseContains($string);
     }
 
   }
