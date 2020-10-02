@@ -71,10 +71,10 @@ class DomainAccessEntityFieldTest extends DomainTestBase {
     ]);
     $this->drupalLogin($this->admin_user);
     $this->drupalGet('admin/structure/taxonomy/manage/domain_access/overview/fields');
-    $this->assertResponse(200, 'Manage fields page accessed.');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check for a domain field.
-    $this->assertText('Domain Access', 'Domain form field found.');
+    $this->assertSession()->pageTextContains('Domain Access');
   }
 
 }

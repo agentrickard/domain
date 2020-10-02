@@ -33,17 +33,17 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
 
     // Visit the article field administration page.
     $this->drupalGet('admin/structure/types/manage/article/fields');
-    $this->assertResponse(200, 'Manage fields page accessed.');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check for the field.
-    $this->assertText($label, 'Domain form field found.');
+    $this->assertSession()->pageTextContains($label);
 
     // Visit the article field display administration page.
     $this->drupalGet('admin/structure/types/manage/article/display');
-    $this->assertResponse(200, 'Manage field display page accessed.');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check for the field.
-    $this->assertText($label, 'Domain form field found.');
+    $this->assertSession()->pageTextContains($label);
   }
 
   /**
@@ -66,16 +66,16 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
 
     // Visit the article field display administration page.
     $this->drupalGet('node/add/article');
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check the new field exists on the page.
-    $this->assertText($label, 'Found the domain field instance.');
+    $this->assertSession()->pageTextContains($label);
 
     // We expect to find 5 domain options.
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
       $string = 'value="' . $domain->id() . '"';
-      $this->assertRaw($string, 'Found the domain option.');
+      $this->assertSession()->responseContains($string, 'Found the domain option.');
       if (!isset($one)) {
         $one = $domain->id();
         continue;
@@ -90,8 +90,8 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
     $edit["field_domain_access[{$one}]"] = TRUE;
     $edit["field_domain_access[{$two}]"] = TRUE;
     $edit["field_domain_all_affiliates[value]"] = 1;
-    $this->drupalPostForm('node/add/article', $edit, 'Save');
-    $this->assertResponse(200);
+    $this->submitForm('node/add/article', $edit, 'Save');
+    $this->assertSession()->statusCodeEquals(200);
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
     // Check that two values are set.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);

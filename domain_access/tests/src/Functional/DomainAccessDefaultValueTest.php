@@ -39,21 +39,21 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
 
     // Visit the article field display administration page.
     $this->drupalGet('node/add/article');
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check the new field exists on the page.
-    $this->assertText('Domain Access', 'Found the domain field instance.');
-    $this->assertRaw('name="field_domain_access[example_com]" value="example_com" checked="checked"', 'Default domain selected.');
+    $this->assertSession()->pageTextContains('Domain Access');
+    $this->assertSession()->responseContains('name="field_domain_access[example_com]" value="example_com" checked="checked"');
     // Check the all affiliates field.
-    $this->assertText('Send to all affiliates', 'Found the all affiliates field instance.');
-    $this->assertNoRaw('name="field_domain_all_affiliates[value]" value="1" checked="checked"', 'All affiliates not selected.');
+    $this->assertSession()->pageTextContains('Send to all affiliates');
+    $this->assertSession()->responseNotContains('name="field_domain_all_affiliates[value]" value="1" checked="checked"');
 
     // Now save the node with the values set.
     $edit = [
       'title[0][value]' => 'Test node',
       'field_domain_access[example_com]' => 'example_com',
     ];
-    $this->drupalPostForm('node/add/article', $edit, 'Save');
+    $this->submitForm('node/add/article', $edit, 'Save');
 
     // Load the node.
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
@@ -77,13 +77,13 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
     $this->drupalLogin($this->test_user);
 
     $this->drupalGet('node/1/edit');
-    $this->assertResponse(200);
+    $this->assertSession()->statusCodeEquals(200);
 
     // Now save the node with the values set.
     $edit = [
       'title[0][value]' => 'Test node update',
     ];
-    $this->drupalPostForm('node/1/edit', $edit, 'Save');
+    $this->submitForm('node/1/edit', $edit, 'Save');
 
     // Load the node.
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);

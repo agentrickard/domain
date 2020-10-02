@@ -47,14 +47,14 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Visit the article creation page.
     $this->drupalGet('node/add/article');
-    $this->assertResponse(200, 'Article creation found.');
+    $this->assertSession()->statusCodeEquals(200);
 
     // Check for the form options.
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
-      $this->assertText($domain->label(), 'Domain form item found.');
+      $this->assertSession()->pageTextContains($domain->label());
     }
-    $this->assertText($label, 'All affiliates field found.');
+    $this->assertSession()->pageTextContains($label);
 
     // Test a user who can access some domain settings.
     $user2 = $this->drupalCreateUser(['create article content', 'publish to any assigned domain']);
@@ -64,18 +64,18 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Visit the article creation page.
     $this->drupalGet('node/add/article');
-    $this->assertResponse(200, 'Article creation found.');
+    $this->assertSession()->statusCodeEquals(200, 'Article creation found.');
 
     // Check for the form options.
     foreach ($domains as $domain) {
       if ($domain->id() == $active_domain) {
-        $this->assertRaw('>' . $domain->label() . '</label>', 'Domain form item found.');
+        $this->assertSession()->responseContains('>' . $domain->label() . '</label>', 'Domain form item found.');
       }
       else {
-        $this->assertNoRaw('>' . $domain->label() . '</label>', 'Domain form item not found.');
+        $this->assertSession()->responseNotContains('>' . $domain->label() . '</label>', 'Domain form item not found.');
       }
     }
-    $this->assertNoText($label, 'All affiliates field not found.');
+    $this->assertSession()->pageTextNotContains($label, 'All affiliates field not found.');
 
     // Test a user who can access no domain settings.
     $user3 = $this->drupalCreateUser(['create article content']);
@@ -83,13 +83,13 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Visit the article creation page.
     $this->drupalGet('node/add/article');
-    $this->assertResponse(200, 'Article creation found.');
+    $this->assertSession()->statusCodeEquals(200, 'Article creation found.');
 
     // Check for the form options.
     foreach ($domains as $domain) {
-      $this->assertNoText($domain->label(), 'Domain form item not found.');
+      $this->assertSession()->pageTextNotContains($domain->label(), 'Domain form item not found.');
     }
-    $this->assertNoText($label, 'All affiliates field not found.');
+    $this->assertSession()->pageTextNotContains($label, 'All affiliates field not found.');
 
     // Attempt saving the node.
     // The domain/domain affiliates fields are not accessible to this user.
@@ -98,7 +98,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     $edit = [];
     $edit['title[0][value]'] = $this->randomMachineName(8);
     $edit['body[0][value]'] = $this->randomMachineName(16);
-    $this->drupalPostForm('node/add/article', $edit, t('Save'));
+    $this->submitForm('node/add/article', $edit, t('Save'));
 
     // Check that the node exists in the database.
     $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
@@ -110,11 +110,11 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Visit the account creation page.
     $this->drupalGet('admin/people/create');
-    $this->assertResponse(200, 'User creation found.');
+    $this->assertSession()->statusCodeEquals(200, 'User creation found.');
 
     // Check for the form options.
     foreach ($domains as $domain) {
-      $this->assertText($domain->label(), 'Domain form item found.');
+      $this->assertSession()->pageTextContains($domain->label(), 'Domain form item found.');
     }
 
     // Test a user who can assign users to some domains.
@@ -125,15 +125,15 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Visit the account creation page.
     $this->drupalGet('admin/people/create');
-    $this->assertResponse(200, 'User creation found.');
+    $this->assertSession()->statusCodeEquals(200, 'User creation found.');
 
     // Check for the form options.
     foreach ($domains as $domain) {
       if ($domain->id() == $active_domain) {
-        $this->assertRaw('>' . $domain->label() . '</label>', 'Domain form item found.');
+        $this->assertSession()->responseContains('>' . $domain->label() . '</label>', 'Domain form item found.');
       }
       else {
-        $this->assertNoRaw('>' . $domain->label() . '</label>', 'Domain form item not found.');
+        $this->assertSession()->responseNotContains('>' . $domain->label() . '</label>', 'Domain form item not found.');
       }
     }
 
@@ -143,11 +143,11 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Visit the account creation page.
     $this->drupalGet('admin/people/create');
-    $this->assertResponse(200, 'User creation found.');
+    $this->assertSession()->statusCodeEquals(200, 'User creation found.');
 
     // Check for the form options.
     foreach ($domains as $domain) {
-      $this->assertNoText($domain->label(), 'Domain form item not found.');
+      $this->assertSession()->pageTextNotContains($domain->label(), 'Domain form item not found.');
     }
 
     // Test a user who can access all domain settings.
@@ -165,14 +165,14 @@ class DomainAccessFieldTest extends DomainTestBase {
 
     // Visit the article creation page.
     $this->drupalGet('node/add/' . $type->id());
-    $this->assertResponse(200, $type->id() . ' creation found.');
+    $this->assertSession()->statusCodeEquals(200, $type->id() . ' creation found.');
 
     // Check for the form options.
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
-      $this->assertText($domain->label(), 'Domain form item found.');
+      $this->assertSession()->pageTextContains($domain->label(), 'Domain form item found.');
     }
-    $this->assertText($label, 'All affiliates field found.');
+    $this->assertSession()->pageTextContains($label, 'All affiliates field found.');
 
     // Test user without access to affiliates field editing their user page.
     $user8 = $this->drupalCreateUser(['change own username']);
@@ -183,16 +183,16 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Check for the form options.
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
     foreach ($domains as $domain) {
-      $this->assertNoText($domain->label(), 'Domain form item not found.');
+      $this->assertSession()->pageTextNotContains($domain->label(), 'Domain form item not found.');
     }
 
-    $this->assertNoText($label, 'All affiliates field not found.');
+    $this->assertSession()->pageTextNotContains($label, 'All affiliates field not found.');
 
     // Change own username.
     $edit = [];
     $edit['name'] = $this->randomMachineName();
 
-    $this->drupalPostForm($user_edit_page, $edit, t('Save'));
+    $this->submitForm($user_edit_page, $edit, t('Save'));
   }
 
 }

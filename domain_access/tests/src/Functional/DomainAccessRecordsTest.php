@@ -46,11 +46,11 @@ class DomainAccessRecordsTest extends DomainTestBase {
       ->fetchAll();
 
     $this->assertCount(1, $records, 'Returned the correct number of rows.');
-    $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
-    $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
-    $this->assertEqual($records[0]->grant_view, 1, 'Grant view stored.');
-    $this->assertEqual($records[0]->grant_update, 1, 'Grant update stored.');
-    $this->assertEqual($records[0]->grant_delete, 1, 'Grant delete stored.');
+    $this->assertEquals('domain_id', $records[0]->realm, 'Grant with domain_id acquired for node.');
+    $this->assertEquals($domain->getDomainId(), $records[0]->gid, 'Grant with proper id acquired for node.');
+    $this->assertEquals(1, $records[0]->grant_view, 'Grant view stored.');
+    $this->assertEquals(1, $records[0]->grant_update, 'Grant update stored.');
+    $this->assertEquals(1, $records[0]->grant_delete, 'Grant delete stored.');
 
     // Create another article node.
     $node2 = $this->drupalCreateNode([
@@ -65,16 +65,16 @@ class DomainAccessRecordsTest extends DomainTestBase {
       ->query($query, [':nid' => $node2->id()])
       ->fetchAll();
     $this->assertCount(2, $records, 'Returned the correct number of rows.');
-    $this->assertEqual($records[0]->realm, 'domain_id', 'Grant with domain_id acquired for node.');
-    $this->assertEqual($records[0]->gid, $domain->getDomainId(), 'Grant with proper id acquired for node.');
-    $this->assertEqual($records[0]->grant_view, 1, 'Grant view stored.');
-    $this->assertEqual($records[0]->grant_update, 1, 'Grant update stored.');
-    $this->assertEqual($records[0]->grant_delete, 1, 'Grant delete stored.');
-    $this->assertEqual($records[1]->realm, 'domain_site', 'Grant with domain_site acquired for node.');
-    $this->assertEqual($records[1]->gid, 0, 'Grant with proper id acquired for node.');
-    $this->assertEqual($records[1]->grant_view, 1, 'Grant view stored.');
-    $this->assertEqual($records[1]->grant_update, 0, 'Grant update stored.');
-    $this->assertEqual($records[1]->grant_delete, 0, 'Grant delete stored.');
+    $this->assertEquals('domain_id', $records[0]->realm, 'Grant with domain_id acquired for node.');
+    $this->assertEquals($domain->getDomainId(), $records[0]->gid, 'Grant with proper id acquired for node.');
+    $this->assertEquals(1, $records[0]->grant_view, 'Grant view stored.');
+    $this->assertEquals(1, $records[0]->grant_update, 'Grant update stored.');
+    $this->assertEquals(1, $records[0]->grant_delete, 'Grant delete stored.');
+    $this->assertEquals('domain_site', $records[1]->realm, 'Grant with domain_site acquired for node.');
+    $this->assertEquals(0, $records[1]->gid, 'Grant with proper id acquired for node.');
+    $this->assertEquals(1, $records[1]->grant_view, 'Grant view stored.');
+    $this->assertEquals(0, $records[1]->grant_update, 'Grant update stored.');
+    $this->assertEquals(0, $records[1]->grant_delete, 'Grant delete stored.');
   }
 
 }
