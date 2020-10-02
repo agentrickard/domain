@@ -84,15 +84,15 @@ class DomainSourceLanguageTest extends DomainTestBase {
 
     // Get the link using Url::fromRoute().
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromRoute');
+    $this->assertEquals($expected, $url, 'fromRoute');
 
     // Get the link using Url::fromUserInput()
     $url = Url::fromUserInput($uri_path, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUserInput');
+    $this->assertEquals($expected, $url, 'fromUserInput');
 
     // Get the link using Url::fromUri()
     $url = Url::fromUri($uri, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUri');
+    $this->assertEquals($expected, $url, 'fromUri');
 
     // Now test the same for the Arfrikaans translation.
     $path = 'node/1';
@@ -106,22 +106,22 @@ class DomainSourceLanguageTest extends DomainTestBase {
     $options = ['language' => $language];
 
     $translation = $node->getTranslation('af');
-    $this->assertTrue(domain_source_get($translation) == $id2, domain_source_get($translation));
+    $this->assertEquals($id2, domain_source_get($translation), domain_source_get($translation));
 
     // Because of path cache, we have to flush here.
     drupal_flush_all_caches();
 
     // Get the link using Url::fromRoute().
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromRoute');
+    $this->assertEquals($expected, $url, 'fromRoute');
 
     // Get the link using Url::fromUserInput()
     $url = Url::fromUserInput($uri_path, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUserInput');
+    $this->assertEquals($expected, $url, 'fromUserInput');
 
     // Get the link using Url::fromUri()
     $url = Url::fromUri($uri, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUri');
+    $this->assertEquals($expected, $url, 'fromUri');
   }
 
 }

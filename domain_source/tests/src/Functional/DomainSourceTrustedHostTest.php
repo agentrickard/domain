@@ -54,7 +54,7 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
 
     // Get the link using Url::fromRoute().
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromRoute');
+    $this->assertTrue($expected, $url, 'fromRoute');
 
     // Set up two additional domains.
     $domain2 = $domains['two_example_com'];
@@ -67,7 +67,7 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
     $this->writeSettings($settings);
     // This URL should fail due to trusted host omission.
     $this->drupalGet($url);
-    $this->assertRaw('The provided host name is not valid for this server.');
+    $this->assertSession()->responseContains('The provided host name is not valid for this server.');
 
     // Now switch the node to a domain that is trusted.
     $node->{DOMAIN_SOURCE_FIELD} = $domain2->id();
@@ -76,9 +76,9 @@ class DomainSourceTrustedHostTest extends DomainTestBase {
     $expected = $domain2->getPath() . $path;
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
     // Assert that the URL is what we expect.
-    $this->assertTrue($url == $expected, 'fromRoute');
+    $this->assertTrue($expected, $url, 'fromRoute');
     $this->drupalGet($url);
-    $this->assertResponse(200, 'Url is validated by trusted host settings.');
+    $this->assertSession()->statusCodeEquals(200);
   }
 
 }

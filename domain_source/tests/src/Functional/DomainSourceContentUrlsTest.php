@@ -58,15 +58,15 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
 
     // Get the link using Url::fromRoute().
     $url = Url::fromRoute($route_name, $route_parameters, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromRoute');
+    $this->assertEquals($expected, $url, 'fromRoute');
 
     // Get the link using Url::fromUserInput()
     $url = Url::fromUserInput($uri_path, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUserInput');
+    $this->assertEquals($expected, $url, 'fromUserInput');
 
     // Get the link using Url::fromUri()
     $url = Url::fromUri($uri, $options)->toString();
-    $this->assertTrue($url == $expected, 'fromUri');
+    $this->assertEquals($expected, $url, 'fromUri');
 
     // Get the path processor service.
     $paths = \Drupal::service('domain_access.manager');
@@ -77,7 +77,7 @@ class DomainSourceContentUrlsTest extends DomainTestBase {
       'two_example_com' => $domains['two_example_com']->getPath() . 'node/1',
     ];
 
-    $this->assertTrue($expected == $urls);
+    $this->assertEquals($expected, $urls);
   }
 
 }

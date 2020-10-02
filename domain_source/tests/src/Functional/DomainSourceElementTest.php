@@ -96,7 +96,7 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
+    $this->assertFalse(strpos($url, 'node/' . $nid . '/edit'), 'Form submitted.');
 
     // Edit the node.
     $this->drupalGet('node/' . $nid . '/edit');
@@ -111,7 +111,7 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/' . $nid . '/edit') > 0, 'Form not submitted.');
+    $this->assertTrue(strpos($url, 'node/' . $nid . '/edit') > 0, 'Form not submitted.');
 
     // Set the field properly and save again.
     $this->selectFieldOption($locator, 'one_example_com');
@@ -122,7 +122,7 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
+    $this->assertFalse(strpos($url, 'node/' . $nid . '/edit'), 'Form submitted.');
 
     // Save with no source.
     // Edit the node.
@@ -138,7 +138,7 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Check the URL.
     $url = $this->geturl();
-    $this->assert(strpos($url, 'node/' . $nid . '/edit') === FALSE, 'Form submitted.');
+    $this->assertFalse(strpos($url, 'node/' . $nid . '/edit'), 'Form submitted.');
   }
 
   /**
