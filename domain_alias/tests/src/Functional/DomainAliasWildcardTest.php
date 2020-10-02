@@ -49,19 +49,19 @@ class DomainAliasWildcardTest extends DomainAliasTestBase {
     }
     // Test the environment loader.
     $local = $alias_loader->loadByEnvironment('local');
-    $this->assert(count($local) == 3, 'Three aliases set to local');
+    $this->assertCount(3, $local, 'Three aliases set to local');
     // Test the environment matcher. $domain here is two.example.com.
     $match = $alias_loader->loadByEnvironmentMatch($domain, 'local');
-    $this->assert(count($match) == 1, 'One environment match loaded');
+    $this->assertCount(1, $match, 'One environment match loaded');
     $alias = current($match);
-    $this->assert($alias->getPattern() == 'five.example.*', 'Proper pattern match loaded.');
+    $this->assertEquals('five.example.*', $alias->getPattern(), 'Proper pattern match loaded.');
 
     // Test the environment matcher. $domain here is one.example.com.
     $domain = $domain_storage->load('one_example_com');
     $matches = $alias_loader->loadByEnvironmentMatch($domain, 'local');
-    $this->assert(count($matches) == 1, 'One environment match loaded');
+    $this->assertCount(1, $matches, 'One environment match loaded');
     $alias = current($matches);
-    $this->assert($alias->getPattern() == 'four.example.*', 'Proper pattern match loaded.');
+    $this->assertEquals('four.example.*', $alias->getPattern(), 'Proper pattern match loaded.');
 
     // Now load a page and check things.
     // Since we cannot read the service request, we place a block

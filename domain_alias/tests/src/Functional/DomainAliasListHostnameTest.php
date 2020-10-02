@@ -35,8 +35,8 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
     $patterns = ['*.' . $base, 'four.' . $base, 'five.' . $base];
     $i = 0;
     foreach ($domains as $domain) {
-      $this->assert($domain->getHostname() == $hostnames[$i], 'Hostnames set correctly');
-      $this->assert($domain->getCanonical() == $hostnames[$i], 'Canonical domains set correctly');
+      $this->assertEquals($hostnames[$i], $domain->getHostname(), 'Hostnames set correctly');
+      $this->assertEquals($hostnames[$i], $domain->getCanonical(), 'Canonical domains set correctly');
       $values = [
         'domain_id' => $domain->id(),
         'pattern' => array_shift($patterns),
@@ -48,12 +48,12 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
     }
     // Test the environment loader.
     $local = $alias_loader->loadByEnvironment('local');
-    $this->assert(count($local) == 3, 'Three aliases set to local');
+    $this->assertCount(3, $local, 'Three aliases set to local');
     // Test the environment matcher. $domain here is two.example.com.
     $match = $alias_loader->loadByEnvironmentMatch($domain, 'local');
-    $this->assert(count($match) == 1, 'One environment match loaded');
+    $this->assertCount(1, $match, 'One environment match loaded');
     $alias = current($match);
-    $this->assert($alias->getPattern() == 'five.' . $base, 'Proper pattern match loaded.');
+    $this->assertEquals('five.' . $base, $alias->getPattern(), 'Proper pattern match loaded.');
 
     $admin = $this->drupalCreateUser([
       'bypass node access',
@@ -74,8 +74,8 @@ class DomainAliasListHostnameTest extends DomainAliasTestBase {
     $i = 0;
     $domains = $domain_storage->loadMultiple();
     foreach ($domains as $domain) {
-      $this->assert($domain->getHostname() == $hostnames[$i], 'Hostnames set correctly');
-      $this->assert($domain->getCanonical() == $hostnames[$i], 'Canonical domains set correctly');
+      $this->assertEquals($hostnames[$i], $domain->getHostname(), 'Hostnames set correctly');
+      $this->assertEquals($hostnames[$i], $domain->getCanonical(), 'Canonical domains set correctly');
       $i++;
     }
   }

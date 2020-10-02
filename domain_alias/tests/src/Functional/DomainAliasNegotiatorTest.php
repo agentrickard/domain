@@ -48,8 +48,8 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     foreach ($domain_storage->loadMultiple() as $domain) {
       $alias_domains[] = $domain;
       $this->drupalGet($domain->getPath());
-      $this->assertRaw($domain->label(), 'Loaded the proper domain.');
-      $this->assertRaw('Exact match', 'Direct domain match.');
+      $this->assertSession()->responseContains($domain->label());
+      $this->assertSession()->responseContains('Exact match');
     }
 
     // Now, test an alias for each domain.
@@ -65,9 +65,9 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
       $alias_domain->setPath();
       $url = $alias_domain->getPath();
       $this->drupalGet($url);
-      $this->assertRaw($alias_domain->label(), 'Loaded the proper domain.');
-      $this->assertRaw('ALIAS:', 'No direct domain match.');
-      $this->assertRaw($alias->getPattern(), 'Alias match.');
+      $this->assertSession()->responseContains($alias_domain->label());
+      $this->assertSession()->responseContains('ALIAS:');
+      $this->assertSession()->responseContains($alias->getPattern());
 
       // Test redirections.
       // @TODO: This could be much more elegant: the redirects break assertRaw()
@@ -90,9 +90,9 @@ class DomainAliasNegotiatorTest extends DomainAliasTestBase {
     $alias_domain->setPath();
     $url = $alias_domain->getPath();
     $this->drupalGet($url);
-    $this->assertRaw($alias_domain->label(), 'Loaded the proper domain.');
-    $this->assertRaw('ALIAS:', 'No direct domain match.');
-    $this->assertRaw($alias->getPattern(), 'Alias match.');
+    $this->assertSession()->responseContains($alias_domain->label());
+    $this->assertSession()->responseContains('ALIAS:');
+    $this->assertSession()->responseContains($alias->getPattern());
 
     // Test redirections.
     // @TODO: This could be much more elegant: the redirects break assertRaw()
