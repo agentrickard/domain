@@ -92,7 +92,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * {@inheritdoc}
    */
   public static function getAllValue(FieldableEntityInterface $entity) {
-    return $entity->hasField(DOMAIN_ACCESS_ALL_FIELD) ? $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
+    return $entity->hasField(DOMAIN_ACCESS_ALL_FIELD) ? (bool) $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
   }
 
   /**
