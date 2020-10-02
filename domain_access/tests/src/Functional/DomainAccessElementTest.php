@@ -94,7 +94,7 @@ class DomainAccessElementTest extends DomainTestBase {
     $values = $manager->getAccessValues($node);
     $this->assertCount(3, $values, 'Node saved with three domain records.');
     $value = $manager->getAllValue($node);
-    $this->assertEquals(1, $value, 'Node saved to all affiliates.');
+    $this->assertTrue($value, 'Node saved to all affiliates.');
 
     // Now login as a user with limited rights.
     $account = $this->drupalCreateUser([
@@ -145,7 +145,7 @@ class DomainAccessElementTest extends DomainTestBase {
     $values = $manager->getAccessValues($node);
     $this->assertCount(2, $values, 'Node saved with two domain records.');
     $value = $manager->getAllValue($node);
-    $this->assertCount(1, $value, 'Node saved to all affiliates.');
+    $this->assertTrue($value, 'Node saved to all affiliates.');
   }
 
 }
