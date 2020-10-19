@@ -7,3 +7,6 @@ services:
     arguments: ['@domain.negotiator', '@module_handler', '@entity_type.manager', '@path_alias.manager', '@config.factory']
     tags:
       - { name: path_processor_outbound, priority: 90 }
+  domain_source.token:
+    class: Drupal\domain_source\DomainSourceToken
+    arguments: ['@config.factory']
