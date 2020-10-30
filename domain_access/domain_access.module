@@ -638,7 +638,7 @@ function domain_access_domain_insert($entity) {
     // Do not fire hook when config sync in progress.
     return;
   }
-  $id = 'domain_access_add_action.' . $entity->id();
+  $id = 'domain_access_add_action__' . $entity->id();
   $controller = \Drupal::entityTypeManager()->getStorage('action');
   if (!$controller->load($id)) {
     /** @var \Drupal\system\Entity\Action $action */
@@ -647,13 +647,13 @@ function domain_access_domain_insert($entity) {
       'type' => 'node',
       'label' => t('Add selected content to the @label domain', ['@label' => $entity->label()]),
       'configuration' => [
-        'domain_id' => $entity->id(),
+        'domain_id' => [$entity->id()],
       ],
       'plugin' => 'domain_access_add_action',
     ]);
     $action->trustData()->save();
   }
-  $remove_id = 'domain_access_remove_action.' . $entity->id();
+  $remove_id = 'domain_access_remove_action__' . $entity->id();
   if (!$controller->load($remove_id)) {
     /** @var \Drupal\system\Entity\Action $action */
     $action = $controller->create([
@@ -661,13 +661,13 @@ function domain_access_domain_insert($entity) {
       'type' => 'node',
       'label' => t('Remove selected content from the @label domain', ['@label' => $entity->label()]),
       'configuration' => [
-        'domain_id' => $entity->id(),
+        'domain_id' => [$entity->id()],
       ],
       'plugin' => 'domain_access_remove_action',
     ]);
     $action->trustData()->save();
   }
-  $id = 'domain_access_add_editor_action.' . $entity->id();
+  $id = 'domain_access_add_editor_action__' . $entity->id();
   if (!$controller->load($id)) {
     /** @var \Drupal\system\Entity\Action $action */
     $action = $controller->create([
@@ -675,13 +675,13 @@ function domain_access_domain_insert($entity) {
       'type' => 'user',
       'label' => t('Add editors to the @label domain', ['@label' => $entity->label()]),
       'configuration' => [
-        'domain_id' => $entity->id(),
+        'domain_id' => [$entity->id()],
       ],
       'plugin' => 'domain_access_add_editor_action',
     ]);
     $action->trustData()->save();
   }
-  $remove_id = 'domain_access_remove_editor_action.' . $entity->id();
+  $remove_id = 'domain_access_remove_editor_action__' . $entity->id();
   if (!$controller->load($remove_id)) {
     /** @var \Drupal\system\Entity\Action $action */
     $action = $controller->create([
@@ -689,7 +689,7 @@ function domain_access_domain_insert($entity) {
       'type' => 'user',
       'label' => t('Remove editors from the @label domain', ['@label' => $entity->label()]),
       'configuration' => [
-        'domain_id' => $entity->id(),
+        'domain_id' => [$entity->id()],
       ],
       'plugin' => 'domain_access_remove_editor_action',
     ]);

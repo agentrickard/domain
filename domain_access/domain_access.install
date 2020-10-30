@@ -44,3 +44,7 @@ function domain_access_update_8001() {
   $config->set('node_advanced_tab_open', 0);
   $config->save(TRUE);
 }
+
+/**
+ * @TODO: Update action names to replace . with __.
+ */
