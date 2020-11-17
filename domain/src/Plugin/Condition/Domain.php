@@ -74,7 +74,7 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
       ],
     ];
 
-    return $form;
+    return parent::buildConfigurationForm($form, $form_state);
   }
 
   /**
