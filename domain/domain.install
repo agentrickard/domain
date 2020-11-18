@@ -48,3 +48,35 @@ function _domain_configure_field() {
     ])->save();
   }
 }
+
+/**
+ * Updates block domain context_mapping for Drupal 8.8 and higher.
+ */
+function domain_update_8002() {
+  $new_context_id = '@domain.current_domain_context:domain';
+  $config_factory = \Drupal::configFactory();
+  $update_list = [];
+  foreach ($config_factory->listAll('block.block.') as $block_config_name) {
+    $update_block = FALSE;
+    $block = $config_factory->getEditable($block_config_name);
+    if ($visibility = $block->get('visibility')) {
+      foreach ($visibility as $condition_plugin_id => &$condition) {
+        if ($condition_plugin_id == 'domain') {
+          $condition['context_mapping']['domain'] = $new_context_id;
+          $update_block = TRUE;
+          $update_list[] = $block_config_name;
+        }
+      }
+    }
+    if ($update_block) {
+      $block->set('visibility', $visibility);
+      $block->save(TRUE);
+    }
+  }
+  if (empty($update_list)) {
+    return t('No blocks updated.');
+  }
+  else {
+    return t('Updated @count blocks: @blocks', ['@count' => count($update_list), '@blocks' => implode(', ', $update_list)]);
+  }
+}
