@@ -53,7 +53,8 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
       'title[0][value]' => 'Test node',
       'field_domain_access[example_com]' => 'example_com',
     ];
-    $this->drupalPostForm('node/add/article', $edit, 'Save');
+    $this->drupalGet('node/add/article');
+    $this->submitForm($edit, 'Save');
 
     // Load the node.
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
@@ -83,7 +84,8 @@ class DomainAccessDefaultValueTest extends DomainTestBase {
     $edit = [
       'title[0][value]' => 'Test node update',
     ];
-    $this->drupalPostForm('node/1/edit', $edit, 'Save');
+    $this->drupalGet('node/1/edit');
+    $this->submitForm($edit, 'Save');
 
     // Load the node.
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);

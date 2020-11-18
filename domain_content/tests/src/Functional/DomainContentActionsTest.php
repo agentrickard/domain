@@ -47,7 +47,7 @@ class DomainContentActionsTest extends DomainContentTestBase {
       'node_bulk_form[1]' => TRUE,
       'action' => 'domain_access_add_action.two_example_com',
     ];
-    $this->drupalPostForm(NULL, $edit, t('Apply to selected items'));
+    $this->submitForm($edit, 'Apply to selected items');
 
     // Both domains should be present.
     $this->assertRaw($old_domain->label() . '</a>');
@@ -59,7 +59,7 @@ class DomainContentActionsTest extends DomainContentTestBase {
       'node_bulk_form[1]' => TRUE,
       'action' => 'domain_access_remove_action.two_example_com',
     ];
-    $this->drupalPostForm(NULL, $edit, t('Apply to selected items'));
+    $this->submitForm($edit, 'Apply to selected items');
 
     // Domains are linked properly in the output.
     $this->assertRaw($old_domain->label() . '</a>');
@@ -73,7 +73,7 @@ class DomainContentActionsTest extends DomainContentTestBase {
       'node_bulk_form[0]' => TRUE,
       'action' => 'domain_access_none_action',
     ];
-    $this->drupalPostForm(NULL, $edit, t('Apply to selected items'));
+    $this->submitForm($edit, 'Apply to selected items');
 
     // There should be four elements.
     $this->assertRaw('node_bulk_form[3]');
