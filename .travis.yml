@@ -50,7 +50,7 @@ before_install:
   # Remove Xdebug. Not an issue for PHP 7.
   - phpenv config-rm xdebug.ini || true
 
-  - composer self-update
+  - composer self-update --1
 
   # Install Drush.
   - composer global require --no-interaction drush/drush:8.*
