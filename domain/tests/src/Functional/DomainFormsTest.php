@@ -34,7 +34,8 @@ class DomainFormsTest extends DomainTestBase {
     $edit = $this->domainPostValues();
     // Use hostname with dot (.) to avoid validation error.
     $edit['hostname'] = 'example.com';
-    $this->drupalPostForm('admin/config/domain/add', $edit, 'Save');
+    $this->drupalGet('admin/config/domain/add');
+    $this->submitForm($edit, 'Save');
 
     // Did it save correctly?
     $default_id = $storage->loadDefaultId();
@@ -56,7 +57,8 @@ class DomainFormsTest extends DomainTestBase {
     $edit = [];
     $edit['name'] = 'Foo';
     $edit['validate_url'] = 0;
-    $this->drupalPostForm($editUrl, $edit, 'Save');
+    $this->drupalGet($editUrl);
+    $this->submitForm($edit, 'Save');
 
     // Check that the update succeeded.
     $storage->resetCache([$default_id]);
@@ -68,7 +70,8 @@ class DomainFormsTest extends DomainTestBase {
     $this->drupalGet($deleteUrl);
 
     // Delete the record.
-    $this->drupalPostForm($deleteUrl, [], 'Delete');
+    $this->drupalGet($deleteUrl);
+    $this->submitForm([], 'Delete');
     $storage->resetCache([$default_id]);
     $domain = $storage->load($default_id);
     $this->assertEmpty($domain, 'Domain record deleted.');
