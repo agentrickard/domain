@@ -57,6 +57,7 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
     $this->setBaseHostname();
     $this->domainCreateTestDomains(5);
 
+    $this->createLanguage();
   }
 
   /**
@@ -68,57 +69,64 @@ class DomainConfigUISettingsTest extends WebDriverTestBase {
     $value = $this->explodePathSettings($config->get('path_pages'));
     $this->assertEquals($expected, $value);
 
-    $this->drupalLogin($this->adminUser);
+    // Test with language and without.
+    foreach (['en', 'es'] as $langcode) {
+      $config->save();
+      $prefix = '';
+      if ($langcode == 'es') {
+        $prefix = '/es';
+      }
+      $this->drupalLogin($this->adminUser);
+      // Test some theme paths.
+      $path = $prefix . '/admin/appearance';
+      $this->drupalGet($path);
+      $page = $this->getSession()->getPage();
+      $page->findLink('Disable domain configuration');
 
-    // Test some theme paths.
-    $path = '/admin/appearance';
-    $this->drupalGet($path);
-    $page = $this->getSession()->getPage();
-    $page->findLink('Disable domain configuration');
+      $path = $prefix . '/admin/appearance/settings/stark';
+      $this->drupalGet($path);
+      $page = $this->getSession()->getPage();
+      $page->findLink('Enable domain configuration');
+      $page->clickLink('Enable domain configuration');
 
-    $path = '/admin/appearance/settings/stark';
-    $this->drupalGet($path);
-    $page = $this->getSession()->getPage();
-    $page->findLink('Enable domain configuration');
-    $page->clickLink('Enable domain configuration');
+      $this->assertSession()->assertWaitOnAjaxRequest();
 
-    $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->drupalGet($path);
+      $config2 = $this->config('domain_config_ui.settings');
+      $expected2 = $this->explodePathSettings("/admin/appearance\r\n/admin/config/system/site-information\r\n/admin/appearance/settings/stark");
+      $value2 = $this->explodePathSettings($config2->get('path_pages'));
+      $this->assertEquals($expected2, $value2);
 
-    $this->drupalGet($path);
-    $config2 = $this->config('domain_config_ui.settings');
-    $expected2 = $this->explodePathSettings("/admin/appearance\r\n/admin/config/system/site-information\r\n/admin/appearance/settings/stark");
-    $value2 = $this->explodePathSettings($config2->get('path_pages'));
-    $this->assertEquals($expected2, $value2);
+      // Test removal of paths.
+      $this->drupalGet($path);
+      $page = $this->getSession()->getPage();
+      $page->findLink('Disable domain configuration');
+      $page->clickLink('Disable domain configuration');
 
-    // Test removal of paths.
-    $this->drupalGet($path);
-    $page = $this->getSession()->getPage();
-    $page->findLink('Disable domain configuration');
-    $page->clickLink('Disable domain configuration');
+      $this->assertSession()->assertWaitOnAjaxRequest();
 
-    $this->assertSession()->assertWaitOnAjaxRequest();
+      $path = $prefix . '/admin/config/system/site-information';
+      $this->drupalGet($path);
+      $page = $this->getSession()->getPage();
+      $page->findLink('Disable domain configuration');
+      $page->clickLink('Disable domain configuration');
 
-    $path = '/admin/config/system/site-information';
-    $this->drupalGet($path);
-    $page = $this->getSession()->getPage();
-    $page->findLink('Disable domain configuration');
-    $page->clickLink('Disable domain configuration');
+      $this->assertSession()->assertWaitOnAjaxRequest();
 
-    $this->assertSession()->assertWaitOnAjaxRequest();
+      $expected3 = $this->explodePathSettings("/admin/appearance");
+      $config3 = $this->config('domain_config_ui.settings');
+      $value3 = $this->explodePathSettings($config3->get('path_pages'));
+      $this->assertEquals($expected3, $value3);
 
-    $expected3 = $this->explodePathSettings("/admin/appearance");
-    $config3 = $this->config('domain_config_ui.settings');
-    $value3 = $this->explodePathSettings($config3->get('path_pages'));
-    $this->assertEquals($expected3, $value3);
+      $this->drupalGet($path);
+      $page = $this->getSession()->getPage();
+      $page->findLink('Enable domain configuration');
 
-    $this->drupalGet($path);
-    $page = $this->getSession()->getPage();
-    $page->findLink('Enable domain configuration');
-
-    // Ensure the editor cannot access the form.
-    $this->drupalLogin($this->editorUser);
-    $this->drupalGet($path);
-    $this->assertSession()->pageTextNotContains('Enable domain configuration');
+      // Ensure the editor cannot access the form.
+      $this->drupalLogin($this->editorUser);
+      $this->drupalGet($path);
+      $this->assertSession()->pageTextNotContains('Enable domain configuration');
+    }
   }
 
 }

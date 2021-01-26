@@ -143,34 +143,4 @@ class DomainConfigUIOverrideTest extends WebDriverTestBase {
     $this->assertEquals($config['page']['front'], '/user/login');
   }
 
-  /**
-   * Creates a second language for testing overrides.
-   */
-  private function createLanguage() {
-    // Create and login user.
-    $adminUser = $this->drupalCreateUser(['administer languages', 'access administration pages']);
-    $this->drupalLogin($adminUser);
-
-    // Add language.
-    $edit = [
-      'predefined_langcode' => 'es',
-    ];
-    $this->drupalGet('admin/config/regional/language/add');
-    $this->submitForm($edit, 'Add language');
-
-    // Enable URL language detection and selection.
-    $edit = ['language_interface[enabled][language-url]' => '1'];
-    $this->drupalGet('admin/config/regional/language/detection');
-    $this->submitForm($edit, 'Save settings');
-
-    $this->drupalLogout();
-
-    // In order to reflect the changes for a multilingual site in the container
-    // we have to rebuild it.
-    $this->rebuildContainer();
-
-    $es = \Drupal::entityTypeManager()->getStorage('configurable_language')->load('es');
-    $this->assertTrue(!empty($es), 'Created test language.');
-  }
-
 }

@@ -65,7 +65,7 @@ class DomainController {
       \Drupal::messenger()->addMessage($message);
     }
     else {
-      \Drupal::messenger()->addMessage($this->t('The operation failed.'));
+      \Drupal::messenger()->addError($this->t('The operation failed.'));
     }
 
     // Return to the invoking page.
