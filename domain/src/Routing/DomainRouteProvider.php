@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\domain_config\Routing;
+namespace Drupal\domain\Routing;
 
 use Drupal\Core\Routing\RouteProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
  * The default behaviour is to cache routes by path and query parameters only,
  * for multiple domains this can make the home page of domain 1 be served from
  * cache as the home page of domain 2.
+ *
+ * Originally used by Domain Config, this behavior is tested in
+ * domain_config/tests/src/Functional/DomainConfigHomepageTest.php.
+ *
+ * We have moved the behavior to the main module to better support extension
+ * modules that do not require Domain Config, such as Domain Path.
  */
 class DomainRouteProvider extends RouteProvider {
 
