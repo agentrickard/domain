@@ -5,7 +5,6 @@ namespace Drupal\domain;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
-#use Drupal\domain\Routing\DomainRouteProvider;
 
 /**
  * Overrides the router.route_provider service.
@@ -21,10 +20,7 @@ class DomainServiceProvider extends ServiceProviderBase implements ServiceModifi
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    if ($container->hasDefinition('router.route_provider')) {
-    #  $definition = $container->getDefinition('router.route_provider');
-    #  $definition->setClass('Drupal\domain\Routing\DomainRouteProvider');
-    }
+    // Add the site context to the render cache.
     if ($container->hasParameter('renderer.config')) {
       $renderer_config = $container->getParameter('renderer.config');
 

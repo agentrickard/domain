@@ -8,7 +8,6 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
-use Drupal\Core\Routing\CacheableRouteProviderInterface;
 use Drupal\Core\Routing\RouteProvider;
 use Drupal\Core\State\StateInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +38,7 @@ class DomainRouteProvider extends RouteProvider {
    */
   public function __construct($inner_service, Connection $connection, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, InboundPathProcessorInterface $path_processor, CacheTagsInvalidatorInterface $cache_tag_invalidator, $table = 'router', LanguageManagerInterface $language_manager = NULL) {
     $this->innerService = $inner_service;
-    parent::__construct($connection, $state, $current_path, $cache_backend, $path_processor,$cache_tag_invalidator, $table, $language_manager);
+    parent::__construct($connection, $state, $current_path, $cache_backend, $path_processor, $cache_tag_invalidator, $table, $language_manager);
   }
 
   /**

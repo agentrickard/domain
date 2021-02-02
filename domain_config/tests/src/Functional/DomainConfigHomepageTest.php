@@ -11,6 +11,10 @@ use Drupal\user\RoleInterface;
  */
 class DomainConfigHomepageTest extends DomainConfigTestBase {
 
+  /**
+   * @var array $modules
+   *  The modules to enable.
+   */
   public static $modules = ['node', 'views'];
 
   /**
