@@ -21,9 +21,10 @@ class DomainServiceProvider extends ServiceProviderBase implements ServiceModifi
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    $definition = $container->getDefinition('router.route_provider');
-    $definition->setClass(DomainRouteProvider::class);
-
+    if ($container->hasDefinition('router.route_provider')) {
+      $definition = $container->getDefinition('router.route_provider');
+      $definition->setClass('Drupal\domain\Routing\DomainRouteProvider');
+    }
     if ($container->hasParameter('renderer.config')) {
       $renderer_config = $container->getParameter('renderer.config');
 
