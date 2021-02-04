@@ -62,7 +62,8 @@ class DomainSelection extends DefaultSelection {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $selection_handler_settings = $this->configuration['handler_settings'];
+    $form = parent::buildConfigurationForm($form, $form_state);
+    $selection_handler_settings = $this->configuration;
 
     // Merge-in default values.
     $selection_handler_settings += [
