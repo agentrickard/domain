@@ -56,6 +56,9 @@ class DomainEntityReferenceTest extends DomainTestBase {
 
     // Check the new field.
     $this->assertText('Domain test field', 'Added a test field display instance.');
+
+    // Visit the field config page.
+    $this->drupalGet('admin/config/people/accounts/fields/user.user.field_domain_access');
   }
 
   /**
