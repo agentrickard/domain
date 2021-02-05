@@ -2,7 +2,7 @@
   "name": "drupal/domain",
   "description": "Creates domain records within a Drupal installation.",
   "type": "drupal-module",
-  "license": "GPL-2.0+",
+  "license": "GPL-2.0-or-later",
   "authors": [
     {
       "name": "Ken Rickard",
@@ -10,9 +10,10 @@
     }
   ],
   "support": {
-    "issues": "http://drupal.org/project/issues/domain",
-    "irc": "http://irc.freenode.org/drupal-contribute",
-    "source": "http://cgit.drupalcode.org/domain"
+    "issues": "https://drupal.org/project/issues/domain",
+    "irc": "https://irc.freenode.org/drupal-contribute",
+    "chat": "https://drupal.slack.com",
+    "source": "https://git.drupalcode.org/project/domain"
   },
   "extra": {
     "drush": {
