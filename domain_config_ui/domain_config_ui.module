@@ -58,7 +58,7 @@ function domain_config_ui_admin_form($op) {
           'op' => $op,
           'route_name' => \Drupal::routeMatch()->getRouteName(),
         ];
-        foreach (\Drupal::routeMatch()->getParameters() as $key => $value) {
+        foreach (\Drupal::routeMatch()->getRawParameters() as $key => $value) {
           $params[$key] = $value;
         }
         $title = new TranslatableMarkup('Enable domain configuration');
