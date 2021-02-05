@@ -6,4 +6,5 @@ version: VERSION
 core_version_requirement: ^8 || ^9
 dependencies:
   - drupal:node
+  - drupal:path_alias
   - domain:domain
