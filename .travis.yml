@@ -13,6 +13,8 @@ matrix:
       php: 7.3
     - env: DRUPAL_BRANCH="9.0.x" drupal" MODULE_LIST="domain domain_access domain_alias domain_config domain_source"
       php: 7.3
+    - env: DRUPAL_BRANCH="9.1.x" drupal" MODULE_LIST="domain domain_access domain_alias domain_config domain_source"
+      php: 7.3
 
 addons:
   hosts:
