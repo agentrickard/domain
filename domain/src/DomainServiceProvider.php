@@ -1,11 +1,10 @@
 <?php
 
-namespace Drupal\domain_config;
+namespace Drupal\domain;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
-use Drupal\domain_config\Routing\DomainRouteProvider;
 
 /**
  * Overrides the router.route_provider service.
@@ -15,15 +14,13 @@ use Drupal\domain_config\Routing\DomainRouteProvider;
  *
  * @see https://www.drupal.org/node/2662196#comment-10838164
  */
-class DomainConfigServiceProvider extends ServiceProviderBase implements ServiceModifierInterface {
+class DomainServiceProvider extends ServiceProviderBase implements ServiceModifierInterface {
 
   /**
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    $definition = $container->getDefinition('router.route_provider');
-    $definition->setClass(DomainRouteProvider::class);
-
+    // Add the site context to the render cache.
     if ($container->hasParameter('renderer.config')) {
       $renderer_config = $container->getParameter('renderer.config');
 

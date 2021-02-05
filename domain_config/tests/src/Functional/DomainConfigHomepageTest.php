@@ -11,12 +11,13 @@ use Drupal\user\RoleInterface;
  */
 class DomainConfigHomepageTest extends DomainConfigTestBase {
 
+  /**
+   * @var array The modules to enable.
+   */
   public static $modules = ['node', 'views'];
 
   /**
    * Tests that domain-specific homepage loading works.
-   *
-   * @TODO: Requires https://www.drupal.org/node/2662196
    */
   public function testDomainConfigHomepage() {
     // Let anon users see content.
