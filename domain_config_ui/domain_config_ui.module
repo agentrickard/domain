@@ -143,7 +143,7 @@ function domain_config_ui_save_warning_message(array $domain_options = []) {
 function domain_config_ui_path_is_registered() {
   $path_pages = \Drupal::config('domain_config_ui.settings')->get('path_pages');
   // Theme settings pass arguments, so check both path and route.
-  $path = \Drupal::requestStack()->getCurrentRequest()->getPathInfo();
+  $path = \Drupal::service('path.current')->getPath();
 
   // Get internal path without language prefix.
   $url = Url::fromUri('internal:' . $path);
