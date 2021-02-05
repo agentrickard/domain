@@ -87,10 +87,22 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
     // Assume first time loading is NULL.
     static $load = NULL;
 
+    $config_override_exists = FALSE;
+    if (is_null($load)) {
+      // Ensure we don't have any values in settings.php.
+      $config_from_settings = array_keys($GLOBALS['config']);
+      foreach ($config_from_settings as $config_key) {
+        if (strpos($config_key, 'domain.config', 0) !== FALSE) {
+          $config_override_exists = TRUE;
+          break;
+        }
+      }
+    }
+    
     // Check if any overridden config exists or if we have already
     // made this check.
     // See https://www.drupal.org/project/domain/issues/3126532.
-    if ($load === FALSE || !$this->storage->listAll('domain.config.')) {
+    if ($load === FALSE || (!$this->storage->listAll('domain.config.') && !$config_override_exists)) {
       $load = FALSE;
       return [];
     }
@@ -151,6 +163,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
    * Get configuration name for this hostname.
    *
    * It will be the same name with a prefix depending on domain and language:
+   *
    * @code domain.config.DOMAIN_ID.LANGCODE @endcode
    *
    * @param string $name
