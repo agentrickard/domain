@@ -81,16 +81,6 @@ class DomainListBuilder extends DraggableListBuilder {
   protected $userStorage;
 
   /**
-   * The number of entities to list per page.
-   *
-   * DraggableListBuilder sets this to FALSE, which cancels any pagination.
-   * Restore the default value from EntityListBuilder.
-   *
-   * @var int|false
-   */
-  protected $limit = 50;
-
-  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
@@ -135,6 +125,8 @@ class DomainListBuilder extends DraggableListBuilder {
     $this->moduleHandler = $module_handler;
     $this->domainElementManager = $domain_element_manager;
     $this->userStorage = $this->entityTypeManager->getStorage('user');
+    // DraggableListBuilder sets this to FALSE, which cancels any pagination.
+    $this->limit = 50;
   }
 
   /**
