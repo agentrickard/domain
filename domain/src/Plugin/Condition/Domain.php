@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "domain",
  *   label = @Translation("Domain"),
  *   context_definitions = {
- *     "domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = FALSE)
+ *     "domain" = @ContextDefinition("entity:domain", label = @Translation("Domain"), required = TRUE)
  *   }
  * )
  */
@@ -74,7 +74,7 @@ class Domain extends ConditionPluginBase implements ContainerFactoryPluginInterf
       ],
     ];
 
-    return $form;
+    return parent::buildConfigurationForm($form, $form_state);
   }
 
   /**
