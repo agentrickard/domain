@@ -33,25 +33,62 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
     $this->domainCreateTestDomains(5);
     // Get the domain list.
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
-    $this->drupalCreateNode([
+    $node1 = $this->drupalCreateNode([
       'type' => 'article',
       'title' => 'Node 1',
       'promoted' => TRUE,
     ]);
-    $this->drupalCreateNode([
+    $node2 = $this->drupalCreateNode([
       'type' => 'article',
       'title' => 'Node 2',
       'promoted' => TRUE,
     ]);
+    $node3 = $this->drupalCreateNode([
+      'type' => 'article',
+      'title' => 'Node 3',
+      'promoted' => TRUE,
+    ]);
     $homepages = $this->getHomepages();
     foreach ($domains as $domain) {
-      $home = $this->drupalGet($domain->getPath());
+      foreach (['en', 'es'] as $langcode) {
+        $prefix = '';
+        if ($langcode == 'es') {
+          $prefix = 'es/';
+        }
+        $home = $this->drupalGet($domain->getPath() . $prefix);
 
-      // Check if this setting is picked up.
-      $expected = $domain->getPath() . $homepages[$domain->id()];
-      $expected_home = $this->drupalGet($expected);
+        // Check if this setting is picked up.
+        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()][$langcode];
+        $expected_home = $this->drupalGet($expected);
 
-      $this->assertTrue($home == $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+        $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+      }
+    }
+    // Explicit test for https://www.drupal.org/project/domain/issues/3154402
+    // Create and login user.
+    $admin_user = $this->drupalCreateUser(['bypass node access', 'access administration pages']);
+    $this->drupalLogin($admin_user);
+    $this->drupalGet($domain->getPath() . 'node/' . $node3->id() . '/delete');
+    $this->getSession()->getPage()->pressButton('Delete');
+    $this->drupalLogout();
+
+    // Retest the homepages.
+    foreach ($domains as $domain) {
+      foreach (['en', 'es'] as $langcode) {
+        $prefix = '';
+        if ($langcode == 'es') {
+          $prefix = 'es/';
+        }
+        // Prime the cache to prevent a bigpipe mismatch.
+        $this->drupalGet($domain->getPath() . $prefix);
+        $home = $this->drupalGet($domain->getPath() . $prefix);
+
+        // Check if this setting is picked up.
+        $expected = $domain->getPath() . $prefix . $homepages[$domain->id()][$langcode];
+        $expected_home = $this->drupalGet($expected);
+
+        $this->assertEqual($home, $expected_home, 'Proper home page loaded (' . $domain->id() . ').');
+      }
     }
   }
 
@@ -60,11 +97,11 @@ class DomainConfigHomepageTest extends DomainConfigTestBase {
    */
   private function getHomepages() {
     $homepages = [
-      'example_com' => 'node',
-      'one_example_com' => 'node/1',
-      'two_example_com' => 'node',
-      'three_example_com' => 'node',
-      'four_example_com' => 'node/2',
+      'example_com' => ['en' => 'node', 'es' => 'node'],
+      'one_example_com' => ['en' => 'node/1', 'es' => 'node'],
+      'two_example_com' => ['en' => 'node', 'es' => 'node'],
+      'three_example_com' => ['en' => 'node', 'es' => 'node'],
+      'four_example_com' => ['en' => 'node/2', 'es' => 'node/2'],
     ];
     return $homepages;
   }
