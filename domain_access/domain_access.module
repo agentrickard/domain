@@ -348,20 +348,21 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
   // Check to see that we have a valid active domain.
   // Without one, we cannot assert an opinion about access.
   if (!$active_domain || empty($active_domain->getDomainId())) {
-    return AccessResult::neutral();
+    return AccessResult::neutral()->addCacheableDependency($node);
   }
 
   $type = $node->bundle();
   $manager = \Drupal::service('domain_access.manager');
   $allowed = FALSE;
 
-  // In order to access update or delete, the user must be able to View.
-  if ($op == 'view' && $manager->checkEntityAccess($node, $account)) {
-    /** @var \Drupal\user\UserInterface $user */
+  // In order to access update or delete, the user must be able to view.
+  // Domain-specific permissions are relevant only if the node is not published.
+  if ($op == 'view') {
     if ($node->isPublished()) {
-      $allowed = TRUE;
+      // Explicit restatement of the condition, for clarity.
+      $allowed = FALSE;
     }
-    elseif ($account->hasPermission('view unpublished domain content')) {
+    elseif ($account->hasPermission('view unpublished domain content') && $manager->checkEntityAccess($node, $account)) {
       $allowed = TRUE;
     }
   }
@@ -391,8 +392,8 @@ function domain_access_node_access(NodeInterface $node, $op, AccountInterface $a
       ->addCacheableDependency($node);
   }
 
-  // No opinion.
-  return AccessResult::neutral();
+  // No opinion on FALSE.
+  return AccessResult::neutral()->addCacheableDependency($node);
 }
 
 /**
