@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\domain_content\Functional;
 
+use Drupal\domain_access\DomainAccessManagerInterface;
+
 /**
  * Creates domain admins and test which content lists they can access.
  *
@@ -62,7 +64,7 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
       'publish to any assigned domain',
       'assign domain editors',
     ]);
-    $this->addDomainsToEntity('user', $this->limited_user->id(), array_keys($this->domains), DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $this->limited_user->id(), array_keys($this->domains), DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
 
     $this->drupalLogin($this->limited_user);
     // Test the overview and domain-specific pages.
@@ -93,7 +95,7 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
       'access domain content',
       'publish to any assigned domain',
     ]);
-    $this->addDomainsToEntity('user', $this->editor_user->id(), array_keys($this->domains), DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $this->editor_user->id(), array_keys($this->domains), DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
 
     $this->drupalLogin($this->editor_user);
     // Test the overview and domain-specific pages.
@@ -134,7 +136,7 @@ class DomainContentPermissionsTest extends DomainContentTestBase {
     ]);
     $ids = array_keys($this->domains);
     $assigned_id = end($ids);
-    $this->addDomainsToEntity('user', $this->assign_user->id(), [$assigned_id], DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $this->assign_user->id(), [$assigned_id], DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
 
     $this->drupalLogin($this->assign_user);
     // Test the overview and domain-specific pages.

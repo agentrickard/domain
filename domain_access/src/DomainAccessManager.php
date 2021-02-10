@@ -66,7 +66,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public static function getAccessValues(FieldableEntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD) {
+  public static function getAccessValues(FieldableEntityInterface $entity, $field_name = DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD) {
     // @TODO: static cache.
     $list = [];
     // @TODO In tests, $entity is returning NULL.
@@ -92,7 +92,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
    * {@inheritdoc}
    */
   public static function getAllValue(FieldableEntityInterface $entity) {
-    return $entity->hasField(DOMAIN_ACCESS_ALL_FIELD) ? $entity->get(DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
+    return $entity->hasField(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD) ? $entity->get(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD)->value : NULL;
   }
 
   /**
@@ -120,7 +120,7 @@ class DomainAccessManager implements DomainAccessManagerInterface {
       }
     }
     // When creating a new entity, populate if required.
-    elseif ($entity->getFieldDefinition(DOMAIN_ACCESS_FIELD)->isRequired()) {
+    elseif ($entity->getFieldDefinition(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD)->isRequired()) {
       /** @var \Drupal\domain\DomainInterface $active */
       if ($active = \Drupal::service('domain.negotiator')->getActiveDomain()) {
         $item[0]['target_uuid'] = $active->uuid();

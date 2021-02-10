@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\DomainInterface;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -118,7 +119,7 @@ class DomainAccessControlHandler extends EntityAccessControlHandler implements E
    */
   public function isDomainAdmin(EntityInterface $entity, AccountInterface $account) {
     $user = $this->userStorage->load($account->id());
-    $user_domains = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    $user_domains = $this->domainElementManager->getFieldValues($user, DomainInterface::DOMAIN_ADMIN_FIELD);
     return isset($user_domains[$entity->id()]);
   }
 

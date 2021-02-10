@@ -5,6 +5,7 @@ namespace Drupal\domain_source\Commands;
 use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\CommandData;
 use Drupal\domain\Commands\DomainCommands;
+use Drupal\domain_source\DomainSourceElementManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -35,7 +36,7 @@ class DomainSourceCommands extends DomainCommands {
    */
   public function alterDomainInfo($result, CommandData $commandData) {
     // Display which entities are enabled for domain by checking for the fields.
-    $result['domain_source_entities'] = $this->getFieldEntities(DOMAIN_SOURCE_FIELD);
+    $result['domain_source_entities'] = $this->getFieldEntities(DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD);
 
     return $result;
   }
@@ -70,7 +71,7 @@ class DomainSourceCommands extends DomainCommands {
     $delete_options = [
       'entity_filter' => 'node',
       'policy' => $policy_content,
-      'field' => DOMAIN_SOURCE_FIELD,
+      'field' => DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD,
     ];
 
     return $this->doReassign($target_domain, $delete_options);

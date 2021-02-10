@@ -3,6 +3,8 @@
 namespace Drupal\Tests\domain_source\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
+use Drupal\domain_source\DomainSourceElementManagerInterface;
 
 /**
  * Tests behavior for getting all URLs for an entity.
@@ -38,9 +40,9 @@ class DomainSourceTokenTest extends DomainTestBase {
     $nodes_values = [
       'type' => 'page',
       'title' => 'foo',
-      DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com', 'two_example_com'],
-      DOMAIN_ACCESS_ALL_FIELD => 0,
-      DOMAIN_SOURCE_FIELD => 'one_example_com',
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com', 'two_example_com'],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 0,
+      DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD => 'one_example_com',
     ];
     $node = $this->createNode($nodes_values);
 
@@ -48,7 +50,7 @@ class DomainSourceTokenTest extends DomainTestBase {
     $this->assertEqual($token_handler->replace('[node:canonical-source-domain-url]', ['node' => $node]), $domains['one_example_com']->getPath() . 'node/1');
     $this->assertEqual($node->toUrl('canonical')->setAbsolute()->toString(), $domains['one_example_com']->getPath() . 'node/1');
 
-    $node->set(DOMAIN_SOURCE_FIELD, 'two_example_com');
+    $node->set(DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD, 'two_example_com');
     $this->assertEqual($token_handler->replace('[node:canonical-source-domain-url]', ['node' => $node]), $domains['two_example_com']->getPath() . 'node/1');
     $this->assertEqual($node->toUrl('canonical')->setAbsolute()->toString(), $domains['two_example_com']->getPath() . 'node/1');
 
@@ -59,11 +61,11 @@ class DomainSourceTokenTest extends DomainTestBase {
     drupal_flush_all_caches();
 
     // Test token value, and URL without token.
-    $node->set(DOMAIN_SOURCE_FIELD, 'one_example_com');
+    $node->set(DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD, 'one_example_com');
     $one_example_com_absolute_url = $node->toUrl('canonical')->setAbsolute()->toString();
     $this->assertEqual($token_handler->replace('[node:canonical-source-domain-url]', ['node' => $node]), $domains['one_example_com']->getPath() . 'node/1');
 
-    $node->set(DOMAIN_SOURCE_FIELD, 'two_example_com');
+    $node->set(DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD, 'two_example_com');
     $two_example_com_absolute_url = $node->toUrl('canonical')->setAbsolute()->toString();
     $this->assertEqual($token_handler->replace('[node:canonical-source-domain-url]', ['node' => $node]), $domains['two_example_com']->getPath() . 'node/1');
 

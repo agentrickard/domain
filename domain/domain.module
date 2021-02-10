@@ -7,14 +7,9 @@
 
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Url;
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Component\Utility\Html;
-
-/**
- * The name of the node access control field.
- */
-const DOMAIN_ADMIN_FIELD = 'field_domain_admin';
+use Drupal\domain\DomainInterface;
 
 /**
  * Entity URI callback.
@@ -103,7 +98,7 @@ function domain_preprocess_html(array &$variables) {
 function domain_form_user_form_alter(&$form, &$form_state, $form_id) {
   // Add the options hidden from the user silently to the form.
   $manager = \Drupal::service('domain.element_manager');
-  $form = $manager->setFormOptions($form, $form_state, DOMAIN_ADMIN_FIELD);
+  $form = $manager->setFormOptions($form, $form_state, DomainInterface::DOMAIN_ADMIN_FIELD);
 }
 
 /**
@@ -116,7 +111,7 @@ function domain_domain_references_alter($query, $account, $context) {
       // Do nothing.
     }
     elseif ($account->hasPermission('assign domain administrators')) {
-      $allowed = \Drupal::service('domain.element_manager')->getFieldValues($account, DOMAIN_ADMIN_FIELD);
+      $allowed = \Drupal::service('domain.element_manager')->getFieldValues($account, DomainInterface::DOMAIN_ADMIN_FIELD);
       $query->condition('id', array_keys($allowed), 'IN');
     }
     else {
@@ -130,9 +125,9 @@ function domain_domain_references_alter($query, $account, $context) {
  * Implements hook_views_data_alter().
  */
 function domain_views_data_alter(array &$data) {
-  $table = 'user__' . DOMAIN_ADMIN_FIELD;
+  $table = 'user__' . DomainInterface::DOMAIN_ADMIN_FIELD;
   // Since domains are not stored in the database, relationships cannot be used.
-  unset($data[$table][DOMAIN_ADMIN_FIELD]['relationship']);
+  unset($data[$table][DomainInterface::DOMAIN_ADMIN_FIELD]['relationship']);
 }
 
 /**

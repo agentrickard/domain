@@ -3,6 +3,7 @@
 namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests behavior for saving the domain access field elements.
@@ -39,8 +40,8 @@ class DomainAccessSaveTest extends DomainTestBase {
       'title' => 'Test node',
       'uid' => '1',
       'status' => 1,
-      DOMAIN_ACCESS_FIELD => ['example_com'],
-      DOMAIN_ACCESS_ALL_FIELD => 1,
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => ['example_com'],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 1,
     ]);
     $node->save();
 
@@ -60,8 +61,8 @@ class DomainAccessSaveTest extends DomainTestBase {
       'title' => 'Test node',
       'uid' => '1',
       'status' => 1,
-      DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com'],
-      DOMAIN_ACCESS_ALL_FIELD => 0,
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => ['example_com', 'one_example_com'],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 0,
     ]);
     $node->save();
 

@@ -4,6 +4,7 @@ namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests saving the domain access field elements in multiple languages.
@@ -54,8 +55,8 @@ class DomainAccessLanguageSaveTest extends DomainTestBase {
       'title' => 'Test node',
       'uid' => '1',
       'status' => 1,
-      DOMAIN_ACCESS_FIELD => ['example_com'],
-      DOMAIN_ACCESS_ALL_FIELD => 1,
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => ['example_com'],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 1,
     ]);
     $node->save();
 
@@ -72,8 +73,8 @@ class DomainAccessLanguageSaveTest extends DomainTestBase {
     // Create an Afrikaans translation assigned to domain 2.
     $translation = $node->addTranslation('af');
     $translation->title->value = $this->randomString();
-    $translation->{DOMAIN_ACCESS_FIELD} = ['example_com', 'one_example_com'];
-    $translation->{DOMAIN_ACCESS_ALL_FIELD} = 0;
+    $translation->{DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD} = ['example_com', 'one_example_com'];
+    $translation->{DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD} = 0;
     $translation->status = 1;
     $node->save();
 

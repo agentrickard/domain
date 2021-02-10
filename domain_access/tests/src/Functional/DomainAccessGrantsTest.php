@@ -4,6 +4,7 @@ namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests the application of domain access grants.
@@ -51,7 +52,7 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // Create an article node.
     $node1 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => [$domain->id()],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => [$domain->id()],
     ]);
     $this->assertNotNull($node_storage->load($node1->id()), 'Article node created.');
 
@@ -72,8 +73,8 @@ class DomainAccessGrantsTest extends DomainTestBase {
     // Create an article node.
     $node2 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => [$domain->id()],
-      DOMAIN_ACCESS_ALL_FIELD => 1,
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => [$domain->id()],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 1,
     ]);
     $this->assertNotNull($node_storage->load($node2->id()), 'Article node created.');
     // Test the response of the node on each site. Should allow access on all.

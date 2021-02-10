@@ -3,9 +3,10 @@
 namespace Drupal\domain_content\Controller;
 
 use Drupal\Core\Link;
-use Drupal\domain\DomainInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
+use Drupal\domain\DomainInterface;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Controller routines domain content pages.
@@ -94,11 +95,11 @@ class DomainContentController extends ControllerBase {
    */
   protected function getCount($entity_type = 'node', DomainInterface $domain = NULL) {
     if (is_null($domain)) {
-      $field = DOMAIN_ACCESS_ALL_FIELD;
+      $field = DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD;
       $value = 1;
     }
     else {
-      $field = DOMAIN_ACCESS_FIELD;
+      $field = DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD;
       $value = $domain->id();
     }
     // Note that we ignore node access so these queries work on any domain.

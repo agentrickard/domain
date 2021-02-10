@@ -3,6 +3,7 @@
 namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests behavior for the domain access field element.
@@ -68,14 +69,14 @@ class DomainAccessElementTest extends DomainTestBase {
     $count = 0;
     $ids = ['example_com', 'one_example_com', 'two_example_com'];
     foreach ($domains as $domain) {
-      $locator = DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
+      $locator = DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
       $this->findField($locator);
       if (in_array($domain->id(), $ids)) {
         $this->checkField($locator);
       }
     }
     // Find the all affiliates field.
-    $locator = DOMAIN_ACCESS_ALL_FIELD . '[value]';
+    $locator = DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD . '[value]';
     $this->findField($locator);
 
     // Set all affiliates to TRUE.
@@ -103,7 +104,7 @@ class DomainAccessElementTest extends DomainTestBase {
       'publish to any assigned domain',
     ]);
     $ids = ['example_com', 'one_example_com'];
-    $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $account->id(), $ids, DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
     $user_storage = \Drupal::entityTypeManager()->getStorage('user');
     $user = $user_storage->load($account->id());
     $values = $manager->getAccessValues($user);
@@ -117,7 +118,7 @@ class DomainAccessElementTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     foreach ($domains as $domain) {
-      $locator = DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
+      $locator = DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
       $this->findField($locator);
       if ($domain->id() == 'example_com') {
         $this->checkField($locator);
@@ -131,7 +132,7 @@ class DomainAccessElementTest extends DomainTestBase {
       }
     }
 
-    $locator = DOMAIN_ACCESS_ALL_FIELD . '[value]';
+    $locator = DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD . '[value]';
     $this->assertSession()->fieldNotExists($locator);
 
     // Save the form.

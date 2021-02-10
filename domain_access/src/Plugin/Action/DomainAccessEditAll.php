@@ -17,7 +17,7 @@ class DomainAccessEditAll extends DomainAccessActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    $entity->set(DOMAIN_ACCESS_ALL_FIELD, 1);
+    $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 1);
     $entity->save();
   }
 

@@ -10,6 +10,11 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 interface DomainInterface extends ConfigEntityInterface {
 
   /**
+   * The name of the admin access control field.
+   */
+  const DOMAIN_ADMIN_FIELD = 'field_domain_admin';
+
+  /**
    * Detects if the current domain is the active domain.
    *
    * @return bool

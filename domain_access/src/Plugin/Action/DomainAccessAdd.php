@@ -2,6 +2,8 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\domain_access\DomainAccessManagerInterface;
+
 /**
  * Assigns a node to a domain.
  *
@@ -23,7 +25,7 @@ class DomainAccessAdd extends DomainAccessActionBase {
     // Add domain assignment if not present.
     if ($entity !== FALSE && !isset($node_domains[$id])) {
       $node_domains[$id] = $id;
-      $entity->set(DOMAIN_ACCESS_FIELD, array_keys($node_domains));
+      $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD, array_keys($node_domains));
       $entity->save();
     }
   }
