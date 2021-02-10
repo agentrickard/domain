@@ -2,6 +2,8 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\domain_access\DomainAccessManagerInterface;
+
 /**
  * Assigns a node to all affiliates.
  *

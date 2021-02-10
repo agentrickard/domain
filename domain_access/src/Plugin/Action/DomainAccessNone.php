@@ -2,6 +2,8 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\domain_access\DomainAccessManagerInterface;
+
 /**
  * Removes a node to all affiliates..
  *
