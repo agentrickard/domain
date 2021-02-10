@@ -3,6 +3,7 @@
 namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests the domain access entity reference field type.
