@@ -14,6 +14,14 @@ use Drupal\domain_access\DomainAccessManagerInterface;
 use Drupal\domain_source\DomainSourceElementManagerInterface;
 
 /**
+ * Defines the name of the source domain field.
+ *
+ * @deprecated This constant will be replaced in the final release by
+ * Drupal\domain\DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD.
+ */
+const DOMAIN_SOURCE_FIELD = 'field_domain_source';
+
+/**
  * Creates our fields for an entity bundle.
  *
  * @param string $entity_type

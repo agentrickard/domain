@@ -12,6 +12,14 @@ use Drupal\Component\Utility\Html;
 use Drupal\domain\DomainInterface;
 
 /**
+ * The name of the admin access control field.
+ *
+ * @deprecated This constant will be replaced in the final release by
+ * Drupal\domain\DomainInterface::DOMAIN_ADMIN_FIELD.
+ */
+const DOMAIN_ADMIN_FIELD = 'field_domain_admin';
+
+/**
  * Entity URI callback.
  *
  * @param \Drupal\domain\DomainInterface $domain

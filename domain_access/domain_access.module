@@ -15,6 +15,22 @@ use Drupal\Core\Form\FormState;
 use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
+ * The name of the node access control field.
+ *
+ * @deprecated This constant will be replaced in the final release by
+ * Drupal\domain\DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD.
+ */
+const DOMAIN_ACCESS_FIELD = 'field_domain_access';
+
+/**
+ * The name of the all affiliates field.
+ *
+ * @deprecated This constant will be replaced in the final release by
+ * Drupal\domain\DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD.
+ */
+const DOMAIN_ACCESS_ALL_FIELD = 'field_domain_all_affiliates';
+
+/**
  * Implements hook_node_grants().
  */
 function domain_access_node_grants(AccountInterface $account, $op) {
