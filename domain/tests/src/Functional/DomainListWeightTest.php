@@ -68,7 +68,7 @@ class DomainListWeightTest extends DomainTestBase {
         $this->assert($domain->getWeight() == 61, 'Weight set to 61 ' . $domain->getWeight());
       }
       else {
-        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight() . 'Weights unchanged');
+        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight(), 'Weights unchanged');
       }
       $i++;
     }
@@ -99,7 +99,7 @@ class DomainListWeightTest extends DomainTestBase {
         $this->assert($domain->getWeight() == 2, 'Weight set to 2');
       }
       else {
-        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight() . 'Weights unchanged');
+        $this->assert($domain->getWeight() == $domains_old[$domain->id()]->getWeight(), 'Weights unchanged');
       }
     }
     // The last domain should be test59_example_com.

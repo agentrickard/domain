@@ -210,7 +210,7 @@ class DomainConfigUIController {
    * Sorts items by parent config.
    */
   public function sortItems($a, $b) {
-    return $a['item'] > $b['item'];
+    return strcmp($a['item'], $b['item']);
   }
 
   /**
