@@ -18,17 +18,17 @@ interface DomainNegotiatorInterface {
    *
    * No matching record found.
    */
-  const DOMAIN_MATCH_NONE = 0;
+  const DOMAIN_MATCHED_NONE = 0;
 
   /**
    * An exact domain record string match found.
    */
-  const DOMAIN_MATCH_EXACT = 1;
+  const DOMAIN_MATCHED_EXACT = 1;
 
   /**
    * An alias pattern match found.
    */
-  const DOMAIN_MATCH_ALIAS = 2;
+  const DOMAIN_MATCHED_ALIAS = 2;
 
   /**
    * Determines the active domain request.

@@ -523,7 +523,7 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMatchType($match_type = DomainNegotiatorInterface::DOMAIN_MATCH_EXACT) {
+  public function setMatchType($match_type = DomainNegotiatorInterface::DOMAIN_MATCHED_EXACT) {
     $this->matchType = $match_type;
   }
 

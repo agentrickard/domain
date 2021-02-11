@@ -201,7 +201,7 @@ interface DomainInterface extends ConfigEntityInterface {
    *   DomainNegotiatorInterface::DOMAIN_MATCH_EXACT,
    *   DomainNegotiatorInterface::DOMAIN_MATCH_ALIAS.
    */
-  public function setMatchType($match_type = DomainNegotiatorInterface::DOMAIN_MATCH_EXACT);
+  public function setMatchType($match_type = DomainNegotiatorInterface::DOMAIN_MATCHED_EXACT);
 
   /**
    * Gets the type of record match returned by the negotiator.
