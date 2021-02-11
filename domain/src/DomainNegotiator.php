@@ -16,6 +16,9 @@ class DomainNegotiator implements DomainNegotiatorInterface {
    * Defines record matching types when dealing with request alteration.
    *
    * @see hook_domain_request_alter().
+   *
+   * @deprecated These constant will be replaced in the final release by
+   * Drupal\domain\DomainNegotiatorInterface.
    */
   const DOMAIN_MATCH_NONE = 0;
   const DOMAIN_MATCH_EXACT = 1;
@@ -99,7 +102,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // Try to load a direct match.
     if ($domain = $this->domainStorage()->loadByHostname($httpHost)) {
       // If the load worked, set an exact match flag for the hook.
-      $domain->setMatchType(self::DOMAIN_MATCH_EXACT);
+      $domain->setMatchType(DomainNegotiatorInterface::DOMAIN_MATCH_EXACT);
     }
     // If a straight load fails, create a base domain for checking. This data
     // is required for hook_domain_request_alter().
@@ -107,7 +110,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $values = ['hostname' => $httpHost];
       /** @var \Drupal\domain\DomainInterface $domain */
       $domain = $this->domainStorage()->create($values);
-      $domain->setMatchType(self::DOMAIN_MATCH_NONE);
+      $domain->setMatchType(DomainNegotiatorInterface::DOMAIN_MATCH_NONE);
     }
 
     // Now check with modules (like Domain Alias) that register alternate
@@ -121,7 +124,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     // Fallback to default domain if no match.
     elseif ($domain = $this->domainStorage()->loadDefaultDomain()) {
       $this->moduleHandler->alter('domain_request', $domain);
-      $domain->setMatchType(self::DOMAIN_MATCH_NONE);
+      $domain->setMatchType(DomainNegotiatorInterface::DOMAIN_MATCH_NONE);
       if (!empty($domain->id())) {
         $this->setActiveDomain($domain);
       }
@@ -202,7 +205,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     $values = ['hostname' => $hostname];
     /** @var \Drupal\domain\DomainInterface $domain */
     $domain = $this->domainStorage()->create($values);
-    $domain->setMatchType(self::DOMAIN_MATCH_NONE);
+    $domain->setMatchType(DomainNegotiatorInterface::DOMAIN_MATCH_NONE);
 
     // Now check with modules (like Domain Alias) that register alternate
     // lookup systems with the main module.

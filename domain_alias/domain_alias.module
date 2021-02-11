@@ -6,10 +6,10 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\domain\DomainInterface;
-use Drupal\domain\DomainNegotiator;
 use Drupal\Core\Url;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\domain\DomainInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Implements hook_domain_request_alter().
@@ -32,7 +32,7 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
   $has_definition = \Drupal::entityTypeManager()->hasDefinition('domain_alias');
 
   // If an exact match has loaded, do nothing.
-  if ($domain->getMatchType() === DomainNegotiator::DOMAIN_MATCH_EXACT || !$has_definition) {
+  if ($domain->getMatchType() === DomainNegotiatorInterface::DOMAIN_MATCH_EXACT || !$has_definition) {
     return;
   }
   // If no exact match, then run the alias load routine.
@@ -44,7 +44,7 @@ function domain_alias_domain_request_alter(DomainInterface &$domain) {
     /** @var \Drupal\domain\Entity\Domain $domain */
     if ($domain = $domain_storage->load($alias->getDomainId())) {
       $domain->addProperty('alias', $alias);
-      $domain->setMatchType(DomainNegotiator::DOMAIN_MATCH_ALIAS);
+      $domain->setMatchType(DomainNegotiatorInterface::DOMAIN_MATCH_ALIAS);
       $redirect = $alias->getRedirect();
       if (!empty($redirect)) {
         $domain->setRedirect($redirect);
