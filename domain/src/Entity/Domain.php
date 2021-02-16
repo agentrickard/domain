@@ -567,4 +567,16 @@ class Domain extends ConfigEntityBase implements DomainInterface {
     return $this->canonical;
   }
 
+  /**
+   * Prevent render errors when Twig wants to read this object.
+   *
+   * @see \Drupal\Core\Template\TwigExtension::escapeFilter()
+   *
+   * @return string
+   *   The name of the domain being rendered.
+   */
+  public function toString() {
+    return $this->name;
+  }
+
 }

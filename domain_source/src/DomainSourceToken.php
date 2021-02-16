@@ -56,19 +56,24 @@ class DomainSourceToken {
     // Based on the type, get the proper domain context.
     switch ($type) {
       case 'node':
-        if (isset($tokens['canonical-source-domain-url']) && !empty($data['node'])) {
-          /** @var \Drupal\node\NodeInterface $node */
-          $node = $data['node'];
-          $original = $tokens['canonical-source-domain-url'];
-          if (in_array('canonical', $this->getExcludedRoutes()) && $node->hasField('field_domain_source') && !$node->field_domain_source->isEmpty()) {
-            /** @var \Drupal\domain\Domain $sourceDomain */
-            $sourceDomain = $node->field_domain_source->entity;
-
-            $replacements[$original] = $sourceDomain->buildUrl($node->toUrl()->toString());
-            $bubbleable_metadata->addCacheableDependency($sourceDomain);
+        foreach ($tokens as $name => $original) {
+          if ($name !== 'canonical-source-domain-url') {
+            continue;
           }
-          else {
-            $replacements[$original] = $node->toUrl('canonical')->setAbsolute()->toString();
+          if (!empty($data['node'])) {
+            /** @var \Drupal\node\NodeInterface $node */
+            $node = $data['node'];
+            $original = $tokens['canonical-source-domain-url'];
+            if (in_array('canonical', $this->getExcludedRoutes()) && $node->hasField('field_domain_source') && !$node->field_domain_source->isEmpty()) {
+              /** @var \Drupal\domain\Domain $sourceDomain */
+              $sourceDomain = $node->field_domain_source->entity;
+              $url = $node->toUrl('canonical')->toString();
+              $replacements[$original] = $sourceDomain->buildUrl($url);
+              $bubbleable_metadata->addCacheableDependency($sourceDomain);
+            }
+            else {
+              $replacements[$original] = $node->toUrl('canonical')->setAbsolute()->toString();
+            }
           }
         }
         break;

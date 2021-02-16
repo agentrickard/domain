@@ -23,7 +23,8 @@ class DomainAccessField extends EntityField {
       foreach ($items as &$item) {
         $object = $item['raw'];
         $entity = $object->getEntity();
-        $url = $entity->toUrl()->toString();
+        // Mark the entity as external to force domain URL prefixing.
+        $url = $entity->toUrl('canonical', ['external' => TRUE])->toString();
         $domain = $item['rendered']['#options']['entity'];
         $item['rendered']['#type'] = 'markup';
         $item['rendered']['#markup'] = '<a href="' . $domain->buildUrl($url) . '">' . $domain->label() . '</a>';
