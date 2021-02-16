@@ -50,10 +50,18 @@ function domain_config_ui_admin_form($op) {
     $route = \Drupal::routeMatch()->getRouteObject();
     // We make a special exception for the themes overview, which is unique.
     // @TODO: make this list extensible.
-    $special = $route->getPath() === '/admin/appearance';
-    if ($route->hasDefault('_form') || $special) {
-      $form_name = $route->getDefault('_form');
-      if (method_exists($form_name, 'getEditableConfigNames') || $special) {
+    $special_form = FALSE;
+    $special_paths = [
+      '/admin/appearance',
+      '/admin/appearance/settings',
+      '/admin/appearance/settings/{theme}',
+    ];
+    if (in_array($route->getPath(), $special_paths, TRUE)) {
+      $special_form = TRUE;
+    }
+    if ($route->hasDefault('_form') || $special_form) {
+      $base_form = $route->getDefault('_form');
+      if ($special_form || (is_callable($base_form, TRUE) && method_exists($base_form, 'getEditableConfigNames'))) {
         $params = [
           'op' => $op,
           'route_name' => \Drupal::routeMatch()->getRouteName(),
