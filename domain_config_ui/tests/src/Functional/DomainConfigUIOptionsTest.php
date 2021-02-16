@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\domain_config_ui\Functional;
 
+use Drupal\domain\DomainInterface;
 use Drupal\Tests\domain_config\Functional\DomainConfigTestBase;
 use Drupal\Tests\domain_config_ui\Traits\DomainConfigUITestTrait;
 
@@ -35,8 +36,8 @@ class DomainConfigUIOptionsTest extends DomainConfigTestBase {
 
     $this->domainCreateTestDomains(5);
     // Assign the adminUser and editorUser to some domains.
-    $this->addDomainsToEntity('user', $this->limitedUser->id(), ['example_com', 'one_example_com'], DOMAIN_ADMIN_FIELD);
-    $this->addDomainsToEntity('user', $this->languageUser->id(), ['two_example_com', 'three_example_com'], DOMAIN_ADMIN_FIELD);
+    $this->addDomainsToEntity('user', $this->limitedUser->id(), ['example_com', 'one_example_com'], DomainInterface::DOMAIN_ADMIN_FIELD);
+    $this->addDomainsToEntity('user', $this->languageUser->id(), ['two_example_com', 'three_example_com'], DomainInterface::DOMAIN_ADMIN_FIELD);
   }
 
   /**

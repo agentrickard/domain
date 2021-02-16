@@ -233,7 +233,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
     }
 
     // Display which entities are enabled for domain by checking for the fields.
-    $rows['domain_admin_entities'] = $this->getFieldEntities(DOMAIN_ADMIN_FIELD);
+    $rows['domain_admin_entities'] = $this->getFieldEntities(DomainInterface::DOMAIN_ADMIN_FIELD);
 
     return new PropertyList($rows);
   }
@@ -477,7 +477,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
     $delete_options = [
       'entity_filter' => 'user',
       'policy' => $policy_users,
-      'field' => DOMAIN_ADMIN_FIELD,
+      'field' => DomainInterface::DOMAIN_ADMIN_FIELD,
     ];
 
     if ($policy_users !== 'ignore') {
@@ -1182,7 +1182,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @return string[]
    *   List of entity machine names that support domain references.
    */
-  protected function findDomainEnabledEntities($using_field = DOMAIN_ADMIN_FIELD) {
+  protected function findDomainEnabledEntities($using_field = DomainInterface::DOMAIN_ADMIN_FIELD) {
     $this->ensureEntityFieldMap();
     $entities = [];
     foreach ($this->entityFieldMap as $type => $fields) {
@@ -1204,7 +1204,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @return bool
    *   True if this type of entity has a domain field.
    */
-  protected function entityHasDomainField($entity_type, $field = DOMAIN_ADMIN_FIELD) {
+  protected function entityHasDomainField($entity_type, $field = DomainInterface::DOMAIN_ADMIN_FIELD) {
     // Try to avoid repeated calls to getFieldMap(), assuming it's expensive.
     $this->ensureEntityFieldMap();
     return array_key_exists($field, $this->entityFieldMap[$entity_type]);
@@ -1232,7 +1232,8 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @param string $domain_id
    *   The machine name of the domain to enumerate.
    * @param string $field
-   *   The field to manipulate in the entity, e.g. DOMAIN_ACCESS_FIELD.
+   *   The field to manipulate in the entity, e.g.
+   *   DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD.
    * @param bool $just_count
    *   Flag to return a count rather than a list.
    *
@@ -1266,7 +1267,8 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    * @param string $entity_type
    *   The entity type name, e.g. 'node'.
    * @param string $field
-   *   The field to manipulate in the entity, e.g. DOMAIN_ADMIN_FIELD.
+   *   The field to manipulate in the entity, e.g.
+   *   DomainInterface::DOMAIN_ADMIN_FIELD.
    * @param \Drupal\domain\DomainInterface $old_domain
    *   The domain the entities currently belong to. It is not an error for
    *   entity ids to be passed in that are not in this domain, though of course
@@ -1360,7 +1362,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *   [
    *     'entity_filter' => 'node',
    *     'policy' => 'prompt' | 'default' | 'ignore' | {domain_id}
-   *     'field' => DOMAIN_ACCESS_FIELD,
+   *     'field' => DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD,
    *   ];
    *   The caller is expected to provide this information.
    * @param array $domains

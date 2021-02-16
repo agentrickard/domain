@@ -3,11 +3,17 @@
 namespace Drupal\domain;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\domain\DomainNegotiatorInterface;
 
 /**
  * Provides an interface defining a domain entity.
  */
 interface DomainInterface extends ConfigEntityInterface {
+
+  /**
+   * The name of the admin access control field.
+   */
+  const DOMAIN_ADMIN_FIELD = 'field_domain_admin';
 
   /**
    * Detects if the current domain is the active domain.
@@ -191,11 +197,11 @@ interface DomainInterface extends ConfigEntityInterface {
    * @param int $match_type
    *   A numeric constant indicating the type of match derived by the caller.
    *   Use this value to determine if the request needs to be overridden. Valid
-   *   types are DomainNegotiator::DOMAIN_MATCH_NONE,
-   *   DomainNegotiator::DOMAIN_MATCH_EXACT,
-   *   DomainNegotiator::DOMAIN_MATCH_ALIAS.
+   *   types are DomainNegotiatorInterface::DOMAIN_MATCH_NONE,
+   *   DomainNegotiatorInterface::DOMAIN_MATCH_EXACT,
+   *   DomainNegotiatorInterface::DOMAIN_MATCH_ALIAS.
    */
-  public function setMatchType($match_type = DomainNegotiator::DOMAIN_MATCH_EXACT);
+  public function setMatchType($match_type = DomainNegotiatorInterface::DOMAIN_MATCHED_EXACT);
 
   /**
    * Gets the type of record match returned by the negotiator.

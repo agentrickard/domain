@@ -10,6 +10,7 @@ use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\domain\DomainInterface;
 use Drupal\domain\DomainElementManagerInterface;
 use Drupal\domain_config_ui\DomainConfigUIManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -87,7 +88,7 @@ class SwitchForm extends FormBase {
     else {
       $account = $this->currentUser();
       $user = $this->entityTypeManager->getStorage('user')->load($account->id());
-      $user_domains = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+      $user_domains = $this->domainElementManager->getFieldValues($user, DomainInterface::DOMAIN_ADMIN_FIELD);
     }
     $permission = $this->currentUser()->hasPermission('use domain config ui') ||
                   $this->currentUser()->hasPermission('administer domain config ui');

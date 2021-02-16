@@ -4,6 +4,7 @@ namespace Drupal\Tests\domain_source\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_source\DomainSourceElementManagerInterface;
 
 /**
  * Tests behavior for the rewriting links using core URL methods.
@@ -39,7 +40,7 @@ class DomainSourceUrlTest extends DomainTestBase {
     $nodes_values = [
       'type' => 'page',
       'title' => 'foo',
-      DOMAIN_SOURCE_FIELD => $id,
+      DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD => $id,
     ];
     $node = $this->createNode($nodes_values);
 

@@ -6,6 +6,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests creation of nodes and users before and after deleting required fields.
@@ -66,7 +67,7 @@ class DomainAccessEntityCrudTest extends KernelTestBase {
    *   Entity type bundle.
    */
   protected function deleteDomainAccessFields($entity_type, $bundle) {
-    $fields = [DOMAIN_ACCESS_FIELD, DOMAIN_ACCESS_ALL_FIELD];
+    $fields = [DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD, DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD];
     foreach ($fields as $field_name) {
       FieldConfig::loadByName($entity_type, $bundle, $field_name)->delete();
     }

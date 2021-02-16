@@ -3,6 +3,8 @@
 namespace Drupal\Tests\domain_source\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
+use Drupal\domain_source\DomainSourceElementManagerInterface;
 
 /**
  * Tests behavior for the domain source field element.
@@ -71,21 +73,21 @@ class DomainSourceElementTest extends DomainTestBase {
     $count = 0;
     $ids = ['example_com', 'one_example_com', 'two_example_com'];
     foreach ($domains as $domain) {
-      $locator = DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
+      $locator = DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD . '[' . $domain->id() . ']';
       $this->findField($locator);
       if (in_array($domain->id(), $ids)) {
         $this->checkField($locator);
       }
     }
     // Find the all affiliates field.
-    $locator = DOMAIN_ACCESS_ALL_FIELD . '[value]';
+    $locator = DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD . '[value]';
     $this->findField($locator);
 
     // Set all affiliates to TRUE.
     $this->checkField($locator);
 
     // Find the Domain Source field.
-    $locator = DOMAIN_SOURCE_FIELD;
+    $locator = DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD;
     $this->findField($locator);
     // Set it to one_example_com.
     $this->selectFieldOption($locator, 'one_example_com');
@@ -107,7 +109,7 @@ class DomainSourceElementTest extends DomainTestBase {
 
     // Save the form.
     $this->pressButton('edit-submit');
-    $this->assertSession()->assertEscaped('The source domain must be selected as a publishing option.');
+    $this->assertSession()->pageTextContains('The source domain must be selected as a publishing option.');
 
     // Check the URL.
     $url = $this->geturl();
@@ -154,7 +156,7 @@ class DomainSourceElementTest extends DomainTestBase {
     $this->drupalGet('node/add/article');
     $this->assertSession()->statusCodeEquals(200);
 
-    $locator = DOMAIN_SOURCE_FIELD;
+    $locator = DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD;
     $this->assertSession()->fieldNotExists($locator);
 
     // Editor with domain permissions should see the element once they
@@ -168,12 +170,12 @@ class DomainSourceElementTest extends DomainTestBase {
     $this->drupalGet('node/add/article');
     $this->assertSession()->statusCodeEquals(200);
 
-    $locator = DOMAIN_SOURCE_FIELD;
+    $locator = DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD;
     $this->assertSession()->fieldNotExists($locator);
 
     // Domain assignment.
     $ids = ['example_com', 'one_example_com'];
-    $this->addDomainsToEntity('user', $editor2->id(), $ids, DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $editor2->id(), $ids, DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
 
     $this->drupalGet('node/add/article');
     $this->assertSession()->statusCodeEquals(200);

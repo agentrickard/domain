@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\domain_alias\Functional;
 
+use Drupal\domain\DomainInterface;
+
 /**
  * Tests behavior for the domain list builder.
  *
@@ -60,11 +62,11 @@ class DomainAliasListBuilderTest extends DomainAliasTestBase {
       'edit domain aliases',
     ]);
     $ids = ['example_com', 'one_example_com'];
-    $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ADMIN_FIELD);
+    $this->addDomainsToEntity('user', $account->id(), $ids, DomainInterface::DOMAIN_ADMIN_FIELD);
     $user_storage = \Drupal::entityTypeManager()->getStorage('user');
     $user = $user_storage->load($account->id());
     $manager = \Drupal::service('domain.element_manager');
-    $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    $values = $manager->getFieldValues($user, DomainInterface::DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 2, 'User saved with two domain records.');
 
     $this->drupalLogin($account);

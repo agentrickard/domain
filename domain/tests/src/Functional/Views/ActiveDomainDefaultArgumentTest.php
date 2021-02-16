@@ -5,6 +5,7 @@ namespace Drupal\Tests\domain\Functional\Views;
 use Drupal\Core\Url;
 use Drupal\Tests\domain\Functional\DomainTestBase;
 use Drupal\Tests\domain\Traits\DomainTestTrait;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests the active_domain default argument.
@@ -51,7 +52,7 @@ class ActiveDomainDefaultArgumentTest extends DomainTestBase {
         $node = $this->drupalCreateNode([
           'type' => 'article',
           'title' => $this->randomString(),
-          DOMAIN_ACCESS_FIELD => $domain_id,
+          DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => $domain_id,
         ]);
         $this->data[$domain_id][] = $node->id();
         $nodes_count--;

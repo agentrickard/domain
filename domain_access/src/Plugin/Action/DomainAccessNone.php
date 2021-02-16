@@ -2,6 +2,8 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\domain_access\DomainAccessManagerInterface;
+
 /**
  * Removes a node to all affiliates..
  *
@@ -17,7 +19,7 @@ class DomainAccessNone extends DomainAccessActionBase {
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    $entity->set(DOMAIN_ACCESS_ALL_FIELD, 0);
+    $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 0);
     $entity->save();
   }
 

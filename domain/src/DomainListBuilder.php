@@ -12,6 +12,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\domain\DomainInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -335,7 +336,7 @@ class DomainListBuilder extends DraggableListBuilder {
     // that allow users to view the entire list.
     if (!$this->currentUser->hasPermission('administer domains') && !$this->currentUser->hasPermission('view domain list')) {
       $user = $this->userStorage->load($this->currentUser->id());
-      $allowed = $this->domainElementManager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+      $allowed = $this->domainElementManager->getFieldValues($user, DomainInterface::DOMAIN_ADMIN_FIELD);
       $query->condition('id', array_keys($allowed), 'IN');
     }
 

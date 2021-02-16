@@ -3,8 +3,9 @@
 namespace Drupal\Tests\domain_source\Functional;
 
 use Drupal\Core\Url;
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_source\DomainSourceElementManagerInterface;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Tests behavior for the rewriting links using core URL methods.
@@ -56,7 +57,7 @@ class DomainSourceLanguageTest extends DomainTestBase {
     $node = $this->drupalCreateNode([
       'body' => [[]],
       'status' => 1,
-      DOMAIN_SOURCE_FIELD => $id,
+      DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD => $id,
     ]);
 
     // Programmatically create a translation.
@@ -67,7 +68,7 @@ class DomainSourceLanguageTest extends DomainTestBase {
     $id2 = 'two_example_com';
     $translation = $node->addTranslation('af');
     $translation->title->value = $this->randomString();
-    $translation->{DOMAIN_SOURCE_FIELD} = $id2;
+    $translation->{DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD} = $id2;
     $translation->status = 1;
     $node->save();
 

@@ -10,9 +10,14 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\domain\DomainRedirectResponse;
+use Drupal\domain_access\DomainAccessManagerInterface;
+use Drupal\domain_source\DomainSourceElementManagerInterface;
 
 /**
  * Defines the name of the source domain field.
+ *
+ * @deprecated This constant will be replaced in the final release by
+ * Drupal\domain\DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD.
  */
 const DOMAIN_SOURCE_FIELD = 'field_domain_source';
 
@@ -28,12 +33,12 @@ const DOMAIN_SOURCE_FIELD = 'field_domain_source';
  * @see domain_source_install()
  */
 function domain_source_confirm_fields($entity_type, $bundle) {
-  $id = $entity_type . '.' . $bundle . '.' . DOMAIN_SOURCE_FIELD;
+  $id = $entity_type . '.' . $bundle . '.' . DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD;
   $field_config_storage = \Drupal::entityTypeManager()->getStorage('field_config');
 
   if (!$field = $field_config_storage->load($id)) {
     $field = [
-      'field_name' => DOMAIN_SOURCE_FIELD,
+      'field_name' => DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD,
       'entity_type' => $entity_type,
       'label' => 'Domain Source',
       'bundle' => $bundle,
@@ -59,7 +64,7 @@ function domain_source_confirm_fields($entity_type, $bundle) {
     ->getStorage('entity_form_display')
     ->load($entity_type . '.' . $bundle . '.default');
   if ($display) {
-    $display->setComponent(DOMAIN_SOURCE_FIELD, [
+    $display->setComponent(DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD, [
       'type' => 'options_select',
       'weight' => 42,
     ])->save();
@@ -106,11 +111,11 @@ function domain_source_entity_form_display_insert(EntityInterface $entity) {
 function domain_source_get(EntityInterface $entity) {
   $source = NULL;
 
-  if (!isset($entity->{DOMAIN_SOURCE_FIELD})) {
+  if (!isset($entity->{DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD})) {
     return $source;
   }
 
-  $value = $entity->get(DOMAIN_SOURCE_FIELD)->offsetGet(0);
+  $value = $entity->get(DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD)->offsetGet(0);
   if (!empty($value)) {
     $target_id = $value->target_id;
     if ($domain = \Drupal::entityTypeManager()->getStorage('domain')->load($target_id)) {
@@ -129,7 +134,9 @@ function domain_source_get(EntityInterface $entity) {
 function domain_source_form_alter(&$form, &$form_state, $form_id) {
   $object = $form_state->getFormObject();
   // Set up our TrustedRedirect handler for form saves.
-  if (isset($form[DOMAIN_SOURCE_FIELD]) && !empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity()) {
+  if (isset($form[DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD]) && !empty($object) && is_callable([$object, 'getEntity']) && $entity = $object->getEntity()) {
+    // Validate the form.
+    $form['#validate'][] = 'domain_source_form_validate';
     foreach ($form['actions'] as $key => $element) {
       // Redirect submit handlers, but not the preview button.
       if ($key != 'preview' && isset($element['#type']) && $element['#type'] == 'submit') {
@@ -145,24 +152,29 @@ function domain_source_form_alter(&$form, &$form_state, $form_id) {
 function domain_source_form_validate($element, FormStateInterface $form_state) {
   $values = $form_state->getValues();
   // This is only run if Domain Access is present.
-  if (isset($values[DOMAIN_SOURCE_FIELD]) && is_array($values[DOMAIN_SOURCE_FIELD]) && isset($values[DOMAIN_ACCESS_FIELD])) {
-    $access_values = $values[DOMAIN_ACCESS_FIELD];
-    $source_value = current($values[DOMAIN_SOURCE_FIELD]);
+  if (isset($values[DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD]) && \Drupal::moduleHandler()->moduleExists('domain_access') && isset($values[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD])) {
+    $access_values = $values[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD];
+    $source_value = current($values[DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD]);
   }
   // If no value is selected, that's acceptable. Else run through a check.
   // Note that the _none selection returns as [FALSE].
-  $source_set = empty($source_value);
-  foreach ($access_values as $value) {
-    // Core is inconsistent depending on the field order.
-    // See https://www.drupal.org/project/domain/issues/2945771#comment-12493199
-    if (is_array($value) && $value == $source_value) {
-      $source_set = TRUE;
-    }
-    elseif (is_string($value) && !empty($source_value['target_id']) && $value == $source_value['target_id']) {
-      $source_set = TRUE;
+  $source_valid = FALSE;
+  if (empty($source_value)) {
+    $source_valid = TRUE;
+  }
+  else {
+    foreach ($access_values as $value) {
+      // Core is inconsistent depending on the field order.
+      // See https://www.drupal.org/project/domain/issues/2945771#comment-12493199
+      if (is_array($value) && $value == $source_value) {
+        $source_valid = TRUE;
+      }
+      elseif (is_string($value) && !empty($source_value['target_id']) && $value == $source_value['target_id']) {
+        $source_valid = TRUE;
+      }
     }
   }
-  if (!$source_set) {
+  if (!$source_valid) {
     $form_state->setError($element, t('The source domain must be selected as a publishing option.'));
   }
 }
@@ -198,13 +210,10 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
   // Add the options hidden from the user silently to the form.
   $manager = \Drupal::service('domain_source.element_manager');
   $hide = TRUE;
-  $form = $manager->setFormOptions($form, $form_state, DOMAIN_SOURCE_FIELD, $hide);
-  // Check that our field is present and add validation if Domain Access is
-  // installed. See https://www.drupal.org/node/2952535.
-  if (isset($form[DOMAIN_SOURCE_FIELD]) && defined('DOMAIN_ACCESS_FIELD') && isset($form[DOMAIN_ACCESS_FIELD])) {
-    $form[DOMAIN_SOURCE_FIELD]['#element_validate'] = ['domain_source_form_validate'];
-    // If using a select field, load the JS to show/hide options.
-    if ($form[DOMAIN_SOURCE_FIELD]['widget']['#type'] == 'select') {
+  $form = $manager->setFormOptions($form, $form_state, DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD, $hide);
+  // If using a select field, load the JS to show/hide options.
+  if (isset($form[DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD]) && \Drupal::moduleHandler()->moduleExists('domain_access') && isset($form[DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD])) {
+    if ($form[DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD]['widget']['#type'] == 'select') {
       $form['#attached']['library'][] = 'domain_source/drupal.domain_source';
     }
   }
@@ -214,11 +223,11 @@ function domain_source_form_node_form_alter(&$form, FormStateInterface $form_sta
  * Implements hook_views_data_alter().
  */
 function domain_source_views_data_alter(array &$data) {
-  $table = 'node__' . DOMAIN_SOURCE_FIELD;
-  $data[$table][DOMAIN_SOURCE_FIELD]['field']['id'] = 'domain_source';
-  $data[$table][DOMAIN_SOURCE_FIELD . '_target_id']['filter']['id'] = 'domain_source';
+  $table = 'node__' . DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD;
+  $data[$table][DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD]['field']['id'] = 'domain_source';
+  $data[$table][DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD . '_target_id']['filter']['id'] = 'domain_source';
   // Since domains are not stored in the database, relationships cannot be used.
-  unset($data[$table][DOMAIN_SOURCE_FIELD]['relationship']);
+  unset($data[$table][DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD]['relationship']);
 }
 
 /**
@@ -276,10 +285,10 @@ function domain_source_presave_generate(EntityInterface $entity) {
       $selection = $entity->devel_generate['domain_source'];
       if ($selection == '_derive') {
         if (!empty($selections)) {
-          $values[DOMAIN_SOURCE_FIELD] = current($selections);
+          $values[DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD] = current($selections);
         }
         else {
-          $values[DOMAIN_SOURCE_FIELD] = NULL;
+          $values[DomainSourceElementManagerInterface::DOMAIN_SOURCE_FIELD] = NULL;
         }
       }
       foreach ($values as $name => $value) {

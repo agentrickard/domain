@@ -2,6 +2,8 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\domain_access\DomainAccessManagerInterface;
+
 /**
  * Removes an editor from a domain.
  *
@@ -23,7 +25,7 @@ class DomainAccessRemoveEditor extends DomainAccessActionBase {
     // Skip adding the role to the user if they already have it.
     if ($entity !== FALSE && isset($user_domains[$id])) {
       unset($user_domains[$id]);
-      $entity->set(DOMAIN_ACCESS_FIELD, array_keys($user_domains));
+      $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD, array_keys($user_domains));
       $entity->save();
     }
   }

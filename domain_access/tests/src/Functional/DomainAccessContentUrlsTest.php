@@ -4,6 +4,7 @@ namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Core\Url;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests behavior for getting all URLs for an entity.
@@ -39,12 +40,12 @@ class DomainAccessContentUrlsTest extends DomainTestBase {
     $nodes_values = [
       'type' => 'page',
       'title' => 'foo',
-      DOMAIN_ACCESS_FIELD => [
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => [
         'example_com',
         'one_example_com',
         'two_example_com',
       ],
-      DOMAIN_ACCESS_ALL_FIELD => 0,
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 0,
     ];
     $node = $this->createNode($nodes_values);
 

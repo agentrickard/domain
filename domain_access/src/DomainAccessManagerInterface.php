@@ -13,6 +13,16 @@ use Drupal\domain\DomainInterface;
 interface DomainAccessManagerInterface {
 
   /**
+   * The name of the node access control field.
+   */
+  const DOMAIN_ACCESS_FIELD = 'field_domain_access';
+
+  /**
+   * The name of the all affiliates field.
+   */
+  const DOMAIN_ACCESS_ALL_FIELD = 'field_domain_all_affiliates';
+
+  /**
    * Get the domain access field values from an entity.
    *
    * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
@@ -23,7 +33,7 @@ interface DomainAccessManagerInterface {
    * @return array
    *   The domain access field values.
    */
-  public static function getAccessValues(FieldableEntityInterface $entity, $field_name = DOMAIN_ACCESS_FIELD);
+  public static function getAccessValues(FieldableEntityInterface $entity, $field_name = DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
 
   /**
    * Get the all affiliates field values from an entity.

@@ -3,6 +3,7 @@
 namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests the domain access entity reference field type.
@@ -98,7 +99,7 @@ class DomainAccessAllAffiliatesTest extends DomainTestBase {
     $values = \Drupal::service('domain_access.manager')->getAccessValues($node);
     $this->assertCount(2, $values, 'Node saved with two domain records.');
     // Check that all affiliates is set.
-    $this->assertNotEmpty($node->get(DOMAIN_ACCESS_ALL_FIELD)->value, 'Node assigned to all affiliates.');
+    $this->assertNotEmpty($node->get(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD)->value, 'Node assigned to all affiliates.');
   }
 
 }

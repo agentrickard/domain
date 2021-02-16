@@ -4,6 +4,7 @@ namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\Core\Database\Database;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests the domain access integration with node_access records.
@@ -34,8 +35,8 @@ class DomainAccessRecordsTest extends DomainTestBase {
     // Create an article node.
     $node1 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => [$domain->id()],
-      DOMAIN_ACCESS_ALL_FIELD => 0,
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => [$domain->id()],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 0,
     ]);
     $this->assertNotNull($node_storage->load($node1->id()), 'Article node created.');
 
@@ -55,8 +56,8 @@ class DomainAccessRecordsTest extends DomainTestBase {
     // Create another article node.
     $node2 = $this->drupalCreateNode([
       'type' => 'article',
-      DOMAIN_ACCESS_FIELD => [$domain->id()],
-      DOMAIN_ACCESS_ALL_FIELD => 1,
+      DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD => [$domain->id()],
+      DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 1,
     ]);
     $this->assertNotNull($node_storage->load($node2->id()), 'Article node created.');
     // Check to see if grants added by domain_node_access_records made it in.

@@ -4,6 +4,7 @@ namespace Drupal\Tests\domain_access\Functional;
 
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\domain\Functional\DomainTestBase;
+use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
  * Tests the domain access entity reference field type.
@@ -59,7 +60,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Test a user who can access some domain settings.
     $user2 = $this->drupalCreateUser(['create article content', 'publish to any assigned domain']);
     $active_domain = array_rand($domains, 1);
-    $this->addDomainsToEntity('user', $user2->id(), $active_domain, DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $user2->id(), $active_domain, DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
     $this->drupalLogin($user2);
 
     // Visit the article creation page.
@@ -121,7 +122,7 @@ class DomainAccessFieldTest extends DomainTestBase {
     // Test a user who can assign users to some domains.
     $user5 = $this->drupalCreateUser(['administer users', 'assign domain editors']);
     $active_domain = array_rand($domains, 1);
-    $this->addDomainsToEntity('user', $user5->id(), $active_domain, DOMAIN_ACCESS_FIELD);
+    $this->addDomainsToEntity('user', $user5->id(), $active_domain, DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
     $this->drupalLogin($user5);
 
     // Visit the account creation page.

@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\domain\Functional;
 
+use Drupal\domain\DomainInterface;
 use Drupal\user\UserInterface;
 
 /**
@@ -54,7 +55,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $count = 0;
     $ids = ['example_com', 'one_example_com', 'two_example_com'];
     foreach ($domains as $domain) {
-      $locator = DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
+      $locator = DomainInterface::DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
       $this->findField($locator);
       if (in_array($domain->id(), $ids)) {
         $this->checkField($locator);
@@ -69,7 +70,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $user = $storage->load(3);
     // Check that two values are set.
     $manager = \Drupal::service('domain.element_manager');
-    $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    $values = $manager->getFieldValues($user, DomainInterface::DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 3, 'User saved with three domain records.');
 
     // Now login as a user with limited rights.
@@ -78,9 +79,9 @@ class DomainAdminElementTest extends DomainTestBase {
       'assign domain administrators',
     ]);
     $ids = ['example_com', 'one_example_com'];
-    $this->addDomainsToEntity('user', $account->id(), $ids, DOMAIN_ADMIN_FIELD);
+    $this->addDomainsToEntity('user', $account->id(), $ids, DomainInterface::DOMAIN_ADMIN_FIELD);
     $tester = $storage->load($account->id());
-    $values = $manager->getFieldValues($tester, DOMAIN_ADMIN_FIELD);
+    $values = $manager->getFieldValues($tester, DomainInterface::DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 2, 'User saved with two domain records.');
     $storage->resetCache([$account->id()]);
     $this->drupalLogin($account);
@@ -89,7 +90,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
 
     foreach ($domains as $domain) {
-      $locator = DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
+      $locator = DomainInterface::DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
       $this->findField($locator);
       if ($domain->id() == 'example_com') {
         $this->checkField($locator);
@@ -110,7 +111,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $storage->resetCache([$user->id()]);
     $user = $storage->load($user->id());
     // Check that two values are set.
-    $values = $manager->getFieldValues($user, DOMAIN_ADMIN_FIELD);
+    $values = $manager->getFieldValues($user, DomainInterface::DOMAIN_ADMIN_FIELD);
     $this->assert(count($values) == 2, 'User saved with two domain records.');
 
     // Test the case presented in https://www.drupal.org/node/2841962.
@@ -123,7 +124,7 @@ class DomainAdminElementTest extends DomainTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->responseNotContains('Domain administrator');
     foreach ($domains as $domain) {
-      $locator = DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
+      $locator = DomainInterface::DOMAIN_ADMIN_FIELD . '[' . $domain->id() . ']';
       $this->assertSession()->fieldNotExists($locator);
     }
     // Create a user through the form.

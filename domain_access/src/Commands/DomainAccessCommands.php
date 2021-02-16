@@ -5,6 +5,7 @@ namespace Drupal\domain_access\Commands;
 use Consolidation\AnnotatedCommand\AnnotationData;
 use Consolidation\AnnotatedCommand\CommandData;
 use Drupal\domain\Commands\DomainCommands;
+use Drupal\domain_access\DomainAccessManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -35,7 +36,7 @@ class DomainAccessCommands extends DomainCommands {
    */
   public function alterDomainInfo($result, CommandData $commandData) {
     // Display which entities are enabled for domain by checking for the fields.
-    $result['domain_access_entities'] = $this->getFieldEntities(DOMAIN_ACCESS_FIELD);
+    $result['domain_access_entities'] = $this->getFieldEntities(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD);
 
     return $result;
   }
@@ -70,7 +71,7 @@ class DomainAccessCommands extends DomainCommands {
     $delete_options = [
       'entity_filter' => 'node',
       'policy' => $policy_content,
-      'field' => DOMAIN_ACCESS_FIELD,
+      'field' => DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD,
     ];
 
     return $this->doReassign($target_domain, $delete_options);

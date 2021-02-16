@@ -40,7 +40,7 @@ function hook_domain_load(array $domains) {
  */
 function hook_domain_request_alter(\Drupal\domain\DomainInterface &$domain) {
   // Add a special case to the example domain.
-  if ($domain->getMatchType() == \Drupal\domain\DomainNegotiator::DOMAIN_MATCH_EXACT && $domain->id() == 'example_com') {
+  if ($domain->getMatchType() == \Drupal\domain\DomainNegotiatorInterface::DOMAIN_MATCHED_EXACT && $domain->id() == 'example_com') {
     // Do something here.
     $domain->addProperty('foo', 'Bar');
   }
