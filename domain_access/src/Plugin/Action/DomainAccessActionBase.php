@@ -49,7 +49,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    */
   public function defaultConfiguration() {
     return [
-      'domain_id' => '',
+      'domain_id' => [],
     ];
   }
 
@@ -60,9 +60,9 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadOptionsList();
     $form['domain_id'] = [
       '#type' => 'checkboxes',
-      '#title' => t('Domain'),
+      '#title' => t('Domains'),
       '#options' => $domains,
-      '#default_value' => $this->configuration['id'],
+      '#default_value' => $this->configuration['domain_id'],
       '#required' => TRUE,
     ];
     return $form;
@@ -81,7 +81,9 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
   public function calculateDependencies() {
     if (!empty($this->configuration['domain_id'])) {
       $prefix = $this->entityType->getConfigPrefix() . '.';
-      $this->addDependency('config', $prefix . $this->configuration['domain_id']);
+      foreach ($this->configuration['domain_id'] as $id) {
+        $this->addDependency('config', $prefix . $id);
+      }
     }
     return $this->dependencies;
   }

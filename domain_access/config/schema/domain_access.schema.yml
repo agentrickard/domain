@@ -25,26 +25,38 @@ action.configuration.domain_access_add_action:
   label: 'Configuration for the add domain(s) to content action'
   mapping:
     domain_id:
-      type: string
+      type: sequence
       label: 'The ID(s) of the domain(s) to add'
+      sequence:
+        type: string
+        label: 'Domain id'
 action.configuration.domain_access_remove_action:
   type: mapping
   label: 'Configuration for the remove domain(s) from content action'
   mapping:
     domain_id:
-      type: string
+      type: sequence
       label: 'The ID(s) of the domain(s) to remove'
+      sequence:
+        type: string
+        label: 'Domain id'
 action.configuration.domain_access_add_editor_action:
   type: mapping
   label: 'Configuration for the add domain(s) to users action'
   mapping:
     domain_id:
-      type: string
+      type: sequence
       label: 'The ID(s) of the domain(s) to add'
+      sequence:
+        type: string
+        label: 'Domain id'
 action.configuration.domain_access_remove_editor_action:
   type: mapping
   label: 'Configuration for the remove domain(s) from users action'
   mapping:
     domain_id:
-      type: string
+      type: sequence
       label: 'The ID(s) of the domain(s) to remove'
+      sequence:
+        type: string
+        label: 'Domain id'
