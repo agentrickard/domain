@@ -33,25 +33,6 @@ function domain_uri(DomainInterface $domain) {
 }
 
 /**
- * Implements hook_entity_load().
- *
- * The $domain->path and $domain->uri properties are derived from data in the
- * {domain} table. We use the hook system to load that data to indicate that
- * the data is not native to the object.
- *
- * This action is performed in hook_entity_load(), which precedes the running
- * of hook_domain_load() and ensures that our data is present for other modules.
- */
-function domain_entity_load(array $entities, $entity_type) {
-  if ($entity_type == 'domain') {
-    foreach ($entities as $domain) {
-      $domain->setPath();
-      $domain->setUrl();
-    }
-  }
-}
-
-/**
  * Implements hook_help().
  */
 function domain_help($route_name, RouteMatchInterface $route_match) {

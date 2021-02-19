@@ -98,7 +98,7 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
         }
       }
     }
-    
+
     // Check if any overridden config exists or if we have already
     // made this check.
     // See https://www.drupal.org/project/domain/issues/3126532.
@@ -234,8 +234,12 @@ class DomainConfigOverrider implements ConfigFactoryOverrideInterface {
 
     // The same issue is true for the domainNegotiator.
     $this->domainNegotiator = \Drupal::service('domain.negotiator');
+    // See https://www.drupal.org/project/domain/issues/3195219
+    $this->domainNegotiator->setBootstrapStatus(TRUE);
     // Get the domain context.
     $this->domain = $this->domainNegotiator->getActiveDomain(TRUE);
+    // Reset the status.
+    $this->domainNegotiator->setBootstrapStatus(FALSE);
   }
 
 }

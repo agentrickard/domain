@@ -207,4 +207,32 @@ class DomainStorage extends ConfigEntityStorage implements DomainStorageInterfac
     return $scheme;
   }
 
+  /**
+   * Attaches data to entities upon loading.
+   *
+   * @param array $entities
+   *   Associative array of query results, keyed on the entity ID.
+   */
+  protected function postLoad(array &$entities) {
+    $entity_class = $this->entityClass;
+    $entity_class::postLoad($this, $entities);
+
+    // Do not load module hooks during early bootstrap.
+    // @see Drupal\domain_config\DomainConfigOverrider::initiateContext()
+    // We cannot inject the negotiator due to dependencies.
+    $status = \Drupal::service('domain.negotiator')->getBootstrapStatus();
+    if (!$status) {
+      // Call hook_entity_load().
+      foreach ($this->moduleHandler()->getImplementations('entity_load') as $module) {
+        $function = $module . '_entity_load';
+        $function($entities, $this->entityTypeId);
+      }
+      // Call hook_TYPE_load().
+      foreach ($this->moduleHandler()->getImplementations($this->entityTypeId . '_load') as $module) {
+        $function = $module . '_' . $this->entityTypeId . '_load';
+        $function($entities);
+      }
+    }
+  }
+
 }

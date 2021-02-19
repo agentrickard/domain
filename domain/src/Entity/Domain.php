@@ -360,6 +360,17 @@ class Domain extends ConfigEntityBase implements DomainInterface {
   /**
    * {@inheritdoc}
    */
+  public static function postLoad(EntityStorageInterface $storage, array &$entities) {
+    foreach ($entities as $domain) {
+      $domain->setPath();
+      $domain->setUrl();
+    }
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
     // Invalidate cache tags relevant to domains.

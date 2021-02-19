@@ -8,6 +8,12 @@
 /**
  * Notifies other modules that we are loading a domain record from the database.
  *
+ * Note that this hook and hook_entity_load() will *not* run during very early
+ * bootstrap phases, such as when Domain Config fires to load configuration
+ * overrides. That is because Domain Config can load very early in the
+ * Drupal bootstrap process. These hooks will fire normally when the
+ * domain.subscriber service runs as part of the KernelEvent.
+ *
  * When using this hook, you should invoke the namespace with:
  *
  * use Drupal\domain\DomainInterface;

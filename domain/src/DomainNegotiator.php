@@ -232,4 +232,20 @@ class DomainNegotiator implements DomainNegotiatorInterface {
     return $this->domainStorage;
   }
 
+  /**
+   * @param boolean $status
+   * @return boolean
+   */
+  public function setBootstrapStatus($status) {
+    $this->status = $status;
+    return $status;
+  }
+
+  /**
+   * @return boolean
+   */
+  public function getBootstrapStatus() {
+    return $this->status ?? FALSE;
+  }
+
 }
