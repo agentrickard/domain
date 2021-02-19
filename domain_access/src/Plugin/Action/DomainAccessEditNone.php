@@ -13,7 +13,7 @@ use Drupal\domain_access\DomainAccessManagerInterface;
  *   type = "user"
  * )
  */
-class DomainAccessEditNone extends DomainAccessActionBase {
+class DomainAccessEditNone extends DomainAccessSimpleBase {
 
   /**
    * {@inheritdoc}
@@ -21,6 +21,18 @@ class DomainAccessEditNone extends DomainAccessActionBase {
   public function execute($entity = NULL) {
     $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 0);
     $entity->save();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function executeMultiple(array $objects) {
+    foreach ($objects as $entity) {
+      if (!empty($entity) && $entity->hasField(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD)) {
+        $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 0);
+        $entity->save();
+      }
+    }
   }
 
 }
