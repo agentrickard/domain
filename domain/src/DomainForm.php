@@ -191,16 +191,22 @@ class DomainForm extends EntityForm {
       $form_state->setErrorByName('hostname', $this->t('The hostname is already registered.'));
     }
 
-    // Check the domain response. First, clear the path value.
-    $entity->setPath();
-    // Check the response.
-    $response = $this->validator->checkResponse($entity);
-    // If validate_url is set, then we must receive a 200 response.
-    if ($entity->validate_url && $response != 200) {
-      if (empty($response)) {
-        $response = 500;
+    // Is validate_url set?
+    if ($entity->validate_url) {
+      // Check the domain response. First, clear the path value.
+      $entity->setPath();
+      // Check the response.
+      $response = $this->validator->checkResponse($entity);
+      // If validate_url is set, then we must receive a 200 response.
+      if ($response !== 200) {
+        if (empty($response)) {
+          $response = 500;
+        }
+        $form_state->setErrorByName('hostname', $this->t('The server request to @url returned a @response response. To proceed, disable the <em>Test server response</em> in the form.', [
+          '@url' => $entity->getPath(),
+          '@response' => $response
+        ]));
       }
-      $form_state->setErrorByName('hostname', $this->t('The server request to @url returned a @response response. To proceed, disable the <em>Test server response</em> in the form.', ['@url' => $entity->getPath(), '@response' => $response]));
     }
   }
 
