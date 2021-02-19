@@ -222,7 +222,7 @@ class DomainAliasStorage extends ConfigEntityStorage implements DomainAliasStora
    */
   private function buildPortPatterns(array $patterns, $hostname, $port = NULL) {
     // Fetch the port if empty.
-    if (empty($port)) {
+    if (empty($port) && !empty($this->requestStack->getCurrentRequest())) {
       $port = $this->requestStack->getCurrentRequest()->getPort();
     }
 
