@@ -28,17 +28,6 @@ class DefaultDomain extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function executeMultiple(array $objects) {
-    foreach ($objects as $object) {
-      if ($object instanceof DomainInterface) {
-        $object->saveDefault();
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
     $access_result = AccessResult::allowedIfHasPermission($account, 'administer domains');
     return $return_as_object ? $access_result : $access_result->isAllowed();
