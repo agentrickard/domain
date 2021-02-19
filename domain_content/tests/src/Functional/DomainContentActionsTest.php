@@ -45,7 +45,7 @@ class DomainContentActionsTest extends DomainContentTestBase {
     $edit = [
       'node_bulk_form[0]' => TRUE,
       'node_bulk_form[1]' => TRUE,
-      'action' => 'domain_access_add_action.two_example_com',
+      'action' => 'domain_access_add_action_two_example_com',
     ];
     $this->submitForm($edit, 'Apply to selected items');
 
@@ -57,7 +57,7 @@ class DomainContentActionsTest extends DomainContentTestBase {
     $edit = [
       'node_bulk_form[0]' => TRUE,
       'node_bulk_form[1]' => TRUE,
-      'action' => 'domain_access_remove_action.two_example_com',
+      'action' => 'domain_access_remove_action_two_example_com',
     ];
     $this->submitForm($edit, 'Apply to selected items');
 
