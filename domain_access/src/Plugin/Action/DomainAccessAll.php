@@ -2,7 +2,9 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\Core\Field\FieldUpdateActionBase;
 use Drupal\domain_access\DomainAccessManagerInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Assigns a node to all affiliates.
@@ -13,26 +15,13 @@ use Drupal\domain_access\DomainAccessManagerInterface;
  *   type = "node"
  * )
  */
-class DomainAccessAll extends DomainAccessSimpleBase {
+class DomainAccessAll extends FieldUpdateActionBase {
 
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
-    $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 1);
-    $entity->save();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function executeMultiple(array $objects) {
-    foreach ($objects as $entity) {
-      if (!empty($entity) && $entity->hasField(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD)) {
-        $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 1);
-        $entity->save();
-      }
-    }
+  protected function getFieldsToUpdate() {
+    return [DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 1];
   }
 
 }

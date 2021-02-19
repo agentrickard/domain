@@ -2,6 +2,7 @@
 
 namespace Drupal\domain_access\Plugin\Action;
 
+use Drupal\Core\Field\FieldUpdateActionBase;
 use Drupal\domain_access\DomainAccessManagerInterface;
 
 /**
@@ -13,26 +14,13 @@ use Drupal\domain_access\DomainAccessManagerInterface;
  *   type = "user"
  * )
  */
-class DomainAccessEditNone extends DomainAccessSimpleBase {
+class DomainAccessEditNone extends FieldUpdateActionBase {
 
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
-    $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 0);
-    $entity->save();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function executeMultiple(array $objects) {
-    foreach ($objects as $entity) {
-      if (!empty($entity) && $entity->hasField(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD)) {
-        $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD, 0);
-        $entity->save();
-      }
-    }
+  protected function getFieldsToUpdate() {
+    return [DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD => 0];
   }
 
 }

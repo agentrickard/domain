@@ -92,10 +92,7 @@ abstract class DomainAccessActionBase extends ConfigurableActionBase implements 
    * {@inheritdoc}
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\user\UserInterface $object */
-    // @TODO: fix this logic.
     $access = $object->access('update', $account, TRUE);
-
     return $return_as_object ? $access : $access->isAllowed();
   }
 
