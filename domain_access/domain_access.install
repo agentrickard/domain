@@ -48,7 +48,7 @@ function domain_access_update_8001() {
 /**
  * Update actions to current API.
  */
-function domain_access_update_8016() {
+function domain_access_update_8002() {
   $config_factory = \Drupal::configFactory();
   $rename_list = [
     'domain_access_add_action',
@@ -62,7 +62,6 @@ function domain_access_update_8016() {
     'domain_access_edit_none_action',
     'domain_access_none_action',
   ];
-  $list = array_merge($rename_list, $update_config_list);
 
   foreach ($config_factory->listAll() as $name) {
     $config = $config_factory->getEditable($name);
@@ -75,12 +74,19 @@ function domain_access_update_8016() {
     // Rename the items that need it.
     if (in_array($plugin, $rename_list, TRUE)) {
       $configuration = $config->get('configuration');
-      $current = $configuration['domain_id'];
-      $config->set('configuration', ['domain_id' => [$current]]);
+      // Set the domain_id to an array.
+      $current = $configuration['domain_id'] ?? [];
+      $new_configuration = $configuration;
+      $new_configuration['domain_id'] = [$current];
+      $config->set('configuration', $new_configuration);
       $config->save(TRUE);
+
+      // If the name has a period, change to underscore.
       $id = $config->getName();
-      $new_id = str_replace($plugin . '.', $plugin . '_', $id);
-      $config_factory->rename($id, $new_id);
+      if (substr_count($id, $plugin . '.') > 0) {
+        $new_id = str_replace($plugin . '.', $plugin . '_', $id);
+        $config_factory->rename($id, $new_id);
+      }
     }
   }
 }
