@@ -82,10 +82,10 @@ function domain_access_update_8002() {
       $config->save(TRUE);
 
       // If the name has a period, change to underscore.
-      $id = $config->getName();
-      if (substr_count($id, $plugin . '.') > 0) {
-        $new_id = str_replace($plugin . '.', $plugin . '_', $id);
-        $config_factory->rename($id, $new_id);
+      $name = $config->getName();
+      if (substr_count($name, $plugin . '.') > 0) {
+        $new_name = str_replace($plugin . '.', $plugin . '_', $name);
+        $config_factory->rename($name, $new_name);
       }
     }
   }
