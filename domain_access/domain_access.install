@@ -46,7 +46,7 @@ function domain_access_update_8001() {
 }
 
 /**
- * Update actions to current API.
+ * Update actions to use arrays for configuration.
  */
 function domain_access_update_8002() {
   $config_factory = \Drupal::configFactory();
@@ -71,7 +71,7 @@ function domain_access_update_8002() {
       $config->set('configuration', []);
       $config->save(TRUE);
     }
-    // Rename the items that need it.
+    // Convert our complex plugins.
     if (in_array($plugin, $rename_list, TRUE)) {
       $configuration = $config->get('configuration');
       // Set the domain_id to an array.
