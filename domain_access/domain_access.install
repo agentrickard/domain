@@ -82,10 +82,31 @@ function domain_access_update_8002() {
       }
       $config->set('configuration', $new_configuration);
       $config->save(TRUE);
+    }
+  }
+}
+/**
+ * Update action names.
+ */
+function domain_access_update_8003() {
+  $config_factory = \Drupal::configFactory();
+  $rename_list = [
+    'domain_access_add_action',
+    'domain_access_add_editor_action',
+    'domain_access_remove_action',
+    'domain_access_remove_editor_action'
+  ];
 
+  foreach ($config_factory->listAll() as $name) {
+    $config = $config_factory->getEditable($name);
+    $plugin = $config->get('plugin');
+    // Rename the items that need it.
+    if (in_array($plugin, $rename_list, TRUE)) {
       // If the name has a period, change to underscore.
       $name = $config->getName();
       if (substr_count($name, $plugin . '.') > 0) {
+        $id = $config->get('id');
+        $config->set('id', str_replace('.', '_', $id));
         $new_name = str_replace($plugin . '.', $plugin . '_', $name);
         $config_factory->rename($name, $new_name);
       }
