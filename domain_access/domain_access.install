@@ -107,6 +107,7 @@ function domain_access_update_8003() {
       if (substr_count($name, $plugin . '.') > 0) {
         $id = $config->get('id');
         $config->set('id', str_replace('.', '_', $id));
+        $config->save();
         $new_name = str_replace($plugin . '.', $plugin . '_', $name);
         $config_factory->rename($name, $new_name);
       }
