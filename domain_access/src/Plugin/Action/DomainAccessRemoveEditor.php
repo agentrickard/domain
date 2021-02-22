@@ -13,21 +13,6 @@ use Drupal\domain_access\DomainAccessManagerInterface;
  *   type = "user"
  * )
  */
-class DomainAccessRemoveEditor extends DomainAccessActionBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public function execute($entity = NULL) {
-    $id = $this->configuration['domain_id'];
-    $user_domains = \Drupal::service('domain_access.manager')->getAccessValues($entity);
-
-    // Skip adding the role to the user if they already have it.
-    if ($entity !== FALSE && isset($user_domains[$id])) {
-      unset($user_domains[$id]);
-      $entity->set(DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD, array_keys($user_domains));
-      $entity->save();
-    }
-  }
-
+class DomainAccessRemoveEditor extends DomainAccessRemove {
+  // This class does the same action to a different type of entity.
 }
