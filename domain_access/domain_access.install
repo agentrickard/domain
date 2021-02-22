@@ -66,7 +66,7 @@ function domain_access_update_8002() {
   foreach ($config_factory->listAll() as $name) {
     $config = $config_factory->getEditable($name);
     $plugin = $config->get('plugin');
-    // Save our plugins with arrays for configuration.
+    // Save our default plugins with arrays for configuration.
     if (in_array($plugin, $update_config_list, TRUE)) {
       $config->set('configuration', []);
       $config->save(TRUE);
@@ -77,7 +77,9 @@ function domain_access_update_8002() {
       // Set the domain_id to an array.
       $current = $configuration['domain_id'] ?? [];
       $new_configuration = $configuration;
-      $new_configuration['domain_id'] = [$current];
+      if (!is_array($current)) {
+        $new_configuration['domain_id'] = [$current];
+      }
       $config->set('configuration', $new_configuration);
       $config->save(TRUE);
 
