@@ -45,8 +45,62 @@ class DomainBlockVisibilityTest extends DomainTestBase {
     }
 
     // Now let's only show the block on two domains.
+    /*
+     * visibility:
+  domain:
+    id: domain
+    domains:
+      example_local: example_local
+      one_example_local: one_example_local
+    negate: false
+    context_mapping:
+      domain: '@domain.current_domain_context:domain'
+
+     */
+    $allowed_domains = [
+      'example_com' => 'example_com',
+      'one_example_com' => 'one_example_com',
+    ];
+    $settings = [
+      'visibility' => [
+        'domain' => [
+          'id' => 'domain',
+          'domains' => $allowed_domains,
+          'negate' => FALSE,
+          'context_mapping' => ['domain' => '@domain.current_domain_context:domain'],
+        ],
+      ],
+    ];
+    $block2 = $this->placeBlock('domain_nav_block', $settings);
+
+    // Load the homepage. All links should appear.
+    foreach ($domains as $id => $domain) {
+      $url = $domain->getPath();
+      $this->drupalGet($url);
+      if (in_array($id, $allowed_domains, TRUE)) {
+        $this->assertBlockAppears($block2);
+      }
+      else {
+        $this->assertNoBlockAppears($block2);
+      }
+    }
 
     // Now let's negate (reverse) the condition.
+    $settings['visibility']['domain']['negate'] = TRUE;
+    $block3 = $this->placeBlock('domain_nav_block', $settings);
+
+    // Load the homepage. All links should appear.
+    foreach ($domains as $id => $domain) {
+      $url = $domain->getPath();
+      $this->drupalGet($url);
+      if (!in_array($id, $allowed_domains, TRUE)) {
+        $this->assertBlockAppears($block3);
+      }
+      else {
+        $this->assertNoBlockAppears($block3);
+      }
+    }
+
   }
 
 }
