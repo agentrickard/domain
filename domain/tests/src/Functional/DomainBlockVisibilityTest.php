@@ -3,6 +3,8 @@
 namespace Drupal\Tests\domain\Functional;
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Tests\block\Functional\AssertBlockAppearsTrait;
+use Drupal\Tests\block\Traits\BlockCreationTrait;
 
 /**
  * Tests the domain navigation block.
@@ -10,6 +12,9 @@ use Drupal\Core\Session\AccountInterface;
  * @group domain
  */
 class DomainBlockVisibilityTest extends DomainTestBase {
+
+  use AssertBlockAppearsTrait;
+  use BlockCreationTrait;
 
   /**
    * Modules to enable.
@@ -27,7 +32,7 @@ class DomainBlockVisibilityTest extends DomainTestBase {
     $domains = \Drupal::entityTypeManager()->getStorage('domain')->loadMultiple();
 
     // Place the nav block.
-    $block = $this->drupalPlaceBlock('domain_nav_block');
+    $block = $this->placeBlock('domain_nav_block');
 
     // Let the anon user view the block.
     user_role_grant_permissions(AccountInterface::ANONYMOUS_ROLE, ['use domain nav block']);
@@ -36,16 +41,12 @@ class DomainBlockVisibilityTest extends DomainTestBase {
     foreach ($domains as $domain) {
       $url = $domain->getPath();
       $this->drupalGet($url);
-      $this->findLinks($domains);
+      $this->assertBlockAppears($block);
     }
 
-  }
+    // Now let's only show the block on two domains.
 
-  public function findLinks(array $domains) {
-    // Confirm domain links.
-    foreach ($domains as $id => $domain) {
-      $this->findLink($domain->label());
-    }
+    // Now let's negate (reverse) the condition.
   }
 
 }
