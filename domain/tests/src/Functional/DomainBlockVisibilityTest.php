@@ -45,18 +45,6 @@ class DomainBlockVisibilityTest extends DomainTestBase {
     }
 
     // Now let's only show the block on two domains.
-    /*
-     * visibility:
-  domain:
-    id: domain
-    domains:
-      example_local: example_local
-      one_example_local: one_example_local
-    negate: false
-    context_mapping:
-      domain: '@domain.current_domain_context:domain'
-
-     */
     $allowed_domains = [
       'example_com' => 'example_com',
       'one_example_com' => 'one_example_com',
