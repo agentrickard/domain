@@ -86,6 +86,6 @@ function domain_update_8002() {
 /**
  * Ensure that the update to block visibility is applied properly.
  */
-function domain_update_8005() {
+function domain_update_8003() {
   domain_update_8002();
 }
