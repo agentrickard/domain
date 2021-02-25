@@ -63,7 +63,7 @@ function domain_update_8002() {
     $block = $config_factory->getEditable($block_config_name);
     if ($visibility = $block->get('visibility')) {
       foreach ($visibility as $condition_plugin_id => &$condition) {
-        if ($condition_plugin_id == 'domain') {
+        if ($condition_plugin_id == 'domain' && (empty($condition['context_mapping']['domain']) || $condition['context_mapping']['domain'] !== $new_context_id)) {
           $condition['context_mapping']['domain'] = $new_context_id;
           $update_block = TRUE;
           $update_list[] = $block_config_name;
@@ -81,4 +81,11 @@ function domain_update_8002() {
   else {
     return t('Updated @count blocks: @blocks', ['@count' => count($update_list), '@blocks' => implode(', ', $update_list)]);
   }
+}
+
+/**
+ * Ensure that the update to block visibility was applied properly.
+ */
+function domain_update_8003() {
+  domain_update_8002();
 }
