@@ -207,6 +207,7 @@ class DomainListBuilder extends DraggableListBuilder {
     $header['hostname'] = $this->t('Hostname');
     $header['status'] = $this->t('Status');
     $header['is_default'] = $this->t('Default');
+    $header['scheme'] = $this->t('Scheme');
     $header += parent::buildHeader();
     if (!$this->currentUser->hasPermission('administer domains')) {
       unset($header['weight']);
@@ -232,7 +233,12 @@ class DomainListBuilder extends DraggableListBuilder {
     }
     $row['status'] = ['#markup' => $entity->status() ? $this->t('Active') : $this->t('Inactive')];
     $row['is_default'] = ['#markup' => ($entity->isDefault() ? $this->t('Yes') : $this->t('No'))];
+    $row['scheme'] = ['#markup' => $entity->getRawScheme()];
     $row += parent::buildRow($entity);
+
+    if ($entity->getRawScheme() === 'variable') {
+      $row['scheme']['#markup'] .= ' (' . $entity->getScheme(FALSE) . ')';
+    }
 
     if (!$this->currentUser->hasPermission('administer domains')) {
       unset($row['weight']);
