@@ -838,12 +838,16 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *   The count of extra domains to generate. Default is 15.
    * @option empty
    *   Pass empty=1 to truncate the {domain} table before creating records.
+   * @option scheme
+   *   Options are http | https | variable
    * @usage drush domain-generate example.com
    * @usage drush domain-generate example.com --count=25
    * @usage drush domain-generate example.com --count=25 --empty=1
+   * @usage drush domain-generate example.com --count=25 --empty=1 --scheme=https
    * @usage drush gend
    * @usage drush gend --count=25
    * @usage drush gend --count=25 --empty=1
+   * @usage drush gend --count=25 --empty=1 --scheme=https
    *
    * @command domain:generate
    * @aliases gend,domgen,domain-generate
@@ -853,7 +857,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
    *
    * @throws \Drupal\domain\Commands\DomainCommandException
    */
-  public function generate($primary = 'example.com', array $options = ['count' => NULL, 'empty' => NULL]) {
+  public function generate($primary = 'example.com', array $options = ['count' => NULL, 'empty' => NULL, 'scheme' => 'http']) {
     // Check the number of domains to create.
     $count = $options['count'];
     if (is_null($count)) {
@@ -930,7 +934,7 @@ class DomainCommands extends DrushCommands implements CustomEventAwareInterface 
       $values = [
         'name' => ($item != $primary) ? ucwords(str_replace(".$primary", '', $item)) : \Drupal::config('system.site')->get('name'),
         'hostname' => $hostname,
-        'scheme' => 'http',
+        'scheme' => $options['scheme'],
         'status' => 1,
         'weight' => ($item != $primary) ? $key + $start_weight + 1 : -1,
         'is_default' => 0,
