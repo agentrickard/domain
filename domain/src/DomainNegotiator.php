@@ -174,7 +174,7 @@ class DomainNegotiator implements DomainNegotiatorInterface {
       $httpHost = $request->getHttpHost();
     }
     else {
-      $httpHost = $_SERVER['HTTP_HOST'];
+      $httpHost = $_SERVER['HTTP_HOST'] ?? NULL;
     }
     $hostname = !empty($httpHost) ? $httpHost : 'localhost';
     return $this->domainStorage()->prepareHostname($hostname);
