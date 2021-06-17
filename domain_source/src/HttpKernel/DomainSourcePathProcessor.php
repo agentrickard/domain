@@ -130,6 +130,11 @@ class DomainSourcePathProcessor implements OutboundPathProcessorInterface {
     $alias = $this->aliasManager->getPathByAlias($path, $langcode);
     $url = Url::fromUserInput($alias, $options);
 
+    // Get the route name to pass through to the alter hooks.
+    if ($url->isRouted()) {
+      $options['route_name'] = $url->getRouteName();
+    }
+
     // Check the route, if available. Entities can be configured to
     // only rewrite specific routes.
     if ($url->isRouted() && $this->allowedRoute($url->getRouteName())) {
