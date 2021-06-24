@@ -23,6 +23,7 @@ Changelog
 16-FEB-2021 8.x-1.0-beta3
 19-FEB-2021 8.x-1.0-beta4
 25-FEB-2021 8.x-1.0-beta5
+24-JUN-2021 8.x-1.0-beta6
 
 Status
 ====
