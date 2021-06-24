@@ -62,7 +62,11 @@ class CurrentDomainContext implements ContextProviderInterface {
    * {@inheritdoc}
    */
   public function getAvailableContexts() {
-    return $this->getRuntimeContexts([]);
+    // See https://www.drupal.org/project/domain/issues/3201514
+    if ($this->negotiator->getActiveDomain()) {
+      return $this->getRuntimeContexts([]);
+    }
+    return [];
   }
 
 }
