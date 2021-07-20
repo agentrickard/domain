@@ -77,7 +77,6 @@ class DomainLanguageNegotiationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    global $base_url;
     $config = $this->config('domain.language_negotiation');
     $domains = $this->domainStorage->loadMultipleSorted();
 
@@ -99,7 +98,13 @@ class DomainLanguageNegotiationForm extends ConfigFormBase {
     foreach ($domains as $domain) {
       $row = [];
       $row['label'] = ['#markup' => $domain->label()];
-      $form[$domain->id()] = $row;
+      $row['base_url'] = ['#markup' => $domain->getHostname()];
+      $row['language'] = [
+        '#type' => 'select',
+        '#options' => $options,
+        '#default_value' => $config->get($domain->id()),
+      ];
+      $form['domain_list'][$domain->id()] = $row;
     }
 
     $form_state->setRedirect('language.negotiation');
@@ -110,25 +115,13 @@ class DomainLanguageNegotiationForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    $languages = $this->languageManager->getLanguages();
-
-    parent::validateForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // Save selected format (prefix or domain).
-    $this->config('language.negotiation')
-      ->set('url.source', $form_state->getValue('language_negotiation_url_part'))
-      // Save new domain and prefix values.
-      ->set('url.prefixes', $form_state->getValue('prefix'))
-      ->set('url.domains', $form_state->getValue('domain'))
-      ->save();
-
-    parent::submitForm($form, $form_state);
+    $values = $form_state->getValues();
+    $config = $this->config('domain.language_negotiation');
+    foreach($values['domain_list'] as $id => $value) {
+      $config->set($id, $value['language']);
+    }
+    $config->save();
   }
 
 }
