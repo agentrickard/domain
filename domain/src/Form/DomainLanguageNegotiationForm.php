@@ -79,13 +79,27 @@ class DomainLanguageNegotiationForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     global $base_url;
     $config = $this->config('domain.language_negotiation');
-
     $domains = $this->domainStorage->loadMultipleSorted();
 
     $languages = $this->languageManager->getLanguages();
     $options = [];
     foreach ($languages as $langcode => $language) {
       $options[$langcode] = $language->getName();
+    }
+
+    $header['label'] = $this->t('Domain');
+    $header['base_url'] = $this->t('Base url');
+    $header['language'] = $this->t('Language');
+
+    $form['domain_list'] = [
+      '#type' => 'table',
+      '#header' => $header,
+    ];
+
+    foreach ($domains as $domain) {
+      $row = [];
+      $row['label'] = ['#markup' => $domain->label()];
+      $form[$domain->id()] = $row;
     }
 
     $form_state->setRedirect('language.negotiation');
