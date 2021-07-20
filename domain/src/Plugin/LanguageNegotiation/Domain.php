@@ -2,13 +2,15 @@
 
 namespace Drupal\domain\Plugin\LanguageNegotiation;
 
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
-use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
-use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
+use Drupal\domain\DomainNegotiatorInterface;
+use Drupal\language\Annotation\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Drupal\language\LanguageSwitcherInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,7 +26,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   config_route_name = "domain.language_negotiation"
  * )
  */
-class Domain extends LanguageNegotiationMethodBase implements LanguageSwitcherInterface {
+class Domain extends LanguageNegotiationMethodBase implements ContainerFactoryPluginInterface, LanguageSwitcherInterface {
 
   /**
    * The language negotiation method id.
@@ -32,10 +34,62 @@ class Domain extends LanguageNegotiationMethodBase implements LanguageSwitcherIn
   const METHOD_ID = 'domain';
 
   /**
+   * Domain Negotiator.
+   *
+   * @var \Drupal\domain\DomainNegotiatorInterface
+   */
+  private $domainNegotiator;
+
+  /**
+   * Config Factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  private $configFactory;
+
+  /**
+   * Language Manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * Constructs a new LanguageNegotiationUserAdmin instance.
+   *
+   * @param \Drupal\domain\DomainNegotiatorInterface $domainNegotiator
+   *   Domain Negotiator.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   Config Factory.
+   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   *   Language Manager.
+   */
+  public function __construct(DomainNegotiatorInterface $domainNegotiator, ConfigFactoryInterface $configFactory, LanguageManagerInterface $languageManager) {
+    $this->domainNegotiator = $domainNegotiator;
+    $this->configFactory = $configFactory;
+    $this->languageManager = $languageManager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $container->get('domain.negotiator'),
+      $container->get('config.factory'),
+      $container->get('language_manager')
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getLangcode(Request $request = NULL) {
     $langcode = NULL;
+
+    if ($domain = $this->domainNegotiator->getActiveDomain()) {
+
+    }
 
     return $langcode;
   }

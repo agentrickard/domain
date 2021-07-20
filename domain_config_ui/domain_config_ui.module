@@ -173,6 +173,7 @@ function domain_config_ui_route_is_admin() {
   $disallowed = [
     '/admin/config/domain/config-ui',
     '/admin/config/domain/settings',
+    '/admin/config/regional/language/detections/domain',
   ];
   if (in_array($route->getPath(), $disallowed, TRUE)) {
     return FALSE;

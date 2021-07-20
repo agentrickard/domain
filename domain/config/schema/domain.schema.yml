@@ -16,6 +16,11 @@ domain.settings:
       type: text
       label: 'Custom css classes to apply to the body tag of each domain'
 
+domain.language_negotiation:
+  type: config_object
+  label: 'Domain language negotiation'
+  mapping:
+
 domain.record.*:
   type: config_entity
   label: 'Domain record'
