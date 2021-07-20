@@ -53,3 +53,11 @@ domain.inline_action:
     _entity_access: domain.update
     _csrf_token: 'TRUE'
     op: 'enable|disable|default'
+
+domain.language_negotiation:
+  path: '/admin/config/regional/language/detections/domain'
+  defaults:
+    _title: 'Domain language negotiation'
+    _form: '\Drupal\domain\Form\DomainLanguageNegotiationForm'
+  requirements:
+    _permission: 'administer languages'
