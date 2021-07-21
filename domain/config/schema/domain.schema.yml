@@ -20,15 +20,12 @@ domain.language_negotiation:
   type: config_object
   label: 'Domain language negotiation'
   mapping:
-    domains:
+    domain_language:
       type: sequence
       label: 'Domains'
       sequence:
-        type: sequence
-        label: 'Langcode'
-        sequence:
-          type: sequence
-
+        type: string
+        label: 'Langcode mapping'
 
 domain.record.*:
   type: config_entity

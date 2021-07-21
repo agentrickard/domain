@@ -44,6 +44,7 @@ class DomainLanguageNegotiationForm extends ConfigFormBase {
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager) {
     parent::__construct($config_factory);
+    /* @var \Drupal\domain\DomainStorageInterface */
     $this->domainStorage = $entity_type_manager->getStorage('domain');
     $this->languageManager = $language_manager;
   }
@@ -99,10 +100,11 @@ class DomainLanguageNegotiationForm extends ConfigFormBase {
       $row = [];
       $row['label'] = ['#markup' => $domain->label()];
       $row['base_url'] = ['#markup' => $domain->getHostname()];
+      $mapping = $config->get('domain_language');
       $row['language'] = [
         '#type' => 'select',
         '#options' => $options,
-        '#default_value' => $config->get($domain->id()),
+        '#default_value' => $mapping[$domain->id()] ?? '',
       ];
       $form['domain_list'][$domain->id()] = $row;
     }
@@ -118,9 +120,11 @@ class DomainLanguageNegotiationForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
     $config = $this->config('domain.language_negotiation');
+    $items = [];
     foreach($values['domain_list'] as $id => $value) {
-      $config->set($id, $value['language']);
+      $items[$id] = $value['language'];
     }
+    $config->set('domain_language', $items);
     $config->save();
   }
 
