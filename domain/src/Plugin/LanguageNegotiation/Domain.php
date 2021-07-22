@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  *   id = "domain",
  *   types = {\Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE,
  *   \Drupal\Core\Language\LanguageInterface::TYPE_CONTENT},
- *   weight = -12,
+ *   weight = 0,
  *   name = @Translation("Domain record"),
  *   description = @Translation("Language specified for a registered Domain or its aliases"),
  *   config_route_name = "domain.language_negotiation"
@@ -88,7 +88,8 @@ class Domain extends LanguageNegotiationMethodBase implements ContainerFactoryPl
     $langcode = NULL;
 
     if ($domain = $this->domainNegotiator->getActiveDomain()) {
-
+      $values = $this->configFactory->get('domain.language_negotiation')->get('domain_language');
+      $langcode = $values[$domain->id()] ?: NULL;
     }
 
     return $langcode;
