@@ -95,27 +95,14 @@ class Domain extends LanguageNegotiationMethodBase implements ContainerFactoryPl
     return $langcode;
   }
 
-
   /**
    * {@inheritdoc}
    */
   public function getLanguageSwitchLinks(Request $request, $type, Url $url) {
     $links = [];
-    $query = $request->query->all();
-    // @todo update this logic.
-    foreach ($this->languageManager->getNativeLanguages() as $language) {
-      $links[$language->getId()] = [
-        // We need to clone the $url object to avoid using the same one for all
-        // links. When the links are rendered, options are set on the $url
-        // object, so if we use the same one, they would be set for all links.
-        'url' => clone $url,
-        'title' => $language->getName(),
-        'language' => $language,
-        'attributes' => ['class' => ['language-link']],
-        'query' => $query,
-      ];
-    }
-
+    // The links array expects a 1:1 relationship between language and domain.
+    // That is not the case for us, so we recommend using the provided
+    // Domain Navigation block instead.
     return $links;
   }
 
