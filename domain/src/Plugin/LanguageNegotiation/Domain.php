@@ -89,7 +89,7 @@ class Domain extends LanguageNegotiationMethodBase implements ContainerFactoryPl
 
     if ($domain = $this->domainNegotiator->getActiveDomain()) {
       $values = $this->configFactory->get('domain.language_negotiation')->get('domain_language');
-      $langcode = $values[$domain->id()] ?: NULL;
+      $langcode = $values[$domain->id()] ?? NULL;
     }
 
     return $langcode;
