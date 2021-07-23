@@ -14,7 +14,11 @@ class DomainLanguageNegotiatorTest extends DomainTestBase {
    *
    * @var array
    */
-  public static $modules = ['domain', 'node', 'language', 'views'];
+  public static $modules = [
+    'domain',
+    'language',
+    'locale',
+  ];
 
   /**
    * Domain list for this test.
@@ -64,27 +68,51 @@ class DomainLanguageNegotiatorTest extends DomainTestBase {
     // we have to rebuild it.
     $this->rebuildContainer();
 
-    $this->drupalGet('admin/config/regional/language/detection/domain');
-    #$this->submitForm($edit, 'Save configuration');
+    $this->drupalGet('admin/config/regional/language/detections/domain');
+    $edit = [
+      'domain_list[example_com][language]' => 'en',
+      'domain_list[one_example_com][language]' => 'en',
+      'domain_list[two_example_com][language]' => 'es',
+      'domain_list[three_example_com][language]' => 'es',
+      'domain_list[four_example_com][language]' => 'en',
+    ];
+    $this->submitForm($edit, 'Save configuration');
 
     $this->drupalLogout();
 
     $es = \Drupal::entityTypeManager()->getStorage('configurable_language')->load('es');
     $this->assertNotEmpty($es, 'Created test language.');
-
   }
 
   /**
-   * Test inactive domain.
+   * Test domain-based language interface.
    */
-  public function testInactiveDomain() {
-    $domains = $this->domains;
+  public function testDomainLanguageNegotiator() {
+    $this->drupalLogin($this->adminUser);
 
-    // Grab a known domain for testing.
-    $domain = $domains['two_example_com'];
-    $this->drupalGet($domain->getPath());
-    $this->assertTrue($domain->status(), 'Tested domain is set to active.');
-    $this->assertTrue($domain->getPath() == $this->getUrl(), 'Loaded the active domain.');
+    $expected = $this->getExpectedText();
+
+    // Test the test on the page, which should translate.
+    foreach ($this->domains as $domain) {
+      $admin_page = $domain->getPath() . 'admin/config/regional/language';
+      $this->drupalGet($admin_page);
+      $this->assertSession()->pageTextContains($expected[$domain->id()]);
+    }
   }
 
+  /**
+   * Gets the expected text string on each page.
+   *
+   * @return array
+   *   The array of text, keyed by domain id.
+   */
+  public function getExpectedText() {
+    return [
+      'example_com' => 'Default',
+      'one_example_com' => 'Default',
+      'two_example_com' => 'Por defecto',
+      'three_example_com' => 'Por defecto',
+      'four_example_com' => 'Default',
+    ];
+  }
 }
