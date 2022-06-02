@@ -10,13 +10,13 @@ Domain module for Drupal port to Drupal 8, under active development.
 
 Domain required Drupal 8.5 or higher.
 
-Active branch is the 8-x.1-x branch in GitHub. Begin any forks from there.
+Active branch is the [8-x.1-x branch in GitLab](https://git.drupalcode.org/project/domain). Begin any forks from there. The GitHub repository is no longer an active fork.
 
 The underlying API is stable, and it's currently usable for access control.
 The configuration supports manual editing. Themes should work. Views and Bulk
 Operations are not yet supported.
 
-For a complete feature status list, see [CHANGELOG.md](https://github.com/agentrickard/domain/blob/8.x-1.x/CHANGELOG.md)
+For a complete feature status list, see [CHANGELOG.md](https://git.drupalcode.org/project/domain/blob/8.x-1.x/CHANGELOG.md)
 
 Included modules
 -------
@@ -184,37 +184,14 @@ For developers, see also the information in the Domain Alias README.
 Contributing
 ====
 
-If you'd like to contribute, please do. Github forks and pull requests are preferable.
-If you prefer a patch-based workflow, you can attach patches to GitHub issues or Drupal.org
-issues. If you open a Drupal.org issue, please link to it from the appropriate GitHub
-issue.
-
-The GitHub issues are grouped under three milestones:
-
-1. Alpha -- items required for a test release. When this is complete, we will roll an
-alpha1 release on Drupal.org.
-2. Beta -- items considered critical features for a release. When complete, we will roll
-a beta release on Drupal.org.
-3. Final -- items required for a stable, secure release on Drupal.org.
-
-We would like to tackle issues in that order, but feel free to work on what motivates you.
-
-Testing [![Build Status](https://travis-ci.com/agentrickard/domain.svg?branch=8.x-1.x)](https://travis-ci.com/agentrickard/domain)
-====
-
-@zerolab built a Travis definition file for automated testing! That means all pull requests will automatically run tests!
-
 If you file a pull request or patch, please (at a minimum) run the existing tests to check
 for failures. Writing additional tests will greatly speed completion, as I won't commit
 code without test coverage.
 
 New tests should be written in PHPUnit as Functional, Kernel, or Unit tests.
 
-Because Domain requires varying http host requests to test, we can't normally use the Drupal.org
-testing infrastructure. (This may change, but we are not counting on it.)
-
 To setup a proper environment locally, you need multiple or wilcard domains configured to
-point to your drupal instance. I use variants of `example.com` for local tests. See
+point to your drupal instance. I use variants of `example.local` for local tests. See
 `DomainTestBase` for documentation. Domain testing should work with root hosts other than
 `example.com`, though we also expect to find the subdomains `one.*, two.*, three.*, four.*, five.*`
 in most test cases. See `DomainTestBase::domainCreateTestDomains()` for the logic.
