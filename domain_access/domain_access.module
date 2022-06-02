@@ -18,7 +18,7 @@ use Drupal\domain_access\DomainAccessManagerInterface;
  * The name of the node access control field.
  *
  * @deprecated This constant will be replaced in the final release by
- * Drupal\domain\DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD.
+ * \Drupal\domain_access\DomainAccessManagerInterface::DOMAIN_ACCESS_FIELD.
  */
 const DOMAIN_ACCESS_FIELD = 'field_domain_access';
 
@@ -26,7 +26,7 @@ const DOMAIN_ACCESS_FIELD = 'field_domain_access';
  * The name of the all affiliates field.
  *
  * @deprecated This constant will be replaced in the final release by
- * Drupal\domain\DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD.
+ * \Drupal\domain_access\DomainAccessManagerInterface::DOMAIN_ACCESS_ALL_FIELD.
  */
 const DOMAIN_ACCESS_ALL_FIELD = 'field_domain_all_affiliates';
 
