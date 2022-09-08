@@ -49,6 +49,11 @@ class DomainSourceSettingsForm extends ConfigFormBase {
       '#options' => $options,
       '#description' => $this->t('Check the routes to disable. Any entity URL with a Domain Source field will be rewritten unless its corresponding route is disabled.'),
     ];
+    $form['dont_redirect_on_aliases'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Don\'t redirect to the primary domain on aliases'),
+      '#default_value' => $config->get('dont_redirect_on_aliases')
+    ];
     return parent::buildForm($form, $form_state);
   }
 
@@ -58,6 +63,7 @@ class DomainSourceSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('domain_source.settings')
       ->set('exclude_routes', $form_state->getValue('exclude_routes'))
+      ->set('dont_redirect_on_aliases', $form_state->getValue('dont_redirect_on_aliases'))
       ->save();
 
     parent::submitForm($form, $form_state);

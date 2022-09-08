@@ -1,1 +1,2 @@
 exclude_routes: {}
+dont_redirect_on_aliases: 0
