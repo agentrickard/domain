@@ -5,8 +5,12 @@
  * Domain-based access control for content.
  */
 
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityFormInterface;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
@@ -558,7 +562,6 @@ function domain_access_confirm_fields($entity_type, $bundle, array $text = []) {
         // Users should not be required to be a domain editor.
         'required' => $entity_type !== 'user',
         'description' => 'Select the affiliate domain(s) for this ' . $text[$entity_type]['name'],
-        'default_value_callback' => 'Drupal\domain_access\DomainAccessManager::getDefaultValue',
         'settings' => [
           'handler' => 'default:domain',
           // Handler_settings are deprecated but seem to be necessary here.
@@ -756,5 +759,59 @@ function domain_access_default_form_values(&$form, &$form_state, $entity) {
     // Set the default values correctly.
     $values = \Drupal::service('domain_access.manager')->getAccessValues($entity);
     $form['field_domain_access']['widget']['#default_value'] = array_keys($values);
+  }
+}
+
+/**
+ * Implements hook_entity_prepare_form().
+ *
+ * If configured, "add_current_domain" to a field_domain_access instance.
+ */
+function domain_access_entity_prepare_form(EntityInterface $entity, $operation, FormStateInterface $form_state) {
+  if ($entity instanceof ContentEntityInterface) {
+    if ($entity->hasField(DOMAIN_ACCESS_FIELD)) {
+      $field = $entity->get(DOMAIN_ACCESS_FIELD);
+      /** @var \Drupal\Core\Field\FieldConfigInterface $field_definition */
+      $field_definition = $field->getFieldDefinition();
+      // Use getValue() as isEmpty() sees empty array as nonempty.
+      if ($operation === 'default' && $entity->isNew()
+        && $field_definition->getThirdPartySetting('domain_access', 'add_current_domain')) {
+        /** @var \Drupal\domain\DomainInterface $current_domain */
+        if ($current_domain = \Drupal::service('domain.negotiator')->getActiveDomain()) {
+          // Merge in current domain, i.e. set it only if it is not set yet.
+          /** @var \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $item */
+          foreach ($field as $item) {
+            if ($item->get('target_id')->getValue() === $current_domain->id()) {
+              $contains_current_domain = TRUE;
+            }
+          }
+          if (empty($contains_current_domain)) {
+            $field[] = ['target_id' => $current_domain->id()];
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for field_config_edit_form.
+ *
+ * Adds our "add_current_domain" setting to field_domain_access instances.
+ */
+function domain_access_form_field_config_edit_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  $form_object = $form_state->getFormObject();
+  if ($form_object instanceof EntityFormInterface) {
+    $config = $form_object->getEntity();
+    if ($config instanceof FieldConfigInterface && $config->getName() === DOMAIN_ACCESS_FIELD) {
+      $subform =& $form['third_party_settings']['domain_access'];
+      $subform['#type'] = 'fieldset';
+      $subform['#title'] = t('Domain access settings');
+      $subform['add_current_domain'] = [
+        '#title' => t('Add current domain to default values'),
+        '#type' => 'checkbox',
+        '#default_value' => $config->getThirdPartySetting('domain_access', 'add_current_domain'),
+      ];
+    }
   }
 }

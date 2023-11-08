@@ -69,6 +69,8 @@ interface DomainAccessManagerInterface {
    *
    * @return array
    *   The default field value(s).
+   *
+   * @deprecated Will be removed in 8.x-2.x or 9.x-1.x.
    */
   public static function getDefaultValue(FieldableEntityInterface $entity, FieldDefinitionInterface $definition);
 
